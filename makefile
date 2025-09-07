@@ -12,9 +12,9 @@ web:
 	mkdir -p $(WEB_BUILD_DIR)
 	$(MAKE) -C stagess all
 	cp -r stagess/build/stagess/ $(WEB_BUILD_DIR)/stagess
-	cp -r stagess/build/tutoriel-stagess/ $(WEB_BUILD_DIR)/tutoriel-stagess
+	cp -r stagess/build/tutoriel/ $(WEB_BUILD_DIR)/tutoriel
 	$(MAKE) -C stagess_admin all
-	cp -r stagess_admin/build/admin-stagess/ $(WEB_BUILD_DIR)/admin-stagess
-	cp -r stagess_admin/build/tutoriel-admin-stagess/ $(WEB_BUILD_DIR)/tutoriel-admin-stagess
+	cp -r stagess_admin/build/admin/ $(WEB_BUILD_DIR)/admin
+	cp -r stagess_admin/build/tutoriel-admin/ $(WEB_BUILD_DIR)/tutoriel-admin
 	cp utilities/index.html $(WEB_BUILD_DIR)/index.html
 	cd $(WEB_BUILD_DIR) && zip -r stagess.zip .
