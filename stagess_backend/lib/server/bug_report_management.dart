@@ -6,7 +6,7 @@ import 'package:logging/logging.dart';
 final _logger = Logger('StageSsApp');
 
 Future<void> answerBugReportRequest(HttpRequest request) async {
-  _logger.info('Received a post bug request');
+  _logger.severe('Received a post bug request');
 
   final body = await utf8.decoder.bind(request).join();
   final data = jsonDecode(body);

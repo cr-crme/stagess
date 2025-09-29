@@ -1,4 +1,3 @@
-import 'package:logging/logging.dart';
 import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/utils/database_user.dart';
@@ -8,8 +7,6 @@ import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common/utils.dart';
-
-final _logger = Logger('AdminsRepository');
 
 // AccessLevel in this repository is discarded as all operations are currently
 // available to all users
@@ -21,8 +18,6 @@ abstract class AdminsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.accessLevel < AccessLevel.superAdmin) {
-      _logger
-          .severe('User ${user.userId} does not have permission to get admins');
       throw InvalidRequestException(
           'You do not have permission to get all administrators');
     }
@@ -40,8 +35,6 @@ abstract class AdminsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.accessLevel < AccessLevel.superAdmin) {
-      _logger
-          .severe('User ${user.userId} does not have permission to get admins');
       throw InvalidRequestException(
           'You do not have permission to get all administrators');
     }
@@ -59,8 +52,6 @@ abstract class AdminsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.accessLevel < AccessLevel.superAdmin) {
-      _logger
-          .severe('User ${user.userId} does not have permission to put admins');
       throw InvalidRequestException(
           'You do not have permission to get put administrators');
     }

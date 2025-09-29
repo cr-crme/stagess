@@ -81,14 +81,17 @@ void main() async {
   _logger.info('Using database backend: ${_databaseBackend.name}');
 
   final devConnexions = await _connectDatabase(
-      databaseBackend: _databaseBackend,
-      firebaseApiKey: firebaseApiKey,
-      settings: _devSettings);
+    databaseBackend: _databaseBackend,
+    firebaseApiKey: firebaseApiKey,
+    settings: _devSettings,
+    isProduction: false,
+  );
 
   final productionConnexions = await _connectDatabase(
       databaseBackend: _databaseBackend,
       firebaseApiKey: firebaseApiKey,
-      settings: _productionSettings);
+      settings: _productionSettings,
+      isProduction: true);
 
   _logger.info('Server ready and waiting for requests...');
   final requestHandler = HttpRequestHandler(
@@ -143,6 +146,7 @@ Future<Connexions> _connectDatabase({
   required DatabaseBackend databaseBackend,
   required String firebaseApiKey,
   required ConnectionSettings settings,
+  required bool isProduction,
 }) async {
   final sqlInterface = switch (databaseBackend) {
     DatabaseBackend.mock => null,
@@ -198,6 +202,7 @@ Future<Connexions> _connectDatabase({
             MySqlInternshipsRepository(sqlInterface: sqlInterface),
           DatabaseBackend.mock => InternshipsRepositoryMock()
         },
-      ));
+      ),
+      skipLog: !isProduction);
   return connexions;
 }

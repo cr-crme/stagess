@@ -9,6 +9,13 @@ class ConnexionRefusedException implements InternshipBankException {
   String toString() => _message;
 }
 
+class RateLimitedException implements InternshipBankException {
+  RateLimitedException();
+
+  @override
+  String toString() => 'Rate limit exceeded';
+}
+
 class InvalidRequestTypeException implements InternshipBankException {
   final String _message;
 

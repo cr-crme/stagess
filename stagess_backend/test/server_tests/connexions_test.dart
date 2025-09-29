@@ -37,7 +37,8 @@ DatabaseManager get _mockedDatabase => DatabaseManager(
     );
 
 Future<CommunicationProtocol> _sendAndReceive({required String toSend}) async {
-  final connexions = Connexions(database: _mockedDatabase, firebaseApiKey: '');
+  final connexions =
+      Connexions(database: _mockedDatabase, firebaseApiKey: '', skipLog: true);
   final client = WebSocketMock();
   connexions.add(client);
   client.streamController.add(_prepareHandshake());
@@ -63,7 +64,8 @@ void main() {
     final connexions = Connexions(
         timeout: Duration(milliseconds: 200),
         database: _mockedDatabase,
-        firebaseApiKey: '');
+        firebaseApiKey: '',
+        skipLog: true);
     final client = WebSocketMock();
     final isConnectedFuture = connexions.add(client);
 
@@ -94,7 +96,8 @@ void main() {
     final connexions = Connexions(
         timeout: Duration(milliseconds: 200),
         database: _mockedDatabase,
-        firebaseApiKey: '');
+        firebaseApiKey: '',
+        skipLog: true);
     final client = WebSocketMock();
     final isConnectedFuture = connexions.add(client);
 
@@ -154,7 +157,8 @@ void main() {
     final connexions = Connexions(
         timeout: Duration(milliseconds: 200),
         database: _mockedDatabase,
-        firebaseApiKey: '');
+        firebaseApiKey: '',
+        skipLog: true);
     final client = WebSocketMock();
     final isConnectedFuture = connexions.add(client);
 
@@ -211,7 +215,8 @@ void main() {
     final connexions = Connexions(
         timeout: Duration(milliseconds: 200),
         database: _mockedDatabase,
-        firebaseApiKey: '');
+        firebaseApiKey: '',
+        skipLog: true);
     final client = WebSocketMock();
     final isConnectedFuture = connexions.add(client);
 
@@ -269,7 +274,8 @@ void main() {
     final connexions = Connexions(
         timeout: Duration(milliseconds: 200),
         database: _mockedDatabase,
-        firebaseApiKey: '');
+        firebaseApiKey: '',
+        skipLog: true);
     final client = WebSocketMock();
     final isConnectedFuture = connexions.add(client);
 
@@ -324,8 +330,8 @@ void main() {
   });
 
   test('Add a new client to Connexions and disconnect', () async {
-    final connexions =
-        Connexions(database: _mockedDatabase, firebaseApiKey: '');
+    final connexions = Connexions(
+        database: _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final client = WebSocketMock();
 
     // Listen to incoming messages from connexions
@@ -359,8 +365,8 @@ void main() {
   });
 
   test('Add a new client to Connexions and experience error', () async {
-    final connexions =
-        Connexions(database: _mockedDatabase, firebaseApiKey: '');
+    final connexions = Connexions(
+        database: _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final client = WebSocketMock();
     connexions.add(client);
 
@@ -375,8 +381,8 @@ void main() {
   });
 
   test('New client disconnect during handshake', () async {
-    final connexions =
-        Connexions(database: _mockedDatabase, firebaseApiKey: '');
+    final connexions = Connexions(
+        database: _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final client = WebSocketMock();
     connexions.add(client);
 
@@ -444,8 +450,8 @@ void main() {
   });
 
   test('Send a POST teacher request and receive the update', () async {
-    final connexions =
-        Connexions(database: _mockedDatabase, firebaseApiKey: '');
+    final connexions = Connexions(
+        database: _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final client1 = WebSocketMock();
     connexions.add(client1);
     client1.streamController.add(_prepareHandshake());
@@ -538,8 +544,8 @@ void main() {
     expect(protocol.response, Response.failure);
   });
   test('Send invalid UPDATE request', () async {
-    final connexions =
-        Connexions(database: _mockedDatabase, firebaseApiKey: '');
+    final connexions = Connexions(
+        database: _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final client = WebSocketMock();
     connexions.add(client);
     client.streamController.add(_prepareHandshake());
@@ -570,8 +576,8 @@ void main() {
   });
 
   test('Send a message to a disconnected client', () async {
-    final connexions =
-        Connexions(database: _mockedDatabase, firebaseApiKey: '');
+    final connexions = Connexions(
+        database: _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final client = WebSocketMock();
     connexions.add(client);
     client.streamController.add(_prepareHandshake());

@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:firebase_admin/firebase_admin.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
-import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/server/database_manager.dart';
 import 'package:stagess_backend/utils/database_user.dart';
@@ -24,13 +23,15 @@ class Connexions {
   DatabaseManager get database => _database;
   final Duration _timeout;
   final String _firebaseApiKey;
+  final bool skipLog;
 
   // coverage:ignore-start
-  Connexions({
-    Duration timeout = const Duration(seconds: 5),
-    required DatabaseManager database,
-    required String firebaseApiKey,
-  })  : _timeout = timeout,
+  Connexions(
+      {Duration timeout = const Duration(seconds: 5),
+      required DatabaseManager database,
+      required String firebaseApiKey,
+      required this.skipLog})
+      : _timeout = timeout,
         _database = database,
         _firebaseApiKey = firebaseApiKey;
   // coverage:ignore-end
@@ -39,9 +40,9 @@ class Connexions {
     try {
       _clients[client] = DatabaseUser.empty();
 
-      client.listen((message) => _incommingMessage(client, message: message),
-          onDone: () => _onConnexionClosed(client,
-              message: 'Client ${client.hashCode} disconnected'),
+      client.listen((message) => _incomingMessage(client, message: message),
+          onDone: () =>
+              _onConnexionClosed(client, message: 'Client disconnected'),
           onError: (error) =>
               _onConnexionClosed(client, message: 'Connexion error $error'));
 
@@ -55,6 +56,11 @@ class Connexions {
           throw ConnexionRefusedException('Handshake timeout');
         }
       }
+
+      if (!skipLog) {
+        _logger.info(
+            'Adding new client (${client.hashCode}:${_clients[client]?.userId})');
+      }
     } catch (e) {
       await _refuseConnexion(client, e.toString());
       return false;
@@ -63,7 +69,7 @@ class Connexions {
     return true;
   }
 
-  Future<void> _incommingMessage(WebSocket client,
+  Future<void> _incomingMessage(WebSocket client,
       {required dynamic message}) async {
     try {
       final map = jsonDecode(message);
@@ -72,222 +78,27 @@ class Connexions {
       // Prevent unauthorized access to the database
       if ((_clients[client]?.isNotVerified ?? true) &&
           protocol.requestType != RequestType.handshake) {
-        throw ConnexionRefusedException(
-            'Client ${client.hashCode} not verified');
+        throw ConnexionRefusedException('Client not verified');
       }
 
       switch (protocol.requestType) {
         case RequestType.handshake:
           await _handleHandshake(client, protocol: protocol);
-
-          // Send the handshake to the client
-          _send(client,
-              message: CommunicationProtocol(
-                  requestType: RequestType.handshake,
-                  response: Response.success,
-                  data: _clients[client]!.serialize()));
           break;
 
         case RequestType.get:
         case RequestType.post:
         case RequestType.delete:
-          if (protocol.field == null) {
-            throw MissingFieldException(
-                'Field is required to ${protocol.requestType.name} data');
-          }
-          final response = switch (protocol.requestType) {
-            RequestType.get => await _database.get(protocol.field!,
-                data: protocol.data, user: _clients[client]!),
-            RequestType.post => await _database.put(protocol.field!,
-                data: protocol.data, user: _clients[client]!),
-            RequestType.delete => await _database.delete(protocol.field!,
-                data: protocol.data, user: _clients[client]!),
-            _ => throw InvalidRequestTypeException(
-                'Invalid request type: ${protocol.requestType}'),
-          };
-          _sendSuccessResponse(
-              client: client, protocol: protocol, response: response);
+          await _handleDatabaseRequest(client: client, protocol: protocol);
           break;
 
         case RequestType.registerUser:
-          final myAccessLevel =
-              _clients[client]?.accessLevel ?? AccessLevel.invalid;
-          final email = protocol.data?['email'] as String?;
-          final userType =
-              AccessLevel.fromSerialized(protocol.data?['user_type']);
-          if (email == null || userType == AccessLevel.invalid) {
-            throw ConnexionRefusedException('Invalid request data.');
-          }
-
-          final app = FirebaseAdmin.instance.app();
-          if (app == null) {
-            throw ConnexionRefusedException(
-                'Firebase app is not initialized. Please check your configuration.');
-          }
-
-          // Get the related user data
-          late Map<String, dynamic>? user;
-          switch (userType) {
-            case AccessLevel.teacher:
-              if (myAccessLevel < AccessLevel.admin) {
-                throw ConnexionRefusedException(
-                    'Client ${client.hashCode} is not authorized to register user');
-              }
-              user = await _getTeacherFromDatabase(
-                  user: _clients[client]!,
-                  sqlInterface: _database.sqlInterface,
-                  email: email);
-              break;
-            case AccessLevel.admin:
-              if (myAccessLevel < AccessLevel.superAdmin) {
-                throw ConnexionRefusedException(
-                    'Client ${client.hashCode} is not authorized to register user');
-              }
-              user = await _getAdminFromDatabase(
-                  user: _clients[client]!,
-                  sqlInterface: _database.sqlInterface,
-                  email: email);
-              break;
-            case AccessLevel.superAdmin:
-            case AccessLevel.invalid:
-              throw ConnexionRefusedException(
-                  'Client ${client.hashCode} is not authorized to register user.');
-          }
-
-          // Make sure only previously added teachers can be registered
-          if (user == null || user['has_registered_account'] == 1) {
-            throw ConnexionRefusedException(
-                'No user found with email $email. Please add the user to the database before registering them.');
-          }
-
-          // Register the user in Firebase
-          try {
-            await app.auth().createUser(email: email, emailVerified: false);
-            await _sendPasswordResetEmail(email, _firebaseApiKey);
-          } on FirebaseAuthError catch (e) {
-            if (e.code == 'auth/email-already-exists') {
-              // Continue as it means the user is registered
-            } else {
-              rethrow;
-            }
-          }
-          // Send confirmation to the client
-          await _send(client,
-              message: CommunicationProtocol(
-                  id: protocol.id,
-                  requestType: RequestType.response,
-                  field: protocol.field,
-                  response: Response.success));
-
-          // Add the confirmation to the database
-          final field = switch (userType) {
-            AccessLevel.teacher => RequestFields.teacher,
-            AccessLevel.admin => RequestFields.admin,
-            AccessLevel.superAdmin ||
-            AccessLevel.invalid =>
-              throw 'Client ${client.hashCode} is not authorized to register user.',
-          };
-          await _database.put(field,
-              data: {'id': user['id'], 'has_registered_account': true},
-              user: _clients[client]!);
-
-          // Notify all clients that the teacher has registered an account
-          await _sendAll(CommunicationProtocol(
-            requestType: RequestType.update,
-            field: field,
-            data: {
-              'id': user['id'],
-              'updated_fields': ['has_registered_account']
-            },
-          ));
+          await _handleRegisterUser(client: client, protocol: protocol);
+          break;
 
         case RequestType.unregisterUser:
-          final myAccessLevel =
-              _clients[client]?.accessLevel ?? AccessLevel.invalid;
-          final email = protocol.data?['email'] as String?;
-          final userType =
-              AccessLevel.fromSerialized(protocol.data?['user_type']);
-          if (email == null || userType == AccessLevel.invalid) {
-            throw ConnexionRefusedException('Invalid request data.');
-          }
-
-          final app = FirebaseAdmin.instance.app();
-          if (app == null) {
-            throw ConnexionRefusedException(
-                'Firebase app is not initialized. Please check your configuration.');
-          }
-
-          // Delete the user from Firebase
-          try {
-            final user = await app.auth().getUserByEmail(email);
-            await app.auth().deleteUser(user.uid);
-          } on FirebaseAuthError catch (e) {
-            if (e.code == 'auth/user-not-found') {
-              // Continue as it means the user is not registered
-            } else {
-              rethrow;
-            }
-          }
-          // Send confirmation to the client
-          await _send(client,
-              message: CommunicationProtocol(
-                  id: protocol.id,
-                  requestType: RequestType.response,
-                  field: protocol.field,
-                  response: Response.success));
-
-          // Adjust the internal database to reflect the unregistration
-          late Map<String, dynamic>? user;
-          switch (userType) {
-            case AccessLevel.teacher:
-              if (myAccessLevel < AccessLevel.admin) {
-                throw ConnexionRefusedException(
-                    'Client is not authorized to register user');
-              }
-              user = await _getTeacherFromDatabase(
-                  user: _clients[client]!,
-                  sqlInterface: _database.sqlInterface,
-                  email: email);
-              break;
-            case AccessLevel.admin:
-              if (myAccessLevel < AccessLevel.superAdmin) {
-                throw ConnexionRefusedException(
-                    'Client is not authorized to register user');
-              }
-              user = await _getAdminFromDatabase(
-                  user: _clients[client]!,
-                  sqlInterface: _database.sqlInterface,
-                  email: email);
-              break;
-            case AccessLevel.superAdmin:
-            case AccessLevel.invalid:
-              throw ConnexionRefusedException(
-                  'Client is not authorized to register user.');
-          }
-
-          if (user != null) {
-            // Remove the confirmation from the database
-            final field = switch (userType) {
-              AccessLevel.teacher => RequestFields.teacher,
-              AccessLevel.admin => RequestFields.admin,
-              AccessLevel.invalid ||
-              AccessLevel.superAdmin =>
-                throw 'Client is not authorized to register user.',
-            };
-
-            await _database.put(field,
-                data: {'id': user['id'], 'has_registered_account': false},
-                user: _clients[client]!);
-            // Notify all clients that the teacher has unregistered an account
-            await _sendAll(CommunicationProtocol(
-              requestType: RequestType.update,
-              field: field,
-              data: {
-                'id': user['id'],
-                'updated_fields': ['has_registered_account']
-              },
-            ));
-          }
+          await _handleUnregisterUser(client: client, protocol: protocol);
+          break;
 
         case RequestType.response:
         case RequestType.update:
@@ -295,20 +106,30 @@ class Connexions {
               'Invalid request type: ${protocol.requestType}');
       }
     } on ConnexionRefusedException catch (e) {
+      if (!skipLog) {
+        _logger.info(
+            'Refusing connexion of client (${client.hashCode}:${_clients[client]?.userId}): $e');
+      }
       await _send(client,
           message: CommunicationProtocol(
               requestType: RequestType.response,
               data: {'error': e.toString()},
               response: Response.connexionRefused));
     } on InternshipBankException catch (e) {
-      _logger
-          .severe('Error processing request for client ${client.hashCode}: $e');
+      if (!skipLog) {
+        _logger.severe(
+            'Error while processing request from client (${client.hashCode}:${_clients[client]?.userId}): $e');
+      }
       await _send(client,
           message: CommunicationProtocol(
               requestType: RequestType.response,
               data: {'error': e.toString()},
               response: Response.failure));
     } catch (e) {
+      if (!skipLog) {
+        _logger.severe(
+            'Internal error while processing request from client (${client.hashCode}:${_clients[client]?.userId}): $e');
+      }
       await _send(client,
           message: CommunicationProtocol(
               requestType: RequestType.response,
@@ -317,11 +138,244 @@ class Connexions {
     }
   }
 
-  Future<void> _sendSuccessResponse({
+  Future<void> _handleRegisterUser({
     required WebSocket client,
     required CommunicationProtocol protocol,
-    required RepositoryResponse response,
   }) async {
+    final myAccessLevel = _clients[client]?.accessLevel ?? AccessLevel.invalid;
+    final email = protocol.data?['email'] as String?;
+    final userType = AccessLevel.fromSerialized(protocol.data?['user_type']);
+    if (email == null || userType == AccessLevel.invalid) {
+      throw ConnexionRefusedException('Invalid request data.');
+    }
+
+    final app = FirebaseAdmin.instance.app();
+    if (app == null) {
+      throw ConnexionRefusedException(
+          'Firebase app is not initialized. Please check your configuration.');
+    }
+
+    // Get the related user data
+    late Map<String, dynamic>? user;
+    switch (userType) {
+      case AccessLevel.teacher:
+        if (myAccessLevel < AccessLevel.admin) {
+          throw ConnexionRefusedException(
+              'Client is not authorized to register user');
+        }
+        user = await _getTeacherFromDatabase(
+            user: _clients[client]!,
+            sqlInterface: _database.sqlInterface,
+            email: email);
+        break;
+      case AccessLevel.admin:
+        if (myAccessLevel < AccessLevel.superAdmin) {
+          throw ConnexionRefusedException(
+              'Client is not authorized to register user');
+        }
+        user = await _getAdminFromDatabase(
+            user: _clients[client]!,
+            sqlInterface: _database.sqlInterface,
+            email: email);
+        break;
+      case AccessLevel.superAdmin:
+      case AccessLevel.invalid:
+        throw ConnexionRefusedException(
+            'Client is not authorized to register user.');
+    }
+
+    // Make sure only previously added teachers can be registered
+    if (user == null || user['has_registered_account'] == 1) {
+      throw ConnexionRefusedException(
+          'No user found with email $email. Please add the user to the database before registering them.');
+    }
+
+    // Register the user in Firebase
+    try {
+      await app.auth().createUser(email: email, emailVerified: false);
+      await _sendPasswordResetEmail(email, _firebaseApiKey);
+    } on FirebaseAuthError catch (e) {
+      if (e.code == 'auth/email-already-exists') {
+        // Continue as it means the user is registered
+      } else {
+        rethrow;
+      }
+    }
+    // Send confirmation to the client
+    await _send(client,
+        message: CommunicationProtocol(
+            id: protocol.id,
+            requestType: RequestType.response,
+            field: protocol.field,
+            response: Response.success));
+
+    // Add the confirmation to the database
+    final field = switch (userType) {
+      AccessLevel.teacher => RequestFields.teacher,
+      AccessLevel.admin => RequestFields.admin,
+      AccessLevel.superAdmin ||
+      AccessLevel.invalid =>
+        throw 'Client is not authorized to register user.',
+    };
+    await _database.put(field,
+        data: {'id': user['id'], 'has_registered_account': true},
+        user: _clients[client]!);
+
+    // Notify all clients that the teacher has registered an account
+    await _sendAll(CommunicationProtocol(
+      requestType: RequestType.update,
+      field: field,
+      data: {
+        'id': user['id'],
+        'updated_fields': ['has_registered_account']
+      },
+    ));
+
+    if (!skipLog) {
+      _logger.info(
+          'Client (${client.hashCode}:${_clients[client]?.userId}) has registered user $email');
+    }
+  }
+
+  Future<void> _handleUnregisterUser({
+    required WebSocket client,
+    required CommunicationProtocol protocol,
+  }) async {
+    final myAccessLevel = _clients[client]?.accessLevel ?? AccessLevel.invalid;
+    final email = protocol.data?['email'] as String?;
+    final userType = AccessLevel.fromSerialized(protocol.data?['user_type']);
+    if (email == null || userType == AccessLevel.invalid) {
+      throw ConnexionRefusedException('Invalid request data.');
+    }
+
+    final app = FirebaseAdmin.instance.app();
+    if (app == null) {
+      throw ConnexionRefusedException(
+          'Firebase app is not initialized. Please check your configuration.');
+    }
+
+    // Delete the user from Firebase
+    try {
+      final user = await app.auth().getUserByEmail(email);
+      await app.auth().deleteUser(user.uid);
+    } on FirebaseAuthError catch (e) {
+      if (e.code == 'auth/user-not-found') {
+        // Continue as it means the user is not registered
+      } else {
+        rethrow;
+      }
+    }
+    // Send confirmation to the client
+    await _send(client,
+        message: CommunicationProtocol(
+            id: protocol.id,
+            requestType: RequestType.response,
+            field: protocol.field,
+            response: Response.success));
+
+    // Adjust the internal database to reflect the unregistration
+    late Map<String, dynamic>? user;
+    switch (userType) {
+      case AccessLevel.teacher:
+        if (myAccessLevel < AccessLevel.admin) {
+          throw ConnexionRefusedException(
+              'Client is not authorized to register user');
+        }
+        user = await _getTeacherFromDatabase(
+            user: _clients[client]!,
+            sqlInterface: _database.sqlInterface,
+            email: email);
+        break;
+      case AccessLevel.admin:
+        if (myAccessLevel < AccessLevel.superAdmin) {
+          throw ConnexionRefusedException(
+              'Client is not authorized to register user');
+        }
+        user = await _getAdminFromDatabase(
+            user: _clients[client]!,
+            sqlInterface: _database.sqlInterface,
+            email: email);
+        break;
+      case AccessLevel.superAdmin:
+      case AccessLevel.invalid:
+        throw ConnexionRefusedException(
+            'Client is not authorized to register user.');
+    }
+
+    if (user != null) {
+      // Remove the confirmation from the database
+      final field = switch (userType) {
+        AccessLevel.teacher => RequestFields.teacher,
+        AccessLevel.admin => RequestFields.admin,
+        AccessLevel.invalid ||
+        AccessLevel.superAdmin =>
+          throw 'Client is not authorized to register user.',
+      };
+
+      await _database.put(field,
+          data: {'id': user['id'], 'has_registered_account': false},
+          user: _clients[client]!);
+      // Notify all clients that the teacher has unregistered an account
+      await _sendAll(CommunicationProtocol(
+        requestType: RequestType.update,
+        field: field,
+        data: {
+          'id': user['id'],
+          'updated_fields': ['has_registered_account']
+        },
+      ));
+    }
+
+    if (!skipLog) {
+      _logger.info(
+          'Client (${client.hashCode}:${_clients[client]?.userId}) has unregistered user $email');
+    }
+  }
+
+  Future<void> _handleDatabaseRequest({
+    required WebSocket client,
+    required CommunicationProtocol protocol,
+  }) async {
+    if (protocol.field == null) {
+      throw MissingFieldException(
+          'Field is required to ${protocol.requestType.name} data');
+    }
+
+    final response = switch (protocol.requestType) {
+      RequestType.get => await _database.get(protocol.field!,
+          data: protocol.data, user: _clients[client]!),
+      RequestType.post => await _database.put(protocol.field!,
+          data: protocol.data, user: _clients[client]!),
+      RequestType.delete => await _database.delete(protocol.field!,
+          data: protocol.data, user: _clients[client]!),
+      _ => throw InvalidRequestTypeException(
+          'Invalid request type: ${protocol.requestType}'),
+    };
+
+    if (!skipLog) {
+      final prefixMethod = switch (protocol.requestType) {
+        RequestType.get => 'get-requested',
+        RequestType.post => 'post-requested',
+        RequestType.delete => 'delete-requested',
+        _ => 'invalid-requested',
+      };
+      final prefixField = switch (protocol.field!) {
+        RequestFields.schoolBoards ||
+        RequestFields.schoolBoard =>
+          'school board',
+        RequestFields.admins || RequestFields.admin => 'admin',
+        RequestFields.teachers || RequestFields.teacher => 'teacher',
+        RequestFields.students || RequestFields.student => 'student',
+        RequestFields.enterprises || RequestFields.enterprise => 'enterprise',
+        RequestFields.internships || RequestFields.internship => 'internship',
+      };
+      final prefixId = (protocol.data?['id'] != null)
+          ? 'for id ${protocol.data!['id'].toString()}'
+          : 'for all elements';
+      _logger.info(
+          'Client (${client.hashCode}:${_clients[client]?.userId}) has $prefixMethod $prefixField $prefixId');
+    }
+
     await _send(client,
         message: CommunicationProtocol(
             id: protocol.id,
@@ -365,7 +419,8 @@ class Connexions {
           jsonEncode(message.copyWith(socketId: client.hashCode).serialize()));
     } catch (e) {
       // If we can't send the message, we can assume the client is disconnected
-      await _onConnexionClosed(client, message: 'Connexion closed');
+      await _onConnexionClosed(client,
+          message: 'Connexion closed unexpectedly: $e');
     }
   }
 
@@ -401,6 +456,19 @@ class Connexions {
         id: authenticatorId, email: email);
     if (user == null) throw ConnexionRefusedException('Invalid token payload');
     _clients[client] = user;
+
+    // Success, send the handshake to the client
+    if (!skipLog) {
+      _logger.info(
+          'Client (${client.hashCode}:${_clients[client]?.userId}) connected as ${_clients[client]!.accessLevel.name} '
+          'for school board ${_clients[client]!.schoolBoardId} '
+          'and school ${_clients[client]!.schoolId}');
+    }
+    await _send(client,
+        message: CommunicationProtocol(
+            requestType: RequestType.handshake,
+            response: Response.success,
+            data: _clients[client]!.serialize()));
   }
 
   Future<void> _refuseConnexion(WebSocket client, String message) async {
@@ -415,6 +483,11 @@ class Connexions {
 
   Future<void> _onConnexionClosed(WebSocket client,
       {required String message}) async {
+    if (!skipLog) {
+      _logger.info(
+          'Closing connexion of client (${client.hashCode}:${_clients[client]?.userId}): $message');
+    }
+
     await client.close();
     _clients.remove(client);
   }

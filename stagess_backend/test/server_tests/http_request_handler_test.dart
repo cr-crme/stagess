@@ -23,6 +23,7 @@ Connexions get _mockedConnexions => Connexions(
         internshipsDatabase: InternshipsRepositoryMock(),
       ),
       firebaseApiKey: '',
+      skipLog: true,
     );
 
 void main() {

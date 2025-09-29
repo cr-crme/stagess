@@ -276,7 +276,7 @@ class MySqlTeachersRepository extends TeachersRepository {
     }
     if (differences.contains('school_id')) {
       if (user.accessLevel < AccessLevel.admin) {
-        _logger.severe(
+        _logger.warning(
             'User ${user.userId} tried to change the school (${teacher.schoolId}) '
             'of teacher (${teacher.id}) but does not have permission, skipping');
       } else {

@@ -698,7 +698,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     for (final job in previous.jobs) {
       if (!enterprise.jobs.map((e) => e.id).contains(job.id)) {
         if (user.accessLevel < AccessLevel.admin) {
-          _logger.severe(
+          _logger.warning(
               'User ${user.userId} tried to remove job (${job.id}) from enterprise '
               '(${enterprise.id}) but does not have permission, skipping');
           continue;
@@ -743,7 +743,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       final toUpdate = <String, dynamic>{};
       if (differences.contains('specialization_id')) {
         if (user.accessLevel < AccessLevel.admin) {
-          _logger.severe(
+          _logger.warning(
               'User ${user.userId} tried to update "specialization_id" of job (${job.id}) '
               'of enterprise (${enterprise.id}) but does not have permission, skipping');
         } else {
@@ -756,7 +756,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       }
       if (differences.contains('reserved_for_id')) {
         if (user.accessLevel < AccessLevel.admin) {
-          _logger.severe(
+          _logger.warning(
               'User ${user.userId} tried to update "reserved_for_id" of job (${job.id}) '
               'of enterprise (${enterprise.id}) but does not have permission, skipping');
         } else {

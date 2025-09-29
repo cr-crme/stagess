@@ -21,14 +21,11 @@ class HttpRequestHandler {
 
   Future<void> answer(HttpRequest request,
       {NetworkRateLimiter? rateLimiter}) async {
-    if (rateLimiter != null && rateLimiter.isRefused(request)) {
-      request.response.statusCode = HttpStatus.tooManyRequests;
-      request.response.write('Too Many Requests');
-      await request.response.close();
-      return;
-    }
-
     try {
+      if (rateLimiter != null && rateLimiter.isRefused(request)) {
+        throw RateLimitedException();
+      }
+
       if (request.method == 'OPTIONS') {
         return await _answerOptionsRequest(request);
       } else if (request.method == 'GET') {
@@ -37,23 +34,34 @@ class HttpRequestHandler {
         return await _answerPostRequest(request);
       } else {
         // Handle other HTTP methods
-        return await _sendConnexionRefused(request);
+        throw ConnexionRefusedException('Unsupported method');
       }
     } on ConnexionRefusedException catch (e) {
-      request.response.statusCode = HttpStatus.unauthorized;
-      request.response.write('Unauthorized: $e');
-      await request.response.close();
+      await _sendFailedAndClose(request,
+          statusCode: HttpStatus.unauthorized, message: 'Unauthorized: $e');
+    } on RateLimitedException catch (e) {
+      await _sendFailedAndClose(request,
+          statusCode: HttpStatus.tooManyRequests, message: 'Unauthorized: $e');
     } catch (e) {
       // This is a catch-all for any exceptions so the server doesn't crash on an
       // unhandled/unexpected exception. This should never actually happens
 
       // Remove from test coverage (the next four lines)
       // coverage:ignore-start
-      request.response.statusCode = HttpStatus.internalServerError;
-      request.response.write('Internal Server Error');
-      await request.response.close();
+      await _sendFailedAndClose(request,
+          statusCode: HttpStatus.internalServerError,
+          message: 'Internal Server Error');
       // coverage:ignore-end
     }
+  }
+
+  Future<void> _sendFailedAndClose(HttpRequest request,
+      {required int statusCode, required String message}) async {
+    _logger.info(
+        'Request from ${request.connectionInfo?.remoteAddress.address}:${request.connectionInfo?.remotePort} failed: $message');
+    request.response.statusCode = statusCode;
+    request.response.write(message);
+    await request.response.close();
   }
 
   Future<void> _answerOptionsRequest(HttpRequest request) async {
@@ -68,6 +76,10 @@ class HttpRequestHandler {
   }
 
   Future<void> _answerGetRequest(HttpRequest request) async {
+    _logger.info(
+        'Received a GET request from ${request.connectionInfo?.remoteAddress.address}:${request.connectionInfo?.remotePort} '
+        'to endpoint ${request.uri.path}');
+
     if (request.uri.path ==
         '/${BackendHelpers.connectEndpoint(isDev: false)}') {
       try {
@@ -90,16 +102,14 @@ class HttpRequestHandler {
   }
 
   Future<void> _answerPostRequest(HttpRequest request) async {
+    _logger.info(
+        'Received a POST request from ${request.connectionInfo?.remoteAddress.address}:${request.connectionInfo?.remotePort} '
+        'to endpoint ${request.uri.path}');
+
     if (request.uri.path == '/${BackendHelpers.bugReportEndpoint}') {
       await answerBugReportRequest(request);
     } else {
       throw ConnexionRefusedException('Invalid endpoint');
     }
-  }
-
-  Future<void> _sendConnexionRefused(HttpRequest request) async {
-    request.response.statusCode = HttpStatus.unauthorized;
-    request.response.write('Unauthorized');
-    await request.response.close();
   }
 }
