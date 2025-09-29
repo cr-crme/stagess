@@ -1,11 +1,11 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:firebase_admin/firebase_admin.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/server/database_manager.dart';
+import 'package:stagess_backend/utils/custom_web_socket.dart';
 import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_backend/utils/helpers.dart';
@@ -17,7 +17,7 @@ import 'package:stagess_common/utils.dart';
 final _logger = Logger('Connexions');
 
 class Connexions {
-  final Map<WebSocket, DatabaseUser> _clients = {};
+  final Map<CustomWebSocket, DatabaseUser> _clients = {};
   int get clientCount => _clients.length;
   final DatabaseManager _database;
   DatabaseManager get database => _database;
@@ -36,7 +36,7 @@ class Connexions {
         _firebaseApiKey = firebaseApiKey;
   // coverage:ignore-end
 
-  Future<bool> add(WebSocket client) async {
+  Future<bool> add(CustomWebSocket client) async {
     try {
       _clients[client] = DatabaseUser.empty();
 
@@ -56,11 +56,6 @@ class Connexions {
           throw ConnexionRefusedException('Handshake timeout');
         }
       }
-
-      if (!skipLog) {
-        _logger.info(
-            'Adding new client (${client.hashCode}:${_clients[client]?.userId})');
-      }
     } catch (e) {
       await _refuseConnexion(client, e.toString());
       return false;
@@ -69,7 +64,7 @@ class Connexions {
     return true;
   }
 
-  Future<void> _incomingMessage(WebSocket client,
+  Future<void> _incomingMessage(CustomWebSocket client,
       {required dynamic message}) async {
     try {
       final map = jsonDecode(message);
@@ -108,7 +103,7 @@ class Connexions {
     } on ConnexionRefusedException catch (e) {
       if (!skipLog) {
         _logger.info(
-            'Refusing connexion of client (${client.hashCode}:${_clients[client]?.userId}): $e');
+            'Refusing connexion of client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $e');
       }
       await _send(client,
           message: CommunicationProtocol(
@@ -118,7 +113,7 @@ class Connexions {
     } on InternshipBankException catch (e) {
       if (!skipLog) {
         _logger.severe(
-            'Error while processing request from client (${client.hashCode}:${_clients[client]?.userId}): $e');
+            'Error while processing request from client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $e');
       }
       await _send(client,
           message: CommunicationProtocol(
@@ -128,7 +123,7 @@ class Connexions {
     } catch (e) {
       if (!skipLog) {
         _logger.severe(
-            'Internal error while processing request from client (${client.hashCode}:${_clients[client]?.userId}): $e');
+            'Internal error while processing request from client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $e');
       }
       await _send(client,
           message: CommunicationProtocol(
@@ -139,7 +134,7 @@ class Connexions {
   }
 
   Future<void> _handleRegisterUser({
-    required WebSocket client,
+    required CustomWebSocket client,
     required CommunicationProtocol protocol,
   }) async {
     final myAccessLevel = _clients[client]?.accessLevel ?? AccessLevel.invalid;
@@ -238,7 +233,7 @@ class Connexions {
   }
 
   Future<void> _handleUnregisterUser({
-    required WebSocket client,
+    required CustomWebSocket client,
     required CommunicationProtocol protocol,
   }) async {
     final myAccessLevel = _clients[client]?.accessLevel ?? AccessLevel.invalid;
@@ -333,7 +328,7 @@ class Connexions {
   }
 
   Future<void> _handleDatabaseRequest({
-    required WebSocket client,
+    required CustomWebSocket client,
     required CommunicationProtocol protocol,
   }) async {
     if (protocol.field == null) {
@@ -365,12 +360,12 @@ class Connexions {
       final field = switch (protocol.field!) {
         RequestFields.schoolBoards ||
         RequestFields.schoolBoard =>
-          'school board',
-        RequestFields.admins || RequestFields.admin => 'admin',
-        RequestFields.teachers || RequestFields.teacher => 'teacher',
-        RequestFields.students || RequestFields.student => 'student',
-        RequestFields.enterprises || RequestFields.enterprise => 'enterprise',
-        RequestFields.internships || RequestFields.internship => 'internship',
+          'school boards',
+        RequestFields.admins || RequestFields.admin => 'admins',
+        RequestFields.teachers || RequestFields.teacher => 'teachers',
+        RequestFields.students || RequestFields.student => 'students',
+        RequestFields.enterprises || RequestFields.enterprise => 'enterprises',
+        RequestFields.internships || RequestFields.internship => 'internships',
       };
       _logger.info(
           'Client (${client.hashCode}:${_clients[client]?.userId}) has $method $request of $field');
@@ -412,7 +407,7 @@ class Connexions {
     }
   }
 
-  Future<void> _send(WebSocket client,
+  Future<void> _send(CustomWebSocket client,
       {required CommunicationProtocol message}) async {
     try {
       client.add(
@@ -430,7 +425,7 @@ class Connexions {
     }
   }
 
-  Future<void> _handleHandshake(WebSocket client,
+  Future<void> _handleHandshake(CustomWebSocket client,
       {required CommunicationProtocol protocol}) async {
     if (protocol.data == null) {
       throw ConnexionRefusedException(
@@ -459,8 +454,9 @@ class Connexions {
 
     // Success, send the handshake to the client
     if (!skipLog) {
-      _logger.info(
-          'Client (${client.hashCode}:${_clients[client]?.userId}) connected as ${_clients[client]!.accessLevel.name} '
+      _logger.info('Client (${client.hashCode}:${_clients[client]?.userId}, '
+          'ip=${client.ipAddress}:${client.port}) has successfully '
+          'connected as ${_clients[client]!.accessLevel.name} '
           'for school board ${_clients[client]!.schoolBoardId} '
           'and school ${_clients[client]!.schoolId}');
     }
@@ -471,7 +467,7 @@ class Connexions {
             data: _clients[client]!.serialize()));
   }
 
-  Future<void> _refuseConnexion(WebSocket client, String message) async {
+  Future<void> _refuseConnexion(CustomWebSocket client, String message) async {
     await _send(client,
         message: CommunicationProtocol(
             requestType: RequestType.response,
@@ -481,11 +477,11 @@ class Connexions {
     await _onConnexionClosed(client, message: message);
   }
 
-  Future<void> _onConnexionClosed(WebSocket client,
+  Future<void> _onConnexionClosed(CustomWebSocket client,
       {required String message}) async {
     if (!skipLog) {
       _logger.info(
-          'Closing connexion of client (${client.hashCode}:${_clients[client]?.userId}): $message');
+          'Closing connexion of client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $message');
     }
 
     await client.close();

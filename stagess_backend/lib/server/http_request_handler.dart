@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:logging/logging.dart';
 import 'package:stagess_backend/server/bug_report_management.dart';
 import 'package:stagess_backend/server/connexions.dart';
+import 'package:stagess_backend/utils/custom_web_socket.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_backend/utils/network_rate_limiter.dart';
 import 'package:stagess_common/services/backend_helpers.dart';
@@ -76,14 +77,20 @@ class HttpRequestHandler {
   }
 
   Future<void> _answerGetRequest(HttpRequest request) async {
-    _logger.info(
-        'Received a GET request from ${request.connectionInfo?.remoteAddress.address}:${request.connectionInfo?.remotePort} '
+    final ipAddress =
+        request.connectionInfo?.remoteAddress.address ?? 'unknown';
+    final port = request.connectionInfo?.remotePort ?? 0;
+
+    _logger.info('Received a GET request from $ipAddress:$port '
         'to endpoint ${request.uri.path}');
 
     if (request.uri.path ==
         '/${BackendHelpers.connectEndpoint(isDev: false)}') {
       try {
-        _productionConnexions?.add(await WebSocketTransformer.upgrade(request));
+        _productionConnexions?.add(CustomWebSocket(
+            socket: await WebSocketTransformer.upgrade(request),
+            ipAddress: ipAddress,
+            port: port));
         return;
       } catch (e) {
         throw ConnexionRefusedException('WebSocket upgrade failed');
@@ -91,7 +98,10 @@ class HttpRequestHandler {
     } else if (request.uri.path ==
         '/${BackendHelpers.connectEndpoint(isDev: true)}') {
       try {
-        _devConnexions?.add(await WebSocketTransformer.upgrade(request));
+        _devConnexions?.add(CustomWebSocket(
+            socket: await WebSocketTransformer.upgrade(request),
+            ipAddress: ipAddress,
+            port: port));
         return;
       } catch (e) {
         throw ConnexionRefusedException('WebSocket upgrade failed');
