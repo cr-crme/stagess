@@ -353,13 +353,13 @@ class Connexions {
     };
 
     if (!skipLog) {
-      final prefixMethod = switch (protocol.requestType) {
+      final method = switch (protocol.requestType) {
         RequestType.get => 'get-requested',
         RequestType.post => 'post-requested',
         RequestType.delete => 'delete-requested',
         _ => 'invalid-requested',
       };
-      final prefixField = switch (protocol.field!) {
+      final field = switch (protocol.field!) {
         RequestFields.schoolBoards ||
         RequestFields.schoolBoard =>
           'school board',
@@ -369,11 +369,10 @@ class Connexions {
         RequestFields.enterprises || RequestFields.enterprise => 'enterprise',
         RequestFields.internships || RequestFields.internship => 'internship',
       };
-      final prefixId = (protocol.data?['id'] != null)
-          ? 'for id ${protocol.data!['id'].toString()}'
-          : 'for all elements';
+      final requestMap = (protocol.data?['id'] as Map<String, dynamic>?) ?? {};
+      final request = 'with request\n$requestMap';
       _logger.info(
-          'Client (${client.hashCode}:${_clients[client]?.userId}) has $prefixMethod $prefixField $prefixId');
+          'Client (${client.hashCode}:${_clients[client]?.userId}) has $method $field $request');
     }
 
     await _send(client,
