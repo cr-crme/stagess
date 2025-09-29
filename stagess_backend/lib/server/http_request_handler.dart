@@ -22,8 +22,6 @@ class HttpRequestHandler {
   Future<void> answer(HttpRequest request,
       {NetworkRateLimiter? rateLimiter}) async {
     if (rateLimiter != null && rateLimiter.isRefused(request)) {
-      _logger.warning(
-          'Rate limit exceeded for ${request.connectionInfo?.remoteAddress.address}');
       request.response.statusCode = HttpStatus.tooManyRequests;
       request.response.write('Too Many Requests');
       await request.response.close();
@@ -42,7 +40,6 @@ class HttpRequestHandler {
         return await _sendConnexionRefused(request);
       }
     } on ConnexionRefusedException catch (e) {
-      _logger.severe('Connexion refused: $e');
       request.response.statusCode = HttpStatus.unauthorized;
       request.response.write('Unauthorized: $e');
       await request.response.close();
@@ -52,7 +49,6 @@ class HttpRequestHandler {
 
       // Remove from test coverage (the next four lines)
       // coverage:ignore-start
-      _logger.severe('Internal error: $e');
       request.response.statusCode = HttpStatus.internalServerError;
       request.response.write('Internal Server Error');
       await request.response.close();
@@ -74,22 +70,18 @@ class HttpRequestHandler {
   Future<void> _answerGetRequest(HttpRequest request) async {
     if (request.uri.path ==
         '/${BackendHelpers.connectEndpoint(isDev: false)}') {
-      _logger.info('Received a connection request to the production database');
       try {
         _productionConnexions?.add(await WebSocketTransformer.upgrade(request));
         return;
       } catch (e) {
-        _logger.severe('Error during WebSocket upgrade: $e');
         throw ConnexionRefusedException('WebSocket upgrade failed');
       }
     } else if (request.uri.path ==
         '/${BackendHelpers.connectEndpoint(isDev: true)}') {
-      _logger.info('Received a connection request to the development database');
       try {
         _devConnexions?.add(await WebSocketTransformer.upgrade(request));
         return;
       } catch (e) {
-        _logger.severe('Error during WebSocket upgrade: $e');
         throw ConnexionRefusedException('WebSocket upgrade failed');
       }
     } else {

@@ -1,4 +1,3 @@
-import 'package:logging/logging.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
@@ -12,8 +11,6 @@ import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/services/image_helpers.dart';
 import 'package:stagess_common/utils.dart';
 
-final _logger = Logger('SchoolBoardsRepository');
-
 abstract class SchoolBoardsRepository implements RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
@@ -21,8 +18,6 @@ abstract class SchoolBoardsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to get school boards');
       throw InvalidRequestException(
           'You do not have permission to get school boards');
     }
@@ -40,8 +35,6 @@ abstract class SchoolBoardsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to get school boards');
       throw InvalidRequestException(
           'You do not have permission to get school boards');
     }
@@ -61,8 +54,6 @@ abstract class SchoolBoardsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified || user.accessLevel < AccessLevel.admin) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to put school boards');
       throw InvalidRequestException(
           'You do not have permission to put school boards');
     }
@@ -88,8 +79,6 @@ abstract class SchoolBoardsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified || user.accessLevel < AccessLevel.superAdmin) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to delete school boards');
       throw InvalidRequestException(
           'You do not have permission to delete school boards');
     }
@@ -345,8 +334,6 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
           'You must be a super admin to delete a school');
     }
 
-    _logger.warning(
-        'The school with id: $schoolId is being deleted by user: ${user.userId}');
     await sqlInterface.performDeleteQuery(
       tableName: 'entities',
       filters: {'shared_id': schoolId},

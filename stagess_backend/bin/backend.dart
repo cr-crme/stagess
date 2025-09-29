@@ -90,7 +90,7 @@ void main() async {
       firebaseApiKey: firebaseApiKey,
       settings: _productionSettings);
 
-  _logger.info('Waiting for requests...');
+  _logger.info('Server ready and waiting for requests...');
   final requestHandler = HttpRequestHandler(
       devConnexions: devConnexions, productionConnexions: productionConnexions);
 

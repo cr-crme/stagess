@@ -95,9 +95,6 @@ class Connexions {
             throw MissingFieldException(
                 'Field is required to ${protocol.requestType.name} data');
           }
-          _logger.finer(
-              '${protocol.requestType.name} data to field: ${protocol.field} for '
-              'client ${client.hashCode}');
           final response = switch (protocol.requestType) {
             RequestType.get => await _database.get(protocol.field!,
                 data: protocol.data, user: _clients[client]!),
@@ -294,13 +291,10 @@ class Connexions {
 
         case RequestType.response:
         case RequestType.update:
-          _logger.finer(
-              'Invalid request type: ${protocol.requestType} for client ${client.hashCode}');
           throw InvalidRequestTypeException(
               'Invalid request type: ${protocol.requestType}');
       }
     } on ConnexionRefusedException catch (e) {
-      _logger.severe('Connexion refused for client ${client.hashCode}');
       await _send(client,
           message: CommunicationProtocol(
               requestType: RequestType.response,
@@ -315,7 +309,6 @@ class Connexions {
               data: {'error': e.toString()},
               response: Response.failure));
     } catch (e) {
-      _logger.severe('Unrecognized error for client ${client.hashCode}: $e ');
       await _send(client,
           message: CommunicationProtocol(
               requestType: RequestType.response,
@@ -341,8 +334,6 @@ class Connexions {
     // actual new data. The client must request it for security reasons
     for (final field in response.updatedData?.keys ?? <RequestFields>[]) {
       for (final updatedId in response.updatedData![field]!.keys) {
-        _logger.finer(
-            'Client ${client.hashCode} updated $field for id $updatedId');
         final updateFields = response.updatedData![field]![updatedId]!;
         if (updateFields.isEmpty) continue;
 
@@ -426,7 +417,6 @@ class Connexions {
       {required String message}) async {
     await client.close();
     _clients.remove(client);
-    _logger.info(message);
   }
 }
 
@@ -546,9 +536,7 @@ Future<void> _sendPasswordResetEmail(String email, String apiKey) async {
     }),
   );
 
-  if (response.statusCode == 200) {
-    _logger.info('Password initialization email sent to $email');
-  } else {
+  if (response.statusCode != 200) {
     throw ConnexionRefusedException('Failed to send password reset email');
   }
 }

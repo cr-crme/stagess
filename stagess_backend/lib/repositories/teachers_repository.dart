@@ -23,8 +23,6 @@ abstract class TeachersRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to get teachers');
       throw InvalidRequestException(
           'You do not have permission to get teachers');
     }
@@ -48,8 +46,6 @@ abstract class TeachersRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to get teachers');
       throw InvalidRequestException(
           'You do not have permission to get teachers');
     }
@@ -73,8 +69,6 @@ abstract class TeachersRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to put teachers');
       throw InvalidRequestException(
           'You do not have permission to put teachers');
     }
@@ -91,13 +85,9 @@ abstract class TeachersRepository implements RepositoryAbstract {
           'You do not have permission to put this teacher');
     } else if (user.accessLevel < AccessLevel.admin) {
       if (previous == null) {
-        _logger.severe(
-            'User ${user.userId} does not have permission to insert teachers');
         throw InvalidRequestException(
             'You do not have permission to insert teachers');
       } else if (previous.id != user.userId) {
-        _logger.severe(
-            'User ${user.userId} does not have permission to update teachers other than themselves');
         throw InvalidRequestException(
             'You do not have permission to update teachers');
       }
@@ -115,8 +105,6 @@ abstract class TeachersRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified || user.accessLevel < AccessLevel.admin) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to delete teachers');
       throw InvalidRequestException(
           'You do not have permission to delete teachers');
     }
@@ -283,13 +271,14 @@ class MySqlTeachersRepository extends TeachersRepository {
 
     final toUpdate = <String, dynamic>{};
     if (differences.contains('school_board_id')) {
-      _logger.severe('Cannot update school_board_id for the teachers');
       throw InvalidRequestException(
           'Cannot update school_board_id for the teachers');
     }
     if (differences.contains('school_id')) {
       if (user.accessLevel < AccessLevel.admin) {
-        _logger.severe('Cannot update school_id for the teachers');
+        _logger.severe(
+            'User ${user.userId} tried to change the school (${teacher.schoolId}) '
+            'of teacher (${teacher.id}) but does not have permission, skipping');
       } else {
         toUpdate['school_id'] = teacher.schoolId;
       }
@@ -301,8 +290,6 @@ class MySqlTeachersRepository extends TeachersRepository {
     if (toUpdate.isNotEmpty) {
       // These modifications are only allowed to admins
       if (user.accessLevel < AccessLevel.admin) {
-        _logger.severe(
-            'User ${user.userId} does not have permission to update teachers');
         throw InvalidRequestException(
             'You do not have permission to insert teachers');
       }
@@ -332,8 +319,6 @@ class MySqlTeachersRepository extends TeachersRepository {
 
     // These modifications are only allowed to admins
     if (user.accessLevel < AccessLevel.admin) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to update teachers');
       throw InvalidRequestException(
           'You do not have permission to insert teachers');
     }

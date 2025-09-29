@@ -83,19 +83,15 @@ abstract class AdminsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.accessLevel < AccessLevel.superAdmin) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to delete admins');
       throw InvalidRequestException(
           'You do not have permission to get delete administrators');
     }
 
     final admin = await _getAdminById(id: id, user: user);
     if (admin == null) {
-      _logger.severe('Administrator with id $id not found');
       throw MissingDataException('Administrator not found');
     }
     if (admin.accessLevel >= AccessLevel.superAdmin) {
-      _logger.severe('User ${user.userId} tried to delete a super admin: $id');
       throw InvalidRequestException('You cannot delete a super administrator');
     }
 

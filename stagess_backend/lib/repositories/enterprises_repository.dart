@@ -29,8 +29,6 @@ abstract class EnterprisesRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to get enterprises');
       throw InvalidRequestException(
           'You do not have permission to get enterprises');
     }
@@ -54,8 +52,6 @@ abstract class EnterprisesRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to get enterprises');
       throw InvalidRequestException(
           'You do not have permission to get enterprises');
     }
@@ -80,8 +76,6 @@ abstract class EnterprisesRepository implements RepositoryAbstract {
     InternshipsRepository? internshipsRepository,
   }) async {
     if (user.isNotVerified) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to put new enterprises');
       throw InvalidRequestException(
           'You do not have permission to put new enterprises');
     }
@@ -126,8 +120,6 @@ abstract class EnterprisesRepository implements RepositoryAbstract {
     InternshipsRepository? internshipsRepository,
   }) async {
     if (user.isNotVerified || user.accessLevel < AccessLevel.admin) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to delete enterprises');
       throw InvalidRequestException(
           'You do not have permission to delete enterprises');
     }
@@ -145,8 +137,6 @@ abstract class EnterprisesRepository implements RepositoryAbstract {
           (await internshipsRepository?.getAll(user: user))?.data ?? {};
       if (internships.values
           .any((internship) => internship['enterprise_id'] == id)) {
-        _logger.severe(
-            'You cannot delete this enterprise because it has active internships');
         throw InvalidRequestException(
             'You cannot delete this enterprise because it has active internships');
       }
@@ -466,12 +456,9 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     final differences = enterprise.getDifference(previous);
 
     if (differences.contains('id')) {
-      _logger.severe('Cannot update the id of an enterprise');
       throw InvalidRequestException('Cannot update the id of an enterprise');
     }
     if (differences.contains('school_board_id')) {
-      _logger.severe(
-          'Cannot update the school board id of an enterprise. Please delete and re-create the enterprise');
       throw InvalidRequestException(
           'Cannot update the school board id of an enterprise. Please delete and re-create the enterprise');
     }
@@ -712,7 +699,8 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       if (!enterprise.jobs.map((e) => e.id).contains(job.id)) {
         if (user.accessLevel < AccessLevel.admin) {
           _logger.severe(
-              'User ${user.userId} does not have permission to remove a job from an enterprise');
+              'User ${user.userId} tried to remove job (${job.id}) from enterprise '
+              '(${enterprise.id}) but does not have permission, skipping');
           continue;
         }
 
@@ -745,11 +733,9 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       if (differences.isEmpty) continue;
 
       if (differences.contains('id')) {
-        _logger.severe('Cannot update the id of a job');
         throw InvalidRequestException('Cannot update the id of a job');
       }
       if (differences.contains('enterprise_id')) {
-        _logger.severe('Cannot update the enterprise id of a job');
         throw InvalidRequestException(
             'Cannot update the enterprise id of a job');
       }
@@ -758,7 +744,8 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       if (differences.contains('specialization_id')) {
         if (user.accessLevel < AccessLevel.admin) {
           _logger.severe(
-              'User ${user.userId} does not have permission to update the specialization id of a job');
+              'User ${user.userId} tried to update "specialization_id" of job (${job.id}) '
+              'of enterprise (${enterprise.id}) but does not have permission, skipping');
         } else {
           toUpdate['specialization_id'] = job.specialization.id.serialize();
         }
@@ -770,7 +757,8 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       if (differences.contains('reserved_for_id')) {
         if (user.accessLevel < AccessLevel.admin) {
           _logger.severe(
-              'User ${user.userId} does not have permission to update the reserved for id of a job');
+              'User ${user.userId} tried to update "reserved_for_id" of job (${job.id}) '
+              'of enterprise (${enterprise.id}) but does not have permission, skipping');
         } else {
           toUpdate['reserved_for_id'] =
               job.reservedForId.isEmpty ? null : job.reservedForId.serialize();
@@ -908,7 +896,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     if (!toUpdate.contains('contact')) return;
 
     if (enterprise.contact.id != previous.contact.id) {
-      _logger.severe('Cannot update the contact id of an enterprise');
       throw InvalidRequestException(
           'Cannot update the contact id of an enterprise');
     }
@@ -1115,8 +1102,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
 
       if (enterprise?.jobs != null) {
         if (internshipsRepository == null) {
-          _logger.severe(
-              'Cannot delete an enterprise with jobs without an internships repository');
           throw InvalidRequestException(
               'Cannot delete an enterprise with jobs without an internships repository');
         }

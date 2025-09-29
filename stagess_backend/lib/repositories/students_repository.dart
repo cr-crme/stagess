@@ -24,8 +24,6 @@ abstract class StudentsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to get students');
       throw InvalidRequestException(
           'You do not have permission to get students');
     }
@@ -49,8 +47,6 @@ abstract class StudentsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to get students');
       throw InvalidRequestException(
           'You do not have permission to get students');
     }
@@ -74,8 +70,6 @@ abstract class StudentsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified || user.accessLevel < AccessLevel.admin) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to put students');
       throw InvalidRequestException(
           'You do not have permission to put students');
     }
@@ -103,8 +97,6 @@ abstract class StudentsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified || user.accessLevel < AccessLevel.admin) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to delete students');
       throw InvalidRequestException(
           'You do not have permission to delete students');
     }
@@ -278,13 +270,14 @@ class MySqlStudentsRepository extends StudentsRepository {
     final differences = student.getDifference(previous);
 
     if (differences.contains('school_board_id')) {
-      _logger.severe('Cannot update school_board_id for the students');
       throw InvalidRequestException(
           'Cannot update school_board_id for the students');
     }
     if (differences.contains('school_id')) {
       if (user.accessLevel < AccessLevel.admin) {
-        _logger.severe('Cannot update school_id for the students');
+        _logger.severe(
+            'User ${user.userId} tried to change the school (${student.schoolId}) of '
+            'student (${student.id}) but does not have permission, skipping');
       } else {
         await sqlInterface.performUpdateQuery(
             tableName: 'students',

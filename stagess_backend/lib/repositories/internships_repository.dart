@@ -1,4 +1,3 @@
-import 'package:logging/logging.dart';
 import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/utils/database_user.dart';
@@ -15,8 +14,6 @@ import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/utils.dart';
 
-final _logger = Logger('Connexions');
-
 // AccessLevel in this repository is discarded as all operations are currently
 // available to all users
 
@@ -27,8 +24,6 @@ abstract class InternshipsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to get internships');
       throw InvalidRequestException(
           'You do not have permission to get internships');
     }
@@ -52,8 +47,6 @@ abstract class InternshipsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to get internships');
       throw InvalidRequestException(
           'You do not have permission to get internships');
     }
@@ -77,8 +70,6 @@ abstract class InternshipsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to put internships');
       throw InvalidRequestException(
           'You do not have permission to put internships');
     }
@@ -109,8 +100,6 @@ abstract class InternshipsRepository implements RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified || user.accessLevel < AccessLevel.admin) {
-      _logger.severe(
-          'User ${user.userId} does not have permission to delete internships');
       throw InvalidRequestException(
           'You do not have permission to delete internships');
     }
@@ -555,19 +544,15 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     // Update the internship
     final differences = internship.getDifference(previous);
     if (differences.contains('school_board_id')) {
-      _logger.severe('School board id cannot be changed');
       throw InvalidRequestException('School board id cannot be changed');
     }
     if (differences.contains('student_id')) {
-      _logger.severe('Student id cannot be changed');
       throw InvalidRequestException('Student id cannot be changed');
     }
     if (differences.contains('enterprise_id')) {
-      _logger.severe('Enterprise id cannot be changed');
       throw InvalidRequestException('Enterprise id cannot be changed');
     }
     if (differences.contains('job_id')) {
-      _logger.severe('Job id cannot be changed');
       throw InvalidRequestException('Job id cannot be changed');
     }
 
@@ -970,7 +955,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     final toUpdate = internship.getDifference(previous);
     if (toUpdate.contains('enterprise_evaluation')) {
       if (previous.enterpriseEvaluation != null) {
-        _logger.severe('Enterprise evaluation cannot be changed');
         throw InvalidRequestException(
             'Enterprise evaluation cannot be changed');
       }
