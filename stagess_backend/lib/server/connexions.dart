@@ -359,6 +359,9 @@ class Connexions {
         RequestType.delete => 'delete-requested',
         _ => 'invalid-requested',
       };
+      final request = protocol.data?['id'] != null
+          ? 'id=${protocol.data!['id']}'
+          : 'all elements';
       final field = switch (protocol.field!) {
         RequestFields.schoolBoards ||
         RequestFields.schoolBoard =>
@@ -369,10 +372,8 @@ class Connexions {
         RequestFields.enterprises || RequestFields.enterprise => 'enterprise',
         RequestFields.internships || RequestFields.internship => 'internship',
       };
-      final requestMap = (protocol.data?['id'] as Map<String, dynamic>?) ?? {};
-      final request = 'with request\n$requestMap';
       _logger.info(
-          'Client (${client.hashCode}:${_clients[client]?.userId}) has $method $field $request');
+          'Client (${client.hashCode}:${_clients[client]?.userId}) has $method $request of $field');
     }
 
     await _send(client,
