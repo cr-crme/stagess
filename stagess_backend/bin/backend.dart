@@ -7,8 +7,8 @@ import 'package:mysql1/mysql1.dart';
 import 'package:stagess_backend/repositories/admins_repository.dart';
 import 'package:stagess_backend/repositories/enterprises_repository.dart';
 import 'package:stagess_backend/repositories/internships_repository.dart';
-import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/repositories/school_boards_repository.dart';
+import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/repositories/students_repository.dart';
 import 'package:stagess_backend/repositories/teachers_repository.dart';
 import 'package:stagess_backend/server/connexions.dart';
@@ -97,9 +97,14 @@ void main() async {
 
   final rateLimiter =
       NetworkRateLimiter(maxRequests: 50, duration: Duration(minutes: 1));
-  await for (HttpRequest request in server) {
-    requestHandler.answer(request, rateLimiter: rateLimiter);
-  }
+
+  server.listen(
+    (HttpRequest request) =>
+        requestHandler.answer(request, rateLimiter: rateLimiter),
+    onError: (error, stackTrace) =>
+        _logger.severe('Error in server: $error\n$stackTrace'),
+    cancelOnError: false,
+  );
 
   if (_databaseBackend == DatabaseBackend.mysql) {
     await (devConnexions.database.sqlInterface.connection as MySqlConnection)
