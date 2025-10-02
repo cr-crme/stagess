@@ -10,15 +10,16 @@ import 'package:stagess/misc/question_file_service.dart';
 import 'package:stagess/misc/risk_data_file_service.dart';
 import 'package:stagess/misc/storage_service.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
-import 'package:url_strategy/url_strategy.dart';
 
 class ProgramInitializer {
   static bool _showDebugElements = kDebugMode;
   static bool get showDebugElements => _showDebugElements;
   static bool _initialized = false;
 
-  static Future<void> initialize(
-      {bool showDebugElements = false, bool mockMe = false}) async {
+  static Future<void> initialize({
+    bool showDebugElements = false,
+    bool mockMe = false,
+  }) async {
     _showDebugElements = showDebugElements;
     if (_initialized) return;
 
@@ -34,9 +35,6 @@ class ProgramInitializer {
       QuestionFileService.loadData(),
     ]);
     StorageService.instance.isMocked = mockMe;
-
-    // Connect Firebase to local emulators
-    setPathUrlStrategy();
 
     _initialized = true;
   }
@@ -58,15 +56,20 @@ class BugReporter {
     });
   }
 
-  static report(Object error, StackTrace stackTrace,
-      {required errorReportUri}) async {
+  static report(
+    Object error,
+    StackTrace stackTrace, {
+    required errorReportUri,
+  }) async {
     // Handle uncaught errors
-    await http.post(errorReportUri,
-        body: jsonEncode({
-          'breadcrumbs': _breadcrumbs,
-          'error': error.toString(),
-          'stack_trace': stackTrace.toString()
-        }));
+    await http.post(
+      errorReportUri,
+      body: jsonEncode({
+        'breadcrumbs': _breadcrumbs,
+        'error': error.toString(),
+        'stack_trace': stackTrace.toString(),
+      }),
+    );
 
     debugPrint('Uncaught error: $error');
     debugPrint('Stack trace: $stackTrace');

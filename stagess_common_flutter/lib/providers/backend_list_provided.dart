@@ -136,6 +136,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       }
     }
 
+    // There is no point in adding the same provider multiple times
     if (_providerSelector[getField(true)] != null) return;
 
     // Keep a reference to the deserializer function
@@ -388,6 +389,10 @@ _Selector _getSelector(RequestFields field) {
     );
   }
   return selector;
+}
+
+Future<void> getAllElements(RequestFields field) async {
+  await _getFromBackend(field);
 }
 
 Future<void> _getFromBackend(

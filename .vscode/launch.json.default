@@ -5,12 +5,6 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Stagess",
-            "request": "launch",
-            "type": "dart",
-            "program": "stagess/lib/main.dart",
-        },
-        {
             "name": "Backend",
             "request": "launch",
             "type": "dart",
@@ -18,7 +12,6 @@
             "env": {
                 "STAGESS_FIREBASE_WEB_API_KEY": "<PUT YOUR FIREBASE WEB API KEY HERE>",
                 "STAGESS_USE_SSL": "< true | false >", 
-                "STAGESS_USE_LOCAL_DATABASE": "< true | false >",
                 "STAGESS_DATABASE_BACKEND": "< mariadb | mysql | mock >",
                 "STAGESS_DATABASE_DEV_PORT": "<PUT YOUR DEV DATABASE PORT HERE>",
                 "STAGESS_DATABASE_DEV_NAME": "<PUT YOUR DEV DATABASE NAME HERE>",
@@ -31,17 +24,26 @@
             },
         },
         {
+            "name": "Stagess",
+            "request": "launch",
+            "type": "dart",
+            "program": "stagess/lib/main.dart",
+            "args": [
+                "--dart-define=STAGESS_WEB_USE_LOCAL_DB=< true | false >",
+                "--dart-define=STAGESS_WEB_USE_SSL=< true | false >",
+                "--dart-define=STAGESS_WEB_USE_DEV_DB=< true | false >",
+            ],
+        },
+        {
             "name": "Stagess Admin",
             "request": "launch",
             "type": "dart",
             "program": "stagess_admin/lib/main.dart",
-        },
-        {
-            "name": "Stagess Admin (with Backend)",
-            "request": "launch",
-            "type": "dart",
-            "program": "stagess_admin/lib/main.dart",
-            "preLaunchTask": "Run Backend Server",
+            "args": [
+                "--dart-define=STAGESS_WEB_USE_LOCAL_DB=< true | false >",
+                "--dart-define=STAGESS_WEB_USE_SSL=< true | false >",
+                "--dart-define=STAGESS_WEB_USE_DEV_DB=< true | false >",
+            ],
         },
         {
             "name": "Reset database",

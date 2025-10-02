@@ -17,15 +17,12 @@ import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 const _useLocalDatabase = bool.fromEnvironment(
   'STAGESS_WEB_USE_LOCAL_DB',
-  defaultValue: true,
-);
-const _useSsl = bool.fromEnvironment(
-  'STAGESS_WEB_USE_SSL',
   defaultValue: false,
 );
+const _useSsl = bool.fromEnvironment('STAGESS_WEB_USE_SSL', defaultValue: true);
 const _useDevDatabase = bool.fromEnvironment(
   'STAGESS_WEB_USE_DEV_DB',
-  defaultValue: true,
+  defaultValue: false,
 );
 
 void main() async {

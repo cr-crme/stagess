@@ -9,10 +9,7 @@ all: main tutorial
 .FORCE:
 build/%.zip: .FORCE
 	rm -rf $(OUT_DIR)/$*
-	flutter build web --base-href=/$*/ \
-		--dart-define=STAGESS_WEB_USE_LOCAL_DB=false \
-		--dart-define=STAGESS_WEB_USE_SSL=true \
-		--dart-define=STAGESS_WEB_USE_DEV_DB=$(DEV_DB)
+	flutter build web --base-href=/$*/ 
 	mv $(OUT_DIR)/web $(OUT_DIR)/$*
 	cd $(OUT_DIR) && $(ZIP) $*.zip $*
 

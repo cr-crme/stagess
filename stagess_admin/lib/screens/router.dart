@@ -46,44 +46,32 @@ final router = GoRouter(
     GoRoute(
       path: Screens.schoolBoardsListScreen,
       name: Screens.schoolBoardsListScreen,
-      builder: (context, state) {
-        return const SchoolBoardsListScreen();
-      },
+      builder: (context, state) => const SchoolBoardsListScreen(),
     ),
     GoRoute(
       path: Screens.adminsListScreen,
       name: Screens.adminsListScreen,
-      builder: (context, state) {
-        return const AdminsListScreen();
-      },
+      builder: (context, state) => const AdminsListScreen(),
     ),
     GoRoute(
       path: Screens.teachersListScreen,
       name: Screens.teachersListScreen,
-      builder: (context, state) {
-        return const TeachersListScreen();
-      },
+      builder: (context, state) => const TeachersListScreen(),
     ),
     GoRoute(
       path: Screens.studentsListScreen,
       name: Screens.studentsListScreen,
-      builder: (context, state) {
-        return const StudentsListScreen();
-      },
+      builder: (context, state) => const StudentsListScreen(),
     ),
     GoRoute(
       path: Screens.enterprisesListScreen,
       name: Screens.enterprisesListScreen,
-      builder: (context, state) {
-        return const EnterprisesListScreen();
-      },
+      builder: (context, state) => const EnterprisesListScreen(),
     ),
     GoRoute(
       path: Screens.internshipsListScreen,
       name: Screens.internshipsListScreen,
-      builder: (context, state) {
-        return const InternshipsListScreen();
-      },
+      builder: (context, state) => const InternshipsListScreen(),
     ),
   ],
 );

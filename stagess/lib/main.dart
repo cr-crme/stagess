@@ -14,12 +14,15 @@ import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
-const _useLocalDatabase =
-    bool.fromEnvironment('STAGESS_WEB_USE_LOCAL_DB', defaultValue: true);
-const _useSsl =
-    bool.fromEnvironment('STAGESS_WEB_USE_SSL', defaultValue: false);
-const _useDevDatabase =
-    bool.fromEnvironment('STAGESS_WEB_USE_DEV_DB', defaultValue: true);
+const _useLocalDatabase = bool.fromEnvironment(
+  'STAGESS_WEB_USE_LOCAL_DB',
+  defaultValue: false,
+);
+const _useSsl = bool.fromEnvironment('STAGESS_WEB_USE_SSL', defaultValue: true);
+const _useDevDatabase = bool.fromEnvironment(
+  'STAGESS_WEB_USE_DEV_DB',
+  defaultValue: false,
+);
 
 // coverage:ignore-start
 void main() async {
@@ -32,15 +35,22 @@ void main() async {
   const showDebugElements = true;
   const useMockers = false;
   final backendUri = BackendHelpers.backendUri(
-      isLocal: _useLocalDatabase, useSsl: _useSsl, isDev: _useDevDatabase);
+    isLocal: _useLocalDatabase,
+    useSsl: _useSsl,
+    isDev: _useDevDatabase,
+  );
   final errorReportUri = BackendHelpers.backendUriForBugReport(
-      isLocal: _useLocalDatabase, useSsl: _useSsl);
+    isLocal: _useLocalDatabase,
+    useSsl: _useSsl,
+  );
 
   await runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
       await ProgramInitializer.initialize(
-          showDebugElements: showDebugElements, mockMe: useMockers);
+        showDebugElements: showDebugElements,
+        mockMe: useMockers,
+      );
 
       runApp(StageSsApp(useMockers: useMockers, backendUri: backendUri));
     },
@@ -51,8 +61,11 @@ void main() async {
 // coverage:ignore-end
 
 class StageSsApp extends StatelessWidget {
-  const StageSsApp(
-      {super.key, this.useMockers = false, required this.backendUri});
+  const StageSsApp({
+    super.key,
+    this.useMockers = false,
+    required this.backendUri,
+  });
 
   final bool useMockers;
   final Uri backendUri;
@@ -62,30 +75,36 @@ class StageSsApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-            create: (context) => AuthProvider(mockMe: useMockers)),
+          create: (context) => AuthProvider(mockMe: useMockers),
+        ),
         ChangeNotifierProxyProvider<AuthProvider, SchoolBoardsProvider>(
-          create: (context) =>
-              SchoolBoardsProvider(uri: backendUri, mockMe: useMockers),
+          create:
+              (context) =>
+                  SchoolBoardsProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, EnterprisesProvider>(
-          create: (context) =>
-              EnterprisesProvider(uri: backendUri, mockMe: useMockers),
+          create:
+              (context) =>
+                  EnterprisesProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, InternshipsProvider>(
-          create: (context) =>
-              InternshipsProvider(uri: backendUri, mockMe: useMockers),
+          create:
+              (context) =>
+                  InternshipsProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, TeachersProvider>(
-          create: (context) =>
-              TeachersProvider(uri: backendUri, mockMe: useMockers),
+          create:
+              (context) =>
+                  TeachersProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, StudentsProvider>(
-          create: (context) =>
-              StudentsProvider(uri: backendUri, mockMe: useMockers),
+          create:
+              (context) =>
+                  StudentsProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
       ],
@@ -98,9 +117,7 @@ class StageSsApp extends StatelessWidget {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: const [
-          Locale('fr', 'CA'),
-        ],
+        supportedLocales: const [Locale('fr', 'CA')],
       ),
     );
   }

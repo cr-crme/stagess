@@ -67,7 +67,6 @@ class Connexions {
           toWait.add(_onConnexionClosed(otherClient,
               message: 'Closing duplicate connexion'));
         }
-        print(toWait);
         await Future.wait(toWait);
       }
     } catch (e) {
