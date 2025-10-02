@@ -2311,7 +2311,7 @@ class _HourMinuteTextFieldState extends State<_HourMinuteTextField>
       context,
     );
 
-    final InputDecorationTheme inputDecorationTheme =
+    final InputDecorationThemeData inputDecorationTheme =
         timePickerTheme.inputDecorationTheme ??
         defaultTheme.inputDecorationTheme;
     InputDecoration inputDecoration = const InputDecoration().applyDefaults(
@@ -3531,7 +3531,7 @@ abstract class _TimePickerDefaults extends TimePickerThemeData {
   TextStyle get hourMinuteTextStyle;
 
   @override
-  InputDecorationTheme get inputDecorationTheme;
+  InputDecorationThemeData get inputDecorationTheme;
 
   @override
   EdgeInsetsGeometry get padding;
@@ -3770,8 +3770,8 @@ class _TimePickerDefaultsM2 extends _TimePickerDefaults {
   }
 
   @override
-  InputDecorationTheme get inputDecorationTheme {
-    return InputDecorationTheme(
+  InputDecorationThemeData get inputDecorationTheme {
+    return InputDecorationThemeData(
       contentPadding: EdgeInsets.zero,
       filled: true,
       fillColor: _hourMinuteInputColor,

@@ -44,8 +44,10 @@ class _SkillEvaluationFormScreenState extends State<SkillEvaluationFormScreen> {
   // does not block the app
   bool _isDisposed = false;
 
-  SkillList _extractSkills(BuildContext context,
-      {required Internship internship}) {
+  SkillList _extractSkills(
+    BuildContext context, {
+    required Internship internship,
+  }) {
     final out = SkillList.empty();
     for (final skill in widget.formController.skillResults(activeOnly: true)) {
       out.add(skill);
@@ -72,9 +74,11 @@ class _SkillEvaluationFormScreenState extends State<SkillEvaluationFormScreen> {
   void _cancel() async {
     _logger.info('User requested to cancel the evaluation form');
 
-    final answer = await ConfirmExitDialog.show(context,
-        content: const Text('Toutes les modifications seront perdues.'),
-        isEditing: widget.editMode);
+    final answer = await ConfirmExitDialog.show(
+      context,
+      content: const Text('Toutes les modifications seront perdues.'),
+      isEditing: widget.editMode,
+    );
     if (!mounted || !answer) return;
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -92,31 +96,36 @@ class _SkillEvaluationFormScreenState extends State<SkillEvaluationFormScreen> {
 
     if (!widget.formController.allAppreciationsAreDone) {
       final result = await showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => AlertDialog(
-                title: const Text('Soumettre l\'évaluation?'),
-                content: const Text(
-                  '**Attention, toutes les compétences n\'ont pas été évaluées**',
-                  style: TextStyle(color: Colors.black),
+        context: context,
+        barrierDismissible: false,
+        builder:
+            (context) => AlertDialog(
+              title: const Text('Soumettre l\'évaluation?'),
+              content: const Text(
+                '**Attention, toutes les compétences n\'ont pas été évaluées**',
+                style: TextStyle(color: Colors.black),
+              ),
+              actions: [
+                OutlinedButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Non'),
                 ),
-                actions: [
-                  OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: const Text('Non')),
-                  TextButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      child: const Text('Oui')),
-                ],
-              ));
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('Oui'),
+                ),
+              ],
+            ),
+      );
       if (result == null || !result) return;
     }
     if (!mounted) return;
 
     // Fetch the data from the form controller
     final internship = widget.formController.internship(context, listen: false);
-    internship.skillEvaluations
-        .add(widget.formController.toInternshipEvaluation());
+    internship.skillEvaluations.add(
+      widget.formController.toInternshipEvaluation(),
+    );
 
     // Pass the evaluation data to the rest of the app
     InternshipsProvider.of(context, listen: false).replace(internship);
@@ -132,7 +141,10 @@ class _SkillEvaluationFormScreenState extends State<SkillEvaluationFormScreen> {
   }
 
   Widget _controlBuilder(
-      BuildContext context, ControlsDetails details, SkillList skills) {
+    BuildContext context,
+    ControlsDetails details,
+    SkillList skills,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
@@ -145,7 +157,9 @@ class _SkillEvaluationFormScreenState extends State<SkillEvaluationFormScreen> {
               const Expanded(child: SizedBox()),
               if (_currentStep != 0)
                 OutlinedButton(
-                    onPressed: _previousStep, child: const Text('Précédent')),
+                  onPressed: _previousStep,
+                  child: const Text('Précédent'),
+                ),
               const SizedBox(width: 20),
               if (_currentStep != skills.length)
                 TextButton(
@@ -171,41 +185,49 @@ class _SkillEvaluationFormScreenState extends State<SkillEvaluationFormScreen> {
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-        'Building SkillEvaluationFormScreen for internship: ${widget.formController.internshipId} '
-        'and editMode: ${widget.editMode}');
+      'Building SkillEvaluationFormScreen for internship: ${widget.formController.internshipId} '
+      'and editMode: ${widget.editMode}',
+    );
     if (_isDisposed) return Container();
 
     final internship = widget.formController.internship(context);
     final skills = _extractSkills(context, internship: internship);
 
-    final student = StudentsHelpers.studentsInMyGroups(context)
-        .firstWhereOrNull((e) => e.id == internship.studentId);
+    final student = StudentsHelpers.studentsInMyGroups(
+      context,
+    ).firstWhereOrNull((e) => e.id == internship.studentId);
 
     return SizedBox(
       width: ResponsiveService.maxBodyWidth,
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-              '${student == null ? 'En attente des informations' : 'Évaluation de ${student.fullName}'}\n'
-              'C1. Compétences spécifiques'),
+            '${student == null ? 'En attente des informations' : 'Évaluation de ${student.fullName}'}\n'
+            'C1. Compétences spécifiques',
+          ),
           leading: IconButton(
-              onPressed: _cancel, icon: const Icon(Icons.arrow_back)),
+            onPressed: _cancel,
+            icon: const Icon(Icons.arrow_back),
+          ),
         ),
         body: PopScope(
-          child: student == null
-              ? const Center(child: CircularProgressIndicator())
-              : ScrollableStepper(
-                  scrollController: _scrollController,
-                  type: StepperType.vertical,
-                  currentStep: _currentStep,
-                  onTapContinue: _nextStep,
-                  onStepTapped: (int tapped) => setState(() {
-                    _currentStep = tapped;
-                    _scrollToCurrentTab();
-                  }),
-                  onTapCancel: _cancel,
-                  steps: [
-                    ...skills.map((skill) => Step(
+          child:
+              student == null
+                  ? const Center(child: CircularProgressIndicator())
+                  : ScrollableStepper(
+                    scrollController: _scrollController,
+                    type: StepperType.vertical,
+                    currentStep: _currentStep,
+                    onTapContinue: _nextStep,
+                    onStepTapped:
+                        (int tapped) => setState(() {
+                          _currentStep = tapped;
+                          _scrollToCurrentTab();
+                        }),
+                    onTapCancel: _cancel,
+                    steps: [
+                      ...skills.map(
+                        (skill) => Step(
                           isActive: true,
                           state:
                               widget.formController.appreciations[skill.id] ==
@@ -213,28 +235,34 @@ class _SkillEvaluationFormScreenState extends State<SkillEvaluationFormScreen> {
                                   ? StepState.indexed
                                   : StepState.complete,
                           title: SubTitle(
-                              '${skill.id}${skill.isOptional ? ' (Facultative)' : ''}',
-                              top: 0,
-                              bottom: 0),
+                            '${skill.id}${skill.isOptional ? ' (Facultative)' : ''}',
+                            top: 0,
+                            bottom: 0,
+                          ),
                           content: _EvaluateSkill(
                             formController: widget.formController,
                             skill: skill,
                             editMode: widget.editMode,
                           ),
-                        )),
-                    Step(
-                      isActive: true,
-                      title: const SubTitle('Commentaires', top: 0, bottom: 0),
-                      content: _Comments(
-                        formController: widget.formController,
-                        editMode: widget.editMode,
+                        ),
                       ),
-                    )
-                  ],
-                  controlsBuilder:
-                      (BuildContext context, ControlsDetails details) =>
-                          _controlBuilder(context, details, skills),
-                ),
+                      Step(
+                        isActive: true,
+                        title: const SubTitle(
+                          'Commentaires',
+                          top: 0,
+                          bottom: 0,
+                        ),
+                        content: _Comments(
+                          formController: widget.formController,
+                          editMode: widget.editMode,
+                        ),
+                      ),
+                    ],
+                    controlsBuilder:
+                        (BuildContext context, ControlsDetails details) =>
+                            _controlBuilder(context, details, skills),
+                  ),
         ),
       ),
     );
@@ -278,34 +306,38 @@ class _EvaluateSkill extends StatelessWidget {
                 'Critères de performance:',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-              ...skill.criteria.map((e) => Padding(
-                    padding: const EdgeInsets.only(left: 12.0, bottom: 4.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          '\u00b7 ',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Flexible(child: Text(e)),
-                      ],
-                    ),
-                  )),
+              ...skill.criteria.map(
+                (e) => Padding(
+                  padding: const EdgeInsets.only(left: 12.0, bottom: 4.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        '\u00b7 ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Flexible(child: Text(e)),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
         formController.evaluationGranularity ==
                 SkillEvaluationGranularity.global
             ? _TaskEvaluation(
-                spacing: spacing,
-                skill: skill,
-                formController: formController,
-                editMode: editMode)
+              spacing: spacing,
+              skill: skill,
+              formController: formController,
+              editMode: editMode,
+            )
             : _TaskEvaluationDetailed(
-                spacing: spacing,
-                skill: skill,
-                formController: formController,
-                editMode: editMode),
+              spacing: spacing,
+              skill: skill,
+              formController: formController,
+              editMode: editMode,
+            ),
         TextFormField(
           decoration: const InputDecoration(label: Text('Commentaires')),
           controller: formController.skillCommentsControllers[skill.id]!,
@@ -314,21 +346,23 @@ class _EvaluateSkill extends StatelessWidget {
         ),
         const SizedBox(height: 24),
         _AppreciationEvaluation(
-            spacing: spacing,
-            skill: skill,
-            formController: formController,
-            editMode: editMode),
+          spacing: spacing,
+          skill: skill,
+          formController: formController,
+          editMode: editMode,
+        ),
       ],
     );
   }
 }
 
 class _TaskEvaluation extends StatelessWidget {
-  const _TaskEvaluation(
-      {required this.spacing,
-      required this.skill,
-      required this.formController,
-      required this.editMode});
+  const _TaskEvaluation({
+    required this.spacing,
+    required this.skill,
+    required this.formController,
+    required this.editMode,
+  });
 
   final double spacing;
   final Skill skill;
@@ -351,11 +385,14 @@ class _TaskEvaluation extends StatelessWidget {
           }
         },
         enabled: editMode,
-        initialValues: formController.taskCompleted[skill.id]!.keys
-            .where((e) =>
-                formController.taskCompleted[skill.id]![e]! !=
-                TaskAppreciationLevel.notEvaluated)
-            .toList(),
+        initialValues:
+            formController.taskCompleted[skill.id]!.keys
+                .where(
+                  (e) =>
+                      formController.taskCompleted[skill.id]![e]! !=
+                      TaskAppreciationLevel.notEvaluated,
+                )
+                .toList(),
         showOtherOption: false,
       ),
     );
@@ -363,11 +400,12 @@ class _TaskEvaluation extends StatelessWidget {
 }
 
 class _TaskEvaluationDetailed extends StatelessWidget {
-  const _TaskEvaluationDetailed(
-      {required this.spacing,
-      required this.skill,
-      required this.formController,
-      required this.editMode});
+  const _TaskEvaluationDetailed({
+    required this.spacing,
+    required this.skill,
+    required this.formController,
+    required this.editMode,
+  });
 
   final double spacing;
   final Skill skill;
@@ -381,62 +419,69 @@ class _TaskEvaluationDetailed extends StatelessWidget {
     }
 
     showDialog(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-              title: const Text('Explication des boutons'),
-              content: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: texts.map((e) => Text(e)).toList(),
+      context: context,
+      builder:
+          (BuildContext context) => AlertDialog(
+            title: const Text('Explication des boutons'),
+            content: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: texts.map((e) => Text(e)).toList(),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
               ),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context, 'OK'),
-                    child: const Text('OK'))
-              ],
-            ));
+            ],
+          ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-        padding: EdgeInsets.only(bottom: spacing),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text('Tâche\u00a0:',
-                    style: Theme.of(context).textTheme.titleSmall),
-                SizedBox(
-                  height: 45,
-                  width: 45,
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(25),
-                    onTap: () => _showHelpOnTask(context),
-                    child: Icon(
-                      Icons.info,
-                      size: 30,
-                      color: Theme.of(context).primaryColor,
-                    ),
+      padding: EdgeInsets.only(bottom: spacing),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                'Tâche\u00a0:',
+                style: Theme.of(context).textTheme.titleSmall,
+              ),
+              SizedBox(
+                height: 45,
+                width: 45,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(25),
+                  onTap: () => _showHelpOnTask(context),
+                  child: Icon(
+                    Icons.info,
+                    size: 30,
+                    color: Theme.of(context).primaryColor,
                   ),
                 ),
-              ],
+              ),
+            ],
+          ),
+          ...formController.taskCompleted[skill.id]!.keys.map(
+            (task) => Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: _TaskAppreciationSelection(
+                formController: formController,
+                skillId: skill.id,
+                task: task,
+                enabled: editMode,
+              ),
             ),
-            ...formController.taskCompleted[skill.id]!.keys
-                .map((task) => Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: _TaskAppreciationSelection(
-                        formController: formController,
-                        skillId: skill.id,
-                        task: task,
-                        enabled: editMode,
-                      ),
-                    )),
-          ],
-        ));
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -475,29 +520,35 @@ class _TaskAppreciationSelectionState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(widget.task),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: byTaskAppreciationLevel
-              .map((e) => InkWell(
-                    onTap: widget.enabled ? () => _select(e) : null,
-                    child: Row(
-                      children: [
-                        Radio(
-                          onChanged: widget.enabled ? _select : null,
-                          fillColor: WidgetStateColor.resolveWith((state) {
-                            return widget.enabled
-                                ? Theme.of(context).primaryColor
-                                : Colors.grey;
-                          }),
-                          value: e,
-                          groupValue: _current,
+        RadioGroup(
+          groupValue: _current,
+          onChanged: _select,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children:
+                byTaskAppreciationLevel
+                    .map(
+                      (e) => InkWell(
+                        onTap: widget.enabled ? () => _select(e) : null,
+                        child: Row(
+                          children: [
+                            Radio(
+                              enabled: widget.enabled,
+                              fillColor: WidgetStateColor.resolveWith((state) {
+                                return widget.enabled
+                                    ? Theme.of(context).primaryColor
+                                    : Colors.grey;
+                              }),
+                              value: e,
+                            ),
+                            Text(e.abbreviation()),
+                          ],
                         ),
-                        Text(e.abbreviation()),
-                      ],
-                    ),
-                  ))
-              .toList(),
-        )
+                      ),
+                    )
+                    .toList(),
+          ),
+        ),
       ],
     );
   }
@@ -526,38 +577,45 @@ class _AppreciationEvaluationState extends State<_AppreciationEvaluation> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(bottom: widget.spacing),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'Appréciation générale de la compétence\u00a0:',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          ...SkillAppreciation.values
-              .where((e) => e != SkillAppreciation.notSelected)
-              .map((e) => RadioListTile<SkillAppreciation>(
+      child: RadioGroup(
+        groupValue: widget.formController.appreciations[widget.skill.id],
+        onChanged:
+            (value) => setState(
+              () =>
+                  widget.formController.appreciations[widget.skill.id] = value!,
+            ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Appréciation générale de la compétence\u00a0:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            ...SkillAppreciation.values
+                .where((e) => e != SkillAppreciation.notSelected)
+                .map(
+                  (e) => RadioListTile<SkillAppreciation>(
                     controlAffinity: ListTileControlAffinity.leading,
                     dense: true,
                     visualDensity: VisualDensity.compact,
-                    onChanged: widget.editMode
-                        ? (value) => setState(() => widget.formController
-                            .appreciations[widget.skill.id] = value!)
-                        : null,
-                    groupValue:
-                        widget.formController.appreciations[widget.skill.id],
+                    enabled: widget.editMode,
                     value: e,
                     fillColor: WidgetStateColor.resolveWith((state) {
                       return widget.editMode
                           ? Theme.of(context).primaryColor
                           : Colors.grey;
                     }),
-                    title: Text(e.name,
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                              color: Colors.black,
-                            )),
-                  )),
-        ],
+                    title: Text(
+                      e.name,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium!.copyWith(color: Colors.black),
+                    ),
+                  ),
+                ),
+          ],
+        ),
       ),
     );
   }

@@ -51,25 +51,35 @@ class RadioWithFollowUpState<T> extends State<RadioWithFollowUp<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (widget.title != null)
-          Text(
-            widget.title!,
-            style: widget.titleStyle ?? Theme.of(context).textTheme.titleSmall,
-          ),
-        ...widget.elements.map((element) => _buildElementTile(element)),
-        if (_showFollowUp) widget.followUpChild!,
-      ],
+    return RadioGroup(
+      groupValue: _current,
+      onChanged: (newValue) {
+        _current = newValue;
+        _checkShowFollowUp();
+        setState(() {});
+        if (widget.onChanged != null) widget.onChanged!(value);
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (widget.title != null)
+            Text(
+              widget.title!,
+              style:
+                  widget.titleStyle ?? Theme.of(context).textTheme.titleSmall,
+            ),
+          ...widget.elements.map((element) => _buildElementTile(element)),
+          if (_showFollowUp) widget.followUpChild!,
+        ],
+      ),
     );
   }
 
   RadioListTile<T> _buildElementTile(T element) {
     return RadioListTile<T>(
-      groupValue: _current,
       visualDensity: VisualDensity.compact,
       dense: true,
+      enabled: widget.enabled,
       controlAffinity: ListTileControlAffinity.leading,
       title: Text(
         element.toString(),
@@ -79,14 +89,6 @@ class RadioWithFollowUpState<T> extends State<RadioWithFollowUp<T>> {
         return widget.enabled ? Theme.of(context).primaryColor : Colors.grey;
       }),
       value: element,
-      onChanged: widget.enabled
-          ? (newValue) {
-              _current = newValue;
-              _checkShowFollowUp();
-              setState(() {});
-              if (widget.onChanged != null) widget.onChanged!(value);
-            }
-          : null,
     );
   }
 }

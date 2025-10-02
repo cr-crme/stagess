@@ -40,10 +40,7 @@ enum _TaskVariety { none, low, high }
 enum _TrainingPlan { none, notFilled, filled }
 
 class TaskAndAbilityStep extends StatefulWidget {
-  const TaskAndAbilityStep({
-    super.key,
-    required this.internship,
-  });
+  const TaskAndAbilityStep({super.key, required this.internship});
 
   final Internship internship;
 
@@ -54,17 +51,19 @@ class TaskAndAbilityStep extends StatefulWidget {
 class TaskAndAbilityStepState extends State<TaskAndAbilityStep> {
   final _formKey = GlobalKey<FormState>();
 
-// Tasks
+  // Tasks
   var _taskVariety = _TaskVariety.none;
-  double? get taskVariety => _taskVariety == _TaskVariety.none
-      ? null
-      : _taskVariety == _TaskVariety.low
+  double? get taskVariety =>
+      _taskVariety == _TaskVariety.none
+          ? null
+          : _taskVariety == _TaskVariety.low
           ? 0.0
           : 1.0;
   var _trainingPlan = _TrainingPlan.none;
-  double? get trainingPlan => _trainingPlan == _TrainingPlan.none
-      ? null
-      : _trainingPlan == _TrainingPlan.notFilled
+  double? get trainingPlan =>
+      _trainingPlan == _TrainingPlan.none
+          ? null
+          : _trainingPlan == _TrainingPlan.notFilled
           ? 0.0
           : 1.0;
 
@@ -86,39 +85,43 @@ class TaskAndAbilityStepState extends State<TaskAndAbilityStep> {
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-        'Building TaskAndAbilityStep for internship: ${widget.internship.id}');
+      'Building TaskAndAbilityStep for internship: ${widget.internship.id}',
+    );
 
-    final enterprise = EnterprisesProvider.of(context, listen: false)
-        .firstWhereOrNull((e) => e.id == widget.internship.enterpriseId);
+    final enterprise = EnterprisesProvider.of(
+      context,
+      listen: false,
+    ).firstWhereOrNull((e) => e.id == widget.internship.enterpriseId);
 
     // Sometimes for some reason the build is called this with these
     // provider empty on the first call
     if (enterprise == null) return Container();
-    final student = StudentsHelpers.studentsInMyGroups(context)
-        .firstWhereOrNull((e) => e.id == widget.internship.studentId);
+    final student = StudentsHelpers.studentsInMyGroups(
+      context,
+    ).firstWhereOrNull((e) => e.id == widget.internship.studentId);
 
     return student == null
         ? Container()
         : Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SubTitle('Informations générales', left: 0),
-                  _buildEnterpriseName(enterprise),
-                  _buildStudentName(student),
-                  const SubTitle('Tâches', left: 0),
-                  _buildVariety(context),
-                  const SizedBox(height: 8),
-                  _buildTrainingPlan(context),
-                  const SubTitle('Habiletés', left: 0),
-                  const SizedBox(height: 16),
-                  _buildSkillsRequired(context),
-                ],
-              ),
+          key: _formKey,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SubTitle('Informations générales', left: 0),
+                _buildEnterpriseName(enterprise),
+                _buildStudentName(student),
+                const SubTitle('Tâches', left: 0),
+                _buildVariety(context),
+                const SizedBox(height: 8),
+                _buildTrainingPlan(context),
+                const SubTitle('Habiletés', left: 0),
+                const SizedBox(height: 16),
+                _buildSkillsRequired(context),
+              ],
             ),
-          );
+          ),
+        );
   }
 
   Widget _buildSkillsRequired(BuildContext context) {
@@ -136,9 +139,10 @@ class TaskAndAbilityStepState extends State<TaskAndAbilityStep> {
 
     return TextField(
       decoration: const InputDecoration(
-          labelText: 'Nom de l\'entreprise',
-          border: InputBorder.none,
-          labelStyle: styleOverride),
+        labelText: 'Nom de l\'entreprise',
+        border: InputBorder.none,
+        labelStyle: styleOverride,
+      ),
       style: styleOverride,
       controller: TextEditingController(text: enterprise.name),
       enabled: false,
@@ -151,9 +155,10 @@ class TaskAndAbilityStepState extends State<TaskAndAbilityStep> {
 
     return TextField(
       decoration: const InputDecoration(
-          labelText: 'Nom de l\'élève',
-          border: InputBorder.none,
-          labelStyle: styleOverride),
+        labelText: 'Nom de l\'élève',
+        border: InputBorder.none,
+        labelStyle: styleOverride,
+      ),
       style: styleOverride,
       controller: TextEditingController(text: student.fullName),
       enabled: false,
@@ -168,35 +173,35 @@ class TaskAndAbilityStepState extends State<TaskAndAbilityStep> {
           '* Tâches données à l\'élève',
           style: Theme.of(context).textTheme.titleSmall!,
         ),
-        Row(
-          children: [
-            Expanded(
-              child: RadioListTile<_TaskVariety>(
-                value: _TaskVariety.low,
-                dense: true,
-                groupValue: _taskVariety,
-                visualDensity: VisualDensity.compact,
-                onChanged: (value) => setState(() => _taskVariety = value!),
-                title: Text(
-                  'Peu variées',
-                  style: Theme.of(context).textTheme.bodyMedium,
+        RadioGroup(
+          groupValue: _taskVariety,
+          onChanged: (value) => setState(() => _taskVariety = value!),
+          child: Row(
+            children: [
+              Expanded(
+                child: RadioListTile<_TaskVariety>(
+                  value: _TaskVariety.low,
+                  dense: true,
+                  visualDensity: VisualDensity.compact,
+                  title: Text(
+                    'Peu variées',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              child: RadioListTile<_TaskVariety>(
-                value: _TaskVariety.high,
-                groupValue: _taskVariety,
-                dense: true,
-                visualDensity: VisualDensity.compact,
-                onChanged: (value) => setState(() => _taskVariety = value!),
-                title: Text(
-                  'Très variées',
-                  style: Theme.of(context).textTheme.bodyMedium,
+              Expanded(
+                child: RadioListTile<_TaskVariety>(
+                  value: _TaskVariety.high,
+                  dense: true,
+                  visualDensity: VisualDensity.compact,
+                  title: Text(
+                    'Très variées',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ),
               ),
-            )
-          ],
+            ],
+          ),
         ),
       ],
     );
@@ -215,35 +220,35 @@ class TaskAndAbilityStepState extends State<TaskAndAbilityStep> {
           'faites par l\'élève\u00a0:',
           style: Theme.of(context).textTheme.titleSmall,
         ),
-        Row(
-          children: [
-            Expanded(
-              child: RadioListTile<_TrainingPlan>(
-                value: _TrainingPlan.notFilled,
-                dense: true,
-                groupValue: _trainingPlan,
-                visualDensity: VisualDensity.compact,
-                onChanged: (value) => setState(() => _trainingPlan = value!),
-                title: Text(
-                  'En partie',
-                  style: Theme.of(context).textTheme.bodyMedium,
+        RadioGroup(
+          groupValue: _trainingPlan,
+          onChanged: (value) => setState(() => _trainingPlan = value!),
+          child: Row(
+            children: [
+              Expanded(
+                child: RadioListTile<_TrainingPlan>(
+                  value: _TrainingPlan.notFilled,
+                  dense: true,
+                  visualDensity: VisualDensity.compact,
+                  title: Text(
+                    'En partie',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              child: RadioListTile<_TrainingPlan>(
-                value: _TrainingPlan.filled,
-                groupValue: _trainingPlan,
-                dense: true,
-                visualDensity: VisualDensity.compact,
-                onChanged: (value) => setState(() => _trainingPlan = value!),
-                title: Text(
-                  'En totalité',
-                  style: Theme.of(context).textTheme.bodyMedium,
+              Expanded(
+                child: RadioListTile<_TrainingPlan>(
+                  value: _TrainingPlan.filled,
+                  dense: true,
+                  visualDensity: VisualDensity.compact,
+                  title: Text(
+                    'En totalité',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ),
               ),
-            )
-          ],
+            ],
+          ),
         ),
       ],
     );

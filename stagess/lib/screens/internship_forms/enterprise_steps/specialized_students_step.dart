@@ -162,11 +162,12 @@ class SpecializedStudentsStepState extends State<SpecializedStudentsStep> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _YesOrNoRadioTile(
-            title: '* Est-ce que le ou la stagiaire avait des besoins '
+            title:
+                '* Est-ce que le ou la stagiaire avait des besoins '
                 'particuliers\u00a0?',
             value: _hasStudentHadDisabilities,
-            onChanged: (value) =>
-                setState(() => _hasStudentHadDisabilities = value),
+            onChanged:
+                (value) => setState(() => _hasStudentHadDisabilities = value),
           ),
           if (_hasStudentHadDisabilities)
             FormField(
@@ -179,50 +180,62 @@ class SpecializedStudentsStepState extends State<SpecializedStudentsStep> {
                 }
                 return null;
               },
-              builder: (errorState) => CheckboxWithOther<_Disabilities>(
-                key: _hasDisabilitiesKey,
-                title:
-                    '* Évaluer la prise en charge de l\'entreprise par rapport '
-                    'aux différents besoins de l\'élève s\'il ou elle avait:\u00a0:',
-                titleStyle: Theme.of(context).textTheme.titleSmall,
-                elements: _Disabilities.values,
-                elementStyleBuilder: (element, isSelected) {
-                  var out = Theme.of(context).textTheme.titleSmall!;
+              builder:
+                  (errorState) => CheckboxWithOther<_Disabilities>(
+                    key: _hasDisabilitiesKey,
+                    title:
+                        '* Évaluer la prise en charge de l\'entreprise par rapport '
+                        'aux différents besoins de l\'élève s\'il ou elle avait:\u00a0:',
+                    titleStyle: Theme.of(context).textTheme.titleSmall,
+                    elements: _Disabilities.values,
+                    elementStyleBuilder: (element, isSelected) {
+                      var out = Theme.of(context).textTheme.titleSmall!;
 
-                  if (errorState.hasError &&
-                      _hasDisabilitiesKey.currentState!.selected
-                          .contains(element) &&
-                      _getDisabilityValue(element) <= 0) {
-                    out = out.copyWith(
-                        color: Theme.of(context).colorScheme.error);
-                  }
+                      if (errorState.hasError &&
+                          _hasDisabilitiesKey.currentState!.selected.contains(
+                            element,
+                          ) &&
+                          _getDisabilityValue(element) <= 0) {
+                        out = out.copyWith(
+                          color: Theme.of(context).colorScheme.error,
+                        );
+                      }
 
-                  return out;
-                },
-                showOtherOption: false,
-                subWidgetBuilder: (element, isSelected) {
-                  return isSelected
-                      ? Align(
-                          alignment: Alignment.centerLeft,
-                          child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 24.0, bottom: 8.0),
-                            child: _RatingBarForm(
-                              key: _disabilityKey(element),
-                              initialValue: _getDisabilityValue(element),
-                              validator: (value) => value! <= 0
-                                  ? 'Sélectionner une valeur'
-                                  : null,
-                              onRatingChanged: (newValue) =>
-                                  _setDisabilityValue(element, newValue!),
+                      return out;
+                    },
+                    showOtherOption: false,
+                    subWidgetBuilder: (element, isSelected) {
+                      return isSelected
+                          ? Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                left: 24.0,
+                                bottom: 8.0,
+                              ),
+                              child: _RatingBarForm(
+                                key: _disabilityKey(element),
+                                initialValue: _getDisabilityValue(element),
+                                validator:
+                                    (value) =>
+                                        value! <= 0
+                                            ? 'Sélectionner une valeur'
+                                            : null,
+                                onRatingChanged:
+                                    (newValue) =>
+                                        _setDisabilityValue(element, newValue!),
+                              ),
                             ),
-                          ),
-                        )
-                      : Container();
-                },
-                onOptionSelected: (value) => setState(() =>
-                    _disabilities = _hasDisabilitiesKey.currentState!.selected),
-              ),
+                          )
+                          : Container();
+                    },
+                    onOptionSelected:
+                        (value) => setState(
+                          () =>
+                              _disabilities =
+                                  _hasDisabilitiesKey.currentState!.selected,
+                        ),
+                  ),
             ),
         ],
       ),
@@ -231,8 +244,11 @@ class SpecializedStudentsStepState extends State<SpecializedStudentsStep> {
 }
 
 class _YesOrNoRadioTile extends StatelessWidget {
-  const _YesOrNoRadioTile(
-      {required this.title, required this.value, required this.onChanged});
+  const _YesOrNoRadioTile({
+    required this.title,
+    required this.value,
+    required this.onChanged,
+  });
 
   final String title;
   final bool value;
@@ -240,18 +256,18 @@ class _YesOrNoRadioTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-        Row(
-          children: [
-            SizedBox(
-              width: 150,
-              child: RadioListTile(
+    return RadioGroup(
+      groupValue: value,
+      onChanged: (newValue) => onChanged(newValue!),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: Theme.of(context).textTheme.titleSmall),
+          Row(
+            children: [
+              SizedBox(
+                width: 150,
+                child: RadioListTile(
                   title: Text(
                     'Oui',
                     style: Theme.of(context).textTheme.bodyMedium,
@@ -259,12 +275,11 @@ class _YesOrNoRadioTile extends StatelessWidget {
                   dense: true,
                   visualDensity: VisualDensity.compact,
                   value: true,
-                  groupValue: value,
-                  onChanged: (_) => onChanged(true)),
-            ),
-            SizedBox(
-              width: 150,
-              child: RadioListTile(
+                ),
+              ),
+              SizedBox(
+                width: 150,
+                child: RadioListTile(
                   title: Text(
                     'Non',
                     style: Theme.of(context).textTheme.bodyMedium,
@@ -272,12 +287,12 @@ class _YesOrNoRadioTile extends StatelessWidget {
                   dense: true,
                   visualDensity: VisualDensity.compact,
                   value: false,
-                  groupValue: value,
-                  onChanged: (_) => onChanged(false)),
-            ),
-          ],
-        ),
-      ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

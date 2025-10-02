@@ -23,24 +23,32 @@ Future<T?> showAttitudeEvaluationDialog<T>({
   _logger.info('Showing AttitudeEvaluationDialog with editMode: $editMode');
 
   return await showDialog<T>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Navigator(
-          onGenerateRoute: (settings) => MaterialPageRoute(
-              builder: (ctx) => Dialog(
+    context: context,
+    barrierDismissible: false,
+    builder:
+        (context) => Navigator(
+          onGenerateRoute:
+              (settings) => MaterialPageRoute(
+                builder:
+                    (ctx) => Dialog(
                       child: AttitudeEvaluationScreen(
-                    rootContext: context,
-                    formController: formController,
-                    editMode: editMode,
-                  )))));
+                        rootContext: context,
+                        formController: formController,
+                        editMode: editMode,
+                      ),
+                    ),
+              ),
+        ),
+  );
 }
 
 class AttitudeEvaluationScreen extends StatefulWidget {
-  const AttitudeEvaluationScreen(
-      {super.key,
-      required this.rootContext,
-      required this.formController,
-      required this.editMode});
+  const AttitudeEvaluationScreen({
+    super.key,
+    required this.rootContext,
+    required this.formController,
+    required this.editMode,
+  });
 
   static const route = '/attitude_evaluation';
 
@@ -79,19 +87,22 @@ class _AttitudeEvaluationScreenState extends State<AttitudeEvaluationScreen> {
 
     _stepStatus[0] = StepState.complete;
     if (_currentStep >= 1) {
-      _stepStatus[1] = widget.formController.isAttitudeCompleted
-          ? StepState.complete
-          : StepState.error;
+      _stepStatus[1] =
+          widget.formController.isAttitudeCompleted
+              ? StepState.complete
+              : StepState.error;
     }
     if (_currentStep >= 2) {
-      _stepStatus[2] = widget.formController.isSkillCompleted
-          ? StepState.complete
-          : StepState.error;
+      _stepStatus[2] =
+          widget.formController.isSkillCompleted
+              ? StepState.complete
+              : StepState.error;
     }
     if (_currentStep >= 3) {
-      _stepStatus[3] = widget.formController.isGeneralAppreciationCompleted
-          ? StepState.complete
-          : StepState.error;
+      _stepStatus[3] =
+          widget.formController.isGeneralAppreciationCompleted
+              ? StepState.complete
+              : StepState.error;
     }
     setState(() {});
 
@@ -107,9 +118,11 @@ class _AttitudeEvaluationScreenState extends State<AttitudeEvaluationScreen> {
 
   void _cancel() async {
     _logger.info('Cancelling AttitudeEvaluationDialog');
-    final answer = await ConfirmExitDialog.show(context,
-        content: const Text('Toutes les modifications seront perdues.'),
-        isEditing: widget.editMode);
+    final answer = await ConfirmExitDialog.show(
+      context,
+      content: const Text('Toutes les modifications seront perdues.'),
+      isEditing: widget.editMode,
+    );
     if (!mounted || !answer) return;
 
     _logger.fine('User confirmed cancellation, closing dialog');
@@ -121,11 +134,13 @@ class _AttitudeEvaluationScreenState extends State<AttitudeEvaluationScreen> {
     _logger.info('Submitting attitude evaluation form');
     if (!widget.formController.isCompleted) {
       await showDialog(
-          context: context,
-          builder: (BuildContext context) => const AlertDialog(
-                title: Text('Formulaire incomplet'),
-                content: Text('Répondre à toutes les questions avec un *.'),
-              ));
+        context: context,
+        builder:
+            (BuildContext context) => const AlertDialog(
+              title: Text('Formulaire incomplet'),
+              content: Text('Répondre à toutes les questions avec un *.'),
+            ),
+      );
       return;
     }
 
@@ -134,8 +149,9 @@ class _AttitudeEvaluationScreenState extends State<AttitudeEvaluationScreen> {
     final internships = InternshipsProvider.of(context, listen: false);
     final internship = internships.fromId(widget.formController.internshipId);
 
-    internship.attitudeEvaluations
-        .add(widget.formController.toInternshipEvaluation());
+    internship.attitudeEvaluations.add(
+      widget.formController.toInternshipEvaluation(),
+    );
     internships.replace(internship);
 
     _logger.fine('Attitude evaluation form submitted successfully');
@@ -152,10 +168,10 @@ class _AttitudeEvaluationScreenState extends State<AttitudeEvaluationScreen> {
           const Expanded(child: SizedBox()),
           if (_currentStep != 0)
             OutlinedButton(
-                onPressed: _previousStep, child: const Text('Précédent')),
-          const SizedBox(
-            width: 20,
-          ),
+              onPressed: _previousStep,
+              child: const Text('Précédent'),
+            ),
+          const SizedBox(width: 20),
           if (_currentStep != 3)
             TextButton(
               onPressed: details.onStepContinue,
@@ -163,8 +179,9 @@ class _AttitudeEvaluationScreenState extends State<AttitudeEvaluationScreen> {
             ),
           if (_currentStep == 3 && widget.editMode)
             TextButton(
-                onPressed: details.onStepContinue,
-                child: const Text('Soumettre')),
+              onPressed: details.onStepContinue,
+              child: const Text('Soumettre'),
+            ),
         ],
       ),
     );
@@ -173,34 +190,41 @@ class _AttitudeEvaluationScreenState extends State<AttitudeEvaluationScreen> {
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-        'Building AttitudeEvaluationScreen for internship: ${widget.formController.internshipId}');
+      'Building AttitudeEvaluationScreen for internship: ${widget.formController.internshipId}',
+    );
 
     final internship =
         InternshipsProvider.of(context)[widget.formController.internshipId];
-    final student = StudentsHelpers.studentsInMyGroups(context)
-        .firstWhereOrNull((e) => e.id == internship.studentId);
+    final student = StudentsHelpers.studentsInMyGroups(
+      context,
+    ).firstWhereOrNull((e) => e.id == internship.studentId);
 
     return SizedBox(
       width: ResponsiveService.maxBodyWidth,
       child: Scaffold(
-          appBar: AppBar(
-            title: Text(
-                '${student == null ? 'En attente des informations' : 'Évaluation de ${student.fullName}'}\nC2. Attitudes - Comportements'),
-            leading: IconButton(
-                onPressed: _cancel, icon: const Icon(Icons.arrow_back)),
+        appBar: AppBar(
+          title: Text(
+            '${student == null ? 'En attente des informations' : 'Évaluation de ${student.fullName}'}\nC2. Attitudes - Comportements',
           ),
-          body: PopScope(
-            child: student == null
-                ? const Center(child: CircularProgressIndicator())
-                : ScrollableStepper(
+          leading: IconButton(
+            onPressed: _cancel,
+            icon: const Icon(Icons.arrow_back),
+          ),
+        ),
+        body: PopScope(
+          child:
+              student == null
+                  ? const Center(child: CircularProgressIndicator())
+                  : ScrollableStepper(
                     scrollController: _scrollController,
                     type: StepperType.horizontal,
                     currentStep: _currentStep,
                     onTapContinue: _nextStep,
-                    onStepTapped: (int tapped) => setState(() {
-                      _currentStep = tapped;
-                      _scrollController.jumpTo(0);
-                    }),
+                    onStepTapped:
+                        (int tapped) => setState(() {
+                          _currentStep = tapped;
+                          _scrollController.jumpTo(0);
+                        }),
                     onTapCancel: _cancel,
                     steps: [
                       Step(
@@ -209,8 +233,9 @@ class _AttitudeEvaluationScreenState extends State<AttitudeEvaluationScreen> {
                         state: _stepStatus[0],
                         isActive: _currentStep == 0,
                         content: _AttitudeGeneralDetailsStep(
-                            formController: widget.formController,
-                            editMode: widget.editMode),
+                          formController: widget.formController,
+                          editMode: widget.editMode,
+                        ),
                       ),
                       Step(
                         label: const Text('Attitudes'),
@@ -260,39 +285,40 @@ class _AttitudeEvaluationScreenState extends State<AttitudeEvaluationScreen> {
                         ),
                       ),
                       Step(
-                          label: const Text('Aptitudes'),
-                          title: Container(),
-                          state: _stepStatus[2],
-                          isActive: _currentStep == 2,
-                          content: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _AttitudeRadioChoices(
-                                title: '7. *${QualityOfWork.title}',
-                                formController: widget.formController,
-                                elements: QualityOfWork.values,
-                                editMode: widget.editMode,
-                              ),
-                              _AttitudeRadioChoices(
-                                title: '8. *${Productivity.title}',
-                                formController: widget.formController,
-                                elements: Productivity.values,
-                                editMode: widget.editMode,
-                              ),
-                              _AttitudeRadioChoices(
-                                title: '9. *${Autonomy.title}',
-                                formController: widget.formController,
-                                elements: Autonomy.values,
-                                editMode: widget.editMode,
-                              ),
-                              _AttitudeRadioChoices(
-                                title: '10. *${Cautiousness.title}',
-                                formController: widget.formController,
-                                elements: Cautiousness.values,
-                                editMode: widget.editMode,
-                              ),
-                            ],
-                          )),
+                        label: const Text('Aptitudes'),
+                        title: Container(),
+                        state: _stepStatus[2],
+                        isActive: _currentStep == 2,
+                        content: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _AttitudeRadioChoices(
+                              title: '7. *${QualityOfWork.title}',
+                              formController: widget.formController,
+                              elements: QualityOfWork.values,
+                              editMode: widget.editMode,
+                            ),
+                            _AttitudeRadioChoices(
+                              title: '8. *${Productivity.title}',
+                              formController: widget.formController,
+                              elements: Productivity.values,
+                              editMode: widget.editMode,
+                            ),
+                            _AttitudeRadioChoices(
+                              title: '9. *${Autonomy.title}',
+                              formController: widget.formController,
+                              elements: Autonomy.values,
+                              editMode: widget.editMode,
+                            ),
+                            _AttitudeRadioChoices(
+                              title: '10. *${Cautiousness.title}',
+                              formController: widget.formController,
+                              elements: Cautiousness.values,
+                              editMode: widget.editMode,
+                            ),
+                          ],
+                        ),
+                      ),
                       Step(
                         label: const Text('Commentaires'),
                         title: Container(),
@@ -308,15 +334,17 @@ class _AttitudeEvaluationScreenState extends State<AttitudeEvaluationScreen> {
                               editMode: widget.editMode,
                             ),
                             _Comments(
-                                formController: widget.formController,
-                                editMode: widget.editMode),
+                              formController: widget.formController,
+                              editMode: widget.editMode,
+                            ),
                           ],
                         ),
-                      )
+                      ),
                     ],
                     controlsBuilder: _controlBuilder,
                   ),
-          )),
+        ),
+      ),
     );
   }
 }
@@ -379,8 +407,12 @@ class _EvaluationDateState extends State<_EvaluationDate> {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Row(
             children: [
-              Text(DateFormat('dd MMMM yyyy', 'fr_CA')
-                  .format(widget.formController.evaluationDate)),
+              Text(
+                DateFormat(
+                  'dd MMMM yyyy',
+                  'fr_CA',
+                ).format(widget.formController.evaluationDate),
+              ),
               if (widget.editMode)
                 IconButton(
                   icon: const Icon(
@@ -398,8 +430,10 @@ class _EvaluationDateState extends State<_EvaluationDate> {
 }
 
 class _PersonAtMeeting extends StatelessWidget {
-  const _PersonAtMeeting(
-      {required this.formController, required this.editMode});
+  const _PersonAtMeeting({
+    required this.formController,
+    required this.editMode,
+  });
 
   final AttitudeEvaluationFormController formController;
   final bool editMode;
@@ -425,11 +459,12 @@ class _PersonAtMeeting extends StatelessWidget {
 }
 
 class _AttitudeRadioChoices extends StatefulWidget {
-  const _AttitudeRadioChoices(
-      {required this.title,
-      required this.formController,
-      required this.elements,
-      required this.editMode});
+  const _AttitudeRadioChoices({
+    required this.title,
+    required this.formController,
+    required this.elements,
+    required this.editMode,
+  });
 
   final String title;
   final AttitudeEvaluationFormController formController;
@@ -451,27 +486,37 @@ class _AttitudeRadioChoicesState extends State<_AttitudeRadioChoices> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SubTitle(widget.title),
-        ...widget.elements.map(
-          (e) => RadioListTile<AttitudeCategoryEnum>(
-            dense: true,
-            visualDensity: VisualDensity.compact,
-            title: Text(e.name,
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                      color: Colors.black,
-                    )),
-            value: e,
-            groupValue: widget.formController.responses[e.runtimeType],
-            onChanged: widget.editMode
-                ? (newValue) => setState(() =>
-                    widget.formController.responses[e.runtimeType] = newValue!)
-                : null,
+    return RadioGroup(
+      groupValue:
+          widget.formController.responses[widget.elements[0].runtimeType],
+      onChanged:
+          (value) => setState(
+            () =>
+                widget.formController.responses[widget
+                        .elements[0]
+                        .runtimeType] =
+                    value!,
           ),
-        ),
-      ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SubTitle(widget.title),
+          ...widget.elements.map(
+            (e) => RadioListTile<AttitudeCategoryEnum>(
+              dense: true,
+              visualDensity: VisualDensity.compact,
+              title: Text(
+                e.name,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium!.copyWith(color: Colors.black),
+              ),
+              value: e,
+              enabled: widget.editMode,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

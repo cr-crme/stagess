@@ -1050,7 +1050,7 @@ class _CumtomInputDatePickerFormFieldState
       context,
     );
     final DatePickerThemeData datePickerTheme = theme.datePickerTheme;
-    final InputDecorationTheme inputTheme = theme.inputDecorationTheme;
+    final InputDecorationThemeData inputTheme = theme.inputDecorationTheme;
     final InputBorder effectiveInputBorder =
         datePickerTheme.inputDecorationTheme?.border ??
         theme.inputDecorationTheme.border ??
@@ -3408,7 +3408,7 @@ class _InputDateRangePickerState extends State<_InputDateRangePicker> {
     final MaterialLocalizations localizations = MaterialLocalizations.of(
       context,
     );
-    final InputDecorationTheme inputTheme = theme.inputDecorationTheme;
+    final InputDecorationThemeData inputTheme = theme.inputDecorationTheme;
     final InputBorder inputBorder =
         inputTheme.border ?? const UnderlineInputBorder();
 

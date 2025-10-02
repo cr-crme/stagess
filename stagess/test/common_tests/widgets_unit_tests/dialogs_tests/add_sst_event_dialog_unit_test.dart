@@ -22,7 +22,9 @@ void main() {
 
       for (int i = 0; i < radioFinders.evaluate().length; i++) {
         final textFinder = find.descendant(
-            of: radioFinders.at(i), matching: find.byType(Text));
+          of: radioFinders.at(i),
+          matching: find.byType(Text),
+        );
         expect(textFinder, findsOneWidget);
         final text = tester.widget<Text>(textFinder);
         expect(text.data, SstEventType.values[i].description);
@@ -42,7 +44,6 @@ void main() {
         for (int j = 0; j < radioFinders.evaluate().length; j++) {
           final radio = tester.widget<RadioListTile>(radioFinders.at(j));
           expect(radio.value, SstEventType.values[j]);
-          expect(radio.groupValue, SstEventType.values[i]);
         }
       }
     });
@@ -63,8 +64,10 @@ void main() {
       final cancelFinder = find.byType(OutlinedButton);
       expect(find.byType(OutlinedButton), findsOneWidget);
 
-      final textFinder =
-          find.descendant(of: cancelFinder, matching: find.byType(Text));
+      final textFinder = find.descendant(
+        of: cancelFinder,
+        matching: find.byType(Text),
+      );
       expect(textFinder, findsOneWidget);
 
       final text = tester.widget<Text>(textFinder);
@@ -77,8 +80,10 @@ void main() {
       final confirmFinder = find.byType(TextButton);
       expect(confirmFinder, findsOneWidget);
 
-      final textFinder =
-          find.descendant(of: confirmFinder, matching: find.byType(Text));
+      final textFinder = find.descendant(
+        of: confirmFinder,
+        matching: find.byType(Text),
+      );
       expect(textFinder, findsOneWidget);
 
       final text = tester.widget<Text>(textFinder);
@@ -95,8 +100,9 @@ void main() {
       expect(find.byType(AddSstEventDialog), findsNothing);
     });
 
-    testWidgets('confirming is refused with snackbar if nothing is selected',
-        (tester) async {
+    testWidgets('confirming is refused with snackbar if nothing is selected', (
+      tester,
+    ) async {
       await tester.pumpWidget(declareWidget(const AddSstEventDialog()));
       expect(find.byType(SnackBar), findsNothing);
 
@@ -111,8 +117,9 @@ void main() {
       expect(find.text('Sélectionner un type d\'incident.'), findsOneWidget);
     });
 
-    testWidgets('confirming is refused if no description is entered',
-        (tester) async {
+    testWidgets('confirming is refused if no description is entered', (
+      tester,
+    ) async {
       await tester.pumpWidget(declareWidget(const AddSstEventDialog()));
 
       await tester.tap(find.text(SstEventType.severe.description));
@@ -128,21 +135,23 @@ void main() {
       expect(find.text('Que s\'est-il passé?'), findsOneWidget);
     });
 
-    testWidgets('confirming is accepted if a type and a description is entered',
-        (tester) async {
-      await tester.pumpWidget(declareWidget(const AddSstEventDialog()));
+    testWidgets(
+      'confirming is accepted if a type and a description is entered',
+      (tester) async {
+        await tester.pumpWidget(declareWidget(const AddSstEventDialog()));
 
-      await tester.tap(find.text(SstEventType.severe.description));
-      await tester.pump();
+        await tester.tap(find.text(SstEventType.severe.description));
+        await tester.pump();
 
-      await tester.enterText(find.byType(TextFormField), 'Test description');
-      await tester.pump();
+        await tester.enterText(find.byType(TextFormField), 'Test description');
+        await tester.pump();
 
-      await tester.tap(find.text('Confirmer'));
-      await tester.pumpAndSettle();
+        await tester.tap(find.text('Confirmer'));
+        await tester.pumpAndSettle();
 
-      // The dialog should be closed
-      expect(find.byType(AddSstEventDialog), findsNothing);
-    });
+        // The dialog should be closed
+        expect(find.byType(AddSstEventDialog), findsNothing);
+      },
+    );
   });
 }

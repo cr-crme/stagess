@@ -43,10 +43,15 @@ class _AddSstEventDialogState extends State<AddSstEventDialog> {
       return;
     }
 
-    if (FormService.validateForm(_formKey,
-        save: true, showSnackbarError: true)) {
-      Navigator.pop(
-          context, {'eventType': _eventType, 'description': _description});
+    if (FormService.validateForm(
+      _formKey,
+      save: true,
+      showSnackbarError: true,
+    )) {
+      Navigator.pop(context, {
+        'eventType': _eventType,
+        'description': _description,
+      });
     }
   }
 
@@ -57,58 +62,48 @@ class _AddSstEventDialogState extends State<AddSstEventDialog> {
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              RadioListTile(
-                title: Text(
-                  SstEventType.severe.description,
-                  style: Theme.of(context).textTheme.bodyMedium,
+          child: RadioGroup(
+            groupValue: _eventType,
+            onChanged: (value) => setState(() => _eventType = value),
+            child: Column(
+              children: [
+                RadioListTile(
+                  title: Text(
+                    SstEventType.severe.description,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  value: SstEventType.severe,
                 ),
-                value: SstEventType.severe,
-                groupValue: _eventType,
-                onChanged: (value) =>
-                    setState(() => _eventType = SstEventType.severe),
-              ),
-              RadioListTile(
-                title: Text(
-                  SstEventType.verbal.description,
-                  style: Theme.of(context).textTheme.bodyMedium,
+                RadioListTile(
+                  title: Text(
+                    SstEventType.verbal.description,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  value: SstEventType.verbal,
                 ),
-                value: SstEventType.verbal,
-                groupValue: _eventType,
-                onChanged: (value) =>
-                    setState(() => _eventType = SstEventType.verbal),
-              ),
-              RadioListTile(
-                title: Text(
-                  SstEventType.minor.description,
-                  style: Theme.of(context).textTheme.bodyMedium,
+                RadioListTile(
+                  title: Text(
+                    SstEventType.minor.description,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  value: SstEventType.minor,
                 ),
-                value: SstEventType.minor,
-                groupValue: _eventType,
-                onChanged: (value) =>
-                    setState(() => _eventType = SstEventType.minor),
-              ),
-              const SizedBox(height: 12),
-              TextWithForm(
-                title: 'Raconter ce qu\'il s\'est passé:',
-                onSaved: (text) => setState(() => _description = text),
-                validator: (text) =>
-                    text?.isEmpty ?? true ? 'Que s\'est-il passé?' : null,
-              ),
-            ],
+                const SizedBox(height: 12),
+                TextWithForm(
+                  title: 'Raconter ce qu\'il s\'est passé:',
+                  onSaved: (text) => setState(() => _description = text),
+                  validator:
+                      (text) =>
+                          text?.isEmpty ?? true ? 'Que s\'est-il passé?' : null,
+                ),
+              ],
+            ),
           ),
         ),
       ),
       actions: [
-        OutlinedButton(
-          onPressed: _onCancel,
-          child: const Text('Annuler'),
-        ),
-        TextButton(
-          onPressed: _onConfirm,
-          child: const Text('Confirmer'),
-        ),
+        OutlinedButton(onPressed: _onCancel, child: const Text('Annuler')),
+        TextButton(onPressed: _onConfirm, child: const Text('Confirmer')),
       ],
     );
   }
