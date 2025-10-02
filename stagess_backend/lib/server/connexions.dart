@@ -56,6 +56,20 @@ class Connexions {
           throw ConnexionRefusedException('Handshake timeout');
         }
       }
+
+      // Disconnect other connections the same user might have
+      for (final otherClient in _clients.keys) {
+        final toWait = <Future>[];
+        if (otherClient != client &&
+            _clients[otherClient]?.userId == _clients[client]?.userId) {
+          _logger.info(
+              'Closing duplicate connexion of user ${_clients[client]?.userId}');
+          toWait.add(_onConnexionClosed(otherClient,
+              message: 'Closing duplicate connexion'));
+        }
+        print(toWait);
+        await Future.wait(toWait);
+      }
     } catch (e) {
       await _refuseConnexion(client, e.toString());
       return false;

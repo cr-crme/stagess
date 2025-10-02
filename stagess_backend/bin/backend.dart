@@ -82,14 +82,15 @@ void main() async {
     databaseBackend: _databaseBackend,
     firebaseApiKey: firebaseApiKey,
     settings: _devSettings,
-    isProduction: false,
+    skipLog: true,
   );
 
   final productionConnexions = await _connectDatabase(
-      databaseBackend: _databaseBackend,
-      firebaseApiKey: firebaseApiKey,
-      settings: _productionSettings,
-      isProduction: true);
+    databaseBackend: _databaseBackend,
+    firebaseApiKey: firebaseApiKey,
+    settings: _productionSettings,
+    skipLog: false,
+  );
 
   _logger.info('Server ready and waiting for requests...');
   final requestHandler = HttpRequestHandler(
@@ -149,7 +150,7 @@ Future<Connexions> _connectDatabase({
   required DatabaseBackend databaseBackend,
   required String firebaseApiKey,
   required ConnectionSettings settings,
-  required bool isProduction,
+  required bool skipLog,
 }) async {
   final sqlInterface = switch (databaseBackend) {
     DatabaseBackend.mock => null,
@@ -206,6 +207,6 @@ Future<Connexions> _connectDatabase({
           DatabaseBackend.mock => InternshipsRepositoryMock()
         },
       ),
-      skipLog: !isProduction);
+      skipLog: skipLog);
   return connexions;
 }
