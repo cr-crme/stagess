@@ -136,6 +136,8 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       }
     }
 
+    if (_providerSelector[getField(true)] != null) return;
+
     // Keep a reference to the deserializer function
     _providerSelector[getField()] = _Selector(
       addOrReplaceItems: _addOrReplaceIntoSelf,
@@ -155,7 +157,8 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       await Future.delayed(const Duration(milliseconds: 100));
       if (_socket == null) return;
     }
-    _getFromBackend(getField(true));
+
+    await _getFromBackend(getField(true));
   }
 
   Future<void> disconnect() async {
