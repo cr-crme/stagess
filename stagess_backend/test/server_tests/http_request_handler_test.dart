@@ -11,10 +11,12 @@ import 'package:stagess_backend/server/http_request_handler.dart';
 import 'package:test/test.dart';
 
 import '../mockers/http_request_mock.dart';
+import '../mockers/sql_connection_mock.dart';
 
-Connexions get _mockedConnexions => Connexions(
+Future<Connexions> get _mockedConnexions async => Connexions(
       database: DatabaseManager(
-        sqlInterface: MySqlInterface(connection: null),
+        sqlInterface: await MySqlInterface.connect(
+            connectToDatabase: () async => DummyMySqlConnection()),
         schoolBoardsDatabase: SchoolBoardsRepositoryMock(),
         adminsDatabase: AdminsRepositoryMock(),
         teachersDatabase: TeachersRepositoryMock(),
@@ -30,8 +32,8 @@ void main() {
   test('Send an a preflight request', () async {
     final request = HttpRequestMock(method: 'OPTIONS', uri: Uri.parse('/'));
     final requestHandler = HttpRequestHandler(
-        devConnexions: _mockedConnexions,
-        productionConnexions: _mockedConnexions);
+        devConnexions: await _mockedConnexions,
+        productionConnexions: await _mockedConnexions);
     await requestHandler.answer(request);
 
     final response = request.response as HttpResponseMock;
@@ -47,8 +49,8 @@ void main() {
   test('Send a POST request', () async {
     final request = HttpRequestMock(method: 'POST', uri: Uri.parse('/'));
     final requestHandler = HttpRequestHandler(
-        devConnexions: _mockedConnexions,
-        productionConnexions: _mockedConnexions);
+        devConnexions: await _mockedConnexions,
+        productionConnexions: await _mockedConnexions);
     await requestHandler.answer(request);
 
     final response = request.response as HttpResponseMock;
@@ -58,8 +60,8 @@ void main() {
   test('Send a GET resquest to an invalid endpoit', () async {
     final request = HttpRequestMock(method: 'GET', uri: Uri.parse('/'));
     final requestHandler = HttpRequestHandler(
-        devConnexions: _mockedConnexions,
-        productionConnexions: _mockedConnexions);
+        devConnexions: await _mockedConnexions,
+        productionConnexions: await _mockedConnexions);
     await requestHandler.answer(request);
 
     final response = request.response as HttpResponseMock;
@@ -72,8 +74,8 @@ void main() {
         uri: Uri.parse('/connect'),
         forceFailToUpgradeToWebSocket: true);
     final requestHandler = HttpRequestHandler(
-        devConnexions: _mockedConnexions,
-        productionConnexions: _mockedConnexions);
+        devConnexions: await _mockedConnexions,
+        productionConnexions: await _mockedConnexions);
     await requestHandler.answer(request);
 
     final response = request.response as HttpResponseMock;
@@ -83,8 +85,8 @@ void main() {
   test('Send a GET request to the /connect endpoint', () async {
     final request = HttpRequestMock(method: 'GET', uri: Uri.parse('/connect'));
     final requestHandler = HttpRequestHandler(
-        devConnexions: _mockedConnexions,
-        productionConnexions: _mockedConnexions);
+        devConnexions: await _mockedConnexions,
+        productionConnexions: await _mockedConnexions);
     await requestHandler.answer(request);
 
     // This test creates a true WebSocket connection (as opposed to a mock)

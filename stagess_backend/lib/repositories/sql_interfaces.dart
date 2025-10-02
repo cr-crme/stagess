@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:mysql1/mysql1.dart';
@@ -16,10 +17,16 @@ final _protectedTables = [
 ];
 
 abstract class SqlInterface {
+  ///
+  /// The current connection to the database
   get connection;
 
+  ///
+  /// Try to perform a query, and catch any database exception to rethrow
   Future<Results> tryQuery(String query, [List<Object?>? values]);
 
+  ///
+  /// Perform a SELECT query and return the results as a list of maps
   Future<List<Map<String, dynamic>>> performSelectQuery({
     required DatabaseUser user,
     required String tableName,
@@ -28,60 +35,84 @@ abstract class SqlInterface {
     List<MySqlTableAccessor>? subqueries,
   });
 
+  ///
+  /// Craft and perform an INSERT query
   Future<Results> performInsertQuery({
     required String tableName,
     required Map<String, dynamic> data,
   });
 
+  ///
+  /// Craft and perform an UPDATE query
   Future<Results> performUpdateQuery({
     required String tableName,
     Map<String, String>? filters,
     required Map<String, dynamic> data,
   });
 
+  ///
+  /// Craft and perform a DELETE query
   Future<Results> performDeleteQuery({
     required String tableName,
     Map<String, String>? filters,
   });
 
+  ///
+  /// Craft and perform an INSERT queries for person entity
   Future<void> performInsertPerson({
     required Person person,
     bool skipAddingEntity = false,
   });
 
+  ///
+  /// Craft and perform an UPDATE queries for person entity
   Future<void> performUpdatePerson({
     required Person person,
     required Person previous,
   });
 
+  ///
+  /// Craft and perform an INSERT queries for phone number
   Future<void> performInsertPhoneNumber({
     required PhoneNumber phoneNumber,
     required String entityId,
   });
 
+  ///
+  /// Craft and perform an UPDATE queries for phone number
   Future<void> performUpdatePhoneNumber({
     required PhoneNumber phoneNumber,
     required PhoneNumber previous,
   });
 
+  ///
+  /// Craft and perform a DELETE queries for phone number
   Future<void> performDeletePhoneNumber({
     required PhoneNumber phoneNumber,
   });
 
+  ///
+  /// Craft and perform an INSERT queries for address
   Future<void> performInsertAddress({
     required Address address,
     required String entityId,
   });
 
+  ///
+  /// Craft and perform an UPDATE queries for address
   Future<void> performUpdateAddress({
     required Address address,
     required Address previous,
   });
 
+  ///
+  /// Craft and perform a DELETE queries for address
   Future<void> performDeleteAddress({
     required Address address,
   });
 
+  ///
+  /// Craft a subquery that will join a relation table to get the data from another table
   MySqlTableAccessor joinSubquery({
     required String dataTableName,
     String? asName,
@@ -93,6 +124,8 @@ abstract class SqlInterface {
     required List<String> fieldsToFetch,
   });
 
+  ///
+  /// Craft a subquery that will select data from another table based on a foreign key
   MySqlTableAccessor selectSubquery({
     required String dataTableName,
     String? asName,
@@ -103,16 +136,42 @@ abstract class SqlInterface {
 }
 
 class MySqlInterface implements SqlInterface {
+  MySqlConnection _connection;
   @override
-  final MySqlConnection? connection;
+  MySqlConnection get connection => _connection;
 
-  MySqlInterface({required this.connection});
+  static Future<MySqlInterface> connect({
+    required Future<MySqlConnection> Function() connectToDatabase,
+  }) async =>
+      MySqlInterface._(
+          connection: await connectToDatabase(),
+          connectToDatabase: connectToDatabase);
+
+  MySqlInterface._({
+    required MySqlConnection connection,
+    required Future<MySqlConnection> Function() connectToDatabase,
+  }) : _connection = connection {
+    // Keep alive the connection
+
+    Timer.periodic(Duration(minutes: 5), (timer) async {
+      await _keepAlive(connectToDatabase: connectToDatabase);
+    });
+  }
+
+  Future<void> _keepAlive(
+      {required Future<MySqlConnection> Function() connectToDatabase}) async {
+    try {
+      await tryQuery('SELECT 1');
+    } catch (e) {
+      _connection = await connectToDatabase();
+    }
+  }
 
 // coverage:ignore-start
   @override
   Future<Results> tryQuery(String query, [List<Object?>? values]) async {
     try {
-      return await connection!.query(query, values);
+      return await connection.query(query, values);
     } on MySqlException catch (e) {
       throw DatabaseFailureException(
           'Database failure: ${e.message} (${e.errorNumber}). '
@@ -472,7 +531,16 @@ class MySqlInterface implements SqlInterface {
 }
 
 class MariaDbSqlInterface extends MySqlInterface {
-  MariaDbSqlInterface({required super.connection});
+  static Future<MariaDbSqlInterface> connect({
+    required Future<MySqlConnection> Function() connectToDatabase,
+  }) async =>
+      MariaDbSqlInterface._(
+          connection: await connectToDatabase(),
+          connectToDatabase: connectToDatabase);
+
+  MariaDbSqlInterface._(
+      {required super.connection, required super.connectToDatabase})
+      : super._();
 
   @override
   Future<Results> tryQuery(String query, [List<Object?>? values]) async {

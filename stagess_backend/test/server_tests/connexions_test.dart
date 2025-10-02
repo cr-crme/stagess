@@ -15,6 +15,7 @@ import 'package:stagess_backend/utils/custom_web_socket.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:test/test.dart';
 
+import '../mockers/sql_connection_mock.dart';
 import '../mockers/web_socket_mock.dart';
 
 String _prepareHandshake() {
@@ -27,8 +28,9 @@ String _prepareHandshake() {
   }).serialize());
 }
 
-DatabaseManager get _mockedDatabase => DatabaseManager(
-      sqlInterface: MySqlInterface(connection: null),
+Future<DatabaseManager> get _mockedDatabase async => DatabaseManager(
+      sqlInterface: await MySqlInterface.connect(
+          connectToDatabase: () async => DummyMySqlConnection()),
       schoolBoardsDatabase: SchoolBoardsRepositoryMock(),
       adminsDatabase: AdminsRepositoryMock(),
       teachersDatabase: TeachersRepositoryMock(),
@@ -38,8 +40,8 @@ DatabaseManager get _mockedDatabase => DatabaseManager(
     );
 
 Future<CommunicationProtocol> _sendAndReceive({required String toSend}) async {
-  final connexions =
-      Connexions(database: _mockedDatabase, firebaseApiKey: '', skipLog: true);
+  final connexions = Connexions(
+      database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
   final socket = WebSocketMock();
   final client =
       CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
@@ -66,7 +68,7 @@ void main() {
   test('Add new client with handshake timeout', () async {
     final connexions = Connexions(
         timeout: Duration(milliseconds: 200),
-        database: _mockedDatabase,
+        database: await _mockedDatabase,
         firebaseApiKey: '',
         skipLog: true);
     final socket = WebSocketMock();
@@ -100,7 +102,7 @@ void main() {
   test('Request something without sending handshake', () async {
     final connexions = Connexions(
         timeout: Duration(milliseconds: 200),
-        database: _mockedDatabase,
+        database: await _mockedDatabase,
         firebaseApiKey: '',
         skipLog: true);
     final socket = WebSocketMock();
@@ -163,7 +165,7 @@ void main() {
   test('Add new client with missing handshake data request', () async {
     final connexions = Connexions(
         timeout: Duration(milliseconds: 200),
-        database: _mockedDatabase,
+        database: await _mockedDatabase,
         firebaseApiKey: '',
         skipLog: true);
     final socket = WebSocketMock();
@@ -223,7 +225,7 @@ void main() {
   test('Add new client with missing token', () async {
     final connexions = Connexions(
         timeout: Duration(milliseconds: 200),
-        database: _mockedDatabase,
+        database: await _mockedDatabase,
         firebaseApiKey: '',
         skipLog: true);
     final socket = WebSocketMock();
@@ -284,7 +286,7 @@ void main() {
   test('Add new client with invalid token', () async {
     final connexions = Connexions(
         timeout: Duration(milliseconds: 200),
-        database: _mockedDatabase,
+        database: await _mockedDatabase,
         firebaseApiKey: '',
         skipLog: true);
     final socket = WebSocketMock();
@@ -344,7 +346,7 @@ void main() {
 
   test('Add a new client to Connexions and disconnect', () async {
     final connexions = Connexions(
-        database: _mockedDatabase, firebaseApiKey: '', skipLog: true);
+        database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
@@ -381,7 +383,7 @@ void main() {
 
   test('Add a new client to Connexions and experience error', () async {
     final connexions = Connexions(
-        database: _mockedDatabase, firebaseApiKey: '', skipLog: true);
+        database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
@@ -399,7 +401,7 @@ void main() {
 
   test('New client disconnect during handshake', () async {
     final connexions = Connexions(
-        database: _mockedDatabase, firebaseApiKey: '', skipLog: true);
+        database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
@@ -470,7 +472,7 @@ void main() {
 
   test('Send a POST teacher request and receive the update', () async {
     final connexions = Connexions(
-        database: _mockedDatabase, firebaseApiKey: '', skipLog: true);
+        database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final socket1 = WebSocketMock();
     final client1 =
         CustomWebSocket(socket: socket1, ipAddress: '127.0.0.1', port: 8080);
@@ -568,7 +570,7 @@ void main() {
   });
   test('Send invalid UPDATE request', () async {
     final connexions = Connexions(
-        database: _mockedDatabase, firebaseApiKey: '', skipLog: true);
+        database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
@@ -602,7 +604,7 @@ void main() {
 
   test('Send a message to a disconnected client', () async {
     final connexions = Connexions(
-        database: _mockedDatabase, firebaseApiKey: '', skipLog: true);
+        database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);

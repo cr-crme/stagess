@@ -11,6 +11,8 @@ import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:test/test.dart';
 
+import '../mockers/sql_connection_mock.dart';
+
 SchoolBoardsRepository get _mockedDatabaseSchoolBoards =>
     SchoolBoardsRepositoryMock();
 AdminsRepository get _mockedAdminsDatabase => AdminsRepositoryMock();
@@ -24,7 +26,8 @@ InternshipsRepository get _mockedDatabaseInternships =>
 void main() {
   test('Get teachers from DatabaseManagers', () async {
     final database = DatabaseManager(
-      sqlInterface: MySqlInterface(connection: null),
+      sqlInterface: await MySqlInterface.connect(
+          connectToDatabase: () async => DummyMySqlConnection()),
       schoolBoardsDatabase: _mockedDatabaseSchoolBoards,
       adminsDatabase: _mockedAdminsDatabase,
       teachersDatabase: _mockedDatabaseTeachers,
@@ -49,7 +52,8 @@ void main() {
 
   test('Get teacher from DatabaseManagers', () async {
     final database = DatabaseManager(
-      sqlInterface: MySqlInterface(connection: null),
+      sqlInterface: await MySqlInterface.connect(
+          connectToDatabase: () async => DummyMySqlConnection()),
       schoolBoardsDatabase: _mockedDatabaseSchoolBoards,
       adminsDatabase: _mockedAdminsDatabase,
       teachersDatabase: _mockedDatabaseTeachers,
@@ -69,7 +73,8 @@ void main() {
 
   test('Get teacher from DatabaseManagers with invalid id', () async {
     final database = DatabaseManager(
-      sqlInterface: MySqlInterface(connection: null),
+      sqlInterface: await MySqlInterface.connect(
+          connectToDatabase: () async => DummyMySqlConnection()),
       schoolBoardsDatabase: _mockedDatabaseSchoolBoards,
       adminsDatabase: _mockedAdminsDatabase,
       teachersDatabase: _mockedDatabaseTeachers,
@@ -90,7 +95,8 @@ void main() {
 
   test('Get teacher from DatabaseManagers without id', () async {
     final database = DatabaseManager(
-      sqlInterface: MySqlInterface(connection: null),
+      sqlInterface: await MySqlInterface.connect(
+          connectToDatabase: () async => DummyMySqlConnection()),
       schoolBoardsDatabase: _mockedDatabaseSchoolBoards,
       adminsDatabase: _mockedAdminsDatabase,
       teachersDatabase: _mockedDatabaseTeachers,
@@ -112,7 +118,8 @@ void main() {
 
   test('Put without data in DatabaseManagers', () async {
     final database = DatabaseManager(
-      sqlInterface: MySqlInterface(connection: null),
+      sqlInterface: await MySqlInterface.connect(
+          connectToDatabase: () async => DummyMySqlConnection()),
       schoolBoardsDatabase: _mockedDatabaseSchoolBoards,
       adminsDatabase: _mockedAdminsDatabase,
       teachersDatabase: _mockedDatabaseTeachers,
@@ -134,7 +141,8 @@ void main() {
 
   test('Set all teachers to DatabaseManagers', () async {
     final database = DatabaseManager(
-      sqlInterface: MySqlInterface(connection: null),
+      sqlInterface: await MySqlInterface.connect(
+          connectToDatabase: () async => DummyMySqlConnection()),
       schoolBoardsDatabase: _mockedDatabaseSchoolBoards,
       adminsDatabase: _mockedAdminsDatabase,
       teachersDatabase: _mockedDatabaseTeachers,
@@ -156,7 +164,8 @@ void main() {
 
   test('Set teacher to DatabaseManagers', () async {
     final database = DatabaseManager(
-      sqlInterface: MySqlInterface(connection: null),
+      sqlInterface: await MySqlInterface.connect(
+          connectToDatabase: () async => DummyMySqlConnection()),
       schoolBoardsDatabase: _mockedDatabaseSchoolBoards,
       adminsDatabase: _mockedAdminsDatabase,
       teachersDatabase: _mockedDatabaseTeachers,
@@ -180,7 +189,8 @@ void main() {
 
   test('Set new teacher to DatabaseManagers', () async {
     final database = DatabaseManager(
-      sqlInterface: MySqlInterface(connection: null),
+      sqlInterface: await MySqlInterface.connect(
+          connectToDatabase: () async => DummyMySqlConnection()),
       schoolBoardsDatabase: _mockedDatabaseSchoolBoards,
       adminsDatabase: _mockedAdminsDatabase,
       teachersDatabase: _mockedDatabaseTeachers,
@@ -204,7 +214,8 @@ void main() {
 
   test('Set teacher to DatabaseManagers without id', () async {
     final database = DatabaseManager(
-      sqlInterface: MySqlInterface(connection: null),
+      sqlInterface: await MySqlInterface.connect(
+          connectToDatabase: () async => DummyMySqlConnection()),
       schoolBoardsDatabase: _mockedDatabaseSchoolBoards,
       adminsDatabase: _mockedAdminsDatabase,
       teachersDatabase: _mockedDatabaseTeachers,

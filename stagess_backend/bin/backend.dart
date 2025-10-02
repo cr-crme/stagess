@@ -153,10 +153,10 @@ Future<Connexions> _connectDatabase({
 }) async {
   final sqlInterface = switch (databaseBackend) {
     DatabaseBackend.mock => null,
-    DatabaseBackend.mysql =>
-      MySqlInterface(connection: await MySqlConnection.connect(settings)),
-    DatabaseBackend.mariadb =>
-      MariaDbSqlInterface(connection: await MySqlConnection.connect(settings)),
+    DatabaseBackend.mysql => await MySqlInterface.connect(
+        connectToDatabase: () async => await MySqlConnection.connect(settings)),
+    DatabaseBackend.mariadb => await MariaDbSqlInterface.connect(
+        connectToDatabase: () async => await MySqlConnection.connect(settings)),
   };
   if (databaseBackend == DatabaseBackend.mariadb) {
     await sqlInterface!.tryQuery('SET SESSION group_concat_max_len = 1000000');

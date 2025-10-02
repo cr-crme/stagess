@@ -1,6 +1,8 @@
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:test/test.dart';
 
+import '../mockers/sql_connection_mock.dart';
+
 String _cleanQuery(String query) {
   return query
       .replaceAll(RegExp(r'\s+'),
@@ -9,33 +11,37 @@ String _cleanQuery(String query) {
 }
 
 void main() {
-  test('MySql query crafter all table', () {
+  test('MySql query crafter all table', () async {
     // Remove spaces and new lines for comparison
-    final sqlInterface = MySqlInterface(connection: null);
+    final sqlInterface = await MySqlInterface.connect(
+        connectToDatabase: () async => DummyMySqlConnection());
     final query =
         _cleanQuery(sqlInterface.craftSelectQuery(tableName: 'my_table'));
 
     expect(query, 'SELECT t.* FROM my_table t');
   });
 
-  test('MySql query crafter element in table', () {
-    final sqlInterface = MySqlInterface(connection: null);
+  test('MySql query crafter element in table', () async {
+    final sqlInterface = await MySqlInterface.connect(
+        connectToDatabase: () async => DummyMySqlConnection());
     final query = _cleanQuery(sqlInterface
         .craftSelectQuery(tableName: 'my_table', filters: {'id': 'my_id'}));
 
     expect(query, 'SELECT t.* FROM my_table t WHERE t.id = ?');
   });
 
-  test('MySql query crafter element in table with specific id', () {
-    final sqlInterface = MySqlInterface(connection: null);
+  test('MySql query crafter element in table with specific id', () async {
+    final sqlInterface = await MySqlInterface.connect(
+        connectToDatabase: () async => DummyMySqlConnection());
     final query = _cleanQuery(sqlInterface.craftSelectQuery(
         tableName: 'my_table', filters: {'my_named_id': 'my_id'}));
 
     expect(query, 'SELECT t.* FROM my_table t WHERE t.my_named_id = ?');
   });
 
-  test('MySql query crafter with table', () {
-    final sqlInterface = MySqlInterface(connection: null);
+  test('MySql query crafter with table', () async {
+    final sqlInterface = await MySqlInterface.connect(
+        connectToDatabase: () async => DummyMySqlConnection());
     final query = _cleanQuery(
         sqlInterface.craftSelectQuery(tableName: 'my_table', sublists: [
       sqlInterface.selectSubquery(
@@ -52,8 +58,9 @@ void main() {
         'FROM table_name st WHERE st.subtable_id = t.table_id ), JSON_ARRAY()) AS new_table FROM my_table t');
   });
 
-  test('MySql query crafter with normalized table', () {
-    final sqlInterface = MySqlInterface(connection: null);
+  test('MySql query crafter with normalized table', () async {
+    final sqlInterface = await MySqlInterface.connect(
+        connectToDatabase: () async => DummyMySqlConnection());
     final query = _cleanQuery(
         sqlInterface.craftSelectQuery(tableName: 'my_table', filters: {
       'my_named_id': 'my_id'
@@ -77,16 +84,18 @@ void main() {
         'FROM my_table t WHERE t.my_named_id = ?');
   });
 
-  test('MySql query crafter insert element', () {
-    final sqlInterface = MySqlInterface(connection: null);
+  test('MySql query crafter insert element', () async {
+    final sqlInterface = await MySqlInterface.connect(
+        connectToDatabase: () async => DummyMySqlConnection());
     final query = _cleanQuery(sqlInterface.craftInsertQuery(
         tableName: 'my_table', data: {'field1': 'value1', 'field2': 'value2'}));
 
     expect(query, 'INSERT INTO my_table (field1, field2) VALUES (?, ?)');
   });
 
-  test('MySql query crafter update element', () {
-    final sqlInterface = MySqlInterface(connection: null);
+  test('MySql query crafter update element', () async {
+    final sqlInterface = await MySqlInterface.connect(
+        connectToDatabase: () async => DummyMySqlConnection());
     final query = _cleanQuery(sqlInterface.craftUpdateQuery(
         tableName: 'my_table',
         filters: {'my_id': 'any_value'},
@@ -95,8 +104,9 @@ void main() {
     expect(query, 'UPDATE my_table SET field1 = ?, field2 = ? WHERE my_id = ?');
   });
 
-  test('MySql query crafter delete element', () {
-    final sqlInterface = MySqlInterface(connection: null);
+  test('MySql query crafter delete element', () async {
+    final sqlInterface = await MySqlInterface.connect(
+        connectToDatabase: () async => DummyMySqlConnection());
     final query = _cleanQuery(sqlInterface.craftDeleteQuery(
         tableName: 'my_table', filters: {'my_id': 'any_values'}));
 
