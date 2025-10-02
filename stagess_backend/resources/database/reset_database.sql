@@ -444,7 +444,7 @@ CREATE TABLE internship_skill_evaluation_items (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     evaluation_id VARCHAR(36) NOT NULL,
     job_id VARCHAR(36) NOT NULL,
-    skill_name VARCHAR(100) NOT NULL,
+    skill_name VARCHAR(1000) NOT NULL,
     appreciation INT NOT NULL,
     comments VARCHAR(2000),
     FOREIGN KEY (evaluation_id) REFERENCES internship_skill_evaluations(id) ON DELETE CASCADE
