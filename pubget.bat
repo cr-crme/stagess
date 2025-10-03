@@ -8,15 +8,15 @@
 @REM Move to the script directory
 cd /d "%~dp0"
 
-@REM @REM Pub get in the common directory
-pushd common
-echo "Running pub get in common directory..."
+@REM @REM Pub get in the stagess_common directory
+pushd stagess_common
+echo "Running pub get in stagess_common directory..."
 dart pub get
 popd
 
-@REM @REM Pub get in the common_flutter directory
-pushd common_flutter
-echo "Running pub get in common_flutter directory..."
+@REM @REM Pub get in the stagess_common_flutter directory
+pushd stagess_common_flutter
+echo "Running pub get in stagess_common_flutter directory..."
 dart pub get
 popd
 
@@ -32,13 +32,17 @@ call dart pub get
 popd
 call flutter pub get
 popd
+pushd external\pdf_generation
+echo "Running pub get in external\pdf_generation directory..."
+call flutter pub get
+popd
 
-@REM Pub get in the backend directory
-pushd backend
-echo "Running pub get in backend directory..."
+@REM Pub get in the stagess_backend directory
+pushd stagess_backend
+echo "Running pub get in stagess_backend directory..."
 call dart pub get
 pushd resources\backend_gui
-echo "Running pub get in backend_gui directory..."
+echo "Running pub get in stagess_backend/resources/backend_gui directory..."
 call flutter pub get
 popd
 popd

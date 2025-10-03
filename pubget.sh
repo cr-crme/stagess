@@ -1,4 +1,4 @@
-#!/usr/bash
+#!/usr/bin/env bash
 
 # This script navigates all the subdirectories of the project
 # and runs the command "pub get" in each of them.
@@ -10,15 +10,15 @@
 # Move to the directory of the script
 cd "$(dirname "$0")"
 
-# Pub get in the common directory
-pushd common
-echo "Running pub get in common directory..."
+# Pub get in the stagess_common directory
+pushd stagess_common
+echo "Running pub get in stagess_common directory..."
 dart pub get
 popd
 
-# Pub get in the common_flutter directory
-pushd common_flutter
-echo "Running pub get in common_flutter directory..."
+# Pub get in the stagess_common_flutter directory
+pushd stagess_common_flutter
+echo "Running pub get in stagess_common_flutter directory..."
 flutter pub get
 popd
 
@@ -34,13 +34,17 @@ dart pub get
 popd
 flutter pub get
 popd
+pushd external/pdf_generation
+echo "Running pub get in external/pdf_generation directory..."
+flutter pub get
+popd
 
-# Pub get in the backend directory
-pushd backend
-echo "Running pub get in backend directory..."
+# Pub get in the stagess_backend directory
+pushd stagess_backend
+echo "Running pub get in stagess_backend directory..."
 dart pub get
 pushd resources/backend_gui
-echo "Running pub get in backend_gui directory..."
+echo "Running pub get in stagess_backend/resources/backend_gui directory..."
 flutter pub get
 popd
 popd
