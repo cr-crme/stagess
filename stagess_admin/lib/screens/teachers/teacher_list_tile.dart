@@ -186,6 +186,42 @@ class TeacherListTileState extends State<TeacherListTile> {
   }
 
   @override
+  void didUpdateWidget(covariant TeacherListTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_firstNameController.text != widget.teacher.firstName) {
+      _firstNameController.text = widget.teacher.firstName;
+    }
+    if (_lastNameController.text != widget.teacher.lastName) {
+      _lastNameController.text = widget.teacher.lastName;
+    }
+
+    if (_addressController.address.toString() !=
+        widget.teacher.address.toString()) {
+      _addressController.address = widget.teacher.address;
+    }
+    if (_phoneController.text != (widget.teacher.phone?.toString() ?? '')) {
+      _phoneController.text = widget.teacher.phone?.toString() ?? '';
+    }
+    if (_emailController.text != widget.teacher.email) {
+      _emailController.text = widget.teacher.email.toString();
+    }
+
+    if (areListsNotEqual(
+      _currentGroups.map((e) => e.text).toList(),
+      widget.teacher.groups,
+    )) {
+      for (var controller in _currentGroups) {
+        controller.dispose();
+      }
+      _currentGroups.clear();
+      for (var group in widget.teacher.groups) {
+        _currentGroups.add(TextEditingController(text: group));
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return widget.isExpandable
         ? AnimatedExpandingCard(
