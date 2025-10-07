@@ -145,6 +145,21 @@ class AdminListTileState extends State<AdminListTile> {
   }
 
   @override
+  void didUpdateWidget(covariant AdminListTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_firstNameController.text != widget.admin.firstName) {
+      _firstNameController.text = widget.admin.firstName;
+    }
+    if (_lastNameController.text != widget.admin.lastName) {
+      _lastNameController.text = widget.admin.lastName;
+    }
+    if (_emailController.text != widget.admin.email) {
+      _emailController.text = widget.admin.email.toString();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return widget.isExpandable
         ? AnimatedExpandingCard(

@@ -210,8 +210,8 @@ class StudentListTileState extends State<StudentListTile> {
                     : 'Une erreur est survenue lors de la modification de l\'élève.',
           );
         }
-        await students.releaseLockForItem(widget.student);
       }
+      await students.releaseLockForItem(widget.student);
     } else {
       final hasLock = await students.getLockForItem(widget.student);
       if (!hasLock || !mounted) {
@@ -227,6 +227,59 @@ class StudentListTileState extends State<StudentListTile> {
     }
 
     if (mounted) setState(() => _isEditing = !_isEditing);
+  }
+
+  @override
+  void didUpdateWidget(covariant StudentListTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_firstNameController.text != widget.student.firstName) {
+      _firstNameController.text = widget.student.firstName;
+    }
+    if (_lastNameController.text != widget.student.lastName) {
+      _lastNameController.text = widget.student.lastName;
+    }
+
+    if (_birthController.value != widget.student.dateBirth) {
+      _birthController.updateValue(widget.student.dateBirth);
+    }
+    if (_addressController.address != widget.student.address) {
+      _addressController.address = widget.student.address;
+    }
+    if (_phoneController.text != widget.student.phone.toString()) {
+      _phoneController.text = widget.student.phone.toString();
+    }
+    if (_emailController.text != widget.student.email) {
+      _emailController.text = widget.student.email.toString();
+    }
+
+    if (_groupController.text != widget.student.group) {
+      _groupController.text =
+          widget.student.group == '-1' ? '' : widget.student.group;
+    }
+    if (_selectedProgram != widget.student.program) {
+      _selectedProgram = widget.student.program;
+    }
+
+    if (_contactFirstNameController.text != widget.student.contact.firstName) {
+      _contactFirstNameController.text = widget.student.contact.firstName;
+    }
+    if (_contactLastNameController.text != widget.student.contact.lastName) {
+      _contactLastNameController.text = widget.student.contact.lastName;
+    }
+    if (_contactLinkController.text != widget.student.contactLink) {
+      _contactLinkController.text = widget.student.contactLink;
+    }
+    if (_contactAddressController.address != widget.student.contact.address) {
+      _contactAddressController.address = widget.student.contact.address;
+    }
+    if (_contactPhoneController.text !=
+        widget.student.contact.phone.toString()) {
+      _contactPhoneController.text = widget.student.contact.phone.toString();
+    }
+    if (_contactEmailController.text != widget.student.contact.email) {
+      _contactEmailController.text = widget.student.contact.email.toString();
+    }
   }
 
   @override

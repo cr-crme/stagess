@@ -172,6 +172,21 @@ class SchoolListTileState extends State<SchoolListTile> {
   }
 
   @override
+  void didUpdateWidget(covariant SchoolListTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_nameController.text != widget.school.name) {
+      _nameController.text = widget.school.name;
+    }
+    if (_addressController.address != widget.school.address) {
+      _addressController.address = widget.school.address;
+    }
+    if (_phoneController.text != widget.school.phone.toString()) {
+      _phoneController.text = widget.school.phone.toString();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return widget.isExpandable
         ? AnimatedExpandingCard(

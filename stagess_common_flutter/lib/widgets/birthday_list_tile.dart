@@ -7,6 +7,10 @@ class BirthdayController {
   DateTime? _value;
   DateTime? get value => _value;
 
+  void updateValue(DateTime? newValue) {
+    _value = newValue;
+  }
+
   void dispose() {
     _value = null;
   }
@@ -61,6 +65,15 @@ class _BirthdayListTileState extends State<BirthdayListTile> {
     setState(() {
       widget.controller._value = DateTime(0);
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant BirthdayListTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.controller != widget.controller) {
+      setState(() {});
+    }
   }
 
   @override
