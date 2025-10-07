@@ -11,6 +11,12 @@ class EnterpriseActivityTypeListController {
     if (_forceRefresh != null) _forceRefresh!();
   }
 
+  void updateActivityTypes(Set<ActivityTypes> value, {bool refresh = true}) {
+    _activityTypes.clear();
+    _activityTypes.addAll(value);
+    if (refresh && _forceRefresh != null) _forceRefresh!();
+  }
+
   EnterpriseActivityTypeListController({required Set<ActivityTypes> initial})
     : _activityTypes = {...initial};
 

@@ -17,8 +17,11 @@ import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 final _logger = Logger('EnterpriseScreen');
 
 class EnterpriseScreen extends StatefulWidget {
-  const EnterpriseScreen(
-      {super.key, required this.id, required this.pageIndex});
+  const EnterpriseScreen({
+    super.key,
+    required this.id,
+    required this.pageIndex,
+  });
 
   static const route = '/enterprise';
 
@@ -31,8 +34,11 @@ class EnterpriseScreen extends StatefulWidget {
 
 class _EnterpriseScreenState extends State<EnterpriseScreen>
     with SingleTickerProviderStateMixin {
-  late final _tabController =
-      TabController(initialIndex: widget.pageIndex, length: 3, vsync: this);
+  late final _tabController = TabController(
+    initialIndex: widget.pageIndex,
+    length: 3,
+    vsync: this,
+  );
 
   late IconButton _actionButton;
 
@@ -63,9 +69,10 @@ class _EnterpriseScreenState extends State<EnterpriseScreen>
     if (_tabController.index == 0) {
       icon = const Icon(Icons.add);
     } else if (_tabController.index == 1) {
-      icon = _aboutPageKey.currentState?.editing ?? false
-          ? const Icon(Icons.save)
-          : const Icon(Icons.edit);
+      icon =
+          _aboutPageKey.currentState?.editing ?? false
+              ? const Icon(Icons.save)
+              : const Icon(Icons.edit);
     } else if (_tabController.index == 2) {
       icon = const Icon(Icons.add);
     }
@@ -74,24 +81,33 @@ class _EnterpriseScreenState extends State<EnterpriseScreen>
       onPressed: () async {
         if (_tabController.index == 0) {
           if (_jobsPageKey.currentState!.isEditing) {
-            if (!await ConfirmExitDialog.show(context,
-                content: Text.rich(TextSpan(children: [
-                  const TextSpan(
-                      text: '** Vous quittez la page sans avoir '
-                          'cliqué sur Enregistrer '),
-                  WidgetSpan(
-                      child: SizedBox(
-                    height: 22,
-                    width: 22,
-                    child: Icon(
-                      Icons.save,
-                      color: Theme.of(context).primaryColor,
+            if (!await ConfirmExitDialog.show(
+              context,
+              content: Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text:
+                          '** Vous quittez la page sans avoir '
+                          'cliqué sur Enregistrer ',
                     ),
-                  )),
-                  const TextSpan(
-                    text: '. **\n\nToutes vos modifications seront perdues.',
-                  ),
-                ])))) {
+                    WidgetSpan(
+                      child: SizedBox(
+                        height: 22,
+                        width: 22,
+                        child: Icon(
+                          Icons.save,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ),
+                    const TextSpan(
+                      text: '. **\n\nToutes vos modifications seront perdues.',
+                    ),
+                  ],
+                ),
+              ),
+            )) {
               return;
             }
             cancelEditing();
@@ -113,7 +129,9 @@ class _EnterpriseScreenState extends State<EnterpriseScreen>
   }
 
   Future<void> addInternship(
-      Enterprise enterprise, Specialization? specialization) async {
+    Enterprise enterprise,
+    Specialization? specialization,
+  ) async {
     _logger.info('Adding internship for enterprise: ${enterprise.name}');
 
     final schoolId = Provider.of<AuthProvider>(context, listen: false).schoolId;
@@ -123,13 +141,16 @@ class _EnterpriseScreenState extends State<EnterpriseScreen>
     }
 
     await showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) => Dialog(
-                child: InternshipEnrollmentScreen(
+      barrierDismissible: false,
+      context: context,
+      builder:
+          (context) => Dialog(
+            child: InternshipEnrollmentScreen(
               enterprise: enterprise,
               specifiedSpecialization: specialization,
-            )));
+            ),
+          ),
+    );
     _logger.fine('Internship added for enterprise: ${enterprise.name}');
   }
 
@@ -144,81 +165,84 @@ class _EnterpriseScreenState extends State<EnterpriseScreen>
   Widget build(BuildContext context) {
     _logger.finer('Building EnterpriseScreen with id: ${widget.id}');
 
-    return Selector<EnterprisesProvider, Enterprise?>(
-      builder: (context, enterprise, _) {
-        if (enterprise == null) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    final enterprise = EnterprisesProvider.of(context).fromIdOrNull(widget.id);
+    if (enterprise == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    return ResponsiveService.scaffoldOf(
+      context,
+      smallDrawer: null,
+      mediumDrawer: MainDrawer.medium,
+      largeDrawer: MainDrawer.large,
+      appBar: ResponsiveService.appBarOf(
+        context,
+        title: Text(enterprise.name),
+        actions: [_actionButton],
+        leading:
+            ResponsiveService.getScreenSize(context) == ScreenSize.small
+                ? null
+                : SizedBox.shrink(),
+        bottom: TabBar(
+          onTap: (index) async {
+            if (!_editing || !_tabController.indexIsChanging) return;
 
-        return ResponsiveService.scaffoldOf(
-          context,
-          smallDrawer: null,
-          mediumDrawer: MainDrawer.medium,
-          largeDrawer: MainDrawer.large,
-          appBar: ResponsiveService.appBarOf(
-            context,
-            title: Text(enterprise.name),
-            actions: [_actionButton],
-            leading:
-                ResponsiveService.getScreenSize(context) == ScreenSize.small
-                    ? null
-                    : SizedBox.shrink(),
-            bottom: TabBar(
-              onTap: (index) async {
-                if (!_editing || !_tabController.indexIsChanging) return;
-
-                _tabController.index = _tabController.previousIndex;
-                if (await ConfirmExitDialog.show(context,
-                    content: Text.rich(TextSpan(children: [
-                      const TextSpan(
-                          text: '** Vous quittez la page sans avoir '
-                              'cliqué sur Enregistrer '),
-                      WidgetSpan(
-                          child: SizedBox(
+            _tabController.index = _tabController.previousIndex;
+            if (await ConfirmExitDialog.show(
+              context,
+              content: Text.rich(
+                TextSpan(
+                  children: [
+                    const TextSpan(
+                      text:
+                          '** Vous quittez la page sans avoir '
+                          'cliqué sur Enregistrer ',
+                    ),
+                    WidgetSpan(
+                      child: SizedBox(
                         height: 22,
                         width: 22,
                         child: Icon(
                           Icons.save,
                           color: Theme.of(context).primaryColor,
                         ),
-                      )),
-                      const TextSpan(
-                        text:
-                            '. **\n\nToutes vos modifications seront perdues.',
                       ),
-                    ])))) {
-                  cancelEditing();
-                  _tabController.animateTo(index);
-                }
-              },
-              controller: _tabController,
-              tabs: const [
-                Tab(icon: Icon(Icons.work), text: 'Métiers offerts'),
-                Tab(icon: Icon(Icons.info_outlined), text: 'À propos'),
-                Tab(icon: Icon(Icons.assignment), text: 'Stages'),
-              ],
-            ),
-          ),
-          body: TabBarView(
-            controller: _tabController,
-            physics: _editing ? const NeverScrollableScrollPhysics() : null,
-            children: [
-              JobsPage(
-                key: _jobsPageKey,
-                enterprise: enterprise,
-                onAddInternshipRequest: addInternship,
+                    ),
+                    const TextSpan(
+                      text: '. **\n\nToutes vos modifications seront perdues.',
+                    ),
+                  ],
+                ),
               ),
-              EnterpriseAboutPage(key: _aboutPageKey, enterprise: enterprise),
-              InternshipsPage(
-                key: _stagePageKey,
-                enterprise: enterprise,
-                onAddInternshipRequest: addInternship,
-              ),
-            ],
+            )) {
+              cancelEditing();
+              _tabController.animateTo(index);
+            }
+          },
+          controller: _tabController,
+          tabs: const [
+            Tab(icon: Icon(Icons.work), text: 'Métiers offerts'),
+            Tab(icon: Icon(Icons.info_outlined), text: 'À propos'),
+            Tab(icon: Icon(Icons.assignment), text: 'Stages'),
+          ],
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        physics: _editing ? const NeverScrollableScrollPhysics() : null,
+        children: [
+          JobsPage(
+            key: _jobsPageKey,
+            enterprise: enterprise,
+            onAddInternshipRequest: addInternship,
           ),
-        );
-      },
-      selector: (context, enterprises) => enterprises.fromIdOrNull(widget.id),
+          EnterpriseAboutPage(key: _aboutPageKey, enterprise: enterprise),
+          InternshipsPage(
+            key: _stagePageKey,
+            enterprise: enterprise,
+            onAddInternshipRequest: addInternship,
+          ),
+        ],
+      ),
     );
   }
 }

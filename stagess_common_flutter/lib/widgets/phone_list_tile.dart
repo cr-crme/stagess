@@ -50,6 +50,15 @@ class _PhoneListTileState extends State<PhoneListTile> {
   // coverage:ignore-end
 
   @override
+  void didUpdateWidget(covariant PhoneListTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller != null &&
+        _phoneController.text != widget.controller?.text) {
+      _phoneController.text = widget.initialValue.toString();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Focus(
       onFocusChange: (hasFocus) {

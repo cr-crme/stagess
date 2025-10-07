@@ -57,6 +57,15 @@ class _WebSiteListTileState extends State<WebSiteListTile> {
   }
 
   @override
+  void didUpdateWidget(covariant WebSiteListTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.controller != null &&
+        _websiteController.text != widget.controller?.text) {
+      _websiteController.text = widget.initialValue.toString();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Focus(
       onFocusChange: (hasFocus) {
