@@ -74,20 +74,19 @@ class TeacherListTileState extends State<TeacherListTile> {
   );
 
   Teacher get editedTeacher => widget.teacher.copyWith(
-        firstName: _firstNameController.text,
-        lastName: _lastNameController.text,
-        address: _addressController.address ??
-            Address.empty.copyWith(id: widget.teacher.address?.id),
-        phone: PhoneNumber.fromString(
-          _phoneController.text,
-          id: widget.teacher.phone?.id,
-        ),
-        email: _emailController.text,
-        groups: _currentGroups
-            .map((e) => e.text)
-            .where((e) => e.isNotEmpty)
-            .toList(),
-      );
+    firstName: _firstNameController.text,
+    lastName: _lastNameController.text,
+    address:
+        _addressController.address ??
+        Address.empty.copyWith(id: widget.teacher.address?.id),
+    phone: PhoneNumber.fromString(
+      _phoneController.text,
+      id: widget.teacher.phone?.id,
+    ),
+    email: _emailController.text,
+    groups:
+        _currentGroups.map((e) => e.text).where((e) => e.isNotEmpty).toList(),
+  );
 
   @override
   void initState() {
@@ -96,6 +95,8 @@ class TeacherListTileState extends State<TeacherListTile> {
   }
 
   Future<void> _onClickedEditing() async {
+    final teachers = TeachersProvider.of(context, listen: false);
+
     if (_isEditing) {
       _logger.info('Finishing editing for teacher ${widget.teacher.id}');
       // Validate the form
@@ -104,12 +105,17 @@ class TeacherListTileState extends State<TeacherListTile> {
       // Finish editing
       final newTeacher = editedTeacher;
       if (newTeacher.getDifference(widget.teacher).isNotEmpty) {
-        TeachersProvider.of(context, listen: false).replace(newTeacher);
-        if (!mounted) return;
+        await teachers.replaceWithConfirmation(newTeacher);
 
         _logger.fine('Teacher ${widget.teacher.id} updated');
       }
+      await teachers.releaseLockForItem(widget.teacher);
+      if (!mounted) return;
+      showSnackBar(context, message: 'Enseignant·e mis à jour');
+    } else {
+      await teachers.getLockForItem(widget.teacher);
     }
+
     setState(() => _isEditing = !_isEditing);
   }
 
@@ -120,29 +126,30 @@ class TeacherListTileState extends State<TeacherListTile> {
       elevation: 0.0,
       onTapHeader: null,
       canChangeExpandedState: false,
-      header: (ctx, isExpanded) => Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 12.0, top: 8, bottom: 8),
-            child: Text(
-              '${widget.teacher.firstName} ${widget.teacher.lastName}',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
-          Row(
+      header:
+          (ctx, isExpanded) => Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              IconButton(
-                icon: Icon(
-                  _isEditing ? Icons.save : Icons.edit,
-                  color: Theme.of(context).primaryColor,
+              Padding(
+                padding: const EdgeInsets.only(left: 12.0, top: 8, bottom: 8),
+                child: Text(
+                  '${widget.teacher.firstName} ${widget.teacher.lastName}',
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
-                onPressed: _onClickedEditing,
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      _isEditing ? Icons.save : Icons.edit,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    onPressed: _onClickedEditing,
+                  ),
+                ],
               ),
             ],
           ),
-        ],
-      ),
       child: _buildEditingForm(),
     );
   }
@@ -175,29 +182,33 @@ class TeacherListTileState extends State<TeacherListTile> {
   Widget _buildName() {
     return _isEditing
         ? Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                controller: _firstNameController,
-                validator: (value) =>
-                    value?.isEmpty == true ? 'Le prénom est requis' : null,
-                decoration: const InputDecoration(labelText: 'Prénom'),
-              ),
-              TextFormField(
-                controller: _lastNameController,
-                validator: (value) =>
-                    value?.isEmpty == true ? 'Le nom est requis' : null,
-                decoration: const InputDecoration(labelText: 'Nom de famille'),
-              ),
-            ],
-          )
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextFormField(
+              controller: _firstNameController,
+              validator:
+                  (value) =>
+                      value?.isEmpty == true ? 'Le prénom est requis' : null,
+              decoration: const InputDecoration(labelText: 'Prénom'),
+            ),
+            TextFormField(
+              controller: _lastNameController,
+              validator:
+                  (value) =>
+                      value?.isEmpty == true ? 'Le nom est requis' : null,
+              decoration: const InputDecoration(labelText: 'Nom de famille'),
+            ),
+          ],
+        )
         : Container();
   }
 
   Widget _buildGroups() {
-    return Text(widget.teacher.groups.isEmpty
-        ? 'Aucun groupe ne vous est assigné'
-        : 'Groupes : ${widget.teacher.groups.join(', ')}');
+    return Text(
+      widget.teacher.groups.isEmpty
+          ? 'Aucun groupe ne vous est assigné'
+          : 'Groupes : ${widget.teacher.groups.join(', ')}',
+    );
   }
 
   Widget _buildAddress() {
@@ -231,8 +242,9 @@ class TeacherListTileState extends State<TeacherListTile> {
   }
 
   Future<void> _changePasswordDialog() async {
-    _logger
-        .info('Change password dialog opened for teacher ${widget.teacher.id}');
+    _logger.info(
+      'Change password dialog opened for teacher ${widget.teacher.id}',
+    );
 
     final formKey = GlobalKey<FormState>();
     final authProvider = AuthProvider.of(context, listen: false);
@@ -241,89 +253,97 @@ class TeacherListTileState extends State<TeacherListTile> {
     final confirmPasswordController = TextEditingController();
 
     final response = await showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text('Changer le mot de passe'),
-            content: Form(
-              key: formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: oldPasswordController,
-                    decoration: const InputDecoration(
-                        labelText: 'Entrer l\'ancien mot de passe'),
-                    obscureText: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'L\'ancien mot de passe est requis';
-                      }
-                      return null;
-                    },
+      barrierDismissible: false,
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Changer le mot de passe'),
+          content: Form(
+            key: formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: oldPasswordController,
+                  decoration: const InputDecoration(
+                    labelText: 'Entrer l\'ancien mot de passe',
                   ),
-                  SizedBox(height: 24.0),
-                  Text(
-                    'Le mot de passe doit contenir au moins 8 caractères.',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  TextFormField(
-                    controller: newPasswordController,
-                    decoration: const InputDecoration(
-                        labelText: 'Entrer le nouveau mot de passe'),
-                    obscureText: true,
-                    validator: (value) {
-                      return FormService.passwordValidator(value);
-                    },
-                  ),
-                  TextFormField(
-                    controller: confirmPasswordController,
-                    decoration: const InputDecoration(
-                        labelText: 'Confirmer le mot de passe'),
-                    obscureText: true,
-                    validator: (value) {
-                      if (value != newPasswordController.text) {
-                        return 'Les mots de passe ne correspondent pas';
-                      }
-                      return null;
-                    },
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text('Annuler')),
-              TextButton(
-                  onPressed: () async {
-                    // Validate the form
-                    if (!(formKey.currentState!.validate()) || !mounted) return;
-
-                    // Reconnected
-                    try {
-                      await authProvider.signInWithEmailAndPassword(
-                          email: widget.teacher.email ?? '',
-                          password: oldPasswordController.text);
-                    } catch (e) {
-                      _logger.severe('Failed to reauthenticate user: $e');
-                      if (!context.mounted) return;
-                      showSnackBar(context,
-                          message: 'L\'ancien mot de passe est incorrect');
-                      return;
+                  obscureText: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'L\'ancien mot de passe est requis';
                     }
-                    if (!context.mounted) return;
-
-                    await authProvider
-                        .updatePassword(newPasswordController.text);
-                    if (!context.mounted) return;
-                    Navigator.of(context).pop(true);
+                    return null;
                   },
-                  child: Text('Confirmer')),
-            ],
-          );
-        });
+                ),
+                SizedBox(height: 24.0),
+                Text(
+                  'Le mot de passe doit contenir au moins 8 caractères.',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                TextFormField(
+                  controller: newPasswordController,
+                  decoration: const InputDecoration(
+                    labelText: 'Entrer le nouveau mot de passe',
+                  ),
+                  obscureText: true,
+                  validator: (value) {
+                    return FormService.passwordValidator(value);
+                  },
+                ),
+                TextFormField(
+                  controller: confirmPasswordController,
+                  decoration: const InputDecoration(
+                    labelText: 'Confirmer le mot de passe',
+                  ),
+                  obscureText: true,
+                  validator: (value) {
+                    if (value != newPasswordController.text) {
+                      return 'Les mots de passe ne correspondent pas';
+                    }
+                    return null;
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            OutlinedButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('Annuler'),
+            ),
+            TextButton(
+              onPressed: () async {
+                // Validate the form
+                if (!(formKey.currentState!.validate()) || !mounted) return;
+
+                // Reconnected
+                try {
+                  await authProvider.signInWithEmailAndPassword(
+                    email: widget.teacher.email ?? '',
+                    password: oldPasswordController.text,
+                  );
+                } catch (e) {
+                  _logger.severe('Failed to reauthenticate user: $e');
+                  if (!context.mounted) return;
+                  showSnackBar(
+                    context,
+                    message: 'L\'ancien mot de passe est incorrect',
+                  );
+                  return;
+                }
+                if (!context.mounted) return;
+
+                await authProvider.updatePassword(newPasswordController.text);
+                if (!context.mounted) return;
+                Navigator.of(context).pop(true);
+              },
+              child: Text('Confirmer'),
+            ),
+          ],
+        );
+      },
+    );
     if (response == null || !mounted) return;
 
     _logger.info('Changing password for teacher ${widget.teacher.id}');

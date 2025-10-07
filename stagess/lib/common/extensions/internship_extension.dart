@@ -15,8 +15,10 @@ extension InternshipExtension on Internship {
     final student = students.firstWhere((e) => e.id == studentId);
     final teacher = TeachersProvider.of(context, listen: false)[teacherId];
     if (!teacher.groups.contains(student.group)) {
+      // TODO: This currently creates a problem with "tableau de supervision" where some students appear but cannot be assigned to a teacher
       throw Exception(
-          'The teacher ${teacher.fullName} is not assigned to the group ${student.group}');
+        'The teacher ${teacher.fullName} is not assigned to the group ${student.group}',
+      );
     }
 
     return copyWith(
@@ -32,7 +34,8 @@ extension InternshipExtension on Internship {
     }
 
     return copyWith(
-        extraSupervisingTeacherIds:
-            extraSupervisingTeacherIds.where((id) => id != teacherId).toList());
+      extraSupervisingTeacherIds:
+          extraSupervisingTeacherIds.where((id) => id != teacherId).toList(),
+    );
   }
 }

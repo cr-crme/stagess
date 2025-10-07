@@ -20,6 +20,7 @@ import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('SupervisionChart');
 
@@ -152,10 +153,12 @@ class _SupervisionChartState extends State<SupervisionChart>
     pathParameters: Screens.params(student),
   );
 
-  void _toggleEditMode(
+  Future<void> _toggleEditMode(
     BuildContext context, {
     required List<_InternshipMetaData> internships,
-  }) {
+  }) async {
+    final internshipsProvided = InternshipsProvider.of(context, listen: false);
+
     if (_editMode) {
       _logger.info('Saving changes in edit mode');
 
@@ -166,11 +169,7 @@ class _SupervisionChartState extends State<SupervisionChart>
         return;
       }
 
-      final internshipsProvided = InternshipsProvider.of(
-        context,
-        listen: false,
-      );
-
+      final toWait = <Future>[];
       for (final meta in internships) {
         final internship = internshipsProvided.fromIdOrNull(meta.internship.id);
         if (internship == null) continue;
@@ -181,11 +180,28 @@ class _SupervisionChartState extends State<SupervisionChart>
             .copyWith(visitingPriority: meta.visitingPriority);
 
         final differences = internship.getDifference(newInternship);
-        if (differences.isEmpty) continue;
+        if (differences.isNotEmpty) {
+          // Update the internship with the new values
+          toWait.add(
+            internshipsProvided.replaceWithConfirmation(newInternship),
+          );
+        }
 
-        // Update the internship with the new values
-        internshipsProvided.replace(newInternship);
         _logger.fine('Updated internship: ${newInternship.id}');
+      }
+      await Future.wait(toWait);
+
+      toWait.clear();
+      for (final meta in internships) {
+        toWait.add(internshipsProvided.releaseLockForItem(meta.internship));
+      }
+      await Future.wait(toWait);
+
+      if (!context.mounted) return;
+      showSnackBar(context, message: 'Modifications enregistrées');
+    } else {
+      for (final meta in internships) {
+        await internshipsProvided.getLockForItem(meta.internship);
       }
     }
 

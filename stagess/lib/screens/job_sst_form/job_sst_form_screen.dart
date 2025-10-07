@@ -16,7 +16,7 @@ import 'package:stagess_common_flutter/widgets/radio_with_follow_up.dart';
 
 final _logger = Logger('JobSstFormScreen');
 
-Future<T?> showJobSstFormDialog<T>(
+Future<Enterprise?> showJobSstFormDialog(
   BuildContext context, {
   required String enterpriseId,
   required String jobId,
@@ -25,7 +25,7 @@ Future<T?> showJobSstFormDialog<T>(
   final enterprises = EnterprisesProvider.of(context, listen: false);
   enterprises.getLockForItem(enterprises[enterpriseId]);
 
-  final editedEnterprise = await showDialog<T>(
+  final editedEnterprise = await showDialog<Enterprise?>(
     context: context,
     barrierDismissible: false,
     builder:
@@ -43,6 +43,10 @@ Future<T?> showJobSstFormDialog<T>(
               ),
         ),
   );
+  if (editedEnterprise != null) {
+    await enterprises.replaceWithConfirmation(editedEnterprise);
+  }
+
   await enterprises.releaseLockForItem(enterprises[enterpriseId]);
   return editedEnterprise;
 }
@@ -79,19 +83,18 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
     _questionsKey.currentState!.formKey.currentState!.save();
 
     final enterprises = EnterprisesProvider.of(context, listen: false);
-    enterprises[widget.enterpriseId].jobs[widget.jobId].sstEvaluation.update(
+    final enterprise = enterprises.fromId(widget.enterpriseId);
+    enterprise.jobs[widget.jobId].sstEvaluation.update(
       questions: _questionsKey.currentState!.answer,
     );
 
-    enterprises[widget.enterpriseId].jobs.replace(
-      enterprises[widget.enterpriseId].jobs[widget.jobId],
-    );
+    enterprise.jobs.replace(enterprise.jobs[widget.jobId]);
 
     _logger.fine(
       'JobSstFormScreen submitted successfully for jobId: ${widget.jobId}',
     );
     if (!widget.rootContext.mounted) return;
-    Navigator.of(widget.rootContext).pop();
+    Navigator.of(widget.rootContext).pop(enterprise);
   }
 
   void _cancel() async {
@@ -106,7 +109,7 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
     // If the user confirmed, we close the dialog and return to the previous screen
     _logger.fine('User confirmed exit, navigating back');
     if (!widget.rootContext.mounted) return;
-    Navigator.of(widget.rootContext).pop();
+    Navigator.of(widget.rootContext).pop(null);
   }
 
   void _showHelp({required bool force}) async {
