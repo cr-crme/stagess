@@ -186,6 +186,19 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   }
 
   Future<void> _onClickedDeleting() async {
+    final enterprises = EnterprisesProvider.of(context, listen: false);
+    final hasLock = await enterprises.getLockForItem(widget.enterprise);
+    if (!hasLock || !mounted) {
+      if (mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible de supprimer l\'entreprise, car elle est en cours de modification par un autre utilisateur.',
+        );
+      }
+      return;
+    }
+
     // Show confirmation dialog
     final answer = await showDialog(
       context: context,
@@ -193,21 +206,24 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
           (context) =>
               ConfirmDeleteEnterpriseDialog(enterprise: widget.enterprise),
     );
-    if (answer == null || !answer || !mounted) return;
+    if (answer == null || !answer || !mounted) {
+      await enterprises.releaseLockForItem(widget.enterprise);
+      return;
+    }
 
-    final isSuccess = await EnterprisesProvider.of(
-      context,
-      listen: false,
-    ).removeWithConfirmation(widget.enterprise);
-    if (!mounted) return;
-
-    showSnackBar(
-      context,
-      message:
-          isSuccess
-              ? 'Entreprise supprimée avec succès'
-              : 'Échec de la suppression de l\'entreprise',
+    final isSuccess = await enterprises.removeWithConfirmation(
+      widget.enterprise,
     );
+    if (mounted) {
+      showSnackBar(
+        context,
+        message:
+            isSuccess
+                ? 'Entreprise supprimée avec succès'
+                : 'Échec de la suppression de l\'entreprise',
+      );
+    }
+    await enterprises.releaseLockForItem(widget.enterprise);
   }
 
   Future<void> _onClickedEditing() async {

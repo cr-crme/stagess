@@ -110,26 +110,40 @@ class TeacherListTileState extends State<TeacherListTile> {
   }
 
   Future<void> _onClickedDeleting() async {
+    final teachers = TeachersProvider.of(context, listen: false);
+    final hasLock = await teachers.getLockForItem(widget.teacher);
+    if (!hasLock || !mounted) {
+      if (mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible de supprimer cet enseignant, car il est en cours de modification par un autre utilisateur',
+        );
+      }
+      return;
+    }
+
     // Show confirmation dialog
     final answer = await showDialog(
       context: context,
       builder: (context) => ConfirmDeleteTeacherDialog(teacher: widget.teacher),
     );
-    if (answer == null || !answer || !mounted) return;
+    if (answer == null || !answer || !mounted) {
+      await teachers.releaseLockForItem(widget.teacher);
+      return;
+    }
 
-    final isSuccess = await TeachersProvider.of(
-      context,
-      listen: false,
-    ).removeWithConfirmation(widget.teacher);
-    if (!mounted) return;
-
-    showSnackBar(
-      context,
-      message:
-          isSuccess
-              ? 'Enseignant supprimé avec succès'
-              : 'Échec de la suppression de l\'enseignant',
-    );
+    final isSuccess = await teachers.removeWithConfirmation(widget.teacher);
+    if (mounted) {
+      showSnackBar(
+        context,
+        message:
+            isSuccess
+                ? 'Enseignant supprimé avec succès'
+                : 'Échec de la suppression de l\'enseignant',
+      );
+    }
+    await teachers.releaseLockForItem(widget.teacher);
   }
 
   Future<void> _onClickedEditing() async {

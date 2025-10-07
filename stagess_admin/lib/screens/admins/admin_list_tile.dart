@@ -70,26 +70,40 @@ class AdminListTileState extends State<AdminListTile> {
   }
 
   Future<void> _onClickedDeleting() async {
+    final admins = AdminsProvider.of(context, listen: false);
+    final hasLock = await admins.getLockForItem(widget.admin);
+    if (!hasLock || !mounted) {
+      if (mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible de supprimer cet administrateur, car il est en cours de modification par un autre utilisateur.',
+        );
+      }
+      return;
+    }
+
     // Show confirmation dialog
     final answer = await showDialog(
       context: context,
       builder: (context) => ConfirmDeleteAdminDialog(admin: widget.admin),
     );
-    if (answer == null || !answer || !mounted) return;
+    if (answer == null || !answer || !mounted) {
+      await admins.releaseLockForItem(widget.admin);
+      return;
+    }
 
-    final isSuccess = await AdminsProvider.of(
-      context,
-      listen: false,
-    ).removeWithConfirmation(widget.admin);
-    if (!mounted) return;
-
-    showSnackBar(
-      context,
-      message:
-          isSuccess
-              ? 'L\'administrateur a été supprimé avec succès.'
-              : 'Une erreur est survenue lors de la suppression de l\'administrateur.',
-    );
+    final isSuccess = await admins.removeWithConfirmation(widget.admin);
+    if (mounted) {
+      showSnackBar(
+        context,
+        message:
+            isSuccess
+                ? 'L\'administrateur a été supprimé avec succès.'
+                : 'Une erreur est survenue lors de la suppression de l\'administrateur.',
+      );
+    }
+    await admins.releaseLockForItem(widget.admin);
   }
 
   Future<void> _onClickedEditing() async {

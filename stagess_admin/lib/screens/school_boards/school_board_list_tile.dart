@@ -95,6 +95,19 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
   }
 
   Future<void> _onClickedDeleting() async {
+    final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
+    final hasLock = await schoolBoards.getLockForItem(widget.schoolBoard);
+    if (!hasLock || !mounted) {
+      if (mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible de supprimer le centre de services scolaire, car il est en cours de modification par un autre utilisateur.',
+        );
+      }
+      return;
+    }
+
     // Show confirmation dialog
     final answer = await showDialog(
       context: context,
@@ -102,20 +115,24 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
           (context) =>
               ConfirmDeleteSchoolBoardDialog(schoolBoard: widget.schoolBoard),
     );
-    if (answer == null || !answer || !mounted) return;
+    if (answer == null || !answer || !mounted) {
+      await schoolBoards.releaseLockForItem(widget.schoolBoard);
+      return;
+    }
 
     final isSuccess = await SchoolBoardsProvider.of(
       context,
     ).removeWithConfirmation(widget.schoolBoard);
-    if (!mounted) return;
-
-    showSnackBar(
-      context,
-      message:
-          isSuccess
-              ? 'Centre de services scolaire supprimé avec succès'
-              : 'Échec de la suppression de la centre de services scolaire',
-    );
+    if (mounted) {
+      showSnackBar(
+        context,
+        message:
+            isSuccess
+                ? 'Centre de services scolaire supprimé avec succès'
+                : 'Échec de la suppression de la centre de services scolaire',
+      );
+    }
+    await schoolBoards.releaseLockForItem(widget.schoolBoard);
   }
 
   Future<void> _onClickedEditing() async {

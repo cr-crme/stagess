@@ -85,28 +85,45 @@ class SchoolListTileState extends State<SchoolListTile> {
   }
 
   Future<void> _onClickedDeleting() async {
+    final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
+    final hasLock = await schoolBoards.getLockForItem(widget.schoolBoard);
+    if (!hasLock || !mounted) {
+      if (mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible de supprimer cette école, elle est en cours de modification par un autre utilisateur',
+        );
+      }
+      return;
+    }
+
     // Show confirmation dialog
     final answer = await showDialog(
       context: context,
       builder: (context) => ConfirmDeleteSchoolDialog(school: widget.school),
     );
-    if (answer == null || !answer || !mounted) return;
+    if (answer == null || !answer || !mounted) {
+      await schoolBoards.releaseLockForItem(widget.schoolBoard);
+      return;
+    }
 
     widget.schoolBoard.schools.removeWhere(
       (school) => school.id == widget.school.id,
     );
-    final isSuccess = await SchoolBoardsProvider.of(
-      context,
-    ).replaceWithConfirmation(widget.schoolBoard);
-    if (!mounted) return;
-
-    showSnackBar(
-      context,
-      message:
-          isSuccess
-              ? 'L\'école a été supprimée avec succès'
-              : 'Une erreur est survenue lors de la suppression de l\'école',
+    final isSuccess = await schoolBoards.replaceWithConfirmation(
+      widget.schoolBoard,
     );
+    if (mounted) {
+      showSnackBar(
+        context,
+        message:
+            isSuccess
+                ? 'L\'école a été supprimée avec succès'
+                : 'Une erreur est survenue lors de la suppression de l\'école',
+      );
+    }
+    await schoolBoards.releaseLockForItem(widget.schoolBoard);
   }
 
   Future<void> _onClickedEditing() async {

@@ -230,6 +230,19 @@ class InternshipListTileState extends State<InternshipListTile> {
   }
 
   Future<void> _onClickedDeleting() async {
+    final internships = InternshipsProvider.of(context, listen: false);
+    final hasLock = await internships.getLockForItem(widget.internship);
+    if (!hasLock || !mounted) {
+      if (mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible de supprimer le stage, car il est en cours de modification par un autre utilisateur.',
+        );
+      }
+      return;
+    }
+
     // Show confirmation dialog
     final answer = await showDialog(
       context: context,
@@ -237,21 +250,24 @@ class InternshipListTileState extends State<InternshipListTile> {
           (context) =>
               ConfirmDeleteInternshipDialog(internship: widget.internship),
     );
-    if (answer == null || !answer || !mounted) return;
+    if (answer == null || !answer || !mounted) {
+      await internships.releaseLockForItem(widget.internship);
+      return;
+    }
 
-    final isSuccess = await InternshipsProvider.of(
-      context,
-      listen: false,
-    ).removeWithConfirmation(widget.internship);
-    if (!mounted) return;
-
-    showSnackBar(
-      context,
-      message:
-          isSuccess
-              ? 'Stage supprimé avec succès.'
-              : 'Échec de la suppression du stage.',
+    final isSuccess = await internships.removeWithConfirmation(
+      widget.internship,
     );
+    if (mounted) {
+      showSnackBar(
+        context,
+        message:
+            isSuccess
+                ? 'Stage supprimé avec succès.'
+                : 'Échec de la suppression du stage.',
+      );
+    }
+    await internships.releaseLockForItem(widget.internship);
   }
 
   Future<void> _onClickedEditing() async {
