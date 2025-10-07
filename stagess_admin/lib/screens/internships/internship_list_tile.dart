@@ -255,6 +255,8 @@ class InternshipListTileState extends State<InternshipListTile> {
   }
 
   Future<void> _onClickedEditing() async {
+    final internships = InternshipsProvider.of(context, listen: false);
+
     if (_isEditing) {
       // Validate the form
       if (!(await validate()) || !mounted) return;
@@ -262,23 +264,35 @@ class InternshipListTileState extends State<InternshipListTile> {
       // Finish editing
       final newInternship = editedInternship;
       if (newInternship.getDifference(widget.internship).isNotEmpty) {
-        final isSuccess = await InternshipsProvider.of(
-          context,
-          listen: false,
-        ).replaceWithConfirmation(newInternship);
-        if (!mounted) return;
-
-        showSnackBar(
-          context,
-          message:
-              isSuccess
-                  ? 'Stage modifié avec succès.'
-                  : 'Échec de la modification du stage.',
+        final isSuccess = await internships.replaceWithConfirmation(
+          newInternship,
         );
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                isSuccess
+                    ? 'Stage modifié avec succès.'
+                    : 'Échec de la modification du stage.',
+          );
+        }
+      }
+      await internships.releaseLockForItem(widget.internship);
+    } else {
+      final hasLock = await internships.getLockForItem(widget.internship);
+      if (!hasLock || !mounted) {
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                'Impossible de modifier le stage, car il est en cours de modification par un autre utilisateur.',
+          );
+        }
+        return;
       }
     }
 
-    setState(() => _isEditing = !_isEditing);
+    if (mounted) setState(() => _isEditing = !_isEditing);
   }
 
   @override

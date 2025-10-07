@@ -76,8 +76,7 @@ class EnterpriseAboutPageState extends State<EnterpriseAboutPage> {
           showSnackBar(
             context,
             message:
-                'Impossible de modifier cette entreprise car elle est '
-                'actuellement modifiée par un autre utilisateur.',
+                'Impossible de modifier cette entreprise, car elle est en cours de modification par un autre utilisateur.',
           );
         }
         return;

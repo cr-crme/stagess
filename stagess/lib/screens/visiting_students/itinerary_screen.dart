@@ -49,8 +49,11 @@ class _ItineraryMainScreenState extends State<ItineraryMainScreen> {
     if (enterprises.isEmpty) return;
 
     final students = {
-      ...StudentsHelpers.mySupervizedStudents(context,
-          listen: false, activeOnly: true)
+      ...StudentsHelpers.mySupervizedStudents(
+        context,
+        listen: false,
+        activeOnly: true,
+      ),
     };
     if (!mounted) return;
 
@@ -98,7 +101,8 @@ class _ItineraryMainScreenState extends State<ItineraryMainScreen> {
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-        'Building ItineraryMainScreen with ${_waypoints.length} waypoints');
+      'Building ItineraryMainScreen with ${_waypoints.length} waypoints',
+    );
 
     return RawScrollbar(
       controller: _scrollController,
@@ -126,9 +130,10 @@ class ItineraryScreen extends StatefulWidget {
 
 class _ItineraryScreenState extends State<ItineraryScreen> {
   late final _routingController = RoutingController(
-      destinations: widget.waypoints,
-      itinerary: currentItinerary,
-      onItineraryChanged: _onItineraryChanged);
+    destinations: widget.waypoints,
+    itinerary: currentItinerary,
+    onItineraryChanged: _onItineraryChanged,
+  );
 
   void _onItineraryChanged() {
     setState(() {});
@@ -138,16 +143,29 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
   // and update it each time we would have used it
   late var _teachersProvider = TeachersProvider.of(context, listen: false);
   final _itineraries = <DateTime, Itinerary>{};
-  void _selectItinerary(DateTime date) {
+  Future<void> _selectItinerary(DateTime date) async {
     _teachersProvider = TeachersProvider.of(context, listen: false);
+
+    final hasLock = await _teachersProvider.getLockForItem(
+      _teachersProvider.myTeacher!,
+    );
+    if (!hasLock || !mounted) {
+      // TODO check what if !hasLock
+      return;
+    }
+
     if (_itineraries[date] == null) {
       _itineraries[date] =
-          ItinerariesHelpers.fromDate(date, teachers: _teachersProvider)
-                  ?.copyWith() ??
-              Itinerary(date: date);
+          ItinerariesHelpers.fromDate(
+            date,
+            teachers: _teachersProvider,
+          )?.copyWith() ??
+          Itinerary(date: date);
     }
-    _routingController.setItinerary(_itineraries[date]!,
-        teachers: _teachersProvider);
+    _routingController.setItinerary(
+      _itineraries[date]!,
+      teachers: _teachersProvider,
+    );
   }
 
   late DateTime _currentDate;
@@ -170,6 +188,9 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     if (_routingController.hasChanged) {
       _routingController.saveItinerary(teachers: _teachersProvider);
     }
+    // TODO move this to a better place?
+    _teachersProvider.releaseLockForItem(_teachersProvider.myTeacher!);
+
     super.dispose();
   }
 
@@ -179,7 +200,8 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
 
     // We need to define small 200px over actual small screen width because of the
     // row nature of the page.
-    final isSmall = MediaQuery.of(context).size.width <
+    final isSmall =
+        MediaQuery.of(context).size.width <
         ResponsiveService.smallScreenWidth + 200;
 
     return Column(
@@ -191,22 +213,22 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
           direction: isSmall ? Axis.vertical : Axis.horizontal,
           children: [
             Flexible(
-                flex: 3,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _showDate(),
-                    _map(),
-                  ],
-                )),
+              flex: 3,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [_showDate(), _map()],
+              ),
+            ),
             Flexible(
               flex: 2,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (!isSmall) SizedBox(height: 60),
-                  _Distance(_routingController.distances,
-                      itinerary: currentItinerary),
+                  _Distance(
+                    _routingController.distances,
+                    itinerary: currentItinerary,
+                  ),
                   _studentsToVisitWidget(context),
                 ],
               ),
@@ -225,24 +247,24 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-                'Faire l\'itinéraire du\n${DateFormat('d MMMM yyyy', 'fr_CA').format(_currentDate)}',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 20)),
+              'Faire l\'itinéraire du\n${DateFormat('d MMMM yyyy', 'fr_CA').format(_currentDate)}',
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 20),
+            ),
             const SizedBox(width: 12),
             InkWell(
               onTap: _showDatePicker,
               borderRadius: BorderRadius.circular(30.0),
               child: Container(
-                  decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor,
-                      shape: BoxShape.circle),
-                  child: const Padding(
-                    padding: EdgeInsets.all(6.0),
-                    child: Icon(
-                      Icons.calendar_month,
-                      size: 24,
-                    ),
-                  )),
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  shape: BoxShape.circle,
+                ),
+                child: const Padding(
+                  padding: EdgeInsets.all(6.0),
+                  child: Icon(Icons.calendar_month, size: 24),
+                ),
+              ),
             ),
           ],
         ),
@@ -251,13 +273,17 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
           child: Padding(
             padding: const EdgeInsets.only(right: 12.0),
             child: IconButton(
-              onPressed: _routingController.hasChanged
-                  ? () => _selectItinerary(_currentDate)
-                  : null,
-              icon: Icon(Icons.save,
-                  color: _routingController.hasChanged
-                      ? Theme.of(context).primaryColor
-                      : Colors.grey),
+              onPressed:
+                  _routingController.hasChanged
+                      ? () => _selectItinerary(_currentDate)
+                      : null,
+              icon: Icon(
+                Icons.save,
+                color:
+                    _routingController.hasChanged
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey,
+              ),
             ),
           ),
         ),
@@ -267,10 +293,11 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
 
   void _showDatePicker() async {
     final newDate = await showCustomDatePicker(
-        context: context,
-        initialDate: _currentDate,
-        firstDate: DateTime.now(),
-        lastDate: DateTime.now().add(const Duration(days: 31)));
+      context: context,
+      initialDate: _currentDate,
+      firstDate: DateTime.now(),
+      lastDate: DateTime.now().add(const Duration(days: 31)),
+    );
 
     if (newDate == null || !mounted) return;
 
@@ -282,29 +309,36 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
   }
 
   Widget _map() {
-    return LayoutBuilder(builder: (context, constraints) {
-      return SizedBox(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SizedBox(
           width: constraints.maxWidth,
           height: MediaQuery.of(context).size.height * 0.5,
-          child: widget.waypoints.isEmpty
-              ? Center(child: CircularProgressIndicator())
-              : Stack(
-                  children: [
-                    RoutingMap(
-                      controller: _routingController,
-                      waypoints:
-                          widget.waypoints.length == 1 ? [] : widget.waypoints,
-                      centerWaypoint: widget.waypoints.first,
-                      itinerary: currentItinerary,
-                      onItineraryChanged: (_) => setState(() {}),
-                    ),
-                    if (widget.waypoints.length == 1)
-                      Container(
+          child:
+              widget.waypoints.isEmpty
+                  ? Center(child: CircularProgressIndicator())
+                  : Stack(
+                    children: [
+                      RoutingMap(
+                        controller: _routingController,
+                        waypoints:
+                            widget.waypoints.length == 1
+                                ? []
+                                : widget.waypoints,
+                        centerWaypoint: widget.waypoints.first,
+                        itinerary: currentItinerary,
+                        onItineraryChanged: (_) => setState(() {}),
+                      ),
+                      if (widget.waypoints.length == 1)
+                        Container(
                           color: Colors.white.withAlpha(100),
-                          child: Center(child: CircularProgressIndicator())),
-                  ],
-                ));
-    });
+                          child: Center(child: CircularProgressIndicator()),
+                        ),
+                    ],
+                  ),
+        );
+      },
+    );
   }
 
   Widget _studentsToVisitWidget(BuildContext context) {
@@ -370,15 +404,19 @@ class __DistanceState extends State<_Distance> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 5,
+                  ),
                   child: Text(
-                      'Kilométrage\u00a0: '
-                      '${(widget.distances!.isEmpty ? 0 : widget.distances!.reduce((a, b) => a + b).toDouble() / 1000).toStringAsFixed(1)}km',
-                      style: TextStyle(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700)),
+                    'Kilométrage\u00a0: '
+                    '${(widget.distances!.isEmpty ? 0 : widget.distances!.reduce((a, b) => a + b).toDouble() / 1000).toStringAsFixed(1)}km',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
                 Container(
                   decoration: BoxDecoration(
@@ -392,7 +430,7 @@ class __DistanceState extends State<_Distance> {
                 ),
               ],
             ),
-            if (_isExpanded) ..._distancesTo(widget.distances!)
+            if (_isExpanded) ..._distancesTo(widget.distances!),
           ],
         ),
       ),
@@ -408,11 +446,14 @@ class __DistanceState extends State<_Distance> {
       final startingPoint = widget.itinerary[i];
       final endingPoint = widget.itinerary[i + 1];
 
-      out.add(Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 2.0),
-        child: Text(
-            '${startingPoint.title} / ${endingPoint.title} : ${(distance! / 1000).toStringAsFixed(1)}km'),
-      ));
+      out.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 2.0),
+          child: Text(
+            '${startingPoint.title} / ${endingPoint.title} : ${(distance! / 1000).toStringAsFixed(1)}km',
+          ),
+        ),
+      );
     }
 
     return out;

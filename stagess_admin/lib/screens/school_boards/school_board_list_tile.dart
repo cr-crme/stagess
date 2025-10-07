@@ -119,6 +119,8 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
   }
 
   Future<void> _onClickedEditing() async {
+    final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
+
     if (_isEditing) {
       // Validate the form
       if (!(await validate()) || !mounted) return;
@@ -126,23 +128,35 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
       // Finish editing
       final newSchoolBoard = editedSchoolBoard;
       if (newSchoolBoard.getDifference(widget.schoolBoard).isNotEmpty) {
-        final isSuccess = await SchoolBoardsProvider.of(
-          context,
-          listen: false,
-        ).replaceWithConfirmation(newSchoolBoard);
-        if (!mounted) return;
-
-        showSnackBar(
-          context,
-          message:
-              isSuccess
-                  ? 'Centre de services scolaire modifiée avec succès'
-                  : 'Échec de la modification de la centre de services scolaire',
+        final isSuccess = await schoolBoards.replaceWithConfirmation(
+          newSchoolBoard,
         );
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                isSuccess
+                    ? 'Centre de services scolaire modifiée avec succès'
+                    : 'Échec de la modification de la centre de services scolaire',
+          );
+        }
+      }
+      await schoolBoards.releaseLockForItem(widget.schoolBoard);
+    } else {
+      final hasLock = await schoolBoards.getLockForItem(widget.schoolBoard);
+      if (!hasLock || !mounted) {
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                'Impossible de modifier le centre de services scolaire, car il est en cours de modification par un autre utilisateur.',
+          );
+        }
+        return;
       }
     }
 
-    setState(() => _isEditing = !_isEditing);
+    if (mounted) setState(() => _isEditing = !_isEditing);
   }
 
   @override

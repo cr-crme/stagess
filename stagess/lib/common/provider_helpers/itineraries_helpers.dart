@@ -20,13 +20,16 @@ class ItinerariesHelpers {
 
   static final _dateFormat = DateFormat('dd_MM_yyyy');
 
-  static Itinerary? fromDate(DateTime date,
-      {required TeachersProvider teachers}) {
+  static Itinerary? fromDate(
+    DateTime date, {
+    required TeachersProvider teachers,
+  }) {
     final itineraries = teachers.myTeacher?.itineraries;
     if (itineraries == null) return null;
 
     final dateAsString = _dateFormat.format(date);
-    return itineraries
-        .firstWhereOrNull((e) => _dateFormat.format(e.date) == dateAsString);
+    return itineraries.firstWhereOrNull(
+      (e) => _dateFormat.format(e.date) == dateAsString,
+    );
   }
 }

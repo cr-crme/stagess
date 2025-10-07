@@ -177,6 +177,8 @@ class StudentListTileState extends State<StudentListTile> {
   }
 
   Future<void> _onClickedEditing() async {
+    final students = StudentsProvider.of(context, listen: false);
+
     if (_isEditing) {
       // Validate the form
       if (!(await validate()) || !mounted) return;
@@ -184,23 +186,33 @@ class StudentListTileState extends State<StudentListTile> {
       // Finish editing
       final newStudent = editedStudent;
       if (newStudent.getDifference(widget.student).isNotEmpty) {
-        final isSuccess = await StudentsProvider.of(
-          context,
-          listen: false,
-        ).replaceWithConfirmation(newStudent);
-        if (!mounted) return;
-
-        showSnackBar(
-          context,
-          message:
-              isSuccess
-                  ? 'L\'élève a été modifié avec succès.'
-                  : 'Une erreur est survenue lors de la modification de l\'élève.',
-        );
+        final isSuccess = await students.replaceWithConfirmation(newStudent);
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                isSuccess
+                    ? 'L\'élève a été modifié avec succès.'
+                    : 'Une erreur est survenue lors de la modification de l\'élève.',
+          );
+        }
+        await students.releaseLockForItem(widget.student);
+      }
+    } else {
+      final hasLock = await students.getLockForItem(widget.student);
+      if (!hasLock || !mounted) {
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                'Impossible de modifier cet élève, car il est en cours de modification par un autre utilisateur.',
+          );
+        }
+        return;
       }
     }
 
-    setState(() => _isEditing = !_isEditing);
+    if (mounted) setState(() => _isEditing = !_isEditing);
   }
 
   @override

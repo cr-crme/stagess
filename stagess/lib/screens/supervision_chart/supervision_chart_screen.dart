@@ -200,8 +200,26 @@ class _SupervisionChartState extends State<SupervisionChart>
       if (!context.mounted) return;
       showSnackBar(context, message: 'Modifications enregistrées');
     } else {
+      var hasLock = true;
       for (final meta in internships) {
-        await internshipsProvided.getLockForItem(meta.internship);
+        hasLock =
+            hasLock &&
+            await internshipsProvided.getLockForItem(meta.internship);
+      }
+      if (!hasLock) {
+        final toWait = <Future>[];
+        for (final meta in internships) {
+          toWait.add(internshipsProvided.releaseLockForItem(meta.internship));
+        }
+        await Future.wait(toWait);
+
+        if (!context.mounted) return;
+        showSnackBar(
+          context,
+          message:
+              'Impossible de modifier le tableau de supervision, car il est en cours de modification par un autre utilisateur.',
+        );
+        return;
       }
     }
 

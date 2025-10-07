@@ -33,7 +33,7 @@ Future<Internship?> showVisaEvaluationDialog({
         showSnackBar(
           context,
           message:
-              'Impossible de modifier ce stage, il est peut-être en cours de modification ailleurs.',
+              'Impossible de modifier ce stage, car il est en cours de modification par un autre utilisateur.',
         );
       }
       return null;

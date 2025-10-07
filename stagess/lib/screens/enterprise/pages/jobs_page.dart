@@ -80,7 +80,7 @@ class JobsPageState extends State<JobsPage> {
         showSnackBar(
           context,
           message:
-              'Impossible d\'ajouter un poste. L\'entreprise est peut-être en cours de modification par un autre utilisateur.',
+              'Impossible d\'ajouter un poste, car l\'entreprise est en cours de modification par un autre utilisateur.',
         );
       }
       return;
@@ -120,7 +120,7 @@ class JobsPageState extends State<JobsPage> {
         showSnackBar(
           context,
           message:
-              'Impossible d\'ajouter une image. L\'entreprise est peut-être en cours de modification par un autre utilisateur.',
+              'Impossible d\'ajouter une image, car l\'entreprise est en cours de modification par un autre utilisateur.',
         );
       }
       return;
@@ -157,7 +157,7 @@ class JobsPageState extends State<JobsPage> {
         showSnackBar(
           context,
           message:
-              'Impossible de supprimer une image. L\'entreprise est peut-être en cours de modification par un autre utilisateur.',
+              'Impossible de supprimer une image, car l\'entreprise est en cours de modification par un autre utilisateur.',
         );
       }
       return;
@@ -184,7 +184,7 @@ class JobsPageState extends State<JobsPage> {
         showSnackBar(
           context,
           message:
-              'Impossible d\'ajouter un événement SST. L\'entreprise est peut-être en cours de modification par un autre utilisateur.',
+              'Impossible d\'ajouter un événement SST, car l\'entreprise est en cours de modification par un autre utilisateur.',
         );
       }
       return;
@@ -256,7 +256,7 @@ class JobsPageState extends State<JobsPage> {
         showSnackBar(
           context,
           message:
-              'Impossible d\'ajouter un commentaire. L\'entreprise est peut-être en cours de modification par un autre utilisateur.',
+              'Impossible d\'ajouter un commentaire, car l\'entreprise est en cours de modification par un autre utilisateur.',
         );
       }
       return;
@@ -337,7 +337,7 @@ class JobsPageState extends State<JobsPage> {
           showSnackBar(
             context,
             message:
-                'Impossible de modifier le poste. Celui-ci est peut-être en cours de modification par un autre utilisateur.',
+                'Impossible de modifier le poste, car celui-ci est en cours de modification par un autre utilisateur.',
           );
         }
         return;

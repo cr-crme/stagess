@@ -129,7 +129,7 @@ class InternshipDetailsState extends State<InternshipDetails> {
           showSnackBar(
             context,
             message:
-                'Le stage est en cours d\'édition par un autre utilisateur.',
+                'Impossible de modifier le stage, car il est en cours de modification par un autre utilisateur.',
           );
         }
         return;

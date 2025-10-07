@@ -13,6 +13,7 @@ import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/radio_with_follow_up.dart';
+import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('JobSstFormScreen');
 
@@ -23,7 +24,18 @@ Future<Enterprise?> showJobSstFormDialog(
 }) async {
   _logger.info('Showing JobSstFormDialog for jobId: $jobId');
   final enterprises = EnterprisesProvider.of(context, listen: false);
-  enterprises.getLockForItem(enterprises[enterpriseId]);
+  final hasLock = await enterprises.getLockForItem(enterprises[enterpriseId]);
+  if (!hasLock || !context.mounted) {
+    _logger.warning('Could not get lock for enterpriseId: $enterpriseId');
+    if (context.mounted) {
+      showSnackBar(
+        context,
+        message:
+            'Impossible de modifier le formulaire, car il est en cours de modification par un autre utilisateur.',
+      );
+    }
+    return null;
+  }
 
   final editedEnterprise = await showDialog<Enterprise?>(
     context: context,

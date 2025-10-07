@@ -133,6 +133,8 @@ class TeacherListTileState extends State<TeacherListTile> {
   }
 
   Future<void> _onClickedEditing() async {
+    final teachers = TeachersProvider.of(context, listen: false);
+
     if (_isEditing) {
       // Validate the form
       if (!(await validate()) || !mounted) return;
@@ -140,22 +142,33 @@ class TeacherListTileState extends State<TeacherListTile> {
       // Finish editing
       final newTeacher = editedTeacher;
       if (newTeacher.getDifference(widget.teacher).isNotEmpty) {
-        final isSuccess = await TeachersProvider.of(
-          context,
-          listen: false,
-        ).replaceWithConfirmation(newTeacher);
-        if (!mounted) return;
-
-        showSnackBar(
-          context,
-          message:
-              isSuccess
-                  ? 'Enseignant modifié avec succès'
-                  : 'Échec de la modification de l\'enseignant',
-        );
+        final isSuccess = await teachers.replaceWithConfirmation(newTeacher);
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                isSuccess
+                    ? 'Enseignant modifié avec succès'
+                    : 'Échec de la modification de l\'enseignant',
+          );
+        }
+      }
+      await teachers.releaseLockForItem(widget.teacher);
+    } else {
+      final hasLock = await teachers.getLockForItem(widget.teacher);
+      if (!hasLock || !mounted) {
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                'Impossible de modifier cet enseignant, car il est en cours de modification par un autre utilisateur.',
+          );
+        }
+        return;
       }
     }
-    setState(() => _isEditing = !_isEditing);
+
+    if (mounted) setState(() => _isEditing = !_isEditing);
   }
 
   @override

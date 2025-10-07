@@ -211,6 +211,8 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   }
 
   Future<void> _onClickedEditing() async {
+    final enterprises = EnterprisesProvider.of(context, listen: false);
+
     if (_isEditing) {
       // Validate the form
       if (!(await validate()) || !mounted) return;
@@ -218,23 +220,35 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       // Finish editing
       final newEnterprise = editedEnterprise;
       if (newEnterprise.getDifference(widget.enterprise).isNotEmpty) {
-        final isSuccess = await EnterprisesProvider.of(
-          context,
-          listen: false,
-        ).replaceWithConfirmation(newEnterprise);
-        if (!mounted) return;
-
-        showSnackBar(
-          context,
-          message:
-              isSuccess
-                  ? 'Entreprise mise à jour avec succès'
-                  : 'Échec de la mise à jour de l\'entreprise',
+        final isSuccess = await enterprises.replaceWithConfirmation(
+          newEnterprise,
         );
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                isSuccess
+                    ? 'Entreprise mise à jour avec succès'
+                    : 'Échec de la mise à jour de l\'entreprise',
+          );
+        }
+      }
+      await enterprises.releaseLockForItem(widget.enterprise);
+    } else {
+      final hasLock = await enterprises.getLockForItem(widget.enterprise);
+      if (!hasLock || !mounted) {
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                'Impossible de modifier l\'entreprise, car elle est en cours de modification par un autre utilisateur.',
+          );
+        }
+        return;
       }
     }
 
-    setState(() => _isEditing = !_isEditing);
+    if (mounted) setState(() => _isEditing = !_isEditing);
   }
 
   @override

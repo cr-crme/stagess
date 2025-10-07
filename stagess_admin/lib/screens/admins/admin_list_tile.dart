@@ -93,31 +93,41 @@ class AdminListTileState extends State<AdminListTile> {
   }
 
   Future<void> _onClickedEditing() async {
+    final admins = AdminsProvider.of(context, listen: false);
+
     if (_isEditing) {
       // Validate the form
       if (!(await validate()) || !mounted) return;
-      setState(() => _isEditing = !_isEditing);
-
       // Finish editing
       final newAdmin = editedAdmin;
       if (newAdmin.getDifference(widget.admin).isNotEmpty) {
-        final isSuccess = await AdminsProvider.of(
-          context,
-          listen: false,
-        ).replaceWithConfirmation(newAdmin);
-        if (!mounted) return;
-
-        showSnackBar(
-          context,
-          message:
-              isSuccess
-                  ? 'L\'administrateur a été modifié avec succès.'
-                  : 'Une erreur est survenue lors de la modification de l\'administrateur.',
-        );
+        final isSuccess = await admins.replaceWithConfirmation(newAdmin);
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                isSuccess
+                    ? 'L\'administrateur a été modifié avec succès.'
+                    : 'Une erreur est survenue lors de la modification de l\'administrateur.',
+          );
+        }
       }
+      await admins.releaseLockForItem(widget.admin);
     } else {
-      setState(() => _isEditing = !_isEditing);
+      final hasLock = await admins.getLockForItem(widget.admin);
+      if (!hasLock || !mounted) {
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                'Impossible de modifier cet administrateur, car il est en cours de modification par un autre utilisateur.',
+          );
+        }
+        return;
+      }
     }
+
+    if (mounted) setState(() => _isEditing = !_isEditing);
   }
 
   @override

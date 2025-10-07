@@ -113,7 +113,18 @@ class TeacherListTileState extends State<TeacherListTile> {
       if (!mounted) return;
       showSnackBar(context, message: 'Enseignant·e mis à jour');
     } else {
-      await teachers.getLockForItem(widget.teacher);
+      final hasLock = await teachers.getLockForItem(widget.teacher);
+      if (!hasLock || !mounted) {
+        _logger.warning('Could not get lock for teacher ${widget.teacher.id}');
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                'Impossible de modifier cet·te enseignant·e, car iel est en cours de modification par un autre utilisateur.',
+          );
+        }
+        return;
+      }
     }
 
     setState(() => _isEditing = !_isEditing);

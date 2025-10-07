@@ -110,6 +110,8 @@ class SchoolListTileState extends State<SchoolListTile> {
   }
 
   Future<void> _onClickedEditing() async {
+    final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
+
     if (_isEditing) {
       // Validate the form
       if (!(await validate()) || !mounted) return;
@@ -121,23 +123,35 @@ class SchoolListTileState extends State<SchoolListTile> {
           (school) => school.id == widget.school.id,
         );
         widget.schoolBoard.schools.add(newSchool);
-        final isSuccess = await SchoolBoardsProvider.of(
-          context,
-          listen: false,
-        ).replaceWithConfirmation(widget.schoolBoard);
-        if (!mounted) return;
-
-        showSnackBar(
-          context,
-          message:
-              isSuccess
-                  ? 'L\'école a été modifiée avec succès'
-                  : 'Une erreur est survenue lors de la modification de l\'école',
+        final isSuccess = await schoolBoards.replaceWithConfirmation(
+          widget.schoolBoard,
         );
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                isSuccess
+                    ? 'L\'école a été modifiée avec succès'
+                    : 'Une erreur est survenue lors de la modification de l\'école',
+          );
+        }
+      }
+      await schoolBoards.releaseLockForItem(widget.schoolBoard);
+    } else {
+      final hasLock = await schoolBoards.getLockForItem(widget.schoolBoard);
+      if (!hasLock || !mounted) {
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                'Impossible de modifier cette école, elle est en cours de modification par un autre utilisateur',
+          );
+        }
+        return;
       }
     }
 
-    setState(() => _isEditing = !_isEditing);
+    if (mounted) setState(() => _isEditing = !_isEditing);
   }
 
   @override
