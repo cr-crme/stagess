@@ -15,6 +15,41 @@ import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('EnterpriseEvaluationScreen');
 
+Future<void> showEnterpriseEvaluationDialog(
+  BuildContext context, {
+  required Internship internship,
+}) async {
+  final internships = InternshipsProvider.of(context, listen: false);
+  final hasLock = await internships.getLockForItem(internship);
+  if (!hasLock || !context.mounted) {
+    if (context.mounted) {
+      showSnackBar(
+        context,
+        message:
+            'Impossible de modifier ce stage, il est peut-être en cours de modification ailleurs.',
+      );
+    }
+    return;
+  }
+
+  final editedInternship = await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder:
+        (context) =>
+            Dialog(child: EnterpriseEvaluationScreen(id: internship.id)),
+  );
+  if (editedInternship == null) {
+    await internships.releaseLockForItem(internship);
+    return;
+  }
+
+  await internships.replaceWithConfirmation(editedInternship);
+  if (context.mounted) {
+    showSnackBar(context, message: 'Le stage a été mis à jour');
+  }
+}
+
 class EnterpriseEvaluationScreen extends StatefulWidget {
   const EnterpriseEvaluationScreen({super.key, required this.id});
 
@@ -33,7 +68,7 @@ class _EnterpriseEvaluationScreenState
   final List<StepState> _stepStatus = [
     StepState.indexed,
     StepState.indexed,
-    StepState.indexed
+    StepState.indexed,
   ];
 
   final _taskAndAbilityKey = GlobalKey<TaskAndAbilityStepState>();
@@ -44,8 +79,10 @@ class _EnterpriseEvaluationScreenState
 
   void _showInvalidFieldsSnakBar([String? message]) {
     ScaffoldMessenger.of(context).clearSnackBars();
-    showSnackBar(context,
-        message: message ?? 'Remplir tous les champs avec un *.');
+    showSnackBar(
+      context,
+      message: message ?? 'Remplir tous les champs avec un *.',
+    );
   }
 
   void _nextStep() async {
@@ -141,8 +178,10 @@ class _EnterpriseEvaluationScreenState
       acceptanceTsa: _specializedStudentsKey.currentState!.acceptanceTsa,
       acceptanceLanguageDisorder:
           _specializedStudentsKey.currentState!.acceptanceLanguageDisorder,
-      acceptanceIntellectualDisability: _specializedStudentsKey
-          .currentState!.acceptanceIntellectualDisability,
+      acceptanceIntellectualDisability:
+          _specializedStudentsKey
+              .currentState!
+              .acceptanceIntellectualDisability,
       acceptancePhysicalDisability:
           _specializedStudentsKey.currentState!.acceptancePhysicalDisability,
       acceptanceMentalHealthDisorder:
@@ -151,28 +190,29 @@ class _EnterpriseEvaluationScreenState
           _specializedStudentsKey.currentState!.acceptanceBehaviorDifficulties,
     );
 
-    // Pass the evaluation data to the rest of the app
-    internships.replace(internship);
-
-    _logger
-        .fine('Evaluation submitted successfully for internship: ${widget.id}');
-    Navigator.pop(context);
+    _logger.fine(
+      'Evaluation submitted successfully for internship: ${widget.id}',
+    );
+    Navigator.pop(context, internship);
   }
 
   void _cancel() async {
     _logger.info('Cancel called, current step: $_currentStep');
     final navigator = Navigator.of(context);
-    final answer = await ConfirmExitDialog.show(context,
-        content: const Text('Toutes les modifications seront perdues.'));
+    final answer = await ConfirmExitDialog.show(
+      context,
+      content: const Text('Toutes les modifications seront perdues.'),
+    );
     if (!mounted || !answer) return;
     _logger.fine('User confirmed exit, navigating back');
-    navigator.pop();
+    navigator.pop(null);
   }
 
   @override
   Widget build(BuildContext context) {
     _logger.fine(
-        'Building EnterpriseEvaluationScreen for internship: ${widget.id}');
+      'Building EnterpriseEvaluationScreen for internship: ${widget.id}',
+    );
 
     final internships = InternshipsProvider.of(context, listen: false);
     final internship = internships.firstWhere((e) => e.id == widget.id);
@@ -181,55 +221,59 @@ class _EnterpriseEvaluationScreenState
       width: ResponsiveService.maxBodyWidth,
       child: Scaffold(
         appBar: AppBar(
-            title: const Text('Évaluation post-stage'),
-            leading: IconButton(
-                onPressed: _cancel, icon: const Icon(Icons.arrow_back))),
+          title: const Text('Évaluation post-stage'),
+          leading: IconButton(
+            onPressed: _cancel,
+            icon: const Icon(Icons.arrow_back),
+          ),
+        ),
         body: PopScope(
           child: Selector<EnterprisesProvider, Job>(
-            builder: (context, job, _) => ScrollableStepper(
-              type: StepperType.horizontal,
-              scrollController: _scrollController,
-              currentStep: _currentStep,
-              onTapContinue: _nextStep,
-              onStepTapped: (int tapped) => setState(() {
-                _scrollController.jumpTo(0);
-                _currentStep = tapped;
-              }),
-              onTapCancel: () => Navigator.pop(context),
-              steps: [
-                Step(
-                  state: _stepStatus[0],
-                  isActive: _currentStep == 0,
-                  title: const Text(
-                    'Tâches et\nhabiletés',
-                    textAlign: TextAlign.center,
-                  ),
-                  content: TaskAndAbilityStep(
-                    key: _taskAndAbilityKey,
-                    internship: internship,
-                  ),
+            builder:
+                (context, job, _) => ScrollableStepper(
+                  type: StepperType.horizontal,
+                  scrollController: _scrollController,
+                  currentStep: _currentStep,
+                  onTapContinue: _nextStep,
+                  onStepTapped:
+                      (int tapped) => setState(() {
+                        _scrollController.jumpTo(0);
+                        _currentStep = tapped;
+                      }),
+                  onTapCancel: () => Navigator.pop(context),
+                  steps: [
+                    Step(
+                      state: _stepStatus[0],
+                      isActive: _currentStep == 0,
+                      title: const Text(
+                        'Tâches et\nhabiletés',
+                        textAlign: TextAlign.center,
+                      ),
+                      content: TaskAndAbilityStep(
+                        key: _taskAndAbilityKey,
+                        internship: internship,
+                      ),
+                    ),
+                    Step(
+                      state: _stepStatus[1],
+                      isActive: _currentStep == 1,
+                      title: const Text('Encadrement'),
+                      content: SupervisionStep(key: _supervisionKey, job: job),
+                    ),
+                    Step(
+                      state: _stepStatus[2],
+                      isActive: _currentStep == 2,
+                      title: const Text('Clientèle\nspécialisée'),
+                      content: SpecializedStudentsStep(
+                        key: _specializedStudentsKey,
+                      ),
+                    ),
+                  ],
+                  controlsBuilder: _controlBuilder,
                 ),
-                Step(
-                  state: _stepStatus[1],
-                  isActive: _currentStep == 1,
-                  title: const Text('Encadrement'),
-                  content: SupervisionStep(
-                    key: _supervisionKey,
-                    job: job,
-                  ),
-                ),
-                Step(
-                  state: _stepStatus[2],
-                  isActive: _currentStep == 2,
-                  title: const Text('Clientèle\nspécialisée'),
-                  content:
-                      SpecializedStudentsStep(key: _specializedStudentsKey),
-                ),
-              ],
-              controlsBuilder: _controlBuilder,
-            ),
-            selector: (context, enterprises) =>
-                enterprises[internship.enterpriseId].jobs[internship.jobId],
+            selector:
+                (context, enterprises) =>
+                    enterprises[internship.enterpriseId].jobs[internship.jobId],
           ),
         ),
       ),
@@ -244,16 +288,17 @@ class _EnterpriseEvaluationScreenState
         children: [
           if (_currentStep != 0)
             OutlinedButton(
-                onPressed: _previousStep, child: const Text('Précédent')),
-          const SizedBox(
-            width: 20,
-          ),
+              onPressed: _previousStep,
+              child: const Text('Précédent'),
+            ),
+          const SizedBox(width: 20),
           TextButton(
             onPressed: details.onStepContinue,
-            child: _currentStep == 2
-                ? const Text('Confirmer')
-                : const Text('Suivant'),
-          )
+            child:
+                _currentStep == 2
+                    ? const Text('Confirmer')
+                    : const Text('Suivant'),
+          ),
         ],
       ),
     );

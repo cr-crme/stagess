@@ -11,7 +11,7 @@ import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/services/image_helpers.dart';
 import 'package:stagess_common/utils.dart';
 
-abstract class SchoolBoardsRepository implements RepositoryAbstract {
+abstract class SchoolBoardsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
     List<String>? fields,
@@ -52,10 +52,23 @@ abstract class SchoolBoardsRepository implements RepositoryAbstract {
     required String id,
     required Map<String, dynamic> data,
     required DatabaseUser user,
+    bool tryRequestingLock = true,
   }) async {
     if (user.isNotVerified || user.accessLevel < AccessLevel.admin) {
       throw InvalidRequestException(
           'You do not have permission to put school boards');
+    }
+
+    if (!canEdit(user: user, id: id)) {
+      if (!tryRequestingLock ||
+          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+        throw InvalidRequestException(
+            'You must acquire a lock before editing this school board');
+      }
+      final response = await putById(
+          id: id, data: data, user: user, tryRequestingLock: false);
+      await releaseLock(user: user, id: id);
+      return response;
     }
 
     // Update if exists, insert if not
@@ -77,10 +90,23 @@ abstract class SchoolBoardsRepository implements RepositoryAbstract {
   Future<RepositoryResponse> deleteById({
     required String id,
     required DatabaseUser user,
+    bool tryRequestingLock = true,
   }) async {
     if (user.isNotVerified || user.accessLevel < AccessLevel.superAdmin) {
       throw InvalidRequestException(
           'You do not have permission to delete school boards');
+    }
+
+    if (!canEdit(user: user, id: id)) {
+      if (!tryRequestingLock ||
+          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+        throw InvalidRequestException(
+            'You must acquire a lock before deleting this school board');
+      }
+      final response =
+          await deleteById(id: id, user: user, tryRequestingLock: false);
+      await releaseLock(user: user, id: id);
+      return response;
     }
 
     final removedId = await _deleteSchoolBoard(id: id, user: user);

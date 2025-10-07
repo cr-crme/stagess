@@ -11,7 +11,6 @@ import 'package:stagess_common/models/internships/internship_evaluation_skill.da
 import 'package:stagess_common/models/internships/task_appreciation.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
-import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 
 final _logger = Logger('SkillEvaluationFormScreen');
@@ -87,7 +86,7 @@ class _SkillEvaluationFormScreenState extends State<SkillEvaluationFormScreen> {
 
     _logger.fine('User confirmed cancellation, disposing form controller');
     if (!widget.rootContext.mounted) return;
-    Navigator.of(widget.rootContext).pop();
+    Navigator.of(widget.rootContext).pop(null);
   }
 
   void _submit() async {
@@ -127,9 +126,6 @@ class _SkillEvaluationFormScreenState extends State<SkillEvaluationFormScreen> {
       widget.formController.toInternshipEvaluation(),
     );
 
-    // Pass the evaluation data to the rest of the app
-    InternshipsProvider.of(context, listen: false).replace(internship);
-
     _isDisposed = true;
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       widget.formController.dispose();
@@ -137,7 +133,7 @@ class _SkillEvaluationFormScreenState extends State<SkillEvaluationFormScreen> {
 
     _logger.fine('Skill evaluation form submitted successfully');
     if (!widget.rootContext.mounted) return;
-    Navigator.of(widget.rootContext).pop();
+    Navigator.of(widget.rootContext).pop(internship);
   }
 
   Widget _controlBuilder(

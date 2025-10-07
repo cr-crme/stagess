@@ -94,6 +94,8 @@ class Connexions {
           await _handleHandshake(client, protocol: protocol);
           break;
 
+        case RequestType.getLock:
+        case RequestType.releaseLock:
         case RequestType.get:
         case RequestType.post:
         case RequestType.delete:
@@ -355,6 +357,10 @@ class Connexions {
       RequestType.post => await _database.put(protocol.field!,
           data: protocol.data, user: _clients[client]!),
       RequestType.delete => await _database.delete(protocol.field!,
+          data: protocol.data, user: _clients[client]!),
+      RequestType.getLock => await _database.getLock(protocol.field!,
+          data: protocol.data, user: _clients[client]!),
+      RequestType.releaseLock => await _database.releaseLock(protocol.field!,
           data: protocol.data, user: _clients[client]!),
       _ => throw InvalidRequestTypeException(
           'Invalid request type: ${protocol.requestType}'),

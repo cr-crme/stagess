@@ -172,7 +172,7 @@ class _AddressListTileState extends State<AddressListTile> {
               context: context,
               builder:
                   (context) => AlertDialog(
-                    title: const Text('Confimer l\'adresse'),
+                    title: const Text('Confirmer l\'adresse'),
                     content: SingleChildScrollView(
                       child: Column(
                         mainAxisSize: MainAxisSize.min,

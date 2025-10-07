@@ -24,7 +24,7 @@ int numberOfTasksToDo(context) {
   final taskFunctions = [
     _enterprisesToEvaluate,
     _internshipsToTerminate,
-    _postInternshipEvaluationToDo
+    _postInternshipEvaluationToDo,
   ];
   return taskFunctions.fold<int>(0, (prev, e) => prev + e(context).length);
 }
@@ -34,8 +34,9 @@ List<_JobEnterpriseInternshipStudent> _enterprisesToEvaluate(context) {
   // internship in this job and the no evaluation was ever performed
   final myId = TeachersProvider.of(context).myTeacher?.id;
   if (myId == null) return [];
-  final enterprises =
-      EnterprisesProviderExtension.availableEnterprisesOf(context);
+  final enterprises = EnterprisesProviderExtension.availableEnterprisesOf(
+    context,
+  );
   final internships = InternshipsProvider.of(context);
 
   // This happens sometimes, so we need to wait a frame
@@ -45,18 +46,26 @@ List<_JobEnterpriseInternshipStudent> _enterprisesToEvaluate(context) {
   for (final enterprise in enterprises) {
     for (final job in enterprise.availablejobs(context)) {
       if (!job.sstEvaluation.isFilled) {
-        final interns = internships
-            .where((e) =>
-                e.isActive &&
-                e.jobId == job.id &&
-                e.supervisingTeacherIds.contains(myId))
-            .toList();
+        final interns =
+            internships
+                .where(
+                  (e) =>
+                      e.isActive &&
+                      e.jobId == job.id &&
+                      e.supervisingTeacherIds.contains(myId),
+                )
+                .toList();
         if (interns.isEmpty) continue;
 
         interns.sort((a, b) => a.dates.start.compareTo(b.dates.start));
 
-        out.add(_JobEnterpriseInternshipStudent(
-            enterprise: enterprise, job: job, internship: interns[0]));
+        out.add(
+          _JobEnterpriseInternshipStudent(
+            enterprise: enterprise,
+            job: job,
+            internship: interns[0],
+          ),
+        );
       }
     }
   }
@@ -70,8 +79,9 @@ List<_JobEnterpriseInternshipStudent> _internshipsToTerminate(context) {
   // one day
   final internships = InternshipsProvider.of(context);
   final students = StudentsHelpers.mySupervizedStudents(context);
-  final enterprises =
-      EnterprisesProviderExtension.availableEnterprisesOf(context);
+  final enterprises = EnterprisesProviderExtension.availableEnterprisesOf(
+    context,
+  );
 
   // This happens sometimes, so we need to wait a frame
   if (internships.isEmpty || students.isEmpty || enterprises.isEmpty) return [];
@@ -80,19 +90,23 @@ List<_JobEnterpriseInternshipStudent> _internshipsToTerminate(context) {
 
   for (final internship in internships) {
     if (internship.shouldTerminate) {
-      final student =
-          students.firstWhereOrNull((e) => e.id == internship.studentId);
+      final student = students.firstWhereOrNull(
+        (e) => e.id == internship.studentId,
+      );
       if (student == null) continue;
 
-      final enterprise =
-          enterprises.firstWhereOrNull((e) => e.id == internship.enterpriseId);
+      final enterprise = enterprises.firstWhereOrNull(
+        (e) => e.id == internship.enterpriseId,
+      );
       if (enterprise == null) continue;
 
-      out.add(_JobEnterpriseInternshipStudent(
-        internship: internship,
-        student: student,
-        enterprise: enterprise,
-      ));
+      out.add(
+        _JobEnterpriseInternshipStudent(
+          internship: internship,
+          student: student,
+          enterprise: enterprise,
+        ),
+      );
     }
   }
 
@@ -104,8 +118,9 @@ List<_JobEnterpriseInternshipStudent> _postInternshipEvaluationToDo(context) {
   // We should evaluate an internship as soon as it is terminated
   final internships = InternshipsProvider.of(context);
   final students = StudentsHelpers.mySupervizedStudents(context);
-  final enterprises =
-      EnterprisesProviderExtension.availableEnterprisesOf(context);
+  final enterprises = EnterprisesProviderExtension.availableEnterprisesOf(
+    context,
+  );
 
   // This happens sometimes, so we need to wait a frame
   if (internships.isEmpty || students.isEmpty || enterprises.isEmpty) return [];
@@ -114,19 +129,23 @@ List<_JobEnterpriseInternshipStudent> _postInternshipEvaluationToDo(context) {
 
   for (final internship in internships) {
     if (internship.isEnterpriseEvaluationPending) {
-      final student =
-          students.firstWhereOrNull((e) => e.id == internship.studentId);
+      final student = students.firstWhereOrNull(
+        (e) => e.id == internship.studentId,
+      );
       if (student == null) continue;
 
-      final enterprise =
-          enterprises.firstWhereOrNull((e) => e.id == internship.enterpriseId);
+      final enterprise = enterprises.firstWhereOrNull(
+        (e) => e.id == internship.enterpriseId,
+      );
       if (enterprise == null) continue;
 
-      out.add(_JobEnterpriseInternshipStudent(
-        internship: internship,
-        student: student,
-        enterprise: enterprise,
-      ));
+      out.add(
+        _JobEnterpriseInternshipStudent(
+          internship: internship,
+          student: student,
+          enterprise: enterprise,
+        ),
+      );
     }
   }
 
@@ -194,8 +213,9 @@ class _SstRisk extends StatelessWidget {
   Widget build(BuildContext context) {
     final jobs = _enterprisesToEvaluate(context);
 
-    jobs.sort((a, b) =>
-        a.internship!.dates.start.compareTo(b.internship!.dates.start));
+    jobs.sort(
+      (a, b) => a.internship!.dates.start.compareTo(b.internship!.dates.start),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -203,24 +223,26 @@ class _SstRisk extends StatelessWidget {
         const SubTitle('Repérer les risques SST'),
         ...(jobs.isEmpty
             ? [const _AllTasksDone()]
-            : jobs.map(
-                (e) {
-                  final enterprise = e.enterprise!;
-                  final job = e.job!;
-                  final internship = e.internship!;
+            : jobs.map((e) {
+              final enterprise = e.enterprise!;
+              final job = e.job!;
+              final internship = e.internship!;
 
-                  return _TaskTile(
-                    title: enterprise.name,
-                    subtitle: job.specialization.name,
-                    icon: Icons.warning,
-                    iconColor: Theme.of(context).colorScheme.secondary,
-                    date: internship.dates.start,
-                    buttonTitle: 'Remplir le\nquestionnaire SST',
-                    onTap: () => showJobSstFormDialog(context,
-                        enterpriseId: enterprise.id, jobId: job.id),
-                  );
-                },
-              )),
+              return _TaskTile(
+                title: enterprise.name,
+                subtitle: job.specialization.name,
+                icon: Icons.warning,
+                iconColor: Theme.of(context).colorScheme.secondary,
+                date: internship.dates.start,
+                buttonTitle: 'Remplir le\nquestionnaire SST',
+                onTap:
+                    () => showJobSstFormDialog(
+                      context,
+                      enterpriseId: enterprise.id,
+                      jobId: job.id,
+                    ),
+              );
+            })),
       ],
     );
   }
@@ -234,7 +256,8 @@ class _EndingInternship extends StatelessWidget {
     final internships = _internshipsToTerminate(context);
 
     internships.sort(
-        (a, b) => a.internship!.dates.end.compareTo(b.internship!.dates.end));
+      (a, b) => a.internship!.dates.end.compareTo(b.internship!.dates.end),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -242,27 +265,26 @@ class _EndingInternship extends StatelessWidget {
         const SubTitle('Terminer les stages'),
         ...(internships.isEmpty
             ? [const _AllTasksDone()]
-            : internships.map(
-                (e) {
-                  final internship = e.internship!;
-                  final student = e.student!;
-                  final enterprise = e.enterprise!;
+            : internships.map((e) {
+              final internship = e.internship!;
+              final student = e.student!;
+              final enterprise = e.enterprise!;
 
-                  return _TaskTile(
-                    title: student.fullName,
-                    subtitle: enterprise.name,
-                    icon: Icons.flag,
-                    iconColor: Colors.yellow.shade700,
-                    date: internship.dates.end,
-                    buttonTitle: 'Aller au stage',
-                    onTap: () => GoRouter.of(context).pushNamed(
+              return _TaskTile(
+                title: student.fullName,
+                subtitle: enterprise.name,
+                icon: Icons.flag,
+                iconColor: Colors.yellow.shade700,
+                date: internship.dates.end,
+                buttonTitle: 'Aller au stage',
+                onTap:
+                    () => GoRouter.of(context).pushNamed(
                       Screens.student,
                       pathParameters: Screens.params(student),
                       queryParameters: Screens.queryParams(pageIndex: '1'),
                     ),
-                  );
-                },
-              )),
+              );
+            })),
       ],
     );
   }
@@ -275,8 +297,9 @@ class _PostInternshipEvaluation extends StatelessWidget {
   Widget build(BuildContext context) {
     final internships = _postInternshipEvaluationToDo(context);
 
-    internships
-        .sort((a, b) => a.internship!.endDate.compareTo(b.internship!.endDate));
+    internships.sort(
+      (a, b) => a.internship!.endDate.compareTo(b.internship!.endDate),
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -284,28 +307,25 @@ class _PostInternshipEvaluation extends StatelessWidget {
         const SubTitle('Faire les évaluations post-stage'),
         ...(internships.isEmpty
             ? [const _AllTasksDone()]
-            : internships.map(
-                (e) {
-                  final internship = e.internship!;
-                  final student = e.student!;
-                  final enterprise = e.enterprise!;
+            : internships.map((e) {
+              final internship = e.internship!;
+              final student = e.student!;
+              final enterprise = e.enterprise!;
 
-                  return _TaskTile(
-                    title: student.fullName,
-                    subtitle: enterprise.name,
-                    icon: Icons.rate_review,
-                    iconColor: Colors.blueGrey,
-                    date: internship.endDate,
-                    buttonTitle: 'Évaluer l\'entreprise',
-                    onTap: () => showDialog(
-                        context: context,
-                        barrierDismissible: false,
-                        builder: (context) => Dialog(
-                            child:
-                                EnterpriseEvaluationScreen(id: internship.id))),
-                  );
-                },
-              )),
+              return _TaskTile(
+                title: student.fullName,
+                subtitle: enterprise.name,
+                icon: Icons.rate_review,
+                iconColor: Colors.blueGrey,
+                date: internship.endDate,
+                buttonTitle: 'Évaluer l\'entreprise',
+                onTap:
+                    () => showEnterpriseEvaluationDialog(
+                      context,
+                      internship: internship,
+                    ),
+              );
+            })),
       ],
     );
   }
@@ -344,14 +364,12 @@ class _TaskTile extends StatelessWidget {
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           TextButton(
-              onPressed: onTap,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4.0),
-                child: Text(
-                  buttonTitle,
-                  textAlign: TextAlign.center,
-                ),
-              ))
+            onPressed: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
+              child: Text(buttonTitle, textAlign: TextAlign.center),
+            ),
+          ),
         ],
       ),
     );
@@ -360,27 +378,26 @@ class _TaskTile extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 8),
-          Row(children: [
-            SizedBox(width: 60, child: Icon(icon, color: iconColor)),
-            Expanded(
-              //width: MediaQuery.of(context).size.width - 72,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  Text(
-                    subtitle,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  const SizedBox(height: 8),
-                ],
+          Row(
+            children: [
+              SizedBox(width: 60, child: Icon(icon, color: iconColor)),
+              Expanded(
+                //width: MediaQuery.of(context).size.width - 72,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: Theme.of(context).textTheme.titleSmall),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ),
               ),
-            ),
-            if (screenSize == ScreenSize.large) button
-          ]),
+              if (screenSize == ScreenSize.large) button,
+            ],
+          ),
           if (screenSize != ScreenSize.large) button,
           const SizedBox(height: 8),
         ],

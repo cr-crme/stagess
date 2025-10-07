@@ -11,7 +11,7 @@ import 'package:stagess_common/utils.dart';
 // AccessLevel in this repository is discarded as all operations are currently
 // available to all users
 
-abstract class AdminsRepository implements RepositoryAbstract {
+abstract class AdminsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
     List<String>? fields,
@@ -50,10 +50,23 @@ abstract class AdminsRepository implements RepositoryAbstract {
     required String id,
     required Map<String, dynamic> data,
     required DatabaseUser user,
+    bool tryRequestingLock = true,
   }) async {
     if (user.accessLevel < AccessLevel.superAdmin) {
       throw InvalidRequestException(
           'You do not have permission to get put administrators');
+    }
+
+    if (!canEdit(user: user, id: id)) {
+      if (!tryRequestingLock ||
+          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+        throw InvalidRequestException(
+            'You must acquire a lock before editing this administrator');
+      }
+      final response = await putById(
+          id: id, data: data, user: user, tryRequestingLock: false);
+      await releaseLock(user: user, id: id);
+      return response;
     }
 
     // Update if exists, insert if not
@@ -72,10 +85,23 @@ abstract class AdminsRepository implements RepositoryAbstract {
   Future<RepositoryResponse> deleteById({
     required String id,
     required DatabaseUser user,
+    bool tryRequestingLock = true,
   }) async {
     if (user.accessLevel < AccessLevel.superAdmin) {
       throw InvalidRequestException(
           'You do not have permission to get delete administrators');
+    }
+
+    if (!canEdit(user: user, id: id)) {
+      if (!tryRequestingLock ||
+          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+        throw InvalidRequestException(
+            'You must acquire a lock before deleting this administrator');
+      }
+      final response =
+          await deleteById(id: id, user: user, tryRequestingLock: false);
+      await releaseLock(user: user, id: id);
+      return response;
     }
 
     final admin = await _getAdminById(id: id, user: user);

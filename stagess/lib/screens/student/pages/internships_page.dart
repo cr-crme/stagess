@@ -36,8 +36,9 @@ class InternshipsPageState extends State<InternshipsPage> {
   final toEvaluateKey = GlobalKey<_StudentInternshipListViewState>();
 
   List<Internship> _getActiveInternships(List<Internship> internships) {
-    _logger
-        .finer('Fetching active internships for student: ${widget.student.id}');
+    _logger.finer(
+      'Fetching active internships for student: ${widget.student.id}',
+    );
 
     final List<Internship> out = [];
     for (final internship in internships) {
@@ -48,8 +49,9 @@ class InternshipsPageState extends State<InternshipsPage> {
   }
 
   List<Internship> _getClosedInternships(List<Internship> internships) {
-    _logger
-        .finer('Fetching closed internships for student: ${widget.student.id}');
+    _logger.finer(
+      'Fetching closed internships for student: ${widget.student.id}',
+    );
 
     final List<Internship> out = [];
     for (final internship in internships) {
@@ -61,7 +63,8 @@ class InternshipsPageState extends State<InternshipsPage> {
 
   List<Internship> _getToEvaluateInternships(List<Internship> internships) {
     _logger.finer(
-        'Fetching internships to evaluate for student: ${widget.student.id}');
+      'Fetching internships to evaluate for student: ${widget.student.id}',
+    );
 
     final List<Internship> out = [];
     for (final internship in internships) {
@@ -73,7 +76,8 @@ class InternshipsPageState extends State<InternshipsPage> {
 
   void _sortByDate(List<Internship> internships) {
     _logger.finer(
-        'Sorting internships by start date for student: ${widget.student.id}');
+      'Sorting internships by start date for student: ${widget.student.id}',
+    );
     internships.sort((a, b) => a.dates.start.compareTo(b.dates.start));
   }
 
@@ -87,8 +91,9 @@ class InternshipsPageState extends State<InternshipsPage> {
   Widget build(BuildContext context) {
     _logger.finer('Building InternshipsPage for student: ${widget.student.id}');
 
-    final internships =
-        InternshipsProvider.of(context).byStudentId(widget.student.id);
+    final internships = InternshipsProvider.of(
+      context,
+    ).byStudentId(widget.student.id);
     final toEvaluateInternships = _getToEvaluateInternships(internships);
     final activeInternships = _getActiveInternships(internships);
     final closedInternships = _getClosedInternships(internships);
@@ -109,18 +114,20 @@ class InternshipsPageState extends State<InternshipsPage> {
             const SizedBox(height: 12),
           if (toEvaluateInternships.isNotEmpty)
             _StudentInternshipListView(
-                key: toEvaluateKey,
-                scrollController: scrollController,
-                title: 'Entreprises à évaluer',
-                internships: toEvaluateInternships),
+              key: toEvaluateKey,
+              scrollController: scrollController,
+              title: 'Entreprises à évaluer',
+              internships: toEvaluateInternships,
+            ),
           if (toEvaluateInternships.isNotEmpty && closedInternships.isNotEmpty)
             const SizedBox(height: 12),
           if (closedInternships.isNotEmpty)
             _StudentInternshipListView(
-                key: closedKey,
-                scrollController: scrollController,
-                title: 'Historique des stages',
-                internships: closedInternships),
+              key: closedKey,
+              scrollController: scrollController,
+              title: 'Historique des stages',
+              internships: closedInternships,
+            ),
         ],
       ),
     );
@@ -171,19 +178,19 @@ class _StudentInternshipListViewState
       children: [
         Text(
           enterprise.name,
-          style: Theme.of(context)
-              .textTheme
-              .titleLarge!
-              .copyWith(color: Colors.black),
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge!.copyWith(color: Colors.black),
         ),
         Padding(
           padding: const EdgeInsets.only(left: 12.0),
           child: InkWell(
-            onTap: () => GoRouter.of(context).pushNamed(
-              Screens.enterprise,
-              pathParameters: Screens.params(enterprise),
-              queryParameters: Screens.queryParams(pageIndex: '3'),
-            ),
+            onTap:
+                () => GoRouter.of(context).pushNamed(
+                  Screens.enterprise,
+                  pathParameters: Screens.params(enterprise),
+                  queryParameters: Screens.queryParams(pageIndex: '3'),
+                ),
             borderRadius: BorderRadius.circular(25),
             child: Padding(
               padding: const EdgeInsets.all(4),
@@ -193,17 +200,13 @@ class _StudentInternshipListViewState
               ),
             ),
           ),
-        )
+        ),
       ],
     );
   }
 
   void _evaluateEnterprise(context, Internship internship) async {
-    showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) =>
-            Dialog(child: EnterpriseEvaluationScreen(id: internship.id)));
+    await showEnterpriseEvaluationDialog(context, internship: internship);
   }
 
   @override
@@ -226,82 +229,94 @@ class _StudentInternshipListViewState
               final enterprise =
                   EnterprisesProvider.of(context)[internship.enterpriseId];
 
-              final endDate = internship.isActive
-                  ? DateFormat.yMMMd('fr_CA').format(internship.dates.end)
-                  : DateFormat.yMMMd('fr_CA').format(internship.endDate);
+              final endDate =
+                  internship.isActive
+                      ? DateFormat.yMMMd('fr_CA').format(internship.dates.end)
+                      : DateFormat.yMMMd('fr_CA').format(internship.endDate);
 
               final String specializationIdWithName =
                   EnterprisesProvider.of(context)
-                          .fromIdOrNull(internship.enterpriseId)
-                          ?.jobs
-                          .fromIdOrNull(internship.jobId)
-                          ?.specialization
-                          .idWithName ??
-                      '';
+                      .fromIdOrNull(internship.enterpriseId)
+                      ?.jobs
+                      .fromIdOrNull(internship.jobId)
+                      ?.specialization
+                      .idWithName ??
+                  '';
 
               return AnimatedExpandingCard(
                 initialExpandedState: _expanded[internship.id]!,
-                header: (ctx, isExpanded) => ListTile(
-                  title: _buildEnterpriseName(context, enterprise: enterprise),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(left: 12.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4.0),
-                          child: Text(
-                            specializationIdWithName,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium!
-                                .copyWith(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        Text(enterprise.address?.toString() ?? ''),
-                        Text(
-                            '${DateFormat.yMMMd('fr_CA').format(internship.dates.start)} - $endDate'),
-                        if (internship.isActive &&
-                            internship.supervisingTeacherIds
-                                .contains(teacherId))
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                                onPressed: () => showDialog(
-                                    context: context,
-                                    builder: (context) =>
-                                        FinalizeInternshipDialog(
-                                            internshipId: internship.id)),
-                                child: const Text('Terminer le stage')),
-                          ),
-                        if (internship.isEnterpriseEvaluationPending &&
-                            internship.supervisingTeacherIds
-                                .contains(teacherId))
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                                onPressed: () =>
-                                    _evaluateEnterprise(context, internship),
-                                child: const Text('Évaluer l\'entreprise')),
-                          )
-                      ],
-                    ),
-                  ),
-                ),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      InternshipDetails(
-                        key: detailKeys[internship.id],
-                        internshipId: internship.id,
-                        scrollController: widget.scrollController,
+                header:
+                    (ctx, isExpanded) => ListTile(
+                      title: _buildEnterpriseName(
+                        context,
+                        enterprise: enterprise,
                       ),
-                      InternshipSkills(internshipId: internship.id),
-                      if (internship.supervisingTeacherIds.contains(teacherId))
-                        InternshipDocuments(internship: internship),
-                    ]),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(left: 12.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Text(
+                                specializationIdWithName,
+                                style: Theme.of(context).textTheme.bodyMedium!
+                                    .copyWith(fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Text(enterprise.address?.toString() ?? ''),
+                            Text(
+                              '${DateFormat.yMMMd('fr_CA').format(internship.dates.start)} - $endDate',
+                            ),
+                            if (internship.isActive &&
+                                internship.supervisingTeacherIds.contains(
+                                  teacherId,
+                                ))
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed:
+                                      () => showFinalizeInternshipDialog(
+                                        context,
+                                        internshipId: internship.id,
+                                      ),
+                                  child: const Text('Terminer le stage'),
+                                ),
+                              ),
+                            if (internship.isEnterpriseEvaluationPending &&
+                                internship.supervisingTeacherIds.contains(
+                                  teacherId,
+                                ))
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: TextButton(
+                                  onPressed:
+                                      () => _evaluateEnterprise(
+                                        context,
+                                        internship,
+                                      ),
+                                  child: const Text('Évaluer l\'entreprise'),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    InternshipDetails(
+                      key: detailKeys[internship.id],
+                      internshipId: internship.id,
+                      scrollController: widget.scrollController,
+                    ),
+                    InternshipSkills(internshipId: internship.id),
+                    if (internship.supervisingTeacherIds.contains(teacherId))
+                      InternshipDocuments(internship: internship),
+                  ],
+                ),
               );
-            })
+            }),
           ],
         ),
       ],

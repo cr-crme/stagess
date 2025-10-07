@@ -242,4 +242,101 @@ class DatabaseManager {
     }
     return response;
   }
+
+  Future<RepositoryResponse> getLock(
+    RequestFields field, {
+    required Map<String, dynamic>? data,
+    required DatabaseUser user,
+  }) async {
+    final response = switch (field) {
+      RequestFields.schoolBoards => throw InvalidRequestException(
+          'School boards must be locked individually'),
+      RequestFields.schoolBoard => await schoolBoardsDatabase.requestLock(
+          id: _getId(data,
+              messageOnNull: 'An "id" is required to get a school board'),
+          user: user),
+      RequestFields.admins => throw InvalidRequestException(
+          'Administrators must be locked individually'),
+      RequestFields.admin => await adminsDatabase.requestLock(
+          id: _getId(data,
+              messageOnNull: 'An "id" is required to get an admin'),
+          user: user),
+      RequestFields.teachers =>
+        throw InvalidRequestException('Teachers must be locked individually'),
+      RequestFields.teacher => await teachersDatabase.requestLock(
+          id: _getId(data,
+              messageOnNull: 'An "id" is required to get a teacher'),
+          user: user),
+      RequestFields.students =>
+        throw InvalidRequestException('Students must be locked individually'),
+      RequestFields.student => await studentsDatabase.requestLock(
+          id: _getId(data,
+              messageOnNull: 'An "id" is required to get a student'),
+          user: user),
+      RequestFields.enterprises => throw InvalidRequestException(
+          'Enterprises must be locked individually'),
+      RequestFields.enterprise => await enterprisesDatabase.requestLock(
+          id: _getId(data,
+              messageOnNull: 'An "id" is required to get an enterprise'),
+          user: user),
+      RequestFields.internships => throw InvalidRequestException(
+          'Internships must be locked individually'),
+      RequestFields.internship => await internshipsDatabase.requestLock(
+          id: _getId(data,
+              messageOnNull: 'An "id" is required to get an internship'),
+          user: user),
+    };
+
+    return response;
+  }
+
+  Future<RepositoryResponse> releaseLock(
+    RequestFields field, {
+    required Map<String, dynamic>? data,
+    required DatabaseUser user,
+  }) async {
+    final response = switch (field) {
+      RequestFields.schoolBoards => throw InvalidRequestException(
+          'School boards must be locked individually'),
+      RequestFields.schoolBoard => await schoolBoardsDatabase.releaseLock(
+          id: _getId(data,
+              messageOnNull: 'An "id" is required to get a school board'),
+          user: user),
+      RequestFields.admins => throw InvalidRequestException(
+          'Administrators must be locked individually'),
+      RequestFields.admin => await adminsDatabase.releaseLock(
+          id: _getId(data,
+              messageOnNull: 'An "id" is required to get an admin'),
+          user: user),
+      RequestFields.teachers =>
+        throw InvalidRequestException('Teachers must be locked individually'),
+      RequestFields.teacher => await teachersDatabase.releaseLock(
+          id: _getId(data,
+              messageOnNull: 'An "id" is required to get a teacher'),
+          user: user),
+      RequestFields.students =>
+        throw InvalidRequestException('Students must be locked individually'),
+      RequestFields.student => await studentsDatabase.releaseLock(
+          id: _getId(data,
+              messageOnNull: 'An "id" is required to get a student'),
+          user: user),
+      RequestFields.enterprises => throw InvalidRequestException(
+          'Enterprises must be locked individually'),
+      RequestFields.enterprise => await enterprisesDatabase.releaseLock(
+          id: _getId(data,
+              messageOnNull: 'An "id" is required to get an enterprise'),
+          user: user),
+      RequestFields.internships => throw InvalidRequestException(
+          'Internships must be locked individually'),
+      RequestFields.internship => await internshipsDatabase.releaseLock(
+          id: _getId(data,
+              messageOnNull: 'An "id" is required to get an internship'),
+          user: user),
+    };
+
+    if (response.data?['released'] != true) {
+      throw InvalidRequestException('Could not release lock');
+    }
+    return response;
+  }
 }

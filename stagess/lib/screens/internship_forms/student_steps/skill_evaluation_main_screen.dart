@@ -7,6 +7,7 @@ import 'package:stagess/common/widgets/dialogs/confirm_exit_dialog.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/screens/internship_forms/student_steps/skill_evaluation_form_controller.dart';
 import 'package:stagess/screens/internship_forms/student_steps/skill_evaluation_form_screen.dart';
+import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
@@ -15,36 +16,74 @@ import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/radio_with_follow_up.dart';
+import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('SkillEvaluationDialog');
 
-Future<T?> showSkillEvaluationDialog<T>(
-    {required BuildContext context,
-    required String internshipId,
-    required bool editMode}) async {
+Future<Internship?> showSkillEvaluationDialog({
+  required BuildContext context,
+  required String internshipId,
+  required bool editMode,
+}) async {
   _logger.info('Showing SkillEvaluationDialog with editMode: $editMode');
 
-  return await showDialog<T>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Navigator(
-          onGenerateRoute: (settings) => MaterialPageRoute(
-                builder: (ctx) => Dialog(
-                  child: SkillEvaluationMainScreen(
-                    rootContext: context,
-                    internshipId: internshipId,
-                    editMode: editMode,
-                  ),
-                ),
-              )));
+  final internships = InternshipsProvider.of(context, listen: false);
+  final internship = internships[internshipId];
+
+  if (editMode) {
+    final hasLock = await internships.getLockForItem(internship);
+    if (!hasLock || !context.mounted) {
+      if (context.mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible de modifier ce stage, il est peut-être en cours de modification ailleurs.',
+        );
+      }
+      return null;
+    }
+  }
+
+  final editedInternship = await showDialog<Internship?>(
+    context: context,
+    barrierDismissible: false,
+    builder:
+        (context) => Navigator(
+          onGenerateRoute:
+              (settings) => MaterialPageRoute(
+                builder:
+                    (ctx) => Dialog(
+                      child: SkillEvaluationMainScreen(
+                        rootContext: context,
+                        internshipId: internshipId,
+                        editMode: editMode,
+                      ),
+                    ),
+              ),
+        ),
+  );
+  if (!editMode) return editedInternship;
+
+  if (editedInternship == null) {
+    await internships.releaseLockForItem(internship);
+    return editedInternship;
+  }
+
+  await internships.replaceWithConfirmation(editedInternship);
+  if (context.mounted) {
+    showSnackBar(context, message: 'Le stage a été mis à jour');
+  }
+  await internships.releaseLockForItem(internship);
+  return editedInternship;
 }
 
 class SkillEvaluationMainScreen extends StatefulWidget {
-  const SkillEvaluationMainScreen(
-      {super.key,
-      required this.rootContext,
-      required this.internshipId,
-      required this.editMode});
+  const SkillEvaluationMainScreen({
+    super.key,
+    required this.rootContext,
+    required this.internshipId,
+    required this.editMode,
+  });
 
   static const route = '/skill_evaluation';
 
@@ -58,9 +97,13 @@ class SkillEvaluationMainScreen extends StatefulWidget {
 }
 
 class _SkillEvaluationMainScreenState extends State<SkillEvaluationMainScreen> {
-  late final _formController = SkillEvaluationFormController(context,
-      internshipId: widget.internshipId, canModify: true);
-  late int _currentEvaluationIndex = _formController
+  late final _formController = SkillEvaluationFormController(
+    context,
+    internshipId: widget.internshipId,
+    canModify: true,
+  );
+  late int _currentEvaluationIndex =
+      _formController
           .internship(context, listen: false)
           .skillEvaluations
           .length -
@@ -72,77 +115,89 @@ class _SkillEvaluationMainScreenState extends State<SkillEvaluationMainScreen> {
 
     if (_currentEvaluationIndex >= 0) {
       _formController.fillFromPreviousEvaluation(
-          context, _currentEvaluationIndex);
+        context,
+        _currentEvaluationIndex,
+      );
     }
   }
 
   void _cancel() async {
     _logger.info('User requested to cancel the skill evaluation dialog');
 
-    final answer = await ConfirmExitDialog.show(context,
-        content: const Text('Toutes les modifications seront perdues.'),
-        isEditing: widget.editMode);
+    final answer = await ConfirmExitDialog.show(
+      context,
+      content: const Text('Toutes les modifications seront perdues.'),
+      isEditing: widget.editMode,
+    );
     if (!mounted || !answer) return;
 
     _formController.dispose();
     _logger.fine('User confirmed cancellation, disposing form controller');
     if (!widget.rootContext.mounted) return;
-    Navigator.of(widget.rootContext).pop();
+    Navigator.of(widget.rootContext).pop(null);
   }
 
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-        'Building SkillEvaluationMainScreen for internship: ${widget.internshipId}');
+      'Building SkillEvaluationMainScreen for internship: ${widget.internshipId}',
+    );
     final internship = InternshipsProvider.of(context)[widget.internshipId];
 
-    final student = StudentsHelpers.studentsInMyGroups(context)
-        .firstWhereOrNull((e) => e.id == internship.studentId);
+    final student = StudentsHelpers.studentsInMyGroups(
+      context,
+    ).firstWhereOrNull((e) => e.id == internship.studentId);
 
     return SizedBox(
       width: ResponsiveService.maxBodyWidth,
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-              '${student == null ? 'En attente des informations' : 'Évaluation de ${student.fullName}'}\n'
-              'C1. Compétences spécifiques'),
+            '${student == null ? 'En attente des informations' : 'Évaluation de ${student.fullName}'}\n'
+            'C1. Compétences spécifiques',
+          ),
           leading: IconButton(
-              onPressed: _cancel, icon: const Icon(Icons.arrow_back)),
+            onPressed: _cancel,
+            icon: const Icon(Icons.arrow_back),
+          ),
         ),
         body: PopScope(
-          child: student == null
-              ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                  child: Builder(builder: (context) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _EvaluationDate(
-                          formController: _formController,
-                          editMode: widget.editMode,
-                        ),
-                        _PersonAtMeeting(
-                          formController: _formController,
-                          editMode: widget.editMode,
-                        ),
-                        _buildAutofillChooser(),
-                        _JobToEvaluate(
-                          formController: _formController,
-                          editMode: widget.editMode,
-                        ),
-                        _EvaluationTypeChoser(
-                          formController: _formController,
-                          editMode: widget.editMode,
-                        ),
-                        _StartEvaluation(
-                          rootContext: widget.rootContext,
-                          formController: _formController,
-                          editMode: widget.editMode,
-                        ),
-                      ],
-                    );
-                  }),
-                ),
+          child:
+              student == null
+                  ? const Center(child: CircularProgressIndicator())
+                  : SingleChildScrollView(
+                    child: Builder(
+                      builder: (context) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _EvaluationDate(
+                              formController: _formController,
+                              editMode: widget.editMode,
+                            ),
+                            _PersonAtMeeting(
+                              formController: _formController,
+                              editMode: widget.editMode,
+                            ),
+                            _buildAutofillChooser(),
+                            _JobToEvaluate(
+                              formController: _formController,
+                              editMode: widget.editMode,
+                            ),
+                            _EvaluationTypeChoser(
+                              formController: _formController,
+                              editMode: widget.editMode,
+                            ),
+                            _StartEvaluation(
+                              rootContext: widget.rootContext,
+                              formController: _formController,
+                              editMode: widget.editMode,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
         ),
       ),
     );
@@ -155,43 +210,54 @@ class _SkillEvaluationMainScreenState extends State<SkillEvaluationMainScreen> {
     return evaluations.isEmpty
         ? Container()
         : Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SubTitle('Options de remplissage'),
-              Padding(
-                padding: const EdgeInsets.only(left: 24.0),
-                child: Column(
-                  children: [
-                    const Text(
-                      'Préremplir avec les résultats de\u00a0: ',
-                    ),
-                    DropdownButton<int?>(
-                      value: _currentEvaluationIndex,
-                      onChanged: (value) {
-                        _currentEvaluationIndex = value!;
-                        _currentEvaluationIndex >= evaluations.length
-                            ? _formController.clearForm(context)
-                            : _formController.fillFromPreviousEvaluation(
-                                context, _currentEvaluationIndex);
-                        setState(() {});
-                      },
-                      items: evaluations
-                          .asMap()
-                          .keys
-                          .map((index) => DropdownMenuItem(
-                              value: index,
-                              child: Text(DateFormat('dd MMMM yyyy', 'fr_CA')
-                                  .format(evaluations[index].date))))
-                          .toList()
-                        ..add(DropdownMenuItem(
-                            value: evaluations.length,
-                            child: const Text('Vide'))),
-                    ),
-                  ],
-                ),
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SubTitle('Options de remplissage'),
+            Padding(
+              padding: const EdgeInsets.only(left: 24.0),
+              child: Column(
+                children: [
+                  const Text('Préremplir avec les résultats de\u00a0: '),
+                  DropdownButton<int?>(
+                    value: _currentEvaluationIndex,
+                    onChanged: (value) {
+                      _currentEvaluationIndex = value!;
+                      _currentEvaluationIndex >= evaluations.length
+                          ? _formController.clearForm(context)
+                          : _formController.fillFromPreviousEvaluation(
+                            context,
+                            _currentEvaluationIndex,
+                          );
+                      setState(() {});
+                    },
+                    items:
+                        evaluations
+                            .asMap()
+                            .keys
+                            .map(
+                              (index) => DropdownMenuItem(
+                                value: index,
+                                child: Text(
+                                  DateFormat(
+                                    'dd MMMM yyyy',
+                                    'fr_CA',
+                                  ).format(evaluations[index].date),
+                                ),
+                              ),
+                            )
+                            .toList()
+                          ..add(
+                            DropdownMenuItem(
+                              value: evaluations.length,
+                              child: const Text('Vide'),
+                            ),
+                          ),
+                  ),
+                ],
               ),
-            ],
-          );
+            ),
+          ],
+        );
   }
 }
 
@@ -231,8 +297,12 @@ class _EvaluationDateState extends State<_EvaluationDate> {
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Row(
             children: [
-              Text(DateFormat('dd MMMM yyyy', 'fr_CA')
-                  .format(widget.formController.evaluationDate)),
+              Text(
+                DateFormat(
+                  'dd MMMM yyyy',
+                  'fr_CA',
+                ).format(widget.formController.evaluationDate),
+              ),
               if (widget.editMode)
                 IconButton(
                   icon: const Icon(
@@ -250,8 +320,10 @@ class _EvaluationDateState extends State<_EvaluationDate> {
 }
 
 class _PersonAtMeeting extends StatelessWidget {
-  const _PersonAtMeeting(
-      {required this.formController, required this.editMode});
+  const _PersonAtMeeting({
+    required this.formController,
+    required this.editMode,
+  });
 
   final SkillEvaluationFormController formController;
   final bool editMode;
@@ -277,8 +349,10 @@ class _PersonAtMeeting extends StatelessWidget {
 }
 
 class _EvaluationTypeChoser extends StatefulWidget {
-  const _EvaluationTypeChoser(
-      {required this.formController, required this.editMode});
+  const _EvaluationTypeChoser({
+    required this.formController,
+    required this.editMode,
+  });
 
   final SkillEvaluationFormController formController;
   final bool editMode;
@@ -293,8 +367,9 @@ class _EvaluationTypeChoserState extends State<_EvaluationTypeChoser> {
   @override
   Widget build(context) {
     if (_key.currentState != null) {
-      _key.currentState!
-          .forceValue(widget.formController.evaluationGranularity);
+      _key.currentState!.forceValue(
+        widget.formController.evaluationGranularity,
+      );
     }
 
     return Column(
@@ -339,41 +414,53 @@ class _JobToEvaluateState extends State<_JobToEvaluate> {
   List<Specialization> get extraSpecializations {
     final internship = widget.formController.internship(context, listen: false);
     return internship.extraSpecializationIds
-        .map((specializationId) =>
-            ActivitySectorsService.specialization(specializationId))
+        .map(
+          (specializationId) =>
+              ActivitySectorsService.specialization(specializationId),
+        )
         .toList();
   }
 
   void _showHelpOnJobSelection() {
     showDialog(
-        context: context,
-        builder: (BuildContext context) => AlertDialog(
-              title: const Text('Explication des sélections'),
-              content: Text.rich(TextSpan(children: [
-                const TextSpan(text: 'Sélectionner '),
-                WidgetSpan(
+      context: context,
+      builder:
+          (BuildContext context) => AlertDialog(
+            title: const Text('Explication des sélections'),
+            content: Text.rich(
+              TextSpan(
+                children: [
+                  const TextSpan(text: 'Sélectionner '),
+                  WidgetSpan(
                     child: SizedBox(
-                  height: 19,
-                  width: 22,
-                  child: Checkbox(
-                      tristate: true,
-                      value: null,
-                      onChanged: null,
-                      fillColor: WidgetStateProperty.resolveWith(
-                          (states) => Theme.of(context).primaryColor)),
-                )),
-                const TextSpan(
-                  text:
-                      ' pour masquer les compétences précédemment évaluées pour '
-                      'cette évaluation-ci (les résultats sont conservés).',
-                ),
-              ])),
-              actions: [
-                TextButton(
-                    onPressed: () => Navigator.pop(context, 'OK'),
-                    child: const Text('OK'))
-              ],
-            ));
+                      height: 19,
+                      width: 22,
+                      child: Checkbox(
+                        tristate: true,
+                        value: null,
+                        onChanged: null,
+                        fillColor: WidgetStateProperty.resolveWith(
+                          (states) => Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const TextSpan(
+                    text:
+                        ' pour masquer les compétences précédemment évaluées pour '
+                        'cette évaluation-ci (les résultats sont conservés).',
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+    );
   }
 
   Widget _buildJobTile({
@@ -399,9 +486,7 @@ class _JobToEvaluateState extends State<_JobToEvaluate> {
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    '* Compétences à évaluer :',
-                  ),
+                  const Text('* Compétences à évaluer :'),
                   ...specialization.skills.map((skill) {
                     final out = CheckboxListTile(
                       tristate: true,
@@ -431,15 +516,20 @@ class _JobToEvaluateState extends State<_JobToEvaluate> {
                         }
                         setState(() {});
                       },
-                      value: widget.formController
-                              .isNotEvaluatedButWasPreviously(skill.id)
-                          ? null
-                          : widget.formController.isSkillToEvaluate(skill.id),
+                      value:
+                          widget.formController.isNotEvaluatedButWasPreviously(
+                                skill.id,
+                              )
+                              ? null
+                              : widget.formController.isSkillToEvaluate(
+                                skill.id,
+                              ),
                       title: Text(
                         '${skill.idWithName}${skill.isOptional ? ' (Facultative)' : ''}',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
-                      enabled: widget.editMode &&
+                      enabled:
+                          widget.editMode &&
                           (isMainSpecialization ||
                               !duplicatedSkills[skill.id]!),
                     );
@@ -504,23 +594,24 @@ class _JobToEvaluateState extends State<_JobToEvaluate> {
           specialization: specialization,
         ),
         ...extra.asMap().keys.map(
-              (i) => _buildJobTile(
-                title:
-                    'Métier supplémentaire${extra.length > 1 ? ' (${i + 1})' : ''}',
-                specialization: extra[i],
-                duplicatedSkills: usedDuplicateSkills,
-              ),
-            ),
+          (i) => _buildJobTile(
+            title:
+                'Métier supplémentaire${extra.length > 1 ? ' (${i + 1})' : ''}',
+            specialization: extra[i],
+            duplicatedSkills: usedDuplicateSkills,
+          ),
+        ),
       ],
     );
   }
 }
 
 class _StartEvaluation extends StatelessWidget {
-  const _StartEvaluation(
-      {required this.rootContext,
-      required this.formController,
-      required this.editMode});
+  const _StartEvaluation({
+    required this.rootContext,
+    required this.formController,
+    required this.editMode,
+  });
 
   final BuildContext rootContext;
   final SkillEvaluationFormController formController;
@@ -533,17 +624,23 @@ class _StartEvaluation extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(top: 24, right: 24.0, bottom: 24),
         child: TextButton(
-            onPressed: () {
-              formController.setWereAtMeeting();
-              Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => Dialog(
-                          child: SkillEvaluationFormScreen(
+          onPressed: () {
+            formController.setWereAtMeeting();
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder:
+                    (context) => Dialog(
+                      child: SkillEvaluationFormScreen(
                         rootContext: rootContext,
                         formController: formController,
                         editMode: editMode,
-                      ))));
-            },
-            child: const Text('Commencer l\'évaluation')),
+                      ),
+                    ),
+              ),
+            );
+          },
+          child: const Text('Commencer l\'évaluation'),
+        ),
       ),
     );
   }

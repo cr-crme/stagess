@@ -7,21 +7,40 @@ import 'package:stagess/common/widgets/dialogs/confirm_exit_dialog.dart';
 import 'package:stagess/common/widgets/scrollable_stepper.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/screens/internship_forms/student_steps/visa_evaluation_form_controller.dart';
+import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_visa.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
+import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('VisaEvaluationScreen');
 
-Future<T?> showVisaEvaluationDialog<T>({
+Future<Internship?> showVisaEvaluationDialog({
   required BuildContext context,
   required VisaEvaluationFormController formController,
   required bool editMode,
 }) async {
   _logger.info('Showing VisaEvaluationDialog with editMode: $editMode');
 
-  return await showDialog<T>(
+  final internships = InternshipsProvider.of(context, listen: false);
+  final internship = internships[formController.internshipId];
+
+  if (editMode) {
+    final hasLock = await internships.getLockForItem(internship);
+    if (!hasLock || !context.mounted) {
+      if (context.mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible de modifier ce stage, il est peut-être en cours de modification ailleurs.',
+        );
+      }
+      return null;
+    }
+  }
+
+  final editedInternship = await showDialog<Internship?>(
     context: context,
     barrierDismissible: false,
     builder:
@@ -39,6 +58,19 @@ Future<T?> showVisaEvaluationDialog<T>({
               ),
         ),
   );
+  if (!editMode) return editedInternship;
+
+  if (editedInternship == null) {
+    await internships.releaseLockForItem(internship);
+    return null;
+  }
+
+  await internships.replaceWithConfirmation(editedInternship);
+  if (context.mounted) {
+    showSnackBar(context, message: 'Le stage a été mis à jour');
+  }
+  await internships.releaseLockForItem(internship);
+  return editedInternship;
 }
 
 class VisaEvaluationScreen extends StatefulWidget {
@@ -125,7 +157,7 @@ class _VisaEvaluationScreenState extends State<VisaEvaluationScreen> {
 
     _logger.fine('User confirmed cancellation, closing dialog');
     if (!widget.rootContext.mounted) return;
-    Navigator.of(widget.rootContext).pop();
+    Navigator.of(widget.rootContext).pop(null);
   }
 
   Future<void> _submit() async {
@@ -148,11 +180,10 @@ class _VisaEvaluationScreenState extends State<VisaEvaluationScreen> {
     internship.visaEvaluations.add(
       widget.formController.toInternshipEvaluation(),
     );
-    internships.replace(internship);
 
     _logger.fine('Visa evaluation form submitted successfully');
     if (!widget.rootContext.mounted) return;
-    Navigator.of(widget.rootContext).pop();
+    Navigator.of(widget.rootContext).pop(internship);
   }
 
   Widget _controlBuilder(BuildContext context, ControlsDetails details) {

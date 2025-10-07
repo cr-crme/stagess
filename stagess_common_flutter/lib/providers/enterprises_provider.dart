@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
-import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/backend_list_provided.dart';
 
@@ -15,11 +14,6 @@ class EnterprisesProvider extends BackendListProvided<Enterprise> {
   @override
   Enterprise deserializeItem(data) {
     return Enterprise.fromSerialized(data);
-  }
-
-  void replaceJob(enterprise, Job job) {
-    this[enterprise].jobs.replace(job);
-    replace(this[enterprise]);
   }
 
   @override

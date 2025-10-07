@@ -20,20 +20,31 @@ Future<T?> showJobSstFormDialog<T>(
   BuildContext context, {
   required String enterpriseId,
   required String jobId,
-}) {
+}) async {
   _logger.info('Showing JobSstFormDialog for jobId: $jobId');
+  final enterprises = EnterprisesProvider.of(context, listen: false);
+  enterprises.getLockForItem(enterprises[enterpriseId]);
 
-  return showDialog<T>(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => Navigator(
-          onGenerateRoute: (settings) => MaterialPageRoute(
-              builder: (ctx) => Dialog(
+  final editedEnterprise = await showDialog<T>(
+    context: context,
+    barrierDismissible: false,
+    builder:
+        (context) => Navigator(
+          onGenerateRoute:
+              (settings) => MaterialPageRoute(
+                builder:
+                    (ctx) => Dialog(
                       child: JobSstFormScreen(
-                    rootContext: context,
-                    enterpriseId: enterpriseId,
-                    jobId: jobId,
-                  )))));
+                        rootContext: context,
+                        enterpriseId: enterpriseId,
+                        jobId: jobId,
+                      ),
+                    ),
+              ),
+        ),
+  );
+  await enterprises.releaseLockForItem(enterprises[enterpriseId]);
+  return editedEnterprise;
 }
 
 class JobSstFormScreen extends StatefulWidget {
@@ -68,24 +79,27 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
     _questionsKey.currentState!.formKey.currentState!.save();
 
     final enterprises = EnterprisesProvider.of(context, listen: false);
-    enterprises[widget.enterpriseId]
-        .jobs[widget.jobId]
-        .sstEvaluation
-        .update(questions: _questionsKey.currentState!.answer);
+    enterprises[widget.enterpriseId].jobs[widget.jobId].sstEvaluation.update(
+      questions: _questionsKey.currentState!.answer,
+    );
 
-    enterprises.replaceJob(widget.enterpriseId,
-        enterprises[widget.enterpriseId].jobs[widget.jobId]);
+    enterprises[widget.enterpriseId].jobs.replace(
+      enterprises[widget.enterpriseId].jobs[widget.jobId],
+    );
 
     _logger.fine(
-        'JobSstFormScreen submitted successfully for jobId: ${widget.jobId}');
+      'JobSstFormScreen submitted successfully for jobId: ${widget.jobId}',
+    );
     if (!widget.rootContext.mounted) return;
     Navigator.of(widget.rootContext).pop();
   }
 
   void _cancel() async {
     _logger.info('Cancelling JobSstFormScreen for jobId: ${widget.jobId}');
-    final answer = await ConfirmExitDialog.show(context,
-        content: const Text('Toutes les modifications seront perdues.'));
+    final answer = await ConfirmExitDialog.show(
+      context,
+      content: const Text('Toutes les modifications seront perdues.'),
+    );
     // If the user cancelled the closing of the dialog, we do nothing
     if (!answer) return;
 
@@ -112,102 +126,90 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
     if (!mounted) return;
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(
-          'REPÈRES',
-          textAlign: TextAlign.center,
-        ),
-        content: RawScrollbar(
-            controller: scrollController,
-            thumbVisibility: true,
-            thickness: 7,
-            minThumbLength: 75,
-            thumbColor: Theme.of(context).primaryColor,
-            radius: const Radius.circular(20),
-            child: SingleChildScrollView(
+      builder:
+          (context) => AlertDialog(
+            title: const Text('REPÈRES', textAlign: TextAlign.center),
+            content: RawScrollbar(
               controller: scrollController,
-              child: Container(
-                margin: const EdgeInsets.only(right: 12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Objectifs du questionnaire',
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    ItemizedText(
-                      const [
+              thumbVisibility: true,
+              thickness: 7,
+              minThumbLength: 75,
+              thumbColor: Theme.of(context).primaryColor,
+              radius: const Radius.circular(20),
+              child: SingleChildScrollView(
+                controller: scrollController,
+                child: Container(
+                  margin: const EdgeInsets.only(right: 12.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Objectifs du questionnaire',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      ItemizedText(const [
                         'S\'informer sur les risques auxquels est exposé l\'élève à ce '
                             'poste de travail.',
                         'Susciter un dialogue avec l\'entreprise sur les mesures '
                             'de prévention.\n'
                             'Les différentes sous-questions visent spécifiquement à '
-                            'favoriser les échanges.'
-                      ],
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Avec qui le remplir\u00a0?',
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    Text(
-                      'La personne qui est en charge de former l\'élève sur le plancher\u00a0:',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    ItemizedText(
-                      const [
+                            'favoriser les échanges.',
+                      ], style: Theme.of(context).textTheme.bodyMedium),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Avec qui le remplir\u00a0?',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      Text(
+                        'La personne qui est en charge de former l\'élève sur le plancher\u00a0:',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      ItemizedText(const [
                         'C\'est elle qui connait le mieux le poste de travail de l\'élève',
                         'Il sera plus facile d\'aborder avec elle qu\'avec l\'employeur '
                             'les questions relatives aux dangers et aux accidents',
-                      ],
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Quand',
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    ItemizedText(
-                      const [
+                      ], style: Theme.of(context).textTheme.bodyMedium),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Quand',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      ItemizedText(const [
                         'La première semaine de stage',
                         'Pendant (ou après) une visite du poste de travail de l\'élève',
-                      ],
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Durée',
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    Text(
-                      '15 minutes',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Cibles',
-                      style: Theme.of(context).textTheme.titleSmall,
-                    ),
-                    ItemizedText(
-                      const [
+                      ], style: Theme.of(context).textTheme.bodyMedium),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Durée',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      Text(
+                        '15 minutes',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'Cibles',
+                        style: Theme.of(context).textTheme.titleSmall,
+                      ),
+                      ItemizedText(const [
                         'Nouvelle entreprise : remplissage initial',
                         'Milieu de stage récurrent : validation et mise à jour des '
                             'réponses des années précédentes',
-                      ],
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
+                      ], style: Theme.of(context).textTheme.bodyMedium),
+                    ],
+                  ),
                 ),
               ),
-            )),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, 'OK'),
-              child: const Text('OK')),
-        ],
-      ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, 'OK'),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
     );
 
     final prefs = await SharedPreferences.getInstance();
@@ -220,26 +222,30 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
 
     _showHelp(force: false);
 
-    final enterprise =
-        EnterprisesProvider.of(context).fromId(widget.enterpriseId);
+    final enterprise = EnterprisesProvider.of(
+      context,
+    ).fromId(widget.enterpriseId);
 
     return SizedBox(
       width: ResponsiveService.maxBodyWidth,
       child: Scaffold(
         appBar: AppBar(
-            title: const Text('Repérer les risques SST'),
-            leading: IconButton(
-                onPressed: _cancel, icon: const Icon(Icons.arrow_back)),
-            actions: [
-              InkWell(
-                onTap: () => _showHelp(force: true),
-                borderRadius: BorderRadius.circular(25),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Icon(Icons.info),
-                ),
-              )
-            ]),
+          title: const Text('Repérer les risques SST'),
+          leading: IconButton(
+            onPressed: _cancel,
+            icon: const Icon(Icons.arrow_back),
+          ),
+          actions: [
+            InkWell(
+              onTap: () => _showHelp(force: true),
+              borderRadius: BorderRadius.circular(25),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: Icon(Icons.info),
+              ),
+            ),
+          ],
+        ),
         body: PopScope(
           child: SingleChildScrollView(
             child: Padding(
@@ -269,13 +275,8 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           OutlinedButton(onPressed: _cancel, child: const Text('Annuler')),
-          const SizedBox(
-            width: 20,
-          ),
-          TextButton(
-            onPressed: _submit,
-            child: const Text('Confirmer'),
-          )
+          const SizedBox(width: 20),
+          TextButton(onPressed: _submit, child: const Text('Confirmer')),
         ],
       ),
     );
@@ -309,12 +310,7 @@ class _QuestionsStepState extends State<_QuestionsStep> {
   Widget build(BuildContext context) {
     return Form(
       key: formKey,
-      child: Column(
-        children: [
-          _buildHeader(),
-          _buildQuestions(),
-        ],
-      ),
+      child: Column(children: [_buildHeader(), _buildQuestions()]),
     );
   }
 
@@ -359,9 +355,10 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                         answer['Q${question.id}+t'] = null;
                       }
                     },
-                    followUpChild: question.followUpQuestion == null
-                        ? null
-                        : _buildFollowUpQuestion(question, context),
+                    followUpChild:
+                        question.followUpQuestion == null
+                            ? null
+                            : _buildFollowUpQuestion(question, context),
                   ),
                 );
 
@@ -372,10 +369,11 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                     title: '${index + 1}. ${question.question}',
                     elements: question.choices!.toList(),
                     hasNotApplicableOption: true,
-                    initialValues: (widget.job.sstEvaluation
-                            .questions['Q${question.id}'] as List?)
-                        ?.map((e) => e as String)
-                        .toList(),
+                    initialValues:
+                        (widget.job.sstEvaluation.questions['Q${question.id}']
+                                as List?)
+                            ?.map((e) => e as String)
+                            .toList(),
                     onOptionSelected: (values) {
                       answer['Q${question.id}'] = values;
                       if (!question.choices!.any((q) => values.contains(q))) {
@@ -383,9 +381,10 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                         _followUpController['Q${question.id}+t']!.text = '';
                       }
                     },
-                    followUpChild: question.followUpQuestion == null
-                        ? null
-                        : _buildFollowUpQuestion(question, context),
+                    followUpChild:
+                        question.followUpQuestion == null
+                            ? null
+                            : _buildFollowUpQuestion(question, context),
                   ),
                 );
 
@@ -394,11 +393,17 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                   padding: const EdgeInsets.only(bottom: 36.0),
                   child: TextWithForm(
                     title: '${index + 1}. ${question.question}',
-                    initialValue: widget.job.sstEvaluation
-                            .questions['Q${question.id}']?.first ??
+                    initialValue:
+                        widget
+                            .job
+                            .sstEvaluation
+                            .questions['Q${question.id}']
+                            ?.first ??
                         '',
-                    onChanged: (text) => answer['Q${question.id}'] =
-                        text == null ? null : [text],
+                    onChanged:
+                        (text) =>
+                            answer['Q${question.id}'] =
+                                text == null ? null : [text],
                   ),
                 );
             }
@@ -410,16 +415,18 @@ class _QuestionsStepState extends State<_QuestionsStep> {
 
   Padding _buildFollowUpQuestion(Question question, BuildContext context) {
     _followUpController['Q${question.id}+t'] = TextEditingController(
-        text: widget.job.sstEvaluation.questions['Q${question.id}+t']?.first ??
-            '');
+      text:
+          widget.job.sstEvaluation.questions['Q${question.id}+t']?.first ?? '',
+    );
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: TextWithForm(
         controller: _followUpController['Q${question.id}+t'],
         title: question.followUpQuestion!,
         titleStyle: Theme.of(context).textTheme.bodyMedium,
-        onChanged: (text) =>
-            answer['Q${question.id}+t'] = text == null ? null : [text],
+        onChanged:
+            (text) =>
+                answer['Q${question.id}+t'] = text == null ? null : [text],
       ),
     );
   }
@@ -445,12 +452,14 @@ class _QuestionsStepState extends State<_QuestionsStep> {
         ),
         TextField(
           decoration: const InputDecoration(
-              labelText: 'Métier semi-spécialisé',
-              border: InputBorder.none,
-              labelStyle: styleOverride),
+            labelText: 'Métier semi-spécialisé',
+            border: InputBorder.none,
+            labelStyle: styleOverride,
+          ),
           style: styleOverride,
-          controller:
-              TextEditingController(text: widget.job.specialization.name),
+          controller: TextEditingController(
+            text: widget.job.specialization.name,
+          ),
           maxLines: null,
           enabled: false,
         ),

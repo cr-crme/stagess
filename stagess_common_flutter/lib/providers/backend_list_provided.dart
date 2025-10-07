@@ -210,6 +210,48 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     }
   }
 
+  /// Requests a lock for the given [item] so it can be edited asynchronously.
+  /// If the lock cannot be acquired, an exception is thrown.
+  Future<bool> getLockForItem(T item) async {
+    try {
+      final response = await sendMessageWithResponse(
+        message: CommunicationProtocol(
+          requestType: RequestType.getLock,
+          field: getField(),
+          data: {'id': item.id},
+        ),
+      );
+      if (response.response != Response.success ||
+          response.data?['locked'] != true) {
+        return false;
+      }
+      return true;
+    } on Exception {
+      return false;
+    }
+  }
+
+  /// Releases a previously acquired lock for the given [item].
+  /// If the lock cannot be released, an exception is thrown.
+  Future<bool> releaseLockForItem(T item) async {
+    try {
+      final response = await sendMessageWithResponse(
+        message: CommunicationProtocol(
+          requestType: RequestType.releaseLock,
+          field: getField(),
+          data: {'id': item.id},
+        ),
+      );
+      if (response.response != Response.success ||
+          response.data?['released'] != true) {
+        return false;
+      }
+      return true;
+    } on Exception {
+      return false;
+    }
+  }
+
   /// Adds an item to the Realtime Database.
   ///
   /// Note that [notify] has no effect here and should not be used.
@@ -527,6 +569,8 @@ Future<void> _incommingMessage(
       case RequestType.post:
       case RequestType.registerUser:
       case RequestType.unregisterUser:
+      case RequestType.getLock:
+      case RequestType.releaseLock:
         throw Exception('Unsupported request type: ${protocol.requestType}');
     }
   } catch (e) {

@@ -25,6 +25,8 @@ enum RequestType {
   update,
   registerUser,
   unregisterUser,
+  getLock,
+  releaseLock,
 }
 
 enum Response {

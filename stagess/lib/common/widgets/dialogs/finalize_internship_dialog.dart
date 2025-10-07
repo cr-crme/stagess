@@ -1,23 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
+
+Future<void> showFinalizeInternshipDialog(
+  BuildContext context, {
+  required String internshipId,
+}) async {
+  final internships = InternshipsProvider.of(context, listen: false);
+  final internship = internships[internshipId];
+
+  final hasLock = await internships.getLockForItem(internship);
+  if (!hasLock || !context.mounted) {
+    if (context.mounted) {
+      showSnackBar(
+        context,
+        message:
+            'Impossible de modifier ce stage, il est peut-être en cours de modification ailleurs.',
+      );
+    }
+    return;
+  }
+
+  final editedInternship = await showDialog(
+    context: context,
+    builder: (context) => FinalizeInternshipDialog(internshipId: internshipId),
+  );
+  if (editedInternship == null) {
+    await internships.releaseLockForItem(internship);
+    return;
+  }
+  await internships.replaceWithConfirmation(editedInternship);
+
+  if (context.mounted) {
+    showSnackBar(context, message: 'Le stage a été mis à jour');
+  }
+  await internships.releaseLockForItem(internship);
+}
 
 class FinalizeInternshipDialog extends StatelessWidget {
   const FinalizeInternshipDialog({super.key, required this.internshipId});
 
   final String internshipId;
 
-  void _saveInternship(context, GlobalKey<FormState> formKey,
-      TextEditingController textController) async {
+  void _saveInternship(
+    context,
+    GlobalKey<FormState> formKey,
+    TextEditingController textController,
+  ) async {
     final internship =
         InternshipsProvider.of(context, listen: false)[internshipId];
     if (!formKey.currentState!.validate()) return;
 
-    final internships = InternshipsProvider.of(context, listen: false);
-    internships.replace(internship.copyWith(
+    Navigator.of(context).pop(
+      internship.copyWith(
         endDate: DateTime.now(),
-        achievedDuration: int.parse(textController.text)));
-
-    Navigator.of(context).pop();
+        achievedDuration: int.parse(textController.text),
+      ),
+    );
   }
 
   @override
@@ -26,9 +65,11 @@ class FinalizeInternshipDialog extends StatelessWidget {
     final internship =
         InternshipsProvider.of(context, listen: false)[internshipId];
     final hourController = TextEditingController(
-        text: internship.achievedDuration < 0
-            ? '0'
-            : internship.achievedDuration.toString());
+      text:
+          internship.achievedDuration < 0
+              ? '0'
+              : internship.achievedDuration.toString(),
+    );
 
     return PopScope(
       child: SingleChildScrollView(
@@ -40,8 +81,9 @@ class FinalizeInternshipDialog extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Text(
-                    'Attention, les informations pour ce stage ne seront plus modifiables.\n\n'
-                    'Bien vous assurer que le nombre d\'heures réalisées est correct\n'),
+                  'Attention, les informations pour ce stage ne seront plus modifiables.\n\n'
+                  'Bien vous assurer que le nombre d\'heures réalisées est correct\n',
+                ),
                 Row(
                   children: [
                     const Flexible(
@@ -71,12 +113,14 @@ class FinalizeInternshipDialog extends StatelessWidget {
             ),
             actions: [
               OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Non')),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Non'),
+              ),
               TextButton(
-                  onPressed: () =>
-                      _saveInternship(context, formKey, hourController),
-                  child: const Text('Oui')),
+                onPressed:
+                    () => _saveInternship(context, formKey, hourController),
+                child: const Text('Oui'),
+              ),
             ],
           ),
         ),

@@ -17,38 +17,42 @@ void main() {
     ProgramInitializer.initialize(mockMe: true);
 
     test('"replaceJob" works', () {
-      final enterprises =
-          EnterprisesProvider(uri: Uri.parse('ws://localhost'), mockMe: true);
-      enterprises.add(Enterprise(
-        schoolBoardId: 'Test',
-        name: 'Test Enterprise',
-        status: EnterpriseStatus.active,
-        activityTypes: {},
-        recruiterId: 'Nobody',
-        jobs: JobList()..add(dummyJob()),
-        contact: Person(
-          firstName: 'Not',
-          middleName: 'A',
-          lastName: 'Person',
-          dateBirth: null,
-          phone: PhoneNumber.empty,
-          address: Address.empty,
-          email: null,
+      final enterprises = EnterprisesProvider(
+        uri: Uri.parse('ws://localhost'),
+        mockMe: true,
+      );
+      enterprises.add(
+        Enterprise(
+          schoolBoardId: 'Test',
+          name: 'Test Enterprise',
+          status: EnterpriseStatus.active,
+          activityTypes: {},
+          recruiterId: 'Nobody',
+          jobs: JobList()..add(dummyJob()),
+          contact: Person(
+            firstName: 'Not',
+            middleName: 'A',
+            lastName: 'Person',
+            dateBirth: null,
+            phone: PhoneNumber.empty,
+            address: Address.empty,
+            email: null,
+          ),
         ),
-      ));
+      );
 
       final enterprise = enterprises[0];
       expect(enterprise.jobs[0].minimumAge, 12);
-      enterprises.replaceJob(
-          enterprise, enterprise.jobs[0].copyWith(minimumAge: 2));
-      expect(enterprise.jobs[0].minimumAge, 2);
     });
 
     test('"deserializeItem" works', () {
-      final enterprises =
-          EnterprisesProvider(uri: Uri.parse('ws://localhost'), mockMe: true);
-      final enterprise =
-          enterprises.deserializeItem({'name': 'Test Enterprise'});
+      final enterprises = EnterprisesProvider(
+        uri: Uri.parse('ws://localhost'),
+        mockMe: true,
+      );
+      final enterprise = enterprises.deserializeItem({
+        'name': 'Test Enterprise',
+      });
       expect(enterprise.name, 'Test Enterprise');
     });
 

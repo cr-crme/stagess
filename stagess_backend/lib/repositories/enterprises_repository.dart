@@ -22,7 +22,7 @@ final _logger = Logger('EnterprisesRepository');
 // AccessLevel in this repository is discarded as all operations are currently
 // available to all users
 
-abstract class EnterprisesRepository implements RepositoryAbstract {
+abstract class EnterprisesRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
     List<String>? fields,
@@ -74,6 +74,7 @@ abstract class EnterprisesRepository implements RepositoryAbstract {
     required Map<String, dynamic> data,
     required DatabaseUser user,
     InternshipsRepository? internshipsRepository,
+    bool tryRequestingLock = true,
   }) async {
     if (user.isNotVerified) {
       throw InvalidRequestException(
@@ -83,6 +84,22 @@ abstract class EnterprisesRepository implements RepositoryAbstract {
     if (internshipsRepository == null) {
       throw InvalidRequestException(
           'Internships repository is required for this operation');
+    }
+
+    if (!canEdit(user: user, id: id)) {
+      if (!tryRequestingLock ||
+          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+        throw InvalidRequestException(
+            'You must acquire a lock before editing this enterprise');
+      }
+      final response = await putById(
+          id: id,
+          data: data,
+          user: user,
+          internshipsRepository: internshipsRepository,
+          tryRequestingLock: false);
+      await releaseLock(user: user, id: id);
+      return response;
     }
 
     // Update if exists, insert if not
@@ -118,10 +135,26 @@ abstract class EnterprisesRepository implements RepositoryAbstract {
     required String id,
     required DatabaseUser user,
     InternshipsRepository? internshipsRepository,
+    bool tryRequestingLock = true,
   }) async {
     if (user.isNotVerified || user.accessLevel < AccessLevel.admin) {
       throw InvalidRequestException(
           'You do not have permission to delete enterprises');
+    }
+
+    if (!canEdit(user: user, id: id)) {
+      if (!tryRequestingLock ||
+          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+        throw InvalidRequestException(
+            'You must acquire a lock before deleting this enterprise');
+      }
+      final response = await deleteById(
+          id: id,
+          user: user,
+          internshipsRepository: internshipsRepository,
+          tryRequestingLock: false);
+      await releaseLock(user: user, id: id);
+      return response;
     }
 
     if (user.accessLevel <= AccessLevel.admin &&

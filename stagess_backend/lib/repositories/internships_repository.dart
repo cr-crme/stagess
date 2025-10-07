@@ -17,7 +17,7 @@ import 'package:stagess_common/utils.dart';
 // AccessLevel in this repository is discarded as all operations are currently
 // available to all users
 
-abstract class InternshipsRepository implements RepositoryAbstract {
+abstract class InternshipsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
     List<String>? fields,
@@ -68,10 +68,23 @@ abstract class InternshipsRepository implements RepositoryAbstract {
     required String id,
     required Map<String, dynamic> data,
     required DatabaseUser user,
+    bool tryRequestingLock = true,
   }) async {
     if (user.isNotVerified) {
       throw InvalidRequestException(
           'You do not have permission to put internships');
+    }
+
+    if (!canEdit(user: user, id: id)) {
+      if (!tryRequestingLock ||
+          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+        throw InvalidRequestException(
+            'You must acquire a lock before editing this internship');
+      }
+      final response = await putById(
+          id: id, data: data, user: user, tryRequestingLock: false);
+      await releaseLock(user: user, id: id);
+      return response;
     }
 
     // Update if exists, insert if not
@@ -98,6 +111,7 @@ abstract class InternshipsRepository implements RepositoryAbstract {
   Future<RepositoryResponse> deleteById({
     required String id,
     required DatabaseUser user,
+    bool tryRequestingLock = true,
   }) async {
     if (user.isNotVerified || user.accessLevel < AccessLevel.admin) {
       throw InvalidRequestException(
@@ -109,6 +123,18 @@ abstract class InternshipsRepository implements RepositoryAbstract {
             user.schoolBoardId) {
       throw InvalidRequestException(
           'You do not have permission to delete this internship');
+    }
+
+    if (!canEdit(user: user, id: id)) {
+      if (!tryRequestingLock ||
+          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+        throw InvalidRequestException(
+            'You must acquire a lock before deleting this internship');
+      }
+      final response =
+          await deleteById(id: id, user: user, tryRequestingLock: false);
+      await releaseLock(user: user, id: id);
+      return response;
     }
 
     final removedId = await _deleteInternship(id: id, user: user);
