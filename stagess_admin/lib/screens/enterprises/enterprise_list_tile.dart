@@ -85,7 +85,10 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   late final _nameController = TextEditingController(
     text: widget.enterprise.name,
   );
-  late EnterpriseStatus _enterpriseStatus = widget.enterprise.status;
+  late final _enterpriseStatusController =
+      RadioWithFollowUpController<EnterpriseStatus>(
+        initialValue: widget.enterprise.status,
+      );
   late final _activityTypeController = EnterpriseActivityTypeListController(
     initial: widget.enterprise.activityTypes,
   );
@@ -95,7 +98,8 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
         job.id,
         EnterpriseJobListController(
           context: context,
-          enterpriseStatus: _enterpriseStatus,
+          enterpriseStatus:
+              _enterpriseStatusController.value ?? EnterpriseStatus.active,
           job: job,
           reservedForPickerController: EntityPickerController(
             allElementsTitle: 'Tous les enseignant\u00b7e\u00b7s',
@@ -148,7 +152,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
 
   Enterprise get editedEnterprise => widget.enterprise.copyWith(
     name: _nameController.text,
-    status: _enterpriseStatus,
+    status: _enterpriseStatusController.value,
     activityTypes: _activityTypeController.activityTypes,
     recruiterId: _teacherPickerController.teacher?.id ?? '',
     phone: PhoneNumber.fromString(
@@ -265,6 +269,15 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     }
 
     if (mounted) setState(() => _isEditing = !_isEditing);
+  }
+
+  @override
+  void didUpdateWidget(covariant EnterpriseListTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_enterpriseStatusController.value != widget.enterprise.status) {
+      _enterpriseStatusController.forceSet(widget.enterprise.status);
+    }
   }
 
   @override
@@ -405,13 +418,13 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       padding: const EdgeInsets.only(right: 12.0),
       child: RadioWithFollowUp(
         elements: EnterpriseStatus.values,
-        initialValue: _enterpriseStatus,
+        controller: _enterpriseStatusController,
         enabled: _isEditing,
         onChanged:
             (value) => setState(() {
-              if (value != null) _enterpriseStatus = value;
               _jobControllers.forEach((_, controller) {
-                controller.enterpriseStatus = _enterpriseStatus;
+                controller.enterpriseStatus =
+                    _enterpriseStatusController.value!;
               });
             }),
       ),
@@ -431,7 +444,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       () =>
           _jobControllers[job.id] = EnterpriseJobListController(
             context: context,
-            enterpriseStatus: _enterpriseStatus,
+            enterpriseStatus: _enterpriseStatusController.value!,
             job: job,
             reservedForPickerController: EntityPickerController(
               allElementsTitle: 'Tous les enseignant\u00b7e\u00b7s',

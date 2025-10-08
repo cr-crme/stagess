@@ -26,11 +26,14 @@ enum _MyTestingEnum {
 void main() {
   group('RadioWithFollowUp', () {
     testWidgets('renders all the choices', (tester) async {
-      await tester
-          .pumpWidget(declareWidget(const RadioWithFollowUp<_MyTestingEnum>(
-        elements: _MyTestingEnum.values,
-        followUpChild: Text('My follow up'),
-      )));
+      await tester.pumpWidget(
+        declareWidget(
+          const RadioWithFollowUp<_MyTestingEnum>(
+            elements: _MyTestingEnum.values,
+            followUpChild: Text('My follow up'),
+          ),
+        ),
+      );
 
       for (final choice in _MyTestingEnum.values) {
         expect(find.text(choice.toString()), findsOneWidget);
@@ -41,35 +44,52 @@ void main() {
     });
 
     testWidgets('can render a title', (tester) async {
-      await tester.pumpWidget(declareWidget(
+      await tester.pumpWidget(
+        declareWidget(
           const RadioWithFollowUp<_MyTestingEnum>(
-              title: 'My title', elements: _MyTestingEnum.values)));
+            title: 'My title',
+            elements: _MyTestingEnum.values,
+          ),
+        ),
+      );
 
       final titleFinder = find.text('My title');
       expect(titleFinder, findsOneWidget);
-      expect(tester.widget<Text>(titleFinder).style,
-          Theme.of(tester.context(titleFinder)).textTheme.titleSmall);
+      expect(
+        tester.widget<Text>(titleFinder).style,
+        Theme.of(tester.context(titleFinder)).textTheme.titleSmall,
+      );
     });
 
     testWidgets('can customize the title', (tester) async {
-      await tester.pumpWidget(declareWidget(
+      await tester.pumpWidget(
+        declareWidget(
           const RadioWithFollowUp<_MyTestingEnum>(
-              elements: _MyTestingEnum.values,
-              title: 'My title',
-              titleStyle: TextStyle(color: Colors.red))));
+            elements: _MyTestingEnum.values,
+            title: 'My title',
+            titleStyle: TextStyle(color: Colors.red),
+          ),
+        ),
+      );
 
       expect(
-          tester.widget<Text>(find.text('My title')).style!.color, Colors.red);
+        tester.widget<Text>(find.text('My title')).style!.color,
+        Colors.red,
+      );
     });
 
-    testWidgets('tapping values that add follow up does show it',
-        (tester) async {
-      await tester
-          .pumpWidget(declareWidget(const RadioWithFollowUp<_MyTestingEnum>(
-        elements: _MyTestingEnum.values,
-        elementsThatShowChild: [_MyTestingEnum.a, _MyTestingEnum.c],
-        followUpChild: Text('My follow up'),
-      )));
+    testWidgets('tapping values that add follow up does show it', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        declareWidget(
+          const RadioWithFollowUp<_MyTestingEnum>(
+            elements: _MyTestingEnum.values,
+            elementsThatShowChild: [_MyTestingEnum.a, _MyTestingEnum.c],
+            followUpChild: Text('My follow up'),
+          ),
+        ),
+      );
 
       // The follow up is not present
       expect(find.text('My follow up'), findsNothing);
@@ -89,78 +109,111 @@ void main() {
     });
 
     testWidgets('nothing is selected by default', (tester) async {
-      final key = GlobalKey<RadioWithFollowUpState<_MyTestingEnum>>();
-      await tester.pumpWidget(declareWidget(RadioWithFollowUp<_MyTestingEnum>(
-        key: key,
-        elements: _MyTestingEnum.values,
-        followUpChild: const Text('My follow up'),
-      )));
+      final controller = RadioWithFollowUpController<_MyTestingEnum>();
+      await tester.pumpWidget(
+        declareWidget(
+          RadioWithFollowUp<_MyTestingEnum>(
+            controller: controller,
+            elements: _MyTestingEnum.values,
+            followUpChild: const Text('My follow up'),
+          ),
+        ),
+      );
 
       // No radio is checked
-      expect(key.currentState!.value, isNull);
+      expect(controller.value, isNull);
     });
 
     testWidgets('can initialize with value', (tester) async {
-      final key = GlobalKey<RadioWithFollowUpState<_MyTestingEnum>>();
-      await tester.pumpWidget(declareWidget(RadioWithFollowUp<_MyTestingEnum>(
-          key: key,
-          elements: _MyTestingEnum.values,
-          initialValue: _MyTestingEnum.c)));
+      final controller = RadioWithFollowUpController<_MyTestingEnum>();
+      await tester.pumpWidget(
+        declareWidget(
+          RadioWithFollowUp<_MyTestingEnum>(
+            controller: controller,
+            elements: _MyTestingEnum.values,
+            initialValue: _MyTestingEnum.c,
+          ),
+        ),
+      );
 
       // The value returns the current checked value
-      expect(key.currentState!.value, _MyTestingEnum.c);
+      expect(controller.value, _MyTestingEnum.c);
     });
 
     testWidgets('can tap a value', (tester) async {
-      final key = GlobalKey<RadioWithFollowUpState<_MyTestingEnum>>();
-      await tester.pumpWidget(declareWidget(RadioWithFollowUp<_MyTestingEnum>(
-          key: key, elements: _MyTestingEnum.values)));
+      final controller = RadioWithFollowUpController<_MyTestingEnum>();
+      await tester.pumpWidget(
+        declareWidget(
+          RadioWithFollowUp<_MyTestingEnum>(
+            controller: controller,
+            elements: _MyTestingEnum.values,
+          ),
+        ),
+      );
 
       // Tap the choice
       await tester.tap(find.text(_MyTestingEnum.a.toString()));
       await tester.pump();
 
       // The value returns the current checked value
-      expect(key.currentState!.value, _MyTestingEnum.a);
+      expect(controller.value, _MyTestingEnum.a);
     });
 
     testWidgets('can force a selection', (tester) async {
-      final key = GlobalKey<RadioWithFollowUpState<_MyTestingEnum>>();
-      await tester.pumpWidget(declareWidget(RadioWithFollowUp<_MyTestingEnum>(
-          key: key, elements: _MyTestingEnum.values)));
+      final controller = RadioWithFollowUpController<_MyTestingEnum>();
+      await tester.pumpWidget(
+        declareWidget(
+          RadioWithFollowUp<_MyTestingEnum>(
+            controller: controller,
+            elements: _MyTestingEnum.values,
+          ),
+        ),
+      );
 
       // Force the choice
-      key.currentState!.forceValue(_MyTestingEnum.b);
+      controller.forceSet(_MyTestingEnum.b);
       await tester.pump();
 
       // The value returns the current checked value
-      expect(key.currentState!.value, _MyTestingEnum.b);
+      expect(controller.value, _MyTestingEnum.b);
     });
 
     testWidgets('cannot tap if disabled', (tester) async {
-      final key = GlobalKey<RadioWithFollowUpState<_MyTestingEnum>>();
-      await tester.pumpWidget(declareWidget(RadioWithFollowUp<_MyTestingEnum>(
-          key: key, elements: _MyTestingEnum.values, enabled: false)));
+      final controller = RadioWithFollowUpController<_MyTestingEnum>();
+      await tester.pumpWidget(
+        declareWidget(
+          RadioWithFollowUp<_MyTestingEnum>(
+            controller: controller,
+            elements: _MyTestingEnum.values,
+            enabled: false,
+          ),
+        ),
+      );
 
       // Tap the choice
       await tester.tap(find.text(_MyTestingEnum.a.toString()));
       await tester.pump();
 
       // The value returns the current checked value
-      expect(key.currentState!.value, isNull);
+      expect(controller.value, isNull);
     });
 
-    testWidgets('"onChanged" is called when a selection is made',
-        (tester) async {
+    testWidgets('"onChanged" is called when a selection is made', (
+      tester,
+    ) async {
       bool wasCalled = false;
       _MyTestingEnum? value;
-      await tester.pumpWidget(declareWidget(RadioWithFollowUp<_MyTestingEnum>(
-        elements: _MyTestingEnum.values,
-        onChanged: (option) {
-          wasCalled = true;
-          value = option;
-        },
-      )));
+      await tester.pumpWidget(
+        declareWidget(
+          RadioWithFollowUp<_MyTestingEnum>(
+            elements: _MyTestingEnum.values,
+            onChanged: (option) {
+              wasCalled = true;
+              value = option;
+            },
+          ),
+        ),
+      );
 
       // Tap a choice one by one
       await tester.tap(find.text(_MyTestingEnum.b.toString()));

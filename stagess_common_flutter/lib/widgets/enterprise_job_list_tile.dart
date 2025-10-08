@@ -534,7 +534,7 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
     );
   }
 
-  final _uniformFormKey = GlobalKey<RadioWithFollowUpState<UniformStatus>>();
+  late final _uniformFormKey = ValueKey('${job.id}_uniform_form');
   Widget _buildUniform() {
     return BuildUniformRadio(
       uniformKey: _uniformFormKey,
@@ -547,15 +547,18 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
     );
   }
 
-  final _protectionsKey =
-      GlobalKey<RadioWithFollowUpState<ProtectionsStatus>>();
+  late final _protectionsKey = ValueKey('${job.id}_protections_form');
+  late final _protectionsController =
+      RadioWithFollowUpController<ProtectionsStatus>(
+        initialValue: job.protections.status,
+      );
   final _protectionsTextController =
       GlobalKey<CheckboxWithOtherState<ProtectionsType>>();
   Widget _buildProtections() {
     return BuildProtectionsRadio(
       protectionsKey: _protectionsKey,
       protectionsTypeKey: _protectionsTextController,
-      initialSelection: job.protections.status,
+      controller: _protectionsController,
       initialItems:
           job.protections.protections.map((e) => e.toString()).toList(),
       enabled: widget.editMode,
@@ -644,7 +647,7 @@ class BuildPrerequisitesCheckboxes extends StatelessWidget {
 class BuildUniformRadio extends StatelessWidget {
   const BuildUniformRadio({
     super.key,
-    required this.uniformKey,
+    this.uniformKey,
     required this.uniformTextController,
     this.initialSelection,
     this.enabled = true,
@@ -652,7 +655,7 @@ class BuildUniformRadio extends StatelessWidget {
     this.hideTitle = false,
   });
 
-  final GlobalKey<RadioWithFollowUpState<UniformStatus>> uniformKey;
+  final Key? uniformKey;
   final TextEditingController uniformTextController;
   final UniformStatus? initialSelection;
   final bool enabled;
@@ -716,18 +719,18 @@ class BuildUniformRadio extends StatelessWidget {
 class BuildProtectionsRadio extends StatelessWidget {
   const BuildProtectionsRadio({
     super.key,
-    required this.protectionsKey,
+    this.protectionsKey,
     required this.protectionsTypeKey,
-    this.initialSelection,
+    required this.controller,
     this.initialItems,
     this.enabled = true,
     required this.onChanged,
     this.hideTitle = false,
   });
 
-  final GlobalKey<RadioWithFollowUpState<ProtectionsStatus>> protectionsKey;
+  final RadioWithFollowUpController<ProtectionsStatus> controller;
+  final Key? protectionsKey;
   final GlobalKey<CheckboxWithOtherState<ProtectionsType>> protectionsTypeKey;
-  final ProtectionsStatus? initialSelection;
   final List<String>? initialItems;
   final bool enabled;
   final Function(ProtectionsStatus status, List<String> protections) onChanged;
@@ -749,7 +752,7 @@ class BuildProtectionsRadio extends StatelessWidget {
         ProtectionsStatus.suppliedByEnterprise,
         ProtectionsStatus.suppliedBySchool,
       ],
-      initialValue: initialSelection,
+      controller: controller,
       followUpChild: CheckboxWithOther<ProtectionsType>(
         key: protectionsTypeKey,
         title: 'Lesquels\u00a0:',
@@ -757,15 +760,13 @@ class BuildProtectionsRadio extends StatelessWidget {
         elements: ProtectionsType.values,
         initialValues: initialItems,
         onOptionSelected: (values) {
-          final status =
-              protectionsKey.currentState?.value ?? ProtectionsStatus.none;
+          final status = controller.value ?? ProtectionsStatus.none;
           final protections = values.map((e) => e.toString()).toList();
           onChanged(status, protections);
         },
       ),
       onChanged: (value) {
-        final status =
-            protectionsKey.currentState?.value ?? ProtectionsStatus.none;
+        final status = controller.value ?? ProtectionsStatus.none;
         final protections = protectionsTypeKey.currentState?.values ?? [];
         onChanged(status, protections);
       },

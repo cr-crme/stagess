@@ -362,16 +362,23 @@ class _EvaluationTypeChoser extends StatefulWidget {
 }
 
 class _EvaluationTypeChoserState extends State<_EvaluationTypeChoser> {
-  final _key = GlobalKey<RadioWithFollowUpState<SkillEvaluationGranularity>>();
+  // TODO Check this still works (key was removed)
+  late final _controller =
+      RadioWithFollowUpController<SkillEvaluationGranularity>(
+        initialValue: widget.formController.evaluationGranularity,
+      );
+
+  @override
+  void didUpdateWidget(covariant _EvaluationTypeChoser oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_controller.value != widget.formController.evaluationGranularity) {
+      _controller.forceSet(widget.formController.evaluationGranularity);
+    }
+  }
 
   @override
   Widget build(context) {
-    if (_key.currentState != null) {
-      _key.currentState!.forceValue(
-        widget.formController.evaluationGranularity,
-      );
-    }
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -379,9 +386,8 @@ class _EvaluationTypeChoserState extends State<_EvaluationTypeChoser> {
         Padding(
           padding: const EdgeInsets.only(left: 24.0),
           child: RadioWithFollowUp<SkillEvaluationGranularity>(
-            key: _key,
+            controller: _controller,
             elements: SkillEvaluationGranularity.values,
-            initialValue: widget.formController.evaluationGranularity,
             onChanged: (value) {
               widget.formController.evaluationGranularity = value!;
             },

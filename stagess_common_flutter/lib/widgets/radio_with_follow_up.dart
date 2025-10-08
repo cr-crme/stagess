@@ -1,11 +1,35 @@
 import 'package:flutter/material.dart';
 
+class RadioWithFollowUpController<T> {
+  T? _current;
+  T? get value => _current;
+  void forceSet(T? value) {
+    _current = value;
+    if (_state != null) {
+      _state!._checkShowFollowUp();
+      _state!._forceRefresh();
+    }
+  }
+
+  RadioWithFollowUpController({T? initialValue}) : _current = initialValue;
+
+  _RadioWithFollowUpState<T>? _state;
+  void _attach(_RadioWithFollowUpState<T> state) {
+    _state = state;
+  }
+
+  void _detach() {
+    _state = null;
+  }
+}
+
 class RadioWithFollowUp<T> extends StatefulWidget {
   const RadioWithFollowUp({
     super.key,
     this.title,
     this.titleStyle,
     this.initialValue,
+    this.controller,
     required this.elements,
     this.elementsThatShowChild,
     this.followUpChild,
@@ -16,6 +40,7 @@ class RadioWithFollowUp<T> extends StatefulWidget {
   final String? title;
   final TextStyle? titleStyle;
   final T? initialValue;
+  final RadioWithFollowUpController<T>? controller;
   final List<T> elements;
   final List<T>? elementsThatShowChild;
   final Widget? followUpChild;
@@ -23,41 +48,58 @@ class RadioWithFollowUp<T> extends StatefulWidget {
   final bool enabled;
 
   @override
-  State<RadioWithFollowUp<T>> createState() => RadioWithFollowUpState<T>();
+  State<RadioWithFollowUp<T>> createState() => _RadioWithFollowUpState<T>();
 }
 
-class RadioWithFollowUpState<T> extends State<RadioWithFollowUp<T>> {
-  late T? _current = widget.initialValue;
+class _RadioWithFollowUpState<T> extends State<RadioWithFollowUp<T>> {
+  late final RadioWithFollowUpController<T> _controller;
 
-  /// This is a callback that can be called using the global key
-  void forceValue(T value) => setState(() => _current = value);
-
-  bool get hasFollowUp => _hasFollowUp;
   bool _hasFollowUp = false;
-
   bool get _showFollowUp => widget.followUpChild != null && _hasFollowUp;
-
-  T? get value => _current;
 
   @override
   void initState() {
     super.initState();
+
+    if (widget.controller != null && widget.initialValue != null) {
+      throw ArgumentError(
+        'Cannot provide both a controller and an initial value',
+      );
+    } else if (widget.controller != null) {
+      _controller = widget.controller!;
+    } else {
+      _controller = RadioWithFollowUpController<T>(
+        initialValue: widget.initialValue,
+      );
+    }
+
+    _controller._attach(this);
+
     _checkShowFollowUp();
   }
 
   void _checkShowFollowUp() {
-    _hasFollowUp = widget.elementsThatShowChild?.contains(_current) ?? false;
+    _hasFollowUp =
+        widget.elementsThatShowChild?.contains(_controller.value) ?? false;
+  }
+
+  void _forceRefresh() {
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _controller._detach();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return RadioGroup(
-      groupValue: _current,
+      groupValue: _controller.value,
       onChanged: (newValue) {
-        _current = newValue;
-        _checkShowFollowUp();
-        setState(() {});
-        if (widget.onChanged != null) widget.onChanged!(value);
+        _controller.forceSet(newValue);
+        if (widget.onChanged != null) widget.onChanged!(_controller.value);
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
