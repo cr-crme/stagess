@@ -100,7 +100,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
           context: context,
           enterpriseStatus:
               _enterpriseStatusController.value ?? EnterpriseStatus.active,
-          job: job,
+          job: job.copyWith(),
           reservedForPickerController: EntityPickerController(
             allElementsTitle: 'Tous les enseignant\u00b7e\u00b7s',
             schools: [],
@@ -278,8 +278,23 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     if (_enterpriseStatusController.value != widget.enterprise.status) {
       _enterpriseStatusController.forceSet(widget.enterprise.status);
     }
-
-    _jobControllers.forEach((key, controller) {
+    for (final job in widget.enterprise.jobs) {
+      if (!_jobControllers.containsKey(job.id)) {
+        _jobControllers[job.id] = EnterpriseJobListController(
+          context: context,
+          enterpriseStatus:
+              _enterpriseStatusController.value ?? EnterpriseStatus.active,
+          job: job.copyWith(),
+          reservedForPickerController: EntityPickerController(
+            allElementsTitle: 'Tous les enseignant·e·s',
+            schools: [],
+            teachers: [...TeachersProvider.of(context, listen: false)],
+            initialId: job.reservedForId,
+          ),
+        );
+      }
+    }
+    for (final key in _jobControllers.keys) {
       final job = widget.enterprise.jobs.firstWhereOrNull(
         (job) => job.id == key,
       );
@@ -288,7 +303,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
         _jobControllers.remove(key);
         return;
       }
-      final serializedOldJob = controller.job.serialize();
+      final serializedOldJob = _jobControllers[key]!.job.serialize();
       final serializedNewJob = job.serialize();
 
       if (areMapsNotEqual(serializedOldJob, serializedNewJob)) {
@@ -296,16 +311,16 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
           context: context,
           enterpriseStatus:
               _enterpriseStatusController.value ?? EnterpriseStatus.active,
-          job: job,
+          job: job.copyWith(),
           reservedForPickerController: EntityPickerController(
-            allElementsTitle: 'Tous les enseignant\u00b7e\u00b7s',
+            allElementsTitle: 'Tous les enseignant·e·s',
             schools: [],
             teachers: [...TeachersProvider.of(context, listen: false)],
             initialId: job.reservedForId,
           ),
         );
       }
-    });
+    }
 
     if (_nameController.text != widget.enterprise.name) {
       _nameController.text = widget.enterprise.name;

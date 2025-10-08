@@ -1,50 +1,19 @@
 import 'package:flutter/material.dart';
 
-class CheckboxWithOther<T> extends StatefulWidget {
-  const CheckboxWithOther({
-    super.key,
-    this.title,
-    this.titleStyle,
-    required this.elements,
-    this.initialValues,
-    this.elementStyleBuilder,
-    this.subWidgetBuilder,
-    this.hasNotApplicableOption = false,
-    this.showOtherOption = true,
-    this.errorMessageOther = 'Préciser au moins un élément',
-    this.onOptionSelected,
-    this.followUpChild,
-    this.enabled = true,
-  });
-
-  final String? title;
-  final TextStyle? titleStyle;
+class CheckboxWithOtherController<T> {
   final List<T> elements;
-  final List<String>? initialValues;
-  final TextStyle Function(T element, bool isSelected)? elementStyleBuilder;
-  final Widget Function(T element, bool isSelected)? subWidgetBuilder;
-  final bool showOtherOption;
   final bool hasNotApplicableOption;
-  final String errorMessageOther;
-  final Function(List<String>)? onOptionSelected;
-  final Widget? followUpChild;
-  final bool enabled;
 
-  @override
-  State<CheckboxWithOther<T>> createState() => CheckboxWithOtherState<T>();
-}
-
-class CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
   final Map<T, bool> _elementValues = {};
   bool _isNotApplicable = false;
+  bool get isNotApplicable => _isNotApplicable;
 
   final _otherTextController = TextEditingController();
   bool _hasOther = false;
+  bool get hasOther => _hasOther;
 
-  bool get hasFollowUp => _hasFollowUp;
   bool _hasFollowUp = false;
-
-  bool get _showFollowUp => widget.followUpChild != null && _hasFollowUp;
+  bool get hasFollowUp => _hasFollowUp;
 
   ///
   /// This returns all the selected elements except for everything related to
@@ -57,6 +26,39 @@ class CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
       }
     }
     return out;
+  }
+
+  CheckboxWithOtherController({
+    required this.elements,
+    this.hasNotApplicableOption = false,
+    List<String>? initialValues,
+  }) {
+    // Initialize all elements from the initial value
+    for (final e in elements) {
+      _elementValues[e] = initialValues?.contains(e.toString()) ?? false;
+    }
+
+    // But initial values may contains "other" element which must be parsed too
+    if (hasNotApplicableOption &&
+        initialValues != null &&
+        initialValues.length == 1 &&
+        initialValues[0] == '__NOT_APPLICABLE_INTERNAL__') {
+      _isNotApplicable = true;
+      return;
+    }
+
+    if (initialValues != null) {
+      final elementsAsString = elements.map((e) => e.toString());
+      for (final initial in initialValues) {
+        if (initial.isNotEmpty && !elementsAsString.contains(initial)) {
+          _hasOther = true;
+          _otherTextController.text =
+              _otherTextController.text.isEmpty
+                  ? initial
+                  : '${_otherTextController.text}\n$initial';
+        }
+      }
+    }
   }
 
   ///
@@ -77,42 +79,113 @@ class CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
     return out;
   }
 
+  void forceSet(T element, bool value) {
+    if (!_elementValues.containsKey(element)) {
+      throw ArgumentError('Element $element is not part of the options');
+    }
+
+    _elementValues[element] = value;
+    if (_state != null) {
+      _state!._checkForShowingChild();
+      _state!._forceRefresh();
+    }
+  }
+
+  void forceSetIsNotApplicable(bool value) {
+    if (!hasNotApplicableOption) {
+      throw Exception(
+        'This controller does not have a "not applicable" option',
+      );
+    }
+    _isNotApplicable = value;
+    if (_isNotApplicable) {
+      for (final e in _elementValues.keys) {
+        _elementValues[e] = false;
+      }
+      _hasOther = false;
+      _otherTextController.text = '';
+      if (_state != null) _state!._checkForShowingChild();
+    }
+    if (_state != null) _state!._forceRefresh();
+  }
+
+  void forceSetOther(bool value) {
+    _hasOther = value;
+    if (_state != null) {
+      _state!._checkForShowingChild();
+      _state!._forceRefresh();
+    }
+  }
+
+  _CheckboxWithOtherState<T>? _state;
+  void _attach(_CheckboxWithOtherState<T> state) {
+    if (_state != null) {
+      throw Exception('A controller can only be attached to one widget');
+    }
+    _state = state;
+  }
+
+  void _detach() {
+    _state = null;
+  }
+}
+
+class CheckboxWithOther<T> extends StatefulWidget {
+  const CheckboxWithOther({
+    super.key,
+    required this.controller,
+    this.title,
+    this.titleStyle,
+    this.elementStyleBuilder,
+    this.subWidgetBuilder,
+    this.showOtherOption = true,
+    this.errorMessageOther = 'Préciser au moins un élément',
+    this.onOptionSelected,
+    this.followUpChild,
+    this.enabled = true,
+  });
+
+  final CheckboxWithOtherController<T> controller;
+  final String? title;
+  final TextStyle? titleStyle;
+  final TextStyle Function(T element, bool isSelected)? elementStyleBuilder;
+  final Widget Function(T element, bool isSelected)? subWidgetBuilder;
+  final bool showOtherOption;
+  final String errorMessageOther;
+  final Function(List<String>)? onOptionSelected;
+  final Widget? followUpChild;
+  final bool enabled;
+
+  @override
+  State<CheckboxWithOther<T>> createState() => _CheckboxWithOtherState<T>();
+}
+
+class _CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
+  bool get _showFollowUp =>
+      widget.followUpChild != null && widget.controller._hasFollowUp;
+
   void _checkForShowingChild() {
-    _hasFollowUp = _elementValues.values.any((e) => e) || _hasOther;
+    widget.controller._hasFollowUp =
+        widget.controller._elementValues.values.any((e) => e) ||
+        widget.controller._hasOther;
   }
 
   @override
   void initState() {
     super.initState();
-
-    // Initialize all elements from the initial value
-    for (final e in widget.elements) {
-      _elementValues[e] = widget.initialValues?.contains(e.toString()) ?? false;
-    }
-
-    // But initial values may contains "other" element which must be parsed too
-    if (widget.hasNotApplicableOption &&
-        widget.initialValues != null &&
-        widget.initialValues!.length == 1 &&
-        widget.initialValues![0] == '__NOT_APPLICABLE_INTERNAL__') {
-      _isNotApplicable = true;
-      return;
-    }
-
-    if (widget.initialValues != null) {
-      final elementsAsString = widget.elements.map((e) => e.toString());
-      for (final initial in widget.initialValues!) {
-        if (initial.isNotEmpty && !elementsAsString.contains(initial)) {
-          _hasOther = true;
-          _otherTextController.text =
-              _otherTextController.text.isEmpty
-                  ? initial
-                  : '${_otherTextController.text}\n$initial';
-        }
-      }
-    }
-
     _checkForShowingChild();
+
+    widget.controller._attach(this);
+  }
+
+  void _forceRefresh() {
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    widget.controller._detach();
+    super.dispose();
   }
 
   @override
@@ -125,7 +198,7 @@ class CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
             widget.title!,
             style: widget.titleStyle ?? Theme.of(context).textTheme.titleSmall,
           ),
-        ..._elementValues.keys.map(
+        ...widget.controller._elementValues.keys.map(
           (element) => Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -140,26 +213,27 @@ class CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
                           ? Theme.of(context).textTheme.bodyMedium
                           : widget.elementStyleBuilder!(
                             element,
-                            _elementValues[element]!,
+                            widget.controller._elementValues[element]!,
                           ),
                 ),
-                enabled: widget.enabled && !_isNotApplicable,
-                value: _elementValues[element]!,
+                enabled: widget.enabled && !widget.controller._isNotApplicable,
+                value: widget.controller._elementValues[element]!,
                 onChanged: (newValue) {
-                  _elementValues[element] = newValue!;
-                  _checkForShowingChild();
-                  setState(() {});
+                  widget.controller.forceSet(element, newValue!);
                   if (widget.onOptionSelected != null) {
-                    widget.onOptionSelected!(values);
+                    widget.onOptionSelected!(widget.controller.values);
                   }
                 },
               ),
               if (widget.subWidgetBuilder != null)
-                widget.subWidgetBuilder!(element, _elementValues[element]!),
+                widget.subWidgetBuilder!(
+                  element,
+                  widget.controller._elementValues[element]!,
+                ),
             ],
           ),
         ),
-        if (widget.hasNotApplicableOption)
+        if (widget.controller.hasNotApplicableOption)
           CheckboxListTile(
             visualDensity: VisualDensity.compact,
             dense: true,
@@ -169,20 +243,11 @@ class CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
               style: Theme.of(context).textTheme.bodyMedium,
             ),
             enabled: widget.enabled,
-            value: _isNotApplicable,
+            value: widget.controller._isNotApplicable,
             onChanged: (newValue) {
-              _isNotApplicable = newValue!;
-              if (_isNotApplicable) {
-                for (final e in _elementValues.keys) {
-                  _elementValues[e] = false;
-                }
-                _hasOther = false;
-                _otherTextController.text = '';
-                _checkForShowingChild();
-              }
-              setState(() {});
+              widget.controller.forceSetIsNotApplicable(newValue!);
               if (widget.onOptionSelected != null) {
-                widget.onOptionSelected!(values);
+                widget.onOptionSelected!(widget.controller.values);
               }
             },
           ),
@@ -192,19 +257,17 @@ class CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
             dense: true,
             controlAffinity: ListTileControlAffinity.leading,
             title: Text('Autre', style: Theme.of(context).textTheme.bodyMedium),
-            value: _hasOther,
-            enabled: widget.enabled && !_isNotApplicable,
+            value: widget.controller._hasOther,
+            enabled: widget.enabled && !widget.controller._isNotApplicable,
             onChanged: (newValue) {
-              _hasOther = newValue!;
-              _checkForShowingChild();
-              setState(() {});
+              widget.controller.forceSetOther(newValue!);
               if (widget.onOptionSelected != null) {
-                widget.onOptionSelected!(values);
+                widget.onOptionSelected!(widget.controller.values);
               }
             },
           ),
         Visibility(
-          visible: _hasOther,
+          visible: widget.controller._hasOther,
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
@@ -215,7 +278,7 @@ class CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 TextFormField(
-                  controller: _otherTextController,
+                  controller: widget.controller._otherTextController,
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                   ),
@@ -225,13 +288,13 @@ class CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
                   keyboardType: TextInputType.multiline,
                   onChanged: (text) {
                     if (widget.onOptionSelected != null) {
-                      widget.onOptionSelected!(values);
+                      widget.onOptionSelected!(widget.controller.values);
                     }
                   },
                   enabled: widget.enabled,
                   validator:
                       (value) =>
-                          _hasOther &&
+                          widget.controller._hasOther &&
                                   (value == null ||
                                       !RegExp('[a-zA-Z0-9]').hasMatch(value))
                               ? widget.errorMessageOther
