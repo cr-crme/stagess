@@ -140,7 +140,9 @@ class _ActivityTypesPickerFormField extends FormField<Set<ActivityTypes>> {
     late FocusNode textFieldFocusNode;
     final controller =
         (state.widget as _ActivityTypesPickerFormField).controller;
-    controller._forceRefresh = () => state.didChange(controller._activityTypes);
+    controller._forceRefresh = () {
+      if (state.mounted) state.didChange(controller._activityTypes);
+    };
     final activityTabAtTop =
         (state.widget as _ActivityTypesPickerFormField).activityTabAtTop;
     final title = (state.widget as _ActivityTypesPickerFormField).title;
