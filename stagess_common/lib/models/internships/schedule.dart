@@ -224,7 +224,7 @@ class InternshipHelpers {
         final dayB = b.schedule[day]!;
 
         if (dayA.blocks.length != dayB.blocks.length) return false;
-        if (areListsEqual(dayA.blocks, dayB.blocks)) return false;
+        if (areListsNotEqual(dayA.blocks, dayB.blocks)) return false;
       }
     }
     return true;

@@ -32,12 +32,14 @@ class TeacherPickerTile extends StatelessWidget {
     required this.schoolBoardId,
     required this.controller,
     required this.editMode,
+    this.isMandatory = false,
   });
 
   final String? title;
   final TeacherPickerController controller;
   final String schoolBoardId;
   final bool editMode;
+  final bool isMandatory;
 
   @override
   Widget build(BuildContext context) {
@@ -98,12 +100,18 @@ class TeacherPickerTile extends StatelessWidget {
       fieldViewBuilder: (_, textController, focusNode, onSubmitted) {
         controller._textController = textController;
 
-        return TextField(
+        return TextFormField(
           controller: controller._textController,
           focusNode: focusNode,
           readOnly: false,
           enabled: editMode,
           style: const TextStyle(color: Colors.black),
+          validator: (value) {
+            if (isMandatory && (value == null || value.isEmpty)) {
+              return 'Ce champ est obligatoire';
+            }
+            return null;
+          },
           decoration: InputDecoration(
             labelText: title ?? 'Sélectionner un·e enseignant·e',
             labelStyle: const TextStyle(color: Colors.black),

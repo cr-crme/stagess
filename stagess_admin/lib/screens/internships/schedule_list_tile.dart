@@ -79,6 +79,23 @@ class _DateRange extends StatefulWidget {
 class _DateRangeState extends State<_DateRange> {
   bool _isValid = true;
 
+  late final _scheduleStartController = TextEditingController(
+    text:
+        widget.scheduleController.dateRange == null
+            ? null
+            : DateFormat.yMMMEd(
+              'fr_CA',
+            ).format(widget.scheduleController.dateRange!.start),
+  );
+  late final _scheduleEndController = TextEditingController(
+    text:
+        widget.scheduleController.dateRange == null
+            ? null
+            : DateFormat.yMMMEd(
+              'fr_CA',
+            ).format(widget.scheduleController.dateRange!.end),
+  );
+
   Future<void> _promptDateRange(context) async {
     final referenceDate =
         (widget.scheduleController.dateRange?.start ?? DateTime.now());
@@ -97,9 +114,40 @@ class _DateRangeState extends State<_DateRange> {
 
     _isValid = true;
     widget.scheduleController.dateRange = range;
+    _scheduleStartController.text = DateFormat.yMMMEd(
+      'fr_CA',
+    ).format(range.start);
+    _scheduleEndController.text = DateFormat.yMMMEd('fr_CA').format(range.end);
 
     widget.onScheduleChanged();
     setState(() {});
+  }
+
+  @override
+  void didUpdateWidget(covariant _DateRange oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final startDate =
+        (widget.scheduleController.dateRange == null
+            ? null
+            : DateFormat.yMMMEd(
+              'fr_CA',
+            ).format(widget.scheduleController.dateRange!.start)) ??
+        '';
+    if (_scheduleStartController.text != startDate) {
+      _scheduleStartController.text = startDate;
+    }
+
+    final endDate =
+        (widget.scheduleController.dateRange == null
+            ? null
+            : DateFormat.yMMMEd(
+              'fr_CA',
+            ).format(widget.scheduleController.dateRange!.end)) ??
+        '';
+    if (_scheduleEndController.text != endDate) {
+      _scheduleEndController.text = endDate;
+    }
   }
 
   @override
@@ -163,12 +211,7 @@ class _DateRangeState extends State<_DateRange> {
                           labelStyle: TextStyle(color: Colors.black),
                           border: InputBorder.none,
                         ),
-                        initialValue:
-                            widget.scheduleController.dateRange == null
-                                ? null
-                                : DateFormat.yMMMEd('fr_CA').format(
-                                  widget.scheduleController.dateRange!.start,
-                                ),
+                        controller: _scheduleStartController,
                         style: TextStyle(color: Colors.black),
                         enabled: false,
                       ),
@@ -180,12 +223,7 @@ class _DateRangeState extends State<_DateRange> {
                           labelStyle: TextStyle(color: Colors.black),
                           border: InputBorder.none,
                         ),
-                        initialValue:
-                            widget.scheduleController.dateRange == null
-                                ? null
-                                : DateFormat.yMMMEd('fr_CA').format(
-                                  widget.scheduleController.dateRange!.end,
-                                ),
+                        controller: _scheduleEndController,
                         style: TextStyle(color: Colors.black),
                         enabled: false,
                       ),

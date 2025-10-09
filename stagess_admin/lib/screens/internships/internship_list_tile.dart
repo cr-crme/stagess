@@ -166,12 +166,7 @@ class InternshipListTileState extends State<InternshipListTile> {
     );
 
     final schedulesHasChanged =
-        !widget.internship.hasVersions ||
-        !InternshipHelpers.areSchedulesEqual(
-          widget.internship.weeklySchedules,
-          _weeklySchedulesController.weeklySchedules,
-        ) ||
-        widget.internship.dates != _weeklySchedulesController.dateRange;
+        !widget.internship.hasVersions || _weeklySchedulesController.hasChanged;
 
     final transportationsChanged = areListsNotEqual(
       widget.internship.hasVersions ? widget.internship.transportations : [],
@@ -309,6 +304,80 @@ class InternshipListTileState extends State<InternshipListTile> {
     }
 
     if (mounted) setState(() => _isEditing = !_isEditing);
+  }
+
+  @override
+  void didUpdateWidget(covariant InternshipListTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final teachers = TeachersProvider.of(context, listen: false);
+
+    if (_teacherPickerController.teacher?.id !=
+        widget.internship.signatoryTeacherId) {
+      _teacherPickerController.teacher = teachers.fromIdOrNull(
+        widget.internship.signatoryTeacherId,
+      );
+    }
+
+    if (_contactFirstNameController.text !=
+        widget.internship.supervisor.firstName) {
+      _contactFirstNameController.text = widget.internship.supervisor.firstName;
+    }
+    if (_contactLastNameController.text !=
+        widget.internship.supervisor.lastName) {
+      _contactLastNameController.text = widget.internship.supervisor.lastName;
+    }
+    if (_contactPhoneController.text !=
+        (widget.internship.supervisor.phone?.toString() ?? '')) {
+      _contactPhoneController.text =
+          widget.internship.supervisor.phone?.toString() ?? '';
+    }
+    if (_contactEmailController.text != widget.internship.supervisor.email) {
+      _contactEmailController.text = widget.internship.supervisor.email ?? '';
+    }
+
+    if (_weeklySchedulesController.dateRange != widget.internship.dates) {
+      _weeklySchedulesController.dateRange = widget.internship.dates;
+    }
+    if (!InternshipHelpers.areSchedulesEqual(
+      _weeklySchedulesController.weeklySchedules,
+      widget.internship.weeklySchedules,
+    )) {
+      _weeklySchedulesController
+          .weeklySchedules = InternshipHelpers.copySchedules(
+        widget.internship.weeklySchedules,
+        keepId: true,
+      );
+    }
+
+    if (_expectedDurationController.text !=
+        widget.internship.expectedDuration.toString()) {
+      _expectedDurationController.text =
+          widget.internship.expectedDuration.toString();
+    }
+    if (_transportations.toSet() != widget.internship.transportations.toSet()) {
+      _transportations
+        ..clear()
+        ..addAll(widget.internship.transportations);
+    }
+    if (_visitFrequenciesController.text !=
+        widget.internship.visitFrequencies) {
+      _visitFrequenciesController.text = widget.internship.visitFrequencies;
+    }
+
+    if (_endDate != widget.internship.endDate) {
+      _endDate = widget.internship.endDate;
+    }
+    if (_achievedDurationController.text !=
+        (widget.internship.achievedDuration < 0
+            ? ''
+            : widget.internship.achievedDuration.toString())) {
+      _achievedDurationController.text =
+          widget.internship.achievedDuration.toString();
+    }
+
+    if (_teacherNotesController.text != widget.internship.teacherNotes) {
+      _teacherNotesController.text = widget.internship.teacherNotes;
+    }
   }
 
   @override
@@ -450,6 +519,7 @@ class InternshipListTileState extends State<InternshipListTile> {
         schoolBoardId: widget.internship.schoolBoardId,
         controller: _teacherPickerController,
         editMode: _isEditing,
+        isMandatory: true,
       ),
     );
   }
@@ -554,7 +624,7 @@ class InternshipListTileState extends State<InternshipListTile> {
 
   Future<void> _promptEndDate() async {
     final date = await showCustomDatePicker(
-      helpText: 'Sélectionner les dates',
+      helpText: 'Sélectionner la date de fin',
       cancelText: 'Annuler',
       confirmText: 'Confirmer',
       context: context,
