@@ -95,25 +95,31 @@ class _RadioWithFollowUpState<T> extends State<RadioWithFollowUp<T>> {
 
   @override
   Widget build(BuildContext context) {
-    return RadioGroup(
-      groupValue: _controller.value,
-      onChanged: (newValue) {
-        _controller.forceSet(newValue);
-        if (widget.onChanged != null) widget.onChanged!(_controller.value);
-      },
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (widget.title != null)
-            Text(
-              widget.title!,
-              style:
-                  widget.titleStyle ?? Theme.of(context).textTheme.titleSmall,
-            ),
-          ...widget.elements.map((element) => _buildElementTile(element)),
-          if (_showFollowUp) widget.followUpChild!,
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RadioGroup(
+          groupValue: _controller.value,
+          onChanged: (newValue) {
+            _controller.forceSet(newValue);
+            if (widget.onChanged != null) widget.onChanged!(_controller.value);
+          },
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (widget.title != null)
+                Text(
+                  widget.title!,
+                  style:
+                      widget.titleStyle ??
+                      Theme.of(context).textTheme.titleSmall,
+                ),
+              ...widget.elements.map((element) => _buildElementTile(element)),
+            ],
+          ),
+        ),
+        if (_showFollowUp) widget.followUpChild!,
+      ],
     );
   }
 

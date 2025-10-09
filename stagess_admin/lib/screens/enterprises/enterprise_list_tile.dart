@@ -92,23 +92,28 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   late final _activityTypeController = EnterpriseActivityTypeListController(
     initial: widget.enterprise.activityTypes,
   );
+
+  EnterpriseJobListController _controllerFromJob(
+    BuildContext context, {
+    required Job job,
+  }) {
+    return EnterpriseJobListController(
+      context: context,
+      enterpriseStatus:
+          _enterpriseStatusController.value ?? EnterpriseStatus.active,
+      job: job.copyWith(),
+      reservedForPickerController: EntityPickerController(
+        allElementsTitle: 'Tous les enseignant\u00b7e\u00b7s',
+        schools: [],
+        teachers: [...TeachersProvider.of(context, listen: false)],
+        initialId: job.reservedForId,
+      ),
+    );
+  }
+
   late final _jobControllers = Map.fromEntries(
     widget.enterprise.jobs.map(
-      (job) => MapEntry(
-        job.id,
-        EnterpriseJobListController(
-          context: context,
-          enterpriseStatus:
-              _enterpriseStatusController.value ?? EnterpriseStatus.active,
-          job: job.copyWith(),
-          reservedForPickerController: EntityPickerController(
-            allElementsTitle: 'Tous les enseignant\u00b7e\u00b7s',
-            schools: [],
-            teachers: [...TeachersProvider.of(context, listen: false)],
-            initialId: job.reservedForId,
-          ),
-        ),
-      ),
+      (job) => MapEntry(job.id, _controllerFromJob(context, job: job)),
     ),
   );
   late final _teacherPickerController = TeacherPickerController(
@@ -278,47 +283,29 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     if (_enterpriseStatusController.value != widget.enterprise.status) {
       _enterpriseStatusController.forceSet(widget.enterprise.status);
     }
-    for (final job in widget.enterprise.jobs) {
-      if (!_jobControllers.containsKey(job.id)) {
-        _jobControllers[job.id] = EnterpriseJobListController(
-          context: context,
-          enterpriseStatus:
-              _enterpriseStatusController.value ?? EnterpriseStatus.active,
-          job: job.copyWith(),
-          reservedForPickerController: EntityPickerController(
-            allElementsTitle: 'Tous les enseignant·e·s',
-            schools: [],
-            teachers: [...TeachersProvider.of(context, listen: false)],
-            initialId: job.reservedForId,
-          ),
-        );
+
+    // Replace the job controllers if the jobs have changed
+    final keysToRemove = <String>[];
+    for (final key in _jobControllers.keys) {
+      final job = widget.enterprise.jobs.fromIdOrNull(key);
+      if (job == null) {
+        keysToRemove.add(key);
+        continue;
+      }
+
+      final serializedOldJob = _jobControllers[key]!.job.serialize();
+      if (areMapsNotEqual(serializedOldJob, job.serialize())) {
+        _jobControllers[key] = _controllerFromJob(context, job: job);
       }
     }
-    for (final key in _jobControllers.keys) {
-      final job = widget.enterprise.jobs.firstWhereOrNull(
-        (job) => job.id == key,
-      );
-      if (job == null) {
-        // This job has been removed
-        _jobControllers.remove(key);
-        return;
-      }
-      final serializedOldJob = _jobControllers[key]!.job.serialize();
-      final serializedNewJob = job.serialize();
-
-      if (areMapsNotEqual(serializedOldJob, serializedNewJob)) {
-        _jobControllers[key] = EnterpriseJobListController(
-          context: context,
-          enterpriseStatus:
-              _enterpriseStatusController.value ?? EnterpriseStatus.active,
-          job: job.copyWith(),
-          reservedForPickerController: EntityPickerController(
-            allElementsTitle: 'Tous les enseignant·e·s',
-            schools: [],
-            teachers: [...TeachersProvider.of(context, listen: false)],
-            initialId: job.reservedForId,
-          ),
-        );
+    // Remove deleted jobs
+    for (final key in keysToRemove) {
+      _jobControllers.remove(key);
+    }
+    // Add new jobs
+    for (final job in widget.enterprise.jobs) {
+      if (!_jobControllers.containsKey(job.id)) {
+        _jobControllers[job.id] = _controllerFromJob(context, job: job);
       }
     }
 

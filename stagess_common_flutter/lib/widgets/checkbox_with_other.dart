@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stagess_common/utils.dart';
 
 class CheckboxWithOtherController<T> {
   final List<T> elements;
@@ -8,9 +9,10 @@ class CheckboxWithOtherController<T> {
   bool _isNotApplicable = false;
   bool get isNotApplicable => _isNotApplicable;
 
-  final _otherTextController = TextEditingController();
   bool _hasOther = false;
   bool get hasOther => _hasOther;
+  final _otherTextController = TextEditingController();
+  String get otherText => _otherTextController.text;
 
   bool _hasFollowUp = false;
   bool get hasFollowUp => _hasFollowUp;
@@ -79,7 +81,22 @@ class CheckboxWithOtherController<T> {
     return out;
   }
 
-  void forceSet(T element, bool value) {
+  void forceSetIfDifferent({required CheckboxWithOtherController comparator}) {
+    if (areListsNotEqual(values, comparator.values)) {
+      for (var element in elements) {
+        _forceSet(element, comparator.selected.contains(element));
+      }
+      if (hasNotApplicableOption) {
+        _forceSetIsNotApplicable(comparator.isNotApplicable);
+      }
+      _forceSetOther(comparator.hasOther);
+      if (hasOther) {
+        _forceSetOtherText(comparator.otherText);
+      }
+    }
+  }
+
+  void _forceSet(T element, bool value) {
     if (!_elementValues.containsKey(element)) {
       throw ArgumentError('Element $element is not part of the options');
     }
@@ -91,7 +108,7 @@ class CheckboxWithOtherController<T> {
     }
   }
 
-  void forceSetIsNotApplicable(bool value) {
+  void _forceSetIsNotApplicable(bool value) {
     if (!hasNotApplicableOption) {
       throw Exception(
         'This controller does not have a "not applicable" option',
@@ -109,12 +126,23 @@ class CheckboxWithOtherController<T> {
     if (_state != null) _state!._forceRefresh();
   }
 
-  void forceSetOther(bool value) {
+  void _forceSetOther(bool value) {
     _hasOther = value;
     if (_state != null) {
       _state!._checkForShowingChild();
       _state!._forceRefresh();
     }
+  }
+
+  void _forceSetOtherText(String text) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // We must delay the update of the text controller to avoid a setState() issue
+      _otherTextController.text = text;
+      if (_state != null) {
+        _state!._checkForShowingChild();
+        _state!._forceRefresh();
+      }
+    });
   }
 
   _CheckboxWithOtherState<T>? _state;
@@ -219,7 +247,7 @@ class _CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
                 enabled: widget.enabled && !widget.controller._isNotApplicable,
                 value: widget.controller._elementValues[element]!,
                 onChanged: (newValue) {
-                  widget.controller.forceSet(element, newValue!);
+                  widget.controller._forceSet(element, newValue!);
                   if (widget.onOptionSelected != null) {
                     widget.onOptionSelected!(widget.controller.values);
                   }
@@ -245,7 +273,7 @@ class _CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
             enabled: widget.enabled,
             value: widget.controller._isNotApplicable,
             onChanged: (newValue) {
-              widget.controller.forceSetIsNotApplicable(newValue!);
+              widget.controller._forceSetIsNotApplicable(newValue!);
               if (widget.onOptionSelected != null) {
                 widget.onOptionSelected!(widget.controller.values);
               }
@@ -260,7 +288,7 @@ class _CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
             value: widget.controller._hasOther,
             enabled: widget.enabled && !widget.controller._isNotApplicable,
             onChanged: (newValue) {
-              widget.controller.forceSetOther(newValue!);
+              widget.controller._forceSetOther(newValue!);
               if (widget.onOptionSelected != null) {
                 widget.onOptionSelected!(widget.controller.values);
               }
