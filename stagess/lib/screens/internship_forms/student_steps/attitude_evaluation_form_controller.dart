@@ -22,8 +22,9 @@ class AttitudeEvaluationFormController {
     InternshipEvaluationAttitude evaluation =
         internship.attitudeEvaluations[evaluationIndex];
 
-    final controller =
-        AttitudeEvaluationFormController(internshipId: internshipId);
+    final controller = AttitudeEvaluationFormController(
+      internshipId: internshipId,
+    );
 
     controller.evaluationDate = evaluation.date;
 
@@ -53,18 +54,19 @@ class AttitudeEvaluationFormController {
       date: evaluationDate,
       presentAtEvaluation: wereAtMeeting,
       attitude: AttitudeEvaluation(
-          inattendance: responses[Inattendance]! as Inattendance,
-          ponctuality: responses[Ponctuality]! as Ponctuality,
-          sociability: responses[Sociability]! as Sociability,
-          politeness: responses[Politeness]! as Politeness,
-          motivation: responses[Motivation]! as Motivation,
-          dressCode: responses[DressCode]! as DressCode,
-          qualityOfWork: responses[QualityOfWork]! as QualityOfWork,
-          productivity: responses[Productivity]! as Productivity,
-          autonomy: responses[Autonomy]! as Autonomy,
-          cautiousness: responses[Cautiousness]! as Cautiousness,
-          generalAppreciation:
-              responses[GeneralAppreciation]! as GeneralAppreciation),
+        inattendance: responses[Inattendance]! as Inattendance,
+        ponctuality: responses[Ponctuality]! as Ponctuality,
+        sociability: responses[Sociability]! as Sociability,
+        politeness: responses[Politeness]! as Politeness,
+        motivation: responses[Motivation]! as Motivation,
+        dressCode: responses[DressCode]! as DressCode,
+        qualityOfWork: responses[QualityOfWork]! as QualityOfWork,
+        productivity: responses[Productivity]! as Productivity,
+        autonomy: responses[Autonomy]! as Autonomy,
+        cautiousness: responses[Cautiousness]! as Cautiousness,
+        generalAppreciation:
+            responses[GeneralAppreciation]! as GeneralAppreciation,
+      ),
       comments: commentsController.text,
       formVersion: _formVersion,
     );
@@ -72,7 +74,10 @@ class AttitudeEvaluationFormController {
 
   DateTime evaluationDate = DateTime.now();
 
-  final wereAtMeetingKey = GlobalKey<CheckboxWithOtherState<String>>();
+  late final wereAtMeetingController = CheckboxWithOtherController(
+    elements: wereAtMeetingOptions,
+    initialValues: wereAtMeeting,
+  );
   final List<String> wereAtMeetingOptions = [
     'Stagiaire',
     'Responsable en milieu de stage',
@@ -80,7 +85,7 @@ class AttitudeEvaluationFormController {
   final List<String> wereAtMeeting = [];
   void setWereAtMeeting() {
     wereAtMeeting.clear();
-    wereAtMeeting.addAll(wereAtMeetingKey.currentState!.values);
+    wereAtMeeting.addAll(wereAtMeetingController.values);
   }
 
   Map<Type, AttitudeCategoryEnum?> responses = {};

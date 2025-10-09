@@ -559,7 +559,7 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
   );
   Widget _buildPrerequisites() {
     return BuildPrerequisitesCheckboxes(
-      checkBoxKey: _preInternshipRequestKey,
+      checkboxKey: _preInternshipRequestKey,
       controller: _preInternshipRequestsController,
       enabled: widget.editMode,
       onChanged: (values) {
@@ -655,13 +655,13 @@ class BuildPrerequisitesCheckboxes extends StatelessWidget {
   const BuildPrerequisitesCheckboxes({
     super.key,
     required this.controller,
-    required this.checkBoxKey,
+    required this.checkboxKey,
     this.enabled = true,
     this.onChanged,
     this.hideTitle = false,
   });
 
-  final Key checkBoxKey;
+  final Key checkboxKey;
   final CheckboxWithOtherController<PreInternshipRequestTypes> controller;
   final bool enabled;
   final Function(List<String>)? onChanged;
@@ -670,7 +670,7 @@ class BuildPrerequisitesCheckboxes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CheckboxWithOther<PreInternshipRequestTypes>(
-      key: checkBoxKey,
+      key: checkboxKey,
       controller: controller,
       title:
           hideTitle

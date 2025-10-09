@@ -90,31 +90,83 @@ class PrerequisitesBodyState extends State<_PrerequisitesBody> {
             : [_uniformTextController.text],
   );
 
-  late final _protectionsRequestKey = ValueKey(
-    '${widget.job.id}_protections_form',
+  late final _protectionsRadioKey = ValueKey(
+    '${widget.job.id}_protections_radio',
   );
-  final _protectionsTypeKey =
-      GlobalKey<CheckboxWithOtherState<ProtectionsType>>();
-  late final _protectionsController =
+  late final _protectionsRadioController =
       RadioWithFollowUpController<ProtectionsStatus>(
         initialValue: widget.job.protections.status,
       );
+  late final _protectionsCheckboxKey = ValueKey(
+    '${widget.job.id}_protections_checkbox',
+  );
+  late final _protectionsCheckboxController = CheckboxWithOtherController(
+    elements: ProtectionsType.values,
+    initialValues:
+        widget.job.protections.protections.map((e) => e.toString()).toList(),
+  );
   Protections get protections => Protections(
-    status: _protectionsController.value!,
+    status: _protectionsRadioController.value!,
     protections:
-        _protectionsController.value! == ProtectionsStatus.none
+        _protectionsRadioController.value! == ProtectionsStatus.none
             ? []
-            : _protectionsTypeKey.currentState!.values,
+            : _protectionsCheckboxController.values,
   );
 
-  final _preInternshipRequestKey =
-      GlobalKey<CheckboxWithOtherState<PreInternshipRequestTypes>>();
-  List<String> get prerequisites =>
-      _preInternshipRequestKey.currentState!.values;
+  late final _preInternshipRequestKey = ValueKey(
+    '${widget.job.id}_preinternship_requests',
+  );
+  late final _preInternshipRequestsController = CheckboxWithOtherController(
+    elements: PreInternshipRequestTypes.values,
+    initialValues: [
+      ...widget.job.preInternshipRequests.requests.map((e) => e.toString()),
+      widget.job.preInternshipRequests.other ?? '',
+    ],
+  );
+  List<String> get prerequisites => _preInternshipRequestsController.values;
+
+  @override
+  void didUpdateWidget(covariant oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (_ageController.text != widget.job.minimumAge.toString()) {
+      _ageController.text = widget.job.minimumAge.toString();
+    }
+
+    _preInternshipRequestsController.forceSetIfDifferent(
+      comparator: CheckboxWithOtherController(
+        elements: PreInternshipRequestTypes.values,
+        initialValues: [
+          ...widget.job.preInternshipRequests.requests.map((e) => e.toString()),
+          widget.job.preInternshipRequests.other ?? '',
+        ],
+      ),
+    );
+
+    if (_uniformRequestController.value != widget.job.uniforms.status) {
+      _uniformRequestController.forceSet(widget.job.uniforms.status);
+    }
+    final uniformText = widget.job.uniforms.uniforms.join('\n');
+    if (_uniformTextController.text != uniformText) {
+      _uniformTextController.text = uniformText;
+    }
+
+    if (_protectionsRadioController.value != widget.job.protections.status) {
+      _protectionsRadioController.forceSet(widget.job.protections.status);
+    }
+    _protectionsCheckboxController.forceSetIfDifferent(
+      comparator: CheckboxWithOtherController(
+        elements: ProtectionsType.values,
+        initialValues:
+            widget.job.protections.protections
+                .map((e) => e.toString())
+                .toList(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    // TODO Test if this still works after refactor
     _logger.finer(
       'Building PrerequisitesExpansionPanel for job: ${widget.job.specialization.name}',
     );
@@ -196,13 +248,8 @@ class PrerequisitesBodyState extends State<_PrerequisitesBody> {
             ? BuildUniformRadio(
               hideTitle: true,
               uniformKey: _uniformRequestKey,
-              uniformTextController:
-                  _uniformTextController
-                    ..text =
-                        uniforms.status == UniformStatus.none
-                            ? ''
-                            : uniforms.uniforms.join('\n'),
-              initialSelection: uniforms.status,
+              controller: _uniformRequestController,
+              uniformTextController: _uniformTextController,
               onChanged: (value) => setState(() {}),
             )
             : Column(
@@ -238,8 +285,8 @@ class PrerequisitesBodyState extends State<_PrerequisitesBody> {
         ),
         widget.isEditing
             ? BuildPrerequisitesCheckboxes(
-              checkBoxKey: _preInternshipRequestKey,
-              initialValues: requests,
+              checkboxKey: _preInternshipRequestKey,
+              controller: _preInternshipRequestsController,
               hideTitle: true,
             )
             : requests.isEmpty
@@ -262,10 +309,10 @@ class PrerequisitesBodyState extends State<_PrerequisitesBody> {
         widget.isEditing
             ? BuildProtectionsRadio(
               hideTitle: true,
-              protectionsKey: _protectionsRequestKey,
-              protectionsTypeKey: _protectionsTypeKey,
-              controller: _protectionsController,
-              initialItems: protections.protections,
+              radioKey: _protectionsRadioKey,
+              radioController: _protectionsRadioController,
+              checkboxKey: _protectionsCheckboxKey,
+              checkboxController: _protectionsCheckboxController,
               onChanged: (status, protections) => setState(() {}),
             )
             : Column(

@@ -42,8 +42,9 @@ class SpecializedStudentsStep extends StatefulWidget {
 
 class SpecializedStudentsStepState extends State<SpecializedStudentsStep> {
   final _formKey = GlobalKey<FormState>();
-  final _hasDisabilitiesKey =
-      GlobalKey<CheckboxWithOtherState<_Disabilities>>();
+  final _disabilityController = CheckboxWithOtherController(
+    elements: _Disabilities.values,
+  );
 
   bool _hasStudentHadDisabilities = false;
   List<_Disabilities> _disabilities = [];
@@ -172,8 +173,7 @@ class SpecializedStudentsStepState extends State<SpecializedStudentsStep> {
           if (_hasStudentHadDisabilities)
             FormField(
               validator: (value) {
-                for (final element
-                    in _hasDisabilitiesKey.currentState!.selected) {
+                for (final element in _disabilityController.selected) {
                   if (_getDisabilityValue(element) <= 0) {
                     return 'Sélectionner une valeur pour $element';
                   }
@@ -181,20 +181,17 @@ class SpecializedStudentsStepState extends State<SpecializedStudentsStep> {
                 return null;
               },
               builder:
-                  (errorState) => CheckboxWithOther<_Disabilities>(
-                    key: _hasDisabilitiesKey,
+                  (errorState) => CheckboxWithOther(
+                    controller: _disabilityController,
                     title:
                         '* Évaluer la prise en charge de l\'entreprise par rapport '
                         'aux différents besoins de l\'élève s\'il ou elle avait:\u00a0:',
                     titleStyle: Theme.of(context).textTheme.titleSmall,
-                    elements: _Disabilities.values,
                     elementStyleBuilder: (element, isSelected) {
                       var out = Theme.of(context).textTheme.titleSmall!;
 
                       if (errorState.hasError &&
-                          _hasDisabilitiesKey.currentState!.selected.contains(
-                            element,
-                          ) &&
+                          _disabilityController.selected.contains(element) &&
                           _getDisabilityValue(element) <= 0) {
                         out = out.copyWith(
                           color: Theme.of(context).colorScheme.error,
@@ -231,9 +228,7 @@ class SpecializedStudentsStepState extends State<SpecializedStudentsStep> {
                     },
                     onOptionSelected:
                         (value) => setState(
-                          () =>
-                              _disabilities =
-                                  _hasDisabilitiesKey.currentState!.selected,
+                          () => _disabilities = _disabilityController.selected,
                         ),
                   ),
             ),

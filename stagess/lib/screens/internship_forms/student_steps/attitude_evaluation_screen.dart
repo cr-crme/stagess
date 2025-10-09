@@ -477,9 +477,7 @@ class _PersonAtMeeting extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 24.0),
           child: CheckboxWithOther(
-            key: formController.wereAtMeetingKey,
-            elements: formController.wereAtMeetingOptions,
-            initialValues: formController.wereAtMeeting,
+            controller: formController.wereAtMeetingController,
             enabled: editMode,
           ),
         ),

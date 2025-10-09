@@ -67,8 +67,10 @@ class TaskAndAbilityStepState extends State<TaskAndAbilityStep> {
           ? 0.0
           : 1.0;
 
-  final _skillKey = GlobalKey<CheckboxWithOtherState<_RequiredSkills>>();
-  List<String> get requiredSkills => _skillKey.currentState!.values;
+  final _skillController = CheckboxWithOtherController(
+    elements: _RequiredSkills.values,
+  );
+  List<String> get requiredSkills => _skillController.values;
 
   Future<String?> validate() async {
     _logger.finer('Validating TaskAndAbilityStep');
@@ -126,9 +128,8 @@ class TaskAndAbilityStepState extends State<TaskAndAbilityStep> {
 
   Widget _buildSkillsRequired(BuildContext context) {
     return CheckboxWithOther(
-      key: _skillKey,
+      controller: _skillController,
       title: '* Habiletés requises pour le stage\u00a0:',
-      elements: _RequiredSkills.values,
       errorMessageOther: 'Préciser les autres habiletés requises.',
     );
   }

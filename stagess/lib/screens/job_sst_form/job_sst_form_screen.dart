@@ -357,10 +357,13 @@ class _QuestionsStepState extends State<_QuestionsStep> {
               case QuestionType.radio:
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 24.0),
-                  child: RadioWithFollowUp(
+                  child: RadioWithFollowUp<String>(
                     title: '${index + 1}. ${question.question}',
                     initialValue:
-                        widget.job.sstEvaluation.questions['Q${question.id}'],
+                        widget
+                            .job
+                            .sstEvaluation
+                            .questions['Q${question.id}']?[0],
                     elements: question.choices!.toList(),
                     elementsThatShowChild: [question.choices!.first],
                     onChanged: (value) {
@@ -382,13 +385,15 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                   padding: const EdgeInsets.only(bottom: 24.0),
                   child: CheckboxWithOther(
                     title: '${index + 1}. ${question.question}',
-                    elements: question.choices!.toList(),
-                    hasNotApplicableOption: true,
-                    initialValues:
-                        (widget.job.sstEvaluation.questions['Q${question.id}']
-                                as List?)
-                            ?.map((e) => e as String)
-                            .toList(),
+                    controller: CheckboxWithOtherController(
+                      elements: question.choices!.toList(),
+                      hasNotApplicableOption: true,
+                      initialValues:
+                          (widget.job.sstEvaluation.questions['Q${question.id}']
+                                  as List?)
+                              ?.map((e) => e as String)
+                              .toList(),
+                    ),
                     onOptionSelected: (values) {
                       answer['Q${question.id}'] = values;
                       if (!question.choices!.any((q) => values.contains(q))) {

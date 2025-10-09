@@ -11,8 +11,11 @@ import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 class SkillEvaluationFormController {
   static const _formVersion = '1.0.0';
 
-  SkillEvaluationFormController(BuildContext context,
-      {required this.internshipId, required this.canModify}) {
+  SkillEvaluationFormController(
+    BuildContext context, {
+    required this.internshipId,
+    required this.canModify,
+  }) {
     clearForm(context);
   }
   int? _previousEvaluationIndex; // -1 is the last, null is not from evaluation
@@ -28,12 +31,17 @@ class SkillEvaluationFormController {
 
   final Map<String, Skill> _idToSkill = {};
 
-  factory SkillEvaluationFormController.fromInternshipId(context,
-      {required String internshipId,
-      required int evaluationIndex,
-      required bool canModify}) {
-    final controller = SkillEvaluationFormController(context,
-        internshipId: internshipId, canModify: canModify);
+  factory SkillEvaluationFormController.fromInternshipId(
+    context, {
+    required String internshipId,
+    required int evaluationIndex,
+    required bool canModify,
+  }) {
+    final controller = SkillEvaluationFormController(
+      context,
+      internshipId: internshipId,
+      canModify: canModify,
+    );
     controller.fillFromPreviousEvaluation(context, evaluationIndex);
     return controller;
   }
@@ -84,8 +92,9 @@ class SkillEvaluationFormController {
     _resetForm(context);
 
     final internshipTp = internship(context, listen: false);
-    final enterprise = EnterprisesProvider.of(context,
-        listen: false)[internshipTp.enterpriseId];
+    final enterprise =
+        EnterprisesProvider.of(context, listen: false)[internshipTp
+            .enterpriseId];
     final specialization = enterprise.jobs[internshipTp.jobId].specialization;
 
     for (final skill in specialization.skills) {
@@ -133,7 +142,8 @@ class SkillEvaluationFormController {
 
       final skill = _idToSkill[skillId]!;
       for (final task in skill.tasks) {
-        taskCompleted[skillId]![task.title] = skillEvaluation.tasks
+        taskCompleted[skillId]![task.title] =
+            skillEvaluation.tasks
                 .firstWhereOrNull((e) => e.title == task.title)
                 ?.level ??
             TaskAppreciationLevel.notEvaluated;
@@ -146,20 +156,26 @@ class SkillEvaluationFormController {
   InternshipEvaluationSkill toInternshipEvaluation() {
     final List<SkillEvaluation> skillEvaluation = [];
     for (final skillId in taskCompleted.keys) {
-      final List<TaskAppreciation> tasks = taskCompleted[skillId]!
-          .keys
-          .map((task) => TaskAppreciation(
-              title: task, level: taskCompleted[skillId]![task]!))
-          .toList();
+      final List<TaskAppreciation> tasks =
+          taskCompleted[skillId]!.keys
+              .map(
+                (task) => TaskAppreciation(
+                  title: task,
+                  level: taskCompleted[skillId]![task]!,
+                ),
+              )
+              .toList();
 
       final skill = _idToSkill[skillId]!;
-      skillEvaluation.add(SkillEvaluation(
-        specializationId: _skillsAreFromSpecializationId[skillId]!,
-        skillName: skill.idWithName,
-        tasks: tasks,
-        appreciation: appreciations[skillId]!,
-        comments: skillCommentsControllers[skillId]!.text,
-      ));
+      skillEvaluation.add(
+        SkillEvaluation(
+          specializationId: _skillsAreFromSpecializationId[skillId]!,
+          skillName: skill.idWithName,
+          tasks: tasks,
+          appreciation: appreciations[skillId]!,
+          comments: skillCommentsControllers[skillId]!.text,
+        ),
+      );
     }
     return InternshipEvaluationSkill(
       date: evaluationDate,
@@ -173,7 +189,10 @@ class SkillEvaluationFormController {
 
   DateTime evaluationDate = DateTime.now();
 
-  final wereAtMeetingKey = GlobalKey<CheckboxWithOtherState<String>>();
+  late final wereAtMeetingController = CheckboxWithOtherController(
+    elements: wereAtMeetingOptions,
+    initialValues: wereAtMeeting,
+  );
   final List<String> wereAtMeetingOptions = [
     'Stagiaire',
     'Responsable en milieu de stage',
@@ -181,7 +200,7 @@ class SkillEvaluationFormController {
   final List<String> wereAtMeeting = [];
   void setWereAtMeeting() {
     wereAtMeeting.clear();
-    wereAtMeeting.addAll(wereAtMeetingKey.currentState!.values);
+    wereAtMeeting.addAll(wereAtMeetingController.values);
   }
 
   ///
@@ -222,8 +241,9 @@ class SkillEvaluationFormController {
     _idToSkill.clear();
 
     final internshipTp = internship(context, listen: false);
-    final enterprise = EnterprisesProvider.of(context,
-        listen: false)[internshipTp.enterpriseId];
+    final enterprise =
+        EnterprisesProvider.of(context, listen: false)[internshipTp
+            .enterpriseId];
 
     final specialization = enterprise.jobs[internshipTp.jobId].specialization;
     for (final skill in specialization.skills) {
@@ -234,8 +254,9 @@ class SkillEvaluationFormController {
 
     for (final extraSpecializationId in internshipTp.extraSpecializationIds) {
       for (final skill
-          in ActivitySectorsService.specialization(extraSpecializationId)
-              .skills) {
+          in ActivitySectorsService.specialization(
+            extraSpecializationId,
+          ).skills) {
         // Do not override main specializations
         if (!_idToSkill.containsKey(skill.id)) _idToSkill[skill.id] = skill;
         _evaluatedSkills[skill.id] = 0;

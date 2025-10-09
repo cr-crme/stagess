@@ -352,7 +352,7 @@ class _EvaluateSkill extends StatelessWidget {
   }
 }
 
-class _TaskEvaluation extends StatelessWidget {
+class _TaskEvaluation extends StatefulWidget {
   const _TaskEvaluation({
     required this.spacing,
     required this.skill,
@@ -366,29 +366,40 @@ class _TaskEvaluation extends StatelessWidget {
   final bool editMode;
 
   @override
+  State<_TaskEvaluation> createState() => _TaskEvaluationState();
+}
+
+class _TaskEvaluationState extends State<_TaskEvaluation> {
+  late final _checkboxController = CheckboxWithOtherController(
+    elements: widget.skill.tasks,
+    initialValues:
+        widget.formController.taskCompleted[widget.skill.id]!.keys
+            .where(
+              (e) =>
+                  widget.formController.taskCompleted[widget.skill.id]![e]! !=
+                  TaskAppreciationLevel.notEvaluated,
+            )
+            .toList(),
+  );
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(bottom: spacing),
+      padding: EdgeInsets.only(bottom: widget.spacing),
       child: CheckboxWithOther(
+        key: ValueKey('checkbox_${widget.skill.id}'),
+        controller: _checkboxController,
         title: 'L\'élève a réussi les tâches suivantes\u00a0:',
-        elements: skill.tasks,
         onOptionSelected: (values) {
-          for (final task in formController.taskCompleted[skill.id]!.keys) {
-            formController.taskCompleted[skill.id]![task] =
+          for (final task
+              in widget.formController.taskCompleted[widget.skill.id]!.keys) {
+            widget.formController.taskCompleted[widget.skill.id]![task] =
                 values.contains(task)
                     ? TaskAppreciationLevel.evaluated
                     : TaskAppreciationLevel.notEvaluated;
           }
         },
-        enabled: editMode,
-        initialValues:
-            formController.taskCompleted[skill.id]!.keys
-                .where(
-                  (e) =>
-                      formController.taskCompleted[skill.id]![e]! !=
-                      TaskAppreciationLevel.notEvaluated,
-                )
-                .toList(),
+        enabled: widget.editMode,
         showOtherOption: false,
       ),
     );
