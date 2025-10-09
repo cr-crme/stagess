@@ -193,6 +193,7 @@ class ScheduleSelector extends StatefulWidget {
 }
 
 class _ScheduleSelectorState extends State<ScheduleSelector> {
+  // TODO This is not here but adding another schedule is met with out of range error
   @override
   Widget build(BuildContext context) {
     return Column(
