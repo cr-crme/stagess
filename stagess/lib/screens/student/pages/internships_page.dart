@@ -100,6 +100,7 @@ class InternshipsPageState extends State<InternshipsPage> {
 
     return SingleChildScrollView(
       controller: scrollController,
+      physics: const ClampingScrollPhysics(),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -320,6 +321,26 @@ class _StudentInternshipListViewState
           ],
         ),
       ],
+    );
+  }
+}
+
+/// Custom physics that limits scroll delta
+class FixedScrollPhysics extends ClampingScrollPhysics {
+  const FixedScrollPhysics({super.parent});
+
+  @override
+  FixedScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return FixedScrollPhysics(parent: buildParent(ancestor));
+  }
+
+  @override
+  double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
+    // Adjust offset so it is max out at 80 pixels per scroll
+    const maxScroll = 80.0;
+    return super.applyPhysicsToUserOffset(
+      position,
+      offset.clamp(-maxScroll, maxScroll),
     );
   }
 }

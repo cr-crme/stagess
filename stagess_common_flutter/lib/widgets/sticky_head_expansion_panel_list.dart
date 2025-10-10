@@ -88,6 +88,9 @@ class _StickyHeadExpansionPanelListState
         (_getHeaderPosition >
             widget.headerTarget - (widget.scrollHeight / 2)) &&
         (_getHeaderPosition < widget.headerTarget + (widget.scrollHeight / 2));
+    debugPrint(
+      '${widget.headerTarget - (widget.scrollHeight / 2)} < $_getHeaderPosition < ${widget.headerTarget + (widget.scrollHeight / 2)}',
+    );
 
     return ExpansionPanelList(
       elevation: widget.elevation ?? 2,
@@ -111,7 +114,7 @@ class _StickyHeadExpansionPanelListState
                       controller: _innerScrollController,
                       physics:
                           isHeaderAtTop
-                              ? const ClampingScrollPhysics()
+                              ? const FixedScrollPhysics()
                               : const NeverScrollableScrollPhysics(),
                       child: sticky.body,
                     ),
@@ -119,6 +122,26 @@ class _StickyHeadExpansionPanelListState
                 ),
               )
               .toList(),
+    );
+  }
+}
+
+/// Custom physics that limits scroll delta
+class FixedScrollPhysics extends ClampingScrollPhysics {
+  const FixedScrollPhysics({super.parent});
+
+  @override
+  FixedScrollPhysics applyTo(ScrollPhysics? ancestor) {
+    return FixedScrollPhysics(parent: buildParent(ancestor));
+  }
+
+  @override
+  double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
+    // Adjust offset so it is max out at 80 pixels per scroll
+    const maxScroll = 80.0;
+    return super.applyPhysicsToUserOffset(
+      position,
+      offset.clamp(-maxScroll, maxScroll),
     );
   }
 }
