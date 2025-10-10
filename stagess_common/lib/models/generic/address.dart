@@ -100,6 +100,7 @@ class Address extends ItemSerializable {
       street != null &&
       city != null &&
       postalCode != null;
+  bool get isNotValid => !isValid;
 
   @override
   bool operator ==(Object other) {

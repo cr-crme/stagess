@@ -117,7 +117,7 @@ class _AddressListTileState extends State<AddressListTile> {
   Address? getAddress() => _address;
   Address? setAddress(newAddress) => _address = newAddress;
 
-  Future<String?> validate() async {
+  Future<String?> validate({bool forceShowIfNotFound = false}) async {
     if (previousValidatedAddress ==
         widget.addressController._textController.text) {
       return null;
@@ -144,8 +144,11 @@ class _AddressListTileState extends State<AddressListTile> {
           (await toCall(widget.addressController._textController.text))!;
     } catch (e) {
       _address = null;
+    }
+    if (_address == null || _address!.isNotValid) {
+      _address = null;
       setState(() => isValidating = false);
-      return 'L\'adresse n\'a pu être trouvée';
+      if (!forceShowIfNotFound) return 'L\'adresse n\'a pu être trouvée';
     }
 
     if (newAddress.toString() == _address.toString()) {
@@ -177,7 +180,9 @@ class _AddressListTileState extends State<AddressListTile> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text('L\'adresse trouvée est\u00a0:\n$newAddress'),
+                          Text(
+                            'L\'adresse trouvée est\u00a0:\n${newAddress.isValid ? newAddress.toString() : 'Aucune'}',
+                          ),
                           const SizedBox(height: 10),
                           SizedBox(
                             height: MediaQuery.of(context).size.height * 1 / 2,
@@ -261,7 +266,7 @@ class _AddressListTileState extends State<AddressListTile> {
 
     return Focus(
       onFocusChange: (hasFocus) {
-        if (!hasFocus) validate();
+        if (!hasFocus) validate(forceShowIfNotFound: true);
       },
       child: InkWell(
         onTap: widget.enabled ? null : () => _showAddress(context),
@@ -302,7 +307,10 @@ class _AddressListTileState extends State<AddressListTile> {
             ),
             if (widget.enabled)
               InkWell(
-                onTap: searchIsClickable ? validate : null,
+                onTap:
+                    searchIsClickable
+                        ? () => validate(forceShowIfNotFound: true)
+                        : null,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     vertical: 4.0,
