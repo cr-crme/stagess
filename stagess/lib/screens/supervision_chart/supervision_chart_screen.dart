@@ -6,6 +6,7 @@ import 'package:logging/logging.dart';
 import 'package:stagess/common/extensions/internship_extension.dart';
 import 'package:stagess/common/extensions/students_extension.dart';
 import 'package:stagess/common/extensions/visiting_priorities_extension.dart';
+import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess/screens/visiting_students/itinerary_screen.dart';
@@ -18,7 +19,6 @@ import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
-import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
@@ -78,7 +78,7 @@ extension _InternshipMetaDataList on List<_InternshipMetaData> {
     if (teacherId == null) return [];
 
     final internships = InternshipsProvider.of(context, listen: true);
-    final students = StudentsProvider.of(context, listen: true);
+    final students = StudentsHelpers.studentsInMyGroups(context, listen: true);
 
     List<_InternshipMetaData> out = [];
 
