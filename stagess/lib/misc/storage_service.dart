@@ -14,13 +14,13 @@ class StorageService {
   bool isMocked = false;
 
   Future<String> uploadJobImage(String path) async {
+    // TODO Add the capability to send images if we decide to keep this
     final file = File(path);
     const destination = 'enterprises/jobs/';
 
-    var ref = _storage.ref(destination +
-        nanoid() +
-        file.hashCode.toString() +
-        extension(file.path));
+    var ref = _storage.ref(
+      destination + nanoid() + file.hashCode.toString() + extension(file.path),
+    );
 
     await ref.putFile(file);
     return await ref.getDownloadURL();

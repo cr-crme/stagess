@@ -13,7 +13,6 @@ class PhotoExpansionPanel extends ExpansionPanel {
     required void Function(Job job, ImageSource source) addImage,
     required void Function(Job job, int index) removeImage,
   }) : super(
-         // TODO update this to the new backend
          headerBuilder:
              (context, isExpanded) => ListTile(
                title: Row(

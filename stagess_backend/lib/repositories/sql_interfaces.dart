@@ -274,7 +274,7 @@ class MySqlInterface implements SqlInterface {
   }) async =>
       await tryQuery(
           craftUpdateQuery(tableName: tableName, filters: filters, data: data),
-          [...data.values, ...filters?.values ?? []]);
+          [...data.values, ...(filters?.values ?? [])]);
 // coverage:ignore-end
 
   String craftUpdateQuery({
