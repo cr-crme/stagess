@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:crcrme_material_theme/crcrme_material_theme.dart';
 import 'package:flutter/material.dart';
@@ -113,7 +112,6 @@ class StageSsApp extends StatelessWidget {
         onGenerateTitle: (context) => 'Stagess',
         theme: crcrmeMaterialTheme,
         routerConfig: router,
-        scrollBehavior: CustomScrollBehavior(),
         localizationsDelegates: const [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
@@ -121,41 +119,6 @@ class StageSsApp extends StatelessWidget {
         ],
         supportedLocales: const [Locale('fr', 'CA')],
       ),
-    );
-  }
-}
-
-class CustomScrollBehavior extends MaterialScrollBehavior {
-  @override
-  Set<PointerDeviceKind> get dragDevices => {
-    PointerDeviceKind.touch,
-    PointerDeviceKind.mouse,
-    PointerDeviceKind.trackpad,
-  };
-
-  @override
-  ScrollPhysics getScrollPhysics(BuildContext context) {
-    // You can customize scroll "strength" here
-    return const FixedScrollPhysics();
-  }
-}
-
-/// Custom physics that limits scroll delta
-class FixedScrollPhysics extends ClampingScrollPhysics {
-  const FixedScrollPhysics({super.parent});
-
-  @override
-  FixedScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return FixedScrollPhysics(parent: buildParent(ancestor));
-  }
-
-  @override
-  double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
-    // Adjust offset so it is max out at 80 pixels per scroll
-    const maxScroll = 80.0;
-    return super.applyPhysicsToUserOffset(
-      position,
-      offset.clamp(-maxScroll, maxScroll),
     );
   }
 }

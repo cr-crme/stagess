@@ -16,7 +16,6 @@ import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/schedule_selector.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
-import 'package:stagess_common_flutter/widgets/sticky_head_expansion_panel_list.dart';
 
 final _logger = Logger('InternshipDetails');
 
@@ -81,14 +80,9 @@ class _InternshipController {
 }
 
 class InternshipDetails extends StatefulWidget {
-  const InternshipDetails({
-    super.key,
-    required this.internshipId,
-    required this.scrollController,
-  });
+  const InternshipDetails({super.key, required this.internshipId});
 
   final String internshipId;
-  final ScrollController scrollController;
 
   @override
   State<InternshipDetails> createState() => InternshipDetailsState();
@@ -285,13 +279,10 @@ class InternshipDetailsState extends State<InternshipDetails> {
     if (myId == null) {
       return const Center(child: Text('Vous n\'êtes pas connecté.'));
     }
-
     return Padding(
       padding: const EdgeInsets.only(left: 24, right: 24),
-      child: StickyHeadExpansionPanelList(
+      child: ExpansionPanelList(
         elevation: 0,
-        headerTarget: 160,
-        outerScrollController: widget.scrollController,
         expansionCallback: (index, isExpanded) async {
           if (_isExpanded && _editMode) {
             if (await preventClosingIfEditing()) return;
@@ -299,12 +290,11 @@ class InternshipDetailsState extends State<InternshipDetails> {
           setState(() => _isExpanded = !_isExpanded);
         },
         children: [
-          StickyHeadExpansionPanel(
+          ExpansionPanel(
             isExpanded: _isExpanded,
             canTapOnHeader: true,
             headerBuilder:
-                (context, headerKey, isExpanded) => Row(
-                  key: headerKey,
+                (context, isExpanded) => Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [

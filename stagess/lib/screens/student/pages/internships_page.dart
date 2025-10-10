@@ -29,8 +29,6 @@ class InternshipsPage extends StatefulWidget {
 }
 
 class InternshipsPageState extends State<InternshipsPage> {
-  final scrollController = ScrollController();
-
   final activeKey = GlobalKey<_StudentInternshipListViewState>();
   final closedKey = GlobalKey<_StudentInternshipListViewState>();
   final toEvaluateKey = GlobalKey<_StudentInternshipListViewState>();
@@ -82,12 +80,6 @@ class InternshipsPageState extends State<InternshipsPage> {
   }
 
   @override
-  void dispose() {
-    scrollController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     _logger.finer('Building InternshipsPage for student: ${widget.student.id}');
 
@@ -99,15 +91,12 @@ class InternshipsPageState extends State<InternshipsPage> {
     final closedInternships = _getClosedInternships(internships);
 
     return SingleChildScrollView(
-      controller: scrollController,
-      physics: const ClampingScrollPhysics(),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (activeInternships.isNotEmpty)
             _StudentInternshipListView(
               key: activeKey,
-              scrollController: scrollController,
               title: 'En cours',
               internships: activeInternships,
             ),
@@ -116,7 +105,6 @@ class InternshipsPageState extends State<InternshipsPage> {
           if (toEvaluateInternships.isNotEmpty)
             _StudentInternshipListView(
               key: toEvaluateKey,
-              scrollController: scrollController,
               title: 'Entreprises à évaluer',
               internships: toEvaluateInternships,
             ),
@@ -125,7 +113,6 @@ class InternshipsPageState extends State<InternshipsPage> {
           if (closedInternships.isNotEmpty)
             _StudentInternshipListView(
               key: closedKey,
-              scrollController: scrollController,
               title: 'Historique des stages',
               internships: closedInternships,
             ),
@@ -140,12 +127,10 @@ class _StudentInternshipListView extends StatefulWidget {
     super.key,
     required this.title,
     required this.internships,
-    required this.scrollController,
   });
 
   final String title;
   final List<Internship> internships;
-  final ScrollController scrollController;
 
   @override
   State<_StudentInternshipListView> createState() =>
@@ -309,7 +294,6 @@ class _StudentInternshipListViewState
                     InternshipDetails(
                       key: detailKeys[internship.id],
                       internshipId: internship.id,
-                      scrollController: widget.scrollController,
                     ),
                     InternshipSkills(internshipId: internship.id),
                     if (internship.supervisingTeacherIds.contains(teacherId))
@@ -321,26 +305,6 @@ class _StudentInternshipListViewState
           ],
         ),
       ],
-    );
-  }
-}
-
-/// Custom physics that limits scroll delta
-class FixedScrollPhysics extends ClampingScrollPhysics {
-  const FixedScrollPhysics({super.parent});
-
-  @override
-  FixedScrollPhysics applyTo(ScrollPhysics? ancestor) {
-    return FixedScrollPhysics(parent: buildParent(ancestor));
-  }
-
-  @override
-  double applyPhysicsToUserOffset(ScrollMetrics position, double offset) {
-    // Adjust offset so it is max out at 80 pixels per scroll
-    const maxScroll = 80.0;
-    return super.applyPhysicsToUserOffset(
-      position,
-      offset.clamp(-maxScroll, maxScroll),
     );
   }
 }
