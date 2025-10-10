@@ -28,7 +28,16 @@ class WeeklySchedulesController {
   var _currentDefaultDaily = _defaultDaily.duplicate();
 
   final List<bool> _useSameScheduleForAllDays = [];
-  List<WeeklySchedule> weeklySchedules = [];
+  final List<WeeklySchedule> _weeklySchedules;
+  List<WeeklySchedule> get weeklySchedules => _weeklySchedules;
+  set weeklySchedules(List<WeeklySchedule> newSchedules) {
+    _weeklySchedules
+      ..clear()
+      ..addAll(newSchedules);
+    _resetUseSameScheduleForAllDays();
+    _hasChanged = true;
+  }
+
   time_utils.DateTimeRange? _dateRange;
   time_utils.DateTimeRange? get dateRange => _dateRange;
   bool _hasChanged = false;
@@ -37,7 +46,7 @@ class WeeklySchedulesController {
     List<WeeklySchedule>? weeklySchedules,
     time_utils.DateTimeRange? dateRange,
   }) : _dateRange = dateRange?.copy(),
-       weeklySchedules = InternshipHelpers.copySchedules(
+       _weeklySchedules = InternshipHelpers.copySchedules(
          weeklySchedules,
          keepId: true,
        ) {
@@ -49,8 +58,8 @@ class WeeklySchedulesController {
   bool get hasChanged => _hasChanged;
   set dateRange(time_utils.DateTimeRange? newRange) {
     _dateRange = newRange;
-    if (weeklySchedules.length == 1) {
-      weeklySchedules[0] = weeklySchedules[0].copyWith(period: newRange);
+    if (_weeklySchedules.length == 1) {
+      _weeklySchedules[0] = _weeklySchedules[0].copyWith(period: newRange);
     }
     _hasChanged = true;
   }
@@ -58,7 +67,7 @@ class WeeklySchedulesController {
   void addWeeklySchedule(WeeklySchedule newSchedule) {
     _logger.finer('Adding new weekly schedule: ${newSchedule.id}');
 
-    weeklySchedules.add(newSchedule);
+    _weeklySchedules.add(newSchedule);
     _useSameScheduleForAllDays.add(
       _useSameScheduleForAllDays.isEmpty
           ? true
@@ -70,7 +79,7 @@ class WeeklySchedulesController {
   void removedWeeklySchedule(int weeklyIndex) {
     _logger.finer('Removing weekly schedule at index: $weeklyIndex');
 
-    weeklySchedules.removeAt(weeklyIndex);
+    _weeklySchedules.removeAt(weeklyIndex);
     _useSameScheduleForAllDays.removeAt(weeklyIndex);
     _hasChanged = true;
   }
@@ -83,8 +92,8 @@ class WeeklySchedulesController {
     _logger.finer(
       'Updating daily schedule (weekly index: $weeklyIndex, day: $day)',
     );
-    weeklySchedules[weeklyIndex].schedule[day] =
-        weeklySchedules[weeklyIndex].schedule[day]?.copyWith(
+    _weeklySchedules[weeklyIndex].schedule[day] =
+        _weeklySchedules[weeklyIndex].schedule[day]?.copyWith(
           blocks: schedule.blocks,
         ) ??
         schedule;
@@ -99,7 +108,7 @@ class WeeklySchedulesController {
     _logger.finer(
       'Updating daily schedule (weekly index: $weeklyIndex, day: $day)',
     );
-    weeklySchedules[weeklyIndex].schedule.remove(day);
+    _weeklySchedules[weeklyIndex].schedule.remove(day);
 
     if (_useSameScheduleForAllDays[weeklyIndex]) {
       applySameScheduleForAllDays(weeklyIndex);
@@ -114,7 +123,7 @@ class WeeklySchedulesController {
     _logger.finer(
       'Updating date range for weekly schedule at index: $weeklyIndex',
     );
-    weeklySchedules[weeklyIndex] = weeklySchedules[weeklyIndex].copyWith(
+    _weeklySchedules[weeklyIndex] = _weeklySchedules[weeklyIndex].copyWith(
       period: newRange,
     );
 
@@ -123,6 +132,13 @@ class WeeklySchedulesController {
     }
 
     _hasChanged = true;
+  }
+
+  void _resetUseSameScheduleForAllDays() {
+    _useSameScheduleForAllDays.clear();
+    for (var _ in _weeklySchedules) {
+      _useSameScheduleForAllDays.add(false);
+    }
   }
 
   void switchApplyToAllDays({required bool value, required int weeklyIndex}) {
@@ -134,7 +150,7 @@ class WeeklySchedulesController {
   }
 
   void applySameScheduleForAllDays(int weeklyIndex) {
-    final schedules = weeklySchedules[weeklyIndex].schedule;
+    final schedules = _weeklySchedules[weeklyIndex].schedule;
     if (schedules.isEmpty) return;
 
     // Reference day is the first day with a schedule
@@ -165,7 +181,7 @@ class WeeklySchedulesController {
 
   void dispose() {
     _logger.finer('Disposing WeeklySchedulesController');
-    weeklySchedules.clear();
+    _weeklySchedules.clear();
     _useSameScheduleForAllDays.clear();
     _dateRange = null;
     _hasChanged = false;
@@ -193,22 +209,21 @@ class ScheduleSelector extends StatefulWidget {
 }
 
 class _ScheduleSelectorState extends State<ScheduleSelector> {
-  // TODO This is not here but adding another schedule is met with out of range error
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (widget.title != null) widget.title!,
-        ...widget.scheduleController.weeklySchedules.asMap().keys.map<Widget>(
+        ...widget.scheduleController._weeklySchedules.asMap().keys.map<Widget>(
           (weekIndex) => _ScheduleSelector(
             key: ValueKey(
-              widget.scheduleController.weeklySchedules[weekIndex].hashCode,
+              widget.scheduleController._weeklySchedules[weekIndex].hashCode,
             ),
             controller: widget.scheduleController,
             weekIndex: weekIndex,
             periodName:
-                widget.scheduleController.weeklySchedules.length > 1
+                widget.scheduleController._weeklySchedules.length > 1
                     ? 'Période ${weekIndex + 1}'
                     : null,
             periodTextSize: widget.periodTextSize,
@@ -226,11 +241,11 @@ class _ScheduleSelectorState extends State<ScheduleSelector> {
                     widget.scheduleController.addWeeklySchedule(
                       WeeklySchedulesController.fillNewScheduleList(
                         schedule:
-                            widget.scheduleController.weeklySchedules.isEmpty
+                            widget.scheduleController._weeklySchedules.isEmpty
                                 ? {}
                                 : widget
                                     .scheduleController
-                                    .weeklySchedules
+                                    ._weeklySchedules
                                     .last
                                     .schedule,
                         periode: widget.scheduleController.dateRange!,
@@ -273,7 +288,7 @@ class _ScheduleSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final weeklySchedule = controller.weeklySchedules[weekIndex];
+    final weeklySchedule = controller._weeklySchedules[weekIndex];
     final useSameScheduleForAllDays =
         controller._useSameScheduleForAllDays[weekIndex];
     int? referenceDayIndex; // Used to determine if it's the first checked day
@@ -302,7 +317,7 @@ class _ScheduleSelector extends StatelessWidget {
               if (editMode)
                 IconButton(
                   onPressed: () {
-                    if (controller.weeklySchedules.length > 1) {
+                    if (controller._weeklySchedules.length > 1) {
                       controller.removedWeeklySchedule(weekIndex);
                     }
                     onShouldRefresh();
@@ -492,7 +507,7 @@ class _ScheduleSelector extends StatelessWidget {
   }
 
   void _promptChangeWeek(BuildContext context) async {
-    final period = controller.weeklySchedules[weekIndex].period;
+    final period = controller._weeklySchedules[weekIndex].period;
     final range = await showCustomDateRangePicker(
       helpText: 'Sélectionner les dates',
       saveText: 'Confirmer',
@@ -582,7 +597,7 @@ class _ScheduleSelector extends StatelessWidget {
     required Day day,
     required bool canChangeTime,
   }) {
-    final schedule = controller.weeklySchedules[weekIndex].schedule[day];
+    final schedule = controller._weeklySchedules[weekIndex].schedule[day];
     final checkboxCallback =
         editMode
             ? () {

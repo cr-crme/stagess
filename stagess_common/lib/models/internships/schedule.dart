@@ -201,32 +201,39 @@ class InternshipHelpers {
     if (listA.length != listB.length) return false;
 
     for (int i = 0; i < listA.length; i++) {
-      final a = listA[i];
-      final b = listB[i];
-
-      if (a.period.start != b.period.start || a.period.end != b.period.end) {
-        return false;
-      }
-
-      if (a.schedule.length != b.schedule.length) return false;
-
-      if (a.schedule.keys.length != b.schedule.keys.length) return false;
-      if (a.schedule.keys
-          .toSet()
-          .difference(b.schedule.keys.toSet())
-          .isNotEmpty) {
-        return false;
-      }
-
-      final days = a.schedule.keys.toList();
-      for (final day in days) {
-        final dayA = a.schedule[day]!;
-        final dayB = b.schedule[day]!;
-
-        if (dayA.blocks.length != dayB.blocks.length) return false;
-        if (areListsNotEqual(dayA.blocks, dayB.blocks)) return false;
-      }
+      if (!areWeeklySchedulesEqual(listA[i], listB[i])) return false;
     }
+    return true;
+  }
+
+  static bool areWeeklySchedulesEqual(
+      WeeklySchedule weeklyA, WeeklySchedule weeklyB) {
+    if (weeklyA.period.start != weeklyB.period.start ||
+        weeklyA.period.end != weeklyB.period.end) {
+      return false;
+    }
+
+    if (weeklyA.schedule.length != weeklyB.schedule.length) return false;
+
+    if (weeklyA.schedule.keys.length != weeklyB.schedule.keys.length) {
+      return false;
+    }
+    if (weeklyA.schedule.keys
+        .toSet()
+        .difference(weeklyB.schedule.keys.toSet())
+        .isNotEmpty) {
+      return false;
+    }
+
+    final days = weeklyA.schedule.keys.toList();
+    for (final day in days) {
+      final dayA = weeklyA.schedule[day]!;
+      final dayB = weeklyB.schedule[day]!;
+
+      if (dayA.blocks.length != dayB.blocks.length) return false;
+      if (areListsNotEqual(dayA.blocks, dayB.blocks)) return false;
+    }
+
     return true;
   }
 }
