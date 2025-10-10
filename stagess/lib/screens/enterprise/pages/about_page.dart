@@ -49,10 +49,15 @@ class EnterpriseAboutPageState extends State<EnterpriseAboutPage> {
     enterprise: widget.enterprise,
   );
 
+  bool _forceDisabled = false;
   bool _editing = false;
   bool get editing => _editing;
 
   Future<void> toggleEdit({bool save = true}) async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
     final enterprises = EnterprisesProvider.of(context, listen: false);
 
     if (_editing) {
@@ -65,7 +70,9 @@ class EnterpriseAboutPageState extends State<EnterpriseAboutPage> {
         _taxesInfoController.reset();
         _logger.fine('Edit mode disabled without saving changes');
         await enterprises.releaseLockForItem(widget.enterprise);
-        setState(() {});
+        setState(() {
+          _forceDisabled = false;
+        });
         return;
       }
     } else {
@@ -79,11 +86,16 @@ class EnterpriseAboutPageState extends State<EnterpriseAboutPage> {
                 'Impossible de modifier cette entreprise, car elle est en cours de modification par un autre utilisateur.',
           );
         }
+        setState(() {
+          _forceDisabled = false;
+        });
         return;
       }
 
       _editing = true;
-      setState(() {});
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -92,6 +104,9 @@ class EnterpriseAboutPageState extends State<EnterpriseAboutPage> {
     if (!mounted) return;
     if (status != null) {
       showSnackBar(context, message: status);
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -101,12 +116,20 @@ class EnterpriseAboutPageState extends State<EnterpriseAboutPage> {
       if (!mounted) return;
       if (status != null) {
         showSnackBar(context, message: status);
+        setState(() {
+          _forceDisabled = false;
+        });
         return;
       }
     }
 
     if (!mounted) return;
-    if (!FormService.validateForm(_formKey, save: true)) return;
+    if (!FormService.validateForm(_formKey, save: true)) {
+      setState(() {
+        _forceDisabled = false;
+      });
+      return;
+    }
     _editing = false;
 
     final newEnteprise = widget.enterprise.copyWith(
@@ -163,6 +186,9 @@ class EnterpriseAboutPageState extends State<EnterpriseAboutPage> {
         showSnackBar(context, message: 'Les informations ont été enregistrées');
       }
       await enterprises.releaseLockForItem(widget.enterprise);
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -174,7 +200,9 @@ class EnterpriseAboutPageState extends State<EnterpriseAboutPage> {
     await enterprises.releaseLockForItem(widget.enterprise);
 
     _logger.fine('Enterprise information saved successfully');
-    setState(() {});
+    setState(() {
+      _forceDisabled = false;
+    });
   }
 
   bool _canPop = false;

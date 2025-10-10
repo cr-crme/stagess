@@ -55,6 +55,7 @@ class SchoolListTileState extends State<SchoolListTile> {
     super.dispose();
   }
 
+  bool _forceDisabled = false;
   bool _isExpanded = false;
   bool _isEditing = false;
   late final bool _canEdit =
@@ -85,6 +86,11 @@ class SchoolListTileState extends State<SchoolListTile> {
   }
 
   Future<void> _onClickedDeleting() async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
+
     final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
     final hasLock = await schoolBoards.getLockForItem(widget.schoolBoard);
     if (!hasLock || !mounted) {
@@ -95,6 +101,9 @@ class SchoolListTileState extends State<SchoolListTile> {
               'Impossible de supprimer cette école, elle est en cours de modification par un autre utilisateur',
         );
       }
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -105,6 +114,9 @@ class SchoolListTileState extends State<SchoolListTile> {
     );
     if (answer == null || !answer || !mounted) {
       await schoolBoards.releaseLockForItem(widget.schoolBoard);
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -124,14 +136,27 @@ class SchoolListTileState extends State<SchoolListTile> {
       );
     }
     await schoolBoards.releaseLockForItem(widget.schoolBoard);
+    setState(() {
+      _forceDisabled = false;
+    });
   }
 
   Future<void> _onClickedEditing() async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
+
     final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
 
     if (_isEditing) {
       // Validate the form
-      if (!(await validate()) || !mounted) return;
+      if (!(await validate()) || !mounted) {
+        setState(() {
+          _forceDisabled = false;
+        });
+        return;
+      }
 
       // Finish editing
       final newSchool = editedSchool;
@@ -164,11 +189,19 @@ class SchoolListTileState extends State<SchoolListTile> {
                 'Impossible de modifier cette école, elle est en cours de modification par un autre utilisateur',
           );
         }
+        setState(() {
+          _forceDisabled = false;
+        });
         return;
       }
     }
 
-    if (mounted) setState(() => _isEditing = !_isEditing);
+    if (mounted) {
+      setState(() {
+        _isEditing = !_isEditing;
+        _forceDisabled = false;
+      });
+    }
   }
 
   @override
@@ -213,16 +246,24 @@ class SchoolListTileState extends State<SchoolListTile> {
                       children: [
                         if (widget.canDelete)
                           IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
-                            onPressed: _onClickedDeleting,
+                            icon: Icon(
+                              Icons.delete,
+                              color: _forceDisabled ? Colors.grey : Colors.red,
+                            ),
+                            onPressed:
+                                _forceDisabled ? null : _onClickedDeleting,
                           ),
                         if (widget.canEdit)
                           IconButton(
                             icon: Icon(
                               _isEditing ? Icons.save : Icons.edit,
-                              color: Theme.of(context).primaryColor,
+                              color:
+                                  _forceDisabled
+                                      ? Colors.grey
+                                      : Theme.of(context).primaryColor,
                             ),
-                            onPressed: _onClickedEditing,
+                            onPressed:
+                                _forceDisabled ? null : _onClickedEditing,
                           ),
                       ],
                     ),

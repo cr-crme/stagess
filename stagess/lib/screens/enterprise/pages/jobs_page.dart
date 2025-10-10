@@ -56,6 +56,7 @@ class JobsPageState extends State<JobsPage> {
       {};
   final Map<String, bool> _isEditingPrerequisites = {};
 
+  bool _forceDisabled = false;
   bool get isEditing => _isEditingPrerequisites.containsValue(true);
   void cancelEditing() {
     _logger.info('Canceling editing in JobsPage');
@@ -71,6 +72,10 @@ class JobsPageState extends State<JobsPage> {
   }
 
   Future<void> addJob() async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
     _logger.finer('Adding job for enterprise: ${widget.enterprise.id}');
     final enterprises = EnterprisesProvider.of(context, listen: false);
 
@@ -83,6 +88,9 @@ class JobsPageState extends State<JobsPage> {
               'Impossible d\'ajouter un poste, car l\'entreprise est en cours de modification par un autre utilisateur.',
         );
       }
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -99,6 +107,9 @@ class JobsPageState extends State<JobsPage> {
 
     if (newJob == null) {
       await enterprises.releaseLockForItem(widget.enterprise);
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
     widget.enterprise.jobs.add(newJob);
@@ -107,10 +118,17 @@ class JobsPageState extends State<JobsPage> {
     if (mounted) {
       showSnackBar(context, message: 'Le poste a bien été ajouté');
     }
+    setState(() {
+      _forceDisabled = false;
+    });
     _logger.finer('Job added: ${newJob.specialization.name}');
   }
 
   void _addImage(Job job, ImageSource source) async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
     _logger.finer('Adding image to job: ${job.specialization.name}');
     final enterprises = EnterprisesProvider.of(context, listen: false);
 
@@ -123,6 +141,9 @@ class JobsPageState extends State<JobsPage> {
               'Impossible d\'ajouter une image, car l\'entreprise est en cours de modification par un autre utilisateur.',
         );
       }
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -144,10 +165,17 @@ class JobsPageState extends State<JobsPage> {
     if (mounted) {
       showSnackBar(context, message: 'Les images ont été ajoutées');
     }
+    setState(() {
+      _forceDisabled = false;
+    });
     _logger.finer('Image(s) added to job: ${job.specialization.name}');
   }
 
   void _removeImage(Job job, int index) async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
     _logger.finer('Removing image from job: ${job.specialization.name}');
     final enterprises = EnterprisesProvider.of(context, listen: false);
 
@@ -160,6 +188,9 @@ class JobsPageState extends State<JobsPage> {
               'Impossible de supprimer une image, car l\'entreprise est en cours de modification par un autre utilisateur.',
         );
       }
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -171,10 +202,17 @@ class JobsPageState extends State<JobsPage> {
     if (mounted) {
       showSnackBar(context, message: 'L\'image a été supprimée');
     }
+    setState(() {
+      _forceDisabled = false;
+    });
     _logger.finer('Image removed from job: ${job.specialization.name}');
   }
 
   void _addSstEvent(Job job) async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
     _logger.finer('Adding SST event to job: ${job.specialization.name}');
     final enterprises = EnterprisesProvider.of(context, listen: false);
 
@@ -187,6 +225,9 @@ class JobsPageState extends State<JobsPage> {
               'Impossible d\'ajouter un événement SST, car l\'entreprise est en cours de modification par un autre utilisateur.',
         );
       }
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -197,6 +238,9 @@ class JobsPageState extends State<JobsPage> {
     );
     if (result == null) {
       await enterprises.releaseLockForItem(widget.enterprise);
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -218,10 +262,18 @@ class JobsPageState extends State<JobsPage> {
     if (mounted) {
       showSnackBar(context, message: 'L\'événement SST a été ajouté');
     }
+    setState(() {
+      _forceDisabled = false;
+    });
     _logger.finer('SST event added to job: ${job.specialization.name}');
   }
 
   void _addComment(Job job) async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
+
     _logger.finer('Adding comment to job: ${job.specialization.name}');
     final teacherId = TeachersProvider.of(context, listen: false).myTeacher?.id;
     if (teacherId == null) {
@@ -230,6 +282,9 @@ class JobsPageState extends State<JobsPage> {
         context,
         message: 'Vous devez être connecté pour ajouter un commentaire.',
       );
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
     final enterprises = EnterprisesProvider.of(context, listen: false);
@@ -247,6 +302,9 @@ class JobsPageState extends State<JobsPage> {
         message:
             'Vous devez avoir supervisé au moins un stage dans cette entreprise pour y ajouter un commentaire.',
       );
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -259,6 +317,9 @@ class JobsPageState extends State<JobsPage> {
               'Impossible d\'ajouter un commentaire, car l\'entreprise est en cours de modification par un autre utilisateur.',
         );
       }
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -271,6 +332,9 @@ class JobsPageState extends State<JobsPage> {
 
     if (newComment == null) {
       await enterprises.releaseLockForItem(widget.enterprise);
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
     job.comments.add(
@@ -285,6 +349,9 @@ class JobsPageState extends State<JobsPage> {
     if (mounted) {
       showSnackBar(context, message: 'Le commentaire a été ajouté');
     }
+    setState(() {
+      _forceDisabled = false;
+    });
     _logger.finer('Comment added to job: ${job.specialization.name}');
   }
 
@@ -304,12 +371,20 @@ class JobsPageState extends State<JobsPage> {
   }
 
   Future<void> _onClickPrerequisiteEdit(Job job) async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
+
     // If we have to validate something before switching
     final enterprises = EnterprisesProvider.of(context, listen: false);
     if (_isEditingPrerequisites[job.id]!) {
       final formKey =
           _prerequisitesFormKeys[job.id]!.currentState!.formKey.currentState!;
       if (!formKey.validate()) {
+        setState(() {
+          _forceDisabled = false;
+        });
         return;
       }
 
@@ -340,12 +415,17 @@ class JobsPageState extends State<JobsPage> {
                 'Impossible de modifier le poste, car celui-ci est en cours de modification par un autre utilisateur.',
           );
         }
+        setState(() {
+          _forceDisabled = false;
+        });
         return;
       }
     }
 
     _isEditingPrerequisites[job.id] = !_isEditingPrerequisites[job.id]!;
-    setState(() {});
+    setState(() {
+      _forceDisabled = false;
+    });
   }
 
   @override

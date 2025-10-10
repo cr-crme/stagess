@@ -44,6 +44,7 @@ class AdminListTileState extends State<AdminListTile> {
     super.dispose();
   }
 
+  bool _forceDisabled = false;
   bool _isExpanded = false;
   bool _isEditing = false;
 
@@ -70,6 +71,11 @@ class AdminListTileState extends State<AdminListTile> {
   }
 
   Future<void> _onClickedDeleting() async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
+
     final admins = AdminsProvider.of(context, listen: false);
     final hasLock = await admins.getLockForItem(widget.admin);
     if (!hasLock || !mounted) {
@@ -80,6 +86,9 @@ class AdminListTileState extends State<AdminListTile> {
               'Impossible de supprimer cet administrateur, car il est en cours de modification par un autre utilisateur.',
         );
       }
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -90,6 +99,9 @@ class AdminListTileState extends State<AdminListTile> {
     );
     if (answer == null || !answer || !mounted) {
       await admins.releaseLockForItem(widget.admin);
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -104,14 +116,26 @@ class AdminListTileState extends State<AdminListTile> {
       );
     }
     await admins.releaseLockForItem(widget.admin);
+    setState(() {
+      _forceDisabled = false;
+    });
   }
 
   Future<void> _onClickedEditing() async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
     final admins = AdminsProvider.of(context, listen: false);
 
     if (_isEditing) {
       // Validate the form
-      if (!(await validate()) || !mounted) return;
+      if (!(await validate()) || !mounted) {
+        setState(() {
+          _forceDisabled = false;
+        });
+        return;
+      }
       // Finish editing
       final newAdmin = editedAdmin;
       if (newAdmin.getDifference(widget.admin).isNotEmpty) {
@@ -137,11 +161,19 @@ class AdminListTileState extends State<AdminListTile> {
                 'Impossible de modifier cet administrateur, car il est en cours de modification par un autre utilisateur.',
           );
         }
+        setState(() {
+          _forceDisabled = false;
+        });
         return;
       }
     }
 
-    if (mounted) setState(() => _isEditing = !_isEditing);
+    if (mounted) {
+      setState(() {
+        _isEditing = !_isEditing;
+        _forceDisabled = false;
+      });
+    }
   }
 
   @override
@@ -184,15 +216,21 @@ class AdminListTileState extends State<AdminListTile> {
                     Row(
                       children: [
                         IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
-                          onPressed: _onClickedDeleting,
+                          icon: Icon(
+                            Icons.delete,
+                            color: _forceDisabled ? Colors.grey : Colors.red,
+                          ),
+                          onPressed: _forceDisabled ? null : _onClickedDeleting,
                         ),
                         IconButton(
                           icon: Icon(
                             _isEditing ? Icons.save : Icons.edit,
-                            color: Theme.of(context).primaryColor,
+                            color:
+                                _forceDisabled
+                                    ? Colors.grey
+                                    : Theme.of(context).primaryColor,
                           ),
-                          onPressed: _onClickedEditing,
+                          onPressed: _forceDisabled ? null : _onClickedEditing,
                         ),
                       ],
                     ),

@@ -71,6 +71,7 @@ class StudentListTileState extends State<StudentListTile> {
     super.dispose();
   }
 
+  bool _forceDisabled = false;
   bool _isExpanded = false;
   bool _isEditing = false;
 
@@ -154,6 +155,11 @@ class StudentListTileState extends State<StudentListTile> {
   }
 
   Future<void> _onClickedDeleting() async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
+
     final students = StudentsProvider.of(context, listen: false);
     final hasLock = await students.getLockForItem(widget.student);
     if (!hasLock || !mounted) {
@@ -164,6 +170,9 @@ class StudentListTileState extends State<StudentListTile> {
               'Impossible de supprimer cet élève, car il est en cours de modification par un autre utilisateur.',
         );
       }
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -174,6 +183,9 @@ class StudentListTileState extends State<StudentListTile> {
     );
     if (answer == null || !answer || !mounted) {
       await students.releaseLockForItem(widget.student);
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -188,14 +200,27 @@ class StudentListTileState extends State<StudentListTile> {
       );
     }
     await students.releaseLockForItem(widget.student);
+    setState(() {
+      _forceDisabled = false;
+    });
   }
 
   Future<void> _onClickedEditing() async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
+
     final students = StudentsProvider.of(context, listen: false);
 
     if (_isEditing) {
       // Validate the form
-      if (!(await validate()) || !mounted) return;
+      if (!(await validate()) || !mounted) {
+        setState(() {
+          _forceDisabled = false;
+        });
+        return;
+      }
 
       // Finish editing
       final newStudent = editedStudent;
@@ -222,11 +247,19 @@ class StudentListTileState extends State<StudentListTile> {
                 'Impossible de modifier cet élève, car il est en cours de modification par un autre utilisateur.',
           );
         }
+        setState(() {
+          _forceDisabled = false;
+        });
         return;
       }
     }
 
-    if (mounted) setState(() => _isEditing = !_isEditing);
+    if (mounted) {
+      setState(() {
+        _isEditing = !_isEditing;
+        _forceDisabled = false;
+      });
+    }
   }
 
   @override
@@ -308,16 +341,24 @@ class StudentListTileState extends State<StudentListTile> {
                       children: [
                         if (widget.canDelete)
                           IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
-                            onPressed: _onClickedDeleting,
+                            icon: Icon(
+                              Icons.delete,
+                              color: _forceDisabled ? Colors.grey : Colors.red,
+                            ),
+                            onPressed:
+                                _forceDisabled ? null : _onClickedDeleting,
                           ),
                         if (widget.canEdit)
                           IconButton(
                             icon: Icon(
                               _isEditing ? Icons.save : Icons.edit,
-                              color: Theme.of(context).primaryColor,
+                              color:
+                                  _forceDisabled
+                                      ? Colors.grey
+                                      : Theme.of(context).primaryColor,
                             ),
-                            onPressed: _onClickedEditing,
+                            onPressed:
+                                _forceDisabled ? null : _onClickedEditing,
                           ),
                       ],
                     ),

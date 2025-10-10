@@ -79,6 +79,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   }
 
   bool _wasDetailsExpanded = false;
+  bool _forceDisabled = false;
   bool _isExpanded = false;
   bool _isEditing = false;
 
@@ -195,6 +196,11 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   }
 
   Future<void> _onClickedDeleting() async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
+
     final enterprises = EnterprisesProvider.of(context, listen: false);
     final hasLock = await enterprises.getLockForItem(widget.enterprise);
     if (!hasLock || !mounted) {
@@ -205,6 +211,9 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
               'Impossible de supprimer l\'entreprise, car elle est en cours de modification par un autre utilisateur.',
         );
       }
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -217,6 +226,9 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     );
     if (answer == null || !answer || !mounted) {
       await enterprises.releaseLockForItem(widget.enterprise);
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
 
@@ -233,14 +245,26 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       );
     }
     await enterprises.releaseLockForItem(widget.enterprise);
+    setState(() {
+      _forceDisabled = false;
+    });
   }
 
   Future<void> _onClickedEditing() async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
     final enterprises = EnterprisesProvider.of(context, listen: false);
 
     if (_isEditing) {
       // Validate the form
-      if (!(await validate()) || !mounted) return;
+      if (!(await validate()) || !mounted) {
+        setState(() {
+          _forceDisabled = false;
+        });
+        return;
+      }
 
       // Finish editing
       final newEnterprise = editedEnterprise;
@@ -269,11 +293,19 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                 'Impossible de modifier l\'entreprise, car elle est en cours de modification par un autre utilisateur.',
           );
         }
+        setState(() {
+          _forceDisabled = false;
+        });
         return;
       }
     }
 
-    if (mounted) setState(() => _isEditing = !_isEditing);
+    if (mounted) {
+      setState(() {
+        _isEditing = !_isEditing;
+        _forceDisabled = false;
+      });
+    }
   }
 
   @override
@@ -399,15 +431,22 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                       children: [
                         if (!hasInternship)
                           IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
-                            onPressed: _onClickedDeleting,
+                            icon: Icon(
+                              Icons.delete,
+                              color: _forceDisabled ? Colors.grey : Colors.red,
+                            ),
+                            onPressed:
+                                _forceDisabled ? null : _onClickedDeleting,
                           ),
                         IconButton(
                           icon: Icon(
                             _isEditing ? Icons.save : Icons.edit,
-                            color: Theme.of(context).primaryColor,
+                            color:
+                                _forceDisabled
+                                    ? Colors.grey
+                                    : Theme.of(context).primaryColor,
                           ),
-                          onPressed: _onClickedEditing,
+                          onPressed: _forceDisabled ? null : _onClickedEditing,
                         ),
                       ],
                     ),

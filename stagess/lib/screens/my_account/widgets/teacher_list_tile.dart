@@ -52,6 +52,7 @@ class TeacherListTileState extends State<TeacherListTile> {
     super.dispose();
   }
 
+  bool _forceDisabled = false;
   bool _isEditing = false;
 
   late final _firstNameController = TextEditingController(
@@ -95,12 +96,22 @@ class TeacherListTileState extends State<TeacherListTile> {
   }
 
   Future<void> _onClickedEditing() async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
+
     final teachers = TeachersProvider.of(context, listen: false);
 
     if (_isEditing) {
       _logger.info('Finishing editing for teacher ${widget.teacher.id}');
       // Validate the form
-      if (!(await validate()) || !mounted) return;
+      if (!(await validate()) || !mounted) {
+        setState(() {
+          _forceDisabled = false;
+        });
+        return;
+      }
 
       // Finish editing
       final newTeacher = editedTeacher;
@@ -110,7 +121,12 @@ class TeacherListTileState extends State<TeacherListTile> {
         _logger.fine('Teacher ${widget.teacher.id} updated');
       }
       await teachers.releaseLockForItem(widget.teacher);
-      if (!mounted) return;
+      if (!mounted) {
+        setState(() {
+          _forceDisabled = false;
+        });
+        return;
+      }
       showSnackBar(context, message: 'Enseignant·e mis à jour');
     } else {
       final hasLock = await teachers.getLockForItem(widget.teacher);
@@ -123,11 +139,17 @@ class TeacherListTileState extends State<TeacherListTile> {
                 'Impossible de modifier cet·te enseignant·e, car iel est en cours de modification par un autre utilisateur.',
           );
         }
+        setState(() {
+          _forceDisabled = false;
+        });
         return;
       }
     }
 
-    setState(() => _isEditing = !_isEditing);
+    setState(() {
+      _isEditing = !_isEditing;
+      _forceDisabled = false;
+    });
   }
 
   @override
@@ -153,9 +175,12 @@ class TeacherListTileState extends State<TeacherListTile> {
                   IconButton(
                     icon: Icon(
                       _isEditing ? Icons.save : Icons.edit,
-                      color: Theme.of(context).primaryColor,
+                      color:
+                          _forceDisabled
+                              ? Colors.grey
+                              : Theme.of(context).primaryColor,
                     ),
-                    onPressed: _onClickedEditing,
+                    onPressed: _forceDisabled ? null : _onClickedEditing,
                   ),
                 ],
               ),

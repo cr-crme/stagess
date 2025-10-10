@@ -97,6 +97,7 @@ class InternshipDetails extends StatefulWidget {
 class InternshipDetailsState extends State<InternshipDetails> {
   bool _isExpanded = false;
   bool _editMode = false;
+  bool _forceDisabled = false;
   bool get editMode => _editMode;
 
   late Internship _internship;
@@ -113,13 +114,19 @@ class InternshipDetailsState extends State<InternshipDetails> {
   }
 
   Future<void> _toggleEditMode({bool save = true}) async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
     final internships = InternshipsProvider.of(context, listen: false);
 
     if (_editMode) {
       _editMode = false;
       if (!save) {
         await internships.releaseLockForItem(_internship);
-        setState(() {});
+        setState(() {
+          _forceDisabled = false;
+        });
         return;
       }
     } else {
@@ -132,12 +139,17 @@ class InternshipDetailsState extends State<InternshipDetails> {
                 'Impossible de modifier le stage, car il est en cours de modification par un autre utilisateur.',
           );
         }
+        setState(() {
+          _forceDisabled = false;
+        });
         return;
       }
 
       _editMode = true;
       _internshipController = _InternshipController(_internship);
-      setState(() {});
+      setState(() {
+        _forceDisabled = false;
+      });
       return;
     }
     _logger.info('Validating internship before toggling edit mode');
@@ -148,6 +160,9 @@ class InternshipDetailsState extends State<InternshipDetails> {
         // Prevent from exiting the edit mode if the field can't be validated
         _editMode = true;
         showSnackBar(context, message: 'Remplir tous les champs avec un *.');
+        setState(() {
+          _forceDisabled = false;
+        });
         return;
       }
     }
@@ -200,7 +215,9 @@ class InternshipDetailsState extends State<InternshipDetails> {
       _logger.fine('Internship updated: ${_internship.id}');
     }
     await internships.releaseLockForItem(_internship);
-    setState(() {});
+    setState(() {
+      _forceDisabled = false;
+    });
   }
 
   void _promptDateRange() async {
@@ -301,10 +318,13 @@ class InternshipDetailsState extends State<InternshipDetails> {
                         _internship.isActive &&
                         _internship.supervisingTeacherIds.contains(myId))
                       IconButton(
-                        onPressed: _toggleEditMode,
+                        onPressed: _forceDisabled ? null : _toggleEditMode,
                         icon: Icon(
                           editMode ? Icons.save : Icons.edit,
-                          color: Theme.of(context).primaryColor,
+                          color:
+                              _forceDisabled
+                                  ? Colors.grey
+                                  : Theme.of(context).primaryColor,
                         ),
                       ),
                   ],

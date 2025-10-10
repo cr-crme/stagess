@@ -151,6 +151,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     );
     if (!hasLock || !mounted) {
       // TODO check what if !hasLock
+      // TODO Do _forceDisabled in this screen?
       return;
     }
 

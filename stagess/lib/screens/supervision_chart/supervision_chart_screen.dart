@@ -140,6 +140,7 @@ class _SupervisionChartState extends State<SupervisionChart>
     vsync: this,
   )..addListener(() => setState(() {}));
 
+  bool _forceDisabled = false;
   bool _editMode = false;
   final _searchTextController = TextEditingController();
   final _visibilityFilters = {
@@ -157,6 +158,10 @@ class _SupervisionChartState extends State<SupervisionChart>
     BuildContext context, {
     required List<_InternshipMetaData> internships,
   }) async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
     final internshipsProvided = InternshipsProvider.of(context, listen: false);
 
     if (_editMode) {
@@ -165,7 +170,10 @@ class _SupervisionChartState extends State<SupervisionChart>
       final teacherId =
           TeachersProvider.of(context, listen: false).myTeacher?.id;
       if (teacherId == null) {
-        _editMode = false;
+        setState(() {
+          _editMode = false;
+          _forceDisabled = false;
+        });
         return;
       }
 
@@ -197,7 +205,12 @@ class _SupervisionChartState extends State<SupervisionChart>
       }
       await Future.wait(toWait);
 
-      if (!context.mounted) return;
+      if (!context.mounted) {
+        setState(() {
+          _forceDisabled = false;
+        });
+        return;
+      }
       showSnackBar(context, message: 'Modifications enregistrées');
     } else {
       var hasLock = true;
@@ -213,18 +226,27 @@ class _SupervisionChartState extends State<SupervisionChart>
         }
         await Future.wait(toWait);
 
-        if (!context.mounted) return;
+        if (!context.mounted) {
+          setState(() {
+            _forceDisabled = false;
+          });
+          return;
+        }
         showSnackBar(
           context,
           message:
               'Impossible de modifier le tableau de supervision, car il est en cours de modification par un autre utilisateur.',
         );
+        setState(() {
+          _forceDisabled = false;
+        });
         return;
       }
     }
 
     setState(() {
       _editMode = !_editMode;
+      _forceDisabled = false;
     });
   }
 
@@ -254,8 +276,17 @@ class _SupervisionChartState extends State<SupervisionChart>
           if (_tabController.index == 0)
             IconButton(
               onPressed:
-                  () => _toggleEditMode(context, internships: internships),
-              icon: Icon(_editMode ? Icons.save : Icons.edit),
+                  _forceDisabled
+                      ? null
+                      : () =>
+                          _toggleEditMode(context, internships: internships),
+              icon: Icon(
+                _editMode ? Icons.save : Icons.edit,
+                color:
+                    _forceDisabled
+                        ? Colors.grey
+                        : Theme.of(context).primaryColor,
+              ),
             ),
         ],
         bottom: _buildBottomTabBar(context),
