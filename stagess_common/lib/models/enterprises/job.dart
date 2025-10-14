@@ -1,6 +1,7 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
 import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/enterprises/job_comment.dart';
+import 'package:stagess_common/models/generic/photo.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 
@@ -37,7 +38,7 @@ class Job extends ItemSerializable {
   final Protections protections;
 
   // Photos
-  final List<String> photosUrl;
+  final List<Photo> photos;
 
   // SST
   final JobSstEvaluation sstEvaluation;
@@ -54,13 +55,13 @@ class Job extends ItemSerializable {
     required this.preInternshipRequests,
     required this.uniforms,
     required this.protections,
-    List<String>? photosUrl,
+    List<Photo>? photos,
     required this.sstEvaluation,
     required this.incidents,
     List<JobComment>? comments,
     required this.reservedForId,
   })  : _specialization = specialization,
-        photosUrl = photosUrl ?? [],
+        photos = photos ?? [],
         comments = comments ?? [];
 
   Job copyWith({
@@ -71,7 +72,7 @@ class Job extends ItemSerializable {
     PreInternshipRequests? preInternshipRequests,
     Uniforms? uniforms,
     Protections? protections,
-    List<String>? photosUrl,
+    List<Photo>? photos,
     JobSstEvaluation? sstEvaluation,
     Incidents? incidents,
     List<JobComment>? comments,
@@ -88,7 +89,7 @@ class Job extends ItemSerializable {
       uniforms: uniforms?.copyWith(id: this.uniforms.id) ?? this.uniforms,
       protections:
           protections?.copyWith(id: this.protections.id) ?? this.protections,
-      photosUrl: photosUrl ?? this.photosUrl,
+      photos: photos ?? this.photos,
       sstEvaluation: sstEvaluation ?? this.sstEvaluation,
       incidents: incidents ?? this.incidents,
       comments: comments ?? this.comments,
@@ -104,7 +105,7 @@ class Job extends ItemSerializable {
       preInternshipRequests: PreInternshipRequests.empty,
       uniforms: Uniforms.empty,
       protections: Protections.empty,
-      photosUrl: [],
+      photos: [],
       sstEvaluation: JobSstEvaluation.empty,
       incidents: Incidents.empty,
       comments: [],
@@ -127,7 +128,7 @@ class Job extends ItemSerializable {
         'pre_internship_requests': preInternshipRequests.serialize(),
         'uniforms': uniforms.serialize(),
         'protections': protections.serialize(),
-        'photos_url': photosUrl.serialize(),
+        'photos': photos.serialize(),
         'sst_evaluations': sstEvaluation.serialize(),
         'incidents': incidents.serialize(),
         'comments': comments.serialize(),
@@ -150,8 +151,8 @@ class Job extends ItemSerializable {
         protections = Protections.fromSerialized(
             (map['protections'] as Map? ?? {}).cast<String, dynamic>()
               ..addAll({'id': map['id']})),
-        photosUrl = ListExt.from(map['photos_url'],
-                deserializer: (e) => StringExt.from(e) ?? '') ??
+        photos = ListExt.from(map['photos'],
+                deserializer: (e) => Photo.fromSerialized(e)) ??
             [],
         sstEvaluation = JobSstEvaluation.fromSerialized(
             (map['sst_evaluations'] as Map? ?? {}).cast<String, dynamic>()
@@ -172,7 +173,7 @@ class Job extends ItemSerializable {
         'specialization: $specialization, '
         'minimumAge: $minimumAge, '
         'preInternshipRequests: $preInternshipRequests, '
-        'photosUrl: $photosUrl, '
+        'photos: $photos, '
         'comments: $comments, '
         'uniforms: $uniforms, '
         'protections: $protections, '

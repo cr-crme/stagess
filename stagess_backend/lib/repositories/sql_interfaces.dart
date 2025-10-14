@@ -557,7 +557,7 @@ class MariaDbSqlInterface extends MySqlInterface {
         query = query.replaceFirst('?', escaped);
       }
     }
-    return super.tryQuery(query, null);
+    return await super.tryQuery(query, null);
   }
 
   String _escapeValue(Object? value) {

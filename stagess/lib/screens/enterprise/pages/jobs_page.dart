@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logging/logging.dart';
@@ -10,7 +13,6 @@ import 'package:stagess/common/widgets/dialogs/confirm_exit_dialog.dart';
 import 'package:stagess/common/widgets/dialogs/job_creator_dialog.dart';
 import 'package:stagess/common/widgets/disponibility_circle.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
-import 'package:stagess/misc/storage_service.dart';
 import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/comments_expansion_panel.dart';
 import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/incidents_expansion_panel.dart';
 import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/photo_expansion_panel.dart';
@@ -21,6 +23,7 @@ import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/enterprises/job_comment.dart';
+import 'package:stagess_common/models/generic/photo.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common/utils.dart';
@@ -156,14 +159,15 @@ class JobsPageState extends State<JobsPage> {
 
     for (XFile? file in images) {
       if (file == null) continue;
-      var url = await StorageService.instance.uploadJobImage(file.path);
-      job.photosUrl.add(url);
+      final Uint8List bytes =
+          await (kIsWeb ? file.readAsBytes() : File(file.path).readAsBytes());
+      job.photos.add(Photo(bytes: bytes));
     }
 
     await enterprises.replaceWithConfirmation(widget.enterprise);
     await enterprises.releaseLockForItem(widget.enterprise);
     if (mounted) {
-      showSnackBar(context, message: 'Les images ont été ajoutées');
+      showSnackBar(context, message: 'L\'image a été ajoutée');
     }
     setState(() {
       _forceDisabled = false;
@@ -194,8 +198,7 @@ class JobsPageState extends State<JobsPage> {
       return;
     }
 
-    await StorageService.instance.removeJobImage(job.photosUrl[index]);
-    job.photosUrl.removeAt(index);
+    job.photos.removeAt(index);
 
     await enterprises.replaceWithConfirmation(widget.enterprise);
     await enterprises.releaseLockForItem(widget.enterprise);

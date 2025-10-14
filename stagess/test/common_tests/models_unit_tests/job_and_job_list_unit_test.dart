@@ -1,9 +1,13 @@
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stagess/common/extensions/job_extension.dart';
 import 'package:stagess/program_helpers.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/enterprises/job_comment.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
+import 'package:stagess_common/models/generic/photo.dart';
+import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 
@@ -29,11 +33,12 @@ void main() {
 
     test('"copyWith" behaves properly', () {
       final job = dummyJob(
-          preInternshipId: 'newPreInternshipId',
-          uniformId: 'newUniformId',
-          protectionsId: 'newProtectionsId',
-          sstEvaluationId: 'newSstEvaluationId',
-          incidentsId: 'newIncidentsId');
+        preInternshipId: 'newPreInternshipId',
+        uniformId: 'newUniformId',
+        protectionsId: 'newProtectionsId',
+        sstEvaluationId: 'newSstEvaluationId',
+        incidentsId: 'newIncidentsId',
+      );
 
       final jobSame = job.copyWith();
       expect(jobSame.id, job.id);
@@ -43,7 +48,7 @@ void main() {
       expect(jobSame.preInternshipRequests, job.preInternshipRequests);
       expect(jobSame.uniforms, job.uniforms);
       expect(jobSame.protections, job.protections);
-      expect(jobSame.photosUrl, job.photosUrl);
+      expect(jobSame.photos, job.photos);
       expect(jobSame.sstEvaluation, job.sstEvaluation);
       expect(jobSame.incidents, job.incidents);
       expect(jobSame.comments, job.comments);
@@ -54,37 +59,46 @@ void main() {
             ActivitySectorsService.activitySectors[2].specializations[8],
         positionsOffered: {'school_id': 2},
         minimumAge: 12,
-        preInternshipRequests:
-            dummyPreInternshipRequests(id: 'newPreInternshipId'),
+        preInternshipRequests: dummyPreInternshipRequests(
+          id: 'newPreInternshipId',
+        ),
         uniforms: dummyUniforms(id: 'newUniformId'),
         protections: dummyProtections(id: 'newProtectionsId'),
-        photosUrl: ['newUrl'],
+        photos: [
+          Photo(bytes: Uint8List.fromList([1, 2, 3])),
+        ],
         sstEvaluation: dummyJobSstEvaluation(id: 'newSstEvaluationId'),
         incidents: dummyIncidents(id: 'newIncidentsId'),
         comments: [
           JobComment(
-              comment: 'newComment',
-              teacherId: 'teacherId',
-              date: DateTime(2023, 10, 1))
+            comment: 'newComment',
+            teacherId: 'teacherId',
+            date: DateTime(2023, 10, 1),
+          ),
         ],
       );
 
       expect(jobDifferent.id, 'newId');
-      expect(jobDifferent.specialization.id,
-          ActivitySectorsService.activitySectors[2].specializations[8].id);
+      expect(
+        jobDifferent.specialization.id,
+        ActivitySectorsService.activitySectors[2].specializations[8].id,
+      );
       expect(jobDifferent.positionsOffered, 2);
       expect(jobDifferent.minimumAge, 12);
       expect(jobDifferent.preInternshipRequests.id, 'newPreInternshipId');
       expect(jobDifferent.uniforms.id, 'newUniformId');
       expect(jobDifferent.protections.id, 'newProtectionsId');
-      expect(jobDifferent.photosUrl, ['newUrl']);
+      expect(jobDifferent.photos, [
+        Photo(bytes: Uint8List.fromList([1, 2, 3])),
+      ]);
       expect(jobDifferent.sstEvaluation.id, 'newSstEvaluationId');
       expect(jobDifferent.incidents.id, 'newIncidentsId');
       expect(jobDifferent.comments, [
         JobComment(
-            comment: 'newComment',
-            teacherId: 'teacherId',
-            date: DateTime(2023, 10, 1))
+          comment: 'newComment',
+          teacherId: 'teacherId',
+          date: DateTime(2023, 10, 1),
+        ),
       ]);
     });
 
@@ -112,7 +126,7 @@ void main() {
         'pre_internship_requests': job.preInternshipRequests.serialize(),
         'uniforms': job.uniforms.serialize(),
         'protections': job.protections.serialize(),
-        'photos_url': job.photosUrl,
+        'photos': job.photos.serialize(),
         'sst_evaluations': job.sstEvaluation.serialize(),
         'incidents': job.incidents.serialize(),
         'comments': job.comments,
@@ -123,10 +137,12 @@ void main() {
       expect(deserialized.positionsOffered, job.positionsOffered);
       expect(deserialized.minimumAge, job.minimumAge);
       expect(
-          deserialized.preInternshipRequests.id, job.preInternshipRequests.id);
+        deserialized.preInternshipRequests.id,
+        job.preInternshipRequests.id,
+      );
       expect(deserialized.uniforms.id, job.uniforms.id);
       expect(deserialized.protections.id, job.protections.id);
-      expect(deserialized.photosUrl, job.photosUrl);
+      expect(deserialized.photos, job.photos);
       expect(deserialized.sstEvaluation.id, job.sstEvaluation.id);
       expect(deserialized.incidents.id, job.incidents.id);
       expect(deserialized.comments, job.comments);
@@ -139,7 +155,7 @@ void main() {
       expect(emptyDeserialized.preInternshipRequests.id, isNotNull);
       expect(emptyDeserialized.uniforms.id, isNotNull);
       expect(emptyDeserialized.protections.id, isNotNull);
-      expect(emptyDeserialized.photosUrl, []);
+      expect(emptyDeserialized.photos, []);
       expect(emptyDeserialized.sstEvaluation.id, isNotNull);
       expect(emptyDeserialized.incidents.id, isNotNull);
       expect(emptyDeserialized.comments, []);
@@ -162,11 +178,11 @@ void main() {
             'pre_internship_requests': e.preInternshipRequests.serialize(),
             'uniforms': e.uniforms.serialize(),
             'protections': e.protections.serialize(),
-            'photos_url': e.photosUrl,
+            'photos': e.photos,
             'sst_evaluations': e.sstEvaluation.serialize(),
             'incidents': e.incidents.serialize(),
             'comments': e.comments,
-          }
+          },
       });
 
       expect(deserialized[0].id, jobList[0].id);
@@ -175,8 +191,10 @@ void main() {
       expect(deserialized[0].sstEvaluation.id, jobList[0].sstEvaluation.id);
       expect(deserialized[0].incidents.id, jobList[0].incidents.id);
       expect(deserialized[0].minimumAge, jobList[0].minimumAge);
-      expect(deserialized[0].preInternshipRequests.id,
-          jobList[0].preInternshipRequests.id);
+      expect(
+        deserialized[0].preInternshipRequests.id,
+        jobList[0].preInternshipRequests.id,
+      );
       expect(deserialized[0].uniforms.id, jobList[0].uniforms.id);
       expect(deserialized[0].protections.id, jobList[0].protections.id);
 

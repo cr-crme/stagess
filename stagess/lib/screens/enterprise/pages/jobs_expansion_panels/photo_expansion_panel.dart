@@ -88,7 +88,7 @@ class _PhotoBodyState extends State<_PhotoBody> {
             child: Stack(
               alignment: Alignment.center,
               children: [
-                Image.network(widget.job.photosUrl[index]),
+                Image.memory(widget.job.photos[index].bytes),
                 Align(
                   alignment: Alignment.bottomCenter,
                   child: Container(
@@ -128,7 +128,7 @@ class _PhotoBodyState extends State<_PhotoBody> {
         _scrollController.hasClients &&
         (_scrollController.offset <
                 _scrollController.position.maxScrollExtent ||
-            (widget.job.photosUrl.length > 2 && _scrollController.offset == 0));
+            (widget.job.photos.length > 2 && _scrollController.offset == 0));
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -137,8 +137,7 @@ class _PhotoBodyState extends State<_PhotoBody> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (widget.job.photosUrl.isNotEmpty &&
-                  _scrollController.hasClients)
+              if (widget.job.photos.isNotEmpty && _scrollController.hasClients)
                 InkWell(
                   onTap: canLeftScroll ? () => _scrollPhotos(-1) : null,
                   borderRadius: BorderRadius.circular(25),
@@ -158,14 +157,14 @@ class _PhotoBodyState extends State<_PhotoBody> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ...widget.job.photosUrl.isEmpty
+                      ...widget.job.photos.isEmpty
                           ? [const Text('Aucune image disponible')]
-                          : widget.job.photosUrl.asMap().keys.map(
+                          : widget.job.photos.asMap().keys.map(
                             (i) => InkWell(
                               onTap: () => _showPhoto(i),
                               child: Card(
-                                child: Image.network(
-                                  widget.job.photosUrl[i],
+                                child: Image.memory(
+                                  widget.job.photos[i].bytes,
                                   height: 250,
                                 ),
                               ),
@@ -175,8 +174,7 @@ class _PhotoBodyState extends State<_PhotoBody> {
                   ),
                 ),
               ),
-              if (widget.job.photosUrl.isNotEmpty &&
-                  _scrollController.hasClients)
+              if (widget.job.photos.isNotEmpty && _scrollController.hasClients)
                 InkWell(
                   onTap: canRightScroll ? () => _scrollPhotos(1) : null,
                   borderRadius: BorderRadius.circular(25),

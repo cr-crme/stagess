@@ -8,7 +8,6 @@ import 'package:logging/logging.dart';
 import 'package:stagess/firebase_options.dart';
 import 'package:stagess/misc/question_file_service.dart';
 import 'package:stagess/misc/risk_data_file_service.dart';
-import 'package:stagess/misc/storage_service.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 
 class ProgramInitializer {
@@ -34,7 +33,6 @@ class ProgramInitializer {
       RiskDataFileService.loadData(),
       QuestionFileService.loadData(),
     ]);
-    StorageService.instance.isMocked = mockMe;
 
     _initialized = true;
   }

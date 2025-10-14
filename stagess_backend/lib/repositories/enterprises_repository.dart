@@ -1,4 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:logging/logging.dart';
+import 'package:mysql1/mysql1.dart';
 import 'package:stagess_backend/repositories/internships_repository.dart';
 import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
@@ -13,6 +16,7 @@ import 'package:stagess_common/models/enterprises/job_list.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
+import 'package:stagess_common/models/generic/photo.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/utils.dart';
@@ -337,10 +341,10 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
               idNameToDataTable: 'job_id',
               fieldsToFetch: ['school_id', 'positions']),
           sqlInterface.selectSubquery(
-              dataTableName: 'enterprise_job_photo_urls',
-              asName: 'photo_url',
+              dataTableName: 'enterprise_job_photos',
+              asName: 'photo',
               idNameToDataTable: 'job_id',
-              fieldsToFetch: ['photo_url']),
+              fieldsToFetch: ['photo']),
           sqlInterface.selectSubquery(
               dataTableName: 'enterprise_job_comments',
               asName: 'comments',
@@ -380,9 +384,12 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
             (job['positions_offered'] as List?)?.asMap().map((_, e) => MapEntry(
                     e['school_id'].toString(), e['positions'] as int? ?? 0)) ??
                 {};
-        jobs[job['id']]['photos_url'] =
-            (job['photo_url'] as List?)?.map((e) => e['photo_url']).toList() ??
-                [];
+        jobs[job['id']]['photos'] = (job['photo'] as List?)
+                ?.map((e) => {
+                      'bytes': (e['photo'] as String).codeUnits,
+                    })
+                .toList() ??
+            [];
         jobs[job['id']]['comments'] = (job['comments'] as List?)
                 ?.map((e) => {
                       'id': e['job_id'],
@@ -564,13 +571,13 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     await Future.wait(toWait);
   }
 
-  Future<void> _insertJobPhotoUrls(List<String> urls, String jobId) async {
+  Future<void> _insertJobPhotos(List<Photo> photos, String jobId) async {
     final toWait = <Future>[];
-    for (final url in urls) {
+    for (final photo in photos) {
       toWait.add(sqlInterface
-          .performInsertQuery(tableName: 'enterprise_job_photo_urls', data: {
+          .performInsertQuery(tableName: 'enterprise_job_photos', data: {
         'job_id': jobId.serialize(),
-        'photo_url': url.serialize(),
+        'photo': photo.bytes,
       }));
     }
     await Future.wait(toWait);
@@ -696,7 +703,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     final toWait = <Future>[];
     toWait
         .add(_insertPositionsOffered(job.positionsOffered, job.id.serialize()));
-    toWait.add(_insertJobPhotoUrls(job.photosUrl, job.id.serialize()));
+    toWait.add(_insertJobPhotos(job.photos, job.id.serialize()));
     toWait.add(_insertJobComments(job.comments, job.id.serialize()));
     toWait.add(_insertJobPreintershipRequests(
         job.preInternshipRequests, job.id.serialize()));
@@ -806,7 +813,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
         );
       }
 
-      // Position offered, PhotoUrls, Comments, Uniforms, protections and incidents are
+      // Position offered, Photos, Comments, Uniforms, protections and incidents are
       // tricky to update (particularly those who can be removed), so we delete them all
       // and reinsert all of them.
       final toWaitDeleted = <Future>[];
@@ -832,12 +839,11 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
         toWait.add(
             _insertPositionsOffered(newPositionsOffered, job.id.serialize()));
       }
-      if (differences.contains('photos_url')) {
+      if (differences.contains('photos')) {
         // This is a bit tricky to simply update, so we delete and reinsert
         toWaitDeleted.add(sqlInterface.performDeleteQuery(
-            tableName: 'enterprise_job_photo_urls',
-            filters: {'job_id': job.id}));
-        toWait.add(_insertJobPhotoUrls(job.photosUrl, job.id.serialize()));
+            tableName: 'enterprise_job_photos', filters: {'job_id': job.id}));
+        toWait.add(_insertJobPhotos(job.photos, job.id.serialize()));
       }
 
       if (differences.contains('comments')) {
