@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:mysql1/mysql1.dart';
@@ -172,16 +171,8 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
     for (final schoolBoard in schoolBoards) {
       final id = schoolBoard['id'].toString();
 
-      if (sqlInterface is MariaDbSqlInterface) {
-        // Convert Blob to a String as a workaround for a bug in the mysql1 package
-        schoolBoard['logo'] =
-            (jsonDecode((schoolBoard['logo'] as Blob).toString()) as List)
-                .map((e) => e as int)
-                .toList();
-      } else {
-        schoolBoard['logo'] =
-            Uint8List.fromList((schoolBoard['logo'] as Blob).toBytes());
-      }
+      schoolBoard['logo'] =
+          Uint8List.fromList((schoolBoard['logo'] as Blob).toBytes());
 
       final schools = await sqlInterface.performSelectQuery(
         user: user,

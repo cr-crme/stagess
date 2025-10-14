@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:mysql1/mysql1.dart';
 import 'package:stagess_backend/utils/database_user.dart';
@@ -556,26 +557,38 @@ class MariaDbSqlInterface extends MySqlInterface {
         query = query.replaceFirst('?', escaped);
       }
     }
-    return super.tryQuery(query);
+    return super.tryQuery(query, null);
   }
 
   String _escapeValue(Object? value) {
     if (value == null) return 'NULL';
-
     if (value is num) return value.toString();
     if (value is bool) return value ? '1' : '0';
-
-    // For DateTime, format as MySQL DATETIME
     if (value is DateTime) {
-      return "'${value.toUtc().toIso8601String().replaceFirst('T', ' ').split('.').first}'";
+      final formatted = value.toUtc().toIso8601String().replaceFirst('T', ' ');
+      return "'${formatted.split('.').first}'";
+    }
+    if (value is Uint8List || value is List<int>) {
+      final bytes =
+          value is Uint8List ? value : Uint8List.fromList(value as List<int>);
+      if (bytes.isEmpty) return "''";
+      final hex = bytes.map((b) => b.toRadixString(16).padLeft(2, '0')).join();
+      return "0x$hex"; // MySQL/MariaDB hex literal
     }
 
-    // Fallback: treat as string
+    if (value is Iterable) {
+      if (value.isEmpty) return '()';
+      final escaped = value.map(_escapeValue).join(', ');
+      return '($escaped)';
+    }
+
     var s = value.toString();
+
     // Escape backslashes and quotes
     s = s.replaceAll(r'\', r'\\');
     s = s.replaceAll("'", r"\'");
     s = s.replaceAll('"', r'\"');
+
     return "'$s'";
   }
 
