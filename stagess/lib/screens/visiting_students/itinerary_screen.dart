@@ -129,6 +129,7 @@ class ItineraryScreen extends StatefulWidget {
 }
 
 class _ItineraryScreenState extends State<ItineraryScreen> {
+  bool _hasLock = false;
   late final _routingController = RoutingController(
     destinations: widget.waypoints,
     itinerary: currentItinerary,
@@ -146,14 +147,15 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
   Future<void> _selectItinerary(DateTime date) async {
     _teachersProvider = TeachersProvider.of(context, listen: false);
 
-    final hasLock = await _teachersProvider.getLockForItem(
+    while (!(await _teachersProvider.getLockForItem(
       _teachersProvider.myTeacher!,
-    );
-    if (!hasLock || !mounted) {
-      // TODO check what if !hasLock
-      // TODO Do _forceDisabled in this screen?
-      return;
+    ))) {
+      if (!mounted) return;
+      await Future.delayed(const Duration(milliseconds: 1000));
     }
+    setState(() {
+      _hasLock = true;
+    });
 
     if (_itineraries[date] == null) {
       _itineraries[date] =
@@ -189,7 +191,6 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     if (_routingController.hasChanged) {
       _routingController.saveItinerary(teachers: _teachersProvider);
     }
-    // TODO move this to a better place?
     _teachersProvider.releaseLockForItem(_teachersProvider.myTeacher!);
 
     super.dispose();
@@ -207,35 +208,53 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
 
     return Column(
       children: [
-        Flex(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment:
-              isSmall ? CrossAxisAlignment.center : CrossAxisAlignment.start,
-          direction: isSmall ? Axis.vertical : Axis.horizontal,
-          children: [
-            Flexible(
-              flex: 3,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [_showDate(), _map()],
+        if (_hasLock)
+          Flex(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment:
+                isSmall ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+            direction: isSmall ? Axis.vertical : Axis.horizontal,
+            children: [
+              Flexible(
+                flex: 3,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [_showDate(), _map()],
+                ),
               ),
-            ),
-            Flexible(
-              flex: 2,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (!isSmall) SizedBox(height: 60),
-                  _Distance(
-                    _routingController.distances,
-                    itinerary: currentItinerary,
+              Flexible(
+                flex: 2,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (!isSmall) SizedBox(height: 60),
+                    _Distance(
+                      _routingController.distances,
+                      itinerary: currentItinerary,
+                    ),
+                    _studentsToVisitWidget(context),
+                  ],
+                ),
+              ),
+            ],
+          )
+        else
+          const Padding(
+            padding: EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 20),
+                SizedBox(
+                  width: 300,
+                  child: Text(
+                    'Votre compte en cours de modification par votre administrateur. '
+                    'Dès que possible, vous serez automatiquement connecté\u00b7e.',
                   ),
-                  _studentsToVisitWidget(context),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
       ],
     );
   }

@@ -1836,6 +1836,8 @@ Future<void> _addDummyInternships(
 
   final teacherA1Id =
       teachers.firstWhere((teacher) => teacher.email == 'a1@moncentre.qc').id;
+  final teacherA2Id =
+      teachers.firstWhere((teacher) => teacher.email == 'a2@moncentre.qc').id;
   final teacherB1Id =
       teachers.firstWhere((teacher) => teacher.email == 'b1@moncentre.qc').id;
   final teacherC1Id =
@@ -2169,7 +2171,7 @@ Future<void> _addDummyInternships(
       schoolBoardId: schoolBoardId,
       creationDate: DateTime.now(),
       studentId: students.firstWhere((e) => e.fullName == 'Vincent Picard').id,
-      signatoryTeacherId: teacherA1Id,
+      signatoryTeacherId: teacherA2Id,
       extraSupervisingTeacherIds: [],
       enterpriseId: enterprises.firstWhere((e) => e.name == 'IGA').id,
       jobId: enterprises.firstWhere((e) => e.name == 'IGA').jobs[0].id,
