@@ -25,6 +25,7 @@ import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/enterprises/job_comment.dart';
 import 'package:stagess_common/models/generic/photo.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
+import 'package:stagess_common/services/image_helpers.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
@@ -156,11 +157,22 @@ class JobsPageState extends State<JobsPage> {
     } else {
       images = await ImagePicker().pickMultiImage();
     }
+    if (images.isEmpty) {
+      await enterprises.releaseLockForItem(widget.enterprise);
+      setState(() {
+        _forceDisabled = false;
+      });
+      return;
+    }
 
     for (XFile? file in images) {
       if (file == null) continue;
-      final Uint8List bytes =
-          await (kIsWeb ? file.readAsBytes() : File(file.path).readAsBytes());
+      final Uint8List bytes = ImageHelpers.resizeImage(
+        await (kIsWeb ? file.readAsBytes() : File(file.path).readAsBytes()),
+        width: null,
+        height: 350,
+      );
+
       job.photos.add(Photo(bytes: bytes));
     }
 

@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:logging/logging.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:stagess_backend/repositories/internships_repository.dart';
@@ -19,6 +17,7 @@ import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/photo.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/person.dart';
+import 'package:stagess_common/services/image_helpers.dart';
 import 'package:stagess_common/utils.dart';
 
 final _logger = Logger('EnterprisesRepository');
@@ -384,12 +383,17 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
             (job['positions_offered'] as List?)?.asMap().map((_, e) => MapEntry(
                     e['school_id'].toString(), e['positions'] as int? ?? 0)) ??
                 {};
-        jobs[job['id']]['photos'] = (job['photo'] as List?)
-                ?.map((e) => {
-                      'bytes': (e['photo'] as String).codeUnits,
-                    })
-                .toList() ??
-            [];
+        if ((job['photo'] as List?) != null) {
+          // The 'photos' in this list were casted to String when fetching from the database
+          // So we need to refetch them properly
+          final photos = (await sqlInterface.performSelectQuery(
+              user: user,
+              tableName: 'enterprise_job_photos',
+              filters: {'job_id': job['id']}) as List);
+          jobs[job['id']]['photos'] = photos
+              .map((e) => {'bytes': (e['photo'] as Blob).toBytes()})
+              .toList();
+        }
         jobs[job['id']]['comments'] = (job['comments'] as List?)
                 ?.map((e) => {
                       'id': e['job_id'],
@@ -577,7 +581,8 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       toWait.add(sqlInterface
           .performInsertQuery(tableName: 'enterprise_job_photos', data: {
         'job_id': jobId.serialize(),
-        'photo': photo.bytes,
+        'photo':
+            ImageHelpers.resizeImage(photo.bytes, width: null, height: 350),
       }));
     }
     await Future.wait(toWait);
