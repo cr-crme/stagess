@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
+import 'package:stagess_admin/extensions/auth_provider_extension.dart';
 import 'package:stagess_admin/firebase_options.dart';
 import 'package:stagess_admin/screens/router.dart';
 import 'package:stagess_common/services/backend_helpers.dart';
@@ -14,6 +15,7 @@ import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
 
 const _useLocalDatabase = bool.fromEnvironment(
   'STAGESS_WEB_USE_LOCAL_DB',
@@ -96,16 +98,31 @@ class Home extends StatelessWidget {
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
       ],
-      child: MaterialApp.router(
-        onGenerateTitle: (context) => 'Administration de Stagess',
-        theme: crcrmeMaterialTheme,
-        routerConfig: router,
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [Locale('fr', 'CA')],
+      child: InactivityLayout(
+        navigatorKey: rootNavigatorKey,
+        timeout: const Duration(minutes: 10),
+        gracePeriod: const Duration(seconds: 60),
+        showGracePeriod:
+            (context) async =>
+                AuthProvider.of(context, listen: false).isFullySignedIn,
+        onTimedout: (context) async {
+          if (!AuthProvider.of(context, listen: false).isFullySignedIn) {
+            return true;
+          }
+          await AuthProviderExtension.disconnectAll(context);
+          return true;
+        },
+        child: MaterialApp.router(
+          onGenerateTitle: (context) => 'Administration de Stagess',
+          theme: crcrmeMaterialTheme,
+          routerConfig: router,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('fr', 'CA')],
+        ),
       ),
     );
   }

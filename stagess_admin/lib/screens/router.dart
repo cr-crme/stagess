@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:stagess_admin/screens/admins/admins_list_screen.dart';
 import 'package:stagess_admin/screens/enterprises/enterprises_list_screen.dart';
@@ -20,9 +21,10 @@ abstract class Screens {
   static const internshipsListScreen = InternshipsListScreen.route;
 }
 
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 // Keep a reference of the last requested state so when login is successful, we can redirect to it
-
 final router = GoRouter(
+  navigatorKey: rootNavigatorKey,
   redirect:
       (context, state) =>
           AuthProvider.of(context).isFullySignedIn ? null : Screens.login,

@@ -1,4 +1,5 @@
 import 'package:enhanced_containers/enhanced_containers.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:stagess/screens/enterprise/enterprise_screen.dart';
 import 'package:stagess/screens/enterprises_list/enterprises_list_screen.dart';
@@ -72,7 +73,9 @@ abstract class Screens {
   }
 }
 
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 final router = GoRouter(
+  navigatorKey: rootNavigatorKey,
   redirect:
       (context, state) =>
           AuthProvider.of(context).isFullySignedIn ? null : Screens.login,

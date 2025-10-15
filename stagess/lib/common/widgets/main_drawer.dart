@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:stagess/common/extensions/auth_provider_extension.dart';
 import 'package:stagess/common/widgets/numbered_tablet.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess/screens/tasks_to_do/tasks_to_do_screen.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
-import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
-import 'package:stagess_common_flutter/providers/internships_provider.dart';
-import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
-import 'package:stagess_common_flutter/providers/students_provider.dart';
-import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({
@@ -29,26 +25,6 @@ class MainDrawer extends StatelessWidget {
   final bool iconOnly;
   final bool canPop;
   final bool roundedCorners;
-
-  void _logOut(BuildContext context) async {
-    await AuthProvider.of(context).signOut();
-    if (!context.mounted) return;
-
-    await SchoolBoardsProvider.of(context, listen: false).disconnect();
-    if (!context.mounted) return;
-    InternshipsProvider.of(context, listen: false).disconnect();
-    if (!context.mounted) return;
-    await Future.wait([
-      SchoolBoardsProvider.of(context, listen: false).disconnect(),
-      InternshipsProvider.of(context, listen: false).disconnect(),
-      StudentsProvider.of(context, listen: false).disconnect(),
-      EnterprisesProvider.of(context, listen: false).disconnect(),
-      TeachersProvider.of(context, listen: false).disconnect(),
-    ]);
-    if (!context.mounted) return;
-
-    GoRouter.of(context).goNamed(Screens.login);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -141,7 +117,7 @@ class MainDrawer extends StatelessWidget {
                     _DrawerItem(
                       titleText: 'Se déconnecter',
                       icon: Icons.logout,
-                      onTap: () => _logOut(context),
+                      onTap: () => AuthProviderExtension.disconnectAll(context),
                       iconOnly: iconOnly,
                       canPop: canPop,
                     ),
