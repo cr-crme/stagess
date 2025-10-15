@@ -85,18 +85,14 @@ class _PhotoBodyState extends State<_PhotoBody> {
       context: context,
       builder:
           (context) => Dialog(
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                Image.memory(widget.job.photos[index].bytes),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    height: 50,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(200),
-                    ),
+            child: Padding(
+              padding: const EdgeInsets.only(right: 20.0, top: 20, left: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.memory(widget.job.photos[index].bytes),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
                     child: InkWell(
                       onTap: () {
                         widget.removeImage(widget.job, index);
@@ -107,8 +103,8 @@ class _PhotoBodyState extends State<_PhotoBody> {
                       child: const Icon(Icons.delete, color: Colors.red),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
     );
