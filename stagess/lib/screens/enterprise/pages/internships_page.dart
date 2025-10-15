@@ -86,6 +86,7 @@ class InternshipsPageState extends State<InternshipsPage> {
     final active = _getActiveInternships(internships);
     final closed = _getClosedInternships(internships);
 
+    // TODO Do not show if the teacher is not the signatory teacher
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

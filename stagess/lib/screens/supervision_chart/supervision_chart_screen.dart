@@ -83,7 +83,7 @@ extension _InternshipMetaDataList on List<_InternshipMetaData> {
     List<_InternshipMetaData> out = [];
 
     for (final internship in internships) {
-      // TODO Do we want to keep the fact the priority is shared between users?
+      // TODO Priority should be teacher specific
       if (!internship.isActive) continue;
 
       final student = students.firstWhereOrNull(

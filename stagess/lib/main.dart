@@ -72,6 +72,7 @@ class StageSsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // TODO Check to disconnect after a while of inactivity
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(

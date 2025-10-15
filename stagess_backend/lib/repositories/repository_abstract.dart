@@ -5,6 +5,8 @@ import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_backend/utils/lock.dart';
 import 'package:stagess_common/communication_protocol.dart';
 
+// TODO get short versions of the elements
+// TODO use cache
 class RepositoryResponse {
   Map<String, dynamic>? data;
   Map<RequestFields, Map<String, List<String>>>? updatedData;
