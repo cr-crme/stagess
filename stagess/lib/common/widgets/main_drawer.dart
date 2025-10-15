@@ -9,7 +9,6 @@ import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({
@@ -48,8 +47,7 @@ class MainDrawer extends StatelessWidget {
     ]);
     if (!context.mounted) return;
 
-    // TODO Refresh the page when disconnecting
-    await launchUrl(Uri.parse('${Uri.base.scheme}://${Uri.base.authority}'));
+    GoRouter.of(context).goNamed(Screens.login);
   }
 
   @override

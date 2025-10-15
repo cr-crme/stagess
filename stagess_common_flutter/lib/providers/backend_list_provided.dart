@@ -173,6 +173,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     for (final selectorKey in _providerSelector.keys.toList()) {
       await _providerSelector[selectorKey]?.stopFetchingData();
     }
+    _providerSelector.clear();
   }
 
   @override
