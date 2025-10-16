@@ -291,7 +291,6 @@ void main() {
         ],
         'expected_duration': 135,
         'achieved_duration': 130,
-        'priority': 0,
         'teacher_notes': '',
         'end_date': DateTime(2034, 10, 28).millisecondsSinceEpoch,
         'skill_evaluations': [dummyInternshipEvaluationSkill().serialize()],
@@ -300,6 +299,7 @@ void main() {
         ],
         'enterprise_evaluation':
             dummyPostInternshipEnterpriseEvaluation().serialize(),
+        'visa_evaluations': dummyInternshipVisaEvaluation().serialize(),
       };
       expect(serialized, expected);
 
@@ -344,6 +344,10 @@ void main() {
       expect(
         deserialized.enterpriseEvaluation!.id,
         internship.enterpriseEvaluation!.id,
+      );
+      expect(
+        deserialized.visaEvaluations[0].id,
+        internship.visaEvaluations[0].id,
       );
 
       // Test for empty deserialize to make sure it doesn't crash

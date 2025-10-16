@@ -32,7 +32,9 @@ void main() {
       expect(enterpriseSame.fax, enterprise.fax);
       expect(enterpriseSame.website, enterprise.website);
       expect(
-          enterpriseSame.headquartersAddress, enterprise.headquartersAddress);
+        enterpriseSame.headquartersAddress,
+        enterprise.headquartersAddress,
+      );
       expect(enterpriseSame.neq, enterprise.neq);
 
       final enterpriseDifferent = enterprise.copyWith(
@@ -55,8 +57,9 @@ void main() {
         phone: PhoneNumber.fromString('866-666-6666'),
         fax: PhoneNumber.fromString('866-666-6666'),
         website: 'newWebsite',
-        headquartersAddress:
-            dummyAddress().copyWith(id: 'newHeadquartersAddressId'),
+        headquartersAddress: dummyAddress().copyWith(
+          id: 'newHeadquartersAddressId',
+        ),
         neq: 'newNeq',
       );
 
@@ -71,8 +74,10 @@ void main() {
       expect(enterpriseDifferent.phone.toString(), '(866) 666-6666');
       expect(enterpriseDifferent.fax.toString(), '(866) 666-6666');
       expect(enterpriseDifferent.website, 'newWebsite');
-      expect(enterpriseDifferent.headquartersAddress!.id,
-          'newHeadquartersAddressId');
+      expect(
+        enterpriseDifferent.headquartersAddress!.id,
+        'newHeadquartersAddressId',
+      );
       expect(enterpriseDifferent.neq, 'newNeq');
     });
 
@@ -82,29 +87,42 @@ void main() {
       final internships = InternshipsProvider.of(context, listen: false);
 
       // Add an internship to another enterprise, which should not be counted
-      internships.add(dummyInternship(
+      internships.add(
+        dummyInternship(
           id: 'anotherInternshipId',
           enterpriseId: 'anotherEnterpriseId',
-          jobId: 'anotherJobId'));
+          jobId: 'anotherJobId',
+        ),
+      );
 
       // No internships
       expect(enterprise.internships(context, listen: false).length, 0);
 
       // One internship
-      internships.add(dummyInternship(
-          enterpriseId: enterprise.id, jobId: enterprise.jobs[0].id));
+      internships.add(
+        dummyInternship(
+          enterpriseId: enterprise.id,
+          jobId: enterprise.jobs[0].id,
+        ),
+      );
       expect(enterprise.internships(context, listen: false).length, 1);
 
       // Two internships
-      internships.add(dummyInternship(
+      internships.add(
+        dummyInternship(
           id: 'anotherInternshipId',
           enterpriseId: enterprise.id,
-          jobId: enterprise.jobs[0].id));
+          jobId: enterprise.jobs[0].id,
+        ),
+      );
       expect(enterprise.internships(context, listen: false).length, 2);
 
       // One internship is terminated, but still counts as an internship
-      internships.replace(internships[1]
-          .copyWith(endDate: DateTime.now().subtract(const Duration(days: 1))));
+      internships.replace(
+        internships[1].copyWith(
+          endDate: DateTime.now().subtract(const Duration(days: 1)),
+        ),
+      );
       expect(enterprise.internships(context, listen: false).length, 2);
     });
 
@@ -114,46 +132,63 @@ void main() {
       final internships = InternshipsProvider.of(context, listen: false);
 
       // Add an internship to another enterprise, which should not be counted
-      internships.add(dummyInternship(
+      internships.add(
+        dummyInternship(
           id: 'anotherInternshipId',
           enterpriseId: 'anotherEnterpriseId',
-          jobId: 'anotherJobId'));
+          jobId: 'anotherJobId',
+        ),
+      );
 
       // One job with two positions was created, so it should be available
       expect(
-          enterprise
-              .withRemainingPositions(context, schoolId: 'school_id')
-              .length,
-          1);
+        enterprise
+            .withRemainingPositions(context, schoolId: 'school_id')
+            .length,
+        1,
+      );
 
       // Fill one of that position, so it should still be available
-      internships.add(dummyInternship(
-          enterpriseId: enterprise.id, jobId: enterprise.jobs[0].id));
+      internships.add(
+        dummyInternship(
+          enterpriseId: enterprise.id,
+          jobId: enterprise.jobs[0].id,
+        ),
+      );
       expect(
-          enterprise
-              .withRemainingPositions(context, schoolId: 'school_id')
-              .length,
-          1);
+        enterprise
+            .withRemainingPositions(context, schoolId: 'school_id')
+            .length,
+        1,
+      );
 
       // Fill the remainning one, so it should not be available anymore
-      internships.add(dummyInternship(
+      internships.add(
+        dummyInternship(
           id: 'anotherInternshipId',
           enterpriseId: enterprise.id,
-          jobId: enterprise.jobs[0].id));
+          jobId: enterprise.jobs[0].id,
+        ),
+      );
       expect(
-          enterprise
-              .withRemainingPositions(context, schoolId: 'school_id')
-              .length,
-          0);
+        enterprise
+            .withRemainingPositions(context, schoolId: 'school_id')
+            .length,
+        0,
+      );
 
       // Terminate one the of job, so it should be available again
-      internships.replace(internships[1]
-          .copyWith(endDate: DateTime.now().subtract(const Duration(days: 1))));
+      internships.replace(
+        internships[1].copyWith(
+          endDate: DateTime.now().subtract(const Duration(days: 1)),
+        ),
+      );
       expect(
-          enterprise
-              .withRemainingPositions(context, schoolId: 'school_id')
-              .length,
-          1);
+        enterprise
+            .withRemainingPositions(context, schoolId: 'school_id')
+            .length,
+        1,
+      );
     });
 
     test('serialization and deserialization works', () {
@@ -176,7 +211,8 @@ void main() {
         'fax': enterprise.fax?.serialize(),
         'website': enterprise.website,
         'headquarters_address': enterprise.headquartersAddress?.serialize(),
-        'neq': enterprise.neq
+        'status': enterprise.status.index,
+        'neq': enterprise.neq,
       });
 
       expect(deserialized.id, enterprise.id);
@@ -191,16 +227,19 @@ void main() {
       expect(deserialized.phone.toString(), enterprise.phone.toString());
       expect(deserialized.fax.toString(), enterprise.fax.toString());
       expect(deserialized.website, enterprise.website);
-      expect(deserialized.headquartersAddress?.id,
-          enterprise.headquartersAddress?.id);
+      expect(
+        deserialized.headquartersAddress?.id,
+        enterprise.headquartersAddress?.id,
+      );
+      expect(deserialized.status.index, enterprise.status.index);
       expect(deserialized.neq, enterprise.neq);
 
       // Test for empty deserialize to make sure it doesn't crash
       final emptyDeserialized = Enterprise.fromSerialized({'id': 'emptyId'});
       expect(emptyDeserialized.id, 'emptyId');
       expect(emptyDeserialized.name, 'Unnamed enterprise');
-      expect(emptyDeserialized.activityTypes, []);
-      expect(emptyDeserialized.recruiterId, '-1');
+      expect(emptyDeserialized.activityTypes, <Set>{});
+      expect(emptyDeserialized.recruiterId, '');
       expect(emptyDeserialized.jobs.length, 0);
       expect(emptyDeserialized.contact.firstName, 'Unnamed');
       expect(emptyDeserialized.contactFunction, '');

@@ -5,8 +5,11 @@ import 'package:stagess_common/models/enterprises/job_list.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
-import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart';
+import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart'
+    as attitude;
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
+import 'package:stagess_common/models/internships/internship_evaluation_visa.dart'
+    as visa;
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/task_appreciation.dart';
 import 'package:stagess_common/models/internships/time_utils.dart';
@@ -248,6 +251,24 @@ PostInternshipEnterpriseEvaluation dummyPostInternshipEnterpriseEvaluation({
   acceptanceBehaviorDifficulties: hasDisorder ? 2 : -1,
 );
 
+visa.VisaEvaluation dummyInternshipVisaEvaluation({
+  String id = 'internshipVisaEvaluationId',
+  bool hasDisorder = true,
+}) => visa.VisaEvaluation(
+  id: id,
+  inattendance: visa.Inattendance.rarely,
+  ponctuality: visa.Ponctuality.sometimeLate,
+  sociability: visa.Sociability.veryLow,
+  politeness: visa.Politeness.alwaysSuitable,
+  motivation: visa.Motivation.low,
+  dressCode: visa.DressCode.notAppropriate,
+  qualityOfWork: visa.QualityOfWork.high,
+  productivity: visa.Productivity.low,
+  autonomy: visa.Autonomy.none,
+  cautiousness: visa.Cautiousness.mostly,
+  generalAppreciation: visa.GeneralAppreciation.passable,
+);
+
 Internship dummyInternship({
   String id = 'internshipId',
   String schoolBoardId = 'schoolBoardId',
@@ -365,26 +386,26 @@ Itinerary dummyItinerary({
       ..add(dummyWaypoint())
       ..add(dummyWaypoint(id: 'waypointId2', latitude: 30.0, longitude: 30.5));
 
-AttitudeEvaluation dummyAttitudeEvaluation({
+attitude.AttitudeEvaluation dummyAttitudeEvaluation({
   String id = 'attitudeEvaluationId',
-}) => AttitudeEvaluation(
+}) => attitude.AttitudeEvaluation(
   id: id,
-  inattendance: Inattendance.rarely,
-  ponctuality: Ponctuality.sometimeLate,
-  sociability: Sociability.veryLow,
-  politeness: Politeness.alwaysSuitable,
-  motivation: Motivation.low,
-  dressCode: DressCode.notAppropriate,
-  qualityOfWork: QualityOfWork.high,
-  productivity: Productivity.low,
-  autonomy: Autonomy.none,
-  cautiousness: Cautiousness.mostly,
-  generalAppreciation: GeneralAppreciation.passable,
+  inattendance: attitude.Inattendance.rarely,
+  ponctuality: attitude.Ponctuality.sometimeLate,
+  sociability: attitude.Sociability.veryLow,
+  politeness: attitude.Politeness.alwaysSuitable,
+  motivation: attitude.Motivation.low,
+  dressCode: attitude.DressCode.notAppropriate,
+  qualityOfWork: attitude.QualityOfWork.high,
+  productivity: attitude.Productivity.low,
+  autonomy: attitude.Autonomy.none,
+  cautiousness: attitude.Cautiousness.mostly,
+  generalAppreciation: attitude.GeneralAppreciation.passable,
 );
 
-InternshipEvaluationAttitude dummyInternshipEvaluationAttitude({
+attitude.InternshipEvaluationAttitude dummyInternshipEvaluationAttitude({
   String id = 'internshipEvaluationAttitudeId',
-}) => InternshipEvaluationAttitude(
+}) => attitude.InternshipEvaluationAttitude(
   id: id,
   date: DateTime(1980, 5, 20),
   presentAtEvaluation: ['Me', 'You'],
