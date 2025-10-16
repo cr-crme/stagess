@@ -5,7 +5,6 @@ import 'package:stagess_common/models/persons/teacher.dart';
 
 import '../utils.dart';
 
-// TODO RERUN ALL TESTS
 void main() {
   group('Teacher', () {
     test('"copyWith" changes the requested elements', () {
@@ -72,10 +71,6 @@ void main() {
 
       // Expect throw on changes
       expect(
-        () => teacher.copyWith(address: dummyAddress()),
-        throwsArgumentError,
-      );
-      expect(
         () => teacher.copyWith(dateBirth: DateTime(0)),
         throwsArgumentError,
       );
@@ -94,11 +89,13 @@ void main() {
         'middle_name': teacher.middleName,
         'last_name': teacher.lastName,
         'groups': teacher.groups,
+        'has_registered_account': false,
         'email': teacher.email,
         'phone': teacher.phone?.serialize(),
         'date_birth': null,
         'address': teacher.address?.serialize(),
         'itineraries': [],
+        'visiting_priorities': {'element1': 0, 'element2': 2},
       });
 
       expect(deserialized.id, teacher.id);
@@ -113,6 +110,8 @@ void main() {
       expect(deserialized.dateBirth, isNull);
       expect(deserialized.address, isNull);
       expect(deserialized.itineraries, []);
+      expect(deserialized.visitingPriority('element1'), VisitingPriority.low);
+      expect(deserialized.visitingPriority('element2'), VisitingPriority.high);
 
       // Test for empty deserialize to make sure it doesn't crash
       final emptyDeserialized = Teacher.fromSerialized({'id': 'emptyId'});
@@ -128,6 +127,7 @@ void main() {
       expect(emptyDeserialized.dateBirth, isNull);
       expect(emptyDeserialized.address, isNull);
       expect(emptyDeserialized.itineraries, []);
+      expect(emptyDeserialized.internshipsWithPriorities, isEmpty);
     });
   });
 }

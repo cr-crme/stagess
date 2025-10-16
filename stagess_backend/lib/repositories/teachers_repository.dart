@@ -538,7 +538,7 @@ class TeachersRepositoryMock extends TeachersRepository {
       firstName: 'John',
       middleName: null,
       lastName: 'Doe',
-      schoolBoardId: '10',
+      schoolBoardId: '100',
       schoolId: '10',
       hasRegisteredAccount: true,
       groups: ['100', '101'],
@@ -554,7 +554,7 @@ class TeachersRepositoryMock extends TeachersRepository {
       firstName: 'Jane',
       middleName: null,
       lastName: 'Doe',
-      schoolBoardId: '10',
+      schoolBoardId: '100',
       schoolId: '10',
       hasRegisteredAccount: true,
       groups: ['100', '101'],
@@ -565,6 +565,22 @@ class TeachersRepositoryMock extends TeachersRepository {
       itineraries: [],
       visitingPriorities: {},
     ),
+    '3': Teacher(
+      id: '3',
+      firstName: 'Jim',
+      middleName: null,
+      lastName: 'Dungeon',
+      schoolBoardId: '200',
+      schoolId: '20',
+      hasRegisteredAccount: true,
+      groups: ['200', '201'],
+      phone: PhoneNumber.fromString('123-456-7890'),
+      email: 'jim.dungeon@email.com',
+      dateBirth: null,
+      address: Address.empty,
+      itineraries: [],
+      visitingPriorities: {},
+    )
   };
 
   @override
