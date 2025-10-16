@@ -265,6 +265,11 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     _sanityChecks(notify: notify);
 
     try {
+      if (mockMe) {
+        super.add(item, notify: true);
+        return true;
+      }
+
       final response = await sendMessageWithResponse(
         message: CommunicationProtocol(
           requestType: RequestType.post,
@@ -272,10 +277,6 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
           data: item.serialize(),
         ),
       );
-
-      if (mockMe) {
-        super.add(item, notify: true);
-      }
       return response.response == Response.success;
     } on Exception {
       // Make sure to keep the list in sync with the database
@@ -329,6 +330,11 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     _sanityChecks(notify: notify);
 
     try {
+      if (mockMe) {
+        super.replace(item, notify: true);
+        return true;
+      }
+
       final response = await sendMessageWithResponse(
         message: CommunicationProtocol(
           requestType: RequestType.post,
@@ -336,10 +342,6 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
           data: item.serialize(),
         ),
       );
-
-      if (mockMe) {
-        super.replace(item, notify: true);
-      }
       return response.response == Response.success;
     } on Exception {
       // Make sure to keep the list in sync with the database

@@ -41,7 +41,7 @@ void main() {
     expect(responseHeaders.current.length, 3);
     expect(responseHeaders.current['Access-Control-Allow-Origin'], '*');
     expect(responseHeaders.current['Access-Control-Allow-Methods'],
-        'GET, OPTIONS');
+        'GET, POST, OPTIONS');
     expect(responseHeaders.current['Access-Control-Allow-Headers'],
         'Content-Type, Authorization');
   });
@@ -54,7 +54,7 @@ void main() {
     await requestHandler.answer(request);
 
     final response = request.response as HttpResponseMock;
-    expect(response.response, 'Unauthorized');
+    expect(response.response, 'Unauthorized: Invalid endpoint');
   });
 
   test('Send a GET resquest to an invalid endpoit', () async {

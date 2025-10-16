@@ -6,9 +6,9 @@ import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/repositories/students_repository.dart';
 import 'package:stagess_backend/repositories/teachers_repository.dart';
 import 'package:stagess_backend/server/database_manager.dart';
-import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_common/communication_protocol.dart';
+import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:test/test.dart';
 
 import '../mockers/sql_connection_mock.dart';
@@ -38,7 +38,7 @@ void main() {
     final teachers = await database.get(
       RequestFields.teachers,
       data: null,
-      user: DatabaseUser.empty(),
+      user: DatabaseUserMock(),
     );
     expect(teachers.data, isA<Map<String, dynamic>>());
     expect(teachers.data!.length, 2);
@@ -64,9 +64,9 @@ void main() {
     final teacher = await database.get(
       RequestFields.teacher,
       data: {'id': '0'},
-      user: DatabaseUser.empty(),
+      user: DatabaseUserMock(),
     );
-    expect(teacher, isA<Map<String, dynamic>>());
+    expect(teacher.data, isA<Map<String, dynamic>>());
     expect(teacher.data!['first_name'], 'John');
     expect(teacher.data!['last_name'], 'Doe');
   });
@@ -86,7 +86,7 @@ void main() {
       () async => await database.get(
         RequestFields.teacher,
         data: {'id': '2'},
-        user: DatabaseUser.empty(),
+        user: DatabaseUserMock(),
       ),
       throwsA(predicate((e) =>
           e is MissingDataException && e.toString() == 'Teacher not found')),
@@ -108,7 +108,7 @@ void main() {
       () async => await database.get(
         RequestFields.teacher,
         data: null,
-        user: DatabaseUser.empty(),
+        user: DatabaseUserMock(),
       ),
       throwsA(predicate((e) =>
           e is MissingFieldException &&
@@ -131,7 +131,7 @@ void main() {
       () async => await database.put(
         RequestFields.teachers,
         data: null,
-        user: DatabaseUser.empty(),
+        user: DatabaseUserMock(),
       ),
       throwsA(predicate((e) =>
           e is MissingDataException &&
@@ -154,7 +154,7 @@ void main() {
       () async => await database.put(
         RequestFields.teachers,
         data: {'0': 'John Doe'},
-        user: DatabaseUser.empty(),
+        user: DatabaseUserMock(),
       ),
       throwsA(predicate((e) =>
           e is InvalidRequestException &&
@@ -176,12 +176,12 @@ void main() {
     await database.put(
       RequestFields.teacher,
       data: {'id': '0', 'first_name': 'John', 'last_name': 'Smith'},
-      user: DatabaseUser.empty(),
+      user: DatabaseUserMock(accessLevel: AccessLevel.admin),
     );
     final updatedTeacher = await database.get(
       RequestFields.teacher,
       data: {'id': '0'},
-      user: DatabaseUser.empty(),
+      user: DatabaseUserMock(),
     );
     expect(updatedTeacher.data!['first_name'], 'John');
     expect(updatedTeacher.data!['last_name'], 'Smith');
@@ -200,13 +200,18 @@ void main() {
     );
     await database.put(
       RequestFields.teacher,
-      data: {'id': '2', 'first_name': 'Agent', 'last_name': 'Smith'},
-      user: DatabaseUser.empty(),
+      data: {
+        'id': '3',
+        'first_name': 'Agent',
+        'last_name': 'Smith',
+        'school_board_id': '100'
+      },
+      user: DatabaseUserMock(accessLevel: AccessLevel.admin),
     );
     final newTeacher = await database.get(
       RequestFields.teacher,
-      data: {'id': '2'},
-      user: DatabaseUser.empty(),
+      data: {'id': '3'},
+      user: DatabaseUserMock(),
     );
     expect(newTeacher.data!['first_name'], 'Agent');
     expect(newTeacher.data!['last_name'], 'Smith');
@@ -227,7 +232,7 @@ void main() {
       () async => await database.put(
         RequestFields.teacher,
         data: {'name': 'John Smith', 'age': 45},
-        user: DatabaseUser.empty(),
+        user: DatabaseUserMock(),
       ),
       throwsA(predicate((e) =>
           e is MissingFieldException &&

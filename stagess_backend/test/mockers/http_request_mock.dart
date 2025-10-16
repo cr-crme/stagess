@@ -215,6 +215,26 @@ class HttpResponseMock implements HttpResponse {
   set statusCode(int statusCode) {}
 }
 
+class HttpConnectionsInfoMock implements HttpConnectionInfo {
+  final InternetAddress localAddress;
+
+  @override
+  final int localPort;
+
+  @override
+  final InternetAddress remoteAddress;
+
+  @override
+  final int remotePort;
+
+  HttpConnectionsInfoMock({
+    required this.localAddress,
+    required this.localPort,
+    required this.remoteAddress,
+    required this.remotePort,
+  });
+}
+
 class HttpRequestMock implements HttpRequest {
   final String _method;
   final Uri _uri;
@@ -263,7 +283,12 @@ class HttpRequestMock implements HttpRequest {
   X509Certificate? get certificate => throw UnimplementedError();
 
   @override
-  HttpConnectionInfo? get connectionInfo => throw UnimplementedError();
+  HttpConnectionInfo? get connectionInfo => HttpConnectionsInfoMock(
+        remoteAddress: InternetAddress.loopbackIPv4,
+        remotePort: 12345,
+        localAddress: InternetAddress.loopbackIPv4,
+        localPort: 80,
+      );
 
   @override
   Future<bool> contains(Object? needle) {
