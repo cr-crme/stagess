@@ -15,7 +15,6 @@ import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/time_utils.dart'
     as time_utils;
-import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/helpers/form_service.dart';
@@ -257,7 +256,6 @@ class _InternshipEnrollmentScreenState
           [],
       transportations: _caracteristicsKey.currentState?.transportations ?? [],
       visitFrequencies: _scheduleKey.currentState?.visitFrequencies ?? '',
-      visitingPriority: VisitingPriority.low,
     );
   }
 

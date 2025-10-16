@@ -125,6 +125,7 @@ class StageSsApp extends StatelessWidget {
           return true;
         },
         child: MaterialApp.router(
+          debugShowCheckedModeBanner: false,
           onGenerateTitle: (context) => 'Stagess',
           theme: crcrmeMaterialTheme,
           routerConfig: router,

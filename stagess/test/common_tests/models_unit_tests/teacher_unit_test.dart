@@ -1,9 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
+import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 
 import '../utils.dart';
 
+// TODO RERUN ALL TESTS
 void main() {
   group('Teacher', () {
     test('"copyWith" changes the requested elements', () {
@@ -22,6 +24,15 @@ void main() {
       expect(teacherSame.address, isNull);
       expect(teacherSame.dateBirth, isNull);
 
+      expect(
+        teacherSame.visitingPriority('element1'),
+        teacher.visitingPriority('element1'),
+      );
+      expect(
+        teacherSame.visitingPriority('element2'),
+        teacher.visitingPriority('element2'),
+      );
+
       final teacherDifferent = teacher.copyWith(
         id: 'newId',
         firstName: 'newFirstName',
@@ -31,6 +42,11 @@ void main() {
         groups: ['newGroup'],
         email: 'newEmail',
         phone: PhoneNumber.fromString('866-666-6666'),
+        visitingPriorities: {
+          'element1': VisitingPriority.low,
+          'element2': VisitingPriority.high,
+          'element3': VisitingPriority.mid,
+        },
       );
 
       expect(teacherDifferent.id, 'newId');
@@ -41,12 +57,28 @@ void main() {
       expect(teacherDifferent.groups, ['newGroup']);
       expect(teacherDifferent.email, 'newEmail');
       expect(teacherDifferent.phone.toString(), '(866) 666-6666');
+      expect(
+        teacherDifferent.visitingPriority('element1'),
+        VisitingPriority.low,
+      );
+      expect(
+        teacherDifferent.visitingPriority('element2'),
+        VisitingPriority.high,
+      );
+      expect(
+        teacherDifferent.visitingPriority('element3'),
+        VisitingPriority.mid,
+      );
 
       // Expect throw on changes
       expect(
-          () => teacher.copyWith(address: dummyAddress()), throwsArgumentError);
+        () => teacher.copyWith(address: dummyAddress()),
+        throwsArgumentError,
+      );
       expect(
-          () => teacher.copyWith(dateBirth: DateTime(0)), throwsArgumentError);
+        () => teacher.copyWith(dateBirth: DateTime(0)),
+        throwsArgumentError,
+      );
     });
 
     test('serialization and deserialization works', () {

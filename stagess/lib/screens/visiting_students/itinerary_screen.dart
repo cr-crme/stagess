@@ -41,6 +41,9 @@ class _ItineraryMainScreenState extends State<ItineraryMainScreen> {
   Future<void> _fillAllWaypoints() async {
     _logger.fine('Filling all waypoints');
     final internships = InternshipsProvider.of(context, listen: false);
+    final currentTeacher =
+        TeachersProvider.of(context, listen: false).currentTeacher;
+    if (currentTeacher == null) return;
 
     var school = SchoolBoardsProvider.of(context, listen: false).currentSchool;
     if (!mounted || school == null) return;
@@ -83,7 +86,7 @@ class _ItineraryMainScreenState extends State<ItineraryMainScreen> {
           title: '${student.firstName} ${student.lastName[0]}.',
           subtitle: enterprise.name,
           address: enterprise.address ?? Address.empty,
-          priority: internship.visitingPriority,
+          priority: currentTeacher.visitingPriority(internship.id),
         ),
       );
     }

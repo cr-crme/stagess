@@ -3,6 +3,7 @@ import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/itineraries/itinerary.dart';
+import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/persons/person.dart';
 
 class Teacher extends Person {
@@ -12,6 +13,7 @@ class Teacher extends Person {
   bool get hasNotRegisteredAccount => !hasRegisteredAccount;
   final List<String> groups;
   final List<Itinerary> itineraries;
+  final Map<String, VisitingPriority> _visitingPriorities;
 
   Teacher({
     super.id,
@@ -27,7 +29,9 @@ class Teacher extends Person {
     required super.address,
     required super.dateBirth,
     required this.itineraries,
-  }) {
+    required Map<String, VisitingPriority> visitingPriorities,
+  })  : _visitingPriorities = visitingPriorities,
+        super() {
     if (dateBirth != null) {
       throw ArgumentError('Date of birth should not be set for a teacher');
     }
@@ -46,9 +50,18 @@ class Teacher extends Person {
         address: null,
         dateBirth: null,
         itineraries: [],
+        visitingPriorities: {},
       );
 
   bool get isEmpty => firstName.isEmpty && lastName.isEmpty;
+
+  List<String> get internshipsWithPriorities =>
+      _visitingPriorities.keys.toList(growable: false);
+  VisitingPriority visitingPriority(String internshipId) =>
+      _visitingPriorities[internshipId] ?? VisitingPriority.low;
+  void setVisitingPriority(String internshipId, VisitingPriority priority) {
+    _visitingPriorities[internshipId] = priority;
+  }
 
   Teacher.fromSerialized(super.map)
       : schoolBoardId = StringExt.from(map['school_board_id']) ?? '-1',
@@ -61,6 +74,11 @@ class Teacher extends Person {
         itineraries = ListExt.from(map['itineraries'],
                 deserializer: Itinerary.fromSerialized) ??
             [],
+        _visitingPriorities = MapExt.from(map['visiting_priorities'],
+                deserializer: (e) =>
+                    VisitingPriority.deserialize(e) ??
+                    VisitingPriority.notApplicable) ??
+            {},
         super.fromSerialized();
 
   @override
@@ -71,6 +89,8 @@ class Teacher extends Person {
       'has_registered_account': hasRegisteredAccount.serialize(),
       'groups': groups.serialize(),
       'itineraries': itineraries.serialize(),
+      'visiting_priorities': _visitingPriorities
+          .map((key, value) => MapEntry(key, value.serialize())),
     });
 
   @override
@@ -88,6 +108,7 @@ class Teacher extends Person {
     Address? address,
     DateTime? dateBirth,
     List<Itinerary>? itineraries,
+    Map<String, VisitingPriority>? visitingPriorities,
   }) =>
       Teacher(
         id: id ?? this.id,
@@ -103,6 +124,7 @@ class Teacher extends Person {
         dateBirth: dateBirth ?? this.dateBirth,
         address: address ?? this.address,
         itineraries: itineraries ?? this.itineraries,
+        visitingPriorities: visitingPriorities ?? _visitingPriorities,
       );
 
   @override
@@ -122,6 +144,7 @@ class Teacher extends Person {
           'date_birth',
           'address',
           'itineraries',
+          'visiting_priorities',
         ].contains(key))) {
       throw InvalidFieldException('Invalid field data detected');
     }
@@ -143,6 +166,10 @@ class Teacher extends Person {
       itineraries: ListExt.from(data['itineraries'],
               deserializer: Itinerary.fromSerialized) ??
           itineraries,
+      visitingPriorities: MapExt.from(data['visiting_priorities'],
+              deserializer: (e) => VisitingPriority
+                  .values[IntExt.from(e) ?? VisitingPriority.low.index]) ??
+          _visitingPriorities,
     );
   }
 

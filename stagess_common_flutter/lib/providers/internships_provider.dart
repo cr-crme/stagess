@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/internships/internship.dart';
-import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/backend_list_provided.dart';
 
@@ -11,10 +10,6 @@ class InternshipsProvider extends BackendListProvided<Internship> {
 
   static InternshipsProvider of(BuildContext context, {listen = true}) =>
       Provider.of<InternshipsProvider>(context, listen: listen);
-
-  void replacePriority(String studentId, VisitingPriority priority) {
-    replace(byStudentId(studentId).last.copyWith(visitingPriority: priority));
-  }
 
   void updateTeacherNote(String studentId, String notes) {
     replace(byStudentId(studentId).last.copyWith(teacherNotes: notes));

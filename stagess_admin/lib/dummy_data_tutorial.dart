@@ -208,256 +208,166 @@ Future<void> _addDummyTeachers(
       schoolBoard.schools.firstWhere((school) => school.name == 'École C').id;
 
   teachers.add(
-    Teacher(
+    Teacher.empty.copyWith(
       firstName: 'Suzanne',
-      middleName: null,
       lastName: 'Bien-Aimé',
       schoolBoardId: schoolBoardId,
       schoolId: schoolAId,
-      hasRegisteredAccount: false,
       groups: ['550', '551'],
       email: 'a1@moncentre.qc',
-      phone: null,
-      address: null,
-      dateBirth: null,
-      itineraries: [],
     ),
   );
 
   teachers.add(
-    Teacher(
+    Teacher.empty.copyWith(
       firstName: 'Enseignant',
-      middleName: null,
       lastName: 'A2',
       schoolBoardId: schoolBoardId,
       schoolId: schoolAId,
-      hasRegisteredAccount: false,
       groups: ['550'],
       email: 'a2@moncentre.qc',
-      phone: null,
-      address: null,
-      dateBirth: null,
-      itineraries: [],
     ),
   );
 
   teachers.add(
-    Teacher(
+    Teacher.empty.copyWith(
       firstName: 'Enseignant',
-      middleName: null,
       lastName: 'A3',
       schoolBoardId: schoolBoardId,
       schoolId: schoolAId,
-      hasRegisteredAccount: false,
       groups: ['550'],
       email: 'a3@moncentre.qc',
-      phone: null,
-      address: null,
-      dateBirth: null,
-      itineraries: [],
     ),
   );
 
   teachers.add(
-    Teacher(
+    Teacher.empty.copyWith(
       firstName: 'Enseignant',
-      middleName: null,
       lastName: 'A4',
       schoolBoardId: schoolBoardId,
       schoolId: schoolAId,
-      hasRegisteredAccount: false,
       groups: ['550'],
       email: 'a4@moncentre.qc',
-      phone: null,
-      address: null,
-      dateBirth: null,
-      itineraries: [],
     ),
   );
 
   teachers.add(
-    Teacher(
+    Teacher.empty.copyWith(
       firstName: 'Enseignant',
-      middleName: null,
       lastName: 'A5',
       schoolBoardId: schoolBoardId,
       schoolId: schoolAId,
-      hasRegisteredAccount: false,
       groups: ['550'],
       email: 'a5@moncentre.qc',
-      phone: null,
-      address: null,
-      dateBirth: null,
-      itineraries: [],
     ),
   );
 
   teachers.add(
-    Teacher(
+    Teacher.empty.copyWith(
       firstName: 'Enseignant',
-      middleName: null,
       lastName: 'A6',
       schoolBoardId: schoolBoardId,
       schoolId: schoolAId,
-      hasRegisteredAccount: false,
       groups: ['550'],
       email: 'a6@moncentre.qc',
-      phone: null,
-      address: null,
-      dateBirth: null,
-      itineraries: [],
     ),
   );
 
   teachers.add(
-    Teacher(
+    Teacher.empty.copyWith(
       firstName: 'Enseignant',
-      middleName: null,
       lastName: 'A7',
       schoolBoardId: schoolBoardId,
       schoolId: schoolAId,
-      hasRegisteredAccount: false,
       groups: ['550'],
       email: 'a7@moncentre.qc',
-      phone: null,
-      address: null,
-      dateBirth: null,
-      itineraries: [],
     ),
   );
 
   teachers.add(
-    Teacher(
+    Teacher.empty.copyWith(
       firstName: 'Enseignant',
-      middleName: null,
       lastName: 'A8',
       schoolBoardId: schoolBoardId,
       schoolId: schoolAId,
-      hasRegisteredAccount: false,
       groups: ['550'],
       email: 'a8@moncentre.qc',
-      phone: null,
-      address: null,
-      dateBirth: null,
-      itineraries: [],
     ),
   );
 
   teachers.add(
-    Teacher(
+    Teacher.empty.copyWith(
       firstName: 'Enseignant',
-      middleName: null,
       lastName: 'A9',
       schoolBoardId: schoolBoardId,
       schoolId: schoolAId,
-      hasRegisteredAccount: false,
       groups: ['551'],
       email: 'a9@moncentre.qc',
-      phone: null,
-      address: null,
-      dateBirth: null,
-      itineraries: [],
     ),
   );
 
   teachers.add(
-    Teacher(
+    Teacher.empty.copyWith(
       firstName: 'Enseignant',
-      middleName: null,
       lastName: 'A10',
       schoolBoardId: schoolBoardId,
       schoolId: schoolAId,
-      hasRegisteredAccount: false,
       groups: ['551'],
       email: 'a10@moncentre.qc',
-      phone: null,
-      address: null,
-      dateBirth: null,
-      itineraries: [],
     ),
   );
 
   teachers.add(
-    Teacher(
+    Teacher.empty.copyWith(
       firstName: 'Enseignant',
-      middleName: null,
       lastName: 'A11',
       schoolBoardId: schoolBoardId,
       schoolId: schoolAId,
-      hasRegisteredAccount: false,
       groups: ['551'],
       email: 'a11@moncentre.qc',
-      phone: null,
-      address: null,
-      dateBirth: null,
-      itineraries: [],
     ),
   );
 
   teachers.add(
-    Teacher(
+    Teacher.empty.copyWith(
       firstName: 'Enseignant',
-      middleName: null,
       lastName: 'A12',
       schoolBoardId: schoolBoardId,
       schoolId: schoolAId,
-      hasRegisteredAccount: false,
       groups: ['551'],
       email: 'a12@moncentre.qc',
-      phone: null,
-      address: null,
-      dateBirth: null,
-      itineraries: [],
     ),
   );
 
   teachers.add(
-    Teacher(
+    Teacher.empty.copyWith(
       firstName: 'Émilien',
-      middleName: null,
       lastName: 'Delcourt',
       schoolBoardId: schoolBoardId,
       schoolId: schoolBId,
-      hasRegisteredAccount: false,
       groups: ['201'],
       email: 'b1@moncentre.qc',
-      phone: null,
-      address: null,
-      dateBirth: null,
-      itineraries: [],
     ),
   );
 
   teachers.add(
-    Teacher(
+    Teacher.empty.copyWith(
       firstName: 'Mortimer',
-      middleName: null,
       lastName: 'Vaillant',
       schoolBoardId: schoolBoardId,
       schoolId: schoolBId,
-      hasRegisteredAccount: false,
       groups: ['200'],
       email: 'b2@moncentre.qc',
-      phone: null,
-      address: null,
-      dateBirth: null,
-      itineraries: [],
     ),
   );
   teachers.add(
-    Teacher(
+    Teacher.empty.copyWith(
       firstName: 'Enseignant',
-      middleName: null,
       lastName: 'C1',
       schoolBoardId: schoolBoardId,
       schoolId: schoolCId,
-      hasRegisteredAccount: false,
       groups: ['300'],
       email: 'c1@moncentre.qc',
-      phone: null,
-      address: null,
-      dateBirth: null,
-      itineraries: [],
     ),
   );
 
@@ -1862,7 +1772,6 @@ Future<void> _addDummyInternships(
         ActivitySectorsService.activitySectors[2].specializations[1].id,
         ActivitySectorsService.activitySectors[1].specializations[0].id,
       ],
-      visitingPriority: VisitingPriority.values[0],
       supervisor: Person(
         firstName: 'Robert',
         middleName: null,
@@ -1969,7 +1878,6 @@ Future<void> _addDummyInternships(
               .jobs[0]
               .id,
       extraSpecializationIds: [],
-      visitingPriority: VisitingPriority.values[0],
       supervisor: Person(
         firstName: 'Claude',
         middleName: null,
@@ -2069,7 +1977,6 @@ Future<void> _addDummyInternships(
     enterpriseId: enterprises.firstWhere((e) => e.name == 'Subway').id,
     jobId: enterprises.firstWhere((e) => e.name == 'Subway').jobs[0].id,
     extraSpecializationIds: [],
-    visitingPriority: VisitingPriority.values[0],
     supervisor: Person(
       firstName: 'Carole',
       middleName: null,
@@ -2176,7 +2083,6 @@ Future<void> _addDummyInternships(
       enterpriseId: enterprises.firstWhere((e) => e.name == 'IGA').id,
       jobId: enterprises.firstWhere((e) => e.name == 'IGA').jobs[0].id,
       extraSpecializationIds: [],
-      visitingPriority: VisitingPriority.values[0],
       supervisor: Person(
         firstName: 'Charles',
         middleName: null,
@@ -2254,7 +2160,6 @@ Future<void> _addDummyInternships(
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Auto Repair').id,
       jobId: enterprises.firstWhere((e) => e.name == 'Auto Repair').jobs[0].id,
       extraSpecializationIds: [],
-      visitingPriority: VisitingPriority.values[0],
       supervisor: Person(
         firstName: 'Thomas',
         middleName: null,
@@ -2331,7 +2236,6 @@ Future<void> _addDummyInternships(
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').id,
       jobId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').jobs[0].id,
       extraSpecializationIds: [],
-      visitingPriority: VisitingPriority.values[0],
       supervisor: Person(
         firstName: 'Maxime',
         middleName: null,
@@ -2432,7 +2336,6 @@ Future<void> _addDummyInternships(
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').id,
       jobId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').jobs[1].id,
       extraSpecializationIds: [],
-      visitingPriority: VisitingPriority.values[0],
       supervisor: Person(
         firstName: 'Mathilde',
         middleName: null,
@@ -2533,7 +2436,6 @@ Future<void> _addDummyInternships(
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Jean Coutu').id,
       jobId: enterprises.firstWhere((e) => e.name == 'Jean Coutu').jobs[0].id,
       extraSpecializationIds: [],
-      visitingPriority: VisitingPriority.values[0],
       supervisor: Person(
         firstName: 'Francis',
         middleName: null,
@@ -2598,7 +2500,6 @@ Future<void> _addDummyInternships(
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Pharmaprix').id,
       jobId: enterprises.firstWhere((e) => e.name == 'Pharmaprix').jobs[0].id,
       extraSpecializationIds: [],
-      visitingPriority: VisitingPriority.values[0],
       supervisor: Person(
         firstName: 'Thierry',
         middleName: null,
@@ -2664,7 +2565,6 @@ Future<void> _addDummyInternships(
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Subway').id,
       jobId: enterprises.firstWhere((e) => e.name == 'Subway').jobs[0].id,
       extraSpecializationIds: [],
-      visitingPriority: VisitingPriority.values[0],
       supervisor: Person(
         firstName: 'Carlos',
         middleName: null,
@@ -2714,6 +2614,24 @@ Future<void> _addDummyInternships(
     ),
   );
   await _waitForDatabaseUpdate(internships, 10);
+
+  // Set the visiting priorities of the internships for teacherA1Id
+  final currentTeacher = teachers.firstWhere((t) => t.id == teacherA1Id);
+  var studentId = students.firstWhere((e) => e.fullName == 'Cedric Masson').id;
+  var internshipId =
+      internships
+          .firstWhere((internship) => internship.studentId == studentId)
+          .id;
+  currentTeacher.setVisitingPriority(internshipId, VisitingPriority.values[2]);
+
+  studentId = students.firstWhere((e) => e.fullName == 'Thomas Caron').id;
+  internshipId =
+      internships
+          .firstWhere((internship) => internship.studentId == studentId)
+          .id;
+  currentTeacher.setVisitingPriority(internshipId, VisitingPriority.values[1]);
+
+  await teachers.replaceWithConfirmation(currentTeacher);
 }
 
 Future<void> _waitForDatabaseUpdate(

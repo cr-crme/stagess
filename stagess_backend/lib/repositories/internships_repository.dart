@@ -10,7 +10,6 @@ import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/time_utils.dart';
 import 'package:stagess_common/models/internships/transportation.dart';
-import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/utils.dart';
 
@@ -262,9 +261,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     final map = <String, Internship>{};
     for (final internship in internships) {
       final id = internship['id'].toString();
-
-      internship['priority'] = internship['visiting_priority'];
-
       internship['signatory_teacher_id'] =
           (internship['supervising_teachers'] as List?)?.firstWhereOrNull(
               (e) => e['is_signatory_teacher'] as int == 1)?['teacher_id'];
@@ -559,7 +555,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
       'job_id': internship.jobId.serialize(),
       'expected_duration': internship.expectedDuration.serialize(),
       'achieved_duration': internship.achievedDuration.serialize(),
-      'visiting_priority': internship.visitingPriority.serialize(),
       'teacher_notes': internship.teacherNotes.serialize(),
       'end_date': internship.endDate.serialize(),
     });
@@ -588,9 +583,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     }
     if (differences.contains('achieved_duration')) {
       toUpdate['achieved_duration'] = internship.achievedDuration.serialize();
-    }
-    if (differences.contains('priority')) {
-      toUpdate['visiting_priority'] = internship.visitingPriority.serialize();
     }
     if (differences.contains('teacher_notes')) {
       toUpdate['teacher_notes'] = internship.teacherNotes.serialize();
@@ -1110,7 +1102,6 @@ class InternshipsRepositoryMock extends InternshipsRepository {
       ],
       expectedDuration: 30,
       achievedDuration: -1,
-      visitingPriority: VisitingPriority.low,
       endDate: DateTime(0),
       teacherNotes: 'Nope',
       transportations: [Transportation.pass],
@@ -1163,7 +1154,6 @@ class InternshipsRepositoryMock extends InternshipsRepository {
       ],
       expectedDuration: 20,
       achievedDuration: -1,
-      visitingPriority: VisitingPriority.mid,
       endDate: DateTime(0),
       teacherNotes: 'Yes',
       transportations: [Transportation.yes, Transportation.ticket],

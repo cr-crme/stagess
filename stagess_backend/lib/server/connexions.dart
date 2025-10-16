@@ -79,9 +79,10 @@ class Connexions {
 
   Future<void> _incomingMessage(CustomWebSocket client,
       {required dynamic message}) async {
+    CommunicationProtocol? protocol;
     try {
       final map = jsonDecode(message);
-      final protocol = CommunicationProtocol.deserialize(map);
+      protocol = CommunicationProtocol.deserialize(map);
 
       // Prevent unauthorized access to the database
       if ((_clients[client]?.isNotVerified ?? true) &&
@@ -122,6 +123,8 @@ class Connexions {
       }
       await _send(client,
           message: CommunicationProtocol(
+              id: protocol?.id,
+              field: protocol?.field,
               requestType: RequestType.response,
               data: {'error': e.toString()},
               response: Response.connexionRefused));
@@ -132,6 +135,8 @@ class Connexions {
       }
       await _send(client,
           message: CommunicationProtocol(
+              id: protocol?.id,
+              field: protocol?.field,
               requestType: RequestType.response,
               data: {'error': e.toString()},
               response: Response.failure));
@@ -142,6 +147,8 @@ class Connexions {
       }
       await _send(client,
           message: CommunicationProtocol(
+              id: protocol?.id,
+              field: protocol?.field,
               requestType: RequestType.response,
               data: {'error': 'Invalid message format: $e'},
               response: Response.failure));

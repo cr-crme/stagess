@@ -55,6 +55,8 @@ DROP TABLE IF EXISTS post_internship_enterprise_evaluations;
 DROP TABLE IF EXISTS post_internship_enterprise_evaluation_skills;
 DROP TABLE IF EXISTS internships;
 
+DROP TABLE IF EXISTS teachers_visiting_priorities;
+
 DROP TABLE IF EXISTS schools;
 DROP TABLE IF EXISTS school_boards;
 
@@ -362,7 +364,6 @@ CREATE TABLE internships (
     job_id VARCHAR(36) NOT NULL,
     expected_duration BIGINT NOT NULL,
     achieved_duration BIGINT NOT NULL,
-    visiting_priority INT NOT NULL,
     teacher_notes VARCHAR(2000) NOT NULL,
     end_date BIGINT,
     FOREIGN KEY (student_id) REFERENCES students(id), 
@@ -532,6 +533,14 @@ CREATE TABLE post_internship_enterprise_evaluations (
     acceptance_physical_disability FLOAT NOT NULL,
     acceptance_mental_health_disorder FLOAT NOT NULL,
     acceptance_behavior_difficulties FLOAT NOT NULL,
+    FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE
+);
+
+CREATE TABLE teachers_visiting_priorities (
+    teacher_id VARCHAR(36) NOT NULL,
+    internship_id VARCHAR(36) NOT NULL,
+    visiting_priority INT NOT NULL,
+    FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE,
     FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE
 );
 

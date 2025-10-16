@@ -74,9 +74,9 @@ extension _InternshipMetaDataList on List<_InternshipMetaData> {
     List<VisitingPriority>? visibilityFilters,
     String? filterText,
   }) {
-    final teacherId =
-        TeachersProvider.of(context, listen: true).currentTeacher?.id;
-    if (teacherId == null) return [];
+    final currentTeacher =
+        TeachersProvider.of(context, listen: true).currentTeacher;
+    if (currentTeacher == null) return [];
 
     final internships = InternshipsProvider.of(context, listen: true);
     final students = StudentsHelpers.studentsInMyGroups(context, listen: true);
@@ -84,7 +84,6 @@ extension _InternshipMetaDataList on List<_InternshipMetaData> {
     List<_InternshipMetaData> out = [];
 
     for (final internship in internships) {
-      // TODO Priority should be teacher specific
       if (!internship.isActive) continue;
 
       final student = students.firstWhereOrNull(
@@ -99,9 +98,16 @@ extension _InternshipMetaDataList on List<_InternshipMetaData> {
           student: students.firstWhere(
             (student) => student.id == internship.studentId,
           ),
-          isSupervised: internship.supervisingTeacherIds.contains(teacherId),
-          visitingPriority: internship.visitingPriority,
-          isTeacherSignatory: internship.signatoryTeacherId == teacherId,
+          isSupervised: internship.supervisingTeacherIds.contains(
+            currentTeacher.id,
+          ),
+          visitingPriority:
+              currentTeacher.visitingPriority(internship.id) ==
+                      VisitingPriority.notApplicable
+                  ? VisitingPriority.low
+                  : currentTeacher.visitingPriority(internship.id),
+          isTeacherSignatory:
+              internship.signatoryTeacherId == currentTeacher.id,
         ),
       );
     }
@@ -142,8 +148,10 @@ class _SupervisionChartState extends State<SupervisionChart>
     vsync: this,
   )..addListener(() => setState(() {}));
 
-  bool _forceDisabled = false;
-  bool _editMode = false;
+  bool _forcePrioritiesDisabled = false;
+  bool _editPrioritiesMode = false;
+  bool _forceSignatoriesDisabled = false;
+  bool _editSignatoriesMode = false;
   final _searchTextController = TextEditingController();
   final _visibilityFilters = {
     VisitingPriority.high: true,
@@ -151,104 +159,160 @@ class _SupervisionChartState extends State<SupervisionChart>
     VisitingPriority.low: true,
   };
 
-  void _navigateToStudentInfo(Student student) => GoRouter.of(context).goNamed(
-    Screens.supervisionStudentDetails,
-    pathParameters: Screens.params(student),
-  );
+  void _navigateToStudentInfo(Student student) {
+    if (_editPrioritiesMode || _editSignatoriesMode) return;
+    GoRouter.of(context).goNamed(
+      Screens.supervisionStudentDetails,
+      pathParameters: Screens.params(student),
+    );
+  }
 
-  Future<void> _toggleEditMode(
+  Future<bool> _getAllInternshipLocks(
+    List<_InternshipMetaData> internships,
+  ) async {
+    final internshipsProvided = InternshipsProvider.of(context, listen: false);
+    final hasLocks = await Future.wait([
+      for (final meta in internships)
+        internshipsProvided.getLockForItem(meta.internship),
+    ]);
+    final hasLock = hasLocks.every((e) => e);
+    if (hasLock) return true;
+
+    // If we failed to acquire all locks, release all of them
+    await _releaseAllInternshipLocks(internships);
+    return false;
+  }
+
+  Future<void> _releaseAllInternshipLocks(
+    Iterable<_InternshipMetaData> internships,
+  ) async {
+    final internshipsProvided = InternshipsProvider.of(context, listen: false);
+    await Future.wait([
+      for (final meta in internships)
+        internshipsProvided.releaseLockForItem(meta.internship),
+    ]);
+  }
+
+  Future<void> _toggleEditPrioritiesMode(
     BuildContext context, {
     required List<_InternshipMetaData> internships,
   }) async {
-    if (_forceDisabled) return;
+    if (_forcePrioritiesDisabled) return;
+    final teachersProvided = TeachersProvider.of(context, listen: false);
+    final currentTeacher = teachersProvided.currentTeacher;
+    if (currentTeacher == null) {
+      setState(() {
+        _editPrioritiesMode = false;
+        _forcePrioritiesDisabled = false;
+      });
+      return;
+    }
     setState(() {
-      _forceDisabled = true;
+      _forcePrioritiesDisabled = true;
+    });
+
+    if (_editPrioritiesMode) {
+      _logger.info('Saving changes in edit priorities mode');
+
+      bool hasChanged = false;
+      for (final meta in internships) {
+        if (meta.visitingPriority !=
+            currentTeacher.visitingPriority(meta.internship.id)) {
+          currentTeacher.setVisitingPriority(
+            meta.internship.id,
+            meta.visitingPriority,
+          );
+          hasChanged = true;
+        }
+      }
+      if (hasChanged) {
+        await teachersProvided.replaceWithConfirmation(currentTeacher);
+      }
+      await teachersProvided.releaseLockForItem(currentTeacher);
+
+      if (context.mounted) {
+        showSnackBar(context, message: 'Modifications enregistrées');
+      }
+      _editPrioritiesMode = false;
+    } else {
+      final hasLock = await teachersProvided.getLockForItem(currentTeacher);
+      if (!hasLock && context.mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible de modifier les priorités du tableau de supervision, car '
+              'l\'enseignant\u00b7e est en cours de modification par un autre utilisateur.',
+        );
+      }
+      _editPrioritiesMode = hasLock;
+    }
+
+    setState(() {
+      _forcePrioritiesDisabled = false;
+    });
+  }
+
+  Future<void> _toggleEditSignatoriesMode(
+    BuildContext context, {
+    required List<_InternshipMetaData> internships,
+  }) async {
+    if (_forceSignatoriesDisabled) return;
+    final teacherId =
+        TeachersProvider.of(context, listen: false).currentTeacher?.id;
+    if (teacherId == null) {
+      setState(() {
+        _editSignatoriesMode = false;
+        _forceSignatoriesDisabled = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _forceSignatoriesDisabled = true;
     });
     final internshipsProvided = InternshipsProvider.of(context, listen: false);
 
-    if (_editMode) {
-      _logger.info('Saving changes in edit mode');
-
-      final teacherId =
-          TeachersProvider.of(context, listen: false).currentTeacher?.id;
-      if (teacherId == null) {
-        setState(() {
-          _editMode = false;
-          _forceDisabled = false;
-        });
-        return;
-      }
+    if (_editSignatoriesMode) {
+      _logger.info('Saving changes in edit are signatories mode');
 
       final toWait = <Future>[];
       for (final meta in internships) {
         final internship = internshipsProvided.fromIdOrNull(meta.internship.id);
         if (internship == null) continue;
 
-        final newInternship = (meta.isSupervised
+        final newInternship =
+            meta.isSupervised
                 ? internship.copyWithTeacher(context, teacherId: teacherId)
-                : internship.copyWithoutTeacher(context, teacherId: teacherId))
-            .copyWith(visitingPriority: meta.visitingPriority);
-
-        final differences = internship.getDifference(newInternship);
-        if (differences.isNotEmpty) {
+                : internship.copyWithoutTeacher(context, teacherId: teacherId);
+        if (internship.getDifference(newInternship).isNotEmpty) {
           // Update the internship with the new values
           toWait.add(
             internshipsProvided.replaceWithConfirmation(newInternship),
           );
         }
-
-        _logger.fine('Updated internship: ${newInternship.id}');
       }
       await Future.wait(toWait);
+      await _releaseAllInternshipLocks(internships);
 
-      toWait.clear();
-      for (final meta in internships) {
-        toWait.add(internshipsProvided.releaseLockForItem(meta.internship));
+      if (context.mounted) {
+        showSnackBar(context, message: 'Modifications enregistrées');
       }
-      await Future.wait(toWait);
-
-      if (!context.mounted) {
-        setState(() {
-          _forceDisabled = false;
-        });
-        return;
-      }
-      showSnackBar(context, message: 'Modifications enregistrées');
+      _editSignatoriesMode = false;
     } else {
-      var hasLock = true;
-      for (final meta in internships) {
-        hasLock =
-            hasLock &&
-            await internshipsProvided.getLockForItem(meta.internship);
-      }
-      if (!hasLock) {
-        final toWait = <Future>[];
-        for (final meta in internships) {
-          toWait.add(internshipsProvided.releaseLockForItem(meta.internship));
-        }
-        await Future.wait(toWait);
-
-        if (!context.mounted) {
-          setState(() {
-            _forceDisabled = false;
-          });
-          return;
-        }
+      final hasLocks = await _getAllInternshipLocks(internships);
+      if (!hasLocks && context.mounted) {
         showSnackBar(
           context,
           message:
-              'Impossible de modifier le tableau de supervision, car il est en cours de modification par un autre utilisateur.',
+              'Impossible de modifier le tableau de supervision, car au moins un '
+              'stage est en cours de modification par un autre utilisateur.',
         );
-        setState(() {
-          _forceDisabled = false;
-        });
-        return;
       }
+      _editSignatoriesMode = hasLocks;
     }
 
     setState(() {
-      _editMode = !_editMode;
-      _forceDisabled = false;
+      _forceSignatoriesDisabled = false;
     });
   }
 
@@ -278,16 +342,35 @@ class _SupervisionChartState extends State<SupervisionChart>
           if (_tabController.index == 0)
             IconButton(
               onPressed:
-                  _forceDisabled
+                  _forcePrioritiesDisabled || _editSignatoriesMode
                       ? null
-                      : () =>
-                          _toggleEditMode(context, internships: internships),
+                      : () => _toggleEditPrioritiesMode(
+                        context,
+                        internships: internships,
+                      ),
               icon: Icon(
-                _editMode ? Icons.save : Icons.edit,
+                _editPrioritiesMode ? Icons.save : Icons.flag,
                 color:
-                    _forceDisabled
+                    _forcePrioritiesDisabled || _editSignatoriesMode
                         ? Colors.grey
-                        : Theme.of(context).primaryColor,
+                        : Colors.white,
+              ),
+            ),
+          if (_tabController.index == 0)
+            IconButton(
+              onPressed:
+                  _forceSignatoriesDisabled || _editPrioritiesMode
+                      ? null
+                      : () => _toggleEditSignatoriesMode(
+                        context,
+                        internships: internships,
+                      ),
+              icon: Icon(
+                _editSignatoriesMode ? Icons.save : Icons.edit_document,
+                color:
+                    _forceSignatoriesDisabled || _editPrioritiesMode
+                        ? Colors.grey
+                        : Colors.white,
               ),
             ),
         ],
@@ -319,12 +402,12 @@ class _SupervisionChartState extends State<SupervisionChart>
                   child: ListView.builder(
                     shrinkWrap: true,
                     itemCount:
-                        _editMode
+                        _editSignatoriesMode
                             ? internships.length
                             : internships.supervizedCount,
                     itemBuilder: ((ctx, i) {
                       final meta =
-                          _editMode
+                          _editSignatoriesMode
                               ? internships[i]
                               : internships.getSupervized(i);
                       if (meta == null) return Container();
@@ -333,8 +416,8 @@ class _SupervisionChartState extends State<SupervisionChart>
                         key: Key(meta.student.id),
                         meta: meta,
                         onTap: () => _navigateToStudentInfo(meta.student),
-                        onInternshipChanged: () {},
-                        editMode: _editMode,
+                        editPrioritiesMode: _editPrioritiesMode,
+                        editSignatoriesMode: _editSignatoriesMode,
                       );
                     }),
                   ),
@@ -483,14 +566,14 @@ class _StudentTile extends StatefulWidget {
     super.key,
     required this.meta,
     required this.onTap,
-    required this.onInternshipChanged,
-    required this.editMode,
+    required this.editPrioritiesMode,
+    required this.editSignatoriesMode,
   });
 
   final _InternshipMetaData meta;
   final Function()? onTap;
-  final Function() onInternshipChanged;
-  final bool editMode;
+  final bool editPrioritiesMode;
+  final bool editSignatoriesMode;
 
   @override
   State<_StudentTile> createState() => _StudentTileState();
@@ -528,106 +611,100 @@ class _StudentTileState extends State<_StudentTile> {
         ?.specialization;
   }
 
+  void _cyclePriority() {
+    setState(() {
+      widget.meta.visitingPriority = widget.meta.visitingPriority.next;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Builder(
-      builder: (context) {
-        final specialization = _getSpecialization(context);
-        if (_enterprise == null || specialization == null) return Container();
+    final specialization = _getSpecialization(context);
+    if (_enterprise == null || specialization == null) return Container();
 
-        return Card(
-          elevation: 10,
-          child: ListTile(
-            onTap: widget.editMode ? null : widget.onTap,
-            leading: SizedBox(
-              height: double.infinity, // This centers the avatar
-              child: widget.meta.student.avatar,
+    return Card(
+      elevation: 10,
+      child: ListTile(
+        onTap:
+            widget.editPrioritiesMode || widget.editSignatoriesMode
+                ? null
+                : widget.onTap,
+        leading: SizedBox(
+          height: double.infinity, // This centers the avatar
+          child: widget.meta.student.avatar,
+        ),
+        tileColor: widget.onTap == null ? disabled.withAlpha(50) : null,
+        title: Text(widget.meta.student.fullName),
+        isThreeLine: true,
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              _enterprise!.name,
+              style: const TextStyle(color: Colors.black87),
             ),
-            tileColor: widget.onTap == null ? disabled.withAlpha(50) : null,
-            title: Text(widget.meta.student.fullName),
-            isThreeLine: true,
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _enterprise!.name,
-                  style: const TextStyle(color: Colors.black87),
-                ),
-                AutoSizeText(
-                  specialization.name,
-                  maxLines: 2,
-                  style: const TextStyle(color: Colors.black87),
-                ),
-              ],
+            AutoSizeText(
+              specialization.name,
+              maxLines: 2,
+              style: const TextStyle(color: Colors.black87),
             ),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Ink(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Colors.grey,
-                        blurRadius: 5.0,
-                        spreadRadius: 0.0,
-                        offset: Offset(2.0, 2.0),
-                      ),
-                    ],
-                    border: Border.all(
-                      color: Theme.of(context).primaryColor.withAlpha(100),
-                      width: 2.5,
+          ],
+        ),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Ink(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  if (widget.editPrioritiesMode)
+                    BoxShadow(
+                      color: Colors.grey,
+                      blurRadius: 5.0,
+                      spreadRadius: 0.0,
+                      offset: Offset(2.0, 2.0),
                     ),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Tooltip(
-                    message:
-                        'Niveau de priorité pour les visites de supervision',
-                    child: InkWell(
-                      onTap:
-                          widget.editMode &&
-                                  (widget.meta.isTeacherSignatory ||
-                                      widget.meta.isSupervised)
-                              ? () {
-                                setState(
-                                  () =>
-                                      widget.meta.visitingPriority =
-                                          widget.meta.visitingPriority.next,
-                                );
-                                widget.onInternshipChanged();
-                              }
-                              : null,
-                      borderRadius: BorderRadius.circular(25),
-                      child: SizedBox(
-                        width: 45,
-                        height: 45,
-                        child: Icon(
-                          widget.meta.visitingPriority.icon,
-                          color: widget.meta.visitingPriority.color,
-                          size: 30,
-                        ),
-                      ),
+                ],
+                border: Border.all(
+                  color: Theme.of(context).primaryColor.withAlpha(100),
+                  width: widget.editPrioritiesMode ? 2.5 : 1,
+                ),
+                shape: BoxShape.circle,
+              ),
+              child: Tooltip(
+                message: 'Niveau de priorité pour les visites de supervision',
+                child: InkWell(
+                  onTap: widget.editPrioritiesMode ? _cyclePriority : null,
+                  borderRadius: BorderRadius.circular(25),
+                  child: SizedBox(
+                    width: 45,
+                    height: 45,
+                    child: Icon(
+                      widget.meta.visitingPriority.icon,
+                      color: widget.meta.visitingPriority.color,
+                      size: 30,
                     ),
                   ),
                 ),
-                if (widget.editMode)
-                  Checkbox(
-                    value:
-                        widget.meta.isTeacherSignatory
-                            ? true
-                            : widget.meta.isSupervised,
-                    onChanged:
-                        widget.editMode && !widget.meta.isTeacherSignatory
-                            ? (value) => setState(
-                              () => widget.meta.isSupervised = value ?? false,
-                            )
-                            : null,
-                  ),
-              ],
+              ),
             ),
-          ),
-        );
-      },
+            if (widget.editSignatoriesMode)
+              Checkbox(
+                value:
+                    widget.meta.isTeacherSignatory
+                        ? true
+                        : widget.meta.isSupervised,
+                onChanged:
+                    widget.editSignatoriesMode &&
+                            !widget.meta.isTeacherSignatory
+                        ? (value) => setState(
+                          () => widget.meta.isSupervised = value ?? false,
+                        )
+                        : null,
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

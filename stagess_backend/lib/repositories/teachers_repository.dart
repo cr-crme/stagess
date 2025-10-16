@@ -216,6 +216,11 @@ class MySqlTeachersRepository extends TeachersRepository {
             idNameToDataTable: 'teacher_id',
             fieldsToFetch: ['id', 'date'],
           ),
+          sqlInterface.selectSubquery(
+            dataTableName: 'teachers_visiting_priorities',
+            idNameToDataTable: 'teacher_id',
+            fieldsToFetch: ['internship_id', 'visiting_priority'],
+          ),
         ]);
 
     final map = <String, Teacher>{};
@@ -260,6 +265,13 @@ class MySqlTeachersRepository extends TeachersRepository {
           ]..sort((a, b) => a['id'].compareTo(b['id']));
         }
       }
+
+      final visitingPriorities = {};
+      for (final priority in teacher['teachers_visiting_priorities'] as List) {
+        final internshipId = priority['internship_id'] as String;
+        visitingPriorities[internshipId] = priority['visiting_priority'];
+      }
+      teacher['visiting_priorities'] = visitingPriorities;
 
       map[id] = Teacher.fromSerialized(teacher);
     }
@@ -392,6 +404,57 @@ class MySqlTeachersRepository extends TeachersRepository {
     await Future.wait(toWait);
   }
 
+  Future<void> _insertToPriorities(Teacher teacher) async {
+    final toWait = <Future>[];
+    for (var internshipId in teacher.internshipsWithPriorities) {
+      toWait.add(sqlInterface
+          .performInsertQuery(tableName: 'teachers_visiting_priorities', data: {
+        'teacher_id': teacher.id,
+        'internship_id': internshipId,
+        'visiting_priority': teacher.visitingPriority(internshipId).index,
+      }));
+    }
+    await Future.wait(toWait);
+  }
+
+  Future<void> _updateToPriorities(
+      DatabaseUser user, Teacher teacher, Teacher previous) async {
+    final differences = teacher.getDifference(previous);
+    if (!differences.contains('visiting_priorities')) return;
+
+    final currentPriorities = await sqlInterface.performSelectQuery(
+      user: user,
+      tableName: 'teachers_visiting_priorities',
+      filters: {'teacher_id': teacher.id},
+      fieldsToFetch: ['internship_id'],
+    );
+
+    // Update priorities
+    final toWait = <Future>[];
+    for (var internshipId in teacher.internshipsWithPriorities) {
+      if (!currentPriorities.any((e) => e['internship_id'] == internshipId)) {
+        toWait.add(sqlInterface.performInsertQuery(
+            tableName: 'teachers_visiting_priorities',
+            data: {
+              'teacher_id': teacher.id,
+              'internship_id': internshipId,
+              'visiting_priority': teacher.visitingPriority(internshipId).index,
+            }));
+      } else {
+        toWait.add(sqlInterface.performUpdateQuery(
+            tableName: 'teachers_visiting_priorities',
+            filters: {
+              'teacher_id': teacher.id,
+              'internship_id': internshipId,
+            },
+            data: {
+              'visiting_priority': teacher.visitingPriority(internshipId).index,
+            }));
+      }
+    }
+    await Future.wait(toWait);
+  }
+
   @override
   Future<void> _putTeacher({
     required Teacher teacher,
@@ -408,9 +471,11 @@ class MySqlTeachersRepository extends TeachersRepository {
     if (previous == null) {
       toWait.add(_insertToGroups(teacher));
       toWait.add(_insertToItineraries(teacher));
+      toWait.add(_insertToPriorities(teacher));
     } else {
       toWait.add(_updateToGroups(teacher, previous, user));
       toWait.add(_updateToItineraries(teacher, previous));
+      toWait.add(_updateToPriorities(user, teacher, previous));
     }
     await Future.wait(toWait);
   }
@@ -469,33 +534,37 @@ class TeachersRepositoryMock extends TeachersRepository {
   // Simulate a database with a map
   final _dummyDatabase = {
     '0': Teacher(
-        id: '0',
-        firstName: 'John',
-        middleName: null,
-        lastName: 'Doe',
-        schoolBoardId: '10',
-        schoolId: '10',
-        hasRegisteredAccount: true,
-        groups: ['100', '101'],
-        phone: PhoneNumber.fromString('098-765-4321'),
-        email: 'john.doe@email.com',
-        dateBirth: null,
-        address: Address.empty,
-        itineraries: []),
+      id: '0',
+      firstName: 'John',
+      middleName: null,
+      lastName: 'Doe',
+      schoolBoardId: '10',
+      schoolId: '10',
+      hasRegisteredAccount: true,
+      groups: ['100', '101'],
+      phone: PhoneNumber.fromString('098-765-4321'),
+      email: 'john.doe@email.com',
+      dateBirth: null,
+      address: Address.empty,
+      itineraries: [],
+      visitingPriorities: {},
+    ),
     '1': Teacher(
-        id: '1',
-        firstName: 'Jane',
-        middleName: null,
-        lastName: 'Doe',
-        schoolBoardId: '10',
-        schoolId: '10',
-        hasRegisteredAccount: true,
-        groups: ['100', '101'],
-        phone: PhoneNumber.fromString('123-456-7890'),
-        email: 'john.doe@email.com',
-        dateBirth: null,
-        address: Address.empty,
-        itineraries: []),
+      id: '1',
+      firstName: 'Jane',
+      middleName: null,
+      lastName: 'Doe',
+      schoolBoardId: '10',
+      schoolId: '10',
+      hasRegisteredAccount: true,
+      groups: ['100', '101'],
+      phone: PhoneNumber.fromString('123-456-7890'),
+      email: 'john.doe@email.com',
+      dateBirth: null,
+      address: Address.empty,
+      itineraries: [],
+      visitingPriorities: {},
+    ),
   };
 
   @override

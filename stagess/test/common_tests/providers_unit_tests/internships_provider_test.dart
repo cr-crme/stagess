@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stagess/program_helpers.dart';
-import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 
 import '../../utils.dart';
@@ -12,8 +11,10 @@ void main() {
     ProgramInitializer.initialize(mockMe: true);
 
     test('"byStudentId" return the right student', () {
-      final internships =
-          InternshipsProvider(uri: Uri.parse('ws://localhost'), mockMe: true);
+      final internships = InternshipsProvider(
+        uri: Uri.parse('ws://localhost'),
+        mockMe: true,
+      );
       internships.add(dummyInternship(studentId: '123'));
       internships.add(dummyInternship(studentId: '123'));
       internships.add(dummyInternship(studentId: '456'));
@@ -27,8 +28,10 @@ void main() {
     });
 
     test('deserializeItem works', () {
-      final internships =
-          InternshipsProvider(uri: Uri.parse('ws://localhost'), mockMe: true);
+      final internships = InternshipsProvider(
+        uri: Uri.parse('ws://localhost'),
+        mockMe: true,
+      );
       final internship = internships.deserializeItem({
         'student_id': '123',
         'enterprise_id': '456',
@@ -36,18 +39,6 @@ void main() {
       });
       expect(internship.studentId, '123');
       expect(internship.enterpriseId, '456');
-      expect(internship.visitingPriority, VisitingPriority.low);
-    });
-
-    test('can replace priority', () {
-      final internships =
-          InternshipsProvider(uri: Uri.parse('ws://localhost'), mockMe: true);
-      internships.add(dummyInternship());
-
-      expect(internships[0].visitingPriority, VisitingPriority.low);
-      internships.replacePriority(
-          internships[0].studentId, VisitingPriority.high);
-      expect(internships[0].visitingPriority, VisitingPriority.high);
     });
 
     testWidgets('can get "of" context', (tester) async {

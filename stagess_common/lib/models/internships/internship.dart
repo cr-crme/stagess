@@ -8,7 +8,6 @@ import 'package:stagess_common/models/internships/internship_evaluation_visa.dar
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/time_utils.dart';
 import 'package:stagess_common/models/internships/transportation.dart';
-import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/persons/person.dart';
 
 export 'package:stagess_common/models/generic/serializable_elements.dart';
@@ -245,7 +244,6 @@ class Internship extends ExtendedItemSerializable {
   // Elements that are parts of the inner working of the internship (can be
   // modify, but won't generate a new version)
   final int achievedDuration;
-  final VisitingPriority visitingPriority;
   final String teacherNotes;
   final DateTime endDate;
 
@@ -322,7 +320,6 @@ class Internship extends ExtendedItemSerializable {
     required List<InternshipMutableElements> mutables,
     required this.expectedDuration,
     required this.achievedDuration,
-    required this.visitingPriority,
     required this.teacherNotes,
     required this.endDate,
     required this.skillEvaluations,
@@ -350,7 +347,6 @@ class Internship extends ExtendedItemSerializable {
     required String visitFrequencies,
     required this.expectedDuration,
     required this.achievedDuration,
-    required this.visitingPriority,
     this.teacherNotes = '',
     required this.endDate,
     List<InternshipEvaluationSkill>? skillEvaluations,
@@ -384,7 +380,6 @@ class Internship extends ExtendedItemSerializable {
         mutables: [],
         expectedDuration: -1,
         achievedDuration: -1,
-        visitingPriority: VisitingPriority.notApplicable,
         teacherNotes: '',
         endDate: DateTime(0),
         skillEvaluations: [],
@@ -412,8 +407,6 @@ class Internship extends ExtendedItemSerializable {
             [],
         expectedDuration = IntExt.from(map['expected_duration']) ?? -1,
         achievedDuration = IntExt.from(map['achieved_duration']) ?? -1,
-        visitingPriority = VisitingPriority.deserialize(map['priority']) ??
-            VisitingPriority.notApplicable,
         teacherNotes = StringExt.from(map['teacher_notes']) ?? '',
         endDate = DateTimeExt.from(map['end_date']) ?? DateTime(0),
         skillEvaluations = ListExt.from(map['skill_evaluations'],
@@ -444,7 +437,6 @@ class Internship extends ExtendedItemSerializable {
         'mutables': serializedMutables,
         'expected_duration': expectedDuration.serialize(),
         'achieved_duration': achievedDuration.serialize(),
-        'priority': visitingPriority.serialize(),
         'teacher_notes': teacherNotes.serialize(),
         'end_date': endDate.serialize(),
         'skill_evaluations': skillEvaluations.serialize(),
@@ -482,7 +474,6 @@ class Internship extends ExtendedItemSerializable {
     List<String>? extraSpecializationIds,
     int? expectedDuration,
     int? achievedDuration,
-    VisitingPriority? visitingPriority,
     String? teacherNotes,
     DateTime? endDate,
     List<InternshipEvaluationSkill>? skillEvaluations,
@@ -504,7 +495,6 @@ class Internship extends ExtendedItemSerializable {
       mutables: _mutables,
       expectedDuration: expectedDuration ?? this.expectedDuration,
       achievedDuration: achievedDuration ?? this.achievedDuration,
-      visitingPriority: visitingPriority ?? this.visitingPriority,
       teacherNotes: teacherNotes ?? this.teacherNotes,
       endDate: endDate ?? this.endDate,
       skillEvaluations: skillEvaluations?.toList() ?? this.skillEvaluations,
@@ -530,7 +520,6 @@ class Internship extends ExtendedItemSerializable {
       'mutables',
       'expected_duration',
       'achieved_duration',
-      'priority',
       'teacher_notes',
       'end_date',
       'skill_evaluations',
@@ -573,8 +562,6 @@ class Internship extends ExtendedItemSerializable {
           IntExt.from(data['expected_duration']) ?? expectedDuration,
       achievedDuration:
           IntExt.from(data['achieved_duration']) ?? achievedDuration,
-      visitingPriority:
-          VisitingPriority.deserialize(data['priority']) ?? visitingPriority,
       teacherNotes: StringExt.from(data['teacher_notes']) ?? teacherNotes,
       endDate: DateTimeExt.from(data['end_date']) ?? endDate,
       skillEvaluations: ListExt.from(data['skill_evaluations'],
@@ -603,7 +590,6 @@ class Internship extends ExtendedItemSerializable {
         'mutables: $_mutables, '
         'expectedDuration: $expectedDuration days, '
         'achievedDuration: $achievedDuration, '
-        'visitingPriority: $visitingPriority, '
         'teacherNotes: $teacherNotes, '
         'endDate: $endDate, '
         'skillEvaluations: $skillEvaluations, '

@@ -113,6 +113,7 @@ class Home extends StatelessWidget {
           return true;
         },
         child: MaterialApp.router(
+          debugShowCheckedModeBanner: false,
           onGenerateTitle: (context) => 'Administration de Stagess',
           theme: crcrmeMaterialTheme,
           routerConfig: router,

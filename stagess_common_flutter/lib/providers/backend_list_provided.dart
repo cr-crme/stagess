@@ -499,6 +499,11 @@ Future<void> _incommingMessage(
       return;
     }
 
+    final completer = _completers.remove(protocol.id);
+    if (completer != null && !completer.isCompleted) {
+      completer.complete(protocol);
+    }
+
     // If no data are provided
     if (protocol.requestType != RequestType.handshake &&
         protocol.field == null) {
@@ -525,10 +530,6 @@ Future<void> _incommingMessage(
         }
       case RequestType.response:
         {
-          final completer = _completers.remove(protocol.id);
-          if (completer != null && !completer.isCompleted) {
-            completer.complete(protocol);
-          }
           return;
         }
       case RequestType.update:
