@@ -42,7 +42,7 @@ class _ItineraryMainScreenState extends State<ItineraryMainScreen> {
     _logger.fine('Filling all waypoints');
     final internships = InternshipsProvider.of(context, listen: false);
 
-    var school = SchoolBoardsProvider.of(context, listen: false).mySchool;
+    var school = SchoolBoardsProvider.of(context, listen: false).currentSchool;
     if (!mounted || school == null) return;
 
     final enterprises = EnterprisesProvider.of(context, listen: false);
@@ -148,7 +148,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     _teachersProvider = TeachersProvider.of(context, listen: false);
 
     while (!(await _teachersProvider.getLockForItem(
-      _teachersProvider.myTeacher!,
+      _teachersProvider.currentTeacher!,
     ))) {
       if (!mounted) return;
       await Future.delayed(const Duration(milliseconds: 1000));
@@ -191,7 +191,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     if (_routingController.hasChanged) {
       _routingController.saveItinerary(teachers: _teachersProvider);
     }
-    _teachersProvider.releaseLockForItem(_teachersProvider.myTeacher!);
+    _teachersProvider.releaseLockForItem(_teachersProvider.currentTeacher!);
 
     super.dispose();
   }

@@ -22,7 +22,7 @@ class SchoolBoardsProvider extends BackendListProvided<SchoolBoard> {
   RequestFields getField([bool asList = false]) =>
       asList ? RequestFields.schoolBoards : RequestFields.schoolBoard;
 
-  SchoolBoard? get mySchoolBoard {
+  SchoolBoard? get currentSchoolBoard {
     final schoolBoardId = _authProvider?.schoolBoardId;
     if (schoolBoardId == null) return null;
 
@@ -32,8 +32,8 @@ class SchoolBoardsProvider extends BackendListProvided<SchoolBoard> {
     return schoolBoard;
   }
 
-  School? get mySchool {
-    final schoolBoard = mySchoolBoard;
+  School? get currentSchool {
+    final schoolBoard = currentSchoolBoard;
     if (schoolBoard == null) return null;
 
     final schoolId = _authProvider?.schoolId;

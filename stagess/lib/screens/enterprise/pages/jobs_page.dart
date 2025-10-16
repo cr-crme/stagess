@@ -290,7 +290,8 @@ class JobsPageState extends State<JobsPage> {
     });
 
     _logger.finer('Adding comment to job: ${job.specialization.name}');
-    final teacherId = TeachersProvider.of(context, listen: false).myTeacher?.id;
+    final teacherId =
+        TeachersProvider.of(context, listen: false).currentTeacher?.id;
     if (teacherId == null) {
       _logger.warning('No teacher ID found when adding comment to job.');
       showSnackBar(

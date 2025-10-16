@@ -275,7 +275,7 @@ class InternshipDetailsState extends State<InternshipDetails> {
   Widget build(BuildContext context) {
     _logger.finer('Building InternshipDetails for ID: ${widget.internshipId}');
 
-    final myId = TeachersProvider.of(context).myTeacher?.id;
+    final myId = TeachersProvider.of(context).currentTeacher?.id;
     if (myId == null) {
       return const Center(child: Text('Vous n\'êtes pas connecté.'));
     }

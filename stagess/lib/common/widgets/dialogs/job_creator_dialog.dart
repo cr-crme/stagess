@@ -22,8 +22,11 @@ class _JobCreatorDialogState extends State<JobCreatorDialog> {
   }
 
   void _onConfirm() {
-    if (FormService.validateForm(_formKey,
-        save: true, showSnackbarError: true)) {
+    if (FormService.validateForm(
+      _formKey,
+      save: true,
+      showSnackbarError: true,
+    )) {
       Navigator.pop(context, controller.job);
     }
   }
@@ -47,7 +50,7 @@ class _JobCreatorDialogState extends State<JobCreatorDialog> {
             child: EnterpriseJobListTile(
               controller: controller,
               schools: [
-                SchoolBoardsProvider.of(context, listen: false).mySchool!
+                SchoolBoardsProvider.of(context, listen: false).currentSchool!,
               ],
               elevation: 0,
               canChangeExpandedState: false,
@@ -58,14 +61,8 @@ class _JobCreatorDialogState extends State<JobCreatorDialog> {
             ),
           ),
           actions: [
-            OutlinedButton(
-              onPressed: _onCancel,
-              child: const Text('Annuler'),
-            ),
-            TextButton(
-              onPressed: _onConfirm,
-              child: const Text('Confirmer'),
-            ),
+            OutlinedButton(onPressed: _onCancel, child: const Text('Annuler')),
+            TextButton(onPressed: _onConfirm, child: const Text('Confirmer')),
           ],
         ),
       ),

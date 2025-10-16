@@ -16,7 +16,8 @@ class MyAccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     _logger.finer('Building MyAccountScreen');
 
-    final currentTeacher = TeachersProvider.of(context, listen: true).myTeacher;
+    final currentTeacher =
+        TeachersProvider.of(context, listen: true).currentTeacher;
 
     return ResponsiveService.scaffoldOf(
       context,
@@ -27,11 +28,10 @@ class MyAccountScreen extends StatelessWidget {
       smallDrawer: MainDrawer.small,
       mediumDrawer: MainDrawer.medium,
       largeDrawer: MainDrawer.large,
-      body: currentTeacher == null
-          ? Center(child: Text('Aucun enseignant trouvé'))
-          : TeacherListTile(
-              teacher: currentTeacher,
-            ),
+      body:
+          currentTeacher == null
+              ? Center(child: Text('Aucun enseignant trouvé'))
+              : TeacherListTile(teacher: currentTeacher),
     );
   }
 }

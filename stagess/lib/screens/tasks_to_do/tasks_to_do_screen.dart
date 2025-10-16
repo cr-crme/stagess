@@ -32,7 +32,7 @@ int numberOfTasksToDo(context) {
 List<_JobEnterpriseInternshipStudent> _enterprisesToEvaluate(context) {
   // We should evaluate a job of an enterprise if there is at least one
   // internship in this job and the no evaluation was ever performed
-  final myId = TeachersProvider.of(context).myTeacher?.id;
+  final myId = TeachersProvider.of(context).currentTeacher?.id;
   if (myId == null) return [];
   final enterprises = EnterprisesProviderExtension.availableEnterprisesOf(
     context,

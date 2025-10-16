@@ -55,13 +55,15 @@ class _InternshipEnrollmentScreenState
   final List<StepState> _stepStatus = [
     StepState.indexed,
     StepState.indexed,
-    StepState.indexed
+    StepState.indexed,
   ];
 
   void _showInvalidFieldsSnakBar([String? message]) {
     ScaffoldMessenger.of(context).clearSnackBars();
-    showSnackBar(context,
-        message: message ?? 'Remplir tous les champs avec un *.');
+    showSnackBar(
+      context,
+      message: message ?? 'Remplir tous les champs avec un *.',
+    );
   }
 
   void _previousStep() {
@@ -78,14 +80,16 @@ class _InternshipEnrollmentScreenState
 
     bool areAllValid = true;
     if (_currentStep >= 0) {
-      final isValid =
-          FormService.validateForm(_caracteristicsKey.currentState!.formKey);
+      final isValid = FormService.validateForm(
+        _caracteristicsKey.currentState!.formKey,
+      );
       areAllValid = areAllValid && isValid;
       _stepStatus[0] = isValid ? StepState.complete : StepState.error;
     }
     if (_currentStep >= 1) {
-      final isValid =
-          FormService.validateForm(_scheduleKey.currentState!.formKey);
+      final isValid = FormService.validateForm(
+        _scheduleKey.currentState!.formKey,
+      );
       areAllValid = areAllValid && isValid;
       _stepStatus[1] = isValid ? StepState.complete : StepState.error;
     }
@@ -122,40 +126,49 @@ class _InternshipEnrollmentScreenState
     }
 
     InternshipsProvider.of(context, listen: false).add(internship);
-    final enterprise = EnterprisesProvider.of(context, listen: false)
-        .fromId(internship.enterpriseId);
+    final enterprise = EnterprisesProvider.of(
+      context,
+      listen: false,
+    ).fromId(internship.enterpriseId);
 
-    final student = StudentsHelpers.studentsInMyGroups(context, listen: false)
-        .firstWhere(
-            (e) => e.id == _caracteristicsKey.currentState!.student!.id);
+    final student = StudentsHelpers.studentsInMyGroups(
+      context,
+      listen: false,
+    ).firstWhere((e) => e.id == _caracteristicsKey.currentState!.student!.id);
     await showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-              title: const SubTitle('Inscription réussie', left: 0, bottom: 0),
-              content: RichText(
-                text: TextSpan(
-                  children: [
-                    TextSpan(
-                        text: '${student.fullName} ',
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    const TextSpan(
-                        text: ' a bien été inscrit comme stagiaire chez '),
-                    TextSpan(
-                        text: enterprise.name,
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    const TextSpan(
-                        text:
-                            '.\n\nVous pouvez maintenant accéder au contrat de stage dans la section "Documents".'),
-                  ],
-                ),
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: const SubTitle('Inscription réussie', left: 0, bottom: 0),
+            content: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: '${student.fullName} ',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const TextSpan(
+                    text: ' a bien été inscrit comme stagiaire chez ',
+                  ),
+                  TextSpan(
+                    text: enterprise.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const TextSpan(
+                    text:
+                        '.\n\nVous pouvez maintenant accéder au contrat de stage dans la section "Documents".',
+                  ),
+                ],
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Ok'),
-                )
-              ],
-            ));
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Ok'),
+              ),
+            ],
+          ),
+    );
 
     _logger.finer('Internship enrollment form submitted successfully');
     if (!mounted) return;
@@ -168,23 +181,28 @@ class _InternshipEnrollmentScreenState
   }
 
   Internship? get _newInternship {
-    final enterprise = _caracteristicsKey.currentState == null
-        ? null
-        : EnterprisesProvider.of(context, listen: false)
-            .fromIdOrNull(_caracteristicsKey.currentState!.enterprise.id);
+    final enterprise =
+        _caracteristicsKey.currentState == null
+            ? null
+            : EnterprisesProvider.of(
+              context,
+              listen: false,
+            ).fromIdOrNull(_caracteristicsKey.currentState!.enterprise.id);
     if (enterprise == null) return null;
 
     final signatoryTeacher =
-        TeachersProvider.of(context, listen: false).myTeacher;
+        TeachersProvider.of(context, listen: false).currentTeacher;
     if (signatoryTeacher == null) {
-      showSnackBar(context,
-          message:
-              'Vous devez être connecté en tant qu\'enseignant pour inscrire un stagiaire.');
+      showSnackBar(
+        context,
+        message:
+            'Vous devez être connecté en tant qu\'enseignant pour inscrire un stagiaire.',
+      );
       return null;
     }
 
     final schoolBoard =
-        SchoolBoardsProvider.of(context, listen: false).mySchoolBoard;
+        SchoolBoardsProvider.of(context, listen: false).currentSchoolBoard;
     if (schoolBoard == null) return null;
 
     return Internship(
@@ -194,38 +212,49 @@ class _InternshipEnrollmentScreenState
       signatoryTeacherId: signatoryTeacher.id,
       extraSupervisingTeacherIds: [],
       enterpriseId: _caracteristicsKey.currentState!.enterprise.id,
-      jobId: enterprise.jobs
-          .firstWhere((job) =>
-              job.specialization ==
-              _caracteristicsKey
-                  .currentState!.primaryJobController.job.specialization)
-          .id,
-      extraSpecializationIds: _caracteristicsKey
-          .currentState!.extraJobControllers
-          .map<String>((e) => e.job.specializationOrNull?.id ?? '')
-          .where((e) => e.isNotEmpty)
-          .toList(),
+      jobId:
+          enterprise.jobs
+              .firstWhere(
+                (job) =>
+                    job.specialization ==
+                    _caracteristicsKey
+                        .currentState!
+                        .primaryJobController
+                        .job
+                        .specialization,
+              )
+              .id,
+      extraSpecializationIds:
+          _caracteristicsKey.currentState!.extraJobControllers
+              .map<String>((e) => e.job.specializationOrNull?.id ?? '')
+              .where((e) => e.isNotEmpty)
+              .toList(),
       supervisor: Person(
-          firstName: _caracteristicsKey.currentState!.supervisorFirstName ?? '',
-          middleName: null,
-          lastName: _caracteristicsKey.currentState!.supervisorLastName ?? '',
-          dateBirth: null,
-          email: _caracteristicsKey.currentState!.supervisorEmail ?? '',
-          address: Address.empty,
-          phone: _caracteristicsKey.currentState?.supervisorPhone == null
-              ? null
-              : PhoneNumber.fromString(
-                  _caracteristicsKey.currentState!.supervisorPhone)),
-      dates: _scheduleKey.currentState?.weeklyScheduleController.dateRange ??
+        firstName: _caracteristicsKey.currentState!.supervisorFirstName ?? '',
+        middleName: null,
+        lastName: _caracteristicsKey.currentState!.supervisorLastName ?? '',
+        dateBirth: null,
+        email: _caracteristicsKey.currentState!.supervisorEmail ?? '',
+        address: Address.empty,
+        phone:
+            _caracteristicsKey.currentState?.supervisorPhone == null
+                ? null
+                : PhoneNumber.fromString(
+                  _caracteristicsKey.currentState!.supervisorPhone,
+                ),
+      ),
+      dates:
+          _scheduleKey.currentState?.weeklyScheduleController.dateRange ??
           time_utils.DateTimeRange(
-              start: DateTime.now(),
-              end: DateTime.now().add(const Duration(days: 30))),
+            start: DateTime.now(),
+            end: DateTime.now().add(const Duration(days: 30)),
+          ),
       expectedDuration: _scheduleKey.currentState?.internshipDuration ?? -1,
       achievedDuration: -1,
       endDate: DateTime(0),
       weeklySchedules:
           _scheduleKey.currentState?.weeklyScheduleController.weeklySchedules ??
-              [],
+          [],
       transportations: _caracteristicsKey.currentState?.transportations ?? [],
       visitFrequencies: _scheduleKey.currentState?.visitFrequencies ?? '',
       visitingPriority: VisitingPriority.low,
@@ -235,8 +264,10 @@ class _InternshipEnrollmentScreenState
   void _cancel() async {
     _logger.info('Canceling internship enrollment form');
     final navigator = Navigator.of(context);
-    final answer = await ConfirmExitDialog.show(context,
-        content: const Text('Toutes les modifications seront perdues.'));
+    final answer = await ConfirmExitDialog.show(
+      context,
+      content: const Text('Toutes les modifications seront perdues.'),
+    );
     if (!mounted || !answer) return;
 
     _logger.finer('Internship enrollment form canceled');
@@ -246,17 +277,21 @@ class _InternshipEnrollmentScreenState
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-        'Building InternshipEnrollmentScreen for enterprise: ${widget.enterprise.id}');
+      'Building InternshipEnrollmentScreen for enterprise: ${widget.enterprise.id}',
+    );
 
     return SizedBox(
       width: ResponsiveService.maxBodyWidth,
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-              'Inscrire un stagiaire chez${ResponsiveService.getScreenSize(context) == ScreenSize.small ? '\n' : ' '}'
-              '${widget.enterprise.name}'),
+            'Inscrire un stagiaire chez${ResponsiveService.getScreenSize(context) == ScreenSize.small ? '\n' : ' '}'
+            '${widget.enterprise.name}',
+          ),
           leading: IconButton(
-              onPressed: _cancel, icon: const Icon(Icons.arrow_back)),
+            onPressed: _cancel,
+            icon: const Icon(Icons.arrow_back),
+          ),
         ),
         body: PopScope(
           child: ScrollableStepper(
@@ -277,12 +312,13 @@ class _InternshipEnrollmentScreenState
                 isActive: _currentStep == 0,
                 title: const Text('Caractéristiques'),
                 content: CaracteristicsStep(
-                    key: _caracteristicsKey,
-                    enterprise: widget.enterprise,
-                    specifiedSpecialization:
-                        widget.specifiedSpecialization == null
-                            ? null
-                            : [widget.specifiedSpecialization!]),
+                  key: _caracteristicsKey,
+                  enterprise: widget.enterprise,
+                  specifiedSpecialization:
+                      widget.specifiedSpecialization == null
+                          ? null
+                          : [widget.specifiedSpecialization!],
+                ),
               ),
               Step(
                 state: _stepStatus[1],
@@ -316,15 +352,19 @@ class _InternshipEnrollmentScreenState
         children: [
           if (_currentStep != 0)
             OutlinedButton(
-                onPressed: _previousStep, child: const Text('Précédent')),
+              onPressed: _previousStep,
+              child: const Text('Précédent'),
+            ),
           const SizedBox(width: 20),
           TextButton(
             onPressed: details.onStepContinue,
-            child: Text(_currentStep == 2
-                ? 'Valider'
-                : _currentStep == 1
-                    ? 'Enregistrer'
-                    : 'Suivant'),
+            child: Text(
+              _currentStep == 2
+                  ? 'Valider'
+                  : _currentStep == 1
+                  ? 'Enregistrer'
+                  : 'Suivant',
+            ),
           ),
         ],
       ),

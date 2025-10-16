@@ -20,9 +20,10 @@ class JobsPageState extends State<JobsPage> {
   final _formKey = GlobalKey<FormState>();
   late final _jobsControllers = <EnterpriseJobListController>[
     EnterpriseJobListController(
-        context: context,
-        enterpriseStatus: EnterpriseStatus.active,
-        job: Job.empty)
+      context: context,
+      enterpriseStatus: EnterpriseStatus.active,
+      job: Job.empty,
+    ),
   ];
   List<EnterpriseJobListController> get jobsControllers => _jobsControllers;
 
@@ -58,8 +59,8 @@ class JobsPageState extends State<JobsPage> {
               shrinkWrap: true,
               itemCount: _jobsControllers.length,
               physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (BuildContext context, int index) =>
-                  _buildNewJobsForm(index),
+              itemBuilder:
+                  (BuildContext context, int index) => _buildNewJobsForm(index),
             ),
             Align(
               alignment: Alignment.centerRight,
@@ -69,13 +70,14 @@ class JobsPageState extends State<JobsPage> {
                   controllers: _jobsControllers,
                   onJobAdded: () => setState(() {}),
                   style: Theme.of(context).textButtonTheme.style!.copyWith(
-                      backgroundColor: Theme.of(context)
-                          .elevatedButtonTheme
-                          .style!
-                          .backgroundColor),
+                    backgroundColor:
+                        Theme.of(
+                          context,
+                        ).elevatedButtonTheme.style!.backgroundColor,
+                  ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
@@ -95,8 +97,8 @@ class JobsPageState extends State<JobsPage> {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             IconButton(
-              onPressed: () =>
-                  setState(() => _jobsControllers.remove(controller)),
+              onPressed:
+                  () => setState(() => _jobsControllers.remove(controller)),
               padding: const EdgeInsets.all(8.0),
               icon: const Icon(Icons.delete_forever),
               tooltip: 'Supprimer',
@@ -105,16 +107,17 @@ class JobsPageState extends State<JobsPage> {
           ],
         ),
         EnterpriseJobListTile(
-            controller: controller,
-            showHeader: false,
-            schools: [
-              SchoolBoardsProvider.of(context, listen: false).mySchool!
-            ],
-            availabilityIsMandatory: true,
-            elevation: 0,
-            canChangeExpandedState: false,
-            initialExpandedState: true,
-            editMode: true),
+          controller: controller,
+          showHeader: false,
+          schools: [
+            SchoolBoardsProvider.of(context, listen: false).currentSchool!,
+          ],
+          availabilityIsMandatory: true,
+          elevation: 0,
+          canChangeExpandedState: false,
+          initialExpandedState: true,
+          editMode: true,
+        ),
         const SizedBox(height: 20),
       ],
     );

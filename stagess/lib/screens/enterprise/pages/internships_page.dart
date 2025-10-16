@@ -55,9 +55,15 @@ class InternshipsPageState extends State<InternshipsPage> {
       'Getting closed internships for enterprise: ${widget.enterprise.id}',
     );
 
+    final currentId = TeachersProvider.of(context).currentTeacher?.id;
+
     final List<Internship> out = [];
     for (final internship in internships) {
-      if (internship.isClosed) out.add(internship);
+      if (internship.isClosed ||
+          internship.isEnterpriseEvaluationPending &&
+              !internship.supervisingTeacherIds.contains(currentId)) {
+        out.add(internship);
+      }
     }
     return out;
   }
@@ -67,9 +73,15 @@ class InternshipsPageState extends State<InternshipsPage> {
       'Getting internships to evaluate for enterprise: ${widget.enterprise.id}',
     );
 
+    final currentId = TeachersProvider.of(context).currentTeacher?.id;
+    if (currentId == null) return [];
+
     final List<Internship> out = [];
     for (final internship in internships) {
-      if (internship.isEnterpriseEvaluationPending) out.add(internship);
+      if (internship.isEnterpriseEvaluationPending &&
+          internship.supervisingTeacherIds.contains(currentId)) {
+        out.add(internship);
+      }
     }
     return out;
   }
@@ -86,7 +98,6 @@ class InternshipsPageState extends State<InternshipsPage> {
     final active = _getActiveInternships(internships);
     final closed = _getClosedInternships(internships);
 
-    // TODO Do not show if the teacher is not the signatory teacher
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

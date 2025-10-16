@@ -5,7 +5,7 @@ import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 class ItinerariesHelpers {
   static void add(Itinerary item, {required TeachersProvider teachers}) {
-    final me = teachers.myTeacher;
+    final me = teachers.currentTeacher;
     if (me == null) throw Exception('No teacher found in context');
 
     final itineraries = me.itineraries;
@@ -24,7 +24,7 @@ class ItinerariesHelpers {
     DateTime date, {
     required TeachersProvider teachers,
   }) {
-    final itineraries = teachers.myTeacher?.itineraries;
+    final itineraries = teachers.currentTeacher?.itineraries;
     if (itineraries == null) return null;
 
     final dateAsString = _dateFormat.format(date);

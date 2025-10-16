@@ -9,19 +9,24 @@ import '../../utils.dart';
 import '../utils.dart';
 
 void _initializeTeacher(BuildContext context) {
-  SchoolBoardsProvider.of(context, listen: false).add(SchoolBoard(
-    id: 'SchoolBoardId',
-    name: 'Test SchoolBoard',
-    logo: null,
-    schools: [dummySchool(id: 'SchoolId')],
-    cnesstNumber: '1234567890',
-  ));
+  SchoolBoardsProvider.of(context, listen: false).add(
+    SchoolBoard(
+      id: 'SchoolBoardId',
+      name: 'Test SchoolBoard',
+      logo: null,
+      schools: [dummySchool(id: 'SchoolId')],
+      cnesstNumber: '1234567890',
+    ),
+  );
 
   final teachers = TeachersProvider.of(context, listen: false);
-  teachers.add(dummyTeacher(
+  teachers.add(
+    dummyTeacher(
       id: 'MockedTeacherId',
       schoolBoardId: 'SchoolBoardId',
-      schoolId: 'SchoolId'));
+      schoolId: 'SchoolId',
+    ),
+  );
 }
 
 void main() {
@@ -30,8 +35,10 @@ void main() {
     ProgramInitializer.initialize(mockMe: true);
 
     test('deserializeItem works', () {
-      final schoolBoards =
-          SchoolBoardsProvider(uri: Uri.parse('ws://localhost'), mockMe: true);
+      final schoolBoards = SchoolBoardsProvider(
+        uri: Uri.parse('ws://localhost'),
+        mockMe: true,
+      );
       final schoolBoard = schoolBoards.deserializeItem({'name': 'Test School'});
       expect(schoolBoard.name, 'Test School');
     });
@@ -42,22 +49,29 @@ void main() {
       expect(schoolBoards, isNotNull);
     });
 
-    testWidgets('can get "mySchoolBoardOf"', (tester) async {
+    testWidgets('can get "currentSchoolBoardOf"', (tester) async {
       final context = await tester.contextWithNotifiers(
-          withSchools: true, withTeachers: true);
+        withSchools: true,
+        withTeachers: true,
+      );
       _initializeTeacher(context);
 
       final schoolBoards =
-          SchoolBoardsProvider.of(context, listen: false).mySchoolBoard;
+          SchoolBoardsProvider.of(context, listen: false).currentSchoolBoard;
       expect(schoolBoards, isNotNull);
     });
 
-    testWidgets('can get "mySchoolOf" context without listen', (tester) async {
+    testWidgets('can get "currentSchoolOf" context without listen', (
+      tester,
+    ) async {
       final context = await tester.contextWithNotifiers(
-          withSchools: true, withTeachers: true);
+        withSchools: true,
+        withTeachers: true,
+      );
       _initializeTeacher(context);
 
-      final school = SchoolBoardsProvider.of(context, listen: false).mySchool;
+      final school =
+          SchoolBoardsProvider.of(context, listen: false).currentSchool;
       expect(school, isNotNull);
     });
   });

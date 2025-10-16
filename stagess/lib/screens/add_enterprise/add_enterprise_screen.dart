@@ -35,13 +35,15 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
   final List<StepState> _stepStatus = [
     StepState.indexed,
     StepState.indexed,
-    StepState.indexed
+    StepState.indexed,
   ];
 
   void _showInvalidFieldsSnakBar([String? message]) {
     ScaffoldMessenger.of(context).clearSnackBars();
-    showSnackBar(context,
-        message: message ?? 'Remplir tous les champs avec un *.');
+    showSnackBar(
+      context,
+      message: message ?? 'Remplir tous les champs avec un *.',
+    );
   }
 
   void _previousStep() {
@@ -90,8 +92,11 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
 
   late Enterprise _currentEnterprise = Enterprise.empty.copyWith(
     schoolBoardId:
-        TeachersProvider.of(context, listen: false).myTeacher?.schoolBoardId,
-    recruiterId: TeachersProvider.of(context, listen: false).myTeacher?.id,
+        TeachersProvider.of(
+          context,
+          listen: false,
+        ).currentTeacher?.schoolBoardId,
+    recruiterId: TeachersProvider.of(context, listen: false).currentTeacher?.id,
   );
 
   void _updateEnterprise() {
@@ -122,10 +127,11 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
     _logger.info('Submitting enterprise form');
     final teachers = TeachersProvider.of(context, listen: false);
     final enterprises = EnterprisesProvider.of(context, listen: false);
-    final myTeacher = teachers.myTeacher;
-    if (myTeacher == null) {
-      showSnackBar(context,
-          message: 'Erreur, votre compte n\'est pas configuré.');
+    if (teachers.currentTeacher == null) {
+      showSnackBar(
+        context,
+        message: 'Erreur, votre compte n\'est pas configuré.',
+      );
       return;
     }
 
@@ -134,30 +140,34 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
     enterprises.add(_currentEnterprise);
 
     await showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-              title: const SubTitle('Entreprise ajoutée', left: 0, bottom: 0),
-              content: RichText(
-                text: TextSpan(
-                  children: [
-                    const TextSpan(text: 'L\'entreprise '),
-                    TextSpan(
-                        text: _currentEnterprise.name,
-                        style: const TextStyle(fontWeight: FontWeight.bold)),
-                    const TextSpan(
-                        text:
-                            ' a bien été ajoutée à la liste des entreprises.\n\n'
-                            'Vous pouvez maintenant y inscrire des stagiaires.'),
-                  ],
-                ),
+      context: context,
+      builder:
+          (ctx) => AlertDialog(
+            title: const SubTitle('Entreprise ajoutée', left: 0, bottom: 0),
+            content: RichText(
+              text: TextSpan(
+                children: [
+                  const TextSpan(text: 'L\'entreprise '),
+                  TextSpan(
+                    text: _currentEnterprise.name,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const TextSpan(
+                    text:
+                        ' a bien été ajoutée à la liste des entreprises.\n\n'
+                        'Vous pouvez maintenant y inscrire des stagiaires.',
+                  ),
+                ],
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Ok'),
-                )
-              ],
-            ));
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Ok'),
+              ),
+            ],
+          ),
+    );
 
     _logger.fine('Entreprise added: ${_currentEnterprise.name}');
     if (mounted) Navigator.pop(context);
@@ -166,8 +176,10 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
   void _cancel() async {
     _logger.info('Canceling enterprise form');
     final navigator = Navigator.of(context);
-    final result = await ConfirmExitDialog.show(context,
-        content: const Text('Toutes les modifications seront perdues.'));
+    final result = await ConfirmExitDialog.show(
+      context,
+      content: const Text('Toutes les modifications seront perdues.'),
+    );
     if (!mounted || !result) return;
 
     _logger.fine('AddEnterpriseScreen cancelled by user.');
@@ -183,19 +195,23 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
         width: ResponsiveService.maxBodyWidth,
         child: Scaffold(
           appBar: AppBar(
-              title: const Text('Ajouter une entreprise'),
-              leading: IconButton(
-                  onPressed: _cancel, icon: const Icon(Icons.arrow_back))),
+            title: const Text('Ajouter une entreprise'),
+            leading: IconButton(
+              onPressed: _cancel,
+              icon: const Icon(Icons.arrow_back),
+            ),
+          ),
           body: ScrollableStepper(
             type: StepperType.horizontal,
             scrollController: _scrollController,
             currentStep: _currentStep,
             onTapContinue: _nextStep,
-            onStepTapped: (int tapped) => setState(() {
-              _updateEnterprise();
-              _scrollController.jumpTo(0);
-              _currentStep = tapped;
-            }),
+            onStepTapped:
+                (int tapped) => setState(() {
+                  _updateEnterprise();
+                  _scrollController.jumpTo(0);
+                  _currentStep = tapped;
+                }),
             onTapCancel: _cancel,
             steps: [
               Step(
@@ -215,10 +231,11 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
                 isActive: _currentStep == 2,
                 title: const Text('Validation des\ninformations'),
                 content: ValidationPage(
-                    enterprise: _currentEnterprise,
-                    activityTypeController:
-                        _aboutKey.currentState?.activityTypesController,
-                    jobControllers: _jobsKey.currentState?.jobsControllers),
+                  enterprise: _currentEnterprise,
+                  activityTypeController:
+                      _aboutKey.currentState?.activityTypesController,
+                  jobControllers: _jobsKey.currentState?.jobsControllers,
+                ),
               ),
             ],
             controlsBuilder: _controlBuilder,
@@ -240,18 +257,20 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
               const Expanded(child: SizedBox()),
               if (_currentStep != 0)
                 OutlinedButton(
-                    onPressed: _previousStep, child: const Text('Précédent')),
-              const SizedBox(
-                width: 20,
-              ),
+                  onPressed: _previousStep,
+                  child: const Text('Précédent'),
+                ),
+              const SizedBox(width: 20),
               TextButton(
                 onPressed: details.onStepContinue,
-                child: Text(_currentStep == 2
-                    ? 'Valider'
-                    : _currentStep == 1
-                        ? 'Enregistrer'
-                        : 'Suivant'),
-              )
+                child: Text(
+                  _currentStep == 2
+                      ? 'Valider'
+                      : _currentStep == 1
+                      ? 'Enregistrer'
+                      : 'Suivant',
+                ),
+              ),
             ],
           ),
         ],

@@ -39,9 +39,11 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen>
   final _enterpriseKey = GlobalKey<_EnterprisesByListState>();
   bool _withSearchBar = false;
 
-  late final _tabController =
-      TabController(initialIndex: 0, length: 2, vsync: this)
-        ..addListener(() => setState(() {}));
+  late final _tabController = TabController(
+    initialIndex: 0,
+    length: 2,
+    vsync: this,
+  )..addListener(() => setState(() {}));
 
   void _search() => setState(() => _withSearchBar = !_withSearchBar);
 
@@ -54,18 +56,16 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen>
       title: const Text('Entreprises'),
       actions: [
         if (_tabController.index == 0)
-          IconButton(
-            onPressed: _search,
-            icon: const Icon(Icons.search),
-          ),
+          IconButton(onPressed: _search, icon: const Icon(Icons.search)),
         IconButton(
           onPressed: () {
             _withSearchBar = false;
             _enterpriseKey.currentState!.searchController.text = '';
             showDialog(
-                context: context,
-                barrierDismissible: false,
-                builder: (context) => Dialog(child: AddEnterpriseScreen()));
+              context: context,
+              barrierDismissible: false,
+              builder: (context) => Dialog(child: AddEnterpriseScreen()),
+            );
           },
           tooltip: 'Ajouter une entreprise',
           icon: const Icon(Icons.add),
@@ -80,7 +80,7 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen>
               children: [
                 Icon(Icons.list),
                 SizedBox(width: 8),
-                Text('Vue liste')
+                Text('Vue liste'),
               ],
             ),
           ),
@@ -90,7 +90,7 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen>
               children: [
                 Icon(Icons.map),
                 SizedBox(width: 8),
-                Text('Vue carte')
+                Text('Vue carte'),
               ],
             ),
           ),
@@ -99,8 +99,9 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen>
     );
 
     final enterprises = EnterprisesProviderExtension.availableEnterprisesOf(
-        context,
-        listen: true);
+      context,
+      listen: true,
+    );
 
     return ResponsiveService.scaffoldOf(
       context,
@@ -142,8 +143,8 @@ class _EnterprisesByList extends StatefulWidget {
 
 class _EnterprisesByListState extends State<_EnterprisesByList> {
   bool _hideNotAvailable = false;
-  late final searchController = TextEditingController()
-    ..addListener(() => setState(() {}));
+  late final searchController =
+      TextEditingController()..addListener(() => setState(() {}));
 
   List<Enterprise> _sortEnterprisesByName(List<Enterprise> enterprises) {
     _logger.finer('Sorting enterprises by name');
@@ -154,9 +155,11 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
   }
 
   List<Enterprise> _filterSelectedEnterprises(List<Enterprise> enterprises) {
-    _logger.finer('Filtering enterprises based on search and availability '
-        '(searchController.text: ${searchController.text}, '
-        'hideNotAvailable: $_hideNotAvailable)');
+    _logger.finer(
+      'Filtering enterprises based on search and availability '
+      '(searchController.text: ${searchController.text}, '
+      'hideNotAvailable: $_hideNotAvailable)',
+    );
 
     final schoolId = AuthProvider.of(context, listen: false).schoolId;
     if (schoolId == null) return enterprises;
@@ -164,10 +167,17 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
     return enterprises.where((enterprise) {
       // Remove if should not be shown by filter availability filter
       if (_hideNotAvailable &&
-          enterprise.availablejobs(context).every((job) =>
-              job.positionsRemaining(context,
-                  schoolId: schoolId, listen: true) <=
-              0)) {
+          enterprise
+              .availablejobs(context)
+              .every(
+                (job) =>
+                    job.positionsRemaining(
+                      context,
+                      schoolId: schoolId,
+                      listen: true,
+                    ) <=
+                    0,
+              )) {
         return false;
       }
 
@@ -178,16 +188,19 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
         return true;
       }
       if (enterprise.availablejobs(context).any((job) {
-        final hasSpecialization =
-            job.specialization.name.toLowerCase().contains(textToSearch);
-        final hasSector =
-            job.specialization.sector.name.toLowerCase().contains(textToSearch);
+        final hasSpecialization = job.specialization.name
+            .toLowerCase()
+            .contains(textToSearch);
+        final hasSector = job.specialization.sector.name.toLowerCase().contains(
+          textToSearch,
+        );
         return hasSpecialization || hasSector;
       })) {
         return true;
       }
-      if (enterprise.activityTypes
-          .any((type) => type.name.toLowerCase().contains(textToSearch))) {
+      if (enterprise.activityTypes.any(
+        (type) => type.name.toLowerCase().contains(textToSearch),
+      )) {
         return true;
       }
       if (enterprise.address.toString().toLowerCase().contains(textToSearch)) {
@@ -204,15 +217,17 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
     // Register to the enterprises provider to refresh the list if it changes
     EnterprisesProvider.of(context, listen: true);
 
-    final enterprises =
-        _sortEnterprisesByName(_filterSelectedEnterprises(widget.enterprises));
+    final enterprises = _sortEnterprisesByName(
+      _filterSelectedEnterprises(widget.enterprises),
+    );
 
     return Column(
       children: [
         if (widget.withSearchBar)
           Container(
-              decoration: BoxDecoration(color: Theme.of(context).primaryColor),
-              child: Search(controller: searchController)),
+            decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+            child: Search(controller: searchController),
+          ),
         SwitchListTile(
           title: const Text('N\'afficher que les stages disponibles'),
           value: _hideNotAvailable,
@@ -222,14 +237,16 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
           child: ListView.builder(
             shrinkWrap: true,
             itemCount: enterprises.length,
-            itemBuilder: (context, index) => EnterpriseCard(
-              enterprise: enterprises.elementAt(index),
-              onTap: (enterprise) => GoRouter.of(context).goNamed(
-                Screens.enterprise,
-                pathParameters: Screens.params(enterprise),
-                queryParameters: Screens.queryParams(pageIndex: '0'),
-              ),
-            ),
+            itemBuilder:
+                (context, index) => EnterpriseCard(
+                  enterprise: enterprises.elementAt(index),
+                  onTap:
+                      (enterprise) => GoRouter.of(context).goNamed(
+                        Screens.enterprise,
+                        pathParameters: Screens.params(enterprise),
+                        queryParameters: Screens.queryParams(pageIndex: '0'),
+                      ),
+                ),
           ),
         ),
       ],
@@ -243,9 +260,12 @@ class _EnterprisesByMap extends StatelessWidget {
   final List<Enterprise> enterprises;
 
   List<Marker> _latlngToMarkers(
-      context, Map<Enterprise, Waypoint> enterprises) {
+    context,
+    Map<Enterprise, Waypoint> enterprises,
+  ) {
     _logger.finer(
-        'Converting enterprises to markers (enterprises: ${enterprises.length})');
+      'Converting enterprises to markers (enterprises: ${enterprises.length})',
+    );
     List<Marker> out = [];
 
     final schoolId = AuthProvider.of(context, listen: false).schoolId;
@@ -259,11 +279,15 @@ class _EnterprisesByMap extends StatelessWidget {
       double nameWidth = 160;
       double nameHeight = 100;
       final waypoint = enterprises[enterprise]!;
-      final color = i == 0
-          ? Colors.purple
-          : enterprise
-                  .withRemainingPositions(context,
-                      schoolId: schoolId, listen: true)
+      final color =
+          i == 0
+              ? Colors.purple
+              : enterprise
+                  .withRemainingPositions(
+                    context,
+                    schoolId: schoolId,
+                    listen: true,
+                  )
                   .isNotEmpty
               ? Colors.green
               : Colors.red;
@@ -277,9 +301,10 @@ class _EnterprisesByMap extends StatelessWidget {
           child: Row(
             children: [
               GestureDetector(
-                onTap: i == 0
-                    ? null
-                    : () => GoRouter.of(context).goNamed(
+                onTap:
+                    i == 0
+                        ? null
+                        : () => GoRouter.of(context).goNamed(
                           Screens.enterprise,
                           pathParameters: Screens.params(enterprise),
                           queryParameters: Screens.queryParams(pageIndex: '0'),
@@ -298,12 +323,16 @@ class _EnterprisesByMap extends StatelessWidget {
               ),
               if (waypoint.showTitle)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
-                      color: color.withAlpha(125), shape: BoxShape.rectangle),
+                    color: color.withAlpha(125),
+                    shape: BoxShape.rectangle,
+                  ),
                   child: Text(waypoint.title),
-                )
+                ),
             ],
           ),
         ),
@@ -313,15 +342,18 @@ class _EnterprisesByMap extends StatelessWidget {
   }
 
   Future<Map<Enterprise, Waypoint>> _fetchEnterprisesCoordinates(
-      BuildContext context) async {
+    BuildContext context,
+  ) async {
     _logger.finer(
-        'Fetching enterprises coordinates (enterprises: ${enterprises.length})');
+      'Fetching enterprises coordinates (enterprises: ${enterprises.length})',
+    );
     final Map<Enterprise, Waypoint> out = {};
 
     final schoolBoard =
-        SchoolBoardsProvider.of(context, listen: false).mySchoolBoard;
+        SchoolBoardsProvider.of(context, listen: false).currentSchoolBoard;
     if (schoolBoard == null) return out;
-    final school = SchoolBoardsProvider.of(context, listen: false).mySchool;
+    final school =
+        SchoolBoardsProvider.of(context, listen: false).currentSchool;
     if (school == null) return out;
 
     final schoolAsEnterprise = Enterprise(
@@ -334,12 +366,16 @@ class _EnterprisesByMap extends StatelessWidget {
       contact: Person.empty,
       address: school.address,
     );
-    out[schoolAsEnterprise] =
-        await Waypoint.fromAddress(title: school.name, address: school.address);
+    out[schoolAsEnterprise] = await Waypoint.fromAddress(
+      title: school.name,
+      address: school.address,
+    );
 
     for (final enterprise in enterprises) {
       out[enterprise] = await Waypoint.fromAddress(
-          title: enterprise.name, address: enterprise.address ?? Address.empty);
+        title: enterprise.name,
+        address: enterprise.address ?? Address.empty,
+      );
     }
     return out;
   }
@@ -351,39 +387,37 @@ class _EnterprisesByMap extends StatelessWidget {
     return SingleChildScrollView(
       physics: const ScrollPhysics(),
       child: FutureBuilder<Map<Enterprise, Waypoint>>(
-          future: _fetchEnterprisesCoordinates(context),
-          builder: (context, snapshot) {
-            if (!snapshot.hasData) {
-              return SizedBox(
-                height: MediaQuery.of(context).size.height,
-                child: const Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
-
-            Map<Enterprise, Waypoint> locations = snapshot.data!;
-            final waypoint = locations[locations.keys.first]!;
+        future: _fetchEnterprisesCoordinates(context),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
             return SizedBox(
-              height: MediaQuery.of(context).size.height - 150,
-              child: FlutterMap(
-                options: MapOptions(
-                    initialCenter:
-                        LatLng(waypoint.latitude, waypoint.longitude),
-                    initialZoom: 14),
-                children: [
-                  TileLayer(
-                    urlTemplate:
-                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'dev.fleaflet.flutter_map.example',
-                    tileProvider: CancellableNetworkTileProvider(),
-                  ),
-                  MarkerLayer(markers: _latlngToMarkers(context, locations)),
-                  const ZoomButtons(),
-                ],
-              ),
+              height: MediaQuery.of(context).size.height,
+              child: const Center(child: CircularProgressIndicator()),
             );
-          }),
+          }
+
+          Map<Enterprise, Waypoint> locations = snapshot.data!;
+          final waypoint = locations[locations.keys.first]!;
+          return SizedBox(
+            height: MediaQuery.of(context).size.height - 150,
+            child: FlutterMap(
+              options: MapOptions(
+                initialCenter: LatLng(waypoint.latitude, waypoint.longitude),
+                initialZoom: 14,
+              ),
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'dev.fleaflet.flutter_map.example',
+                  tileProvider: CancellableNetworkTileProvider(),
+                ),
+                MarkerLayer(markers: _latlngToMarkers(context, locations)),
+                const ZoomButtons(),
+              ],
+            ),
+          );
+        },
+      ),
     );
   }
 }

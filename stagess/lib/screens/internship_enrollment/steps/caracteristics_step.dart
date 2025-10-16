@@ -30,8 +30,11 @@ List<Student> _studentsWithoutInternship(context, List<Student> students) {
 }
 
 class CaracteristicsStep extends StatefulWidget {
-  const CaracteristicsStep(
-      {super.key, required this.enterprise, this.specifiedSpecialization});
+  const CaracteristicsStep({
+    super.key,
+    required this.enterprise,
+    this.specifiedSpecialization,
+  });
 
   final Enterprise enterprise;
   final List<Specialization>? specifiedSpecialization;
@@ -46,7 +49,9 @@ class CaracteristicsStepState extends State<CaracteristicsStep> {
   late final studentController = StudentPickerController(
     schoolBoardId: AuthProvider.of(context, listen: false).schoolBoardId!,
     studentWhiteList: _studentsWithoutInternship(
-        context, StudentsHelpers.studentsInMyGroups(context)),
+      context,
+      StudentsHelpers.studentsInMyGroups(context),
+    ),
   );
   Enterprise get enterprise => widget.enterprise;
   Student? get student => studentController.student;
@@ -54,14 +59,18 @@ class CaracteristicsStepState extends State<CaracteristicsStep> {
   late final primaryJobController = EnterpriseJobListController(
     context: context,
     enterpriseStatus: EnterpriseStatus.active,
-    job: widget.enterprise.availablejobs(context).length == 1
-        ? widget.enterprise.availablejobs(context).first
-        : Job.empty,
-    specializationWhiteList: widget.specifiedSpecialization ??
+    job:
+        widget.enterprise.availablejobs(context).length == 1
+            ? widget.enterprise.availablejobs(context).first
+            : Job.empty,
+    specializationWhiteList:
+        widget.specifiedSpecialization ??
         widget.enterprise
-            .withRemainingPositions(context,
-                schoolId: AuthProvider.of(context, listen: false).schoolId!,
-                listen: false)
+            .withRemainingPositions(
+              context,
+              schoolId: AuthProvider.of(context, listen: false).schoolId!,
+              listen: false,
+            )
             .map((job) => job.specialization)
             .toList(),
   );
@@ -85,7 +94,8 @@ class CaracteristicsStepState extends State<CaracteristicsStep> {
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-        'Building GeneralInformationsStep for enterprise: ${enterprise.id}');
+      'Building GeneralInformationsStep for enterprise: ${enterprise.id}',
+    );
 
     return FocusScope(
       child: Form(
@@ -94,14 +104,19 @@ class CaracteristicsStepState extends State<CaracteristicsStep> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _GeneralInformations(
-                studentController: studentController, setState: setState),
+              studentController: studentController,
+              setState: setState,
+            ),
             const SizedBox(height: 10),
             _MainJob(
-                controller: primaryJobController,
-                extraJobControllers: extraJobControllers),
+              controller: primaryJobController,
+              extraJobControllers: extraJobControllers,
+            ),
             if (student != null && student!.program == Program.fpt)
               _ExtraSpecialization(
-                  controllers: extraJobControllers, setState: setState),
+                controllers: extraJobControllers,
+                setState: setState,
+              ),
             _SupervisonInformation(
               enterprise: widget.enterprise,
               firstNameController: _firstNameController,
@@ -122,8 +137,10 @@ class CaracteristicsStepState extends State<CaracteristicsStep> {
 }
 
 class _GeneralInformations extends StatelessWidget {
-  const _GeneralInformations(
-      {required this.studentController, required this.setState});
+  const _GeneralInformations({
+    required this.studentController,
+    required this.setState,
+  });
   final StudentPickerController studentController;
 
   final Function(Function()) setState;
@@ -131,7 +148,8 @@ class _GeneralInformations extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-        'Building _GeneralInformations with selected student: ${studentController.student?.id}');
+      'Building _GeneralInformations with selected student: ${studentController.student?.id}',
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -155,18 +173,16 @@ class _GeneralInformations extends StatelessWidget {
 }
 
 class _MainJob extends StatelessWidget {
-  const _MainJob({
-    required this.controller,
-    required this.extraJobControllers,
-  });
+  const _MainJob({required this.controller, required this.extraJobControllers});
 
   final EnterpriseJobListController controller;
   final List<EnterpriseJobListController> extraJobControllers;
 
   @override
   Widget build(BuildContext context) {
-    _logger
-        .finer('Building _MainJob with controller job: ${controller.job.id}');
+    _logger.finer(
+      'Building _MainJob with controller job: ${controller.job.id}',
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,27 +199,32 @@ class _MainJob extends StatelessWidget {
             EnterpriseJobListTile(
               controller: controller,
               schools: [
-                SchoolBoardsProvider.of(context, listen: false).mySchool!
+                SchoolBoardsProvider.of(context, listen: false).currentSchool!,
               ],
               editMode: true,
               specializationOnly: true,
               canChangeExpandedState: false,
               initialExpandedState: true,
               elevation: 0.0,
-              jobPickerPadding:
-                  const EdgeInsets.only(left: 8, top: 12, right: 24),
+              jobPickerPadding: const EdgeInsets.only(
+                left: 8,
+                top: 12,
+                right: 24,
+              ),
               showHeader: false,
             ),
           ],
-        )
+        ),
       ],
     );
   }
 }
 
 class _ExtraSpecialization extends StatelessWidget {
-  const _ExtraSpecialization(
-      {required this.controllers, required this.setState});
+  const _ExtraSpecialization({
+    required this.controllers,
+    required this.setState,
+  });
 
   final List<EnterpriseJobListController> controllers;
   final Function(void Function()) setState;
@@ -228,12 +249,14 @@ class _ExtraSpecialization extends StatelessWidget {
                 onTap: () => setState(() => controllers.removeAt(index)),
                 child: const Icon(Icons.delete, color: Colors.red),
               ),
-            )
+            ),
           ],
         ),
         EnterpriseJobListTile(
           controller: controllers[index],
-          schools: [SchoolBoardsProvider.of(context, listen: false).mySchool!],
+          schools: [
+            SchoolBoardsProvider.of(context, listen: false).currentSchool!,
+          ],
           editMode: true,
           specializationOnly: true,
           canChangeExpandedState: false,
@@ -249,29 +272,32 @@ class _ExtraSpecialization extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-        'Building _ExtraSpecialization with ${controllers.length} controllers');
+      'Building _ExtraSpecialization with ${controllers.length} controllers',
+    );
 
     return Padding(
       padding: const EdgeInsets.only(top: 24.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ...controllers.asMap().keys.map<Widget>((i) => Padding(
-                padding: const EdgeInsets.only(bottom: 24.0),
-                child: _extraJobTileBuilder(context, i),
-              )),
+          ...controllers.asMap().keys.map<Widget>(
+            (i) => Padding(
+              padding: const EdgeInsets.only(bottom: 24.0),
+              child: _extraJobTileBuilder(context, i),
+            ),
+          ),
           Text(
-              'Besoin d\'ajouter des compétences d\'un autre métier pour ce stage?',
-              style: Theme.of(context).textTheme.titleMedium),
+            'Besoin d\'ajouter des compétences d\'un autre métier pour ce stage?',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
           const SizedBox(height: 8),
           AddJobButton(
             controllers: controllers,
             onJobAdded: () => setState(() {}),
             style: Theme.of(context).textButtonTheme.style!.copyWith(
-                backgroundColor: Theme.of(context)
-                    .elevatedButtonTheme
-                    .style!
-                    .backgroundColor),
+              backgroundColor:
+                  Theme.of(context).elevatedButtonTheme.style!.backgroundColor,
+            ),
           ),
         ],
       ),
@@ -329,8 +355,9 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-        'Building _SupervisionInformation for enterprise: ${widget.enterprise?.id} '
-        'and contact id: ${widget.enterprise?.contact.id}');
+      'Building _SupervisionInformation for enterprise: ${widget.enterprise?.id} '
+      'and contact id: ${widget.enterprise?.contact.id}',
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,13 +368,16 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Flexible(
-              child: Text('Même personne que le contact de l\'entreprise',
-                  style: Theme.of(context).textTheme.titleMedium),
+              child: Text(
+                'Même personne que le contact de l\'entreprise',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
             ),
             Switch(
-              onChanged: widget.enterprise == null
-                  ? null
-                  : (newValue) => _toggleUseContactInfo(),
+              onChanged:
+                  widget.enterprise == null
+                      ? null
+                      : (newValue) => _toggleUseContactInfo(),
               value: _useContactInfo,
             ),
           ],
@@ -357,28 +387,34 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                TextFormField(
-                  controller: widget.firstNameController,
-                  decoration: const InputDecoration(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextFormField(
+                    controller: widget.firstNameController,
+                    decoration: const InputDecoration(
                       labelText: '* Prénom',
-                      labelStyle: TextStyle(color: Colors.black)),
-                  style: TextStyle(color: Colors.black),
-                  validator: (text) =>
-                      text!.isEmpty ? 'Ajouter un prénom.' : null,
-                  enabled: !_useContactInfo,
-                ),
-                TextFormField(
-                  controller: widget.lastNameController,
-                  decoration: const InputDecoration(
+                      labelStyle: TextStyle(color: Colors.black),
+                    ),
+                    style: TextStyle(color: Colors.black),
+                    validator:
+                        (text) => text!.isEmpty ? 'Ajouter un prénom.' : null,
+                    enabled: !_useContactInfo,
+                  ),
+                  TextFormField(
+                    controller: widget.lastNameController,
+                    decoration: const InputDecoration(
                       labelText: '* Nom de famille',
-                      labelStyle: TextStyle(color: Colors.black)),
-                  style: TextStyle(color: Colors.black),
-                  validator: (text) =>
-                      text!.isEmpty ? 'Ajouter un nom de famille.' : null,
-                  enabled: !_useContactInfo,
-                ),
-              ]),
+                      labelStyle: TextStyle(color: Colors.black),
+                    ),
+                    style: TextStyle(color: Colors.black),
+                    validator:
+                        (text) =>
+                            text!.isEmpty ? 'Ajouter un nom de famille.' : null,
+                    enabled: !_useContactInfo,
+                  ),
+                ],
+              ),
               PhoneListTile(
                 controller: widget.phoneController,
                 isMandatory: true,
@@ -435,33 +471,36 @@ class _TransportationsCheckBoxesState extends State<TransportationsCheckBoxes> {
           const SubTitle('Transport de l\'élève vers l\'entreprise', left: 0),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: Transportation.values.map((e) {
-            return InkWell(
-              onTap: widget.editMode ? () => _updateTransportations(e) : null,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 12.0, right: 8.0),
-                child: Row(
-                  children: [
-                    Text(e.toString()),
-                    Checkbox(
-                      value: widget.transportations.contains(e),
-                      side: WidgetStateBorderSide.resolveWith(
-                        (states) => BorderSide(
-                          color: Theme.of(context).primaryColor,
-                          width: 2.0,
+          children:
+              Transportation.values.map((e) {
+                return InkWell(
+                  onTap:
+                      widget.editMode ? () => _updateTransportations(e) : null,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 12.0, right: 8.0),
+                    child: Row(
+                      children: [
+                        Text(e.toString()),
+                        Checkbox(
+                          value: widget.transportations.contains(e),
+                          side: WidgetStateBorderSide.resolveWith(
+                            (states) => BorderSide(
+                              color: Theme.of(context).primaryColor,
+                              width: 2.0,
+                            ),
+                          ),
+                          fillColor: WidgetStatePropertyAll(Colors.transparent),
+                          checkColor: Colors.black,
+                          onChanged:
+                              widget.editMode
+                                  ? (value) => _updateTransportations(e)
+                                  : null,
                         ),
-                      ),
-                      fillColor: WidgetStatePropertyAll(Colors.transparent),
-                      checkColor: Colors.black,
-                      onChanged: widget.editMode
-                          ? (value) => _updateTransportations(e)
-                          : null,
+                      ],
                     ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
+                  ),
+                );
+              }).toList(),
         ),
       ],
     );

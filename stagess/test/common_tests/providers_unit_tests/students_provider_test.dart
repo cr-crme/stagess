@@ -15,7 +15,9 @@ void _prepareProviders(BuildContext context) {
   final auth = AuthProvider(mockMe: true);
   final teachers = TeachersProvider.of(context, listen: false);
   teachers.initializeAuth(auth);
-  teachers.add(dummyTeacher(id: teachers.myTeacher?.id ?? 'FailedToGetId'));
+  teachers.add(
+    dummyTeacher(id: teachers.currentTeacher?.id ?? 'FailedToGetId'),
+  );
   final students = StudentsProvider.of(context, listen: false);
   students.initializeAuth(auth);
 }
@@ -28,7 +30,9 @@ void main() {
     testWidgets('"studentsInMyGroups" works', (tester) async {
       // Prepare the StudentsProvider
       final context = await tester.contextWithNotifiers(
-          withStudents: true, withTeachers: true);
+        withStudents: true,
+        withTeachers: true,
+      );
       _prepareProviders(context);
 
       // Add random students (my groups are 101 and 102)
@@ -39,13 +43,18 @@ void main() {
       students.add(dummyStudent(group: '103'));
 
       expect(
-          StudentsHelpers.studentsInMyGroups(context, listen: false).length, 3);
+        StudentsHelpers.studentsInMyGroups(context, listen: false).length,
+        3,
+      );
     });
 
     testWidgets('"mySupervizedStudents" works', (tester) async {
       // Prepare the StudentsProvider
       final context = await tester.contextWithNotifiers(
-          withStudents: true, withTeachers: true, withInternships: true);
+        withStudents: true,
+        withTeachers: true,
+        withInternships: true,
+      );
       _prepareProviders(context);
 
       final students = StudentsProvider.of(context, listen: false);
@@ -57,33 +66,42 @@ void main() {
       students.add(dummyStudent(id: 'neverMyStudent2', group: '103'));
 
       expect(
-          StudentsHelpers.mySupervizedStudents(context, listen: false).length,
-          0);
+        StudentsHelpers.mySupervizedStudents(context, listen: false).length,
+        0,
+      );
 
       // Add internship to all of the students
       final internships = InternshipsProvider.of(context, listen: false);
       final teacherId =
-          TeachersProvider.of(context).myTeacher?.id ?? 'FailedToGetId';
+          TeachersProvider.of(context).currentTeacher?.id ?? 'FailedToGetId';
       for (int i = 0; i < students.length; i++) {
         final student = students[i];
-        internships.add(dummyInternship(
+        internships.add(
+          dummyInternship(
             id: 'internshipId$i',
             studentId: student.id,
-            teacherId: i >= 3 ? 'anotherTeacherId' : teacherId));
+            teacherId: i >= 3 ? 'anotherTeacherId' : teacherId,
+          ),
+        );
       }
       expect(
-          StudentsHelpers.mySupervizedStudents(context, listen: false).length,
-          3);
+        StudentsHelpers.mySupervizedStudents(context, listen: false).length,
+        3,
+      );
 
       // Add the fourth student to the supervising list of the teacher
       internships
           .firstWhere((e) => e.studentId == 'notYetMyStudent')
-          .copyWithTeacher(context,
-              teacherId: TeachersProvider.of(context).myTeacher?.id ??
-                  'FailedToGetId');
+          .copyWithTeacher(
+            context,
+            teacherId:
+                TeachersProvider.of(context).currentTeacher?.id ??
+                'FailedToGetId',
+          );
       expect(
-          StudentsHelpers.mySupervizedStudents(context, listen: false).length,
-          4);
+        StudentsHelpers.mySupervizedStudents(context, listen: false).length,
+        4,
+      );
 
       // Terminate one of the internships
       final internship = internships
@@ -91,32 +109,45 @@ void main() {
           .copyWith(endDate: DateTime(0));
       internships.replace(internship);
       expect(
-          StudentsHelpers.mySupervizedStudents(context,
-                  listen: false, activeOnly: false)
-              .length,
-          4);
+        StudentsHelpers.mySupervizedStudents(
+          context,
+          listen: false,
+          activeOnly: false,
+        ).length,
+        4,
+      );
       expect(
-          StudentsHelpers.mySupervizedStudents(context,
-                  listen: false, activeOnly: true)
-              .length,
-          3);
+        StudentsHelpers.mySupervizedStudents(
+          context,
+          listen: false,
+          activeOnly: true,
+        ).length,
+        3,
+      );
 
       // Try to add a student that is not on the right group
       expect(
-          () => internships
-              .firstWhere((e) => e.studentId == 'neverMyStudent2')
-              .copyWithTeacher(context,
-                  teacherId: TeachersProvider.of(context).myTeacher?.id ??
-                      'FailedToGetId'),
-          throwsException);
+        () => internships
+            .firstWhere((e) => e.studentId == 'neverMyStudent2')
+            .copyWithTeacher(
+              context,
+              teacherId:
+                  TeachersProvider.of(context).currentTeacher?.id ??
+                  'FailedToGetId',
+            ),
+        throwsException,
+      );
       expect(
-          StudentsHelpers.mySupervizedStudents(context, listen: false).length,
-          4);
+        StudentsHelpers.mySupervizedStudents(context, listen: false).length,
+        4,
+      );
     });
 
     test('deserializeItem works', () {
-      final students =
-          StudentsProvider(uri: Uri.parse('ws://localhost'), mockMe: true);
+      final students = StudentsProvider(
+        uri: Uri.parse('ws://localhost'),
+        mockMe: true,
+      );
       final student = students.deserializeItem({
         'first_name': 'NotPierre',
         'middle_name': 'NotJean',

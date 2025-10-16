@@ -13,34 +13,42 @@ void main() {
     ProgramInitializer.initialize(mockMe: true);
 
     test('"currentTeacherId" works', () {
-      final teachers =
-          TeachersProvider(uri: Uri.parse('ws://localhost'), mockMe: true);
-      expect(() => teachers.myTeacher?.id, throwsException);
+      final teachers = TeachersProvider(
+        uri: Uri.parse('ws://localhost'),
+        mockMe: true,
+      );
+      expect(() => teachers.currentTeacher?.id, throwsException);
 
       teachers.initializeAuth(AuthProvider(mockMe: true));
       var uuid = Uuid();
       final namespace = UuidValue.fromNamespace(Namespace.dns);
       final teacherId = uuid.v5(namespace.toString(), 'Mock User');
-      expect(teachers.myTeacher?.id, teacherId);
+      expect(teachers.currentTeacher?.id, teacherId);
     });
 
     test('"getCurrentTeacher" works', () {
-      final teachers =
-          TeachersProvider(uri: Uri.parse('ws://localhost'), mockMe: true);
-      expect(teachers.myTeacher?.firstName, 'Error');
+      final teachers = TeachersProvider(
+        uri: Uri.parse('ws://localhost'),
+        mockMe: true,
+      );
+      expect(teachers.currentTeacher?.firstName, 'Error');
 
       final auth = AuthProvider(mockMe: true);
       teachers.initializeAuth(auth);
       teachers.add(dummyTeacher());
-      expect(teachers.myTeacher?.firstName, 'Error');
+      expect(teachers.currentTeacher?.firstName, 'Error');
 
-      teachers.add(dummyTeacher(id: teachers.myTeacher?.id ?? 'FailedToGetId'));
-      expect(teachers.myTeacher?.firstName, 'Pierre');
+      teachers.add(
+        dummyTeacher(id: teachers.currentTeacher?.id ?? 'FailedToGetId'),
+      );
+      expect(teachers.currentTeacher?.firstName, 'Pierre');
     });
 
     test('"deserializeItem" works', () {
-      final teachers =
-          TeachersProvider(uri: Uri.parse('ws://localhost'), mockMe: true);
+      final teachers = TeachersProvider(
+        uri: Uri.parse('ws://localhost'),
+        mockMe: true,
+      );
       final teacher = teachers.deserializeItem(dummyTeacher().serialize());
 
       expect(teacher.firstName, 'Pierre');

@@ -74,7 +74,8 @@ extension _InternshipMetaDataList on List<_InternshipMetaData> {
     List<VisitingPriority>? visibilityFilters,
     String? filterText,
   }) {
-    final teacherId = TeachersProvider.of(context, listen: true).myTeacher?.id;
+    final teacherId =
+        TeachersProvider.of(context, listen: true).currentTeacher?.id;
     if (teacherId == null) return [];
 
     final internships = InternshipsProvider.of(context, listen: true);
@@ -169,7 +170,7 @@ class _SupervisionChartState extends State<SupervisionChart>
       _logger.info('Saving changes in edit mode');
 
       final teacherId =
-          TeachersProvider.of(context, listen: false).myTeacher?.id;
+          TeachersProvider.of(context, listen: false).currentTeacher?.id;
       if (teacherId == null) {
         setState(() {
           _editMode = false;

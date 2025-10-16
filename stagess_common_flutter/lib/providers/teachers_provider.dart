@@ -20,7 +20,7 @@ class TeachersProvider extends BackendListProvided<Teacher> {
     return Teacher.fromSerialized(data);
   }
 
-  Teacher? get myTeacher =>
+  Teacher? get currentTeacher =>
       _authProvider!.teacherId == null || !hasId(_authProvider!.teacherId!)
           ? null
           : this[_authProvider!.teacherId];

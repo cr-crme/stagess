@@ -8,12 +8,14 @@ import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 
 extension EnterprisesProviderExtension on EnterprisesProvider {
-  static List<Enterprise> availableEnterprisesOf(BuildContext context,
-      {bool listen = true}) {
+  static List<Enterprise> availableEnterprisesOf(
+    BuildContext context, {
+    bool listen = true,
+  }) {
     final authProvider = AuthProvider.of(context, listen: false);
-    final mySchoolId = authProvider.schoolId;
-    final myTeacherId = authProvider.teacherId;
-    if (mySchoolId == null || myTeacherId == null) {
+    final currentSchoolId = authProvider.schoolId;
+    final currentTeacherId = authProvider.teacherId;
+    if (currentSchoolId == null || currentTeacherId == null) {
       return [];
     }
 
@@ -25,25 +27,33 @@ extension EnterpriseExtension on Enterprise {
   List<Internship> internships(BuildContext context, {listen = true}) =>
       InternshipsProvider.of(context, listen: listen)
           .mapRemoveNull<Internship>(
-              (Internship e) => e.enterpriseId == id ? e : null)
+            (Internship e) => e.enterpriseId == id ? e : null,
+          )
           .toList();
 
   Iterable<Job> availablejobs(BuildContext context) {
     // Remove the jobs which are visible to certain users only
     final authProvider = AuthProvider.of(context, listen: false);
-    final mySchoolId = authProvider.schoolId!;
-    final myTeacherId = authProvider.teacherId!;
-    return [...jobs]..removeWhere((job) =>
-        job.reservedForId.isNotEmpty &&
-        job.reservedForId != mySchoolId &&
-        job.reservedForId != myTeacherId);
+    final currentSchoolId = authProvider.schoolId!;
+    final currentTeacherId = authProvider.teacherId!;
+    return [...jobs]..removeWhere(
+      (job) =>
+          job.reservedForId.isNotEmpty &&
+          job.reservedForId != currentSchoolId &&
+          job.reservedForId != currentTeacherId,
+    );
   }
 
-  Iterable<Job> withRemainingPositions(context,
-      {required String schoolId, bool listen = false}) {
-    return jobs.where((job) =>
-        (job.positionsOffered[schoolId] ?? 0) -
-            job.positionsOccupied(context, listen: listen) >
-        0);
+  Iterable<Job> withRemainingPositions(
+    context, {
+    required String schoolId,
+    bool listen = false,
+  }) {
+    return jobs.where(
+      (job) =>
+          (job.positionsOffered[schoolId] ?? 0) -
+              job.positionsOccupied(context, listen: listen) >
+          0,
+    );
   }
 }

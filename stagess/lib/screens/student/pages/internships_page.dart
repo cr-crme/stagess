@@ -199,7 +199,8 @@ class _StudentInternshipListViewState
   Widget build(BuildContext context) {
     _prepareExpander(widget.internships);
 
-    final teacherId = TeachersProvider.of(context, listen: false).myTeacher?.id;
+    final teacherId =
+        TeachersProvider.of(context, listen: false).currentTeacher?.id;
     if (teacherId == null) {
       return const Center(child: Text('Vous n\'êtes pas connecté.'));
     }
