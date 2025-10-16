@@ -1,35 +1,12 @@
 import 'package:stagess_backend/repositories/teachers_repository.dart';
-import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:test/test.dart';
 
+import '../mockers/sql_connection_mock.dart';
+
 TeachersRepository get _mockedDatabaseTeachers => TeachersRepositoryMock();
-
-class DatabaseUserMock extends DatabaseUser {
-  final bool _isVerified;
-  final String _schoolBoardId;
-  final AccessLevel _accessLevel;
-
-  DatabaseUserMock({
-    bool isVerified = true,
-    String schoolBoardId = '100',
-    AccessLevel accessLevel = AccessLevel.teacher,
-  })  : _isVerified = isVerified,
-        _schoolBoardId = schoolBoardId,
-        _accessLevel = accessLevel,
-        super.empty();
-
-  @override
-  String get schoolBoardId => _schoolBoardId;
-
-  @override
-  AccessLevel get accessLevel => _accessLevel;
-
-  @override
-  bool get isVerified => _isVerified;
-}
 
 void main() {
   test('Get teachers with insufficient permissions', () async {

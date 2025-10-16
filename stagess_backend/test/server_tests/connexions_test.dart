@@ -18,29 +18,68 @@ import 'package:test/test.dart';
 import '../mockers/sql_connection_mock.dart';
 import '../mockers/web_socket_mock.dart';
 
+class ConnexionsMock extends Connexions {
+  ConnexionsMock({
+    required super.database,
+    required super.firebaseApiKey,
+    super.timeout,
+    required super.skipLog,
+  });
+
+  @override
+  Future<Map<String, dynamic>?> extractJwt(String token) async {
+    try {
+      final jwt = JWT.verify(token, SecretKey('secret passphrase'));
+      if (jwt.payload['app_secret'] != 'dummy_app_secret') {
+        return null;
+      }
+      return jwt.payload;
+    } catch (e) {
+      return null;
+    }
+  }
+}
+
 String _prepareHandshake() {
   return jsonEncode(
       CommunicationProtocol(requestType: RequestType.handshake, data: {
     'token': JWT({
       'app_secret': 'dummy_app_secret',
       'school_board_id': 'dummy_school_board_id',
+      'user_id': 'dummy_user_id',
+      'email': 'john.doe@email.com',
     }).sign(SecretKey('secret passphrase')),
   }).serialize());
 }
 
-Future<DatabaseManager> get _mockedDatabase async => DatabaseManager(
-      sqlInterface: await MySqlInterface.connect(
-          connectToDatabase: () async => DummyMySqlConnection()),
-      schoolBoardsDatabase: SchoolBoardsRepositoryMock(),
-      adminsDatabase: AdminsRepositoryMock(),
-      teachersDatabase: TeachersRepositoryMock(),
-      studentsDatabase: StudentsRepositoryMock(),
-      enterprisesDatabase: EnterprisesRepositoryMock(),
-      internshipsDatabase: InternshipsRepositoryMock(),
-    );
+Future<DatabaseManager> get _mockedDatabase async {
+  final schoolBoardsRepository = SchoolBoardsRepositoryMock();
+  final adminsRepository = AdminsRepositoryMock();
+  final teachersRepository = TeachersRepositoryMock();
+  final studentsRepository = StudentsRepositoryMock();
+  final enterprisesRepository = EnterprisesRepositoryMock();
+  final internshipsRepository = InternshipsRepositoryMock();
+  return DatabaseManager(
+    sqlInterface: await MySqlInterface.connect(
+        connectToDatabase: () async => DummyMySqlConnection(
+              schoolBoardsRepository: schoolBoardsRepository,
+              adminsRepository: adminsRepository,
+              teachersRepository: teachersRepository,
+              studentsRepository: studentsRepository,
+              enterprisesRepository: enterprisesRepository,
+              internshipsRepository: internshipsRepository,
+            )),
+    schoolBoardsDatabase: schoolBoardsRepository,
+    adminsDatabase: adminsRepository,
+    teachersDatabase: teachersRepository,
+    studentsDatabase: studentsRepository,
+    enterprisesDatabase: enterprisesRepository,
+    internshipsDatabase: internshipsRepository,
+  );
+}
 
 Future<CommunicationProtocol> _sendAndReceive({required String toSend}) async {
-  final connexions = Connexions(
+  final connexions = ConnexionsMock(
       database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
   final socket = WebSocketMock();
   final client =
@@ -49,13 +88,21 @@ Future<CommunicationProtocol> _sendAndReceive({required String toSend}) async {
   socket.streamController.add(_prepareHandshake());
 
   // Listen to incoming messages from connexions
+  final handshakeCompleter = Completer<CommunicationProtocol>();
   final protocolCompleter = Completer<CommunicationProtocol>();
   socket.incommingStreamController.stream.listen((message) {
-    protocolCompleter
-        .complete(CommunicationProtocol.deserialize(jsonDecode(message)));
+    final protocol = CommunicationProtocol.deserialize(jsonDecode(message));
+    if (protocol.requestType == RequestType.handshake) {
+      handshakeCompleter.complete(protocol);
+      return;
+    }
+    protocolCompleter.complete(protocol);
   });
   addTearDown(() => socket.incommingStreamController.close());
 
+  await handshakeCompleter.future.timeout(Duration(seconds: 1), onTimeout: () {
+    fail('Timeout waiting for handshake');
+  });
   socket.streamController.add(toSend);
 
   // Wait for the response to be sent to the client
@@ -140,12 +187,8 @@ void main() {
     expect(protocolNotVerified.field, isNull);
     expect(protocolNotVerified.data, isA<Map<String, dynamic>>());
     expect(protocolNotVerified.data!['error'], isA<String>());
-    expect((protocolNotVerified.data!['error'] as String).startsWith('Client'),
-        true);
-    expect(
-        (protocolNotVerified.data!['error'] as String).endsWith('not verified'),
-        true);
-    expect(protocolNotVerified.response, Response.failure);
+    expect(protocolNotVerified.data!['error'], 'Client not verified');
+    expect(protocolNotVerified.response, Response.connexionRefused);
 
     expect(await isConnectedFuture, false);
     expect(socket.isConnected, false);
@@ -208,7 +251,7 @@ void main() {
     expect(protocolMissing.data!['error'], isA<String>());
     expect(protocolMissing.data!['error'],
         'Data is required to validate the handshake');
-    expect(protocolMissing.response, Response.failure);
+    expect(protocolMissing.response, Response.connexionRefused);
 
     final protocolHandshake = await protocolHandshakeCompleter.future
         .timeout(Duration(seconds: 1), onTimeout: () {
@@ -269,7 +312,7 @@ void main() {
     expect(protocolMissing.data!['error'], isA<String>());
     expect(protocolMissing.data!['error'],
         'Token is required to validate the handshake');
-    expect(protocolMissing.response, Response.failure);
+    expect(protocolMissing.response, Response.connexionRefused);
 
     final protocolHandshake = await protocolHandshakeCompleter.future
         .timeout(Duration(seconds: 1), onTimeout: () {
@@ -330,7 +373,71 @@ void main() {
     expect(protocolMissing.data, isA<Map<String, dynamic>>());
     expect(protocolMissing.data!['error'], isA<String>());
     expect(protocolMissing.data!['error'], 'Invalid token');
-    expect(protocolMissing.response, Response.failure);
+    expect(protocolMissing.response, Response.connexionRefused);
+
+    final protocolHandshake = await protocolHandshakeCompleter.future
+        .timeout(Duration(seconds: 1), onTimeout: () {
+      fail('Timeout waiting for protocol update');
+    });
+    expect(protocolHandshake.requestType, RequestType.response);
+    expect(protocolHandshake.field, isNull);
+    expect(protocolHandshake.data, isA<Map<String, dynamic>>());
+    expect(protocolHandshake.data!['error'], isA<String>());
+    expect(protocolHandshake.data!['error'], 'Handshake timeout');
+    expect(protocolHandshake.response, Response.failure);
+  });
+
+  test('Add new client with incomplete token', () async {
+    final connexions = Connexions(
+        timeout: Duration(milliseconds: 200),
+        database: await _mockedDatabase,
+        firebaseApiKey: '',
+        skipLog: true);
+    final socket = WebSocketMock();
+    final client =
+        CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
+    final isConnectedFuture = connexions.add(client);
+
+    // Simulate an invalid handshake
+    final protocolMissingCompleter = Completer<CommunicationProtocol>();
+    final protocolHandshakeCompleter = Completer<CommunicationProtocol>();
+    socket.incommingStreamController.stream.listen((message) {
+      // The first message should be the rejection of the handshake
+      if (!protocolMissingCompleter.isCompleted) {
+        protocolMissingCompleter
+            .complete(CommunicationProtocol.deserialize(jsonDecode(message)));
+        return;
+      } else if (!protocolHandshakeCompleter.isCompleted) {
+        protocolHandshakeCompleter
+            .complete(CommunicationProtocol.deserialize(jsonDecode(message)));
+        return;
+      } else {
+        fail('Unexpected third message: $message');
+      }
+    });
+    addTearDown(() => socket.incommingStreamController.close());
+
+    socket.streamController.add(jsonEncode(
+        CommunicationProtocol(requestType: RequestType.handshake, data: {
+      'token': JWT({
+        'app_secret': 'dummy_app_secret',
+        'school_board_id': 'dummy_school_board_id',
+      }).sign(SecretKey('secret passphrase'))
+    }).serialize()));
+
+    expect(await isConnectedFuture, false);
+    expect(socket.isConnected, false);
+
+    final protocolMissing = await protocolMissingCompleter.future
+        .timeout(Duration(seconds: 1), onTimeout: () {
+      fail('Timeout waiting for protocol update');
+    });
+    expect(protocolMissing.requestType, RequestType.response);
+    expect(protocolMissing.field, isNull);
+    expect(protocolMissing.data, isA<Map<String, dynamic>>());
+    expect(protocolMissing.data!['error'], isA<String>());
+    expect(protocolMissing.data!['error'], 'Invalid token');
+    expect(protocolMissing.response, Response.connexionRefused);
 
     final protocolHandshake = await protocolHandshakeCompleter.future
         .timeout(Duration(seconds: 1), onTimeout: () {
@@ -345,7 +452,7 @@ void main() {
   });
 
   test('Add a new client to Connexions and disconnect', () async {
-    final connexions = Connexions(
+    final connexions = ConnexionsMock(
         database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final socket = WebSocketMock();
     final client =
@@ -372,7 +479,13 @@ void main() {
     });
     expect(protocol.requestType, RequestType.handshake);
     expect(protocol.field, isNull);
-    expect(protocol.data, isNull);
+    expect(protocol.data, isA<Map<String, dynamic>>());
+    expect(protocol.data, {
+      'user_id': '0',
+      'school_board_id': '100',
+      'school_id': null,
+      'access_level': 2
+    });
     expect(protocol.response, Response.success);
 
     // Simulate a client disconnect
@@ -471,35 +584,54 @@ void main() {
   });
 
   test('Send a POST teacher request and receive the update', () async {
-    final connexions = Connexions(
+    final connexions = ConnexionsMock(
         database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final socket1 = WebSocketMock();
     final client1 =
         CustomWebSocket(socket: socket1, ipAddress: '127.0.0.1', port: 8080);
-    connexions.add(client1);
-    socket1.streamController.add(_prepareHandshake());
     final socket2 = WebSocketMock();
     final client2 =
         CustomWebSocket(socket: socket2, ipAddress: '127.0.0.1', port: 8081);
+
+    connexions.add(client1);
     connexions.add(client2);
+    socket1.streamController.add(_prepareHandshake());
     socket2.streamController.add(_prepareHandshake());
 
     // Listen to incoming messages from connexions
-    final protocolCompleter1 = Completer<CommunicationProtocol>();
+    final handshakeCompleter1 = Completer<CommunicationProtocol>();
+    final handshakeCompleter2 = Completer<CommunicationProtocol>();
+    final updateCompleter1 = Completer<CommunicationProtocol>();
+    final updateCompleter2 = Completer<CommunicationProtocol>();
     socket1.incommingStreamController.stream.listen((message) {
       final protocol1 = CommunicationProtocol.deserialize(jsonDecode(message));
-      if (protocol1.requestType != RequestType.update) return;
-      protocolCompleter1.complete(protocol1);
+      if (protocol1.requestType == RequestType.handshake) {
+        handshakeCompleter1.complete(protocol1);
+        return;
+      } else if (protocol1.requestType == RequestType.update) {
+        updateCompleter1.complete(protocol1);
+      }
     });
-    addTearDown(() => socket1.incommingStreamController.close());
-
-    final protocolCompleter2 = Completer<CommunicationProtocol>();
     socket2.incommingStreamController.stream.listen((message) {
       final protocol2 = CommunicationProtocol.deserialize(jsonDecode(message));
-      if (protocol2.requestType != RequestType.update) return;
-      protocolCompleter2.complete(protocol2);
+      if (protocol2.requestType == RequestType.handshake) {
+        handshakeCompleter2.complete(protocol2);
+        return;
+      } else if (protocol2.requestType == RequestType.update) {
+        updateCompleter2.complete(protocol2);
+      }
     });
+    addTearDown(() => socket1.incommingStreamController.close());
     addTearDown(() => socket2.incommingStreamController.close());
+
+    await Future.wait([
+      handshakeCompleter1.future.timeout(Duration(seconds: 1), onTimeout: () {
+        fail('Timeout waiting for handshake 1');
+      }),
+      handshakeCompleter2.future.timeout(Duration(seconds: 1), onTimeout: () {
+        fail('Timeout waiting for handshake 2');
+      }),
+    ]);
 
     // Simulate a POST request
     socket1.streamController.add(
@@ -511,11 +643,11 @@ void main() {
     );
 
     // Wait for the update to be sent to both clients
-    final protocol1 = await protocolCompleter1.future
+    final protocol1 = await updateCompleter1.future
         .timeout(Duration(seconds: 1), onTimeout: () {
       fail('Timeout waiting for protocol1 update');
     });
-    final protocol2 = await protocolCompleter2.future
+    final protocol2 = await updateCompleter2.future
         .timeout(Duration(seconds: 1), onTimeout: () {
       fail('Timeout waiting for protocol2 update');
     });
@@ -524,12 +656,14 @@ void main() {
     expect(protocol1.requestType, RequestType.update);
     expect(protocol1.field, RequestFields.teacher);
     expect(protocol1.data, isA<Map<String, dynamic>>());
-    expect(protocol1.data!['updated_fields'], ['first_name', 'last_name']);
+    expect(protocol1.data!['updated_fields'],
+        ['first_name', 'last_name', 'has_registered_account']);
     expect(protocol1.response, isNull);
     expect(protocol2.requestType, RequestType.update);
     expect(protocol2.field, RequestFields.teacher);
     expect(protocol2.data, isA<Map<String, dynamic>>());
-    expect(protocol2.data!['updated_fields'], ['first_name', 'last_name']);
+    expect(protocol2.data!['updated_fields'],
+        ['first_name', 'last_name', 'has_registered_account']);
     expect(protocol2.response, isNull);
   });
 
@@ -569,7 +703,7 @@ void main() {
     expect(protocol.response, Response.failure);
   });
   test('Send invalid UPDATE request', () async {
-    final connexions = Connexions(
+    final connexions = ConnexionsMock(
         database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final socket = WebSocketMock();
     final client =
@@ -578,12 +712,22 @@ void main() {
     socket.streamController.add(_prepareHandshake());
 
     // Listen to incoming messages from connexions
+    final handshakeCompleter = Completer<CommunicationProtocol>();
     final protocolCompleter = Completer<CommunicationProtocol>();
     socket.incommingStreamController.stream.listen((message) {
+      final protocol = CommunicationProtocol.deserialize(jsonDecode(message));
+      if (protocol.requestType == RequestType.handshake) {
+        handshakeCompleter.complete(protocol);
+        return;
+      }
       protocolCompleter
           .complete(CommunicationProtocol.deserialize(jsonDecode(message)));
     });
     addTearDown(() => socket.incommingStreamController.close());
+    await handshakeCompleter.future.timeout(Duration(seconds: 1),
+        onTimeout: () {
+      fail('Timeout waiting for handshake');
+    });
 
     // Simulate an invalid UPDATE request
     socket.streamController.add(
