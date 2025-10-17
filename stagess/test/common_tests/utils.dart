@@ -1,9 +1,12 @@
+import 'package:flutter/services.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common/models/enterprises/job_comment.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
+import 'package:stagess_common/models/generic/photo.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart'
     as attitude;
@@ -188,6 +191,22 @@ PreInternshipRequests dummyPreInternshipRequests({String? id}) =>
       isApplicable: true,
     );
 
+Photo dummyPhoto() => Photo(
+  id: 'photoId',
+  bytes: Uint8List.fromList(List.generate(100, (index) => index % 256)),
+);
+
+JobComment dummyJobComment({
+  String comment = 'This is a comment',
+  String teacherId = 'teacherId',
+  DateTime? date,
+}) => JobComment(
+  id: 'jobCommentId',
+  comment: 'newComment',
+  teacherId: 'teacherId',
+  date: DateTime(2023, 10, 1),
+);
+
 Job dummyJob({
   String id = 'jobId',
   String? sstEvaluationId,
@@ -251,22 +270,26 @@ PostInternshipEnterpriseEvaluation dummyPostInternshipEnterpriseEvaluation({
   acceptanceBehaviorDifficulties: hasDisorder ? 2 : -1,
 );
 
-visa.VisaEvaluation dummyInternshipVisaEvaluation({
+visa.InternshipEvaluationVisa dummyInternshipVisaEvaluation({
   String id = 'internshipVisaEvaluationId',
-  bool hasDisorder = true,
-}) => visa.VisaEvaluation(
+}) => visa.InternshipEvaluationVisa(
   id: id,
-  inattendance: visa.Inattendance.rarely,
-  ponctuality: visa.Ponctuality.sometimeLate,
-  sociability: visa.Sociability.veryLow,
-  politeness: visa.Politeness.alwaysSuitable,
-  motivation: visa.Motivation.low,
-  dressCode: visa.DressCode.notAppropriate,
-  qualityOfWork: visa.QualityOfWork.high,
-  productivity: visa.Productivity.low,
-  autonomy: visa.Autonomy.none,
-  cautiousness: visa.Cautiousness.mostly,
-  generalAppreciation: visa.GeneralAppreciation.passable,
+  date: DateTime(1980, 5, 20),
+  formVersion: visa.InternshipEvaluationVisa.currentVersion,
+  form: visa.VisaEvaluation(
+    id: 'visaEvaluationId',
+    inattendance: visa.Inattendance.rarely,
+    ponctuality: visa.Ponctuality.sometimeLate,
+    sociability: visa.Sociability.veryLow,
+    politeness: visa.Politeness.alwaysSuitable,
+    motivation: visa.Motivation.low,
+    dressCode: visa.DressCode.notAppropriate,
+    qualityOfWork: visa.QualityOfWork.high,
+    productivity: visa.Productivity.low,
+    autonomy: visa.Autonomy.none,
+    cautiousness: visa.Cautiousness.mostly,
+    generalAppreciation: visa.GeneralAppreciation.passable,
+  ),
 );
 
 Internship dummyInternship({
@@ -281,13 +304,13 @@ Internship dummyInternship({
   int achievedLength = 130,
 }) {
   final period = DateTimeRange(
-    start: DateTime(1995, 10, 31),
-    end: DateTime(1995, 10, 31).add(const Duration(days: 20)),
+    start: DateTime(2005, 10, 31),
+    end: DateTime(2005, 10, 31).add(const Duration(days: 20)),
   );
   return Internship(
     id: id,
     schoolBoardId: schoolBoardId,
-    creationDate: versionDate ?? DateTime(1995, 10, 31),
+    creationDate: versionDate ?? DateTime(2005, 10, 31),
     studentId: studentId,
     signatoryTeacherId: teacherId,
     extraSupervisingTeacherIds: [],
@@ -316,6 +339,7 @@ Internship dummyInternship({
     weeklySchedules: [dummyWeeklySchedule(period: period)],
     skillEvaluations: [dummyInternshipEvaluationSkill()],
     attitudeEvaluations: [dummyInternshipEvaluationAttitude()],
+    visaEvaluations: [dummyInternshipVisaEvaluation()],
     transportations: [Transportation.none],
     visitFrequencies: 'Tous les jours',
   );
@@ -326,10 +350,12 @@ DailySchedule dummyDailySchedule({String id = 'dailyScheduleId'}) {
     id: id,
     blocks: [
       TimeBlock(
+        id: 'timeBlockId1',
         start: const TimeOfDay(hour: 9, minute: 0),
         end: const TimeOfDay(hour: 12, minute: 0),
       ),
       TimeBlock(
+        id: 'timeBlockId2',
         start: const TimeOfDay(hour: 13, minute: 0),
         end: const TimeOfDay(hour: 15, minute: 0),
       ),

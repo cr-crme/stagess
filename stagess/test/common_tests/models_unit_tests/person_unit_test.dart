@@ -9,16 +9,16 @@ void main() {
   group('Person', () {
     test('default is empty', () {
       final person = Person.empty;
-      expect(person.firstName, 'Unnamed');
+      expect(person.firstName, '');
       expect(person.middleName, isNull);
-      expect(person.lastName, 'Unnamed');
+      expect(person.lastName, '');
       expect(person.dateBirth, isNull);
       expect(person.phone, isNull);
       expect(person.email, isNull);
       expect(person.address, isNull);
 
       expect(person.toString(), Person.empty.toString());
-      expect(person.fullName, 'Unnamed Unnamed');
+      expect(person.fullName, '');
     });
 
     test('is shown properly', () {

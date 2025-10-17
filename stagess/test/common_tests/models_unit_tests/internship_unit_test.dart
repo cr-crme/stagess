@@ -40,19 +40,19 @@ void main() {
       expect(internship.nbVersions, 1);
       expect(
         internship.creationDate.millisecondsSinceEpoch,
-        DateTime(1995, 10, 31).millisecondsSinceEpoch,
+        DateTime(2005, 10, 31).millisecondsSinceEpoch,
       );
       expect(internship.creationDateFrom(0), internship.creationDate);
       expect(internship.supervisor.toString(), 'Nobody Forever');
       expect(internship.supervisorFrom(0), internship.supervisor);
       expect(
         internship.dates.start.millisecondsSinceEpoch,
-        DateTime(1995, 10, 31).millisecondsSinceEpoch,
+        DateTime(2005, 10, 31).millisecondsSinceEpoch,
       );
       expect(
         internship.dates.end.millisecondsSinceEpoch,
         DateTime(
-          1995,
+          2005,
           10,
           31,
         ).add(const Duration(days: 20)).millisecondsSinceEpoch,
@@ -265,8 +265,8 @@ void main() {
       final deserialized = Internship.fromSerialized(serialized);
 
       final period = DateTimeRange(
-        start: DateTime(1995, 10, 31),
-        end: DateTime(1995, 10, 31).add(const Duration(days: 20)),
+        start: DateTime(2005, 10, 31),
+        end: DateTime(2005, 10, 31).add(const Duration(days: 20)),
       );
 
       final expected = {
@@ -287,6 +287,8 @@ void main() {
             'starting_date': internship.dates.start.millisecondsSinceEpoch,
             'ending_date': internship.dates.end.millisecondsSinceEpoch,
             'schedules': [dummyWeeklySchedule(period: period).serialize()],
+            'transportations': [Transportation.none.serialize()],
+            'visit_frequencies': 'Tous les jours',
           },
         ],
         'expected_duration': 135,
@@ -299,7 +301,7 @@ void main() {
         ],
         'enterprise_evaluation':
             dummyPostInternshipEnterpriseEvaluation().serialize(),
-        'visa_evaluations': dummyInternshipVisaEvaluation().serialize(),
+        'visa_evaluations': [dummyInternshipVisaEvaluation().serialize()],
       };
       expect(serialized, expected);
 
@@ -362,10 +364,11 @@ void main() {
       expect(emptyDeserialized.expectedDuration, -1);
       expect(emptyDeserialized.achievedDuration, -1);
       expect(emptyDeserialized.teacherNotes, '');
-      expect(emptyDeserialized.endDate, isNull);
+      expect(emptyDeserialized.endDate, DateTime(0));
       expect(emptyDeserialized.skillEvaluations.length, 0);
       expect(emptyDeserialized.attitudeEvaluations.length, 0);
       expect(emptyDeserialized.enterpriseEvaluation, isNull);
+      expect(emptyDeserialized.visaEvaluations.length, 0);
 
       expect(() => emptyDeserialized.dates, throwsStateError);
       expect(() => emptyDeserialized.weeklySchedules, throwsStateError);

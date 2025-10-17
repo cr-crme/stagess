@@ -17,25 +17,25 @@ class VisaEvaluationFormController {
   }) {
     Internship internship =
         InternshipsProvider.of(context, listen: false)[internshipId];
-    InternshipEvaluationVisa evaluation =
+    InternshipEvaluationVisa visaForm =
         internship.visaEvaluations[evaluationIndex];
 
     final controller = VisaEvaluationFormController(internshipId: internshipId);
 
-    controller.evaluationDate = evaluation.date;
+    controller.evaluationDate = visaForm.date;
 
-    controller.responses[Inattendance] = evaluation.attitude.inattendance;
-    controller.responses[Ponctuality] = evaluation.attitude.ponctuality;
-    controller.responses[Sociability] = evaluation.attitude.sociability;
-    controller.responses[Politeness] = evaluation.attitude.politeness;
-    controller.responses[Motivation] = evaluation.attitude.motivation;
-    controller.responses[DressCode] = evaluation.attitude.dressCode;
-    controller.responses[QualityOfWork] = evaluation.attitude.qualityOfWork;
-    controller.responses[Productivity] = evaluation.attitude.productivity;
-    controller.responses[Autonomy] = evaluation.attitude.autonomy;
-    controller.responses[Cautiousness] = evaluation.attitude.cautiousness;
+    controller.responses[Inattendance] = visaForm.form.inattendance;
+    controller.responses[Ponctuality] = visaForm.form.ponctuality;
+    controller.responses[Sociability] = visaForm.form.sociability;
+    controller.responses[Politeness] = visaForm.form.politeness;
+    controller.responses[Motivation] = visaForm.form.motivation;
+    controller.responses[DressCode] = visaForm.form.dressCode;
+    controller.responses[QualityOfWork] = visaForm.form.qualityOfWork;
+    controller.responses[Productivity] = visaForm.form.productivity;
+    controller.responses[Autonomy] = visaForm.form.autonomy;
+    controller.responses[Cautiousness] = visaForm.form.cautiousness;
     controller.responses[GeneralAppreciation] =
-        evaluation.attitude.generalAppreciation;
+        visaForm.form.generalAppreciation;
 
     return controller;
   }
@@ -43,19 +43,20 @@ class VisaEvaluationFormController {
   InternshipEvaluationVisa toInternshipEvaluation() {
     return InternshipEvaluationVisa(
       date: evaluationDate,
-      attitude: VisaEvaluation(
-          inattendance: responses[Inattendance]! as Inattendance,
-          ponctuality: responses[Ponctuality]! as Ponctuality,
-          sociability: responses[Sociability]! as Sociability,
-          politeness: responses[Politeness]! as Politeness,
-          motivation: responses[Motivation]! as Motivation,
-          dressCode: responses[DressCode]! as DressCode,
-          qualityOfWork: responses[QualityOfWork]! as QualityOfWork,
-          productivity: responses[Productivity]! as Productivity,
-          autonomy: responses[Autonomy]! as Autonomy,
-          cautiousness: responses[Cautiousness]! as Cautiousness,
-          generalAppreciation:
-              responses[GeneralAppreciation]! as GeneralAppreciation),
+      form: VisaEvaluation(
+        inattendance: responses[Inattendance]! as Inattendance,
+        ponctuality: responses[Ponctuality]! as Ponctuality,
+        sociability: responses[Sociability]! as Sociability,
+        politeness: responses[Politeness]! as Politeness,
+        motivation: responses[Motivation]! as Motivation,
+        dressCode: responses[DressCode]! as DressCode,
+        qualityOfWork: responses[QualityOfWork]! as QualityOfWork,
+        productivity: responses[Productivity]! as Productivity,
+        autonomy: responses[Autonomy]! as Autonomy,
+        cautiousness: responses[Cautiousness]! as Cautiousness,
+        generalAppreciation:
+            responses[GeneralAppreciation]! as GeneralAppreciation,
+      ),
       formVersion: _formVersion,
     );
   }

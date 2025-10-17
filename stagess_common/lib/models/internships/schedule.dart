@@ -44,6 +44,7 @@ enum Day {
 
 class TimeBlock extends ItemSerializable {
   TimeBlock({
+    super.id,
     required this.start,
     required this.end,
   });

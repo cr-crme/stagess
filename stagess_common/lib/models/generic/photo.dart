@@ -5,7 +5,7 @@ import 'package:enhanced_containers_foundation/enhanced_containers_foundation.da
 class Photo extends ItemSerializable {
   final Uint8List bytes;
 
-  Photo({required this.bytes}) {
+  Photo({super.id, required this.bytes}) {
     // Ensure the file is maximum 1000kb
     if (bytes.lengthInBytes > 1000 * 1024) {
       throw Exception('File is too large');

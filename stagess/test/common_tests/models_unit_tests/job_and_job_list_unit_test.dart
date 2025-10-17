@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stagess/common/extensions/job_extension.dart';
 import 'package:stagess/program_helpers.dart';
@@ -64,18 +62,10 @@ void main() {
         ),
         uniforms: dummyUniforms(id: 'newUniformId'),
         protections: dummyProtections(id: 'newProtectionsId'),
-        photos: [
-          Photo(bytes: Uint8List.fromList([1, 2, 3])),
-        ],
+        photos: [dummyPhoto()],
         sstEvaluation: dummyJobSstEvaluation(id: 'newSstEvaluationId'),
         incidents: dummyIncidents(id: 'newIncidentsId'),
-        comments: [
-          JobComment(
-            comment: 'newComment',
-            teacherId: 'teacherId',
-            date: DateTime(2023, 10, 1),
-          ),
-        ],
+        comments: [dummyJobComment()],
       );
 
       expect(jobDifferent.id, 'newId');
@@ -83,23 +73,22 @@ void main() {
         jobDifferent.specialization.id,
         ActivitySectorsService.activitySectors[2].specializations[8].id,
       );
-      expect(jobDifferent.positionsOffered, 2);
+      expect(jobDifferent.positionsOffered, {'school_id': 2});
       expect(jobDifferent.minimumAge, 12);
       expect(jobDifferent.preInternshipRequests.id, 'newPreInternshipId');
       expect(jobDifferent.uniforms.id, 'newUniformId');
       expect(jobDifferent.protections.id, 'newProtectionsId');
-      expect(jobDifferent.photos, [
-        Photo(bytes: Uint8List.fromList([1, 2, 3])),
-      ]);
+      expect(jobDifferent.photos, isA<List<Photo>>());
+      expect(jobDifferent.photos.length, 1);
+      expect(jobDifferent.photos[0].id, 'photoId');
       expect(jobDifferent.sstEvaluation.id, 'newSstEvaluationId');
       expect(jobDifferent.incidents.id, 'newIncidentsId');
-      expect(jobDifferent.comments, [
-        JobComment(
-          comment: 'newComment',
-          teacherId: 'teacherId',
-          date: DateTime(2023, 10, 1),
-        ),
-      ]);
+      expect(jobDifferent.preInternshipRequests.id, 'newPreInternshipId');
+      expect(jobDifferent.uniforms.id, 'newUniformId');
+      expect(jobDifferent.protections.id, 'newProtectionsId');
+      expect(jobDifferent.comments, isA<List<JobComment>>());
+      expect(jobDifferent.comments.length, 1);
+      expect(jobDifferent.comments[0].id, 'jobCommentId');
     });
 
     test('has the rigt amount', () {
@@ -130,6 +119,7 @@ void main() {
         'sst_evaluations': job.sstEvaluation.serialize(),
         'incidents': job.incidents.serialize(),
         'comments': job.comments,
+        'reserved_for_id': job.reservedForId,
       });
 
       expect(deserialized.id, job.id);
@@ -150,7 +140,7 @@ void main() {
       // Test for empty deserialize to make sure it doesn't crash
       final emptyDeserialized = Job.fromSerialized({'id': 'emptyId'});
       expect(emptyDeserialized.id, 'emptyId');
-      expect(emptyDeserialized.positionsOffered, 0);
+      expect(emptyDeserialized.positionsOffered, {});
       expect(emptyDeserialized.minimumAge, 0);
       expect(emptyDeserialized.preInternshipRequests.id, isNotNull);
       expect(emptyDeserialized.uniforms.id, isNotNull);
@@ -182,6 +172,7 @@ void main() {
             'sst_evaluations': e.sstEvaluation.serialize(),
             'incidents': e.incidents.serialize(),
             'comments': e.comments,
+            'reserved_for_id': e.reservedForId,
           },
       });
 

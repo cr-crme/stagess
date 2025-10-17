@@ -106,7 +106,7 @@ class _InternshipSkillsState extends State<InternshipSkills> {
                 const SizedBox(height: 16.0),
                 _VisaBody(
                   internship: internship,
-                  evaluation: internship.visaEvaluations,
+                  evaluations: internship.visaEvaluations,
                 ),
               ],
             ),
@@ -702,10 +702,10 @@ class _AttitudeBodyState extends State<_AttitudeBody> {
 }
 
 class _VisaBody extends StatefulWidget {
-  const _VisaBody({required this.internship, required this.evaluation});
+  const _VisaBody({required this.internship, required this.evaluations});
 
   final Internship internship;
-  final List<visa.InternshipEvaluationVisa> evaluation;
+  final List<visa.InternshipEvaluationVisa> evaluations;
 
   @override
   State<_VisaBody> createState() => _VisaBodyState();
@@ -717,9 +717,9 @@ class _VisaBodyState extends State<_VisaBody> {
   int _nbPreviousEvaluations = -1;
 
   void _resetIndex() {
-    if (_nbPreviousEvaluations != widget.evaluation.length) {
-      _currentEvaluationIndex = widget.evaluation.length - 1;
-      _nbPreviousEvaluations = widget.evaluation.length;
+    if (_nbPreviousEvaluations != widget.evaluations.length) {
+      _currentEvaluationIndex = widget.evaluations.length - 1;
+      _nbPreviousEvaluations = widget.evaluations.length;
     }
   }
 
@@ -734,7 +734,7 @@ class _VisaBodyState extends State<_VisaBody> {
             onChanged:
                 (value) => setState(() => _currentEvaluationIndex = value!),
             items:
-                widget.evaluation
+                widget.evaluations
                     .asMap()
                     .keys
                     .map(
@@ -744,7 +744,7 @@ class _VisaBodyState extends State<_VisaBody> {
                           DateFormat(
                             'dd MMMM yyyy',
                             'fr_CA',
-                          ).format(widget.evaluation[index].date),
+                          ).format(widget.evaluations[index].date),
                         ),
                       ),
                     )
@@ -769,8 +769,8 @@ class _VisaBodyState extends State<_VisaBody> {
             padding: const EdgeInsets.only(left: 12.0),
             child: ItemizedText(
               widget
-                  .evaluation[_currentEvaluationIndex]
-                  .attitude
+                  .evaluations[_currentEvaluationIndex]
+                  .form
                   .meetsRequirements,
             ),
           ),
@@ -793,8 +793,8 @@ class _VisaBodyState extends State<_VisaBody> {
             padding: const EdgeInsets.only(left: 12.0),
             child: ItemizedText(
               widget
-                  .evaluation[_currentEvaluationIndex]
-                  .attitude
+                  .evaluations[_currentEvaluationIndex]
+                  .form
                   .doesNotMeetRequirements,
             ),
           ),
@@ -819,8 +819,8 @@ class _VisaBodyState extends State<_VisaBody> {
               visa
                   .GeneralAppreciation
                   .values[widget
-                      .evaluation[_currentEvaluationIndex]
-                      .attitude
+                      .evaluations[_currentEvaluationIndex]
+                      .form
                       .generalAppreciation
                       .index]
                   .name,
@@ -896,12 +896,12 @@ class _VisaBodyState extends State<_VisaBody> {
           ),
       child: Column(
         children: [
-          if (widget.evaluation.isEmpty)
+          if (widget.evaluations.isEmpty)
             const Padding(
               padding: EdgeInsets.only(top: 8.0, bottom: 4.0),
               child: Text('Aucune évaluation disponible pour ce stage.'),
             ),
-          if (widget.evaluation.isNotEmpty)
+          if (widget.evaluations.isNotEmpty)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
