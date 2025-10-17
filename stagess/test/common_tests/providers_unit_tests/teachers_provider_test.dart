@@ -2,7 +2,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:stagess/program_helpers.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
-import 'package:uuid/uuid.dart';
 
 import '../../utils.dart';
 import '../utils.dart';
@@ -17,13 +16,12 @@ void main() {
         uri: Uri.parse('ws://localhost'),
         mockMe: true,
       );
-      expect(() => teachers.currentTeacher?.id, throwsException);
+      expect(teachers.currentTeacher?.id, isNull);
 
-      teachers.initializeAuth(AuthProvider(mockMe: true));
-      var uuid = Uuid();
-      final namespace = UuidValue.fromNamespace(Namespace.dns);
-      final teacherId = uuid.v5(namespace.toString(), 'Mock User');
-      expect(teachers.currentTeacher?.id, teacherId);
+      final auth = AuthProvider(mockMe: true);
+      teachers.initializeAuth(auth);
+      teachers.add(dummyTeacher(id: auth.teacherId!));
+      expect(teachers.currentTeacher?.id, auth.teacherId);
     });
 
     test('"getCurrentTeacher" works', () {
@@ -31,16 +29,14 @@ void main() {
         uri: Uri.parse('ws://localhost'),
         mockMe: true,
       );
-      expect(teachers.currentTeacher?.firstName, 'Error');
+      expect(teachers.currentTeacher?.firstName, isNull);
 
       final auth = AuthProvider(mockMe: true);
       teachers.initializeAuth(auth);
       teachers.add(dummyTeacher());
-      expect(teachers.currentTeacher?.firstName, 'Error');
+      expect(teachers.currentTeacher?.firstName, isNull);
 
-      teachers.add(
-        dummyTeacher(id: teachers.currentTeacher?.id ?? 'FailedToGetId'),
-      );
+      teachers.add(dummyTeacher(id: auth.teacherId!));
       expect(teachers.currentTeacher?.firstName, 'Pierre');
     });
 

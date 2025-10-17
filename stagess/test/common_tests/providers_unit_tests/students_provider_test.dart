@@ -12,14 +12,10 @@ import '../../utils.dart';
 import '../utils.dart';
 
 void _prepareProviders(BuildContext context) {
-  final auth = AuthProvider(mockMe: true);
+  final auth = AuthProvider.of(context, listen: false);
+
   final teachers = TeachersProvider.of(context, listen: false);
-  teachers.initializeAuth(auth);
-  teachers.add(
-    dummyTeacher(id: teachers.currentTeacher?.id ?? 'FailedToGetId'),
-  );
-  final students = StudentsProvider.of(context, listen: false);
-  students.initializeAuth(auth);
+  teachers.add(dummyTeacher(id: auth.teacherId!));
 }
 
 void main() {
@@ -30,6 +26,7 @@ void main() {
     testWidgets('"studentsInMyGroups" works', (tester) async {
       // Prepare the StudentsProvider
       final context = await tester.contextWithNotifiers(
+        withAuthentication: true,
         withStudents: true,
         withTeachers: true,
       );
@@ -51,6 +48,7 @@ void main() {
     testWidgets('"mySupervizedStudents" works', (tester) async {
       // Prepare the StudentsProvider
       final context = await tester.contextWithNotifiers(
+        withAuthentication: true,
         withStudents: true,
         withTeachers: true,
         withInternships: true,
@@ -72,8 +70,7 @@ void main() {
 
       // Add internship to all of the students
       final internships = InternshipsProvider.of(context, listen: false);
-      final teacherId =
-          TeachersProvider.of(context).currentTeacher?.id ?? 'FailedToGetId';
+      final teacherId = TeachersProvider.of(context).currentTeacher!.id;
       for (int i = 0; i < students.length; i++) {
         final student = students[i];
         internships.add(
@@ -90,14 +87,14 @@ void main() {
       );
 
       // Add the fourth student to the supervising list of the teacher
-      internships
-          .firstWhere((e) => e.studentId == 'notYetMyStudent')
-          .copyWithTeacher(
-            context,
-            teacherId:
-                TeachersProvider.of(context).currentTeacher?.id ??
-                'FailedToGetId',
-          );
+      internships.replace(
+        internships
+            .firstWhere((e) => e.studentId == 'notYetMyStudent')
+            .copyWithTeacher(
+              context,
+              teacherId: TeachersProvider.of(context).currentTeacher!.id,
+            ),
+      );
       expect(
         StudentsHelpers.mySupervizedStudents(context, listen: false).length,
         4,
@@ -106,7 +103,7 @@ void main() {
       // Terminate one of the internships
       final internship = internships
           .firstWhere((e) => e.studentId == 'myStudent1')
-          .copyWith(endDate: DateTime(0));
+          .copyWith(endDate: DateTime(2023, 1, 1));
       internships.replace(internship);
       expect(
         StudentsHelpers.mySupervizedStudents(
@@ -131,9 +128,7 @@ void main() {
             .firstWhere((e) => e.studentId == 'neverMyStudent2')
             .copyWithTeacher(
               context,
-              teacherId:
-                  TeachersProvider.of(context).currentTeacher?.id ??
-                  'FailedToGetId',
+              teacherId: TeachersProvider.of(context).currentTeacher!.id,
             ),
         throwsException,
       );

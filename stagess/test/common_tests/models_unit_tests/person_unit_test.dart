@@ -83,9 +83,9 @@ void main() {
       // Test for empty deserialize to make sure it doesn't crash
       final emptyDeserialized = Person.fromSerialized({'id': 'emptyId'});
       expect(emptyDeserialized.id, 'emptyId');
-      expect(emptyDeserialized.firstName, 'Unnamed');
+      expect(emptyDeserialized.firstName, '');
       expect(emptyDeserialized.middleName, isNull);
-      expect(emptyDeserialized.lastName, 'Unnamed');
+      expect(emptyDeserialized.lastName, '');
       expect(emptyDeserialized.dateBirth, isNull);
       expect(emptyDeserialized.phone, isNull);
       expect(emptyDeserialized.email, isNull);

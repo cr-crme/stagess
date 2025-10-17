@@ -241,7 +241,7 @@ void main() {
       expect(emptyDeserialized.activityTypes, <Set>{});
       expect(emptyDeserialized.recruiterId, '');
       expect(emptyDeserialized.jobs.length, 0);
-      expect(emptyDeserialized.contact.firstName, 'Unnamed');
+      expect(emptyDeserialized.contact.firstName, '');
       expect(emptyDeserialized.contactFunction, '');
       expect(emptyDeserialized.address, isNull);
       expect(emptyDeserialized.phone, isNull);

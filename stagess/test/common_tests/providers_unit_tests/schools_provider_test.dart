@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stagess/program_helpers.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
@@ -9,12 +10,14 @@ import '../../utils.dart';
 import '../utils.dart';
 
 void _initializeTeacher(BuildContext context) {
+  final authProvided = AuthProvider.of(context, listen: false);
+
   SchoolBoardsProvider.of(context, listen: false).add(
     SchoolBoard(
-      id: 'SchoolBoardId',
+      id: authProvided.schoolBoardId!,
       name: 'Test SchoolBoard',
       logo: null,
-      schools: [dummySchool(id: 'SchoolId')],
+      schools: [dummySchool(id: authProvided.schoolId!)],
       cnesstNumber: '1234567890',
     ),
   );
@@ -23,8 +26,8 @@ void _initializeTeacher(BuildContext context) {
   teachers.add(
     dummyTeacher(
       id: 'MockedTeacherId',
-      schoolBoardId: 'SchoolBoardId',
-      schoolId: 'SchoolId',
+      schoolBoardId: authProvided.schoolBoardId!,
+      schoolId: authProvided.schoolId!,
     ),
   );
 }
@@ -51,6 +54,7 @@ void main() {
 
     testWidgets('can get "currentSchoolBoardOf"', (tester) async {
       final context = await tester.contextWithNotifiers(
+        withAuthentication: true,
         withSchools: true,
         withTeachers: true,
       );
@@ -65,6 +69,7 @@ void main() {
       tester,
     ) async {
       final context = await tester.contextWithNotifiers(
+        withAuthentication: true,
         withSchools: true,
         withTeachers: true,
       );

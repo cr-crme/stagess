@@ -6,13 +6,13 @@ import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 void main() {
   group('VisitingPriority', () {
     test('"next" behaves properly', () {
-      expect(VisitingPriority.low.next, VisitingPriority.high);
-      expect(VisitingPriority.mid.next, VisitingPriority.low);
-      expect(VisitingPriority.high.next, VisitingPriority.mid);
+      expect(VisitingPriority.low.next, VisitingPriority.mid);
+      expect(VisitingPriority.mid.next, VisitingPriority.high);
+      expect(VisitingPriority.high.next, VisitingPriority.low);
 
       // Test the side effects as well
-      expect(VisitingPriority.school.next, VisitingPriority.low);
-      expect(VisitingPriority.notApplicable.next, VisitingPriority.high);
+      expect(VisitingPriority.school.next, VisitingPriority.mid);
+      expect(VisitingPriority.notApplicable.next, VisitingPriority.mid);
     });
 
     test('is the right color', () {

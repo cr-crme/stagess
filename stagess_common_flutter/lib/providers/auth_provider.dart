@@ -20,6 +20,7 @@ class AuthProvider extends ChangeNotifier {
           email: 'email@email.com',
           password: '123123123',
         );
+        teacherId = 'mockTeacherId';
       }
     }
   }

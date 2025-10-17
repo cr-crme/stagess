@@ -34,6 +34,7 @@ void main() {
         'id': school.id,
         'name': school.name,
         'address': school.address.serialize(),
+        'phone': school.phone.serialize(),
       });
 
       expect(deserialized.id, school.id);

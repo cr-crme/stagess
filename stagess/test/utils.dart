@@ -14,9 +14,10 @@ import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 /// Overlay are required for widgets such as Tootip
 Widget addOverlay(Widget child) {
   return MaterialApp(
-    builder: (context, ch) => Overlay(initialEntries: [
-      OverlayEntry(builder: (context) => child),
-    ]),
+    builder:
+        (context, ch) => Overlay(
+          initialEntries: [OverlayEntry(builder: (context) => child)],
+        ),
   );
 }
 
@@ -54,8 +55,10 @@ extension StageSsWidgetTester on WidgetTester {
   Future<void> navigateToScreen(ScreenTest target) async {
     // This function assumes drawer menu is shown
     await openDrawer();
-    final targetButton =
-        find.ancestor(of: find.text(target.name), matching: find.byType(Card));
+    final targetButton = find.ancestor(
+      of: find.text(target.name),
+      matching: find.byType(Card),
+    );
     await tap(targetButton);
 
     await pumpAndSettle(const Duration(milliseconds: 500));
@@ -108,54 +111,129 @@ extension StageSsWidgetTester on WidgetTester {
 
     await pumpWidget(
       MaterialApp(
-        builder: (ctx, ch) => MultiProvider(providers: [
-          if (withAuthentication)
-            ChangeNotifierProvider(
-                create: (context) => AuthProvider(mockMe: true)),
-          if (withSchools)
-            ChangeNotifierProvider(
-                create: (context) => SchoolBoardsProvider(
-                    uri: Uri.parse('ws://localhost'), mockMe: true)),
-          if (withEnterprises)
-            ChangeNotifierProvider(create: (context) {
-              final enterprises = EnterprisesProvider(
-                  uri: Uri.parse('ws://localhost'), mockMe: true);
-              if (dummyEnterprise != null) enterprises.add(dummyEnterprise);
-              return enterprises;
-            }),
-          if (withInternships)
-            ChangeNotifierProvider(create: (context) {
-              final internships = InternshipsProvider(
-                  uri: Uri.parse('ws://localhost'), mockMe: true);
-              if (dummyInternship != null) internships.add(dummyInternship);
-              return internships;
-            }),
-          if (withTeachers && withAuthentication)
-            ChangeNotifierProxyProvider<AuthProvider, TeachersProvider>(
-              create: (context) => TeachersProvider(
-                  uri: Uri.parse('ws://localhost'), mockMe: true),
-              update: (context, auth, previous) =>
-                  previous!..initializeAuth(auth),
+        builder:
+            (ctx, ch) => MultiProvider(
+              providers: [
+                if (withAuthentication)
+                  ChangeNotifierProvider(
+                    create: (context) => AuthProvider(mockMe: true),
+                  ),
+                if (withSchools)
+                  ChangeNotifierProvider(
+                    create:
+                        (context) => SchoolBoardsProvider(
+                          uri: Uri.parse('ws://localhost'),
+                          mockMe: true,
+                        ),
+                  ),
+                if (withEnterprises)
+                  ChangeNotifierProvider(
+                    create: (context) {
+                      final enterprises = EnterprisesProvider(
+                        uri: Uri.parse('ws://localhost'),
+                        mockMe: true,
+                      );
+                      if (dummyEnterprise != null) {
+                        enterprises.add(dummyEnterprise);
+                      }
+                      return enterprises;
+                    },
+                  ),
+                if (withInternships)
+                  ChangeNotifierProvider(
+                    create: (context) {
+                      final internships = InternshipsProvider(
+                        uri: Uri.parse('ws://localhost'),
+                        mockMe: true,
+                      );
+                      if (dummyInternship != null) {
+                        internships.add(dummyInternship);
+                      }
+                      return internships;
+                    },
+                  ),
+                if (withTeachers && withAuthentication)
+                  ChangeNotifierProxyProvider<AuthProvider, TeachersProvider>(
+                    create:
+                        (context) => TeachersProvider(
+                          uri: Uri.parse('ws://localhost'),
+                          mockMe: true,
+                        ),
+                    update:
+                        (context, auth, previous) =>
+                            previous!..initializeAuth(auth),
+                  ),
+                if (withTeachers && !withAuthentication)
+                  ChangeNotifierProvider<TeachersProvider>(
+                    create:
+                        (context) => TeachersProvider(
+                          uri: Uri.parse('ws://localhost'),
+                          mockMe: true,
+                        ),
+                  ),
+                if (withStudents && withAuthentication)
+                  ChangeNotifierProxyProvider<AuthProvider, StudentsProvider>(
+                    create:
+                        (context) => StudentsProvider(
+                          uri: Uri.parse('ws://localhost'),
+                          mockMe: true,
+                        ),
+                    update:
+                        (context, auth, previous) =>
+                            previous!..initializeAuth(auth),
+                  ),
+                if (withStudents && !withAuthentication)
+                  ChangeNotifierProvider<StudentsProvider>(
+                    create:
+                        (context) => StudentsProvider(
+                          uri: Uri.parse('ws://localhost'),
+                          mockMe: true,
+                        ),
+                  ),
+              ],
+              child: child,
             ),
-          if (withTeachers && !withAuthentication)
-            ChangeNotifierProvider<TeachersProvider>(
-                create: (context) => TeachersProvider(
-                    uri: Uri.parse('ws://localhost'), mockMe: true)),
-          if (withStudents && withAuthentication)
-            ChangeNotifierProxyProvider<AuthProvider, StudentsProvider>(
-              create: (context) => StudentsProvider(
-                  uri: Uri.parse('ws://localhost'), mockMe: true),
-              update: (context, auth, previous) =>
-                  previous!..initializeAuth(auth),
-            ),
-          if (withStudents && !withAuthentication)
-            ChangeNotifierProvider<StudentsProvider>(
-              create: (context) => StudentsProvider(
-                  uri: Uri.parse('ws://localhost'), mockMe: true),
-            ),
-        ], child: child),
       ),
     );
+
+    final buildContext = context(find.byWidget(child));
+    if (withAuthentication) {
+      final authProvided = AuthProvider.of(buildContext, listen: false);
+      authProvided.schoolBoardId = 'MockedSchoolBoardId';
+      authProvided.schoolId = 'MockedSchoolId';
+      authProvided.teacherId = 'MockedTeacherId';
+
+      if (withSchools) {
+        SchoolBoardsProvider.of(
+          buildContext,
+          listen: false,
+        ).initializeAuth(AuthProvider.of(buildContext, listen: false));
+      }
+      if (withTeachers) {
+        TeachersProvider.of(
+          buildContext,
+          listen: false,
+        ).initializeAuth(AuthProvider.of(buildContext, listen: false));
+      }
+      if (withStudents) {
+        StudentsProvider.of(
+          buildContext,
+          listen: false,
+        ).initializeAuth(AuthProvider.of(buildContext, listen: false));
+      }
+      if (withEnterprises) {
+        EnterprisesProvider.of(
+          buildContext,
+          listen: false,
+        ).initializeAuth(AuthProvider.of(buildContext, listen: false));
+      }
+      if (withInternships) {
+        InternshipsProvider.of(
+          buildContext,
+          listen: false,
+        ).initializeAuth(AuthProvider.of(buildContext, listen: false));
+      }
+    }
   }
 }
 

@@ -117,9 +117,9 @@ void main() {
       final emptyDeserialized = Teacher.fromSerialized({'id': 'emptyId'});
       expect(emptyDeserialized.id, 'emptyId');
       expect(emptyDeserialized.schoolBoardId, '-1');
-      expect(emptyDeserialized.firstName, 'Unnamed');
+      expect(emptyDeserialized.firstName, '');
       expect(emptyDeserialized.middleName, isNull);
-      expect(emptyDeserialized.lastName, 'Unnamed');
+      expect(emptyDeserialized.lastName, '');
       expect(emptyDeserialized.schoolId, '-1');
       expect(emptyDeserialized.groups, []);
       expect(emptyDeserialized.email, isNull);

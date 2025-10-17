@@ -19,7 +19,7 @@ void main() {
       expect(Program.values.length, 3);
       expect(Program.fpt.toString(), 'FPT');
       expect(Program.fms.toString(), 'FMS');
-      expect(Program.undefined.toString(), 'Undefined');
+      expect(Program.undefined.toString(), 'À déterminer');
     });
 
     testWidgets('"asActive" behaves properly', (tester) async {
@@ -27,15 +27,19 @@ void main() {
       final student = dummyStudent();
 
       // Add an internship to another student
-      InternshipsProvider.of(context, listen: false)
-          .add(dummyInternship(studentId: 'anotherStudentId'));
+      InternshipsProvider.of(
+        context,
+        listen: false,
+      ).add(dummyInternship(studentId: 'anotherStudentId'));
 
       // Start without an internship
       expect(student.hasActiveInternship(context), isFalse);
 
       // Add an internship to the student
-      InternshipsProvider.of(context, listen: false)
-          .add(dummyInternship(studentId: student.id));
+      InternshipsProvider.of(
+        context,
+        listen: false,
+      ).add(dummyInternship(studentId: student.id));
 
       // Now the student has an internship
       expect(student.hasActiveInternship(context), isTrue);
@@ -151,9 +155,9 @@ void main() {
       // Test for empty deserialize to make sure it doesn't crash
       final emptyDeserialized = Student.fromSerialized({'id': 'emptyId'});
       expect(emptyDeserialized.id, 'emptyId');
-      expect(emptyDeserialized.firstName, 'Unnamed');
+      expect(emptyDeserialized.firstName, '');
       expect(emptyDeserialized.middleName, isNull);
-      expect(emptyDeserialized.lastName, 'Unnamed');
+      expect(emptyDeserialized.lastName, '');
       expect(emptyDeserialized.dateBirth, isNull);
       expect(emptyDeserialized.phone, isNull);
       expect(emptyDeserialized.email, isNull);
