@@ -47,8 +47,10 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     if (!_wasDetailsExpanded) return true;
 
     // We do both like so, so all the fields get validated even if one is not valid
-    await _addressController.waitForValidation();
-    await _headquartersAddressController.waitForValidation();
+    await Future.wait([
+      _addressController.waitForValidation(),
+      _headquartersAddressController.waitForValidation(),
+    ]);
     bool isValid = _formKey.currentState?.validate() ?? false;
     isValid = _addressController.isValid && isValid;
     isValid = _headquartersAddressController.isValid && isValid;

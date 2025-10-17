@@ -39,7 +39,9 @@ class AddressController {
   }
 
   Future<String?> requestValidation() async {
-    return _validationFunction == null ? null : await _validationFunction!();
+    final message =
+        _validationFunction == null ? null : await _validationFunction!();
+    return message;
   }
 
   Future<void> waitForValidation() async {
@@ -90,8 +92,9 @@ class AddressListTile extends StatefulWidget {
 }
 
 class _AddressListTileState extends State<AddressListTile> {
-  bool isValidating = false;
-  String? previousValidatedAddress;
+  bool _isValidating = false;
+  String? _previousValidatedAddress;
+  String? _previousValidatedMessage;
   late bool addressHasChanged;
 
   @override
@@ -99,7 +102,7 @@ class _AddressListTileState extends State<AddressListTile> {
     super.initState();
 
     widget.addressController._validationFunction = validate;
-    widget.addressController._isValidating = () => isValidating;
+    widget.addressController._isValidating = () => _isValidating;
     widget.addressController._getAddress = getAddress;
     widget.addressController._setAddress = setAddress;
     widget.addressController._isMandatory = () => widget.isMandatory;
@@ -118,24 +121,26 @@ class _AddressListTileState extends State<AddressListTile> {
   Address? setAddress(newAddress) => _address = newAddress;
 
   Future<String?> validate({bool forceShowIfNotFound = false}) async {
-    if (previousValidatedAddress ==
+    if (_previousValidatedAddress ==
         widget.addressController._textController.text) {
-      return null;
+      return _previousValidatedMessage;
     }
-    if (!addressHasChanged) return null;
+    if (!addressHasChanged) return _previousValidatedMessage;
 
     _address = null;
-    previousValidatedAddress = widget.addressController._textController.text;
+    _previousValidatedAddress = widget.addressController._textController.text;
     if (widget.addressController._textController.text == '') {
-      return widget.isMandatory ? 'Entrer une adresse valide' : null;
+      _previousValidatedMessage =
+          widget.isMandatory ? 'Entrer une adresse valide' : null;
+      return _previousValidatedMessage;
     }
 
-    while (isValidating) {
+    while (_isValidating) {
       await Future.delayed(const Duration(milliseconds: 50));
     }
 
-    setState(() => isValidating = true);
-    late Address newAddress;
+    setState(() => _isValidating = true);
+    late Address? newAddress;
     try {
       final toCall =
           widget.addressController.fromStringOverrideForDebug ??
@@ -143,12 +148,12 @@ class _AddressListTileState extends State<AddressListTile> {
       newAddress =
           (await toCall(widget.addressController._textController.text))!;
     } catch (e) {
-      _address = null;
+      newAddress = null;
     }
-    if (_address == null || _address!.isNotValid) {
-      _address = null;
-      setState(() => isValidating = false);
-      if (!forceShowIfNotFound) return 'L\'adresse n\'a pu être trouvée';
+    if (newAddress == null || newAddress.isNotValid) {
+      setState(() => _isValidating = false);
+      _previousValidatedMessage = 'L\'adresse n\'a pu être trouvée';
+      if (!forceShowIfNotFound) return _previousValidatedMessage;
     }
 
     if (newAddress.toString() == _address.toString()) {
@@ -156,14 +161,16 @@ class _AddressListTileState extends State<AddressListTile> {
       _address = newAddress;
       widget.addressController._textController.text = _address.toString();
       addressHasChanged = false;
-      setState(() => isValidating = false);
-      return null;
+      setState(() => _isValidating = false);
+      _previousValidatedMessage = null;
+      return _previousValidatedMessage;
     }
 
     if (!mounted) {
       // coverage:ignore-start
-      setState(() => isValidating = false);
-      return 'Erreur inconnue';
+      setState(() => _isValidating = false);
+      _previousValidatedMessage = 'Erreur inconnue';
+      return _previousValidatedMessage;
       // coverage:ignore-end
     }
 
@@ -181,7 +188,7 @@ class _AddressListTileState extends State<AddressListTile> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            'L\'adresse trouvée est\u00a0:\n${newAddress.isValid ? newAddress.toString() : 'Aucune'}',
+                            'L\'adresse trouvée est\u00a0:\n${newAddress!.isValid ? newAddress.toString() : 'Aucune'}',
                           ),
                           const SizedBox(height: 10),
                           SizedBox(
@@ -209,8 +216,9 @@ class _AddressListTileState extends State<AddressListTile> {
 
     if (confirmAddress == null || !confirmAddress) {
       _address = null;
-      setState(() => isValidating = false);
-      return 'Essayer une nouvelle adresse';
+      setState(() => _isValidating = false);
+      _previousValidatedMessage = 'Essayer une nouvelle adresse';
+      return _previousValidatedMessage;
     }
 
     _address = newAddress;
@@ -220,12 +228,12 @@ class _AddressListTileState extends State<AddressListTile> {
       widget.addressController.onAddressChangedCallback!();
     }
 
-    setState(() => isValidating = false);
+    setState(() => _isValidating = false);
     addressHasChanged = false;
-    if (!mounted) return null;
+    _previousValidatedMessage = null;
+    if (mounted) setState(() {});
 
-    setState(() {});
-    return null;
+    return _previousValidatedMessage;
   }
 
   // coverage:ignore-start
@@ -262,7 +270,7 @@ class _AddressListTileState extends State<AddressListTile> {
     final searchIsClickable =
         addressHasChanged &&
         widget.addressController._textController.text.isNotEmpty &&
-        !isValidating;
+        !_isValidating;
 
     return Focus(
       onFocusChange: (hasFocus) {
@@ -293,7 +301,7 @@ class _AddressListTileState extends State<AddressListTile> {
                 style:
                     widget.contentStyle ??
                     (widget.enabled ? null : TextStyle(color: Colors.black)),
-                enabled: widget.enabled && !isValidating,
+                enabled: widget.enabled && !_isValidating,
                 maxLines: null,
                 onSaved: (newAddress) => validate(),
                 validator:

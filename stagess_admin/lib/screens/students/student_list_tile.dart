@@ -43,8 +43,10 @@ class StudentListTileState extends State<StudentListTile> {
   final _programRadioKey = GlobalKey<FormFieldState>();
   Future<bool> validate() async {
     // We do both like so, so all the fields get validated even if one is not valid
-    await _addressController.waitForValidation();
-    await _contactAddressController.waitForValidation();
+    await Future.wait([
+      _addressController.waitForValidation(),
+      _contactAddressController.waitForValidation(),
+    ]);
     bool isValid = _formKey.currentState?.validate() ?? false;
     isValid = (_schoolRadioKey.currentState?.validate() ?? false) && isValid;
     isValid = (_programRadioKey.currentState?.validate() ?? false) && isValid;

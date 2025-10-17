@@ -7,10 +7,14 @@ import 'utils.dart';
 void main() {
   group('AnimatedExpandingCard', () {
     testWidgets('Header is always displayed', (tester) async {
-      await tester.pumpWidget(declareWidget(AnimatedExpandingCard(
-        header: (ctx, isExpanded) => Text('Header'),
-        child: Text('Child'),
-      )));
+      await tester.pumpWidget(
+        declareWidget(
+          AnimatedExpandingCard(
+            header: (ctx, isExpanded) => Text('Header'),
+            child: Text('Child'),
+          ),
+        ),
+      );
 
       expect(find.text('Header'), findsOneWidget);
 
@@ -22,13 +26,17 @@ void main() {
     });
 
     testWidgets('tapping expands the card', (tester) async {
-      await tester.pumpWidget(declareWidget(AnimatedExpandingCard(
-        header: (ctx, isExpanded) => Text('Header'),
-        child: Text('Child'),
-      )));
+      await tester.pumpWidget(
+        declareWidget(
+          AnimatedExpandingCard(
+            header: (ctx, isExpanded) => Text('Header'),
+            child: Text('Child'),
+          ),
+        ),
+      );
 
       // Verify the card is not expanded
-      expect(tester.getSize(find.byType(SizeTransition)).height, 0);
+      expect(find.byType(SizeTransition), findsNothing);
 
       // Tap the card header
       await tester.tap(find.text('Header'));
@@ -46,10 +54,14 @@ void main() {
     });
 
     testWidgets('icon changes when card is expanded', (tester) async {
-      await tester.pumpWidget(declareWidget(AnimatedExpandingCard(
-        header: (ctx, isExpanded) => Text('Header'),
-        child: Text('Child'),
-      )));
+      await tester.pumpWidget(
+        declareWidget(
+          AnimatedExpandingCard(
+            header: (ctx, isExpanded) => Text('Header'),
+            child: Text('Child'),
+          ),
+        ),
+      );
 
       // Verify the card shows it is not expanded
       expect(find.byIcon(Icons.expand_more), findsOneWidget);
@@ -70,11 +82,15 @@ void main() {
     });
 
     testWidgets('can start expanded', (tester) async {
-      await tester.pumpWidget(declareWidget(AnimatedExpandingCard(
-        header: (ctx, isExpanded) => Text('Header'),
-        initialExpandedState: true,
-        child: Text('Child'),
-      )));
+      await tester.pumpWidget(
+        declareWidget(
+          AnimatedExpandingCard(
+            header: (ctx, isExpanded) => Text('Header'),
+            initialExpandedState: true,
+            child: Text('Child'),
+          ),
+        ),
+      );
 
       // Verify the card is expanded
       expect(tester.getSize(find.byType(SizeTransition)).height, isPositive);
