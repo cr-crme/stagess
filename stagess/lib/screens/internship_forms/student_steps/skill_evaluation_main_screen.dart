@@ -368,6 +368,7 @@ class _EvaluationTypeChoserState extends State<_EvaluationTypeChoser> {
   @override
   void didUpdateWidget(covariant _EvaluationTypeChoser oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.editMode) return;
 
     if (_controller.value != widget.formController.evaluationGranularity) {
       _controller.forceSet(widget.formController.evaluationGranularity);

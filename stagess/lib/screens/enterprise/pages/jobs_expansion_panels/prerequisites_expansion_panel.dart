@@ -128,6 +128,7 @@ class PrerequisitesBodyState extends State<_PrerequisitesBody> {
   @override
   void didUpdateWidget(covariant oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.isEditing) return;
 
     if (_ageController.text != widget.job.minimumAge.toString()) {
       _ageController.text = widget.job.minimumAge.toString();

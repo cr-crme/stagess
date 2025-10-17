@@ -51,6 +51,8 @@ class _EmailListTileState extends State<EmailListTile> {
   @override
   void didUpdateWidget(covariant EmailListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.enabled) return;
+
     if (widget.controller != null &&
         _emailController.text != widget.controller?.text) {
       _emailController.text = widget.initialValue.toString();

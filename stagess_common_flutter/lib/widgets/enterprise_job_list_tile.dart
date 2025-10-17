@@ -192,6 +192,7 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
   @override
   void didUpdateWidget(covariant EnterpriseJobListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.editMode) return;
 
     _preInternshipRequestsController.forceSetIfDifferent(
       comparator: CheckboxWithOtherController(

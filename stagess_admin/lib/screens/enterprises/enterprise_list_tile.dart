@@ -313,6 +313,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   @override
   void didUpdateWidget(covariant EnterpriseListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (_isEditing) return;
 
     if (_enterpriseStatusController.value != widget.enterprise.status) {
       _enterpriseStatusController.forceSet(widget.enterprise.status);

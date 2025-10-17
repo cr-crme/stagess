@@ -126,6 +126,7 @@ class _DateRangeState extends State<_DateRange> {
   @override
   void didUpdateWidget(covariant _DateRange oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.editMode) return;
 
     final startDate =
         (widget.scheduleController.dateRange == null

@@ -52,6 +52,8 @@ class _PhoneListTileState extends State<PhoneListTile> {
   @override
   void didUpdateWidget(covariant PhoneListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.enabled) return;
+
     if (widget.controller != null &&
         _phoneController.text != widget.controller?.text) {
       _phoneController.text = widget.initialValue.toString();

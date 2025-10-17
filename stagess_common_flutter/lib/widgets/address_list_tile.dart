@@ -121,6 +121,10 @@ class _AddressListTileState extends State<AddressListTile> {
   Address? setAddress(newAddress) => _address = newAddress;
 
   Future<String?> validate({bool forceShowIfNotFound = false}) async {
+    while (_isValidating) {
+      await Future.delayed(const Duration(milliseconds: 50));
+    }
+
     if (_previousValidatedAddress ==
         widget.addressController._textController.text) {
       return _previousValidatedMessage;
@@ -133,10 +137,6 @@ class _AddressListTileState extends State<AddressListTile> {
       _previousValidatedMessage =
           widget.isMandatory ? 'Entrer une adresse valide' : null;
       return _previousValidatedMessage;
-    }
-
-    while (_isValidating) {
-      await Future.delayed(const Duration(milliseconds: 50));
     }
 
     setState(() => _isValidating = true);

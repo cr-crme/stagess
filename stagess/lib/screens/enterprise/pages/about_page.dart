@@ -210,6 +210,7 @@ class EnterpriseAboutPageState extends State<EnterpriseAboutPage> {
   @override
   void didUpdateWidget(covariant EnterpriseAboutPage oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (_editing) return;
 
     if (_contactInfoController.firstName.text !=
         widget.enterprise.contact.firstName) {

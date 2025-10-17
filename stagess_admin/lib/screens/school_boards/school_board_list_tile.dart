@@ -44,6 +44,8 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
   @override
   void didUpdateWidget(covariant SchoolBoardListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (_isEditing) return;
+
     if (widget.schoolBoard.getDifference(oldWidget.schoolBoard).isNotEmpty) {
       // The logo controller won't update automatically, so we need to do it manually
       setState(() {

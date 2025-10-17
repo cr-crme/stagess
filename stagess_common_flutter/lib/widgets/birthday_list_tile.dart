@@ -70,6 +70,7 @@ class _BirthdayListTileState extends State<BirthdayListTile> {
   @override
   void didUpdateWidget(covariant BirthdayListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.enabled) return;
 
     if (oldWidget.controller != widget.controller) {
       setState(() {});
