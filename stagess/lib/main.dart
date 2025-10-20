@@ -54,7 +54,7 @@ void main() async {
         mockMe: useMockers,
       );
 
-      runApp(StageSsApp(useMockers: useMockers, backendUri: backendUri));
+      runApp(StagessApp(useMockers: useMockers, backendUri: backendUri));
     },
     (error, stackTrace) =>
         BugReporter.report(error, stackTrace, errorReportUri: errorReportUri),
@@ -62,8 +62,8 @@ void main() async {
 }
 // coverage:ignore-end
 
-class StageSsApp extends StatelessWidget {
-  const StageSsApp({
+class StagessApp extends StatelessWidget {
+  const StagessApp({
     super.key,
     this.useMockers = false,
     required this.backendUri,

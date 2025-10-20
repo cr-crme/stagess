@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
@@ -96,6 +97,7 @@ extension StageSsWidgetTester on WidgetTester {
     bool withEnterprises = false,
     bool withInternships = false,
     bool withItineraries = false,
+    SchoolBoard? dummySchoolBoard,
     Enterprise? dummyEnterprise,
     Internship? dummyInternship,
   }) async {
@@ -109,131 +111,105 @@ extension StageSsWidgetTester on WidgetTester {
       throw Exception('At least one provider must be required');
     }
 
-    await pumpWidget(
-      MaterialApp(
-        builder:
-            (ctx, ch) => MultiProvider(
-              providers: [
-                if (withAuthentication)
-                  ChangeNotifierProvider(
-                    create: (context) => AuthProvider(mockMe: true),
-                  ),
-                if (withSchools)
-                  ChangeNotifierProvider(
-                    create:
-                        (context) => SchoolBoardsProvider(
-                          uri: Uri.parse('ws://localhost'),
-                          mockMe: true,
-                        ),
-                  ),
-                if (withEnterprises)
-                  ChangeNotifierProvider(
-                    create: (context) {
-                      final enterprises = EnterprisesProvider(
-                        uri: Uri.parse('ws://localhost'),
-                        mockMe: true,
-                      );
-                      if (dummyEnterprise != null) {
-                        enterprises.add(dummyEnterprise);
-                      }
-                      return enterprises;
-                    },
-                  ),
-                if (withInternships)
-                  ChangeNotifierProvider(
-                    create: (context) {
-                      final internships = InternshipsProvider(
-                        uri: Uri.parse('ws://localhost'),
-                        mockMe: true,
-                      );
-                      if (dummyInternship != null) {
-                        internships.add(dummyInternship);
-                      }
-                      return internships;
-                    },
-                  ),
-                if (withTeachers && withAuthentication)
-                  ChangeNotifierProxyProvider<AuthProvider, TeachersProvider>(
-                    create:
-                        (context) => TeachersProvider(
-                          uri: Uri.parse('ws://localhost'),
-                          mockMe: true,
-                        ),
-                    update:
-                        (context, auth, previous) =>
-                            previous!..initializeAuth(auth),
-                  ),
-                if (withTeachers && !withAuthentication)
-                  ChangeNotifierProvider<TeachersProvider>(
-                    create:
-                        (context) => TeachersProvider(
-                          uri: Uri.parse('ws://localhost'),
-                          mockMe: true,
-                        ),
-                  ),
-                if (withStudents && withAuthentication)
-                  ChangeNotifierProxyProvider<AuthProvider, StudentsProvider>(
-                    create:
-                        (context) => StudentsProvider(
-                          uri: Uri.parse('ws://localhost'),
-                          mockMe: true,
-                        ),
-                    update:
-                        (context, auth, previous) =>
-                            previous!..initializeAuth(auth),
-                  ),
-                if (withStudents && !withAuthentication)
-                  ChangeNotifierProvider<StudentsProvider>(
-                    create:
-                        (context) => StudentsProvider(
-                          uri: Uri.parse('ws://localhost'),
-                          mockMe: true,
-                        ),
-                  ),
-              ],
-              child: child,
-            ),
-      ),
-    );
+    final backendUri = Uri.parse('ws://localhost');
 
-    final buildContext = context(find.byWidget(child));
-    if (withAuthentication) {
-      final authProvided = AuthProvider.of(buildContext, listen: false);
+    final authProvided = withAuthentication ? AuthProvider(mockMe: true) : null;
+    if (authProvided != null) {
       authProvided.schoolBoardId = 'MockedSchoolBoardId';
       authProvided.schoolId = 'MockedSchoolId';
       authProvided.teacherId = 'MockedTeacherId';
+    }
 
-      if (withSchools) {
-        SchoolBoardsProvider.of(
-          buildContext,
-          listen: false,
-        ).initializeAuth(AuthProvider.of(buildContext, listen: false));
+    final schoolBoardsProvided =
+        withSchools
+            ? SchoolBoardsProvider(uri: backendUri, mockMe: true)
+            : null;
+    if (schoolBoardsProvided != null) {
+      if (authProvided != null) {
+        schoolBoardsProvided.initializeAuth(authProvided);
       }
-      if (withTeachers) {
-        TeachersProvider.of(
-          buildContext,
-          listen: false,
-        ).initializeAuth(AuthProvider.of(buildContext, listen: false));
-      }
-      if (withStudents) {
-        StudentsProvider.of(
-          buildContext,
-          listen: false,
-        ).initializeAuth(AuthProvider.of(buildContext, listen: false));
-      }
-      if (withEnterprises) {
-        EnterprisesProvider.of(
-          buildContext,
-          listen: false,
-        ).initializeAuth(AuthProvider.of(buildContext, listen: false));
-      }
-      if (withInternships) {
-        InternshipsProvider.of(
-          buildContext,
-          listen: false,
-        ).initializeAuth(AuthProvider.of(buildContext, listen: false));
+      if (dummySchoolBoard != null) {
+        schoolBoardsProvided.add(dummySchoolBoard);
       }
     }
+
+    final enterprisesProvided =
+        withEnterprises
+            ? EnterprisesProvider(uri: backendUri, mockMe: true)
+            : null;
+    if (enterprisesProvided != null) {
+      if (authProvided != null) {
+        enterprisesProvided.initializeAuth(authProvided);
+      }
+      if (dummyEnterprise != null) {
+        enterprisesProvided.add(dummyEnterprise);
+      }
+    }
+
+    final teachersProvided =
+        withTeachers ? TeachersProvider(uri: backendUri, mockMe: true) : null;
+    if (teachersProvided != null) {
+      if (authProvided != null) {
+        teachersProvided.initializeAuth(authProvided);
+      }
+    }
+
+    final studentsProvided =
+        withStudents ? StudentsProvider(uri: backendUri, mockMe: true) : null;
+    if (studentsProvided != null) {
+      if (authProvided != null) {
+        studentsProvided.initializeAuth(authProvided);
+      }
+    }
+
+    final internshipsProvided =
+        withInternships
+            ? InternshipsProvider(uri: backendUri, mockMe: true)
+            : null;
+    if (internshipsProvided != null) {
+      if (authProvided != null) {
+        internshipsProvided.initializeAuth(authProvided);
+      }
+      if (dummyInternship != null) {
+        internshipsProvided.add(dummyInternship);
+      }
+    }
+
+    await pumpWidget(
+      MaterialApp(
+        routes: {
+          '/':
+              (context) => MultiProvider(
+                providers: [
+                  if (authProvided != null)
+                    ChangeNotifierProvider(create: (context) => authProvided),
+                  if (schoolBoardsProvided != null)
+                    ChangeNotifierProvider(
+                      create: (context) => schoolBoardsProvided,
+                    ),
+                  if (withEnterprises)
+                    ChangeNotifierProvider(
+                      create: (context) => enterprisesProvided,
+                    ),
+                  if (withInternships)
+                    ChangeNotifierProvider(
+                      create: (context) => internshipsProvided,
+                    ),
+                  if (withTeachers)
+                    ChangeNotifierProvider(
+                      create: (context) => teachersProvided,
+                    ),
+                  if (withStudents)
+                    ChangeNotifierProvider(
+                      create: (context) => studentsProvided,
+                    ),
+                ],
+                child: child,
+              ),
+          '/next': (context) => Scaffold(body: Text('Next Screen')),
+        },
+      ),
+    );
   }
 }
 

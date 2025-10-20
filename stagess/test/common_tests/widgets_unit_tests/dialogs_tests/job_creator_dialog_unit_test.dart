@@ -2,10 +2,30 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stagess/common/widgets/dialogs/job_creator_dialog.dart';
 import 'package:stagess/program_helpers.dart';
+import 'package:stagess_common/models/school_boards/school_board.dart';
 
 import '../../../utils.dart';
 import '../../utils.dart';
-import '../utils.dart';
+
+Future<void> _prepareDialog(WidgetTester tester) async {
+  final enterprise = dummyEnterprise();
+  return await tester.pumpWidgetWithNotifiers(
+    withAuthentication: true,
+    withSchools: true,
+    withEnterprises: true,
+    withStudents: true,
+    withInternships: true,
+    dummySchoolBoard: SchoolBoard(
+      id: 'MockedSchoolBoardId',
+      name: 'Mocked School Board',
+      logo: null,
+      cnesstNumber: '123456789',
+      schools: [dummySchool(id: 'MockedSchoolId')],
+    ),
+    dummyEnterprise: enterprise,
+    Scaffold(body: JobCreatorDialog(enterprise: enterprise)),
+  );
+}
 
 void main() {
   group('JobCreatorDialog', () {
@@ -13,19 +33,13 @@ void main() {
     ProgramInitializer.initialize(mockMe: true);
 
     testWidgets('renders a title', (tester) async {
-      await tester.pumpWidgetWithNotifiers(
-        JobCreatorDialog(enterprise: dummyEnterprise()),
-        withAuthentication: true,
-        withSchools: true,
-      );
+      await _prepareDialog(tester);
 
       expect(find.text('Ajouter un nouveau poste'), findsOneWidget);
     });
 
     testWidgets('should display a cancel button', (tester) async {
-      await tester.pumpWidget(
-        declareWidget(JobCreatorDialog(enterprise: dummyEnterprise())),
-      );
+      await _prepareDialog(tester);
 
       final cancelFinder = find.byType(OutlinedButton);
       expect(find.byType(OutlinedButton), findsOneWidget);
@@ -41,9 +55,7 @@ void main() {
     });
 
     testWidgets('should display a confirm button', (tester) async {
-      await tester.pumpWidget(
-        declareWidget(JobCreatorDialog(enterprise: dummyEnterprise())),
-      );
+      await _prepareDialog(tester);
 
       final confirmFinder = find.byType(TextButton);
       expect(confirmFinder, findsOneWidget);
@@ -59,9 +71,7 @@ void main() {
     });
 
     testWidgets('can cancel', (tester) async {
-      await tester.pumpWidget(
-        declareWidget(JobCreatorDialog(enterprise: dummyEnterprise())),
-      );
+      await _prepareDialog(tester);
 
       // Drag the screen up to reveal the cancel button
       await tester.drag(find.byType(JobCreatorDialog), const Offset(0, -500));
@@ -77,9 +87,7 @@ void main() {
     testWidgets(
       'confirming is refused with snackbar if not all mandatory fields are filled',
       (tester) async {
-        await tester.pumpWidget(
-          declareWidget(JobCreatorDialog(enterprise: dummyEnterprise())),
-        );
+        await _prepareDialog(tester);
 
         // Drag the screen up to reveal the cancel button
         await tester.drag(find.byType(JobCreatorDialog), const Offset(0, -500));

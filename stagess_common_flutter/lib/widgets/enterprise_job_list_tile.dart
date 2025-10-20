@@ -503,8 +503,10 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
                                                 : Colors.black,
                                       ),
                                     ),
-                                    Text(
-                                      '$positionsRemaining / ${_positionOffered(school.id)}',
+                                    Expanded(
+                                      child: Text(
+                                        '$positionsRemaining / ${_positionOffered(school.id)}',
+                                      ),
                                     ),
                                     IconButton(
                                       onPressed:

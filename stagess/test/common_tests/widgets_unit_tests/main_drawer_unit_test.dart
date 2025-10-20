@@ -25,7 +25,7 @@ void main() {
     testWidgets('renders the proper title', (tester) async {
       await _initializedDrawer(tester);
 
-      expect(find.text('Stagess'), findsOneWidget);
+      expect(find.text('Menu'), findsOneWidget);
     });
 
     testWidgets('The drawer tiles content', (WidgetTester tester) async {
@@ -34,9 +34,12 @@ void main() {
       // Verify that the drawer contains the expected tiles
       for (final screenName in ScreenTest.values) {
         expect(
-            find.ancestor(
-                of: find.text(screenName.name), matching: find.byType(Card)),
-            findsWidgets);
+          find.ancestor(
+            of: find.text(screenName.name),
+            matching: find.byType(Card),
+          ),
+          findsWidgets,
+        );
       }
     });
   });

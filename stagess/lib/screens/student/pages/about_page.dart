@@ -11,10 +11,7 @@ import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 final _logger = Logger('AboutPage');
 
 class AboutPage extends StatefulWidget {
-  const AboutPage({
-    super.key,
-    required this.student,
-  });
+  const AboutPage({super.key, required this.student});
 
   final Student student;
 
@@ -26,13 +23,14 @@ class AboutPageState extends State<AboutPage> {
   final _formKey = GlobalKey<FormState>();
   final _dateFormat = DateFormat.yMd();
 
-  late final _addressController = AddressController()
-    ..initialValue = widget.student.address;
+  late final _addressController =
+      AddressController()..initialValue = widget.student.address;
 
   late final _birthdayController = BirthdayController(
-    initialValue: (widget.student.dateBirth ?? DateTime(0)) == DateTime(0)
-        ? null
-        : widget.student.dateBirth,
+    initialValue:
+        (widget.student.dateBirth ?? DateTime(0)) == DateTime(0)
+            ? null
+            : widget.student.dateBirth,
   );
 
   @override
@@ -80,6 +78,7 @@ class _GeneralInformation extends StatelessWidget {
     // ThemeData does not work anymore so we have to override the style manually
     const styleOverride = TextStyle(color: Colors.black);
 
+    // TODO Address is pushed to the left
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -92,7 +91,9 @@ class _GeneralInformation extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 BirthdayListTile(
-                    controller: birthdayController, enabled: false),
+                  controller: birthdayController,
+                  enabled: false,
+                ),
                 PhoneListTile(
                   titleStyle: styleOverride,
                   contentStyle: styleOverride,
@@ -150,8 +151,9 @@ class _EmergencyContact extends StatelessWidget {
           child: Column(
             children: [
               TextFormField(
-                controller:
-                    TextEditingController(text: student.contact.firstName),
+                controller: TextEditingController(
+                  text: student.contact.firstName,
+                ),
                 decoration: const InputDecoration(
                   labelText: 'Prénom',
                   labelStyle: styleOverride,
@@ -161,8 +163,9 @@ class _EmergencyContact extends StatelessWidget {
                 enabled: false,
               ),
               TextFormField(
-                controller:
-                    TextEditingController(text: student.contact.lastName),
+                controller: TextEditingController(
+                  text: student.contact.lastName,
+                ),
                 decoration: const InputDecoration(
                   labelText: 'Nom de famille',
                   labelStyle: styleOverride,
@@ -200,7 +203,7 @@ class _EmergencyContact extends StatelessWidget {
               const SizedBox(height: 12),
             ],
           ),
-        )
+        ),
       ],
     );
   }

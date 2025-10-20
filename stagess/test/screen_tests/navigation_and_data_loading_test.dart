@@ -13,25 +13,40 @@ void main() {
     TestWidgetsFlutterBinding.ensureInitialized();
     ProgramInitializer.initialize(mockMe: true);
 
-    testWidgets('Then opening page is My enterprises',
-        (WidgetTester tester) async {
+    testWidgets('Then opening page is My enterprises', (
+      WidgetTester tester,
+    ) async {
       // Load the app and navigate to the home page.
-      await tester.pumpWidget(StageSsApp(
+      await tester.pumpWidgetWithNotifiers(
+        withAuthentication: true,
+        StagessApp(
           useMockers: true,
           backendUri: BackendHelpers.backendUri(
-              isLocal: true, useSsl: false, isDev: true)));
+            isLocal: true,
+            useSsl: false,
+            isDev: true,
+          ),
+        ),
+      );
 
       // Verify that the home page is "My students"
       expect(find.text(ScreenTest.enterprises.name), findsOneWidget);
     });
 
-    testWidgets('The drawer navigates and closes on click',
-        (WidgetTester tester) async {
+    testWidgets('The drawer navigates and closes on click', (
+      WidgetTester tester,
+    ) async {
       // Load the app and navigate and open the drawer.
-      await tester.pumpWidget(StageSsApp(
+      await tester.pumpWidget(
+        StagessApp(
           useMockers: true,
           backendUri: BackendHelpers.backendUri(
-              isLocal: true, useSsl: false, isDev: true)));
+            isLocal: true,
+            useSsl: false,
+            isDev: true,
+          ),
+        ),
+      );
 
       // Verify that the drawer contains the expected tiles
       for (final screenNameOuter in ScreenTest.values) {
@@ -55,15 +70,24 @@ void main() {
       }
     });
 
-    testWidgets('The reinitialize data button is not shown in production',
-        (WidgetTester tester) async {
+    testWidgets('The reinitialize data button is not shown in production', (
+      WidgetTester tester,
+    ) async {
       await ProgramInitializer.initialize(
-          showDebugElements: false, mockMe: true);
+        showDebugElements: false,
+        mockMe: true,
+      );
       // Load the app and navigate to the home page (My enterprises).
-      await tester.pumpWidget(StageSsApp(
+      await tester.pumpWidget(
+        StagessApp(
           useMockers: true,
           backendUri: BackendHelpers.backendUri(
-              isLocal: true, useSsl: false, isDev: true)));
+            isLocal: true,
+            useSsl: false,
+            isDev: true,
+          ),
+        ),
+      );
 
       // Verify the reinitialized button is hidden (as in production)
       await tester.openDrawer();
@@ -72,7 +96,9 @@ void main() {
 
       // Reinitialized the testing conditions
       await ProgramInitializer.initialize(
-          showDebugElements: true, mockMe: true);
+        showDebugElements: true,
+        mockMe: true,
+      );
 
       // Verify the reinitialized button is present (as in testing)
       await tester.openDrawer();
@@ -84,13 +110,20 @@ void main() {
     TestWidgetsFlutterBinding.ensureInitialized();
     ProgramInitializer.initialize(showDebugElements: true, mockMe: true);
 
-    testWidgets('The dummy data are properly loaded',
-        (WidgetTester tester) async {
+    testWidgets('The dummy data are properly loaded', (
+      WidgetTester tester,
+    ) async {
       // Load the app and navigate to the home page.
-      await tester.pumpWidget(StageSsApp(
+      await tester.pumpWidget(
+        StagessApp(
           useMockers: true,
           backendUri: BackendHelpers.backendUri(
-              isLocal: true, useSsl: false, isDev: true)));
+            isLocal: true,
+            useSsl: false,
+            isDev: true,
+          ),
+        ),
+      );
 
       // Verify the home page is empty
       for (final enterprise in EnterpriseTest.values) {
@@ -122,7 +155,9 @@ void main() {
         if (i == sortedEnterprises.length ~/ 2) {
           // When getting to half of the enterprises, scroll up
           await tester.drag(
-              find.byType(EnterpriseCard).first, const Offset(0.0, -1000));
+            find.byType(EnterpriseCard).first,
+            const Offset(0.0, -1000),
+          );
           await tester.pump();
         }
         expect(find.text(enterprise.name, skipOffstage: false), findsOneWidget);
@@ -135,8 +170,10 @@ void main() {
         findsNWidgets(InternshipsTest.length),
       );
       for (final internship in InternshipsTest.values) {
-        expect(find.text(internship.studentName, skipOffstage: false),
-            findsOneWidget);
+        expect(
+          find.text(internship.studentName, skipOffstage: false),
+          findsOneWidget,
+        );
       }
 
       // Verify the tasks data is now loaded
