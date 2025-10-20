@@ -2,11 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
-import 'package:stagess_common/models/generic/address.dart';
-import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
-import 'package:stagess_common/models/school_boards/school.dart';
-import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
@@ -113,121 +109,106 @@ extension StageSsWidgetTester on WidgetTester {
       throw Exception('At least one provider must be required');
     }
 
-    AuthProvider? authProvided;
-    if (withAuthentication) {
-      authProvided = AuthProvider(mockMe: true);
-      authProvided.schoolBoardId = 'MockedSchoolBoardId';
-      authProvided.schoolId = 'MockedSchoolId';
-      authProvided.schoolId = 'MockedSchoolId';
-      authProvided.teacherId = 'MockedTeacherId';
-    }
-    SchoolBoardsProvider? schoolBoardsProvided;
-    if (withSchools) {
-      schoolBoardsProvided = SchoolBoardsProvider(
-        uri: Uri.parse('ws://localhost'),
-        mockMe: true,
-      );
-      if (withAuthentication) {
-        schoolBoardsProvided.initializeAuth(authProvided!);
-        schoolBoardsProvided.add(
-          SchoolBoard(
-            id: authProvided.schoolBoardId!,
-            name: 'Mocked School Board',
-            schools: [
-              School(
-                id: authProvided.schoolId!,
-                name: 'Mocked School',
-                address: Address.empty,
-                phone: PhoneNumber.empty,
-              ),
-            ],
-            logo: null,
-            cnesstNumber: '123456789',
-          ),
-        );
-      }
-    }
-
-    late final BuildContext buildContext;
-    final widget = MultiProvider(
-      providers: [
-        if (withAuthentication)
-          ChangeNotifierProvider(create: (context) => authProvided),
-        if (withSchools)
-          ChangeNotifierProvider(create: (context) => schoolBoardsProvided),
-        if (withEnterprises)
-          ChangeNotifierProvider(
-            create: (context) {
-              final enterprises = EnterprisesProvider(
-                uri: Uri.parse('ws://localhost'),
-                mockMe: true,
-              );
-              if (dummyEnterprise != null) {
-                enterprises.add(dummyEnterprise);
-              }
-              return enterprises;
-            },
-          ),
-        if (withInternships)
-          ChangeNotifierProvider(
-            create: (context) {
-              final internships = InternshipsProvider(
-                uri: Uri.parse('ws://localhost'),
-                mockMe: true,
-              );
-              if (dummyInternship != null) {
-                internships.add(dummyInternship);
-              }
-              return internships;
-            },
-          ),
-        if (withTeachers && withAuthentication)
-          ChangeNotifierProxyProvider<AuthProvider, TeachersProvider>(
-            create:
-                (context) => TeachersProvider(
-                  uri: Uri.parse('ws://localhost'),
-                  mockMe: true,
-                ),
-            update:
-                (context, auth, previous) => previous!..initializeAuth(auth),
-          ),
-        if (withTeachers && !withAuthentication)
-          ChangeNotifierProvider<TeachersProvider>(
-            create:
-                (context) => TeachersProvider(
-                  uri: Uri.parse('ws://localhost'),
-                  mockMe: true,
-                ),
-          ),
-        if (withStudents && withAuthentication)
-          ChangeNotifierProxyProvider<AuthProvider, StudentsProvider>(
-            create:
-                (context) => StudentsProvider(
-                  uri: Uri.parse('ws://localhost'),
-                  mockMe: true,
-                ),
-            update:
-                (context, auth, previous) => previous!..initializeAuth(auth),
-          ),
-        if (withStudents && !withAuthentication)
-          ChangeNotifierProvider<StudentsProvider>(
-            create:
-                (context) => StudentsProvider(
-                  uri: Uri.parse('ws://localhost'),
-                  mockMe: true,
-                ),
-          ),
-      ],
-      child: Builder(
-        builder: (context) {
-          buildContext = context;
-          return child;
-        },
+    await pumpWidget(
+      MaterialApp(
+        builder:
+            (ctx, ch) => MultiProvider(
+              providers: [
+                if (withAuthentication)
+                  ChangeNotifierProvider(
+                    create: (context) => AuthProvider(mockMe: true),
+                  ),
+                if (withSchools)
+                  ChangeNotifierProvider(
+                    create:
+                        (context) => SchoolBoardsProvider(
+                          uri: Uri.parse('ws://localhost'),
+                          mockMe: true,
+                        ),
+                  ),
+                if (withEnterprises)
+                  ChangeNotifierProvider(
+                    create: (context) {
+                      final enterprises = EnterprisesProvider(
+                        uri: Uri.parse('ws://localhost'),
+                        mockMe: true,
+                      );
+                      if (dummyEnterprise != null) {
+                        enterprises.add(dummyEnterprise);
+                      }
+                      return enterprises;
+                    },
+                  ),
+                if (withInternships)
+                  ChangeNotifierProvider(
+                    create: (context) {
+                      final internships = InternshipsProvider(
+                        uri: Uri.parse('ws://localhost'),
+                        mockMe: true,
+                      );
+                      if (dummyInternship != null) {
+                        internships.add(dummyInternship);
+                      }
+                      return internships;
+                    },
+                  ),
+                if (withTeachers && withAuthentication)
+                  ChangeNotifierProxyProvider<AuthProvider, TeachersProvider>(
+                    create:
+                        (context) => TeachersProvider(
+                          uri: Uri.parse('ws://localhost'),
+                          mockMe: true,
+                        ),
+                    update:
+                        (context, auth, previous) =>
+                            previous!..initializeAuth(auth),
+                  ),
+                if (withTeachers && !withAuthentication)
+                  ChangeNotifierProvider<TeachersProvider>(
+                    create:
+                        (context) => TeachersProvider(
+                          uri: Uri.parse('ws://localhost'),
+                          mockMe: true,
+                        ),
+                  ),
+                if (withStudents && withAuthentication)
+                  ChangeNotifierProxyProvider<AuthProvider, StudentsProvider>(
+                    create:
+                        (context) => StudentsProvider(
+                          uri: Uri.parse('ws://localhost'),
+                          mockMe: true,
+                        ),
+                    update:
+                        (context, auth, previous) =>
+                            previous!..initializeAuth(auth),
+                  ),
+                if (withStudents && !withAuthentication)
+                  ChangeNotifierProvider<StudentsProvider>(
+                    create:
+                        (context) => StudentsProvider(
+                          uri: Uri.parse('ws://localhost'),
+                          mockMe: true,
+                        ),
+                  ),
+              ],
+              child: child,
+            ),
       ),
     );
-    await pumpWidget(widget);
 
+    final buildContext = context(find.byWidget(child));
     if (withAuthentication) {
+      final authProvided = AuthProvider.of(buildContext, listen: false);
+      authProvided.schoolBoardId = 'MockedSchoolBoardId';
+      authProvided.schoolId = 'MockedSchoolId';
+      authProvided.teacherId = 'MockedTeacherId';
+
+      if (withSchools) {
+        SchoolBoardsProvider.of(
+          buildContext,
+          listen: false,
+        ).initializeAuth(AuthProvider.of(buildContext, listen: false));
+      }
       if (withTeachers) {
         TeachersProvider.of(
           buildContext,
@@ -253,8 +234,6 @@ extension StageSsWidgetTester on WidgetTester {
         ).initializeAuth(AuthProvider.of(buildContext, listen: false));
       }
     }
-
-    await pumpWidget(MaterialApp(builder: (ctx, ch) => widget));
   }
 }
 
