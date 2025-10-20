@@ -12,7 +12,7 @@ class EmailListTile extends StatefulWidget {
     this.icon = Icons.mail,
     this.onSaved,
     this.isMandatory = false,
-    this.enabled = true,
+    this.enabled = false,
     this.canMail = true,
     this.controller,
   });
@@ -61,49 +61,59 @@ class _EmailListTileState extends State<EmailListTile> {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: widget.enabled || _emailController.text == '' ? null : _email,
-      child: Stack(
-        alignment: Alignment.centerLeft,
-        children: [
-          TextFormField(
-            controller: _emailController,
-            decoration: InputDecoration(
-              icon: const SizedBox(width: 30),
-              labelText:
-                  '${widget.isMandatory && widget.enabled ? '* ' : ''}${widget.title}',
-              labelStyle:
-                  widget.titleStyle ??
+    final canTap =
+        widget.canMail && !widget.enabled && _emailController.text != '';
+
+    return MouseRegion(
+      cursor: canTap ? SystemMouseCursors.click : MouseCursor.defer,
+      child: InkWell(
+        onTap: canTap ? _email : null,
+        child: Stack(
+          alignment: Alignment.centerLeft,
+          children: [
+            TextFormField(
+              controller: _emailController,
+              decoration: InputDecoration(
+                icon: const SizedBox(width: 30),
+                labelText:
+                    '${widget.isMandatory && widget.enabled ? '* ' : ''}${widget.title}',
+                labelStyle:
+                    widget.titleStyle ??
+                    (widget.enabled
+                        ? null
+                        : const TextStyle(color: Colors.black)),
+                disabledBorder: InputBorder.none,
+              ),
+              style:
+                  widget.contentStyle ??
                   (widget.enabled
                       ? null
                       : const TextStyle(color: Colors.black)),
-              disabledBorder: InputBorder.none,
-            ),
-            style:
-                widget.contentStyle ??
-                (widget.enabled ? null : const TextStyle(color: Colors.black)),
-            validator: (value) {
-              if (!widget.enabled) return null;
+              validator: (value) {
+                if (!widget.enabled) return null;
 
-              if (!widget.isMandatory && (value == '' || value == null)) {
-                return null;
-              }
+                if (!widget.isMandatory && (value == '' || value == null)) {
+                  return null;
+                }
 
-              return FormService.emailValidator(value);
-            },
-            enabled: widget.enabled,
-            onSaved: widget.onSaved,
-            keyboardType: TextInputType.emailAddress,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Icon(
-              widget.icon,
-              color:
-                  widget.canMail ? Theme.of(context).primaryColor : Colors.grey,
+                return FormService.emailValidator(value);
+              },
+              enabled: widget.enabled,
+              onSaved: widget.onSaved,
+              keyboardType: TextInputType.emailAddress,
             ),
-          ),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Icon(
+                widget.icon,
+                color:
+                    canTap || widget.enabled
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -72,13 +72,20 @@ class AboutPageState extends State<AboutPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SubTitle('Coordonnées de l\'établissement',
-                  left: 0, top: 0),
+              const SubTitle(
+                'Coordonnées de l\'établissement',
+                left: 0,
+                top: 0,
+              ),
               TextFormField(
-                decoration:
-                    const InputDecoration(labelText: '* Nom de l\'entreprise'),
-                validator: (text) =>
-                    text!.isEmpty ? 'Ajouter le nom de l\'entreprise.' : null,
+                decoration: const InputDecoration(
+                  labelText: '* Nom de l\'entreprise',
+                ),
+                validator:
+                    (text) =>
+                        text!.isEmpty
+                            ? 'Ajouter le nom de l\'entreprise.'
+                            : null,
                 onChanged: (name) => this.name = name,
               ),
               AddressListTile(
@@ -98,24 +105,31 @@ class AboutPageState extends State<AboutPage> {
               const SubTitle('Entreprise représentée par', left: 0, top: 0),
               TextFormField(
                 decoration: const InputDecoration(labelText: '* Prénom'),
-                validator: (text) => text!.isEmpty
-                    ? 'Ajouter le nom de la personne représentant l\'entreprise.'
-                    : null,
+                validator:
+                    (text) =>
+                        text!.isEmpty
+                            ? 'Ajouter le nom de la personne représentant l\'entreprise.'
+                            : null,
                 onChanged: (name) => contactFirstName = name,
               ),
               TextFormField(
-                decoration:
-                    const InputDecoration(labelText: '* Nom de famille'),
-                validator: (text) => text!.isEmpty
-                    ? 'Ajouter le nom de la personne représentant l\'entreprise.'
-                    : null,
+                decoration: const InputDecoration(
+                  labelText: '* Nom de famille',
+                ),
+                validator:
+                    (text) =>
+                        text!.isEmpty
+                            ? 'Ajouter le nom de la personne représentant l\'entreprise.'
+                            : null,
                 onChanged: (name) => contactLastName = name,
               ),
               TextFormField(
                 decoration: const InputDecoration(labelText: '* Fonction'),
-                validator: (text) => text!.isEmpty
-                    ? 'Ajouter la fonction de cette personne.'
-                    : null,
+                validator:
+                    (text) =>
+                        text!.isEmpty
+                            ? 'Ajouter la fonction de cette personne.'
+                            : null,
                 onChanged: (function) => contactFunction = function,
               ),
               PhoneListTile(
@@ -127,11 +141,15 @@ class AboutPageState extends State<AboutPage> {
               EmailListTile(
                 controller: contactEmailController,
                 isMandatory: true,
+                enabled: true,
                 canMail: false,
               ),
               const SizedBox(height: 16),
-              const SubTitle('Type d\'activités de l\'entreprise',
-                  left: 0, top: 0),
+              const SubTitle(
+                'Type d\'activités de l\'entreprise',
+                left: 0,
+                top: 0,
+              ),
               EnterpriseActivityTypeListTile(
                 hideTitle: true,
                 subtitle:
