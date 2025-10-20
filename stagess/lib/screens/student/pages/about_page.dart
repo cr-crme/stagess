@@ -78,7 +78,6 @@ class _GeneralInformation extends StatelessWidget {
     // ThemeData does not work anymore so we have to override the style manually
     const styleOverride = TextStyle(color: Colors.black);
 
-    // TODO Address is pushed to the left
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Column(
@@ -94,6 +93,7 @@ class _GeneralInformation extends StatelessWidget {
                   controller: birthdayController,
                   enabled: false,
                 ),
+                const SizedBox(height: 8),
                 PhoneListTile(
                   titleStyle: styleOverride,
                   contentStyle: styleOverride,
@@ -109,15 +109,12 @@ class _GeneralInformation extends StatelessWidget {
                   enabled: false,
                 ),
                 const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.only(left: 12.0),
-                  child: AddressListTile(
-                    addressController: addressController,
-                    titleStyle: styleOverride,
-                    contentStyle: styleOverride,
-                    isMandatory: false,
-                    enabled: false,
-                  ),
+                AddressListTile(
+                  addressController: addressController,
+                  titleStyle: styleOverride,
+                  contentStyle: styleOverride,
+                  isMandatory: false,
+                  enabled: false,
                 ),
               ],
             ),
