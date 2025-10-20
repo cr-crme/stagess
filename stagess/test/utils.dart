@@ -23,13 +23,6 @@ Widget addOverlay(Widget child) {
 }
 
 extension StageSsWidgetTester on WidgetTester {
-  Future<void> loadDummyData() async {
-    // Find the reinitalize data button in the drawer
-    await openDrawer();
-    await tap(find.text(reinitializedDataButtonText));
-    await pumpAndSettle(const Duration(milliseconds: 500));
-  }
-
   BuildContext context(Finder finder) => element(finder);
 
   T ancestorByType<T extends Widget>({required Finder of}) {
@@ -57,7 +50,7 @@ extension StageSsWidgetTester on WidgetTester {
     // This function assumes drawer menu is shown
     await openDrawer();
     final targetButton = find.ancestor(
-      of: find.text(target.name),
+      of: find.byIcon(target.icon),
       matching: find.byType(Card),
     );
     await tap(targetButton);
@@ -249,6 +242,21 @@ enum ScreenTest {
         return 'Entreprises';
       case ScreenTest.healthAndSafetyAtPFAE:
         return 'Santé et Sécurité au PFAE';
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case ScreenTest.enterprises:
+        return Icons.factory_rounded;
+      case ScreenTest.myStudents:
+        return Icons.face;
+      case ScreenTest.supervisionTable:
+        return Icons.table_chart_rounded;
+      case ScreenTest.tasks:
+        return Icons.checklist;
+      case ScreenTest.healthAndSafetyAtPFAE:
+        return Icons.health_and_safety;
     }
   }
 }

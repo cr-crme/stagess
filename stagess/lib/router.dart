@@ -84,7 +84,9 @@ final router = GoRouter(
       path: '/',
       redirect:
           (context, state) =>
-              AuthProvider.of(context).isFullySignedIn ? null : Screens.login,
+              AuthProvider.of(context).isFullySignedIn
+                  ? Screens.home
+                  : Screens.login,
     ),
     GoRoute(
       path: Screens.login,
