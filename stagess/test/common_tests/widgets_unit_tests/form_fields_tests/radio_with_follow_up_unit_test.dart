@@ -124,14 +124,31 @@ void main() {
       expect(controller.value, isNull);
     });
 
-    testWidgets('can initialize with value', (tester) async {
+    testWidgets('cannot send controller and initial value', (tester) async {
       final controller = RadioWithFollowUpController<_MyTestingEnum>();
       await tester.pumpWidget(
         declareWidget(
           RadioWithFollowUp<_MyTestingEnum>(
             controller: controller,
+            initialValue: _MyTestingEnum.a,
             elements: _MyTestingEnum.values,
-            initialValue: _MyTestingEnum.c,
+          ),
+        ),
+      );
+
+      // An error is thrown
+      expect(tester.takeException(), isA<ArgumentError>());
+    });
+
+    testWidgets('can initialize with value from controller', (tester) async {
+      final controller = RadioWithFollowUpController<_MyTestingEnum>(
+        initialValue: _MyTestingEnum.c,
+      );
+      await tester.pumpWidget(
+        declareWidget(
+          RadioWithFollowUp<_MyTestingEnum>(
+            controller: controller,
+            elements: _MyTestingEnum.values,
           ),
         ),
       );

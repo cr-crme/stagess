@@ -700,7 +700,7 @@ class BuildUniformRadio extends StatelessWidget {
   });
 
   final Key? uniformKey;
-  final RadioWithFollowUpController<UniformStatus>? controller;
+  final RadioWithFollowUpController<UniformStatus> controller;
   final TextEditingController uniformTextController;
   final bool enabled;
   final bool hideTitle;
