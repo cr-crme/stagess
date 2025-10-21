@@ -285,10 +285,10 @@ class StudentListTileState extends State<StudentListTile> {
       _birthController.updateValue(widget.student.dateBirth);
     }
     if (_addressController.address != widget.student.address) {
-      if (widget.student.address != null) {
-        _addressController.setAddressAndForceValidated(widget.student.address!);
-      } else {
+      if (widget.student.address == null) {
         _addressController.address = null;
+      } else {
+        _addressController.setAddressAndForceValidated(widget.student.address!);
       }
     }
     if (_phoneController.text != widget.student.phone.toString()) {
@@ -316,12 +316,12 @@ class StudentListTileState extends State<StudentListTile> {
       _contactLinkController.text = widget.student.contactLink;
     }
     if (_contactAddressController.address != widget.student.contact.address) {
-      if (widget.student.contact.address != null) {
+      if (widget.student.contact.address == null) {
+        _contactAddressController.address = null;
+      } else {
         _contactAddressController.setAddressAndForceValidated(
           widget.student.contact.address!,
         );
-      } else {
-        _contactAddressController.address = null;
       }
     }
     if (_contactPhoneController.text !=

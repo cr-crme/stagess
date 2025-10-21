@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -8,6 +10,7 @@ import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/utils.dart';
+import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/address_list_tile.dart';
@@ -21,7 +24,6 @@ class TeacherListTile extends StatefulWidget {
     super.key,
     required this.teacher,
     required this.schoolBoard,
-    this.isExpandable = true,
     this.forceEditingMode = false,
     required this.canEdit,
     required this.canDelete,
@@ -29,7 +31,6 @@ class TeacherListTile extends StatefulWidget {
 
   final Teacher teacher;
   final SchoolBoard schoolBoard;
-  final bool isExpandable;
   final bool forceEditingMode;
   final bool canEdit;
   final bool canDelete;
@@ -63,6 +64,7 @@ class TeacherListTileState extends State<TeacherListTile> {
     super.dispose();
   }
 
+  var _fetchFullDataCompleter = Completer<void>();
   bool _forceDisabled = false;
   bool _isExpanded = false;
   bool _isEditing = false;
@@ -107,7 +109,10 @@ class TeacherListTileState extends State<TeacherListTile> {
   @override
   void initState() {
     super.initState();
-    if (widget.forceEditingMode) _onClickedEditing();
+    if (widget.forceEditingMode) {
+      _fetchFullDataCompleter.complete();
+      _onClickedEditing();
+    }
   }
 
   Future<void> _onClickedDeleting() async {
@@ -230,9 +235,12 @@ class TeacherListTileState extends State<TeacherListTile> {
       _lastNameController.text = widget.teacher.lastName;
     }
 
-    if (_addressController.address.toString() !=
-        widget.teacher.address.toString()) {
-      _addressController.address = widget.teacher.address;
+    if (_addressController.address != widget.teacher.address) {
+      if (widget.teacher.address == null) {
+        _addressController.address = null;
+      } else {
+        _addressController.setAddressAndForceValidated(widget.teacher.address!);
+      }
     }
     if (_phoneController.text != (widget.teacher.phone?.toString() ?? '')) {
       _phoneController.text = widget.teacher.phone?.toString() ?? '';
@@ -255,12 +263,33 @@ class TeacherListTileState extends State<TeacherListTile> {
     }
   }
 
+  Future<void> _fetchData() async {
+    if (_isExpanded) {
+      await TeachersProvider.of(
+        context,
+        listen: false,
+      ).fetchFullData(id: widget.teacher.id);
+      _fetchFullDataCompleter.complete();
+    } else {
+      await Future.delayed(ConfigurationService.expandingTileDuration);
+      _fetchFullDataCompleter = Completer<void>();
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return widget.isExpandable
-        ? AnimatedExpandingCard(
+    return widget.forceEditingMode
+        ? _buildEditingForm()
+        : AnimatedExpandingCard(
+          expandingDuration: ConfigurationService.expandingTileDuration,
           initialExpandedState: _isExpanded,
-          onTapHeader: (isExpanded) => setState(() => _isExpanded = isExpanded),
+          onTapHeader: (isExpanded) {
+            setState(() => _isExpanded = isExpanded);
+            _fetchData();
+          },
           header:
               (ctx, isExpanded) => Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -277,67 +306,106 @@ class TeacherListTileState extends State<TeacherListTile> {
                     ),
                   ),
                   if (_isExpanded)
-                    Row(
-                      children: [
-                        if (widget.canDelete)
-                          IconButton(
-                            icon: Icon(
-                              Icons.delete,
-                              color: _forceDisabled ? Colors.grey : Colors.red,
-                            ),
-                            onPressed:
-                                _forceDisabled ? null : _onClickedDeleting,
-                          ),
-                        if (widget.canEdit)
-                          IconButton(
-                            icon: Icon(
-                              _isEditing ? Icons.save : Icons.edit,
-                              color:
-                                  _forceDisabled
-                                      ? Colors.grey
-                                      : Theme.of(context).primaryColor,
-                            ),
-                            onPressed:
-                                _forceDisabled ? null : _onClickedEditing,
-                          ),
-                      ],
+                    FutureBuilder(
+                      future: _fetchFullDataCompleter.future,
+                      builder:
+                          (context, snapshot) =>
+                              snapshot.connectionState == ConnectionState.done
+                                  ? Row(
+                                    children: [
+                                      if (widget.canDelete)
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.delete,
+                                            color:
+                                                _forceDisabled
+                                                    ? Colors.grey
+                                                    : Colors.red,
+                                          ),
+                                          onPressed:
+                                              _forceDisabled
+                                                  ? null
+                                                  : _onClickedDeleting,
+                                        ),
+                                      if (widget.canEdit)
+                                        IconButton(
+                                          icon: Icon(
+                                            _isEditing
+                                                ? Icons.save
+                                                : Icons.edit,
+                                            color:
+                                                _forceDisabled
+                                                    ? Colors.grey
+                                                    : Theme.of(
+                                                      context,
+                                                    ).primaryColor,
+                                          ),
+                                          onPressed:
+                                              _forceDisabled
+                                                  ? null
+                                                  : _onClickedEditing,
+                                        ),
+                                    ],
+                                  )
+                                  : const SizedBox.shrink(),
                     ),
                 ],
               ),
           child: _buildEditingForm(),
-        )
-        : _buildEditingForm();
+        );
   }
 
   Widget _buildEditingForm() {
-    return Form(
-      key: _formKey,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 24.0, bottom: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSchoolSelection(),
-            const SizedBox(height: 8),
-            _buildName(),
-            const SizedBox(height: 8),
-            _buildAddress(),
-            const SizedBox(height: 8),
-            _buildPhone(),
-            const SizedBox(height: 8),
-            _buildEmail(),
-            const SizedBox(height: 8),
-            _buildGroups(),
-            if (!_isEditing &&
-                widget.teacher.email != null &&
-                widget.teacher.email!.isNotEmpty)
-              Column(
-                children: [const SizedBox(height: 8), _buildCreateUserButton()],
+    return FutureBuilder(
+      future: _fetchFullDataCompleter.future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
               ),
-            const SizedBox(height: 4),
-          ],
-        ),
-      ),
+            ),
+          );
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text('Erreur de chargement'));
+        }
+
+        return Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 24.0, bottom: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSchoolSelection(),
+                const SizedBox(height: 8),
+                _buildName(),
+                const SizedBox(height: 8),
+                _buildAddress(),
+                const SizedBox(height: 8),
+                _buildPhone(),
+                const SizedBox(height: 8),
+                _buildEmail(),
+                const SizedBox(height: 8),
+                _buildGroups(),
+                if (!_isEditing &&
+                    widget.teacher.email != null &&
+                    widget.teacher.email!.isNotEmpty)
+                  Column(
+                    children: [
+                      const SizedBox(height: 8),
+                      _buildCreateUserButton(),
+                    ],
+                  ),
+                const SizedBox(height: 4),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

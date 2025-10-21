@@ -238,6 +238,7 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
     return widget.forceEditingMode
         ? _buildEditingForm()
         : AnimatedExpandingCard(
+          expandingDuration: ConfigurationService.expandingTileDuration,
           initialExpandedState: _isExpanded,
           elevation: widget.elevation,
           onTapHeader: (isExpanded) {
@@ -269,8 +270,7 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
                       future: _fetchFullDataCompleter.future,
                       builder:
                           (context, snapshot) =>
-                              snapshot.connectionState ==
-                                      ConnectionState.waiting
+                              snapshot.connectionState == ConnectionState.done
                                   ? Row(
                                     children: [
                                       if (_canDelete)
