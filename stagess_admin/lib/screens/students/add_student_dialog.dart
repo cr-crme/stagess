@@ -53,7 +53,6 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
                 key: _editingKey,
                 student: Student.empty,
                 schoolBoard: widget.schoolBoard,
-                isExpandable: false,
                 forceEditingMode: true,
                 canEdit: false,
                 canDelete: false,

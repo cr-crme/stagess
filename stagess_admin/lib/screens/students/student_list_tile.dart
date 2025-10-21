@@ -23,20 +23,16 @@ class StudentListTile extends StatefulWidget {
     super.key,
     required this.student,
     required this.schoolBoard,
-    this.isExpandable = true,
     this.forceEditingMode = false,
     required this.canEdit,
     required this.canDelete,
-    this.onExpandedChanged,
   });
 
   final Student student;
-  final bool isExpandable;
   final bool forceEditingMode;
   final SchoolBoard schoolBoard;
   final bool canEdit;
   final bool canDelete;
-  final Future<void> Function(bool isExpanded)? onExpandedChanged;
 
   @override
   State<StudentListTile> createState() => StudentListTileState();
@@ -78,7 +74,7 @@ class StudentListTileState extends State<StudentListTile> {
     super.dispose();
   }
 
-  var _dataIsReadyCompleter = Completer<void>();
+  var _fetchFullDataCompleter = Completer<void>();
   bool _forceDisabled = false;
   bool _isExpanded = false;
   bool _isEditing = false;
@@ -159,8 +155,10 @@ class StudentListTileState extends State<StudentListTile> {
   @override
   void initState() {
     super.initState();
-    if (widget.onExpandedChanged == null) _dataIsReadyCompleter.complete();
-    if (widget.forceEditingMode) _onClickedEditing();
+    if (widget.forceEditingMode) {
+      _fetchFullDataCompleter.complete();
+      _onClickedEditing();
+    }
   }
 
   Future<void> _onClickedDeleting() async {
@@ -337,19 +335,23 @@ class StudentListTileState extends State<StudentListTile> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.isExpandable
-        ? AnimatedExpandingCard(
+    return widget.forceEditingMode
+        ? _buildEditingForm()
+        : AnimatedExpandingCard(
           expandingDuration: ConfigurationService.expandingTileDuration,
           initialExpandedState: _isExpanded,
           onTapHeader: (isExpanded) async {
             setState(() => _isExpanded = isExpanded);
-            if (widget.onExpandedChanged == null) return;
-            await widget.onExpandedChanged!(_isExpanded);
+
             if (_isExpanded) {
-              _dataIsReadyCompleter.complete();
+              await StudentsProvider.of(
+                context,
+                listen: false,
+              ).fetchFullData(id: widget.student.id);
+              _fetchFullDataCompleter.complete();
             } else {
               await Future.delayed(ConfigurationService.expandingTileDuration);
-              _dataIsReadyCompleter = Completer<void>();
+              _fetchFullDataCompleter = Completer<void>();
             }
           },
           header:
@@ -369,7 +371,7 @@ class StudentListTileState extends State<StudentListTile> {
                   ),
                   if (_isExpanded)
                     FutureBuilder(
-                      future: _dataIsReadyCompleter.future,
+                      future: _fetchFullDataCompleter.future,
                       builder:
                           (ctx, snapshot) =>
                               snapshot.connectionState == ConnectionState.done
@@ -414,13 +416,12 @@ class StudentListTileState extends State<StudentListTile> {
                 ],
               ),
           child: _buildEditingForm(),
-        )
-        : _buildEditingForm();
+        );
   }
 
   Widget _buildEditingForm() {
     return FutureBuilder(
-      future: _dataIsReadyCompleter.future,
+      future: _fetchFullDataCompleter.future,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(

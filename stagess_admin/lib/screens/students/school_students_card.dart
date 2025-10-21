@@ -5,7 +5,6 @@ import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/utils.dart' as utils;
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
-import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 class SchoolStudentsCard extends StatelessWidget {
@@ -114,13 +113,6 @@ class _GroupStudentsCard extends StatelessWidget {
               schoolBoard: schoolBoard,
               canEdit: authProvided.databaseAccessLevel >= AccessLevel.admin,
               canDelete: authProvided.databaseAccessLevel >= AccessLevel.admin,
-              onExpandedChanged: (isExpanded) async {
-                if (!isExpanded) return;
-                await StudentsProvider.of(
-                  context,
-                  listen: false,
-                ).fetchFullData(id: student.id);
-              },
             ),
           ),
       ],
