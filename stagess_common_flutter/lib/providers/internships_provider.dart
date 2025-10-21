@@ -24,6 +24,12 @@ class InternshipsProvider extends BackendListProvided<Internship> {
     return Internship.fromSerialized(data);
   }
 
+  @override
+  Map<String, dynamic> get mandatoryFields => {
+    'school_board_id': null,
+    'student_id': null,
+  };
+
   void initializeAuth(AuthProvider auth) {
     initializeFetchingData(authProvider: auth);
     auth.addListener(() => initializeFetchingData(authProvider: auth));

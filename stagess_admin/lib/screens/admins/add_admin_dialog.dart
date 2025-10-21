@@ -49,7 +49,6 @@ class _AddAdminDialogState extends State<AddAdminDialog> {
               AdminListTile(
                 key: _editingKey,
                 admin: Admin.empty,
-                isExpandable: false,
                 forceEditingMode: true,
               ),
             ],

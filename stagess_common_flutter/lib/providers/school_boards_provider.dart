@@ -44,6 +44,15 @@ class SchoolBoardsProvider extends BackendListProvided<SchoolBoard> {
     );
   }
 
+  @override
+  Map<String, dynamic> get mandatoryFields => {
+    'name': null,
+    'address': null,
+    'phone': null,
+    'email': null,
+    'schools': null,
+  };
+
   AuthProvider? _authProvider;
   void initializeAuth(AuthProvider auth) {
     _authProvider = auth;

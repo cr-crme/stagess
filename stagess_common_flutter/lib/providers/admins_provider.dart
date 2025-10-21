@@ -21,6 +21,14 @@ class AdminsProvider extends BackendListProvided<Admin> {
     return Admin.fromSerialized(data);
   }
 
+  @override
+  Map<String, dynamic> get mandatoryFields => {
+    'school_board_id': null,
+    'first_name': null,
+    'middle_name': null,
+    'last_name': null,
+  };
+
   void initializeAuth(AuthProvider auth) {
     if (!auth.isFullySignedIn ||
         auth.databaseAccessLevel < AccessLevel.superAdmin) {

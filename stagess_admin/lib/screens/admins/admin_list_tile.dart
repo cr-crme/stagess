@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:stagess_admin/screens/admins/confirm_delete_admin_dialog.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common/utils.dart';
+import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
@@ -14,12 +17,10 @@ class AdminListTile extends StatefulWidget {
   const AdminListTile({
     super.key,
     required this.admin,
-    this.isExpandable = true,
     this.forceEditingMode = false,
   });
 
   final Admin admin;
-  final bool isExpandable;
   final bool forceEditingMode;
 
   @override
@@ -44,6 +45,7 @@ class AdminListTileState extends State<AdminListTile> {
     super.dispose();
   }
 
+  var _fetchFullDataCompleter = Completer<void>();
   bool _forceDisabled = false;
   bool _isExpanded = false;
   bool _isEditing = false;
@@ -67,7 +69,10 @@ class AdminListTileState extends State<AdminListTile> {
   @override
   void initState() {
     super.initState();
-    if (widget.forceEditingMode) _onClickedEditing();
+    if (widget.forceEditingMode) {
+      _fetchFullDataCompleter.complete();
+      _onClickedEditing();
+    }
   }
 
   Future<void> _onClickedDeleting() async {
@@ -194,10 +199,25 @@ class AdminListTileState extends State<AdminListTile> {
 
   @override
   Widget build(BuildContext context) {
-    return widget.isExpandable
-        ? AnimatedExpandingCard(
+    return widget.forceEditingMode
+        ? _buildEditingForm()
+        : AnimatedExpandingCard(
+          expandingDuration: ConfigurationService.expandingTileDuration,
           initialExpandedState: _isExpanded,
-          onTapHeader: (isExpanded) => setState(() => _isExpanded = isExpanded),
+          onTapHeader: (isExpanded) async {
+            setState(() => _isExpanded = isExpanded);
+
+            if (_isExpanded) {
+              await AdminsProvider.of(
+                context,
+                listen: false,
+              ).fetchFullData(id: widget.admin.id);
+              _fetchFullDataCompleter.complete();
+            } else {
+              _fetchFullDataCompleter = Completer<void>();
+              Future.delayed(ConfigurationService.expandingTileDuration);
+            }
+          },
           header:
               (ctx, isExpanded) => Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -214,57 +234,96 @@ class AdminListTileState extends State<AdminListTile> {
                     ),
                   ),
                   if (_isExpanded)
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            Icons.delete,
-                            color: _forceDisabled ? Colors.grey : Colors.red,
-                          ),
-                          onPressed: _forceDisabled ? null : _onClickedDeleting,
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            _isEditing ? Icons.save : Icons.edit,
-                            color:
-                                _forceDisabled
-                                    ? Colors.grey
-                                    : Theme.of(context).primaryColor,
-                          ),
-                          onPressed: _forceDisabled ? null : _onClickedEditing,
-                        ),
-                      ],
+                    FutureBuilder(
+                      future: _fetchFullDataCompleter.future,
+                      builder:
+                          (context, snapshot) =>
+                              snapshot.connectionState == ConnectionState.done
+                                  ? Row(
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(
+                                          Icons.delete,
+                                          color:
+                                              _forceDisabled
+                                                  ? Colors.grey
+                                                  : Colors.red,
+                                        ),
+                                        onPressed:
+                                            _forceDisabled
+                                                ? null
+                                                : _onClickedDeleting,
+                                      ),
+                                      IconButton(
+                                        icon: Icon(
+                                          _isEditing ? Icons.save : Icons.edit,
+                                          color:
+                                              _forceDisabled
+                                                  ? Colors.grey
+                                                  : Theme.of(
+                                                    context,
+                                                  ).primaryColor,
+                                        ),
+                                        onPressed:
+                                            _forceDisabled
+                                                ? null
+                                                : _onClickedEditing,
+                                      ),
+                                    ],
+                                  )
+                                  : SizedBox.shrink(),
                     ),
                 ],
               ),
           child: _buildEditingForm(),
-        )
-        : _buildEditingForm();
+        );
   }
 
   Widget _buildEditingForm() {
-    return Form(
-      key: _formKey,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 24.0, bottom: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSchoolBoardSelection(),
-            const SizedBox(height: 8),
-            _buildName(),
-            const SizedBox(height: 8),
-            _buildEmail(),
-            if (!_isEditing &&
-                widget.admin.email != null &&
-                widget.admin.email!.isNotEmpty)
-              Column(
-                children: [const SizedBox(height: 8), _buildCreateUserButton()],
+    return FutureBuilder(
+      future: _fetchFullDataCompleter.future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
               ),
-            const SizedBox(height: 4),
-          ],
-        ),
-      ),
+            ),
+          );
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text('Erreur de chargement'));
+        }
+
+        return Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 24.0, bottom: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSchoolBoardSelection(),
+                const SizedBox(height: 8),
+                _buildName(),
+                const SizedBox(height: 8),
+                _buildEmail(),
+                if (!_isEditing &&
+                    widget.admin.email != null &&
+                    widget.admin.email!.isNotEmpty)
+                  Column(
+                    children: [
+                      const SizedBox(height: 8),
+                      _buildCreateUserButton(),
+                    ],
+                  ),
+                const SizedBox(height: 4),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

@@ -16,12 +16,14 @@ class _Selector {
   final Function(dynamic items, {bool notify}) removeItem;
   final Function() stopFetchingData;
   final Function() notify;
+  final Map<String, dynamic> mandatoryFields;
 
   const _Selector({
     required this.addOrReplaceItems,
     required this.removeItem,
     required this.stopFetchingData,
     required this.notify,
+    required this.mandatoryFields,
   });
 }
 
@@ -48,10 +50,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
 
   /// This method should be called after the user has logged on
   @override
-  Future<void> initializeFetchingData({
-    AuthProvider? authProvider,
-    Map<String, dynamic>? initialFieldsToFetch,
-  }) async {
+  Future<void> initializeFetchingData({AuthProvider? authProvider}) async {
     if (isConnected) return;
     if (authProvider == null) {
       throw Exception('AuthProvider is required to initialize the connection');
@@ -148,12 +147,14 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       removeItem: _removeFromSelf,
       stopFetchingData: stopFetchingData,
       notify: notifyListeners,
+      mandatoryFields: mandatoryFields,
     );
     _providerSelector[getField(true)] = _Selector(
       addOrReplaceItems: _addOrReplaceIntoSelf,
       removeItem: _removeFromSelf,
       stopFetchingData: stopFetchingData,
       notify: notifyListeners,
+      mandatoryFields: mandatoryFields,
     );
 
     // Send a get request to the server for the list of items
@@ -162,7 +163,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       if (_socket == null) return;
     }
 
-    await _getFromBackend(getField(true), fields: initialFieldsToFetch);
+    await _getFromBackend(getField(true), fields: mandatoryFields);
   }
 
   bool hasFullData(String id) {
@@ -181,6 +182,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
 
     final field = getField(false);
     await _getFromBackend(field, id: id);
+    await Future.delayed(Duration(seconds: 3));
 
     if (_hasFullData[field] == null) {
       _hasFullData[field] = {};
@@ -211,6 +213,8 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     super.clear();
     notifyListeners();
   }
+
+  Map<String, dynamic> get mandatoryFields;
 
   final bool mockMe;
 
@@ -571,19 +575,26 @@ Future<void> _incommingMessage(
             );
           }
 
-          final requestField = protocol.field!;
-          if (_hasFullData.containsKey(requestField) &&
-              !(_hasFullData[requestField]![protocol.data!['id']] ?? false)) {
-            // No need to update if we have not fetched the full data yet
-            return;
+          final mainField = protocol.field!;
+          final subFields = (protocol.data!['updated_fields'] as List?)
+              ?.cast<String>()
+              .asMap()
+              .map((key, value) => MapEntry(value, null));
+          if (subFields == null) return;
+
+          if (!(_hasFullData[mainField]?[protocol.data!['id']] ?? false)) {
+            // If the user never fetched the full data for this item, only requests
+            // the mandatory fields
+            final mandatoryFields = _getSelector(mainField).mandatoryFields;
+            subFields.removeWhere(
+              (key, value) => !mandatoryFields.keys.contains(key),
+            );
+            if (subFields.isEmpty) return;
           }
           _getFromBackend(
-            requestField,
+            mainField,
             id: protocol.data!['id'],
-            fields: (protocol.data!['updated_fields'] as List?)
-                ?.cast<String>()
-                .asMap()
-                .map((key, value) => MapEntry(value, null)),
+            fields: subFields,
           );
           return;
         }

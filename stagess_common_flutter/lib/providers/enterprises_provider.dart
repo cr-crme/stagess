@@ -20,19 +20,16 @@ class EnterprisesProvider extends BackendListProvided<Enterprise> {
   RequestFields getField([bool asList = false]) =>
       asList ? RequestFields.enterprises : RequestFields.enterprise;
 
+  @override
+  Map<String, dynamic> get mandatoryFields => {
+    'school_board_id': null,
+    'name': null,
+    'address': null,
+    'jobs': {'specialization_id': null, 'positions_offered': null},
+  };
+
   void initializeAuth(AuthProvider auth) {
-    final fields = {
-      'school_board_id': null,
-      'name': null,
-      'address': null,
-      'jobs': {'specialization_id': null, 'positions_offered': null},
-    };
-    initializeFetchingData(authProvider: auth, initialFieldsToFetch: fields);
-    auth.addListener(
-      () => initializeFetchingData(
-        authProvider: auth,
-        initialFieldsToFetch: fields,
-      ),
-    );
+    initializeFetchingData(authProvider: auth);
+    auth.addListener(() => initializeFetchingData(authProvider: auth));
   }
 }
