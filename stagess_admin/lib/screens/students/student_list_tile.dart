@@ -333,6 +333,22 @@ class StudentListTileState extends State<StudentListTile> {
     }
   }
 
+  Future<void> _fetchData() async {
+    if (_isExpanded) {
+      await StudentsProvider.of(
+        context,
+        listen: false,
+      ).fetchFullData(id: widget.student.id);
+      _fetchFullDataCompleter.complete();
+    } else {
+      await Future.delayed(ConfigurationService.expandingTileDuration);
+      _fetchFullDataCompleter = Completer<void>();
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return widget.forceEditingMode
@@ -340,19 +356,9 @@ class StudentListTileState extends State<StudentListTile> {
         : AnimatedExpandingCard(
           expandingDuration: ConfigurationService.expandingTileDuration,
           initialExpandedState: _isExpanded,
-          onTapHeader: (isExpanded) async {
+          onTapHeader: (isExpanded) {
             setState(() => _isExpanded = isExpanded);
-
-            if (_isExpanded) {
-              await StudentsProvider.of(
-                context,
-                listen: false,
-              ).fetchFullData(id: widget.student.id);
-              _fetchFullDataCompleter.complete();
-            } else {
-              await Future.delayed(ConfigurationService.expandingTileDuration);
-              _fetchFullDataCompleter = Completer<void>();
-            }
+            _fetchData();
           },
           header:
               (ctx, isExpanded) => Row(

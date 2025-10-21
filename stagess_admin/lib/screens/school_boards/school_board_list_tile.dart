@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
@@ -10,6 +11,7 @@ import 'package:stagess_common/models/school_boards/school.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/services/image_helpers.dart';
 import 'package:stagess_common/utils.dart';
+import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
@@ -19,12 +21,10 @@ class SchoolBoardListTile extends StatefulWidget {
   const SchoolBoardListTile({
     super.key,
     required this.schoolBoard,
-    this.isExpandable = true,
     this.forceEditingMode = false,
     double? elevation,
   }) : elevation = elevation ?? 5.0;
 
-  final bool isExpandable;
   final bool forceEditingMode;
   final SchoolBoard schoolBoard;
   final double elevation;
@@ -61,6 +61,7 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
     super.dispose();
   }
 
+  var _fetchFullDataCompleter = Completer<void>();
   bool _isExpanded = true;
   bool _forceDisabled = false;
   bool _isEditing = false;
@@ -94,7 +95,12 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
   @override
   void initState() {
     super.initState();
-    if (widget.forceEditingMode) _onClickedEditing();
+    if (widget.forceEditingMode) {
+      _fetchFullDataCompleter.complete();
+      _onClickedEditing();
+    } else {
+      _fetchData();
+    }
   }
 
   Future<void> _onClickedDeleting() async {
@@ -211,13 +217,33 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
     }
   }
 
+  Future<void> _fetchData() async {
+    if (_isExpanded) {
+      await SchoolBoardsProvider.of(
+        context,
+        listen: false,
+      ).fetchFullData(id: widget.schoolBoard.id);
+      _fetchFullDataCompleter.complete();
+    } else {
+      await Future.delayed(ConfigurationService.expandingTileDuration);
+      _fetchFullDataCompleter = Completer<void>();
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return widget.isExpandable
-        ? AnimatedExpandingCard(
+    return widget.forceEditingMode
+        ? _buildEditingForm()
+        : AnimatedExpandingCard(
           initialExpandedState: _isExpanded,
           elevation: widget.elevation,
-          onTapHeader: (isExpanded) => setState(() => _isExpanded = isExpanded),
+          onTapHeader: (isExpanded) {
+            setState(() => _isExpanded = isExpanded);
+            _fetchData();
+          },
           header:
               (ctx, isExpanded) => Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -239,53 +265,90 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
                     ),
                   ),
                   if (_isExpanded)
-                    Row(
-                      children: [
-                        if (_canDelete)
-                          IconButton(
-                            icon: Icon(
-                              Icons.delete,
-                              color: _forceDisabled ? Colors.grey : Colors.red,
-                            ),
-                            onPressed:
-                                _forceDisabled ? null : _onClickedDeleting,
-                          ),
-                        if (_canEdit)
-                          IconButton(
-                            icon: Icon(
-                              _isEditing ? Icons.save : Icons.edit,
-                              color:
-                                  _forceDisabled
-                                      ? Colors.grey
-                                      : Theme.of(context).primaryColor,
-                            ),
-                            onPressed:
-                                _forceDisabled ? null : _onClickedEditing,
-                          ),
-                      ],
+                    FutureBuilder(
+                      future: _fetchFullDataCompleter.future,
+                      builder:
+                          (context, snapshot) =>
+                              snapshot.connectionState ==
+                                      ConnectionState.waiting
+                                  ? Row(
+                                    children: [
+                                      if (_canDelete)
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.delete,
+                                            color:
+                                                _forceDisabled
+                                                    ? Colors.grey
+                                                    : Colors.red,
+                                          ),
+                                          onPressed:
+                                              _forceDisabled
+                                                  ? null
+                                                  : _onClickedDeleting,
+                                        ),
+                                      if (_canEdit)
+                                        IconButton(
+                                          icon: Icon(
+                                            _isEditing
+                                                ? Icons.save
+                                                : Icons.edit,
+                                            color:
+                                                _forceDisabled
+                                                    ? Colors.grey
+                                                    : Theme.of(
+                                                      context,
+                                                    ).primaryColor,
+                                          ),
+                                          onPressed:
+                                              _forceDisabled
+                                                  ? null
+                                                  : _onClickedEditing,
+                                        ),
+                                    ],
+                                  )
+                                  : SizedBox.shrink(),
                     ),
                 ],
               ),
           child: _buildEditingForm(),
-        )
-        : _buildEditingForm();
+        );
   }
 
   Widget _buildEditingForm() {
-    return Form(
-      key: _formKey,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 24.0, bottom: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildName(),
-            _buildLogo(),
-            _buildCnesst(),
-            _buildSchoolNames(),
-          ],
-        ),
-      ),
+    return FutureBuilder(
+      future: _fetchFullDataCompleter.future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          );
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text('Erreur de chargement'));
+        }
+
+        return Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 24.0, bottom: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildName(),
+                _buildLogo(),
+                _buildCnesst(),
+                _buildSchoolNames(),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

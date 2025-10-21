@@ -51,7 +51,6 @@ class _AddSchoolDialogState extends State<AddSchoolBoardDialog> {
               SchoolBoardListTile(
                 key: _editingKey,
                 schoolBoard: widget.schoolBoard,
-                isExpandable: false,
                 forceEditingMode: true,
               ),
             ],
