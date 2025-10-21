@@ -23,7 +23,20 @@ class StudentsProvider extends BackendListProvided<Student> {
   }
 
   Future<void> initializeAuth(AuthProvider auth) async {
-    initializeFetchingData(authProvider: auth);
-    auth.addListener(() => initializeFetchingData(authProvider: auth));
+    final fields = {
+      'school_board_id': null,
+      'school_id': null,
+      'first_name': null,
+      'middle_name': null,
+      'last_name': null,
+      'group': null,
+    };
+    initializeFetchingData(authProvider: auth, initialFieldsToFetch: fields);
+    auth.addListener(
+      () => initializeFetchingData(
+        authProvider: auth,
+        initialFieldsToFetch: fields,
+      ),
+    );
   }
 }

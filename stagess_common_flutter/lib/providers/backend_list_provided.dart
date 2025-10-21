@@ -48,7 +48,10 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
 
   /// This method should be called after the user has logged on
   @override
-  Future<void> initializeFetchingData({AuthProvider? authProvider}) async {
+  Future<void> initializeFetchingData({
+    AuthProvider? authProvider,
+    Map<String, dynamic>? initialFieldsToFetch,
+  }) async {
     if (isConnected) return;
     if (authProvider == null) {
       throw Exception('AuthProvider is required to initialize the connection');
@@ -159,7 +162,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       if (_socket == null) return;
     }
 
-    await _getFromBackend(getField(true));
+    await _getFromBackend(getField(true), fields: initialFieldsToFetch);
   }
 
   Future<void> disconnect() async {
@@ -436,21 +439,22 @@ _Selector _getSelector(RequestFields field) {
   return selector;
 }
 
-Future<void> getAllElements(RequestFields field) async {
-  await _getFromBackend(field);
-}
-
+///
+/// Fetches data from the backend for the given [requestField].
+/// If [id] is provided, only the item with the given id is fetched.
+/// If [fields] is provided, only the specified fields are fetched. This must be a list
+/// of strings (or maps) representing the fields (or fields and subfields) to fetch.
 Future<void> _getFromBackend(
   RequestFields requestField, {
   String? id,
-  List<String>? fields,
+  Map<String, dynamic>? fields,
 }) async {
   try {
     final protocol = await _sendMessageWithResponse(
       message: CommunicationProtocol(
         requestType: RequestType.get,
         field: requestField, // Id is not null for item of the list
-        data: id == null ? null : {'id': id, 'fields': fields},
+        data: {'id': id, 'fields': fields},
       ),
     );
 
@@ -546,7 +550,10 @@ Future<void> _incommingMessage(
           _getFromBackend(
             requestField,
             id: protocol.data!['id'],
-            fields: (protocol.data!['updated_fields'] as List?)?.cast<String>(),
+            fields: (protocol.data!['updated_fields'] as List?)
+                ?.cast<String>()
+                .asMap()
+                .map((key, value) => MapEntry(value, null)),
           );
           return;
         }

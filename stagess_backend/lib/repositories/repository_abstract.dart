@@ -27,7 +27,7 @@ abstract class RepositoryAbstract {
   ///
   /// Get all data from the repository related to the given field.
   Future<RepositoryResponse> getAll({
-    List<String>? fields,
+    Map<String, dynamic>? fields,
     required DatabaseUser user,
   });
 
@@ -36,7 +36,7 @@ abstract class RepositoryAbstract {
   /// If the data doesn't exist, a [MissingDataException] will be thrown.
   Future<RepositoryResponse> getById({
     required String id,
-    List<String>? fields,
+    Map<String, dynamic>? fields,
     required DatabaseUser user,
   });
 

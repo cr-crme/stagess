@@ -41,60 +41,50 @@ class DatabaseManager {
     required Map<String, dynamic>? data,
     required DatabaseUser user,
   }) async {
+    final fields = (data?['fields'] as Map<String, dynamic>?);
     final response = switch (field) {
-      RequestFields.schoolBoards => await schoolBoardsDatabase.getAll(
-          fields: (data?['fields'] as List?)?.cast<String>(),
-          user: user,
-        ),
+      RequestFields.schoolBoards =>
+        await schoolBoardsDatabase.getAll(fields: fields, user: user),
       RequestFields.schoolBoard => await schoolBoardsDatabase.getById(
           id: _getId(data,
               messageOnNull: 'An "id" is required to get a school board'),
-          fields: (data?['fields'] as List?)?.cast<String>(),
-          user: user,
-        ),
-      RequestFields.admins => await adminsDatabase.getAll(user: user),
+          fields: fields,
+          user: user),
+      RequestFields.admins =>
+        await adminsDatabase.getAll(fields: fields, user: user),
       RequestFields.admin => await adminsDatabase.getById(
           id: _getId(data,
               messageOnNull: 'An "id" is required to get an admin'),
-          fields: (data?['fields'] as List?)?.cast<String>(),
-          user: user,
-        ),
-      RequestFields.teachers => await teachersDatabase.getAll(
-          user: user,
-        ),
+          fields: fields,
+          user: user),
+      RequestFields.teachers =>
+        await teachersDatabase.getAll(fields: fields, user: user),
       RequestFields.teacher => await teachersDatabase.getById(
           id: _getId(data,
               messageOnNull: 'An "id" is required to get a teacher'),
-          fields: (data?['fields'] as List?)?.cast<String>(),
-          user: user,
-        ),
-      RequestFields.students => await studentsDatabase.getAll(
-          user: user,
-        ),
+          fields: fields,
+          user: user),
+      RequestFields.students =>
+        await studentsDatabase.getAll(fields: fields, user: user),
       RequestFields.student => await studentsDatabase.getById(
           id: _getId(data,
               messageOnNull: 'An "id" is required to get a student'),
-          fields: (data?['fields'] as List?)?.cast<String>(),
-          user: user,
-        ),
-      RequestFields.enterprises => await enterprisesDatabase.getAll(
-          user: user,
-        ),
+          fields: fields,
+          user: user),
+      RequestFields.enterprises =>
+        await enterprisesDatabase.getAll(fields: fields, user: user),
       RequestFields.enterprise => await enterprisesDatabase.getById(
           id: _getId(data,
               messageOnNull: 'An "id" is required to get an enterprise'),
-          fields: (data?['fields'] as List?)?.cast<String>(),
-          user: user,
-        ),
-      RequestFields.internships => await internshipsDatabase.getAll(
-          user: user,
-        ),
+          fields: fields,
+          user: user),
+      RequestFields.internships =>
+        await internshipsDatabase.getAll(fields: fields, user: user),
       RequestFields.internship => await internshipsDatabase.getById(
           id: _getId(data,
               messageOnNull: 'An "id" is required to get an internship'),
-          fields: (data?['fields'] as List?)?.cast<String>(),
-          user: user,
-        ),
+          fields: fields,
+          user: user),
     };
 
     if (response.data == null || response.data!.isEmpty) {

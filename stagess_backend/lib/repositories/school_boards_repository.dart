@@ -16,7 +16,7 @@ import 'package:stagess_common/utils.dart';
 abstract class SchoolBoardsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
-    List<String>? fields,
+    Map<String, dynamic>? fields,
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
@@ -33,7 +33,7 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getById({
     required String id,
-    List<String>? fields,
+    Map<String, dynamic>? fields,
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {

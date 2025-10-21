@@ -20,7 +20,7 @@ final _logger = Logger('StudentsRepository');
 abstract class StudentsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
-    List<String>? fields,
+    Map<String, dynamic>? fields,
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
@@ -43,7 +43,7 @@ abstract class StudentsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getById({
     required String id,
-    List<String>? fields,
+    Map<String, dynamic>? fields,
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {

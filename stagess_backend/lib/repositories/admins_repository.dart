@@ -14,7 +14,7 @@ import 'package:stagess_common/utils.dart';
 abstract class AdminsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
-    List<String>? fields,
+    Map<String, dynamic>? fields,
     required DatabaseUser user,
   }) async {
     if (user.accessLevel < AccessLevel.superAdmin) {
@@ -31,7 +31,7 @@ abstract class AdminsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getById({
     required String id,
-    List<String>? fields,
+    Map<String, dynamic>? fields,
     required DatabaseUser user,
   }) async {
     if (user.accessLevel < AccessLevel.superAdmin) {

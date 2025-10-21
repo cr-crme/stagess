@@ -21,7 +21,17 @@ class EnterprisesProvider extends BackendListProvided<Enterprise> {
       asList ? RequestFields.enterprises : RequestFields.enterprise;
 
   void initializeAuth(AuthProvider auth) {
-    initializeFetchingData(authProvider: auth);
-    auth.addListener(() => initializeFetchingData(authProvider: auth));
+    final fields = {
+      'name': null,
+      'address': null,
+      'jobs': {'specialization_id': null, 'positions_offered': null},
+    };
+    initializeFetchingData(authProvider: auth, initialFieldsToFetch: fields);
+    auth.addListener(
+      () => initializeFetchingData(
+        authProvider: auth,
+        initialFieldsToFetch: fields,
+      ),
+    );
   }
 }

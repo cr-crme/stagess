@@ -113,13 +113,28 @@ extension ItemSerializableExtension on ItemSerializable {
     return diff;
   }
 
-  Map<String, dynamic> serializeWithFields(List<String>? fields) {
-    final serialized = serialize();
-    if (fields != null) {
-      serialized.removeWhere((key, value) =>
-          key != 'id' && key != 'version' && !fields.contains(key));
-    }
+  Map<String, dynamic> serializeWithFields(Map<String, dynamic>? fields) =>
+      serialize().filter(fields);
+}
 
-    return serialized;
+extension _MapExtensions on Map<String, dynamic> {
+  Map<String, dynamic> filter(Map<String, dynamic>? fields) {
+    if (fields != null) {
+      final fieldsToKeep = fields.keys.toSet();
+
+      removeWhere((key, value) =>
+          key != 'id' && key != 'version' && !fieldsToKeep.contains(key));
+
+      for (var key in fieldsToKeep) {
+        final subelements = this[key];
+        if (subelements is! Map<String, dynamic>) continue;
+
+        final subfields = fields[key];
+        if (subfields is! Map<String, dynamic>) continue;
+        this[key] = subelements.map((key, value) => MapEntry(key,
+            value is Map<String, dynamic> ? value.filter(subfields) : value));
+      }
+    }
+    return this;
   }
 }
