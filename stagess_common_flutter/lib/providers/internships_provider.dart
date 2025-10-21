@@ -28,6 +28,8 @@ class InternshipsProvider extends BackendListProvided<Internship> {
   Map<String, dynamic> get mandatoryFields => {
     'school_board_id': null,
     'student_id': null,
+    'signatory_teacher_id': null,
+    'extra_supervising_teacher_ids': null,
   };
 
   void initializeAuth(AuthProvider auth) {

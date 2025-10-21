@@ -29,6 +29,7 @@ import 'package:stagess_common_flutter/widgets/schedule_selector.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 import 'package:stagess_common_flutter/widgets/student_picker_tile.dart';
 
+// TODO Fix when expanding
 class InternshipListTile extends StatefulWidget {
   const InternshipListTile({
     super.key,
