@@ -5,6 +5,7 @@ import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/utils.dart' as utils;
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
+import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 class SchoolStudentsCard extends StatelessWidget {
@@ -79,12 +80,12 @@ class _GroupStudentsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = AuthProvider.of(context, listen: true);
+    final authProvided = AuthProvider.of(context, listen: true);
+    final teacherProvided = TeachersProvider.of(context, listen: false);
     final teachers =
-        TeachersProvider.of(
-          context,
-          listen: false,
-        ).where((teacher) => teacher.groups.contains(group)).toList();
+        teacherProvided
+            .where((teacher) => teacher.groups.contains(group))
+            .toList();
     teachers.sort((a, b) {
       final teacherA = a.lastName.toLowerCase();
       final teacherB = b.lastName.toLowerCase();
@@ -111,8 +112,16 @@ class _GroupStudentsCard extends StatelessWidget {
               key: ValueKey(student.id),
               student: student,
               schoolBoard: schoolBoard,
-              canEdit: authProvider.databaseAccessLevel >= AccessLevel.admin,
-              canDelete: authProvider.databaseAccessLevel >= AccessLevel.admin,
+              canEdit: authProvided.databaseAccessLevel >= AccessLevel.admin,
+              canDelete: authProvided.databaseAccessLevel >= AccessLevel.admin,
+              onExpandedChanged: (isExpanded) {
+                if (!isExpanded) return;
+                final studentProvided = StudentsProvider.of(
+                  context,
+                  listen: false,
+                );
+                studentProvided.forceFetchFullData(id: student.id);
+              },
             ),
           ),
       ],

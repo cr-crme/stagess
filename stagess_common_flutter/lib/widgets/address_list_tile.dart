@@ -20,6 +20,8 @@ class AddressController {
   bool Function()? _isValidating;
   Address? Function()? _getAddress;
   Address? Function(Address)? _setAddress;
+  void Function(Address address, {String? validationMessage})?
+  _setAddressAndForceValidation;
   bool Function()? _isMandatory;
   Address? _initialValue;
   set initialValue(Address? value) {
@@ -36,6 +38,12 @@ class AddressController {
 
     _textController.text = address?.toString() ?? '';
     requestValidation();
+  }
+
+  void setAddressAndForceValidated(Address value) {
+    if (_setAddressAndForceValidation != null) {
+      _setAddressAndForceValidation!(value, validationMessage: null);
+    }
   }
 
   Future<String?> requestValidation() async {
@@ -105,6 +113,8 @@ class _AddressListTileState extends State<AddressListTile> {
     widget.addressController._isValidating = () => _isValidating;
     widget.addressController._getAddress = getAddress;
     widget.addressController._setAddress = setAddress;
+    widget.addressController._setAddressAndForceValidation =
+        _setAndForceValidation;
     widget.addressController._isMandatory = () => widget.isMandatory;
     _address = widget.addressController._initialValue;
 
@@ -119,6 +129,14 @@ class _AddressListTileState extends State<AddressListTile> {
   Address? _address;
   Address? getAddress() => _address;
   Address? setAddress(newAddress) => _address = newAddress;
+
+  void _setAndForceValidation(Address address, {String? validationMessage}) {
+    _address = address;
+    addressHasChanged = false;
+    widget.addressController._textController.text = _address.toString();
+    _previousValidatedAddress = address.toString();
+    _previousValidatedMessage = validationMessage;
+  }
 
   Future<String?> validate({bool forceShowIfNotFound = false}) async {
     while (_isValidating) {

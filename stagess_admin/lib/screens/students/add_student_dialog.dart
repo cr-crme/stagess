@@ -57,6 +57,7 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
                 forceEditingMode: true,
                 canEdit: false,
                 canDelete: false,
+                onExpandedChanged: (isExpanded) => {},
               ),
             ],
           ),

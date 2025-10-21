@@ -22,6 +22,7 @@ class EnterprisesProvider extends BackendListProvided<Enterprise> {
 
   void initializeAuth(AuthProvider auth) {
     final fields = {
+      'school_board_id': null,
       'name': null,
       'address': null,
       'jobs': {'specialization_id': null, 'positions_offered': null},

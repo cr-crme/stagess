@@ -24,6 +24,7 @@ class StudentListTile extends StatefulWidget {
     this.forceEditingMode = false,
     required this.canEdit,
     required this.canDelete,
+    required this.onExpandedChanged,
   });
 
   final Student student;
@@ -32,6 +33,7 @@ class StudentListTile extends StatefulWidget {
   final SchoolBoard schoolBoard;
   final bool canEdit;
   final bool canDelete;
+  final void Function(bool isExpanded) onExpandedChanged;
 
   @override
   State<StudentListTile> createState() => StudentListTileState();
@@ -280,7 +282,11 @@ class StudentListTileState extends State<StudentListTile> {
       _birthController.updateValue(widget.student.dateBirth);
     }
     if (_addressController.address != widget.student.address) {
-      _addressController.address = widget.student.address;
+      if (widget.student.address != null) {
+        _addressController.setAddressAndForceValidated(widget.student.address!);
+      } else {
+        _addressController.address = null;
+      }
     }
     if (_phoneController.text != widget.student.phone.toString()) {
       _phoneController.text = widget.student.phone.toString();
@@ -307,7 +313,13 @@ class StudentListTileState extends State<StudentListTile> {
       _contactLinkController.text = widget.student.contactLink;
     }
     if (_contactAddressController.address != widget.student.contact.address) {
-      _contactAddressController.address = widget.student.contact.address;
+      if (widget.student.contact.address != null) {
+        _contactAddressController.setAddressAndForceValidated(
+          widget.student.contact.address!,
+        );
+      } else {
+        _contactAddressController.address = null;
+      }
     }
     if (_contactPhoneController.text !=
         widget.student.contact.phone.toString()) {
@@ -323,7 +335,10 @@ class StudentListTileState extends State<StudentListTile> {
     return widget.isExpandable
         ? AnimatedExpandingCard(
           initialExpandedState: _isExpanded,
-          onTapHeader: (isExpanded) => setState(() => _isExpanded = isExpanded),
+          onTapHeader: (isExpanded) {
+            setState(() => _isExpanded = isExpanded);
+            widget.onExpandedChanged(_isExpanded);
+          },
           header:
               (ctx, isExpanded) => Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

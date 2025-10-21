@@ -165,6 +165,18 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     await _getFromBackend(getField(true), fields: initialFieldsToFetch);
   }
 
+  ///
+  /// Forces fetching the full data for the item with the given [id].
+  /// Return if new data were fetched.
+  Future<bool> forceFetchFullData({required String id}) async {
+    final field = getField(false);
+    if (_hasFullData[field]?[id] == true) return false;
+
+    await _getFromBackend(field, id: id);
+    _hasFullData[field]?[id] = true;
+    return true;
+  }
+
   Future<void> disconnect() async {
     if (_socket != null) {
       _socket!.close();
@@ -428,6 +440,7 @@ int? _socketId;
 bool _handshakeReceived = false;
 Map<RequestFields, _Selector> _providerSelector = {};
 final _completers = <String, Completer<CommunicationProtocol>>{};
+final Map<RequestFields, Map<String, bool>> _hasFullData = {};
 
 _Selector _getSelector(RequestFields field) {
   final selector = _providerSelector[field];
@@ -547,6 +560,11 @@ Future<void> _incommingMessage(
           }
 
           final requestField = protocol.field!;
+          if (_hasFullData.containsKey(requestField) &&
+              !(_hasFullData[requestField]![protocol.data!['id']] ?? false)) {
+            // No need to update if we have not fetched the full data yet
+            return;
+          }
           _getFromBackend(
             requestField,
             id: protocol.data!['id'],
