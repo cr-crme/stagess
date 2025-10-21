@@ -27,7 +27,7 @@ class StudentListTile extends StatefulWidget {
     this.forceEditingMode = false,
     required this.canEdit,
     required this.canDelete,
-    required this.onExpandedChanged,
+    this.onExpandedChanged,
   });
 
   final Student student;
@@ -36,7 +36,7 @@ class StudentListTile extends StatefulWidget {
   final SchoolBoard schoolBoard;
   final bool canEdit;
   final bool canDelete;
-  final Future<void> Function(bool isExpanded) onExpandedChanged;
+  final Future<void> Function(bool isExpanded)? onExpandedChanged;
 
   @override
   State<StudentListTile> createState() => StudentListTileState();
@@ -78,6 +78,7 @@ class StudentListTileState extends State<StudentListTile> {
     super.dispose();
   }
 
+  var _dataIsReadyCompleter = Completer<void>();
   bool _forceDisabled = false;
   bool _isExpanded = false;
   bool _isEditing = false;
@@ -158,6 +159,7 @@ class StudentListTileState extends State<StudentListTile> {
   @override
   void initState() {
     super.initState();
+    if (widget.onExpandedChanged == null) _dataIsReadyCompleter.complete();
     if (widget.forceEditingMode) _onClickedEditing();
   }
 
@@ -333,8 +335,6 @@ class StudentListTileState extends State<StudentListTile> {
     }
   }
 
-  var _dataIsReadyCompleter = Completer<void>();
-
   @override
   Widget build(BuildContext context) {
     return widget.isExpandable
@@ -343,7 +343,8 @@ class StudentListTileState extends State<StudentListTile> {
           initialExpandedState: _isExpanded,
           onTapHeader: (isExpanded) async {
             setState(() => _isExpanded = isExpanded);
-            await widget.onExpandedChanged(_isExpanded);
+            if (widget.onExpandedChanged == null) return;
+            await widget.onExpandedChanged!(_isExpanded);
             if (_isExpanded) {
               _dataIsReadyCompleter.complete();
             } else {
