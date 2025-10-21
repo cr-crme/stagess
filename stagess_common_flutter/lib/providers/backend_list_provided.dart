@@ -165,16 +165,28 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     await _getFromBackend(getField(true), fields: initialFieldsToFetch);
   }
 
-  ///
-  /// Forces fetching the full data for the item with the given [id].
-  /// Return if new data were fetched.
-  Future<bool> forceFetchFullData({required String id}) async {
+  bool hasFullData(String id) {
     final field = getField(false);
-    if (_hasFullData[field]?[id] == true) return false;
+    return _hasFullData[field]?[id] == true;
+  }
 
+  ///
+  /// Fetches the full data for the item with the given [id].
+  /// Return if new data were fetched.
+  Future<void> fetchFullData({
+    required String id,
+    bool forceRefetch = false,
+  }) async {
+    if (hasFullData(id) && !forceRefetch) return;
+
+    final field = getField(false);
     await _getFromBackend(field, id: id);
-    _hasFullData[field]?[id] = true;
-    return true;
+
+    if (_hasFullData[field] == null) {
+      _hasFullData[field] = {};
+    }
+    _hasFullData[field]![id] = true;
+    return;
   }
 
   Future<void> disconnect() async {

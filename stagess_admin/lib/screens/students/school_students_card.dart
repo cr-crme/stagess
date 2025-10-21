@@ -114,13 +114,12 @@ class _GroupStudentsCard extends StatelessWidget {
               schoolBoard: schoolBoard,
               canEdit: authProvided.databaseAccessLevel >= AccessLevel.admin,
               canDelete: authProvided.databaseAccessLevel >= AccessLevel.admin,
-              onExpandedChanged: (isExpanded) {
+              onExpandedChanged: (isExpanded) async {
                 if (!isExpanded) return;
-                final studentProvided = StudentsProvider.of(
+                await StudentsProvider.of(
                   context,
                   listen: false,
-                );
-                studentProvided.forceFetchFullData(id: student.id);
+                ).fetchFullData(id: student.id);
               },
             ),
           ),

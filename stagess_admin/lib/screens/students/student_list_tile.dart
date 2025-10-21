@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -7,6 +9,7 @@ import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/utils.dart';
+import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/address_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
@@ -33,7 +36,7 @@ class StudentListTile extends StatefulWidget {
   final SchoolBoard schoolBoard;
   final bool canEdit;
   final bool canDelete;
-  final void Function(bool isExpanded) onExpandedChanged;
+  final Future<void> Function(bool isExpanded) onExpandedChanged;
 
   @override
   State<StudentListTile> createState() => StudentListTileState();
@@ -330,14 +333,23 @@ class StudentListTileState extends State<StudentListTile> {
     }
   }
 
+  var _dataIsReadyCompleter = Completer<void>();
+
   @override
   Widget build(BuildContext context) {
     return widget.isExpandable
         ? AnimatedExpandingCard(
+          expandingDuration: ConfigurationService.expandingTileDuration,
           initialExpandedState: _isExpanded,
-          onTapHeader: (isExpanded) {
+          onTapHeader: (isExpanded) async {
             setState(() => _isExpanded = isExpanded);
-            widget.onExpandedChanged(_isExpanded);
+            await widget.onExpandedChanged(_isExpanded);
+            if (_isExpanded) {
+              _dataIsReadyCompleter.complete();
+            } else {
+              await Future.delayed(ConfigurationService.expandingTileDuration);
+              _dataIsReadyCompleter = Completer<void>();
+            }
           },
           header:
               (ctx, isExpanded) => Row(
@@ -355,30 +367,48 @@ class StudentListTileState extends State<StudentListTile> {
                     ),
                   ),
                   if (_isExpanded)
-                    Row(
-                      children: [
-                        if (widget.canDelete)
-                          IconButton(
-                            icon: Icon(
-                              Icons.delete,
-                              color: _forceDisabled ? Colors.grey : Colors.red,
-                            ),
-                            onPressed:
-                                _forceDisabled ? null : _onClickedDeleting,
-                          ),
-                        if (widget.canEdit)
-                          IconButton(
-                            icon: Icon(
-                              _isEditing ? Icons.save : Icons.edit,
-                              color:
-                                  _forceDisabled
-                                      ? Colors.grey
-                                      : Theme.of(context).primaryColor,
-                            ),
-                            onPressed:
-                                _forceDisabled ? null : _onClickedEditing,
-                          ),
-                      ],
+                    FutureBuilder(
+                      future: _dataIsReadyCompleter.future,
+                      builder:
+                          (ctx, snapshot) =>
+                              snapshot.connectionState == ConnectionState.done
+                                  ? Row(
+                                    children: [
+                                      if (widget.canDelete)
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.delete,
+                                            color:
+                                                _forceDisabled
+                                                    ? Colors.grey
+                                                    : Colors.red,
+                                          ),
+                                          onPressed:
+                                              _forceDisabled
+                                                  ? null
+                                                  : _onClickedDeleting,
+                                        ),
+                                      if (widget.canEdit)
+                                        IconButton(
+                                          icon: Icon(
+                                            _isEditing
+                                                ? Icons.save
+                                                : Icons.edit,
+                                            color:
+                                                _forceDisabled
+                                                    ? Colors.grey
+                                                    : Theme.of(
+                                                      context,
+                                                    ).primaryColor,
+                                          ),
+                                          onPressed:
+                                              _forceDisabled
+                                                  ? null
+                                                  : _onClickedEditing,
+                                        ),
+                                    ],
+                                  )
+                                  : SizedBox.shrink(),
                     ),
                 ],
               ),
@@ -388,33 +418,52 @@ class StudentListTileState extends State<StudentListTile> {
   }
 
   Widget _buildEditingForm() {
-    return Form(
-      key: _formKey,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 24.0, bottom: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSchoolSelection(),
-            const SizedBox(height: 8),
-            _buildName(),
-            const SizedBox(height: 8),
-            _buildBirthday(),
-            const SizedBox(height: 4),
-            _buildAddress(),
-            const SizedBox(height: 4),
-            _buildPhone(),
-            const SizedBox(height: 4),
-            _buildEmail(),
-            const SizedBox(height: 4),
-            _buildGroup(),
-            const SizedBox(height: 4),
-            _buildProgramSelection(),
-            const SizedBox(height: 8),
-            _buildContact(),
-          ],
-        ),
-      ),
+    return FutureBuilder(
+      future: _dataIsReadyCompleter.future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          );
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text('Erreur de chargement'));
+        }
+
+        return Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 24.0, bottom: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSchoolSelection(),
+                const SizedBox(height: 8),
+                _buildName(),
+                const SizedBox(height: 8),
+                _buildBirthday(),
+                const SizedBox(height: 4),
+                _buildAddress(),
+                const SizedBox(height: 4),
+                _buildPhone(),
+                const SizedBox(height: 4),
+                _buildEmail(),
+                const SizedBox(height: 4),
+                _buildGroup(),
+                const SizedBox(height: 4),
+                _buildProgramSelection(),
+                const SizedBox(height: 8),
+                _buildContact(),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

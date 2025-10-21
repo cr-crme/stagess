@@ -9,6 +9,7 @@ class AnimatedExpandingCard extends StatefulWidget {
     this.onTapHeader,
     this.canChangeExpandedState = true,
     this.initialExpandedState = false,
+    this.preventTapWhenAnimating = true,
     this.elevation = 10.0,
   });
 
@@ -18,6 +19,7 @@ class AnimatedExpandingCard extends StatefulWidget {
   final Widget child;
   final bool canChangeExpandedState;
   final bool initialExpandedState;
+  final bool preventTapWhenAnimating;
   final double elevation;
 
   @override
@@ -44,6 +46,18 @@ class _AnimatedExpandingCardState extends State<AnimatedExpandingCard>
     }
   }
 
+  bool _isAnimating = false;
+
+  void _trackIsAnimating() async {
+    setState(() {
+      _isAnimating = true;
+    });
+    await Future.delayed(widget.expandingDuration);
+    setState(() {
+      _isAnimating = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -54,13 +68,17 @@ class _AnimatedExpandingCardState extends State<AnimatedExpandingCard>
         children: [
           InkWell(
             onTap: () {
+              if (_isAnimating && widget.preventTapWhenAnimating) {
+                return;
+              }
+
               if (widget.canChangeExpandedState) {
                 _isExpanded = !_isExpanded;
                 _isExpanded
                     ? _expandingAnimationController.forward()
                     : _expandingAnimationController.reverse();
+                _trackIsAnimating();
               }
-
               if (widget.onTapHeader != null) widget.onTapHeader!(_isExpanded);
               setState(() {});
             },
