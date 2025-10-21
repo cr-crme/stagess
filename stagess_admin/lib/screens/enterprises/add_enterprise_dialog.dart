@@ -54,7 +54,6 @@ class _AddEnterpriseDialogState extends State<AddEnterpriseDialog> {
                 enterprise: Enterprise.empty.copyWith(
                   schoolBoardId: widget.schoolBoard.id,
                 ),
-                isExpandable: false,
                 forceEditingMode: true,
               ),
             ],

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:stagess_admin/screens/enterprises/confirm_delete_enterprise_dialog.dart';
@@ -10,6 +12,7 @@ import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/utils.dart';
+import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
@@ -29,12 +32,10 @@ class EnterpriseListTile extends StatefulWidget {
   const EnterpriseListTile({
     super.key,
     required this.enterprise,
-    this.isExpandable = true,
     this.forceEditingMode = false,
   });
 
   final Enterprise enterprise;
-  final bool isExpandable;
   final bool forceEditingMode;
 
   @override
@@ -80,6 +81,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     super.dispose();
   }
 
+  var _fetchFullDataCompleter = Completer<void>();
   bool _wasDetailsExpanded = false;
   bool _forceDisabled = false;
   bool _isExpanded = false;
@@ -194,7 +196,10 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   @override
   void initState() {
     super.initState();
-    if (widget.forceEditingMode) _onClickedEditing();
+    if (widget.forceEditingMode) {
+      _fetchFullDataCompleter.complete();
+      _onClickedEditing();
+    }
   }
 
   Future<void> _onClickedDeleting() async {
@@ -356,7 +361,13 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       );
     }
     if (_addressController.address != widget.enterprise.address) {
-      _addressController.address = widget.enterprise.address;
+      if (widget.enterprise.address == null) {
+        _addressController.address = null;
+      } else {
+        _addressController.setAddressAndForceValidated(
+          widget.enterprise.address!,
+        );
+      }
     }
     if (_phoneController.text != widget.enterprise.phone?.toString()) {
       _phoneController.text = widget.enterprise.phone?.toString() ?? '';
@@ -369,8 +380,13 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     }
     if (_headquartersAddressController.address !=
         widget.enterprise.headquartersAddress) {
-      _headquartersAddressController.address =
-          widget.enterprise.headquartersAddress;
+      if (widget.enterprise.headquartersAddress == null) {
+        _headquartersAddressController.address = null;
+      } else {
+        _headquartersAddressController.setAddressAndForceValidated(
+          widget.enterprise.headquartersAddress!,
+        );
+      }
     }
     if (_contactFirstNameController.text !=
         widget.enterprise.contact.firstName) {
@@ -403,6 +419,22 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     }
   }
 
+  Future<void> _fetchData() async {
+    if (_isExpanded) {
+      await EnterprisesProvider.of(
+        context,
+        listen: false,
+      ).fetchFullData(id: widget.enterprise.id);
+      _fetchFullDataCompleter.complete();
+    } else {
+      await Future.delayed(ConfigurationService.expandingTileDuration);
+      _fetchFullDataCompleter = Completer<void>();
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final internships = InternshipsProvider.of(context, listen: true);
@@ -410,10 +442,15 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       (internship) => internship.enterpriseId == widget.enterprise.id,
     );
 
-    return widget.isExpandable
-        ? AnimatedExpandingCard(
+    return widget.forceEditingMode
+        ? _buildEditingForm()
+        : AnimatedExpandingCard(
+          expandingDuration: ConfigurationService.expandingTileDuration,
           initialExpandedState: _isExpanded,
-          onTapHeader: (isExpanded) => setState(() => _isExpanded = isExpanded),
+          onTapHeader: (isExpanded) {
+            setState(() => _isExpanded = isExpanded);
+            _fetchData();
+          },
           header:
               (ctx, isExpanded) => Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -430,92 +467,131 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                     ),
                   ),
                   if (_isExpanded)
-                    Row(
-                      children: [
-                        if (!hasInternship)
-                          IconButton(
-                            icon: Icon(
-                              Icons.delete,
-                              color: _forceDisabled ? Colors.grey : Colors.red,
-                            ),
-                            onPressed:
-                                _forceDisabled ? null : _onClickedDeleting,
-                          ),
-                        IconButton(
-                          icon: Icon(
-                            _isEditing ? Icons.save : Icons.edit,
-                            color:
-                                _forceDisabled
-                                    ? Colors.grey
-                                    : Theme.of(context).primaryColor,
-                          ),
-                          onPressed: _forceDisabled ? null : _onClickedEditing,
-                        ),
-                      ],
+                    FutureBuilder(
+                      future: _fetchFullDataCompleter.future,
+                      builder:
+                          (context, snapshot) =>
+                              snapshot.connectionState == ConnectionState.done
+                                  ? Row(
+                                    children: [
+                                      if (!hasInternship)
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.delete,
+                                            color:
+                                                _forceDisabled
+                                                    ? Colors.grey
+                                                    : Colors.red,
+                                          ),
+                                          onPressed:
+                                              _forceDisabled
+                                                  ? null
+                                                  : _onClickedDeleting,
+                                        ),
+                                      IconButton(
+                                        icon: Icon(
+                                          _isEditing ? Icons.save : Icons.edit,
+                                          color:
+                                              _forceDisabled
+                                                  ? Colors.grey
+                                                  : Theme.of(
+                                                    context,
+                                                  ).primaryColor,
+                                        ),
+                                        onPressed:
+                                            _forceDisabled
+                                                ? null
+                                                : _onClickedEditing,
+                                      ),
+                                    ],
+                                  )
+                                  : const SizedBox.shrink(),
                     ),
                 ],
               ),
           child: _buildEditingForm(),
-        )
-        : _buildEditingForm();
+        );
   }
 
   Widget _buildEditingForm() {
-    return Form(
-      key: _formKey,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 24.0, bottom: 24.0, right: 24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildEnterpriseStatus(),
-            const SizedBox(height: 8),
-            _buildJobs(),
-            const SizedBox(height: 8),
-            AnimatedExpandingCard(
-              elevation: 0.0,
-              onTapHeader: (newState) => _wasDetailsExpanded = true,
-              header:
-                  (ctx, isExpanded) => Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Text(
-                      isExpanded
-                          ? 'Détails de l\'entreprise'
-                          : 'Plus de détails sur l\'entreprise...',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ),
-              child: Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildName(),
-                    const SizedBox(height: 8),
-                    _buildRecruiter(),
-                    const SizedBox(height: 8),
-                    _buildAddress(),
-                    const SizedBox(height: 8),
-                    _buildPhone(),
-                    const SizedBox(height: 8),
-                    _buildFax(),
-                    const SizedBox(height: 8),
-                    _buildWebsite(),
-                    const SizedBox(height: 8),
-                    _buildHeadquartersAddress(),
-                    const SizedBox(height: 8),
-                    _buildContact(),
-                    const SizedBox(height: 8),
-                    _buildNeq(),
-                    const SizedBox(height: 8),
-                    _buildActivityTypes(),
-                  ],
-                ),
+    return FutureBuilder(
+      future: _fetchFullDataCompleter.future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
               ),
             ),
-          ],
-        ),
-      ),
+          );
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text('Erreur de chargement'));
+        }
+
+        return Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.only(
+              left: 24.0,
+              bottom: 24.0,
+              right: 24.0,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildEnterpriseStatus(),
+                const SizedBox(height: 8),
+                _buildJobs(),
+                const SizedBox(height: 8),
+                AnimatedExpandingCard(
+                  elevation: 0.0,
+                  onTapHeader: (newState) => _wasDetailsExpanded = true,
+                  header:
+                      (ctx, isExpanded) => Padding(
+                        padding: const EdgeInsets.all(12.0),
+                        child: Text(
+                          isExpanded
+                              ? 'Détails de l\'entreprise'
+                              : 'Plus de détails sur l\'entreprise...',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildName(),
+                        const SizedBox(height: 8),
+                        _buildRecruiter(),
+                        const SizedBox(height: 8),
+                        _buildAddress(),
+                        const SizedBox(height: 8),
+                        _buildPhone(),
+                        const SizedBox(height: 8),
+                        _buildFax(),
+                        const SizedBox(height: 8),
+                        _buildWebsite(),
+                        const SizedBox(height: 8),
+                        _buildHeadquartersAddress(),
+                        const SizedBox(height: 8),
+                        _buildContact(),
+                        const SizedBox(height: 8),
+                        _buildNeq(),
+                        const SizedBox(height: 8),
+                        _buildActivityTypes(),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
