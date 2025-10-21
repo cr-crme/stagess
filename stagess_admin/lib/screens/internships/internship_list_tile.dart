@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +16,7 @@ import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/utils.dart';
+import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
@@ -30,14 +33,12 @@ class InternshipListTile extends StatefulWidget {
   const InternshipListTile({
     super.key,
     required this.internship,
-    this.isExpandable = true,
     this.forceEditingMode = false,
     required this.canEdit,
     required this.canDelete,
   });
 
   final Internship internship;
-  final bool isExpandable;
   final bool forceEditingMode;
   final bool canEdit;
   final bool canDelete;
@@ -71,6 +72,7 @@ class InternshipListTileState extends State<InternshipListTile> {
     super.dispose();
   }
 
+  var _fetchFullDataCompleter = Completer<void>();
   bool _isExpanded = false;
   bool _forceDisabled = false;
   bool _isEditing = false;
@@ -222,7 +224,10 @@ class InternshipListTileState extends State<InternshipListTile> {
   @override
   void initState() {
     super.initState();
-    if (widget.forceEditingMode) _onClickedEditing();
+    if (widget.forceEditingMode) {
+      _fetchFullDataCompleter.complete();
+      _onClickedEditing();
+    }
   }
 
   Future<void> _onClickedDeleting() async {
@@ -414,15 +419,36 @@ class InternshipListTileState extends State<InternshipListTile> {
     }
   }
 
+  Future<void> _fetchData() async {
+    if (_isExpanded) {
+      await InternshipsProvider.of(
+        context,
+        listen: false,
+      ).fetchFullData(id: widget.internship.id);
+      _fetchFullDataCompleter.complete();
+    } else {
+      await Future.delayed(ConfigurationService.expandingTileDuration);
+      _fetchFullDataCompleter = Completer<void>();
+    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final student = _studentPickerController.student;
     final enterprise = _enterprisePickerController.enterprise;
 
-    return widget.isExpandable
-        ? AnimatedExpandingCard(
+    return widget.forceEditingMode
+        ? _buildEditingForm()
+        : AnimatedExpandingCard(
+          expandingDuration: ConfigurationService.expandingTileDuration,
           initialExpandedState: _isExpanded,
-          onTapHeader: (isExpanded) => setState(() => _isExpanded = isExpanded),
+          onTapHeader: (isExpanded) {
+            setState(() => _isExpanded = isExpanded);
+            _fetchData();
+          },
           header:
               (ctx, isExpanded) => Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -439,76 +465,112 @@ class InternshipListTileState extends State<InternshipListTile> {
                     ),
                   ),
                   if (_isExpanded)
-                    Row(
-                      children: [
-                        if (widget.canDelete)
-                          IconButton(
-                            icon: Icon(
-                              Icons.delete,
-                              color: _forceDisabled ? Colors.grey : Colors.red,
-                            ),
-                            onPressed:
-                                _forceDisabled ? null : _onClickedDeleting,
-                          ),
-                        if (widget.canEdit)
-                          IconButton(
-                            icon: Icon(
-                              _isEditing ? Icons.save : Icons.edit,
-                              color:
-                                  _forceDisabled
-                                      ? Colors.grey
-                                      : Theme.of(context).primaryColor,
-                            ),
-                            onPressed:
-                                _forceDisabled ? null : _onClickedEditing,
-                          ),
-                      ],
+                    FutureBuilder(
+                      future: _fetchFullDataCompleter.future,
+                      builder:
+                          (context, snapshot) =>
+                              snapshot.connectionState == ConnectionState.done
+                                  ? Row(
+                                    children: [
+                                      if (widget.canDelete)
+                                        IconButton(
+                                          icon: Icon(
+                                            Icons.delete,
+                                            color:
+                                                _forceDisabled
+                                                    ? Colors.grey
+                                                    : Colors.red,
+                                          ),
+                                          onPressed:
+                                              _forceDisabled
+                                                  ? null
+                                                  : _onClickedDeleting,
+                                        ),
+                                      if (widget.canEdit)
+                                        IconButton(
+                                          icon: Icon(
+                                            _isEditing
+                                                ? Icons.save
+                                                : Icons.edit,
+                                            color:
+                                                _forceDisabled
+                                                    ? Colors.grey
+                                                    : Theme.of(
+                                                      context,
+                                                    ).primaryColor,
+                                          ),
+                                          onPressed:
+                                              _forceDisabled
+                                                  ? null
+                                                  : _onClickedEditing,
+                                        ),
+                                    ],
+                                  )
+                                  : SizedBox.shrink(),
                     ),
                 ],
               ),
           child: _buildEditingForm(),
-        )
-        : _buildEditingForm();
+        );
   }
 
   Widget _buildEditingForm() {
-    return Form(
-      key: _formKey,
-      child: Padding(
-        padding: const EdgeInsets.only(left: 24.0, bottom: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildSupervisingTeacher(),
-            const SizedBox(height: 8),
-            if (widget.forceEditingMode)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildStudent(),
-                  const SizedBox(height: 8),
-                  _buildEnterprise(),
-                  const SizedBox(height: 8),
-                ],
+    return FutureBuilder(
+      future: _fetchFullDataCompleter.future,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
               ),
-            _buildSupervisorContact(),
-            const SizedBox(height: 8),
-            _buildWeeklySchedule(),
-            const SizedBox(height: 8.0),
-            _buildExpectedDuration(),
-            const SizedBox(height: 8.0),
-            _buildTransportation(),
-            const SizedBox(height: 8.0),
-            _buildVisitFrequencies(),
-            const SizedBox(height: 8.0),
-            _buildEndDate(),
-            const SizedBox(height: 8.0),
-            _buildAchievedDuration(),
-            const SizedBox(height: 8),
-            _buildTeacherNotes(),
-          ],
-        ),
-      ),
+            ),
+          );
+        }
+        if (snapshot.hasError) {
+          return Center(child: Text('Erreur de chargement'));
+        }
+
+        return Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 24.0, bottom: 8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSupervisingTeacher(),
+                const SizedBox(height: 8),
+                if (widget.forceEditingMode)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildStudent(),
+                      const SizedBox(height: 8),
+                      _buildEnterprise(),
+                      const SizedBox(height: 8),
+                    ],
+                  ),
+                _buildSupervisorContact(),
+                const SizedBox(height: 8),
+                _buildWeeklySchedule(),
+                const SizedBox(height: 8.0),
+                _buildExpectedDuration(),
+                const SizedBox(height: 8.0),
+                _buildTransportation(),
+                const SizedBox(height: 8.0),
+                _buildVisitFrequencies(),
+                const SizedBox(height: 8.0),
+                _buildEndDate(),
+                const SizedBox(height: 8.0),
+                _buildAchievedDuration(),
+                const SizedBox(height: 8),
+                _buildTeacherNotes(),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

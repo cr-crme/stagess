@@ -54,7 +54,6 @@ class _AddInternshipDialogState extends State<AddInternshipDialog> {
                 internship: Internship.empty.copyWith(
                   schoolBoardId: widget.schoolBoard.id,
                 ),
-                isExpandable: false,
                 forceEditingMode: true,
                 canEdit: false,
                 canDelete: false,
