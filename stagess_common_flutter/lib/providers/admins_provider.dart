@@ -22,11 +22,14 @@ class AdminsProvider extends BackendListProvided<Admin> {
   }
 
   @override
-  Map<String, dynamic> get mandatoryFields => {
+  Map<String, dynamic>? get mandatoryFields => {
     'school_board_id': null,
     'first_name': null,
     'middle_name': null,
     'last_name': null,
+    'email': null,
+    'access_level': null,
+    'has_registered_account': null,
   };
 
   void initializeAuth(AuthProvider auth) {

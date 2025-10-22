@@ -16,7 +16,7 @@ class _Selector {
   final Function(dynamic items, {bool notify}) removeItem;
   final Function() stopFetchingData;
   final Function() notify;
-  final Map<String, dynamic> mandatoryFields;
+  final Map<String, dynamic>? mandatoryFields;
 
   const _Selector({
     required this.addOrReplaceItems,
@@ -214,7 +214,11 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     notifyListeners();
   }
 
-  Map<String, dynamic> get mandatoryFields;
+  ///
+  /// The fields to initially fetch as the app won't work properly if they are missing.
+  /// To get the subfields of a Map, use a Map inside the main Map.
+  /// Null always gets all the subfields. So if you want all the fields, just return null.
+  Map<String, dynamic>? get mandatoryFields;
 
   final bool mockMe;
 
@@ -587,7 +591,7 @@ Future<void> _incommingMessage(
             // the mandatory fields
             final mandatoryFields = _getSelector(mainField).mandatoryFields;
             subFields.removeWhere(
-              (key, value) => !mandatoryFields.keys.contains(key),
+              (key, value) => !(mandatoryFields?.keys.contains(key) ?? true),
             );
             if (subFields.isEmpty) return;
           }

@@ -25,9 +25,12 @@ class InternshipsProvider extends BackendListProvided<Internship> {
   }
 
   @override
-  Map<String, dynamic> get mandatoryFields => {
+  Map<String, dynamic>? get mandatoryFields => {
     'school_board_id': null,
     'student_id': null,
+    'enterprise_id': null,
+    'job_id': null,
+    'extra_specialization_ids': null,
     'signatory_teacher_id': null,
     'extra_supervising_teacher_ids': null,
   };

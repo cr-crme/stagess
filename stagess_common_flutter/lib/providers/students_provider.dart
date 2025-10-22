@@ -23,7 +23,7 @@ class StudentsProvider extends BackendListProvided<Student> {
   }
 
   @override
-  Map<String, dynamic> get mandatoryFields => {
+  Map<String, dynamic>? get mandatoryFields => {
     'school_board_id': null,
     'school_id': null,
     'first_name': null,

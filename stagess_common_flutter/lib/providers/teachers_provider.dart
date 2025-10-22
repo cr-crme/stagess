@@ -26,12 +26,15 @@ class TeachersProvider extends BackendListProvided<Teacher> {
           : this[_authProvider!.teacherId];
 
   @override
-  Map<String, dynamic> get mandatoryFields => {
+  Map<String, dynamic>? get mandatoryFields => {
     'school_board_id': null,
     'school_id': null,
     'first_name': null,
     'middle_name': null,
     'last_name': null,
+    'email': null,
+    'groups': null,
+    'has_registered_account': null,
   };
 
   AuthProvider? _authProvider;

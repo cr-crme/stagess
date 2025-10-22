@@ -21,11 +21,11 @@ class EnterprisesProvider extends BackendListProvided<Enterprise> {
       asList ? RequestFields.enterprises : RequestFields.enterprise;
 
   @override
-  Map<String, dynamic> get mandatoryFields => {
+  Map<String, dynamic>? get mandatoryFields => {
     'school_board_id': null,
     'name': null,
     'address': null,
-    'jobs': {'specialization_id': null, 'positions_offered': null},
+    'jobs': {'id': null, 'specialization_id': null, 'positions_offered': null},
   };
 
   void initializeAuth(AuthProvider auth) {
