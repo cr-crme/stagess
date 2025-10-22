@@ -182,7 +182,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
 
     final field = getField(false);
     await _getFromBackend(field, id: id);
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(Duration(seconds: 1));
 
     if (_hasFullData[field] == null) {
       _hasFullData[field] = {};

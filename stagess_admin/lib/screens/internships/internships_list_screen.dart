@@ -150,12 +150,12 @@ class InternshipsListScreen extends StatelessWidget {
                 initialExpandedState: true,
                 child: Column(
                   children: [
-                    _InternshipsByActive(
+                    _InternshipsByStatus(
                       key: const ValueKey('active_internships'),
                       areActive: true,
                       internships: schoolBoardEntry.value[true] ?? {},
                     ),
-                    _InternshipsByActive(
+                    _InternshipsByStatus(
                       key: const ValueKey('closed_internships'),
                       areActive: false,
                       internships: schoolBoardEntry.value[false] ?? {},
@@ -166,12 +166,12 @@ class InternshipsListScreen extends StatelessWidget {
             )
             .toList(),
       AccessLevel.admin || AccessLevel.teacher || AccessLevel.invalid => [
-        _InternshipsByActive(
+        _InternshipsByStatus(
           key: const ValueKey('active_internships'),
           areActive: true,
           internships: schoolBoardInternships.values.firstOrNull?[true] ?? {},
         ),
-        _InternshipsByActive(
+        _InternshipsByStatus(
           key: const ValueKey('closed_internships'),
           areActive: false,
           internships: schoolBoardInternships.values.firstOrNull?[false] ?? {},
@@ -181,8 +181,8 @@ class InternshipsListScreen extends StatelessWidget {
   }
 }
 
-class _InternshipsByActive extends StatelessWidget {
-  const _InternshipsByActive({
+class _InternshipsByStatus extends StatelessWidget {
+  const _InternshipsByStatus({
     super.key,
     required this.areActive,
     required this.internships,

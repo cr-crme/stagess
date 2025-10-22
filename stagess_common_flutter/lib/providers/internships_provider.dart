@@ -33,6 +33,8 @@ class InternshipsProvider extends BackendListProvided<Internship> {
     'extra_specialization_ids': null,
     'signatory_teacher_id': null,
     'extra_supervising_teacher_ids': null,
+    'mutables': {'id': null},
+    'end_date': null,
   };
 
   void initializeAuth(AuthProvider auth) {

@@ -29,7 +29,6 @@ import 'package:stagess_common_flutter/widgets/schedule_selector.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 import 'package:stagess_common_flutter/widgets/student_picker_tile.dart';
 
-// TODO Fix when expanding
 class InternshipListTile extends StatefulWidget {
   const InternshipListTile({
     super.key,
@@ -358,35 +357,38 @@ class InternshipListTileState extends State<InternshipListTile> {
       );
     }
 
-    if (_contactFirstNameController.text !=
-        widget.internship.supervisor.firstName) {
-      _contactFirstNameController.text = widget.internship.supervisor.firstName;
+    final supervisor =
+        widget.internship.hasVersions
+            ? widget.internship.supervisor
+            : Person.empty;
+    if (_contactFirstNameController.text != supervisor.firstName) {
+      _contactFirstNameController.text = supervisor.firstName;
     }
-    if (_contactLastNameController.text !=
-        widget.internship.supervisor.lastName) {
-      _contactLastNameController.text = widget.internship.supervisor.lastName;
+    if (_contactLastNameController.text != supervisor.lastName) {
+      _contactLastNameController.text = supervisor.lastName;
     }
-    if (_contactPhoneController.text !=
-        (widget.internship.supervisor.phone?.toString() ?? '')) {
-      _contactPhoneController.text =
-          widget.internship.supervisor.phone?.toString() ?? '';
+    if (_contactPhoneController.text != (supervisor.phone?.toString() ?? '')) {
+      _contactPhoneController.text = supervisor.phone?.toString() ?? '';
     }
-    if (_contactEmailController.text != widget.internship.supervisor.email) {
-      _contactEmailController.text = widget.internship.supervisor.email ?? '';
+    if (_contactEmailController.text != supervisor.email) {
+      _contactEmailController.text = supervisor.email ?? '';
     }
 
-    if (_weeklySchedulesController.dateRange != widget.internship.dates) {
-      _weeklySchedulesController.dateRange = widget.internship.dates;
+    final dates =
+        widget.internship.hasVersions ? widget.internship.dates : null;
+    if (_weeklySchedulesController.dateRange != dates) {
+      _weeklySchedulesController.dateRange = dates;
     }
+    final weeklySchedules =
+        widget.internship.hasVersions
+            ? widget.internship.weeklySchedules
+            : <WeeklySchedule>[];
     if (!InternshipHelpers.areSchedulesEqual(
       _weeklySchedulesController.weeklySchedules,
-      widget.internship.weeklySchedules,
+      weeklySchedules,
     )) {
-      _weeklySchedulesController
-          .weeklySchedules = InternshipHelpers.copySchedules(
-        widget.internship.weeklySchedules,
-        keepId: true,
-      );
+      _weeklySchedulesController.weeklySchedules =
+          InternshipHelpers.copySchedules(weeklySchedules, keepId: true);
     }
 
     if (_expectedDurationController.text !=
@@ -394,14 +396,19 @@ class InternshipListTileState extends State<InternshipListTile> {
       _expectedDurationController.text =
           widget.internship.expectedDuration.toString();
     }
-    if (_transportations.toSet() != widget.internship.transportations.toSet()) {
+    final transportations =
+        widget.internship.hasVersions
+            ? widget.internship.transportations
+            : <Transportation>[];
+    if (_transportations.toSet() != transportations.toSet()) {
       _transportations
         ..clear()
-        ..addAll(widget.internship.transportations);
+        ..addAll(transportations);
     }
-    if (_visitFrequenciesController.text !=
-        widget.internship.visitFrequencies) {
-      _visitFrequenciesController.text = widget.internship.visitFrequencies;
+    final visitFrequencies =
+        widget.internship.hasVersions ? widget.internship.visitFrequencies : '';
+    if (_visitFrequenciesController.text != visitFrequencies) {
+      _visitFrequenciesController.text = visitFrequencies;
     }
 
     if (_endDate != widget.internship.endDate) {
