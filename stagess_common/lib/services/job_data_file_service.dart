@@ -43,7 +43,7 @@ abstract class ActivitySectorsService {
 
 class ActivitySector extends NamedItemSerializable {
   ActivitySector.fromSerialized(super.map)
-      : specializations = SpecializationList.fromSerialized(map['s']),
+      : specializations = SpecializationList.fromSerialized(map?['s']),
         super.fromSerialized();
 
   @override
@@ -90,8 +90,8 @@ class Specialization extends NamedItemSerializable {
   }
 
   Specialization.fromSerialized(super.map)
-      : skills = SkillList.fromSerialized(map['s']),
-        questions = List.from(map['q']),
+      : skills = SkillList.fromSerialized(map?['s']),
+        questions = List.from(map?['q']),
         super.fromSerialized();
 
   @override
@@ -147,11 +147,11 @@ class SpecializationList extends _NamedItemSerializableList<Specialization> {
 
 class Skill extends NamedItemSerializable {
   Skill.fromSerialized(super.map)
-      : complexity = map['x'],
-        criteria = List.from(map['c'], growable: false),
-        tasks = (map['t'] as List).map((e) => Task.fromSerialized(e)).toList(),
-        risks = List.from(map['r'], growable: false),
-        isOptional = map['o'],
+      : complexity = map?['x'],
+        criteria = List.from(map?['c'], growable: false),
+        tasks = (map?['t'] as List).map((e) => Task.fromSerialized(e)).toList(),
+        risks = List.from(map?['r'], growable: false),
+        isOptional = map?['o'],
         super.fromSerialized();
 
   @override
@@ -173,8 +173,8 @@ class Skill extends NamedItemSerializable {
 
 class Task extends ItemSerializable {
   Task.fromSerialized(super.map)
-      : title = map['t'],
-        isOptional = map['o'],
+      : title = map?['t'],
+        isOptional = map?['o'],
         super.fromSerialized();
 
   @override
@@ -229,7 +229,7 @@ abstract class NamedItemSerializable extends ItemSerializable {
   final String name;
 
   NamedItemSerializable.fromSerialized(super.map)
-      : name = map['n'],
+      : name = map?['n'],
         super.fromSerialized();
 
   @override

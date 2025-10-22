@@ -182,22 +182,22 @@ class Enterprise extends ExtendedItemSerializable {
 
   @override
   Enterprise.fromSerialized(super.map)
-      : schoolBoardId = StringExt.from(map['school_board_id']) ?? '-1',
-        name = StringExt.from(map['name']) ?? 'Unnamed enterprise',
+      : schoolBoardId = StringExt.from(map?['school_board_id']) ?? '-1',
+        name = StringExt.from(map?['name']) ?? 'Unnamed enterprise',
         status =
-            EnterpriseStatus.from(map['status']) ?? EnterpriseStatus.active,
-        activityTypes = (map['activity_types'] as List? ?? [])
-            .map((e) => ActivityTypes._fromInt(e, map['version']))
+            EnterpriseStatus.from(map?['status']) ?? EnterpriseStatus.active,
+        activityTypes = (map?['activity_types'] as List? ?? [])
+            .map((e) => ActivityTypes._fromInt(e, map?['version']))
             .toSet(),
-        recruiterId = StringExt.from(map['recruiter_id']) ?? '',
-        _jobs = JobList.fromSerialized(map['jobs'] ?? {}),
-        contact = Person.fromSerialized(map['contact'] ?? {}),
-        contactFunction = StringExt.from(map['contact_function']) ?? '',
-        address = Address.from(map['address']),
-        phone = PhoneNumber.from(map['phone']),
-        fax = PhoneNumber.from(map['fax']),
-        website = StringExt.from(map['website']),
-        headquartersAddress = Address.from(map['headquarters_address']),
-        neq = StringExt.from(map['neq']),
+        recruiterId = StringExt.from(map?['recruiter_id']) ?? '',
+        _jobs = JobList.fromSerialized(map?['jobs'] ?? {}),
+        contact = Person.fromSerialized(map?['contact'] ?? {}),
+        contactFunction = StringExt.from(map?['contact_function']) ?? '',
+        address = Address.from(map?['address']),
+        phone = PhoneNumber.from(map?['phone']),
+        fax = PhoneNumber.from(map?['fax']),
+        website = StringExt.from(map?['website']),
+        headquartersAddress = Address.from(map?['headquarters_address']),
+        neq = StringExt.from(map?['neq']),
         super.fromSerialized();
 }

@@ -35,10 +35,10 @@ class Admin extends Person {
   bool get isEmpty => firstName.isEmpty && lastName.isEmpty;
 
   Admin.fromSerialized(super.map)
-      : schoolBoardId = StringExt.from(map['school_board_id']) ?? '-1',
+      : schoolBoardId = StringExt.from(map?['school_board_id']) ?? '-1',
         hasRegisteredAccount =
-            BoolExt.from(map['has_registered_account']) ?? false,
-        accessLevel = AccessLevel.fromSerialized(map['access_level']),
+            BoolExt.from(map?['has_registered_account']) ?? false,
+        accessLevel = AccessLevel.fromSerialized(map?['access_level']),
         super.fromSerialized();
 
   @override

@@ -38,10 +38,10 @@ class JobSstEvaluation extends ItemSerializable {
 
   JobSstEvaluation.fromSerialized(super.map)
       : questions = {
-          for (final entry in (map['questions'] as Map? ?? {}).entries)
+          for (final entry in (map?['questions'] as Map? ?? {}).entries)
             entry.key: (entry.value as List?)?.map((e) => e as String).toList()
         },
-        date = DateTimeExt.from(map['date']) ?? DateTime(0),
+        date = DateTimeExt.from(map?['date']) ?? DateTime(0),
         super.fromSerialized();
 
   @override

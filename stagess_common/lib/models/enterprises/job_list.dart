@@ -13,7 +13,6 @@ class JobList extends ListSerializable<Job> {
 
   @override
   Job deserializeItem(data) {
-    return Job.fromSerialized(
-        (data ?? {}).map((k, v) => MapEntry(k.toString(), v)));
+    return Job.fromSerialized(data);
   }
 }

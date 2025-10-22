@@ -45,11 +45,11 @@ class Uniforms extends ItemSerializable {
       );
 
   Uniforms.fromSerialized(super.map, String version)
-      : status = map['status'] == null
+      : status = map?['status'] == null
             ? UniformStatus.none
-            : UniformStatus._fromInt(map['status'] as int, version),
+            : UniformStatus._fromInt(map?['status'] as int, version),
         uniforms =
-            (map['uniforms'] as List?)?.map((e) => e as String).toList() ?? [],
+            (map?['uniforms'] as List?)?.map((e) => e as String).toList() ?? [],
         super.fromSerialized();
 
   Uniforms copyWith({

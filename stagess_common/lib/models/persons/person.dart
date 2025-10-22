@@ -41,13 +41,13 @@ class Person extends ExtendedItemSerializable {
   }
 
   Person.fromSerialized(super.map)
-      : firstName = StringExt.from(map['first_name']) ?? '',
-        middleName = StringExt.from(map['middle_name']),
-        lastName = StringExt.from(map['last_name']) ?? '',
-        dateBirth = DateTimeExt.from(map['date_birth']),
-        phone = PhoneNumber.from(map['phone']),
-        email = StringExt.from(map['email']),
-        address = Address.from(map['address']),
+      : firstName = StringExt.from(map?['first_name']) ?? '',
+        middleName = StringExt.from(map?['middle_name']),
+        lastName = StringExt.from(map?['last_name']) ?? '',
+        dateBirth = DateTimeExt.from(map?['date_birth']),
+        phone = PhoneNumber.from(map?['phone']),
+        email = StringExt.from(map?['email']),
+        address = Address.from(map?['address']),
         super.fromSerialized();
 
   @override

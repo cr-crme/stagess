@@ -92,16 +92,16 @@ class Student extends Person {
   }) : photo = photo ?? Random().nextInt(0xFFFFFF).toString();
 
   Student.fromSerialized(super.map)
-      : schoolBoardId = StringExt.from(map['school_board_id']) ?? '-1',
-        schoolId = StringExt.from(map['school_id']) ?? '-1',
-        photo = StringExt.from(map['photo']) ??
+      : schoolBoardId = StringExt.from(map?['school_board_id']) ?? '-1',
+        schoolId = StringExt.from(map?['school_id']) ?? '-1',
+        photo = StringExt.from(map?['photo']) ??
             Random().nextInt(0xFFFFFF).toString(),
-        program = map['program'] == null
+        program = map?['program'] == null
             ? Program.undefined
-            : Program._fromInt(map['program'] as int, map['version']),
-        group = StringExt.from(map['group']) ?? '-1',
-        contact = Person.fromSerialized(map['contact'] ?? {}),
-        contactLink = StringExt.from(map['contact_link']) ?? '',
+            : Program._fromInt(map?['program'] as int, map?['version']),
+        group = StringExt.from(map?['group']) ?? '-1',
+        contact = Person.fromSerialized(map?['contact'] ?? {}),
+        contactLink = StringExt.from(map?['contact_link']) ?? '',
         super.fromSerialized();
 
   @override

@@ -38,38 +38,32 @@ class PostInternshipEnterpriseEvaluation extends ItemSerializable {
     required this.acceptanceBehaviorDifficulties,
   });
 
-  static PostInternshipEnterpriseEvaluation? deserialize(map) {
-    return map == null
-        ? null
-        : PostInternshipEnterpriseEvaluation.fromSerialized(map);
-  }
-
   PostInternshipEnterpriseEvaluation.fromSerialized(super.map)
-      : internshipId = map['internship_id'] ?? '',
-        skillsRequired = ListExt.from(map['skills_required'],
+      : internshipId = map?['internship_id'] ?? '',
+        skillsRequired = ListExt.from(map?['skills_required'],
                 deserializer: (e) => StringExt.from(e)!) ??
             [],
-        taskVariety = _doubleFromSerialized(map['task_variety']),
+        taskVariety = _doubleFromSerialized(map?['task_variety']),
         trainingPlanRespect =
-            _doubleFromSerialized(map['training_plan_respect']),
-        autonomyExpected = _doubleFromSerialized(map['autonomy_expected']),
-        efficiencyExpected = _doubleFromSerialized(map['efficiency_expected']),
-        supervisionStyle = _doubleFromSerialized(map['supervision_style']),
+            _doubleFromSerialized(map?['training_plan_respect']),
+        autonomyExpected = _doubleFromSerialized(map?['autonomy_expected']),
+        efficiencyExpected = _doubleFromSerialized(map?['efficiency_expected']),
+        supervisionStyle = _doubleFromSerialized(map?['supervision_style']),
         easeOfCommunication =
-            _doubleFromSerialized(map['ease_of_communication']),
-        absenceAcceptance = _doubleFromSerialized(map['absence_acceptance']),
-        supervisionComments = map['supervision_comments'] ?? '',
-        acceptanceTsa = _doubleFromSerialized(map['acceptance_tsa']),
+            _doubleFromSerialized(map?['ease_of_communication']),
+        absenceAcceptance = _doubleFromSerialized(map?['absence_acceptance']),
+        supervisionComments = map?['supervision_comments'] ?? '',
+        acceptanceTsa = _doubleFromSerialized(map?['acceptance_tsa']),
         acceptanceLanguageDisorder =
-            _doubleFromSerialized(map['acceptance_language_disorder']),
+            _doubleFromSerialized(map?['acceptance_language_disorder']),
         acceptanceIntellectualDisability =
-            _doubleFromSerialized(map['acceptance_intellectual_disability']),
+            _doubleFromSerialized(map?['acceptance_intellectual_disability']),
         acceptancePhysicalDisability =
-            _doubleFromSerialized(map['acceptance_physical_disability']),
+            _doubleFromSerialized(map?['acceptance_physical_disability']),
         acceptanceMentalHealthDisorder =
-            _doubleFromSerialized(map['acceptance_mental_health_disorder']),
+            _doubleFromSerialized(map?['acceptance_mental_health_disorder']),
         acceptanceBehaviorDifficulties =
-            _doubleFromSerialized(map['acceptance_behavior_difficulties']),
+            _doubleFromSerialized(map?['acceptance_behavior_difficulties']),
         super.fromSerialized();
 
   String internshipId;
@@ -164,18 +158,20 @@ class InternshipMutableElements extends ItemSerializable {
   final String visitFrequencies;
 
   InternshipMutableElements.fromSerialized(super.map)
-      : creationDate = DateTimeExt.from(map['creation_date']) ?? DateTime.now(),
-        supervisor = Person.fromSerialized(map['supervisor']),
+      : creationDate =
+            DateTimeExt.from(map?['creation_date']) ?? DateTime.now(),
+        supervisor = Person.fromSerialized(map?['supervisor']),
         dates = DateTimeRange(
-            start: DateTimeExt.from(map['starting_date']) ?? DateTime(0),
-            end: DateTimeExt.from(map['ending_date']) ?? DateTime(0)),
-        weeklySchedules = (map['schedules'] as List)
-            .map((e) => WeeklySchedule.fromSerialized(e))
-            .toList(),
-        transportations = ListExt.from(map['transportations'],
+            start: DateTimeExt.from(map?['starting_date']) ?? DateTime(0),
+            end: DateTimeExt.from(map?['ending_date']) ?? DateTime(0)),
+        weeklySchedules = (map?['schedules'] as List?)
+                ?.map((e) => WeeklySchedule.fromSerialized(e))
+                .toList() ??
+            [],
+        transportations = ListExt.from(map?['transportations'],
                 deserializer: (e) => Transportation.deserialize(e)) ??
             [],
-        visitFrequencies = StringExt.from(map['visit_frequencies']) ?? 'N/A',
+        visitFrequencies = StringExt.from(map?['visit_frequencies']) ?? 'N/A',
         super.fromSerialized();
 
   @override
@@ -389,37 +385,41 @@ class Internship extends ExtendedItemSerializable {
       );
 
   Internship.fromSerialized(super.map)
-      : schoolBoardId = StringExt.from(map['school_board_id']) ?? '-1',
-        studentId = StringExt.from(map['student_id']) ?? '',
-        signatoryTeacherId = StringExt.from(map['signatory_teacher_id']) ?? '',
+      : schoolBoardId = StringExt.from(map?['school_board_id']) ?? '-1',
+        studentId = StringExt.from(map?['student_id']) ?? '',
+        signatoryTeacherId = StringExt.from(map?['signatory_teacher_id']) ?? '',
         extraSupervisingTeacherIds = ListExt.from(
-                map['extra_supervising_teacher_ids'],
+                map?['extra_supervising_teacher_ids'],
                 deserializer: (e) => StringExt.from(e)!) ??
             [],
-        enterpriseId = StringExt.from(map['enterprise_id']) ?? '',
-        jobId = StringExt.from(map['job_id']) ?? '',
-        extraSpecializationIds = ListExt.from(map['extra_specialization_ids'],
+        enterpriseId = StringExt.from(map?['enterprise_id']) ?? '',
+        jobId = StringExt.from(map?['job_id']) ?? '',
+        extraSpecializationIds = ListExt.from(map?['extra_specialization_ids'],
                 deserializer: (e) => StringExt.from(e)!) ??
             [],
-        _mutables = (map['mutables'] as List?)
+        _mutables = (map?['mutables'] as List?)
                 ?.map(((e) => InternshipMutableElements.fromSerialized(e)))
                 .toList() ??
             [],
-        expectedDuration = IntExt.from(map['expected_duration']) ?? -1,
-        achievedDuration = IntExt.from(map['achieved_duration']) ?? -1,
-        teacherNotes = StringExt.from(map['teacher_notes']) ?? '',
-        endDate = DateTimeExt.from(map['end_date']) ?? DateTime(0),
-        skillEvaluations = ListExt.from(map['skill_evaluations'],
-                deserializer: InternshipEvaluationSkill.fromSerialized) ??
+        expectedDuration = IntExt.from(map?['expected_duration']) ?? -1,
+        achievedDuration = IntExt.from(map?['achieved_duration']) ?? -1,
+        teacherNotes = StringExt.from(map?['teacher_notes']) ?? '',
+        endDate = DateTimeExt.from(map?['end_date']) ?? DateTime(0),
+        skillEvaluations = ListExt.from(map?['skill_evaluations'],
+                deserializer: (map) =>
+                    InternshipEvaluationSkill.fromSerialized(map)) ??
             [],
-        attitudeEvaluations = ListExt.from(map['attitude_evaluations'],
-                deserializer: InternshipEvaluationAttitude.fromSerialized) ??
+        attitudeEvaluations = ListExt.from(map?['attitude_evaluations'],
+                deserializer: (map) =>
+                    InternshipEvaluationAttitude.fromSerialized(map)) ??
             [],
-        visaEvaluations = ListExt.from(map['visa_evaluations'],
-                deserializer: InternshipEvaluationVisa.fromSerialized) ??
+        visaEvaluations = ListExt.from(map?['visa_evaluations'],
+                deserializer: (map) =>
+                    InternshipEvaluationVisa.fromSerialized(map)) ??
             [],
-        enterpriseEvaluation = PostInternshipEnterpriseEvaluation.deserialize(
-            map['enterprise_evaluation']),
+        enterpriseEvaluation =
+            PostInternshipEnterpriseEvaluation.fromSerialized(
+                map?['enterprise_evaluation']),
         super.fromSerialized() {
     _finalizeInitialization();
   }
@@ -565,17 +565,21 @@ class Internship extends ExtendedItemSerializable {
       teacherNotes: StringExt.from(data['teacher_notes']) ?? teacherNotes,
       endDate: DateTimeExt.from(data['end_date']) ?? endDate,
       skillEvaluations: ListExt.from(data['skill_evaluations'],
-              deserializer: InternshipEvaluationSkill.fromSerialized) ??
+              deserializer: (map) =>
+                  InternshipEvaluationSkill.fromSerialized(map)) ??
           skillEvaluations,
       attitudeEvaluations: ListExt.from(data['attitude_evaluations'],
-              deserializer: InternshipEvaluationAttitude.fromSerialized) ??
+              deserializer: (map) =>
+                  InternshipEvaluationAttitude.fromSerialized(map)) ??
           attitudeEvaluations,
       visaEvaluations: ListExt.from(data['visa_evaluations'],
-              deserializer: InternshipEvaluationVisa.fromSerialized) ??
+              deserializer: (map) =>
+                  InternshipEvaluationVisa.fromSerialized(map)) ??
           visaEvaluations,
-      enterpriseEvaluation: PostInternshipEnterpriseEvaluation.deserialize(
-              data['enterprise_evaluation']) ??
-          enterpriseEvaluation,
+      enterpriseEvaluation: data['enterprise_evaluation'] == null
+          ? enterpriseEvaluation
+          : PostInternshipEnterpriseEvaluation.fromSerialized(
+              data['enterprise_evaluation']),
     );
   }
 

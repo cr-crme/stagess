@@ -137,34 +137,34 @@ class Job extends ItemSerializable {
 
   Job.fromSerialized(super.map)
       : _specialization = ActivitySectorsService.specializationOrNull(
-            map['specialization_id']),
-        positionsOffered = MapExt.from<int>(map['positions_offered'],
+            map?['specialization_id']),
+        positionsOffered = MapExt.from<int>(map?['positions_offered'],
                 deserializer: (e) => e) ??
             {},
-        minimumAge = IntExt.from(map['minimum_age']) ?? 0,
+        minimumAge = IntExt.from(map?['minimum_age']) ?? 0,
         preInternshipRequests = PreInternshipRequests.fromSerialized(
-            map['pre_internship_requests'] ?? {}, map['version'] ?? '1.0.0'),
+            map?['pre_internship_requests'] ?? {}, map?['version'] ?? '1.0.0'),
         uniforms = Uniforms.fromSerialized(
-            (map['uniforms'] as Map? ?? {}).cast<String, dynamic>()
-              ..addAll({'id': map['id']}),
-            map['version'] ?? '1.0.0'),
+            (map?['uniforms'] as Map? ?? {}).cast<String, dynamic>()
+              ..addAll({'id': map?['id']}),
+            map?['version'] ?? '1.0.0'),
         protections = Protections.fromSerialized(
-            (map['protections'] as Map? ?? {}).cast<String, dynamic>()
-              ..addAll({'id': map['id']})),
-        photos = ListExt.from(map['photos'],
+            (map?['protections'] as Map? ?? {}).cast<String, dynamic>()
+              ..addAll({'id': map?['id']})),
+        photos = ListExt.from(map?['photos'],
                 deserializer: (e) => Photo.fromSerialized(e)) ??
             [],
         sstEvaluation = JobSstEvaluation.fromSerialized(
-            (map['sst_evaluations'] as Map? ?? {}).cast<String, dynamic>()
-              ..addAll({'id': map['id']})),
-        incidents = Incidents.fromSerialized((map['incidents'] as Map? ?? {})
+            (map?['sst_evaluations'] as Map? ?? {}).cast<String, dynamic>()
+              ..addAll({'id': map?['id']})),
+        incidents = Incidents.fromSerialized((map?['incidents'] as Map? ?? {})
             .cast<String, dynamic>()
             .map((key, value) => MapEntry(key, value))
-          ..addAll({'id': map['id']})),
-        comments = ListExt.from(map['comments'],
+          ..addAll({'id': map?['id']})),
+        comments = ListExt.from(map?['comments'],
                 deserializer: (e) => JobComment.fromSerialized(e)) ??
             [],
-        reservedForId = StringExt.from(map['reserved_for_id']) ?? '',
+        reservedForId = StringExt.from(map?['reserved_for_id']) ?? '',
         super.fromSerialized();
 
   @override

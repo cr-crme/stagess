@@ -23,9 +23,9 @@ class School extends ItemSerializable {
       );
 
   School.fromSerialized(super.map)
-      : name = StringExt.from(map['name']) ?? 'Unnamed school',
-        address = Address.fromSerialized(map['address'] ?? {}),
-        phone = PhoneNumber.fromSerialized(map['phone'] ?? {}),
+      : name = StringExt.from(map?['name']) ?? 'Unnamed school',
+        address = Address.fromSerialized(map?['address'] ?? {}),
+        phone = PhoneNumber.fromSerialized(map?['phone'] ?? {}),
         super.fromSerialized();
 
   @override

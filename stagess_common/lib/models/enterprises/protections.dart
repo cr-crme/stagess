@@ -75,12 +75,12 @@ class Protections extends ItemSerializable {
       );
 
   Protections.fromSerialized(super.map)
-      : status = map['status'] == null
+      : status = map?['status'] == null
             ? ProtectionsStatus.none
             : ProtectionsStatus._fromInt(
-                map['status'] as int, map['version'] ?? Job._currentVersion),
+                map?['status'] as int, map?['version'] ?? Job._currentVersion),
         protections =
-            (map['protections'] as List? ?? []).map<String>((e) => e).toList(),
+            (map?['protections'] as List? ?? []).map<String>((e) => e).toList(),
         super.fromSerialized();
 
   Protections copyWith({

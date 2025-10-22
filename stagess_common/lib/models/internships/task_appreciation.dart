@@ -62,10 +62,10 @@ class TaskAppreciation extends ItemSerializable {
   TaskAppreciation({super.id, required this.title, required this.level});
 
   TaskAppreciation.fromSerialized(super.map)
-      : title = map['title'] ?? '',
-        level = map['level'] == null
+      : title = map?['title'] ?? '',
+        level = map?['level'] == null
             ? TaskAppreciationLevel.notEvaluated
-            : TaskAppreciationLevel.values[map['level']],
+            : TaskAppreciationLevel.values[map?['level']],
         super.fromSerialized();
 
   @override

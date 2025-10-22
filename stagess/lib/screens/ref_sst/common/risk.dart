@@ -10,8 +10,8 @@ class Risk extends ItemSerializable {
     this.nameHeader = '',
     subrisks,
     links,
-  })  : subrisks = subrisks ?? [],
-        links = links ?? [];
+  }) : subrisks = subrisks ?? [],
+       links = links ?? [];
 
   Risk copyWith({
     String? id,
@@ -23,13 +23,14 @@ class Risk extends ItemSerializable {
     List<RiskLink>? links,
   }) {
     return Risk(
-        id: id ?? this.id,
-        shortname: shortname ?? this.shortname,
-        abbrv: abbrv ?? this.abbrv,
-        name: name ?? this.name,
-        nameHeader: nameHeader ?? this.nameHeader,
-        subrisks: subrisks ?? this.subrisks,
-        links: links ?? this.links);
+      id: id ?? this.id,
+      shortname: shortname ?? this.shortname,
+      abbrv: abbrv ?? this.abbrv,
+      name: name ?? this.name,
+      nameHeader: nameHeader ?? this.nameHeader,
+      subrisks: subrisks ?? this.subrisks,
+      links: links ?? this.links,
+    );
   }
 
   @override
@@ -38,14 +39,14 @@ class Risk extends ItemSerializable {
   }
 
   Risk.fromSerialized(super.map)
-      : number = int.parse(map['number']),
-        shortname = map['shortname'],
-        abbrv = map['abbrv'],
-        name = map['name'],
-        nameHeader = map['nameHeader'],
-        links = getLinks(map['links'] as List<dynamic>),
-        subrisks = getSubRisks(map['subrisks'] as List<dynamic>),
-        super.fromSerialized();
+    : number = int.parse(map?['number']),
+      shortname = map?['shortname'],
+      abbrv = map?['abbrv'],
+      name = map?['name'],
+      nameHeader = map?['nameHeader'],
+      links = getLinks(map?['links'] as List<dynamic>),
+      subrisks = getSubRisks(map?['subrisks'] as List<dynamic>),
+      super.fromSerialized();
 
   static List<RiskLink> getLinks(List<dynamic> links) {
     List<RiskLink> cardLinks = [];
@@ -54,8 +55,9 @@ class Risk extends ItemSerializable {
       final String linkTitle = link['title'] as String;
       final String linkURL = link['url'] as String;
       //Save link infos into link object, add to link list
-      cardLinks
-          .add(RiskLink(source: linkSource, title: linkTitle, url: linkURL));
+      cardLinks.add(
+        RiskLink(source: linkSource, title: linkTitle, url: linkURL),
+      );
     }
     return cardLinks;
   }
@@ -68,25 +70,34 @@ class Risk extends ItemSerializable {
       final String subriskTitle = subrisk['title'];
       final String subriskIntro = subrisk['intro'];
 
-      Map<String, List<String>> subriskSituations =
-          readParagraph('situations', subrisk);
+      Map<String, List<String>> subriskSituations = readParagraph(
+        'situations',
+        subrisk,
+      );
 
-      Map<String, List<String>> subriskFactors =
-          readParagraph('factors', subrisk);
+      Map<String, List<String>> subriskFactors = readParagraph(
+        'factors',
+        subrisk,
+      );
 
-      Map<String, List<String>> subriskSymptoms =
-          readParagraph('symptoms', subrisk);
+      Map<String, List<String>> subriskSymptoms = readParagraph(
+        'symptoms',
+        subrisk,
+      );
 
       final List<String> images = List.from((subrisk['images']) as List);
 
-      subRisksList.add(SubRisk(
+      subRisksList.add(
+        SubRisk(
           id: subriskID,
           title: subriskTitle,
           intro: subriskIntro,
           situations: subriskSituations,
           factors: subriskFactors,
           symptoms: subriskSymptoms,
-          images: images));
+          images: images,
+        ),
+      );
     }
     return subRisksList;
   }
@@ -100,7 +111,9 @@ class Risk extends ItemSerializable {
   final List<RiskLink> links;
 
   static Map<String, List<String>> readParagraph(
-      String key, Map<String, dynamic> map) {
+    String key,
+    Map<String, dynamic> map,
+  ) {
     Map<String, List<String>> paragraphMap = {};
     final List<dynamic> pargraph = List.from((map[key]) as List<dynamic>);
 

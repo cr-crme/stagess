@@ -46,18 +46,18 @@ class VisaEvaluation extends ItemSerializable {
     required this.generalAppreciation,
   });
   VisaEvaluation.fromSerialized(super.map)
-      : inattendance = Inattendance.fromIndex(map['inattendance'] ?? -1),
-        ponctuality = Ponctuality.fromIndex(map['ponctuality'] ?? -1),
-        sociability = Sociability.fromIndex(map['sociability'] ?? -1),
-        politeness = Politeness.fromIndex(map['politeness'] ?? -1),
-        motivation = Motivation.fromIndex(map['motivation'] ?? -1),
-        dressCode = DressCode.fromIndex(map['dressCode'] ?? -1),
-        qualityOfWork = QualityOfWork.fromIndex(map['quality_of_work'] ?? -1),
-        productivity = Productivity.fromIndex(map['productivity'] ?? -1),
-        autonomy = Autonomy.fromIndex(map['autonomy'] ?? -1),
-        cautiousness = Cautiousness.fromIndex(map['cautiousness'] ?? -1),
+      : inattendance = Inattendance.fromIndex(map?['inattendance'] ?? -1),
+        ponctuality = Ponctuality.fromIndex(map?['ponctuality'] ?? -1),
+        sociability = Sociability.fromIndex(map?['sociability'] ?? -1),
+        politeness = Politeness.fromIndex(map?['politeness'] ?? -1),
+        motivation = Motivation.fromIndex(map?['motivation'] ?? -1),
+        dressCode = DressCode.fromIndex(map?['dressCode'] ?? -1),
+        qualityOfWork = QualityOfWork.fromIndex(map?['quality_of_work'] ?? -1),
+        productivity = Productivity.fromIndex(map?['productivity'] ?? -1),
+        autonomy = Autonomy.fromIndex(map?['autonomy'] ?? -1),
+        cautiousness = Cautiousness.fromIndex(map?['cautiousness'] ?? -1),
         generalAppreciation =
-            GeneralAppreciation.fromIndex(map['general_appreciation'] ?? -1),
+            GeneralAppreciation.fromIndex(map?['general_appreciation'] ?? -1),
         super.fromSerialized();
 
   @override
@@ -109,11 +109,11 @@ class InternshipEvaluationVisa extends ItemSerializable {
     required this.formVersion,
   });
   InternshipEvaluationVisa.fromSerialized(super.map)
-      : date = map['date'] == null
+      : date = map?['date'] == null
             ? DateTime(0)
-            : DateTime.fromMillisecondsSinceEpoch(map['date']),
-        form = VisaEvaluation.fromSerialized(map['form'] ?? {}),
-        formVersion = map['form_version'] ?? currentVersion,
+            : DateTime.fromMillisecondsSinceEpoch(map!['date']),
+        form = VisaEvaluation.fromSerialized(map?['form'] ?? {}),
+        formVersion = map?['form_version'] ?? currentVersion,
         super.fromSerialized();
 
   @override

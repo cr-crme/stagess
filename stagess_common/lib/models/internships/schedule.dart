@@ -53,8 +53,8 @@ class TimeBlock extends ItemSerializable {
   final TimeOfDay end;
 
   TimeBlock.fromSerialized(super.map)
-      : start = TimeOfDay(hour: map['start'][0], minute: map['start'][1]),
-        end = TimeOfDay(hour: map['end'][0], minute: map['end'][1]),
+      : start = TimeOfDay(hour: map?['start'][0], minute: map?['start'][1]),
+        end = TimeOfDay(hour: map?['end'][0], minute: map?['end'][1]),
         super.fromSerialized();
 
   @override
@@ -80,7 +80,7 @@ class DailySchedule extends ItemSerializable {
   final List<TimeBlock> blocks;
 
   DailySchedule.fromSerialized(super.map)
-      : blocks = ListExt.from(map['blocks'] as List?,
+      : blocks = ListExt.from(map?['blocks'] as List?,
                 deserializer: (element) => TimeBlock.fromSerialized(element)) ??
             [],
         super.fromSerialized();
@@ -124,12 +124,12 @@ class WeeklySchedule extends ItemSerializable {
   final DateTimeRange period;
 
   WeeklySchedule.fromSerialized(super.map)
-      : schedule = (map['days'] as Map?)?.map((day, e) => MapEntry(
+      : schedule = (map?['days'] as Map?)?.map((day, e) => MapEntry(
                 Day.values[int.parse(day)], DailySchedule.fromSerialized(e))) ??
             {},
         period = DateTimeRange(
-            start: DateTime.fromMillisecondsSinceEpoch(map['start'] ?? 0),
-            end: DateTime.fromMillisecondsSinceEpoch(map['end'] ?? 0)),
+            start: DateTime.fromMillisecondsSinceEpoch(map?['start'] ?? 0),
+            end: DateTime.fromMillisecondsSinceEpoch(map?['end'] ?? 0)),
         super.fromSerialized();
 
   @override

@@ -13,9 +13,9 @@ class JobComment extends ItemSerializable {
       required this.date});
 
   JobComment.fromSerialized(super.map)
-      : comment = StringExt.from(map['comment']) ?? '',
-        teacherId = StringExt.from(map['teacher_id']) ?? '',
-        date = DateTimeExt.from(map['date']) ?? DateTime(0),
+      : comment = StringExt.from(map?['comment']) ?? '',
+        teacherId = StringExt.from(map?['teacher_id']) ?? '',
+        date = DateTimeExt.from(map?['date']) ?? DateTime(0),
         super.fromSerialized();
 
   JobComment copyWith({

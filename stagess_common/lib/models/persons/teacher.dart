@@ -64,17 +64,17 @@ class Teacher extends Person {
   }
 
   Teacher.fromSerialized(super.map)
-      : schoolBoardId = StringExt.from(map['school_board_id']) ?? '-1',
-        schoolId = StringExt.from(map['school_id']) ?? '-1',
+      : schoolBoardId = StringExt.from(map?['school_board_id']) ?? '-1',
+        schoolId = StringExt.from(map?['school_id']) ?? '-1',
         hasRegisteredAccount =
-            BoolExt.from(map['has_registered_account']) ?? false,
-        groups = ListExt.from(map['groups'],
+            BoolExt.from(map?['has_registered_account']) ?? false,
+        groups = ListExt.from(map?['groups'],
                 deserializer: (e) => StringExt.from(e) ?? '-1') ??
             [],
-        itineraries = ListExt.from(map['itineraries'],
+        itineraries = ListExt.from(map?['itineraries'],
                 deserializer: Itinerary.fromSerialized) ??
             [],
-        _visitingPriorities = MapExt.from(map['visiting_priorities'],
+        _visitingPriorities = MapExt.from(map?['visiting_priorities'],
                 deserializer: (e) =>
                     VisitingPriority.deserialize(e) ??
                     VisitingPriority.notApplicable) ??

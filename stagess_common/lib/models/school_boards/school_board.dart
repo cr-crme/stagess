@@ -24,16 +24,16 @@ class SchoolBoard extends ExtendedItemSerializable {
       SchoolBoard(name: '', logo: Uint8List(0), schools: [], cnesstNumber: '');
 
   SchoolBoard.fromSerialized(super.map)
-      : name = StringExt.from(map['name']) ?? 'Unnamed',
-        logo = map['logo'] is List && (map['logo'] as List).length > 2
-            ? Uint8List.fromList((map['logo'] as List).cast<int>())
+      : name = StringExt.from(map?['name']) ?? 'Unnamed',
+        logo = map?['logo'] is List && (map?['logo'] as List).length > 2
+            ? Uint8List.fromList((map?['logo'] as List).cast<int>())
             : Uint8List(0),
         schools = ListExt.from(
-              map['schools'],
+              map?['schools'],
               deserializer: (e) => School.fromSerialized(e),
             ) ??
             [],
-        cnesstNumber = StringExt.from(map['cnesst_number']) ?? '',
+        cnesstNumber = StringExt.from(map?['cnesst_number']) ?? '',
         super.fromSerialized();
 
   @override

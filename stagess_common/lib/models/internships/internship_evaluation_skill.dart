@@ -56,17 +56,17 @@ class SkillEvaluation extends ItemSerializable {
     required this.comments,
   });
   SkillEvaluation.fromSerialized(super.map)
-      : specializationId = map['job_id'] ?? '',
-        skillName = map['skill'] ?? '',
-        tasks = map['tasks'] == null
+      : specializationId = map?['job_id'] ?? '',
+        skillName = map?['skill'] ?? '',
+        tasks = map?['tasks'] == null
             ? []
-            : (map['tasks'] as List)
+            : (map!['tasks'] as List)
                 .map((e) => TaskAppreciation.fromSerialized(e))
                 .toList(),
-        appreciation = map['appreciation'] == null
+        appreciation = map?['appreciation'] == null
             ? SkillAppreciation.notSelected
-            : SkillAppreciation.values[map['appreciation']],
-        comments = map['comments'] ?? '',
+            : SkillAppreciation.values[map!['appreciation']],
+        comments = map?['comments'] ?? '',
         super.fromSerialized();
 
   @override
@@ -110,20 +110,20 @@ class InternshipEvaluationSkill extends ItemSerializable {
     required this.formVersion,
   });
   InternshipEvaluationSkill.fromSerialized(super.map)
-      : date = map['date'] == null
+      : date = map?['date'] == null
             ? DateTime(0)
-            : DateTime.fromMillisecondsSinceEpoch(map['date']),
+            : DateTime.fromMillisecondsSinceEpoch(map!['date']),
         presentAtEvaluation =
-            (map['present'] as List?)?.map((e) => e as String).toList() ?? [],
-        skillGranularity = map['skill_granularity'] == null
+            (map?['present'] as List?)?.map((e) => e as String).toList() ?? [],
+        skillGranularity = map?['skill_granularity'] == null
             ? SkillEvaluationGranularity.global
-            : SkillEvaluationGranularity.values[map['skill_granularity']],
-        skills = (map['skills'] as List?)
+            : SkillEvaluationGranularity.values[map!['skill_granularity']],
+        skills = (map?['skills'] as List?)
                 ?.map((e) => SkillEvaluation.fromSerialized(e))
                 .toList() ??
             [],
-        comments = map['comments'] ?? '',
-        formVersion = map['form_version'] ?? currentVersion,
+        comments = map?['comments'] ?? '',
+        formVersion = map?['form_version'] ?? currentVersion,
         super.fromSerialized();
 
   @override
