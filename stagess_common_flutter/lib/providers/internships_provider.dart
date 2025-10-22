@@ -25,16 +25,16 @@ class InternshipsProvider extends BackendListProvided<Internship> {
   }
 
   @override
-  FetchingFields get mandatoryFields => FetchingFields.fromMap({
-    'school_board_id': FetchingFields.all,
-    'student_id': FetchingFields.all,
-    'enterprise_id': FetchingFields.all,
-    'job_id': FetchingFields.all,
-    'extra_specialization_ids': FetchingFields.all,
-    'signatory_teacher_id': FetchingFields.all,
-    'extra_supervising_teacher_ids': FetchingFields.all,
-    'mutables': FetchingFields.fromMap({'id': FetchingFields.all}),
-    'end_date': FetchingFields.all,
+  FetchableFields get fetchableFields => FetchableFields({
+    'school_board_id': FetchableFields.mandatory,
+    'student_id': FetchableFields.mandatory,
+    'enterprise_id': FetchableFields.mandatory,
+    'job_id': FetchableFields.mandatory,
+    'extra_specialization_ids': FetchableFields.mandatory,
+    'signatory_teacher_id': FetchableFields.mandatory,
+    'extra_supervising_teacher_ids': FetchableFields.mandatory,
+    'mutables': FetchableFields({'id': FetchableFields.mandatory}),
+    'end_date': FetchableFields.mandatory,
   });
 
   void initializeAuth(AuthProvider auth) {

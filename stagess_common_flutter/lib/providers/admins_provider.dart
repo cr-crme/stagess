@@ -22,14 +22,14 @@ class AdminsProvider extends BackendListProvided<Admin> {
   }
 
   @override
-  FetchingFields get mandatoryFields => FetchingFields.fromMap({
-    'school_board_id': FetchingFields.all,
-    'first_name': FetchingFields.all,
-    'middle_name': FetchingFields.all,
-    'last_name': FetchingFields.all,
-    'email': FetchingFields.all,
-    'access_level': FetchingFields.all,
-    'has_registered_account': FetchingFields.all,
+  FetchableFields get fetchableFields => FetchableFields({
+    'school_board_id': FetchableFields.mandatory,
+    'first_name': FetchableFields.mandatory,
+    'middle_name': FetchableFields.mandatory,
+    'last_name': FetchableFields.mandatory,
+    'email': FetchableFields.mandatory,
+    'access_level': FetchableFields.mandatory,
+    'has_registered_account': FetchableFields.mandatory,
   });
 
   void initializeAuth(AuthProvider auth) {

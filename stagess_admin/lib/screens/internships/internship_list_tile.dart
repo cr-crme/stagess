@@ -433,7 +433,7 @@ class InternshipListTileState extends State<InternshipListTile> {
       await InternshipsProvider.of(
         context,
         listen: false,
-      ).fetchData(id: widget.internship.id, fields: FetchingFields.all);
+      ).fetchData(id: widget.internship.id, fields: FetchableFields.all);
       _fetchFullDataCompleter.complete();
     } else {
       await Future.delayed(ConfigurationService.expandingTileDuration);

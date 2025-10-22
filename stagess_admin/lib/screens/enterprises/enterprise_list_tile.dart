@@ -425,7 +425,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       await EnterprisesProvider.of(
         context,
         listen: false,
-      ).fetchData(id: widget.enterprise.id, fields: FetchingFields.all);
+      ).fetchData(id: widget.enterprise.id, fields: FetchableFields.all);
       _fetchFullDataCompleter.complete();
     } else {
       await Future.delayed(ConfigurationService.expandingTileDuration);

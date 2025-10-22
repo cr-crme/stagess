@@ -223,7 +223,7 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
       await SchoolBoardsProvider.of(
         context,
         listen: false,
-      ).fetchData(id: widget.schoolBoard.id, fields: FetchingFields.all);
+      ).fetchData(id: widget.schoolBoard.id, fields: FetchableFields.all);
       _fetchFullDataCompleter.complete();
     } else {
       await Future.delayed(ConfigurationService.expandingTileDuration);

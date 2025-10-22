@@ -26,15 +26,20 @@ class TeachersProvider extends BackendListProvided<Teacher> {
           : this[_authProvider!.teacherId];
 
   @override
-  FetchingFields get mandatoryFields => FetchingFields.fromMap({
-    'school_board_id': FetchingFields.all,
-    'school_id': FetchingFields.all,
-    'first_name': FetchingFields.all,
-    'middle_name': FetchingFields.all,
-    'last_name': FetchingFields.all,
-    'email': FetchingFields.all,
-    'groups': FetchingFields.all,
-    'has_registered_account': FetchingFields.all,
+  FetchableFields get fetchableFields => FetchableFields({
+    'school_board_id': FetchableFields.mandatory,
+    'school_id': FetchableFields.mandatory,
+    'first_name': FetchableFields.mandatory,
+    'middle_name': FetchableFields.mandatory,
+    'last_name': FetchableFields.mandatory,
+    'date_birth': FetchableFields.optional,
+    'phone': FetchableFields.optional,
+    'email': FetchableFields.mandatory,
+    'address': FetchableFields.optional,
+    'has_registered_account': FetchableFields.mandatory,
+    'groups': FetchableFields.mandatory,
+    'itineraries': FetchableFields.optional,
+    'visiting_priorities': FetchableFields.optional,
   });
 
   AuthProvider? _authProvider;

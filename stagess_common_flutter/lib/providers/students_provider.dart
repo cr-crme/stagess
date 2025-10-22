@@ -23,13 +23,13 @@ class StudentsProvider extends BackendListProvided<Student> {
   }
 
   @override
-  FetchingFields get mandatoryFields => FetchingFields.fromMap({
-    'school_board_id': FetchingFields.all,
-    'school_id': FetchingFields.all,
-    'first_name': FetchingFields.all,
-    'middle_name': FetchingFields.all,
-    'last_name': FetchingFields.all,
-    'group': FetchingFields.all,
+  FetchableFields get fetchableFields => FetchableFields({
+    'school_board_id': FetchableFields.mandatory,
+    'school_id': FetchableFields.mandatory,
+    'first_name': FetchableFields.mandatory,
+    'middle_name': FetchableFields.optional,
+    'last_name': FetchableFields.mandatory,
+    'group': FetchableFields.mandatory,
   });
 
   Future<void> initializeAuth(AuthProvider auth) async {

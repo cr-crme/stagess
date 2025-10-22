@@ -339,7 +339,7 @@ class StudentListTileState extends State<StudentListTile> {
       await StudentsProvider.of(
         context,
         listen: false,
-      ).fetchData(id: widget.student.id, fields: FetchingFields.all);
+      ).fetchData(id: widget.student.id, fields: FetchableFields.all);
       _fetchFullDataCompleter.complete();
     } else {
       await Future.delayed(ConfigurationService.expandingTileDuration);

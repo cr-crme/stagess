@@ -21,14 +21,14 @@ class EnterprisesProvider extends BackendListProvided<Enterprise> {
       asList ? RequestFields.enterprises : RequestFields.enterprise;
 
   @override
-  FetchingFields get mandatoryFields => FetchingFields.fromMap({
-    'school_board_id': FetchingFields.all,
-    'name': FetchingFields.all,
-    'address': FetchingFields.all,
-    'jobs': FetchingFields.fromMap({
-      'id': FetchingFields.all,
-      'specialization_id': FetchingFields.all,
-      'positions_offered': FetchingFields.all,
+  FetchableFields get fetchableFields => FetchableFields({
+    'school_board_id': FetchableFields.mandatory,
+    'name': FetchableFields.mandatory,
+    'address': FetchableFields.mandatory,
+    'jobs': FetchableFields({
+      'id': FetchableFields.mandatory,
+      'specialization_id': FetchableFields.mandatory,
+      'positions_offered': FetchableFields.mandatory,
     }),
   });
 

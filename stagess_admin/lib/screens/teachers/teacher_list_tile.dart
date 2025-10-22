@@ -269,7 +269,7 @@ class TeacherListTileState extends State<TeacherListTile> {
       await TeachersProvider.of(
         context,
         listen: false,
-      ).fetchData(id: widget.teacher.id, fields: FetchingFields.all);
+      ).fetchData(id: widget.teacher.id, fields: FetchableFields.all);
       _fetchFullDataCompleter.complete();
     } else {
       await Future.delayed(ConfigurationService.expandingTileDuration);
