@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
-import 'package:stagess/common/widgets/dialogs/confirm_exit_dialog.dart';
 import 'package:stagess/common/widgets/scrollable_stepper.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/router.dart';
@@ -23,6 +22,7 @@ import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('InternshipEnrollmentScreen');

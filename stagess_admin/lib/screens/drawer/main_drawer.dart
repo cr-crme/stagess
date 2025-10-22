@@ -64,7 +64,11 @@ class MainDrawer extends StatelessWidget {
                 _DrawerItem(
                   titleText: 'Se déconnecter',
                   icon: Icons.logout,
-                  onTap: () => AuthProviderExtension.disconnectAll(context),
+                  onTap:
+                      () => AuthProviderExtension.disconnectAll(
+                        context,
+                        showConfirmDialog: false,
+                      ),
                   iconOnly: iconOnly,
                   canPop: canPop,
                 ),
@@ -122,8 +126,10 @@ class MainDrawer extends StatelessWidget {
                           titleText: 'Se déconnecter',
                           icon: Icons.logout,
                           onTap:
-                              () =>
-                                  AuthProviderExtension.disconnectAll(context),
+                              () => AuthProviderExtension.disconnectAll(
+                                context,
+                                showConfirmDialog: true,
+                              ),
                           iconOnly: iconOnly,
                           canPop: canPop,
                         ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
-import 'package:stagess/common/widgets/dialogs/confirm_exit_dialog.dart';
 import 'package:stagess/common/widgets/scrollable_stepper.dart';
 import 'package:stagess/screens/internship_forms/enterprise_steps/specialized_students_step.dart';
 import 'package:stagess/screens/internship_forms/enterprise_steps/supervision_step.dart';
@@ -11,6 +10,7 @@ import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('EnterpriseEvaluationScreen');

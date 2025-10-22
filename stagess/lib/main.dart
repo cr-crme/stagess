@@ -121,7 +121,10 @@ class StagessApp extends StatelessWidget {
           if (!AuthProvider.of(context, listen: false).isFullySignedIn) {
             return true;
           }
-          await AuthProviderExtension.disconnectAll(context);
+          await AuthProviderExtension.disconnectAll(
+            context,
+            showConfirmDialog: false,
+          );
           return true;
         },
         child: MaterialApp.router(

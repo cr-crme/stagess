@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
-import 'package:stagess/common/widgets/dialogs/confirm_exit_dialog.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
 import 'package:stagess/screens/enterprise/pages/about_page.dart';
 import 'package:stagess/screens/enterprise/pages/internships_page.dart';
@@ -12,6 +11,7 @@ import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
+import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('EnterpriseScreen');

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
-import 'package:stagess/common/widgets/dialogs/confirm_exit_dialog.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
@@ -11,6 +10,7 @@ import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';

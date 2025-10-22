@@ -8,9 +8,21 @@ import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 
 extension AuthProviderExtension on AuthProvider {
-  static Future<void> disconnectAll(BuildContext context) async {
+  static Future<void> disconnectAll(
+    BuildContext context, {
+    required bool showConfirmDialog,
+  }) async {
+    if (showConfirmDialog) {
+      final answer = await ConfirmExitDialog.show(
+        context,
+        content: const Text('Êtes-vous sûr de vouloir vous déconnecter?'),
+      );
+      if (!answer || !context.mounted) return;
+    }
+
     await AuthProvider.of(context).signOut();
     if (!context.mounted) return;
 
