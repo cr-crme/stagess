@@ -11,19 +11,78 @@ import 'package:stagess_common/models/generic/extended_item_serializable.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:web_socket_client/web_socket_client.dart';
 
+class FetchingFields {
+  Map<String, FetchingFields?>? _fields;
+
+  FetchingFields.fromMap(Map<String, FetchingFields> fields) : _fields = fields;
+  FetchingFields._(Map<String, FetchingFields>? fields) : _fields = fields;
+
+  static FetchingFields get empty => FetchingFields._({});
+  static FetchingFields get all => FetchingFields._(null);
+
+  Map<String, dynamic>? get serialized {
+    if (_fields == null) {
+      return null;
+    }
+
+    final Map<String, dynamic> out = {};
+    for (final entry in _fields!.entries) {
+      out[entry.key] = entry.value?.serialized;
+    }
+    return out;
+  }
+
+  bool contains(String field) {
+    if (_fields == null) {
+      return true;
+    }
+
+    for (final key in _fields!.keys) {
+      final subField = _fields![key];
+      if (subField == null) return true;
+      return subField.contains(field);
+    }
+
+    return false;
+  }
+
+  void addAll(FetchingFields other) {
+    if (_fields == null) return;
+
+    if (other._fields == null) {
+      // If the other fields contains all fields, we also contain all fields now
+      _fields = null;
+      return;
+    }
+
+    for (final entry in other._fields!.entries) {
+      if (_fields!.containsKey(entry.key)) {
+        final subField = _fields![entry.key];
+        if (subField != null && entry.value != null) {
+          subField.addAll(entry.value!);
+        } else {
+          _fields![entry.key] = null;
+        }
+      } else {
+        _fields![entry.key] = entry.value;
+      }
+    }
+  }
+}
+
 class _Selector {
   final Function(Map<String, dynamic> items, {bool notify}) addOrReplaceItems;
   final Function(dynamic items, {bool notify}) removeItem;
   final Function() stopFetchingData;
   final Function() notify;
-  final Map<String, dynamic>? mandatoryFields;
+  final FetchingFields registeredFields;
 
   const _Selector({
     required this.addOrReplaceItems,
     required this.removeItem,
     required this.stopFetchingData,
     required this.notify,
-    required this.mandatoryFields,
+    required this.registeredFields,
   });
 }
 
@@ -147,14 +206,14 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       removeItem: _removeFromSelf,
       stopFetchingData: stopFetchingData,
       notify: notifyListeners,
-      mandatoryFields: mandatoryFields,
+      registeredFields: registeredFields,
     );
     _providerSelector[getField(true)] = _Selector(
       addOrReplaceItems: _addOrReplaceIntoSelf,
       removeItem: _removeFromSelf,
       stopFetchingData: stopFetchingData,
       notify: notifyListeners,
-      mandatoryFields: mandatoryFields,
+      registeredFields: registeredFields,
     );
 
     // Send a get request to the server for the list of items
@@ -163,31 +222,25 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       if (_socket == null) return;
     }
 
-    await _getFromBackend(getField(true), fields: mandatoryFields);
-  }
-
-  bool hasFullData(String id) {
-    final field = getField(false);
-    return _hasFullData[field]?[id] == true;
+    _registeredFields.addAll(mandatoryFields);
+    await _getFromBackend(getField(true), fields: registeredFields);
   }
 
   ///
   /// Fetches the full data for the item with the given [id].
   /// Return if new data were fetched.
-  Future<void> fetchFullData({
+  Future<void> fetchData({
     required String id,
-    bool forceRefetch = false,
+    required FetchingFields fields,
+    bool forceRefetchAll = false,
   }) async {
-    if (hasFullData(id) && !forceRefetch) return;
+    if (!_registeredFields.contains(id) && !forceRefetchAll) return;
 
     final field = getField(false);
     await _getFromBackend(field, id: id);
     await Future.delayed(Duration(seconds: 1));
 
-    if (_hasFullData[field] == null) {
-      _hasFullData[field] = {};
-    }
-    _hasFullData[field]![id] = true;
+    _registeredFields.addAll(fields);
     return;
   }
 
@@ -218,7 +271,12 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
   /// The fields to initially fetch as the app won't work properly if they are missing.
   /// To get the subfields of a Map, use a Map inside the main Map.
   /// Null always gets all the subfields. So if you want all the fields, just return null.
-  Map<String, dynamic>? get mandatoryFields;
+  FetchingFields get mandatoryFields;
+
+  ///
+  /// Fields that the user has actively fetched alongside the mandatory fields.
+  final _registeredFields = FetchingFields.empty;
+  FetchingFields get registeredFields => _registeredFields;
 
   final bool mockMe;
 
@@ -460,8 +518,6 @@ int? _socketId;
 bool _handshakeReceived = false;
 Map<RequestFields, _Selector> _providerSelector = {};
 final _completers = <String, Completer<CommunicationProtocol>>{};
-final Map<RequestFields, Map<String, bool>> _hasFullData = {};
-
 _Selector _getSelector(RequestFields field) {
   final selector = _providerSelector[field];
   if (selector == null) {
@@ -480,14 +536,14 @@ _Selector _getSelector(RequestFields field) {
 Future<void> _getFromBackend(
   RequestFields requestField, {
   String? id,
-  Map<String, dynamic>? fields,
+  FetchingFields? fields,
 }) async {
   try {
     final protocol = await _sendMessageWithResponse(
       message: CommunicationProtocol(
         requestType: RequestType.get,
         field: requestField, // Id is not null for item of the list
-        data: {'id': id, 'fields': fields},
+        data: {'id': id, 'fields': fields?.serialized},
       ),
     );
 
@@ -583,22 +639,20 @@ Future<void> _incommingMessage(
           final subFields = (protocol.data!['updated_fields'] as List?)
               ?.cast<String>()
               .asMap()
-              .map((key, value) => MapEntry(value, null));
+              .map((key, value) => MapEntry(value, FetchingFields.all));
           if (subFields == null) return;
 
-          if (!(_hasFullData[mainField]?[protocol.data!['id']] ?? false)) {
-            // If the user never fetched the full data for this item, only requests
-            // the mandatory fields
-            final mandatoryFields = _getSelector(mainField).mandatoryFields;
-            subFields.removeWhere(
-              (key, value) => !(mandatoryFields?.keys.contains(key) ?? true),
-            );
-            if (subFields.isEmpty) return;
-          }
+          // Only update the registered fields
+          final registeredFields = _getSelector(mainField).registeredFields;
+          subFields.removeWhere(
+            (key, value) => !(registeredFields.contains(key)),
+          );
+          if (subFields.isEmpty) return;
+
           _getFromBackend(
             mainField,
             id: protocol.data!['id'],
-            fields: subFields,
+            fields: FetchingFields.fromMap(subFields),
           );
           return;
         }

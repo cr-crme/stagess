@@ -25,17 +25,17 @@ class InternshipsProvider extends BackendListProvided<Internship> {
   }
 
   @override
-  Map<String, dynamic>? get mandatoryFields => {
-    'school_board_id': null,
-    'student_id': null,
-    'enterprise_id': null,
-    'job_id': null,
-    'extra_specialization_ids': null,
-    'signatory_teacher_id': null,
-    'extra_supervising_teacher_ids': null,
-    'mutables': {'id': null},
-    'end_date': null,
-  };
+  FetchingFields get mandatoryFields => FetchingFields.fromMap({
+    'school_board_id': FetchingFields.all,
+    'student_id': FetchingFields.all,
+    'enterprise_id': FetchingFields.all,
+    'job_id': FetchingFields.all,
+    'extra_specialization_ids': FetchingFields.all,
+    'signatory_teacher_id': FetchingFields.all,
+    'extra_supervising_teacher_ids': FetchingFields.all,
+    'mutables': FetchingFields.fromMap({'id': FetchingFields.all}),
+    'end_date': FetchingFields.all,
+  });
 
   void initializeAuth(AuthProvider auth) {
     initializeFetchingData(authProvider: auth);

@@ -8,6 +8,7 @@ import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
+import 'package:stagess_common_flutter/providers/backend_list_provided.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
@@ -202,7 +203,7 @@ class AdminListTileState extends State<AdminListTile> {
       await AdminsProvider.of(
         context,
         listen: false,
-      ).fetchFullData(id: widget.admin.id);
+      ).fetchData(id: widget.admin.id, fields: FetchingFields.all);
       _fetchFullDataCompleter.complete();
     } else {
       await Future.delayed(ConfigurationService.expandingTileDuration);

@@ -17,6 +17,7 @@ import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
+import 'package:stagess_common_flutter/providers/backend_list_provided.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
@@ -432,7 +433,7 @@ class InternshipListTileState extends State<InternshipListTile> {
       await InternshipsProvider.of(
         context,
         listen: false,
-      ).fetchFullData(id: widget.internship.id);
+      ).fetchData(id: widget.internship.id, fields: FetchingFields.all);
       _fetchFullDataCompleter.complete();
     } else {
       await Future.delayed(ConfigurationService.expandingTileDuration);

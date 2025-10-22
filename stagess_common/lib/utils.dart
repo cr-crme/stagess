@@ -117,6 +117,7 @@ extension ItemSerializableExtension on ItemSerializable {
       serialize().filter(fields);
 }
 
+// TODO Change fields to FetchingFields?
 extension _MapExtensions on Map<String, dynamic> {
   Map<String, dynamic> filter(Map<String, dynamic>? fields) {
     if (fields != null) {
@@ -126,13 +127,23 @@ extension _MapExtensions on Map<String, dynamic> {
           key != 'id' && key != 'version' && !fieldsToKeep.contains(key));
 
       for (var key in fieldsToKeep) {
-        final subelements = this[key];
-        if (subelements is! Map<String, dynamic>) continue;
-
         final subfields = fields[key];
         if (subfields is! Map<String, dynamic>) continue;
-        this[key] = subelements.map((key, value) => MapEntry(key,
-            value is Map<String, dynamic> ? value.filter(subfields) : value));
+
+        final subelements = this[key];
+        if (subelements is Map<String, dynamic>) {
+          this[key] = subelements.map((key, value) => MapEntry(key,
+              value is Map<String, dynamic> ? value.filter(subfields) : value));
+        } else if (subelements is List) {
+          this[key] = subelements.map((element) {
+            if (element is Map<String, dynamic>) {
+              return element.filter(subfields);
+            }
+            return element;
+          }).toList();
+        } else {
+          // Do nothing
+        }
       }
     }
     return this;

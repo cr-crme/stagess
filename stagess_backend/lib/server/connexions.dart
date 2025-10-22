@@ -409,6 +409,7 @@ class Connexions {
     // actual new data. The client must request it for security reasons
     for (final field in response.updatedData?.keys ?? <RequestFields>[]) {
       for (final updatedId in response.updatedData![field]!.keys) {
+        // TODO See if updateFields can be of type FetchingFields
         final updateFields = response.updatedData![field]![updatedId]!;
         if (updateFields.isEmpty) continue;
 

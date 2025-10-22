@@ -26,16 +26,16 @@ class TeachersProvider extends BackendListProvided<Teacher> {
           : this[_authProvider!.teacherId];
 
   @override
-  Map<String, dynamic>? get mandatoryFields => {
-    'school_board_id': null,
-    'school_id': null,
-    'first_name': null,
-    'middle_name': null,
-    'last_name': null,
-    'email': null,
-    'groups': null,
-    'has_registered_account': null,
-  };
+  FetchingFields get mandatoryFields => FetchingFields.fromMap({
+    'school_board_id': FetchingFields.all,
+    'school_id': FetchingFields.all,
+    'first_name': FetchingFields.all,
+    'middle_name': FetchingFields.all,
+    'last_name': FetchingFields.all,
+    'email': FetchingFields.all,
+    'groups': FetchingFields.all,
+    'has_registered_account': FetchingFields.all,
+  });
 
   AuthProvider? _authProvider;
   void initializeAuth(AuthProvider auth) {

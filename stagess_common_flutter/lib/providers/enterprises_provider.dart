@@ -21,12 +21,16 @@ class EnterprisesProvider extends BackendListProvided<Enterprise> {
       asList ? RequestFields.enterprises : RequestFields.enterprise;
 
   @override
-  Map<String, dynamic>? get mandatoryFields => {
-    'school_board_id': null,
-    'name': null,
-    'address': null,
-    'jobs': {'id': null, 'specialization_id': null, 'positions_offered': null},
-  };
+  FetchingFields get mandatoryFields => FetchingFields.fromMap({
+    'school_board_id': FetchingFields.all,
+    'name': FetchingFields.all,
+    'address': FetchingFields.all,
+    'jobs': FetchingFields.fromMap({
+      'id': FetchingFields.all,
+      'specialization_id': FetchingFields.all,
+      'positions_offered': FetchingFields.all,
+    }),
+  });
 
   void initializeAuth(AuthProvider auth) {
     initializeFetchingData(authProvider: auth);

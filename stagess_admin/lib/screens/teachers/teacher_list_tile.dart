@@ -12,6 +12,7 @@ import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
+import 'package:stagess_common_flutter/providers/backend_list_provided.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/address_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
@@ -268,7 +269,7 @@ class TeacherListTileState extends State<TeacherListTile> {
       await TeachersProvider.of(
         context,
         listen: false,
-      ).fetchFullData(id: widget.teacher.id);
+      ).fetchData(id: widget.teacher.id, fields: FetchingFields.all);
       _fetchFullDataCompleter.complete();
     } else {
       await Future.delayed(ConfigurationService.expandingTileDuration);

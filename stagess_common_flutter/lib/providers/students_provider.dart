@@ -23,14 +23,14 @@ class StudentsProvider extends BackendListProvided<Student> {
   }
 
   @override
-  Map<String, dynamic>? get mandatoryFields => {
-    'school_board_id': null,
-    'school_id': null,
-    'first_name': null,
-    'middle_name': null,
-    'last_name': null,
-    'group': null,
-  };
+  FetchingFields get mandatoryFields => FetchingFields.fromMap({
+    'school_board_id': FetchingFields.all,
+    'school_id': FetchingFields.all,
+    'first_name': FetchingFields.all,
+    'middle_name': FetchingFields.all,
+    'last_name': FetchingFields.all,
+    'group': FetchingFields.all,
+  });
 
   Future<void> initializeAuth(AuthProvider auth) async {
     initializeFetchingData(authProvider: auth);

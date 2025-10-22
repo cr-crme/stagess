@@ -22,15 +22,15 @@ class AdminsProvider extends BackendListProvided<Admin> {
   }
 
   @override
-  Map<String, dynamic>? get mandatoryFields => {
-    'school_board_id': null,
-    'first_name': null,
-    'middle_name': null,
-    'last_name': null,
-    'email': null,
-    'access_level': null,
-    'has_registered_account': null,
-  };
+  FetchingFields get mandatoryFields => FetchingFields.fromMap({
+    'school_board_id': FetchingFields.all,
+    'first_name': FetchingFields.all,
+    'middle_name': FetchingFields.all,
+    'last_name': FetchingFields.all,
+    'email': FetchingFields.all,
+    'access_level': FetchingFields.all,
+    'has_registered_account': FetchingFields.all,
+  });
 
   void initializeAuth(AuthProvider auth) {
     if (!auth.isFullySignedIn ||
