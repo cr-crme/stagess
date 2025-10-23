@@ -6,6 +6,7 @@ import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/person.dart';
@@ -20,7 +21,7 @@ final _logger = Logger('StudentsRepository');
 abstract class StudentsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
-    Map<String, dynamic>? fields,
+    required FetchableFields fields,
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
@@ -43,7 +44,7 @@ abstract class StudentsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getById({
     required String id,
-    Map<String, dynamic>? fields,
+    required FetchableFields fields,
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
@@ -100,7 +101,10 @@ abstract class StudentsRepository extends RepositoryAbstract {
 
     await _putStudent(student: newStudent, previous: previous, user: user);
     return RepositoryResponse(updatedData: {
-      RequestFields.student: {newStudent.id: newStudent.getDifference(previous)}
+      RequestFields.student: {
+        newStudent.id:
+            FetchableFields.fromFieldNames(newStudent.getDifference(previous))
+      }
     });
   }
 
@@ -139,7 +143,7 @@ abstract class StudentsRepository extends RepositoryAbstract {
       throw DatabaseFailureException('Failed to delete student with id $id');
     }
     return RepositoryResponse(deletedData: {
-      RequestFields.student: [removedId]
+      RequestFields.student: {removedId: FetchableFields.all}
     });
   }
 

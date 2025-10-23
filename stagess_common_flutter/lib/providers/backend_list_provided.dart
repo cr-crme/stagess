@@ -8,177 +8,25 @@ import 'package:enhanced_containers_foundation/enhanced_containers_foundation.da
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/extended_item_serializable.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:web_socket_client/web_socket_client.dart';
-
-class FetchableFields {
-  final bool includeAll;
-  final bool isMandatory;
-  final Map<String, FetchableFields> _fields;
-
-  FetchableFields(Map<String, FetchableFields> fields)
-    : _fields = fields,
-      includeAll = false,
-      isMandatory = false;
-
-  FetchableFields._({
-    required this.includeAll,
-    required this.isMandatory,
-    required Map<String, FetchableFields> fields,
-  }) : _fields = fields {
-    if (isMandatory && _fields.isNotEmpty) {
-      throw 'A FetchableFields cannot be both mandatory and have subfields';
-    }
-    if (includeAll && _fields.isNotEmpty) {
-      throw 'A FetchableFields cannot include all fields and have subfields';
-    }
-    if (includeAll && isMandatory) {
-      throw 'A FetchableFields cannot include all fields and be mandatory';
-    }
-  }
-
-  static FetchableFields get mandatory =>
-      FetchableFields._(includeAll: false, isMandatory: true, fields: {});
-  static FetchableFields get optional =>
-      FetchableFields._(includeAll: false, isMandatory: false, fields: {});
-
-  static FetchableFields get none =>
-      FetchableFields._(includeAll: false, isMandatory: false, fields: {});
-  static FetchableFields get all =>
-      FetchableFields._(includeAll: true, isMandatory: false, fields: {});
-
-  FetchableFields filter(FetchableFields other, {bool keepMandatory = false}) {
-    if (includeAll) {
-      throw 'Cannot serialize FetchableFields with includeAll = true';
-    }
-    final out = FetchableFields({});
-
-    for (final fieldName in _fields.keys) {
-      final current = _fields[fieldName]!;
-      final otherCurrent = other._fields[fieldName];
-
-      if (current.isMandatory && keepMandatory) {
-        out._fields[fieldName] = current;
-      } else if (other.includeAll) {
-        out._fields[fieldName] = current;
-      } else if (otherCurrent != null) {
-        if (current._fields.isEmpty) {
-          out._fields[fieldName] = current;
-        } else {
-          out._fields[fieldName] = current.filter(
-            otherCurrent,
-            keepMandatory: keepMandatory,
-          );
-        }
-      } else if (keepMandatory && current._fields.isNotEmpty) {
-        // We must travers all the local subfields to make sure we keep the mandatory ones
-        final filt = current.filter(FetchableFields.none, keepMandatory: true);
-        if (filt._fields.isNotEmpty) out._fields[fieldName] = filt;
-      }
-    }
-    return out;
-  }
-
-  // TODO This should return a list (instead of a map with null values)
-  Map<String, dynamic> get serialized {
-    if (includeAll) {
-      throw 'Cannot serialize FetchableFields with includeAll = true';
-    }
-
-    final Map<String, dynamic> out = {};
-    for (final fieldName in _fields.keys) {
-      if (_fields[fieldName]!._fields.isEmpty) {
-        out[fieldName] = null;
-      } else {
-        out[fieldName] = _fields[fieldName]!.serialized;
-      }
-    }
-    return out;
-  }
-
-  bool get hasData => _fields.isNotEmpty || includeAll || isMandatory;
-
-  static List<dynamic> getNonIntersectingFields(
-    List<dynamic> referenceFields,
-    FetchableFields first,
-    FetchableFields other,
-  ) {
-    final List<dynamic> out = [];
-
-    for (final entry in referenceFields) {
-      if (entry is List) {
-        out.addAll(
-          entry.map(
-            (value) => getNonIntersectingFields(
-              entry,
-              first._fields[value]!,
-              other._fields[value]!,
-            ),
-          ),
-        );
-      } else if (entry is String) {
-        if ((first.containsFieldName(entry) &&
-                !other.containsFieldName(entry)) ||
-            (!first.containsFieldName(entry) &&
-                other.containsFieldName(entry))) {
-          out.add(entry);
-        }
-      }
-    }
-    return out;
-  }
-
-  bool containsFieldName(String fieldName) {
-    if (includeAll) return true;
-    return _fields.containsKey(fieldName);
-  }
-
-  bool contains(FetchableFields field) {
-    if (includeAll) return true;
-
-    for (final key in _fields.keys) {
-      final subField = _fields[key];
-      if (subField == null) return true;
-      return subField.contains(field);
-    }
-
-    return false;
-  }
-
-  void addAll(FetchableFields other) {
-    if (includeAll) return;
-    if (other.includeAll) throw 'Not implemented yet';
-
-    for (final entry in other._fields.entries) {
-      if (_fields.containsKey(entry.key)) {
-        final subField = _fields[entry.key];
-        if (subField != null && entry.value._fields.isNotEmpty) {
-          subField.addAll(entry.value);
-        } else {
-          _fields[entry.key] = FetchableFields.none;
-        }
-      } else {
-        _fields[entry.key] = entry.value;
-      }
-    }
-  }
-}
 
 class _Selector {
   final Function(Map<String, dynamic> items, {bool notify}) addOrReplaceItems;
   final Function(dynamic items, {bool notify}) removeItem;
   final Function() stopFetchingData;
   final Function() notify;
-  final FetchableFields fetchableFields;
-  final FetchableFields registeredFields;
+  final FetchableFields Function() getReferenceFetchableFields;
+  final FetchableFields? Function(String id) getRegisteredFieldsOf;
 
   const _Selector({
     required this.addOrReplaceItems,
     required this.removeItem,
     required this.stopFetchingData,
     required this.notify,
-    required this.fetchableFields,
-    required this.registeredFields,
+    required this.getReferenceFetchableFields,
+    required this.getRegisteredFieldsOf,
   });
 }
 
@@ -262,7 +110,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
             }
           }
 
-          _incommingMessage(protocol, authProvider: authProvider);
+          _incomingMessage(protocol, authProvider: authProvider);
         });
 
         final started = DateTime.now();
@@ -302,16 +150,16 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       removeItem: _removeFromSelf,
       stopFetchingData: stopFetchingData,
       notify: notifyListeners,
-      fetchableFields: fetchableFields,
-      registeredFields: registeredFields,
+      getReferenceFetchableFields: () => _referenceFetchableFields,
+      getRegisteredFieldsOf: getRegisteredFieldsOf,
     );
     _providerSelector[getField(true)] = _Selector(
       addOrReplaceItems: _addOrReplaceIntoSelf,
       removeItem: _removeFromSelf,
       stopFetchingData: stopFetchingData,
       notify: notifyListeners,
-      fetchableFields: fetchableFields,
-      registeredFields: registeredFields,
+      getReferenceFetchableFields: () => _referenceFetchableFields,
+      getRegisteredFieldsOf: getRegisteredFieldsOf,
     );
 
     // Send a get request to the server for the list of items
@@ -320,7 +168,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       if (_socket == null) return;
     }
 
-    await _getFromBackend(getField(true), fields: registeredFields);
+    await _getFromBackend(getField(true), fields: _referenceFetchableFields);
   }
 
   ///
@@ -331,23 +179,28 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     required FetchableFields fields,
     bool forceRefetchAll = false,
   }) async {
+    if (_registeredFields[id] == null) {
+      _registeredFields[id] = referenceFetchableFields.filter(
+        FetchableFields.none,
+        keepMandatory: true,
+      );
+    }
+
     // Get the not yet fetched fields (that is the non-intersecting fields between
     // the registered fields and the requested fields)
-    final uncontainedFields =
+    final unregisteredFields =
         forceRefetchAll
-            ? fields.serialized
-            : FetchableFields.getNonIntersectingFields(
-              fetchableFields.serialized.values.toList(),
-              registeredFields,
+            ? fields
+            : _referenceFetchableFields.getNonIntersectingFieldNames(
+              _registeredFields[id]!,
               fields,
             );
-    //if (uncontainedFields.isEmpty) return;
+    if (unregisteredFields.isEmpty) return;
 
     final field = getField(false);
-    await _getFromBackend(field, id: id);
+    await _getFromBackend(field, id: id, fields: unregisteredFields);
     await Future.delayed(Duration(seconds: 1));
 
-    _registeredFields.addAll(fields);
     return;
   }
 
@@ -379,15 +232,14 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
   /// should be provided as inner Maps. The final values should be booleans.
   /// If true, that field is mandatory and will be fetch as the app connects to
   /// the backend.
-  FetchableFields get fetchableFields;
+  late final FetchableFields _referenceFetchableFields =
+      referenceFetchableFields;
+  FetchableFields get referenceFetchableFields;
 
   ///
   /// Fields that the user has actively fetched alongside the mandatory fields.
-  late final _registeredFields = fetchableFields.filter(
-    FetchableFields({}),
-    keepMandatory: true,
-  );
-  FetchableFields get registeredFields => _registeredFields;
+  final Map<String, FetchableFields> _registeredFields = {};
+  FetchableFields? getRegisteredFieldsOf(String id) => _registeredFields[id];
 
   final bool mockMe;
 
@@ -651,19 +503,17 @@ Future<void> _getFromBackend(
 }) async {
   try {
     final selector = _getSelector(requestField);
-    final toFetch = selector.fetchableFields.filter(
+    final toFetch = selector.getReferenceFetchableFields().filter(
       fields ?? FetchableFields.all,
     );
 
-    final protocol = await _sendMessageWithResponse(
+    await _sendMessageWithResponse(
       message: CommunicationProtocol(
         requestType: RequestType.get,
         field: requestField, // Id is not null for item of the list
         data: {'id': id, 'fields': toFetch.serialized},
       ),
     );
-
-    selector.addOrReplaceItems(protocol.data!, notify: true);
   } catch (e) {
     dev.log('Error while getting data from the backend: $e');
   }
@@ -696,7 +546,7 @@ Future<CommunicationProtocol> _sendMessageWithResponse({
   return answer;
 }
 
-Future<void> _incommingMessage(
+Future<void> _incomingMessage(
   CommunicationProtocol protocol, {
   required AuthProvider authProvider,
 }) async {
@@ -706,17 +556,6 @@ Future<void> _incommingMessage(
     if (protocol.socketId != null &&
         protocol.socketId != _socketId &&
         protocol.requestType != RequestType.handshake) {
-      return;
-    }
-
-    final completer = _completers.remove(protocol.id);
-    if (completer != null && !completer.isCompleted) {
-      completer.complete(protocol);
-    }
-
-    // If no data are provided
-    if (protocol.requestType != RequestType.handshake &&
-        protocol.field == null) {
       return;
     }
 
@@ -740,6 +579,9 @@ Future<void> _incommingMessage(
         }
       case RequestType.response:
         {
+          final mainField = protocol.field!;
+          final selector = _getSelector(mainField);
+          selector.addOrReplaceItems(protocol.data!, notify: true);
           return;
         }
       case RequestType.update:
@@ -751,24 +593,19 @@ Future<void> _incommingMessage(
           }
 
           final mainField = protocol.field!;
-          final subFields = (protocol.data!['updated_fields'] as List?)
-              ?.cast<String>()
-              .asMap()
-              .map((key, value) => MapEntry(value, FetchableFields.all));
-          if (subFields == null) return;
+          final id = protocol.data!['id'];
+          final registeredFieldsOfId = _getSelector(
+            mainField,
+          ).getRegisteredFieldsOf(id);
 
-          // Only update the registered fields
-          final registeredFields = _getSelector(mainField).registeredFields;
-          subFields.removeWhere(
-            (key, value) => !(registeredFields.containsFieldName(key)),
-          );
+          final subFields = FetchableFields.fromSerialized(
+            (protocol.data!['updated_fields']),
+          ).filter(registeredFieldsOfId ?? FetchableFields.none);
           if (subFields.isEmpty) return;
 
-          _getFromBackend(
-            mainField,
-            id: protocol.data!['id'],
-            fields: FetchableFields(subFields),
-          );
+          await _getFromBackend(mainField, id: id, fields: subFields);
+          registeredFieldsOfId!.addAll(subFields);
+
           return;
         }
       case RequestType.delete:
@@ -779,14 +616,16 @@ Future<void> _incommingMessage(
             );
           }
 
-          final requestField = protocol.field!;
-          final selector = _getSelector(requestField);
-
-          final deletedIds =
-              (protocol.data!['deleted_ids'] as List).cast<String>();
-          for (final id in deletedIds) {
-            selector.removeItem(id, notify: false);
+          final mainField = protocol.field!;
+          if (!FetchableFields.fromSerialized(
+            (protocol.data!['deleted_fields']),
+          ).includeAll) {
+            throw 'Deleted subfields are not supported yet';
           }
+
+          final selector = _getSelector(mainField);
+          selector.removeItem(protocol.data!['id'], notify: false);
+
           selector.notify();
           return;
         }
@@ -799,7 +638,17 @@ Future<void> _incommingMessage(
         throw Exception('Unsupported request type: ${protocol.requestType}');
     }
   } catch (e) {
+    final completer = _completers.remove(protocol.id);
+    if (completer != null && !completer.isCompleted) {
+      completer.complete(protocol);
+    }
+
     dev.log(e.toString(), error: e, stackTrace: StackTrace.current);
     return;
+  } finally {
+    final completer = _completers.remove(protocol.id);
+    if (completer != null && !completer.isCompleted) {
+      completer.complete(protocol);
+    }
   }
 }

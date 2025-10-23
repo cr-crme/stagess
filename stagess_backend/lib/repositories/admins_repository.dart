@@ -4,6 +4,7 @@ import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common/utils.dart';
@@ -14,7 +15,7 @@ import 'package:stagess_common/utils.dart';
 abstract class AdminsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
-    Map<String, dynamic>? fields,
+    required FetchableFields fields,
     required DatabaseUser user,
   }) async {
     if (user.accessLevel < AccessLevel.superAdmin) {
@@ -31,7 +32,7 @@ abstract class AdminsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getById({
     required String id,
-    Map<String, dynamic>? fields,
+    required FetchableFields fields,
     required DatabaseUser user,
   }) async {
     if (user.accessLevel < AccessLevel.superAdmin) {
@@ -77,7 +78,10 @@ abstract class AdminsRepository extends RepositoryAbstract {
 
     await _putAdmin(admin: newAdmin, previous: previous);
     return RepositoryResponse(updatedData: {
-      RequestFields.admin: {newAdmin.id: newAdmin.getDifference(previous)}
+      RequestFields.admin: {
+        newAdmin.id:
+            FetchableFields.fromFieldNames(newAdmin.getDifference(previous))
+      }
     });
   }
 
@@ -118,7 +122,7 @@ abstract class AdminsRepository extends RepositoryAbstract {
           'Failed to delete administrator with id $id');
     }
     return RepositoryResponse(deletedData: {
-      RequestFields.admin: [removedId]
+      RequestFields.admin: {removedId: FetchableFields.all}
     });
   }
 

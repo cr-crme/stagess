@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess_common/communication_protocol.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/school_boards/school.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/utils.dart';
@@ -45,10 +46,10 @@ class SchoolBoardsProvider extends BackendListProvided<SchoolBoard> {
   }
 
   @override
-  FetchableFields get fetchableFields => FetchableFields({
+  FetchableFields get referenceFetchableFields => FetchableFields.reference({
     'name': FetchableFields.mandatory,
     'logo': FetchableFields.optional,
-    'schools': FetchableFields({
+    'schools': FetchableFields.reference({
       'id': FetchableFields.mandatory,
       'name': FetchableFields.mandatory,
       'address': FetchableFields.optional,

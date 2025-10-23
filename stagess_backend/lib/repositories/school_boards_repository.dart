@@ -7,6 +7,7 @@ import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/school_boards/school.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
@@ -16,7 +17,7 @@ import 'package:stagess_common/utils.dart';
 abstract class SchoolBoardsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
-    Map<String, dynamic>? fields,
+    required FetchableFields fields,
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
@@ -33,7 +34,7 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getById({
     required String id,
-    Map<String, dynamic>? fields,
+    required FetchableFields fields,
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
@@ -83,7 +84,8 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
         schoolBoard: newSchoolBoard, previous: previous, user: user);
     return RepositoryResponse(updatedData: {
       RequestFields.schoolBoard: {
-        newSchoolBoard.id: newSchoolBoard.getDifference(previous)
+        newSchoolBoard.id: FetchableFields.fromFieldNames(
+            newSchoolBoard.getDifference(previous))
       }
     });
   }
@@ -117,7 +119,7 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
           'Failed to delete school board with id: $id');
     }
     return RepositoryResponse(deletedData: {
-      RequestFields.schoolBoard: [removedId]
+      RequestFields.schoolBoard: {removedId: FetchableFields.all}
     });
   }
 

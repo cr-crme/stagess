@@ -409,28 +409,29 @@ class Connexions {
     // actual new data. The client must request it for security reasons
     for (final field in response.updatedData?.keys ?? <RequestFields>[]) {
       for (final updatedId in response.updatedData![field]!.keys) {
-        // TODO See if updateFields can be of type FetchingFields
-        final updateFields = response.updatedData![field]![updatedId]!;
-        if (updateFields.isEmpty) continue;
+        final updateFields = response.updatedData![field]![updatedId];
+        if (updateFields?.isEmpty ?? true) continue;
 
         await _sendAll(CommunicationProtocol(
           requestType: RequestType.update,
           field: field,
-          data: {'id': updatedId, 'updated_fields': updateFields},
+          data: {'id': updatedId, 'updated_fields': updateFields!.serialized},
         ));
       }
     }
 
     // Notify all clients for the fields that were deleted
     for (final field in response.deletedData?.keys ?? <RequestFields>[]) {
-      final deletedIds = response.deletedData![field]!;
-      if (deletedIds.isEmpty) continue;
+      for (final deletedId in response.deletedData![field]!.keys) {
+        final deletedFields = response.deletedData![field]![deletedId];
+        if (deletedFields?.isEmpty ?? true) continue;
 
-      await _sendAll(CommunicationProtocol(
-        requestType: RequestType.delete,
-        field: field,
-        data: {'deleted_ids': deletedIds},
-      ));
+        await _sendAll(CommunicationProtocol(
+          requestType: RequestType.delete,
+          field: field,
+          data: {'id': deletedId, 'deleted_fields': deletedFields!.serialized},
+        ));
+      }
     }
   }
 

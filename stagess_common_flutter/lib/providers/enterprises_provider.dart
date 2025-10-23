@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/backend_list_provided.dart';
 
@@ -21,11 +22,11 @@ class EnterprisesProvider extends BackendListProvided<Enterprise> {
       asList ? RequestFields.enterprises : RequestFields.enterprise;
 
   @override
-  FetchableFields get fetchableFields => FetchableFields({
+  FetchableFields get referenceFetchableFields => FetchableFields.reference({
     'school_board_id': FetchableFields.mandatory,
     'name': FetchableFields.mandatory,
     'address': FetchableFields.mandatory,
-    'jobs': FetchableFields({
+    'jobs': FetchableFields.reference({
       'id': FetchableFields.mandatory,
       'specialization_id': FetchableFields.mandatory,
       'positions_offered': FetchableFields.mandatory,

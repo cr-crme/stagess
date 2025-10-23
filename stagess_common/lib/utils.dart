@@ -1,4 +1,5 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 
 bool areListsEqual<T>(List<T> list1, List<T> list2) {
   if (list1.length != list2.length) return false;
@@ -113,37 +114,37 @@ extension ItemSerializableExtension on ItemSerializable {
     return diff;
   }
 
-  Map<String, dynamic> serializeWithFields(Map<String, dynamic>? fields) =>
+  Map<String, dynamic> serializeWithFields(FetchableFields fields) =>
       serialize().filter(fields);
 }
 
-// TODO Change fields to FetchingFields?
 extension _MapExtensions on Map<String, dynamic> {
-  Map<String, dynamic> filter(Map<String, dynamic>? fields) {
-    if (fields != null) {
-      final fieldsToKeep = fields.keys.toSet();
+  Map<String, dynamic> filter(FetchableFields fields) {
+    if (fields.includeAll) return this;
 
-      removeWhere((key, value) =>
-          key != 'id' && key != 'version' && !fieldsToKeep.contains(key));
+    final fieldsToKeep = fields.fieldNames;
+    removeWhere((key, value) =>
+        key != 'id' &&
+        key != 'version' &&
+        !(fieldsToKeep.contains(key) || (fields[key]?.includeAll == false)));
 
-      for (var key in fieldsToKeep) {
-        final subfields = fields[key];
-        if (subfields is! Map<String, dynamic>) continue;
+    for (var key in fieldsToKeep) {
+      final subfields = fields[key];
+      if (subfields?.isEmpty ?? true) continue;
 
-        final subelements = this[key];
-        if (subelements is Map<String, dynamic>) {
-          this[key] = subelements.map((key, value) => MapEntry(key,
-              value is Map<String, dynamic> ? value.filter(subfields) : value));
-        } else if (subelements is List) {
-          this[key] = subelements.map((element) {
-            if (element is Map<String, dynamic>) {
-              return element.filter(subfields);
-            }
-            return element;
-          }).toList();
-        } else {
-          // Do nothing
-        }
+      final subElements = this[key];
+      if (subElements is Map<String, dynamic>) {
+        this[key] = subElements.map((key, value) => MapEntry(key,
+            value is Map<String, dynamic> ? value.filter(subfields!) : value));
+      } else if (subElements is List) {
+        this[key] = subElements.map((element) {
+          if (element is Map<String, dynamic>) {
+            return element.filter(subfields!);
+          }
+          return element;
+        }).toList();
+      } else {
+        // Do nothing
       }
     }
     return this;

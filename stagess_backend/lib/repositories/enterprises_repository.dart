@@ -13,6 +13,7 @@ import 'package:stagess_common/models/enterprises/job_comment.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/photo.dart';
 import 'package:stagess_common/models/internships/internship.dart';
@@ -28,7 +29,7 @@ final _logger = Logger('EnterprisesRepository');
 abstract class EnterprisesRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
-    Map<String, dynamic>? fields,
+    required FetchableFields fields,
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
@@ -51,7 +52,7 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getById({
     required String id,
-    Map<String, dynamic>? fields,
+    required FetchableFields fields,
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
@@ -126,7 +127,8 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     return RepositoryResponse(
       updatedData: {
         RequestFields.enterprise: {
-          newEnterprise.id: newEnterprise.getDifference(previous)
+          newEnterprise.id: FetchableFields.fromFieldNames(
+              newEnterprise.getDifference(previous))
         },
       },
       deletedData: deletedData.deletedData,
@@ -169,8 +171,12 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
 
     // Prevent from deleting an enterprise that has at least one internship
     if (user.accessLevel < AccessLevel.superAdmin) {
-      final internships =
-          (await internshipsRepository?.getAll(user: user))?.data ?? {};
+      final internships = (await internshipsRepository?.getAll(
+                  user: user,
+                  fields: FetchableFields(
+                      {'enterprise_id': FetchableFields.mandatory})))
+              ?.data ??
+          {};
       if (internships.values
           .any((internship) => internship['enterprise_id'] == id)) {
         throw InvalidRequestException(
@@ -756,8 +762,11 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
             tableName: 'enterprise_jobs', filters: {'id': job.id});
 
         out.deletedData ??= {};
-        out.deletedData![RequestFields.internship] ??= [];
-        out.deletedData![RequestFields.internship]!.add(job.id);
+        out.deletedData![RequestFields.internship] ??= {
+          enterprise.id: FetchableFields.none
+        };
+        out.deletedData![RequestFields.internship]![enterprise.id]!
+            .addAll(FetchableFields.fromFieldNames([job.id]));
       }
     }
 
@@ -855,7 +864,13 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
         // Make sure the user has the permission to update the comments
         // i.e. it is an admin or the teacher has supervised at least one internship in this enterprise
         if (user.accessLevel < AccessLevel.admin) {
-          final internships = (await internshipsRepository.getAll(user: user));
+          final internships = (await internshipsRepository.getAll(
+              user: user,
+              fields: FetchableFields({
+                'enterprise_id': FetchableFields.mandatory,
+                'signatory_teacher_id': FetchableFields.mandatory,
+                'extra_supervising_teacher_ids': FetchableFields.mandatory,
+              })));
           final teacherHasSupervizedInThisEnterprise = internships.data?.values
                   .where((internship) =>
                       internship['enterprise_id'] == enterprise.id &&
@@ -1154,8 +1169,11 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
               user: user, internshipsRepository: internshipsRepository);
 
           out.deletedData ??= {};
-          out.deletedData![RequestFields.internship] ??= [];
-          out.deletedData![RequestFields.internship]!.add(job.id);
+          out.deletedData![RequestFields.internship] ??= {
+            enterprise.id: FetchableFields.none
+          };
+          out.deletedData![RequestFields.internship]![enterprise.id]!
+              .addAll(FetchableFields.fromFieldNames([job.id]));
         }
       }
 
@@ -1205,7 +1223,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       }
 
       out.deletedData ??= {};
-      out.deletedData![RequestFields.enterprise] ??= [id];
+      out.deletedData![RequestFields.enterprise] ??= {id: FetchableFields.all};
     } catch (e) {
       throw InvalidRequestException(
           'Unable to delete the enterprise with id $id. Is there any internships associated with this enterprise? $e');
@@ -1273,7 +1291,8 @@ class EnterprisesRepositoryMock extends EnterprisesRepository {
     _dummyDatabase[enterprise.id] = enterprise;
     return RepositoryResponse(updatedData: {
       RequestFields.enterprise: {
-        enterprise.id: enterprise.getDifference(previous)
+        enterprise.id:
+            FetchableFields.fromFieldNames(enterprise.getDifference(previous))
       }
     });
   }
@@ -1286,7 +1305,7 @@ class EnterprisesRepositoryMock extends EnterprisesRepository {
     if (_dummyDatabase.containsKey(id)) {
       _dummyDatabase.remove(id);
       return RepositoryResponse(deletedData: {
-        RequestFields.enterprise: [id]
+        RequestFields.enterprise: {id: FetchableFields.all}
       });
     }
     return RepositoryResponse();

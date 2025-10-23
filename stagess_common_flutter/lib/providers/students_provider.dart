@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess_common/communication_protocol.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/backend_list_provided.dart';
@@ -23,7 +24,7 @@ class StudentsProvider extends BackendListProvided<Student> {
   }
 
   @override
-  FetchableFields get fetchableFields => FetchableFields({
+  FetchableFields get referenceFetchableFields => FetchableFields.reference({
     'school_board_id': FetchableFields.mandatory,
     'school_id': FetchableFields.mandatory,
     'first_name': FetchableFields.mandatory,

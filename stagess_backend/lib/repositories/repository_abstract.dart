@@ -4,12 +4,13 @@ import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_backend/utils/lock.dart';
 import 'package:stagess_common/communication_protocol.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 
 // TODO use cache
 class RepositoryResponse {
   Map<String, dynamic>? data;
-  Map<RequestFields, Map<String, List<String>>>? updatedData;
-  Map<RequestFields, List<String>>? deletedData;
+  Map<RequestFields, Map<String, FetchableFields>>? updatedData;
+  Map<RequestFields, Map<String, FetchableFields>>? deletedData;
 
   RepositoryResponse({
     this.data,
@@ -26,7 +27,7 @@ abstract class RepositoryAbstract {
   ///
   /// Get all data from the repository related to the given field.
   Future<RepositoryResponse> getAll({
-    Map<String, dynamic>? fields,
+    required FetchableFields fields,
     required DatabaseUser user,
   });
 
@@ -35,7 +36,7 @@ abstract class RepositoryAbstract {
   /// If the data doesn't exist, a [MissingDataException] will be thrown.
   Future<RepositoryResponse> getById({
     required String id,
-    Map<String, dynamic>? fields,
+    required FetchableFields fields,
     required DatabaseUser user,
   });
 

@@ -7,6 +7,7 @@ import 'package:stagess_backend/repositories/students_repository.dart';
 import 'package:stagess_backend/repositories/teachers_repository.dart';
 import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 
 class DatabaseUserMock extends DatabaseUser {
   final bool _isVerified;
@@ -81,8 +82,9 @@ class DummyMySqlConnection implements MySqlConnection {
     if (sql.contains('FROM admins t WHERE t.email = ?')) {
       if (adminsRepository == null) return ResultsMock(rows: []);
 
-      final admins = await adminsRepository!
-          .getAll(user: DatabaseUserMock(accessLevel: AccessLevel.superAdmin));
+      final admins = await adminsRepository!.getAll(
+          user: DatabaseUserMock(accessLevel: AccessLevel.superAdmin),
+          fields: FetchableFields({'email': FetchableFields.mandatory}));
 
       if ((values?.length ?? 0) != 1) {
         throw 'Not implemented number of admins query';

@@ -9,6 +9,7 @@ import 'package:stagess_backend/repositories/teachers_repository.dart';
 import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_common/communication_protocol.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 
 String _getId(Map<String, dynamic>? data, {required String messageOnNull}) {
   final id = data?['id']?.toString();
@@ -41,7 +42,12 @@ class DatabaseManager {
     required Map<String, dynamic>? data,
     required DatabaseUser user,
   }) async {
-    final fields = (data?['fields'] as Map<String, dynamic>?);
+    final fields = FetchableFields.fromSerialized(
+        data?['fields'] as Map<String, dynamic>?);
+    if (fields.isEmpty) {
+      throw MissingFieldException('Fields are required to get data');
+    }
+
     final response = switch (field) {
       RequestFields.schoolBoards =>
         await schoolBoardsDatabase.getAll(fields: fields, user: user),

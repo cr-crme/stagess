@@ -6,6 +6,7 @@ import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/itineraries/itinerary.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
@@ -19,7 +20,7 @@ final _logger = Logger('TeachersRepository');
 abstract class TeachersRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
-    Map<String, dynamic>? fields,
+    required FetchableFields fields,
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
@@ -42,7 +43,7 @@ abstract class TeachersRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getById({
     required String id,
-    Map<String, dynamic>? fields,
+    required FetchableFields fields,
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
@@ -108,7 +109,10 @@ abstract class TeachersRepository extends RepositoryAbstract {
 
     await _putTeacher(teacher: newTeacher, previous: previous, user: user);
     return RepositoryResponse(updatedData: {
-      RequestFields.teacher: {newTeacher.id: newTeacher.getDifference(previous)}
+      RequestFields.teacher: {
+        newTeacher.id:
+            FetchableFields.fromFieldNames(newTeacher.getDifference(previous))
+      }
     });
   }
 
@@ -147,7 +151,7 @@ abstract class TeachersRepository extends RepositoryAbstract {
       throw DatabaseFailureException('Failed to delete teacher with id $id');
     }
     return RepositoryResponse(deletedData: {
-      RequestFields.teacher: [removedId]
+      RequestFields.teacher: {removedId: FetchableFields.all}
     });
   }
 

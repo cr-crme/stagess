@@ -5,6 +5,7 @@ import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
@@ -19,7 +20,7 @@ import 'package:stagess_common/utils.dart';
 abstract class InternshipsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
-    Map<String, dynamic>? fields,
+    required FetchableFields fields,
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
@@ -42,7 +43,7 @@ abstract class InternshipsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getById({
     required String id,
-    Map<String, dynamic>? fields,
+    required FetchableFields fields,
     required DatabaseUser user,
   }) async {
     if (user.isNotVerified) {
@@ -101,7 +102,8 @@ abstract class InternshipsRepository extends RepositoryAbstract {
         internship: newInternship, previous: previous, user: user);
     return RepositoryResponse(updatedData: {
       RequestFields.internship: {
-        newInternship.id: newInternship.getDifference(previous)
+        newInternship.id: FetchableFields.fromFieldNames(
+            newInternship.getDifference(previous))
       }
     });
   }
@@ -141,7 +143,7 @@ abstract class InternshipsRepository extends RepositoryAbstract {
       throw DatabaseFailureException('Failed to delete internship with id $id');
     }
     return RepositoryResponse(deletedData: {
-      RequestFields.internship: [removedId]
+      RequestFields.internship: {removedId: FetchableFields.all}
     });
   }
 
