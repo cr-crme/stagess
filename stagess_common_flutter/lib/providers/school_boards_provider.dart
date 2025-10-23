@@ -46,17 +46,7 @@ class SchoolBoardsProvider extends BackendListProvided<SchoolBoard> {
   }
 
   @override
-  FetchableFields get referenceFetchableFields => FetchableFields.reference({
-    'name': FetchableFields.mandatory,
-    'logo': FetchableFields.optional,
-    'schools': FetchableFields.reference({
-      'id': FetchableFields.mandatory,
-      'name': FetchableFields.mandatory,
-      'address': FetchableFields.optional,
-      'phone': FetchableFields.optional,
-    }),
-    'cnesst_number': FetchableFields.optional,
-  });
+  FetchableFields get referenceFetchableFields => SchoolBoard.fetchableFields;
 
   AuthProvider? _authProvider;
   void initializeAuth(AuthProvider auth) {

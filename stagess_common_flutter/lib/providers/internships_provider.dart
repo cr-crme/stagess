@@ -26,17 +26,7 @@ class InternshipsProvider extends BackendListProvided<Internship> {
   }
 
   @override
-  FetchableFields get referenceFetchableFields => FetchableFields.reference({
-    'school_board_id': FetchableFields.mandatory,
-    'student_id': FetchableFields.mandatory,
-    'enterprise_id': FetchableFields.mandatory,
-    'job_id': FetchableFields.mandatory,
-    'extra_specialization_ids': FetchableFields.mandatory,
-    'signatory_teacher_id': FetchableFields.mandatory,
-    'extra_supervising_teacher_ids': FetchableFields.mandatory,
-    'mutables': FetchableFields.reference({'id': FetchableFields.mandatory}),
-    'end_date': FetchableFields.mandatory,
-  });
+  FetchableFields get referenceFetchableFields => Internship.fetchableFields;
 
   void initializeAuth(AuthProvider auth) {
     initializeFetchingData(authProvider: auth);

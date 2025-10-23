@@ -1,4 +1,5 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/task_appreciation.dart';
 
 enum SkillAppreciation {
@@ -138,6 +139,16 @@ class InternshipEvaluationSkill extends ItemSerializable {
       'form_version': formVersion,
     };
   }
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'date': FetchableFields.optional,
+        'present': FetchableFields.optional,
+        'skill_granularity': FetchableFields.optional,
+        'skills': FetchableFields.optional,
+        'comments': FetchableFields.optional,
+        'form_version': FetchableFields.optional,
+      });
 
   @override
   String toString() {

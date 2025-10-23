@@ -1,6 +1,7 @@
 import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/persons/person.dart';
@@ -48,6 +49,14 @@ class Admin extends Person {
       'has_registered_account': hasRegisteredAccount.serialize(),
       'access_level': accessLevel.serialize(),
     });
+
+  static FetchableFields get fetchableFields => Person.fetchableFields
+    ..addAll(FetchableFields.reference({
+      'school_board_id': FetchableFields.mandatory,
+      'email': FetchableFields.mandatory,
+      'has_registered_account': FetchableFields.mandatory,
+      'access_level': FetchableFields.mandatory,
+    }));
 
   @override
   Admin copyWith({

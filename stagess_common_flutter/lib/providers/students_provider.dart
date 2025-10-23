@@ -24,14 +24,7 @@ class StudentsProvider extends BackendListProvided<Student> {
   }
 
   @override
-  FetchableFields get referenceFetchableFields => FetchableFields.reference({
-    'school_board_id': FetchableFields.mandatory,
-    'school_id': FetchableFields.mandatory,
-    'first_name': FetchableFields.mandatory,
-    'middle_name': FetchableFields.optional,
-    'last_name': FetchableFields.mandatory,
-    'group': FetchableFields.mandatory,
-  });
+  FetchableFields get referenceFetchableFields => Student.fetchableFields;
 
   Future<void> initializeAuth(AuthProvider auth) async {
     initializeFetchingData(authProvider: auth);

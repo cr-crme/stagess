@@ -1,6 +1,7 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
 import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/enterprises/job_comment.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/photo.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
@@ -97,6 +98,41 @@ class Job extends ItemSerializable {
     );
   }
 
+  Job copyWithData(map) {
+    return Job(
+      id: StringExt.from(map['id']) ?? id,
+      specialization: ActivitySectorsService.specializationOrNull(
+              map['specialization_id']) ??
+          _specialization,
+      positionsOffered:
+          MapExt.from<int>(map?['positions_offered'], deserializer: (e) => e) ??
+              positionsOffered,
+      minimumAge: IntExt.from(map['minimum_age']) ?? minimumAge,
+      preInternshipRequests: PreInternshipRequests.fromSerialized(
+          map['pre_internship_requests'] ?? {}, map['version'] ?? '1.0.0'),
+      uniforms: Uniforms.fromSerialized(
+          (map['uniforms'] as Map? ?? {}).cast<String, dynamic>()
+            ..addAll({'id': map['id']}),
+          map['version'] ?? '1.0.0'),
+      protections: Protections.fromSerialized(
+          (map['protections'] as Map? ?? {}).cast<String, dynamic>()
+            ..addAll({'id': map['id']})),
+      photos: ListExt.from(map['photos'],
+              deserializer: (e) => Photo.fromSerialized(e)) ??
+          photos,
+      sstEvaluation: JobSstEvaluation.fromSerialized(
+          (map['sst_evaluations'] as Map? ?? {}).cast<String, dynamic>()
+            ..addAll({'id': map['id']})),
+      incidents: Incidents.fromSerialized(
+          (map['incidents'] as Map? ?? {}).cast<String, dynamic>()
+            ..addAll({'id': map['id']})),
+      comments: ListExt.from(map['comments'],
+              deserializer: (e) => JobComment.fromSerialized(e)) ??
+          comments,
+      reservedForId: StringExt.from(map['reserved_for_id']) ?? reservedForId,
+    );
+  }
+
   static Job get empty {
     final job = Job(
       specialization: null,
@@ -134,6 +170,21 @@ class Job extends ItemSerializable {
         'comments': comments.serialize(),
         'reserved_for_id': reservedForId.serialize(),
       };
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'specialization_id': FetchableFields.mandatory,
+        'positions_offered': FetchableFields.mandatory,
+        'minimum_age': FetchableFields.optional,
+        'pre_internship_requests': PreInternshipRequests.fetchableFields,
+        'uniforms': FetchableFields.optional,
+        'protections': FetchableFields.optional,
+        'photos': FetchableFields.optional,
+        'sst_evaluations': FetchableFields.optional,
+        'incidents': FetchableFields.optional,
+        'comments': FetchableFields.optional,
+        'reserved_for_id': FetchableFields.optional,
+      });
 
   Job.fromSerialized(super.map)
       : _specialization = ActivitySectorsService.specializationOrNull(

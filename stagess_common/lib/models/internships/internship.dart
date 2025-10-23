@@ -1,6 +1,7 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
 import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/generic/extended_item_serializable.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
@@ -119,6 +120,26 @@ class PostInternshipEnterpriseEvaluation extends ItemSerializable {
         'acceptance_behavior_difficulties': acceptanceBehaviorDifficulties,
       };
 
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'internship_id': FetchableFields.mandatory,
+        'skills_required': FetchableFields.optional,
+        'task_variety': FetchableFields.optional,
+        'training_plan_respect': FetchableFields.optional,
+        'autonomy_expected': FetchableFields.optional,
+        'efficiency_expected': FetchableFields.optional,
+        'supervision_style': FetchableFields.optional,
+        'ease_of_communication': FetchableFields.optional,
+        'absence_acceptance': FetchableFields.optional,
+        'supervision_comments': FetchableFields.optional,
+        'acceptance_tsa': FetchableFields.optional,
+        'acceptance_language_disorder': FetchableFields.optional,
+        'acceptance_intellectual_disability': FetchableFields.optional,
+        'acceptance_physical_disability': FetchableFields.optional,
+        'acceptance_mental_health_disorder': FetchableFields.optional,
+        'acceptance_behavior_difficulties': FetchableFields.optional,
+      });
+
   @override
   String toString() {
     return 'PostInternshipEnterpriseEvaluation{'
@@ -185,6 +206,17 @@ class InternshipMutableElements extends ItemSerializable {
         'transportations': transportations.map((e) => e.serialize()).toList(),
         'visit_frequencies': visitFrequencies.serialize(),
       };
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'creation_date': FetchableFields.optional,
+        'supervisor': FetchableFields.optional,
+        'starting_date': FetchableFields.optional,
+        'ending_date': FetchableFields.optional,
+        'schedules': FetchableFields.optional,
+        'transportations': FetchableFields.optional,
+        'visit_frequencies': FetchableFields.optional,
+      });
 
   @override
   String toString() {
@@ -444,6 +476,27 @@ class Internship extends ExtendedItemSerializable {
         'visa_evaluations': visaEvaluations.serialize(),
         'enterprise_evaluation': enterpriseEvaluation?.serialize(),
       };
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'school_board_id': FetchableFields.mandatory,
+        'student_id': FetchableFields.mandatory,
+        'signatory_teacher_id': FetchableFields.mandatory,
+        'extra_specialization_ids': FetchableFields.mandatory,
+        'enterprise_id': FetchableFields.mandatory,
+        'job_id': FetchableFields.mandatory,
+        'extra_supervising_teacher_ids': FetchableFields.mandatory,
+        'mutables': InternshipMutableElements.fetchableFields,
+        'expected_duration': FetchableFields.optional,
+        'achieved_duration': FetchableFields.optional,
+        'teacher_notes': FetchableFields.optional,
+        'end_date': FetchableFields.mandatory,
+        'skill_evaluations': InternshipEvaluationSkill.fetchableFields,
+        'attitude_evaluations': InternshipEvaluationAttitude.fetchableFields,
+        'visa_evaluations': InternshipEvaluationVisa.fetchableFields,
+        'enterprise_evaluation':
+            PostInternshipEnterpriseEvaluation.fetchableFields,
+      });
 
   void addVersion({
     required DateTime creationDate,

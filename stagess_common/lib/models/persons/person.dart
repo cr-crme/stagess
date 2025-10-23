@@ -1,6 +1,7 @@
 import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/extended_item_serializable.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 
@@ -60,6 +61,17 @@ class Person extends ExtendedItemSerializable {
         'email': email?.serialize(),
         'address': address?.serialize(),
       };
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'first_name': FetchableFields.mandatory,
+        'middle_name': FetchableFields.mandatory,
+        'last_name': FetchableFields.mandatory,
+        'date_birth': FetchableFields.optional,
+        'phone': FetchableFields.optional,
+        'email': FetchableFields.optional,
+        'address': FetchableFields.optional,
+      });
 
   Person copyWith({
     String? id,

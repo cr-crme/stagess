@@ -127,8 +127,8 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     return RepositoryResponse(
       updatedData: {
         RequestFields.enterprise: {
-          newEnterprise.id: FetchableFields.fromFieldNames(
-              newEnterprise.getDifference(previous))
+          newEnterprise.id: Enterprise.fetchableFields
+              .extractFrom(newEnterprise.getDifference(previous))
         },
       },
       deletedData: deletedData.deletedData,
@@ -765,8 +765,9 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
         out.deletedData![RequestFields.internship] ??= {
           enterprise.id: FetchableFields.none
         };
+        // TODO Validate this
         out.deletedData![RequestFields.internship]![enterprise.id]!
-            .addAll(FetchableFields.fromFieldNames([job.id]));
+            .addAll(Enterprise.fetchableFields.extractFrom([job.id]));
       }
     }
 
@@ -1172,8 +1173,9 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
           out.deletedData![RequestFields.internship] ??= {
             enterprise.id: FetchableFields.none
           };
+          // TODO Validate this
           out.deletedData![RequestFields.internship]![enterprise.id]!
-              .addAll(FetchableFields.fromFieldNames([job.id]));
+              .addAll(Enterprise.fetchableFields.extractFrom([job.id]));
         }
       }
 
@@ -1291,8 +1293,8 @@ class EnterprisesRepositoryMock extends EnterprisesRepository {
     _dummyDatabase[enterprise.id] = enterprise;
     return RepositoryResponse(updatedData: {
       RequestFields.enterprise: {
-        enterprise.id:
-            FetchableFields.fromFieldNames(enterprise.getDifference(previous))
+        enterprise.id: Enterprise.fetchableFields
+            .extractFrom(enterprise.getDifference(previous))
       }
     });
   }

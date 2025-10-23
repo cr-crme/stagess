@@ -22,16 +22,7 @@ class EnterprisesProvider extends BackendListProvided<Enterprise> {
       asList ? RequestFields.enterprises : RequestFields.enterprise;
 
   @override
-  FetchableFields get referenceFetchableFields => FetchableFields.reference({
-    'school_board_id': FetchableFields.mandatory,
-    'name': FetchableFields.mandatory,
-    'address': FetchableFields.mandatory,
-    'jobs': FetchableFields.reference({
-      'id': FetchableFields.mandatory,
-      'specialization_id': FetchableFields.mandatory,
-      'positions_offered': FetchableFields.mandatory,
-    }),
-  });
+  FetchableFields get referenceFetchableFields => Enterprise.fetchableFields;
 
   void initializeAuth(AuthProvider auth) {
     initializeFetchingData(authProvider: auth);

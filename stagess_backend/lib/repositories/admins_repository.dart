@@ -80,7 +80,7 @@ abstract class AdminsRepository extends RepositoryAbstract {
     return RepositoryResponse(updatedData: {
       RequestFields.admin: {
         newAdmin.id:
-            FetchableFields.fromFieldNames(newAdmin.getDifference(previous))
+            Admin.fetchableFields.extractFrom(newAdmin.getDifference(previous))
       }
     });
   }

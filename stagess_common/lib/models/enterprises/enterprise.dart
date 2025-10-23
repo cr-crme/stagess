@@ -1,8 +1,10 @@
 import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
+import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/extended_item_serializable.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/persons/person.dart';
@@ -132,6 +134,7 @@ class Enterprise extends ExtendedItemSerializable {
       throw WrongVersionException(version, _currentVersion);
     }
 
+    // TODO Fix Enterprise not updating from backend
     return Enterprise(
       id: StringExt.from(data['id']) ?? id,
       schoolBoardId: data['school_board_id'] ?? schoolBoardId,
@@ -145,7 +148,13 @@ class Enterprise extends ExtendedItemSerializable {
               .map((e) => ActivityTypes._fromInt(e as int, version))
               .toSet(),
       recruiterId: StringExt.from(data['recruiter_id']) ?? recruiterId,
-      jobs: JobList.from(data['jobs']) ?? _jobs,
+      jobs: JobList()
+        ..addAll(ListExt.mergeWithData(
+          _jobs.toList(),
+          (data['jobs'] as Map?)?.values.toList(),
+          copyWithData: (job, serialized) => job.copyWithData(serialized),
+          deserializer: (serialized) => Job.fromSerialized(serialized),
+        )),
       contact: Person.from(data['contact']) ?? contact,
       contactFunction:
           StringExt.from(data['contact_function']) ?? contactFunction,
@@ -179,6 +188,24 @@ class Enterprise extends ExtendedItemSerializable {
       'neq': neq?.serialize(),
     };
   }
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'school_board_id': FetchableFields.mandatory,
+        'name': FetchableFields.mandatory,
+        'status': FetchableFields.optional,
+        'activity_types': FetchableFields.optional,
+        'recruiter_id': FetchableFields.optional,
+        'jobs': Job.fetchableFields,
+        'contact': Person.fetchableFields,
+        'contact_function': FetchableFields.optional,
+        'address': FetchableFields.mandatory,
+        'phone': FetchableFields.optional,
+        'fax': FetchableFields.optional,
+        'website': FetchableFields.optional,
+        'headquarters_address': FetchableFields.optional,
+        'neq': FetchableFields.optional,
+      });
 
   @override
   Enterprise.fromSerialized(super.map)

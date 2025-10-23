@@ -23,15 +23,7 @@ class AdminsProvider extends BackendListProvided<Admin> {
   }
 
   @override
-  FetchableFields get referenceFetchableFields => FetchableFields.reference({
-    'school_board_id': FetchableFields.mandatory,
-    'first_name': FetchableFields.mandatory,
-    'middle_name': FetchableFields.mandatory,
-    'last_name': FetchableFields.mandatory,
-    'email': FetchableFields.mandatory,
-    'access_level': FetchableFields.mandatory,
-    'has_registered_account': FetchableFields.mandatory,
-  });
+  FetchableFields get referenceFetchableFields => Admin.fetchableFields;
 
   void initializeAuth(AuthProvider auth) {
     if (!auth.isFullySignedIn ||

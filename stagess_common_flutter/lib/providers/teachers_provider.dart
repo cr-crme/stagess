@@ -27,21 +27,7 @@ class TeachersProvider extends BackendListProvided<Teacher> {
           : this[_authProvider!.teacherId];
 
   @override
-  FetchableFields get referenceFetchableFields => FetchableFields.reference({
-    'school_board_id': FetchableFields.mandatory,
-    'school_id': FetchableFields.mandatory,
-    'first_name': FetchableFields.mandatory,
-    'middle_name': FetchableFields.mandatory,
-    'last_name': FetchableFields.mandatory,
-    'date_birth': FetchableFields.optional,
-    'phone': FetchableFields.optional,
-    'email': FetchableFields.mandatory,
-    'address': FetchableFields.optional,
-    'has_registered_account': FetchableFields.mandatory,
-    'groups': FetchableFields.mandatory,
-    'itineraries': FetchableFields.optional,
-    'visiting_priorities': FetchableFields.optional,
-  });
+  FetchableFields get referenceFetchableFields => Teacher.fetchableFields;
 
   AuthProvider? _authProvider;
   void initializeAuth(AuthProvider auth) {

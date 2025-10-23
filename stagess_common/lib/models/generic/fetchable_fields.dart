@@ -17,14 +17,19 @@ class FetchableFields {
     filter(FetchableFields.none, keepMandatory: true);
   }
 
-  // TODO Add the capability to descend the list of field names with subfields
-  FetchableFields.fromFieldNames(List fieldNames)
-      : isReference = false,
-        includeAll = false,
-        isMandatory = false,
-        _fields = {
-          for (var fieldName in fieldNames) fieldName: FetchableFields.all
-        };
+  FetchableFields extractFrom(Iterable fieldNames) {
+    final out = FetchableFields.none;
+    for (final fieldName in fieldNames) {
+      if (fieldName is String) {
+        final current = this[fieldName];
+        if (current == null) continue;
+        out[fieldName] = current;
+      } else if (fieldNames is List) {
+        out.addAll(extractFrom(fieldName));
+      }
+    }
+    return out;
+  }
 
   FetchableFields(Map<String, FetchableFields> fields)
       : isReference = false,
@@ -212,7 +217,11 @@ class FetchableFields {
 
     for (final entry in other._fields.entries) {
       if (_fields.containsKey(entry.key)) {
-        if (entry.value.hasSubfields) _fields[entry.key]?.addAll(entry.value);
+        if (entry.value.hasSubfields) {
+          _fields[entry.key]?.addAll(entry.value);
+        } else if (entry.value.isMandatory) {
+          _fields[entry.key] = entry.value;
+        }
       } else {
         _fields[entry.key] = entry.value;
       }

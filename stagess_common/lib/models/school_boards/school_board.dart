@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/generic/extended_item_serializable.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/school_boards/school.dart';
 
@@ -43,6 +44,14 @@ class SchoolBoard extends ExtendedItemSerializable {
         'schools': schools.serialize(),
         'cnesst_number': cnesstNumber.serialize(),
       };
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'name': FetchableFields.mandatory,
+        'logo': FetchableFields.optional,
+        'schools': School.fetchableFields,
+        'cnesst_number': FetchableFields.optional,
+      });
 
   SchoolBoard copyWith({
     String? id,
@@ -87,11 +96,13 @@ class SchoolBoard extends ExtendedItemSerializable {
       logo: (data['logo'] is List && (data['logo'] as List).length > 2)
           ? Uint8List.fromList((data['logo'] as List).cast<int>())
           : logo,
-      schools: ListExt.from(
-            data['schools'],
-            deserializer: (e) => School.fromSerialized(e),
-          ) ??
-          schools,
+      schools: ListExt.mergeWithData(
+        schools,
+        data['schools'],
+        // TODO Fix School not updating Address
+        copyWithData: (school, serialized) => school.copyWithData(serialized),
+        deserializer: (serialized) => School.fromSerialized(serialized),
+      ),
       cnesstNumber: StringExt.from(data['cnesst_number']) ?? cnesstNumber,
     );
   }

@@ -1,5 +1,6 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
 import 'package:stagess_common/models/generic/address.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 
@@ -37,6 +38,13 @@ class School extends ItemSerializable {
     };
   }
 
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'name': FetchableFields.mandatory,
+        'address': FetchableFields.optional,
+        'phone': FetchableFields.optional,
+      });
+
   School copyWith(
           {String? id, String? name, Address? address, PhoneNumber? phone}) =>
       School(
@@ -45,4 +53,13 @@ class School extends ItemSerializable {
         address: address ?? this.address,
         phone: phone ?? this.phone,
       );
+
+  School copyWithData(Map<String, dynamic> data) {
+    return School(
+      id: StringExt.from(data['id']) ?? id,
+      name: data['name'] ?? name,
+      address: Address.fromSerialized(data['address'] ?? {}),
+      phone: PhoneNumber.fromSerialized(data['phone'] ?? {}),
+    );
+  }
 }

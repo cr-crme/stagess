@@ -110,8 +110,8 @@ abstract class TeachersRepository extends RepositoryAbstract {
     await _putTeacher(teacher: newTeacher, previous: previous, user: user);
     return RepositoryResponse(updatedData: {
       RequestFields.teacher: {
-        newTeacher.id:
-            FetchableFields.fromFieldNames(newTeacher.getDifference(previous))
+        newTeacher.id: Teacher.fetchableFields
+            .extractFrom(newTeacher.getDifference(previous))
       }
     });
   }

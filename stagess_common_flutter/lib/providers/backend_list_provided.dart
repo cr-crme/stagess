@@ -18,7 +18,7 @@ class _Selector {
   final Function() stopFetchingData;
   final Function() notify;
   final FetchableFields Function() getReferenceFetchableFields;
-  final FetchableFields? Function(String id) getRegisteredFieldsOf;
+  final FetchableFields Function(String id) getRegisteredFieldsOf;
 
   const _Selector({
     required this.addOrReplaceItems,
@@ -179,20 +179,13 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     required FetchableFields fields,
     bool forceRefetchAll = false,
   }) async {
-    if (_registeredFields[id] == null) {
-      _registeredFields[id] = referenceFetchableFields.filter(
-        FetchableFields.none,
-        keepMandatory: true,
-      );
-    }
-
     // Get the not yet fetched fields (that is the non-intersecting fields between
     // the registered fields and the requested fields)
     final unregisteredFields =
         forceRefetchAll
             ? fields
             : _referenceFetchableFields.getNonIntersectingFieldNames(
-              _registeredFields[id]!,
+              getRegisteredFieldsOf(id),
               fields,
             );
     if (unregisteredFields.isEmpty) return;
@@ -239,7 +232,16 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
   ///
   /// Fields that the user has actively fetched alongside the mandatory fields.
   final Map<String, FetchableFields> _registeredFields = {};
-  FetchableFields? getRegisteredFieldsOf(String id) => _registeredFields[id];
+  FetchableFields getRegisteredFieldsOf(String id) {
+    if (_registeredFields[id] == null) {
+      _registeredFields[id] = referenceFetchableFields.filter(
+        FetchableFields.none,
+        keepMandatory: true,
+      );
+    }
+
+    return _registeredFields[id]!;
+  }
 
   final bool mockMe;
 
@@ -579,9 +581,30 @@ Future<void> _incomingMessage(
         }
       case RequestType.response:
         {
+          if (protocol.response != Response.success ||
+              (protocol.data?.isEmpty ?? true)) {
+            return;
+          }
+          if (protocol.data!['locked'] != null ||
+              protocol.data!['released'] != null) {
+            return;
+          }
+
           final mainField = protocol.field!;
           final selector = _getSelector(mainField);
           selector.addOrReplaceItems(protocol.data!, notify: true);
+
+          final id = protocol.data!['id'];
+          if (id != null) {
+            final referenceFields = selector.getReferenceFetchableFields();
+            final registeredFieldsOfId = _getSelector(
+              mainField,
+            ).getRegisteredFieldsOf(id);
+            registeredFieldsOfId.addAll(
+              referenceFields.extractFrom(protocol.data?.keys ?? []),
+            );
+          }
+
           return;
         }
       case RequestType.update:
@@ -600,11 +623,10 @@ Future<void> _incomingMessage(
 
           final subFields = FetchableFields.fromSerialized(
             (protocol.data!['updated_fields']),
-          ).filter(registeredFieldsOfId ?? FetchableFields.none);
+          ).filter(registeredFieldsOfId);
           if (subFields.isEmpty) return;
 
           await _getFromBackend(mainField, id: id, fields: subFields);
-          registeredFieldsOfId!.addAll(subFields);
 
           return;
         }
@@ -638,11 +660,6 @@ Future<void> _incomingMessage(
         throw Exception('Unsupported request type: ${protocol.requestType}');
     }
   } catch (e) {
-    final completer = _completers.remove(protocol.id);
-    if (completer != null && !completer.isCompleted) {
-      completer.complete(protocol);
-    }
-
     dev.log(e.toString(), error: e, stackTrace: StackTrace.current);
     return;
   } finally {

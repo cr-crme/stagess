@@ -107,6 +107,13 @@ class PreInternshipRequests extends ItemSerializable {
     };
   }
 
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'requests': FetchableFields.optional,
+        'other': FetchableFields.optional,
+        'is_applicable': FetchableFields.optional,
+      });
+
   static PreInternshipRequests fromSerialized(
     Map<String, dynamic> map,
     String version,

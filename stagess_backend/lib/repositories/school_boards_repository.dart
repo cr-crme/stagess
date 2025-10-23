@@ -84,8 +84,8 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
         schoolBoard: newSchoolBoard, previous: previous, user: user);
     return RepositoryResponse(updatedData: {
       RequestFields.schoolBoard: {
-        newSchoolBoard.id: FetchableFields.fromFieldNames(
-            newSchoolBoard.getDifference(previous))
+        newSchoolBoard.id: SchoolBoard.fetchableFields
+            .extractFrom(newSchoolBoard.getDifference(previous))
       }
     });
   }

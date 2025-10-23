@@ -1,4 +1,5 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 
 class AttitudeEvaluation extends ItemSerializable {
   Inattendance inattendance;
@@ -134,6 +135,15 @@ class InternshipEvaluationAttitude extends ItemSerializable {
       'form_version': formVersion,
     };
   }
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'date': FetchableFields.optional,
+        'present': FetchableFields.optional,
+        'attitude': FetchableFields.optional,
+        'comments': FetchableFields.optional,
+        'form_version': FetchableFields.mandatory,
+      });
 
   @override
   String toString() {

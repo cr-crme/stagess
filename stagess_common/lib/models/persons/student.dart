@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/generic/address.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/persons/person.dart';
@@ -118,6 +119,17 @@ class Student extends Person {
         'contact_link': contactLink.serialize(),
       });
   }
+
+  static FetchableFields get fetchableFields => Person.fetchableFields
+    ..addAll(FetchableFields.reference({
+      'school_board_id': FetchableFields.mandatory,
+      'school_id': FetchableFields.mandatory,
+      'photo': FetchableFields.optional,
+      'program': FetchableFields.optional,
+      'group': FetchableFields.mandatory,
+      'contact': FetchableFields.optional,
+      'contact_link': FetchableFields.optional,
+    }));
 
   Student get limitedInfo => Student(
         id: id,

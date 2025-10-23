@@ -102,8 +102,8 @@ abstract class InternshipsRepository extends RepositoryAbstract {
         internship: newInternship, previous: previous, user: user);
     return RepositoryResponse(updatedData: {
       RequestFields.internship: {
-        newInternship.id: FetchableFields.fromFieldNames(
-            newInternship.getDifference(previous))
+        newInternship.id: Internship.fetchableFields
+            .extractFrom(newInternship.getDifference(previous))
       }
     });
   }

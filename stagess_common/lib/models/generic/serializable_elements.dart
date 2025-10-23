@@ -1,4 +1,5 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
+import 'package:stagess_common/utils.dart';
 
 extension ListExt on List {
   List serialize() {
@@ -23,6 +24,26 @@ extension ListExt on List {
       {required T Function(dynamic) deserializer}) {
     if (elements == null) return null;
     return elements.map((e) => deserializer(e)).toList();
+  }
+
+  static List<T> mergeWithData<T extends ItemSerializable>(
+      List<T> original, List? elements,
+      {required T Function(T original, dynamic serialized) copyWithData,
+      required T Function(dynamic serialized) deserializer}) {
+    final out = from(elements, deserializer: (serialized) {
+          final e = original.firstWhereOrNull((e) => e.id == serialized['id']);
+          return e == null
+              ? deserializer(serialized)
+              : copyWithData(e, serialized);
+        }) ??
+        [];
+
+    final outIds = out.map((s) => s.id).toSet();
+    for (final element in original) {
+      if (outIds.contains(element.id)) continue;
+      out.add(element);
+    }
+    return out;
   }
 }
 

@@ -102,8 +102,8 @@ abstract class StudentsRepository extends RepositoryAbstract {
     await _putStudent(student: newStudent, previous: previous, user: user);
     return RepositoryResponse(updatedData: {
       RequestFields.student: {
-        newStudent.id:
-            FetchableFields.fromFieldNames(newStudent.getDifference(previous))
+        newStudent.id: Student.fetchableFields
+            .extractFrom(newStudent.getDifference(previous))
       }
     });
   }

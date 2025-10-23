@@ -1,5 +1,6 @@
 import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/generic/address.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/itineraries/itinerary.dart';
@@ -92,6 +93,17 @@ class Teacher extends Person {
       'visiting_priorities': _visitingPriorities
           .map((key, value) => MapEntry(key, value.serialize())),
     });
+
+  static FetchableFields get fetchableFields => Person.fetchableFields
+    ..addAll(FetchableFields.reference({
+      'school_board_id': FetchableFields.mandatory,
+      'school_id': FetchableFields.mandatory,
+      'email': FetchableFields.mandatory,
+      'has_registered_account': FetchableFields.mandatory,
+      'groups': FetchableFields.mandatory,
+      'itineraries': FetchableFields.optional,
+      'visiting_priorities': FetchableFields.optional,
+    }));
 
   @override
   Teacher copyWith({
