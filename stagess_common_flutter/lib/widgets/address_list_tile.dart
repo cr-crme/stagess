@@ -41,7 +41,10 @@ class AddressController {
   }
 
   void setAddressAndForceValidated(Address value) {
-    if (_setAddressAndForceValidation != null) {
+    if (_setAddressAndForceValidation == null) {
+      _initialValue = value;
+      _textController.text = value.toString();
+    } else {
       _setAddressAndForceValidation!(value, validationMessage: null);
     }
   }

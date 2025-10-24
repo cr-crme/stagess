@@ -69,7 +69,9 @@ class SchoolBoard extends ExtendedItemSerializable {
       );
 
   @override
-  SchoolBoard copyWithData(Map<String, dynamic> data) {
+  SchoolBoard copyWithData(Map<String, dynamic>? data) {
+    if (data == null || data.isEmpty) return copyWith();
+
     final availableFields = [
       'id',
       'name',

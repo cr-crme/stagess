@@ -185,7 +185,9 @@ class Student extends Person {
       );
 
   @override
-  Student copyWithData(Map<String, dynamic> data) {
+  Student copyWithData(Map<String, dynamic>? data) {
+    if (data == null || data.isEmpty) return copyWith();
+
     // Make sure data does not contain unrecognized fields
     if (data.keys.any((key) => ![
           'id',

@@ -103,7 +103,9 @@ class Enterprise extends ExtendedItemSerializable {
   }
 
   @override
-  Enterprise copyWithData(Map<String, dynamic> data) {
+  Enterprise copyWithData(Map<String, dynamic>? data) {
+    if (data == null || data.isEmpty) return copyWith();
+
     final availableFields = [
       'id',
       'school_board_id',
@@ -134,7 +136,6 @@ class Enterprise extends ExtendedItemSerializable {
       throw WrongVersionException(version, _currentVersion);
     }
 
-    // TODO Fix Enterprise not updating from backend
     return Enterprise(
       id: StringExt.from(data['id']) ?? id,
       schoolBoardId: data['school_board_id'] ?? schoolBoardId,
@@ -155,15 +156,17 @@ class Enterprise extends ExtendedItemSerializable {
           copyWithData: (job, serialized) => job.copyWithData(serialized),
           deserializer: (serialized) => Job.fromSerialized(serialized),
         )),
-      contact: Person.from(data['contact']) ?? contact,
+      contact: contact.copyWithData(data['contact']),
       contactFunction:
           StringExt.from(data['contact_function']) ?? contactFunction,
-      address: Address.from(data['address']) ?? address,
+      address: address?.copyWithData(data['address']) ??
+          Address.from(data['address']),
       phone: PhoneNumber.from(data['phone']) ?? phone,
       fax: PhoneNumber.from(data['fax']) ?? fax,
       website: StringExt.from(data['website']) ?? website,
       headquartersAddress:
-          Address.from(data['headquarters_address']) ?? headquartersAddress,
+          headquartersAddress?.copyWithData(data['headquarters_address']) ??
+              Address.from(data['headquarters_address']),
       neq: StringExt.from(data['neq']) ?? neq,
     );
   }

@@ -84,7 +84,9 @@ class Admin extends Person {
       );
 
   @override
-  Admin copyWithData(Map<String, dynamic> data) {
+  Admin copyWithData(Map<String, dynamic>? data) {
+    if (data == null || data.isEmpty) return copyWith();
+
     // Make sure data does not contain unrecognized fields
     if (data.keys.any((key) => ![
           'id',

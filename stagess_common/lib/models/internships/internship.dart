@@ -208,7 +208,28 @@ class InternshipMutableElements extends ItemSerializable {
         'visit_frequencies': visitFrequencies.serialize(),
       };
 
-  InternshipMutableElements copyWithData(dynamic serialized) {
+  InternshipMutableElements copyWith({
+    DateTime? creationDate,
+    Person? supervisor,
+    DateTimeRange? dates,
+    List<WeeklySchedule>? weeklySchedules,
+    List<Transportation>? transportations,
+    String? visitFrequencies,
+  }) {
+    return InternshipMutableElements(
+      id: id,
+      creationDate: creationDate ?? this.creationDate,
+      supervisor: supervisor ?? this.supervisor,
+      dates: dates ?? this.dates,
+      weeklySchedules: weeklySchedules ?? this.weeklySchedules,
+      transportations: transportations ?? this.transportations,
+      visitFrequencies: visitFrequencies ?? this.visitFrequencies,
+    );
+  }
+
+  InternshipMutableElements copyWithData(Map<String, dynamic>? serialized) {
+    if (serialized == null || serialized.isEmpty) return copyWith();
+
     return InternshipMutableElements(
       id: id,
       creationDate:
@@ -582,7 +603,9 @@ class Internship extends ExtendedItemSerializable {
   }
 
   @override
-  Internship copyWithData(Map<String, dynamic> data) {
+  Internship copyWithData(Map<String, dynamic>? data) {
+    if (data == null || data.isEmpty) return copyWith();
+
     final availableFields = [
       'version',
       'id',

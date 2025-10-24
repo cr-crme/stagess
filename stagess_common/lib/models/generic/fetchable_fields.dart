@@ -2,6 +2,7 @@ class FetchableFields {
   final bool isReference;
   final bool includeAll;
   final bool isMandatory;
+  final bool isEndpointField;
   final Map<String, FetchableFields> _fields;
 
   ///
@@ -11,6 +12,7 @@ class FetchableFields {
       : isReference = true,
         includeAll = false,
         isMandatory = false,
+        isEndpointField = false,
         _fields = fields {
     // Filters the current fields, but ignore the return. This is useful to
     // make sure that no "includeAll" fields are in the reference.
@@ -35,12 +37,14 @@ class FetchableFields {
       : isReference = false,
         _fields = fields,
         includeAll = false,
-        isMandatory = false;
+        isMandatory = false,
+        isEndpointField = false;
 
   FetchableFields._({
     required this.isReference,
     required this.includeAll,
     required this.isMandatory,
+    required this.isEndpointField,
     required Map<String, FetchableFields> fields,
   }) : _fields = fields {
     if (isMandatory && hasSubfields) {
@@ -52,6 +56,9 @@ class FetchableFields {
     if (includeAll && isMandatory) {
       throw 'A FetchableFields cannot include all fields and be mandatory';
     }
+    if (isEndpointField && hasSubfields) {
+      throw 'A FetchableFields cannot be both an endpoint field and have subfields';
+    }
   }
 
   Iterable<String> get fieldNames => _fields.keys;
@@ -60,12 +67,14 @@ class FetchableFields {
         isReference: false,
         includeAll: false,
         isMandatory: true,
+        isEndpointField: true,
         fields: {},
       );
   static FetchableFields get optional => FetchableFields._(
         isReference: false,
         includeAll: false,
         isMandatory: false,
+        isEndpointField: true,
         fields: {},
       );
 
@@ -73,12 +82,14 @@ class FetchableFields {
         isReference: false,
         includeAll: false,
         isMandatory: false,
+        isEndpointField: false,
         fields: {},
       );
   static FetchableFields get all => FetchableFields._(
         isReference: false,
         includeAll: true,
         isMandatory: false,
+        isEndpointField: false,
         fields: {},
       );
 

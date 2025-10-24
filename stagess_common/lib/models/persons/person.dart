@@ -95,8 +95,9 @@ class Person extends ExtendedItemSerializable {
       );
 
   @override
-  Person copyWithData(Map<String, dynamic> data) {
-    // Make sure data does not contain unrecognized fields
+  Person copyWithData(Map<String, dynamic>? data) {
+    if (data == null || data.isEmpty) return copyWith();
+
     if (data.keys.any((key) => ![
           'id',
           'first_name',

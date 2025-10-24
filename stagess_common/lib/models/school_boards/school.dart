@@ -54,7 +54,9 @@ class School extends ItemSerializable {
         phone: phone ?? this.phone,
       );
 
-  School copyWithData(Map<String, dynamic> data) {
+  School copyWithData(Map<String, dynamic>? data) {
+    if (data == null) return copyWith();
+
     return School(
       id: StringExt.from(data['id']) ?? id,
       name: data['name'] ?? name,

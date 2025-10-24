@@ -140,7 +140,9 @@ class Teacher extends Person {
       );
 
   @override
-  Teacher copyWithData(Map<String, dynamic> data) {
+  Teacher copyWithData(Map<String, dynamic>? data) {
+    if (data == null || data.isEmpty) return copyWith();
+
     // Make sure data does not contain unrecognized fields
     if (data.keys.any((key) => ![
           'id',

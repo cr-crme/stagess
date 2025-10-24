@@ -98,14 +98,15 @@ class Job extends ItemSerializable {
     );
   }
 
-  Job copyWithData(map) {
+  Job copyWithData(Map<String, dynamic>? map) {
+    if (map == null || map.isEmpty) return copyWith();
     return Job(
       id: StringExt.from(map['id']) ?? id,
       specialization: ActivitySectorsService.specializationOrNull(
               map['specialization_id']) ??
           _specialization,
       positionsOffered:
-          MapExt.from<int>(map?['positions_offered'], deserializer: (e) => e) ??
+          MapExt.from<int>(map['positions_offered'], deserializer: (e) => e) ??
               positionsOffered,
       minimumAge: IntExt.from(map['minimum_age']) ?? minimumAge,
       preInternshipRequests: PreInternshipRequests.fromSerialized(
