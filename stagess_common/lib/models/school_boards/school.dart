@@ -41,8 +41,8 @@ class School extends ItemSerializable {
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
         'name': FetchableFields.mandatory,
-        'address': FetchableFields.optional,
-        'phone': FetchableFields.optional,
+        'address': Address.fetchableFields,
+        'phone': PhoneNumber.fetchableFields,
       });
 
   School copyWith(

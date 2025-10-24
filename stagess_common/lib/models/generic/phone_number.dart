@@ -1,4 +1,5 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 
 const _regExp =
     r'^(?:\+\(d{1,3})?\s?\(?(\d{3})(?:[-.\)\s]|\)\s)?(\d{3})[-.\s]?(\d{4})(?:\s(?:poste)?\s(\d{1,6}))?$';
@@ -51,6 +52,11 @@ class PhoneNumber extends ItemSerializable {
 
   @override
   Map<String, dynamic> serializedMap() => {'phone_number': toString()};
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'phone_number': FetchableFields.optional,
+      });
 
   static PhoneNumber? from(map) {
     if (map == null) return null;

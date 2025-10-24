@@ -1,4 +1,5 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/internships/time_utils.dart';
 import 'package:stagess_common/utils.dart';
@@ -140,6 +141,13 @@ class WeeklySchedule extends ItemSerializable {
         'start': period.start.millisecondsSinceEpoch,
         'end': period.end.millisecondsSinceEpoch,
       };
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'days': FetchableFields.optional,
+        'start': FetchableFields.optional,
+        'end': FetchableFields.optional,
+      });
 
   ///
   /// Similar to [copyWith], but enforce the change of id

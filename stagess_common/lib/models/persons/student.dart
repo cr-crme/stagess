@@ -127,7 +127,7 @@ class Student extends Person {
       'photo': FetchableFields.optional,
       'program': FetchableFields.optional,
       'group': FetchableFields.mandatory,
-      'contact': FetchableFields.optional,
+      'contact': Person.fetchableFields,
       'contact_link': FetchableFields.optional,
     }));
 

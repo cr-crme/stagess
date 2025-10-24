@@ -99,7 +99,6 @@ class SchoolBoard extends ExtendedItemSerializable {
       schools: ListExt.mergeWithData(
         schools,
         data['schools'],
-        // TODO Fix School not updating Address
         copyWithData: (school, serialized) => school.copyWithData(serialized),
         deserializer: (serialized) => School.fromSerialized(serialized),
       ),

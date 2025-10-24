@@ -2,6 +2,7 @@ import 'package:enhanced_containers_foundation/enhanced_containers_foundation.da
 import 'package:latlong2/latlong.dart';
 import 'package:routing_client_dart/routing_client_dart.dart' as routing_client;
 import 'package:stagess_common/models/generic/address.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/geographic_coordinate_system.dart';
 import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 
@@ -41,6 +42,16 @@ class Waypoint extends ItemSerializable {
       'priority': priority.index,
     };
   }
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'title': FetchableFields.mandatory,
+        'subtitle': FetchableFields.optional,
+        'latitude': FetchableFields.mandatory,
+        'longitude': FetchableFields.mandatory,
+        'address': Address.fetchableFields,
+        'priority': FetchableFields.mandatory,
+      });
 
   static Waypoint fromSerialized(data) {
     return Waypoint(

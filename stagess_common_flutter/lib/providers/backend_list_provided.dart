@@ -168,7 +168,13 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       if (_socket == null) return;
     }
 
-    await _getFromBackend(getField(true), fields: _referenceFetchableFields);
+    await _getFromBackend(
+      getField(true),
+      fields: _referenceFetchableFields.filter(
+        FetchableFields.none,
+        keepMandatory: true,
+      ),
+    );
   }
 
   ///

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/geographic_coordinate_system.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 
@@ -56,6 +57,15 @@ class Address extends ItemSerializable {
         'city': city?.serialize(),
         'postal_code': postalCode?.serialize(),
       };
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'civic': FetchableFields.optional,
+        'street': FetchableFields.optional,
+        'apartment': FetchableFields.optional,
+        'city': FetchableFields.optional,
+        'postal_code': FetchableFields.optional,
+      });
 
   static Address? from(map) {
     if (map == null) return null;

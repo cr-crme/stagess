@@ -101,7 +101,7 @@ class Teacher extends Person {
       'email': FetchableFields.mandatory,
       'has_registered_account': FetchableFields.mandatory,
       'groups': FetchableFields.mandatory,
-      'itineraries': FetchableFields.optional,
+      'itineraries': Itinerary.fetchableFields,
       'visiting_priorities': FetchableFields.optional,
     }));
 

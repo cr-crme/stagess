@@ -134,8 +134,7 @@ extension _MapExtensions on Map<String, dynamic> {
 
       final subElements = this[key];
       if (subElements is Map<String, dynamic>) {
-        this[key] = subElements.map((key, value) => MapEntry(key,
-            value is Map<String, dynamic> ? value.filter(subfields!) : value));
+        this[key] = subElements.filter(subfields!);
       } else if (subElements is List) {
         this[key] = subElements.map((element) {
           if (element is Map<String, dynamic>) {

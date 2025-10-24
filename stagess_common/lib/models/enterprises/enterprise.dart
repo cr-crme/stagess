@@ -199,11 +199,11 @@ class Enterprise extends ExtendedItemSerializable {
         'jobs': Job.fetchableFields,
         'contact': Person.fetchableFields,
         'contact_function': FetchableFields.optional,
-        'address': FetchableFields.mandatory,
-        'phone': FetchableFields.optional,
-        'fax': FetchableFields.optional,
+        'address': Address.fetchableFields,
+        'phone': PhoneNumber.fetchableFields,
+        'fax': PhoneNumber.fetchableFields,
         'website': FetchableFields.optional,
-        'headquarters_address': FetchableFields.optional,
+        'headquarters_address': Address.fetchableFields,
         'neq': FetchableFields.optional,
       });
 

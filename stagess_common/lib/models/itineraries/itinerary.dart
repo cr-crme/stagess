@@ -1,6 +1,7 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:routing_client_dart/routing_client_dart.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/itineraries/waypoint.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:uuid/uuid.dart';
@@ -91,6 +92,12 @@ class Itinerary extends ListSerializable<Waypoint>
         'date': date.millisecondsSinceEpoch,
         'waypoints': super.map((e) => e.serialize()).toList()
       };
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'date': FetchableFields.mandatory,
+        'waypoints': Waypoint.fetchableFields,
+      });
 
   @override
   bool operator ==(Object other) {
