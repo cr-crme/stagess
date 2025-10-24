@@ -208,6 +208,7 @@ class StudentListTileState extends State<StudentListTile> {
       );
     }
     await students.releaseLockForItem(widget.student);
+    if (!mounted) return;
     setState(() {
       _forceDisabled = false;
     });
@@ -273,7 +274,6 @@ class StudentListTileState extends State<StudentListTile> {
   @override
   void didUpdateWidget(covariant StudentListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_isEditing) return;
 
     if (_firstNameController.text != widget.student.firstName) {
       _firstNameController.text = widget.student.firstName;

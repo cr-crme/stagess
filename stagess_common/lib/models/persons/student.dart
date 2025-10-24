@@ -223,7 +223,7 @@ class Student extends Person {
           ? program
           : Program._fromInt(data['program'] as int, _currentVersion),
       group: StringExt.from(data['group']) ?? group,
-      contact: Person.from(data['contact']) ?? contact,
+      contact: contact.copyWithData(data['contact']),
       contactLink: StringExt.from(data['contact_link']) ?? contactLink,
     );
   }

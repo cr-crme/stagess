@@ -90,6 +90,7 @@ class SchoolBoard extends ExtendedItemSerializable {
       throw WrongVersionException(version, _currentVersion);
     }
 
+    final schoolsToKeep = data['schools'].map((e) => e['id']).toSet();
     return SchoolBoard(
       id: StringExt.from(data['id']) ?? id,
       name: data['name'] ?? name,
@@ -97,7 +98,7 @@ class SchoolBoard extends ExtendedItemSerializable {
           ? Uint8List.fromList((data['logo'] as List).cast<int>())
           : logo,
       schools: ListExt.mergeWithData(
-        schools,
+        schools.where((e) => schoolsToKeep.contains(e.id)).toList(),
         data['schools'],
         copyWithData: (school, serialized) => school.copyWithData(serialized),
         deserializer: (serialized) => School.fromSerialized(serialized),

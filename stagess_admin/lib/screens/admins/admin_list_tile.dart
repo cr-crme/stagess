@@ -122,6 +122,7 @@ class AdminListTileState extends State<AdminListTile> {
       );
     }
     await admins.releaseLockForItem(widget.admin);
+    if (!mounted) return;
     setState(() {
       _forceDisabled = false;
     });

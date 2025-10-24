@@ -162,6 +162,7 @@ class TeacherListTileState extends State<TeacherListTile> {
       );
     }
     await teachers.releaseLockForItem(widget.teacher);
+    if (!mounted) return;
     setState(() {
       _forceDisabled = false;
     });

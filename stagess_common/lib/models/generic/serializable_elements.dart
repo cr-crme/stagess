@@ -27,9 +27,11 @@ extension ListExt on List {
   }
 
   static List<T> mergeWithData<T extends ItemSerializable>(
-      List<T> original, List? elements,
-      {required T Function(T original, dynamic serialized) copyWithData,
-      required T Function(dynamic serialized) deserializer}) {
+    List<T> original,
+    List? elements, {
+    required T Function(T original, dynamic serialized) copyWithData,
+    required T Function(dynamic serialized) deserializer,
+  }) {
     final out = from(elements, deserializer: (serialized) {
           final e = original.firstWhereOrNull((e) => e.id == serialized['id']);
           return e == null
