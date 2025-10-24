@@ -127,7 +127,7 @@ class FetchableFields {
 
   Map<String, dynamic> get serialized {
     if (includeAll) {
-      return {'*': true};
+      return {'include_all': true};
     }
 
     final Map<String, dynamic> out = <String, dynamic>{};
@@ -148,7 +148,7 @@ class FetchableFields {
 
     final Map<String, FetchableFields> out = {};
     for (final entry in map.entries) {
-      if (entry.key == '*' && entry.value == true) {
+      if (entry.key == 'include_all' && entry.value == true) {
         return FetchableFields.all;
       } else if (entry.value is bool) {
         out[entry.key] =

@@ -164,6 +164,7 @@ class PostInternshipEnterpriseEvaluation extends ItemSerializable {
 
 class InternshipMutableElements extends ItemSerializable {
   InternshipMutableElements({
+    super.id,
     required this.creationDate,
     required this.supervisor,
     required this.dates,
@@ -206,6 +207,28 @@ class InternshipMutableElements extends ItemSerializable {
         'transportations': transportations.map((e) => e.serialize()).toList(),
         'visit_frequencies': visitFrequencies.serialize(),
       };
+
+  InternshipMutableElements copyWithData(dynamic serialized) {
+    return InternshipMutableElements(
+      id: id,
+      creationDate:
+          DateTimeExt.from(serialized['creation_date']) ?? creationDate,
+      supervisor: supervisor.copyWithData(serialized['supervisor']),
+      dates: DateTimeRange(
+        start: DateTimeExt.from(serialized['starting_date']) ?? dates.start,
+        end: DateTimeExt.from(serialized['ending_date']) ?? dates.end,
+      ),
+      weeklySchedules: (serialized['schedules'] as List?)
+              ?.map((e) => WeeklySchedule.fromSerialized(e))
+              .toList() ??
+          weeklySchedules,
+      transportations: ListExt.from(serialized['transportations'],
+              deserializer: (e) => Transportation.deserialize(e)) ??
+          transportations,
+      visitFrequencies:
+          StringExt.from(serialized['visit_frequencies']) ?? visitFrequencies,
+    );
+  }
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
@@ -607,10 +630,10 @@ class Internship extends ExtendedItemSerializable {
       extraSpecializationIds: ListExt.from(data['extra_specialization_ids'],
               deserializer: (e) => StringExt.from(e)!) ??
           extraSpecializationIds,
-      mutables: (data['mutables'] as List?)
-              ?.map(((e) => InternshipMutableElements.fromSerialized(e)))
-              .toList() ??
-          _mutables,
+      mutables: ListExt.mergeWithData(_mutables, data['mutables'] as List?,
+          copyWithData: (original, serialized) =>
+              original.copyWithData(serialized),
+          deserializer: (e) => InternshipMutableElements.fromSerialized(e)),
       expectedDuration:
           IntExt.from(data['expected_duration']) ?? expectedDuration,
       achievedDuration:

@@ -228,7 +228,6 @@ class TeacherListTileState extends State<TeacherListTile> {
   @override
   void didUpdateWidget(covariant TeacherListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_isEditing) return;
 
     if (_firstNameController.text != widget.teacher.firstName) {
       _firstNameController.text = widget.teacher.firstName;

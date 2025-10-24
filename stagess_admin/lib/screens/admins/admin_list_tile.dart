@@ -186,7 +186,6 @@ class AdminListTileState extends State<AdminListTile> {
   @override
   void didUpdateWidget(covariant AdminListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_isEditing) return;
 
     if (_firstNameController.text != widget.admin.firstName) {
       _firstNameController.text = widget.admin.firstName;

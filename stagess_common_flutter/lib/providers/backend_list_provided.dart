@@ -442,6 +442,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
           data: item.serialize(),
         ),
       );
+      _registeredFields.remove(item.id);
 
       if (mockMe) {
         super.remove(item, notify: true);

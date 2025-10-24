@@ -97,6 +97,18 @@ class Address extends ItemSerializable {
         postalCode: postalCode ?? this.postalCode);
   }
 
+  Address copyWithData(Map<String, dynamic>? data) {
+    if (data == null) return this;
+    return copyWith(
+      id: StringExt.from(data['id']) ?? id,
+      civicNumber: IntExt.from(data['civic']) ?? civicNumber,
+      street: StringExt.from(data['street']) ?? street,
+      apartment: StringExt.from(data['apartment']) ?? apartment,
+      city: StringExt.from(data['city']) ?? city,
+      postalCode: StringExt.from(data['postal_code']) ?? postalCode,
+    );
+  }
+
   bool get isEmpty =>
       civicNumber == null &&
       street == null &&

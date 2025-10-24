@@ -174,7 +174,8 @@ class Job extends ItemSerializable {
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
         'specialization_id': FetchableFields.mandatory,
-        'positions_offered': FetchableFields.mandatory,
+        'positions_offered': FetchableFields.optional
+          ..addAll(FetchableFields.reference({'*': FetchableFields.mandatory})),
         'minimum_age': FetchableFields.optional,
         'pre_internship_requests': PreInternshipRequests.fetchableFields,
         'uniforms': FetchableFields.optional,

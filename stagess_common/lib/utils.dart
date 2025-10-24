@@ -122,15 +122,25 @@ extension _MapExtensions on Map<String, dynamic> {
   Map<String, dynamic> filter(FetchableFields fields) {
     if (fields.includeAll) return this;
 
-    final fieldsToKeep = fields.fieldNames;
+    final fieldsToKeep = fields.fieldNames.toList();
     removeWhere((key, value) =>
         key != 'id' &&
         key != 'version' &&
-        !(fieldsToKeep.contains(key) || (fields[key]?.includeAll == false)));
+        !((fieldsToKeep.length == 1 && fieldsToKeep[0] == '*') ||
+            fieldsToKeep.contains(key) ||
+            (fields[key]?.includeAll == false)));
 
     for (var key in fieldsToKeep) {
       final subfields = fields[key];
       if (subfields?.isEmpty ?? true) continue;
+
+      if (key == '*') {
+        for (final thisKey in keys) {
+          if (this[thisKey] is! Map<String, dynamic>) continue;
+          this[thisKey] =
+              (this[thisKey] as Map<String, dynamic>).filter(subfields!);
+        }
+      }
 
       final subElements = this[key];
       if (subElements is Map<String, dynamic>) {

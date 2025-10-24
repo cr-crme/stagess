@@ -348,7 +348,6 @@ class InternshipListTileState extends State<InternshipListTile> {
   @override
   void didUpdateWidget(covariant InternshipListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_isEditing) return;
     final teachers = TeachersProvider.of(context, listen: false);
 
     if (_teacherPickerController.teacher?.id !=

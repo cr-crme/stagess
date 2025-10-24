@@ -65,20 +65,22 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       );
   @override
   void dispose() {
-    _nameController.dispose();
-    _activityTypeController.dispose();
-    _teacherPickerController.dispose();
-    _phoneController.dispose();
-    _faxController.dispose();
-    _websiteController.dispose();
-    _addressController.dispose();
-    _headquartersAddressController.dispose();
-    _contactFirstNameController.dispose();
-    _contactLastNameController.dispose();
-    _contactFunctionController.dispose();
-    _contactPhoneController.dispose();
-    _contactEmailController.dispose();
-    _neqController.dispose();
+    if (mounted) {
+      _nameController.dispose();
+      _activityTypeController.dispose();
+      _teacherPickerController.dispose();
+      _phoneController.dispose();
+      _faxController.dispose();
+      _websiteController.dispose();
+      _addressController.dispose();
+      _headquartersAddressController.dispose();
+      _contactFirstNameController.dispose();
+      _contactLastNameController.dispose();
+      _contactFunctionController.dispose();
+      _contactPhoneController.dispose();
+      _contactEmailController.dispose();
+      _neqController.dispose();
+    }
     super.dispose();
   }
 
@@ -123,7 +125,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     ),
   );
   late final _teacherPickerController = TeacherPickerController(
-    initial: TeachersProvider.of(context, listen: true).firstWhereOrNull(
+    initial: TeachersProvider.of(context, listen: false).firstWhereOrNull(
       (teacher) => teacher.id == widget.enterprise.recruiterId,
     ),
   );
@@ -319,7 +321,6 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   @override
   void didUpdateWidget(covariant EnterpriseListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_isEditing) return;
 
     if (_enterpriseStatusController.value != widget.enterprise.status) {
       _enterpriseStatusController.forceSet(widget.enterprise.status);
