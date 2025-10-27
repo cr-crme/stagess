@@ -322,7 +322,7 @@ class _PostInternshipEvaluation extends StatelessWidget {
                 onTap:
                     () => showEnterpriseEvaluationDialog(
                       context,
-                      internship: internship,
+                      internshipId: internship.id,
                     ),
               );
             })),

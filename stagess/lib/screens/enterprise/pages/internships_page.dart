@@ -190,7 +190,7 @@ class _InternshipListState extends State<_InternshipList> {
   }
 
   void _evaluateEnterprise(context, Internship internship) async {
-    await showEnterpriseEvaluationDialog(context, internship: internship);
+    await showEnterpriseEvaluationDialog(context, internshipId: internship.id);
   }
 
   /// Returns if the current teacher can control the internship that has the

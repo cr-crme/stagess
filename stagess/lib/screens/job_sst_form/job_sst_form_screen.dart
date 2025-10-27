@@ -7,6 +7,7 @@ import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/misc/question_file_service.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common_flutter/helpers/form_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
@@ -34,7 +35,7 @@ Future<Enterprise?> showJobSstFormDialog(
             enterprises.getLockForItem(enterprises[enterpriseId]),
             enterprises.fetchData(
               id: enterpriseId,
-              fields: Enterprise.fetchableFields,
+              fields: FetchableFields.all,
             ),
           ]),
           builder: (context, snapshot) {

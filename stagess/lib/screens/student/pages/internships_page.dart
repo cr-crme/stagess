@@ -192,7 +192,7 @@ class _StudentInternshipListViewState
   }
 
   void _evaluateEnterprise(context, Internship internship) async {
-    await showEnterpriseEvaluationDialog(context, internship: internship);
+    await showEnterpriseEvaluationDialog(context, internshipId: internship.id);
   }
 
   @override

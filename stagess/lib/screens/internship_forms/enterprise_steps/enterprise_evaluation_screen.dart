@@ -6,6 +6,7 @@ import 'package:stagess/screens/internship_forms/enterprise_steps/specialized_st
 import 'package:stagess/screens/internship_forms/enterprise_steps/supervision_step.dart';
 import 'package:stagess/screens/internship_forms/enterprise_steps/task_and_ability_step.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
@@ -17,10 +18,44 @@ final _logger = Logger('EnterpriseEvaluationScreen');
 
 Future<void> showEnterpriseEvaluationDialog(
   BuildContext context, {
-  required Internship internship,
+  required String internshipId,
 }) async {
   final internships = InternshipsProvider.of(context, listen: false);
-  final hasLock = await internships.getLockForItem(internship);
+
+  final hasLock = await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder:
+        (context) => FutureBuilder(
+          future: Future.wait([
+            internships.getLockForItem(internships[internshipId]),
+            internships.fetchData(
+              id: internshipId,
+              fields: FetchableFields.all,
+            ),
+          ]),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final hasLock = (snapshot.data as List).first as bool;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.of(context).pop(hasLock);
+              });
+            }
+            return Dialog(
+              child: SizedBox(
+                width: 100,
+                height: 100,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+  );
+
   if (!hasLock || !context.mounted) {
     if (context.mounted) {
       showSnackBar(
@@ -32,6 +67,7 @@ Future<void> showEnterpriseEvaluationDialog(
     return;
   }
 
+  final internship = internships.firstWhere((e) => e.id == internshipId);
   final editedInternship = await showDialog(
     context: context,
     barrierDismissible: false,
