@@ -2,6 +2,7 @@ import 'package:enhanced_containers_foundation/enhanced_containers_foundation.da
 import 'package:latlong2/latlong.dart';
 import 'package:routing_client_dart/routing_client_dart.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
+import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/itineraries/waypoint.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:uuid/uuid.dart';
@@ -68,6 +69,23 @@ class Itinerary extends ListSerializable<Waypoint>
       itinerary.add(waypoint.copyWith());
     }
     return itinerary;
+  }
+
+  Itinerary copyWithData(Map<String, dynamic>? data) {
+    if (data == null || data.isEmpty) return copyWith();
+    return Itinerary(
+      id: data['id'] ?? id,
+      date: data['date'] == null
+          ? date
+          : DateTime.fromMillisecondsSinceEpoch(data['date']),
+      waypoints: ListExt.mergeWithData<Waypoint>(
+        toList(),
+        data['waypoints'],
+        copyWithData: (original, serialized) =>
+            original.copyWithData(serialized),
+        deserializer: Waypoint.fromSerialized,
+      ),
+    );
   }
 
   static Itinerary fromSerialized(map) {

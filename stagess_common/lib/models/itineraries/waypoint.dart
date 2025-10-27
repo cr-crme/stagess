@@ -165,6 +165,23 @@ class Waypoint extends ItemSerializable {
     );
   }
 
+  Waypoint copyWithData(data) {
+    return Waypoint(
+      id: data['id'] ?? id,
+      title: data['title'] ?? title,
+      subtitle: data['subtitle'] ?? subtitle,
+      latitude: (data['latitude'] as num?)?.toDouble() ?? latitude,
+      longitude: (data['longitude'] as num?)?.toDouble() ?? longitude,
+      address: data['address'] != null
+          ? Address.fromSerialized(data['address'])
+          : address,
+      priority: data['priority'] != null
+          ? VisitingPriority.values[data['priority']]
+          : priority,
+      showTitle: data['showTitle'] ?? showTitle,
+    );
+  }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
