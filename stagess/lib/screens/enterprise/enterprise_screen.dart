@@ -58,7 +58,6 @@ class EnterpriseScreen extends StatelessWidget {
 
         final hasFullData = snapshot.connectionState == ConnectionState.done;
         return _EnterpriseScreenInternal(
-          key: ValueKey('enterprise_${id}_$hasFullData'),
           id: id,
           pageIndex: pageIndex,
           hasFullData: hasFullData,
@@ -70,7 +69,6 @@ class EnterpriseScreen extends StatelessWidget {
 
 class _EnterpriseScreenInternal extends StatefulWidget {
   const _EnterpriseScreenInternal({
-    super.key,
     required this.id,
     required this.pageIndex,
     required this.hasFullData,
@@ -81,10 +79,11 @@ class _EnterpriseScreenInternal extends StatefulWidget {
   final bool hasFullData;
 
   @override
-  State<_EnterpriseScreenInternal> createState() => _EnterpriseScreenState();
+  State<_EnterpriseScreenInternal> createState() =>
+      _EnterpriseScreenInternalState();
 }
 
-class _EnterpriseScreenState extends State<_EnterpriseScreenInternal>
+class _EnterpriseScreenInternalState extends State<_EnterpriseScreenInternal>
     with SingleTickerProviderStateMixin {
   late final _tabController = TabController(
     initialIndex: widget.pageIndex,
