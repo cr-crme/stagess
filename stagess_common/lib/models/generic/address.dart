@@ -66,6 +66,14 @@ class Address extends ItemSerializable {
         'city': FetchableFields.optional,
         'postal_code': FetchableFields.optional,
       });
+  static FetchableFields get mandatoryFetchableFields =>
+      FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'civic': FetchableFields.mandatory,
+        'street': FetchableFields.mandatory,
+        'city': FetchableFields.mandatory,
+        'postal_code': FetchableFields.mandatory,
+      });
 
   static Address? from(map) {
     if (map == null) return null;

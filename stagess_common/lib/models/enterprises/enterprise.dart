@@ -203,7 +203,7 @@ class Enterprise extends ExtendedItemSerializable {
           ..addAll(FetchableFields.reference({'*': Job.fetchableFields})),
         'contact': Person.fetchableFields,
         'contact_function': FetchableFields.optional,
-        'address': Address.fetchableFields,
+        'address': Address.mandatoryFetchableFields,
         'phone': PhoneNumber.fetchableFields,
         'fax': PhoneNumber.fetchableFields,
         'website': FetchableFields.optional,

@@ -125,7 +125,7 @@ class Student extends Person {
       'school_board_id': FetchableFields.mandatory,
       'school_id': FetchableFields.mandatory,
       'photo': FetchableFields.optional,
-      'program': FetchableFields.optional,
+      'program': FetchableFields.mandatory,
       'group': FetchableFields.mandatory,
       'contact': Person.fetchableFields,
       'contact_link': FetchableFields.optional,

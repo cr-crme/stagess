@@ -24,16 +24,17 @@ class EnterpriseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-        'Building EnterpriseCard for enterprise with id: ${enterprise.id}');
+      'Building EnterpriseCard for enterprise with id: ${enterprise.id}',
+    );
 
     final schoolId = AuthProvider.of(context, listen: false).schoolId ?? '';
 
     final jobs = [...enterprise.jobs];
     final availableJobs = [...enterprise.availablejobs(context)];
     jobs.sort(
-      (a, b) => a.specialization.name
-          .toLowerCase()
-          .compareTo(b.specialization.name.toLowerCase()),
+      (a, b) => a.specialization.name.toLowerCase().compareTo(
+        b.specialization.name.toLowerCase(),
+      ),
     );
 
     return Card(
@@ -42,17 +43,17 @@ class EnterpriseCard extends StatelessWidget {
         onTap: () => onTap(enterprise),
         title: Text(
           enterprise.name,
-          style: Theme.of(context)
-              .textTheme
-              .titleMedium!
-              .copyWith(fontWeight: FontWeight.bold),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 8),
             Visibility(
-              visible: enterprise.address != null ||
+              visible:
+                  enterprise.address != null ||
                   enterprise.headquartersAddress != null,
               child: Text(
                 enterprise.address != null
@@ -63,50 +64,55 @@ class EnterpriseCard extends StatelessWidget {
             ),
             ...(enterprise.status != EnterpriseStatus.active
                 ? [
-                    Padding(
-                      padding:
-                          const EdgeInsets.only(left: 12, top: 8, bottom: 4),
-                      child: Text(
-                        'Aucun métier actif pour cette entreprise',
-                        style: TextStyle(color: Colors.grey[800]),
-                      ),
-                    )
-                  ]
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12, top: 8, bottom: 4),
+                    child: Text(
+                      'Aucun métier actif pour cette entreprise',
+                      style: TextStyle(color: Colors.grey[800]),
+                    ),
+                  ),
+                ]
                 : jobs.isEmpty
-                    ? [
-                        Padding(
-                          padding: const EdgeInsets.only(
-                              left: 12, top: 8, bottom: 4),
+                ? [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12, top: 8, bottom: 4),
+                    child: Text(
+                      'Aucun métier actif pour cette entreprise',
+                      style: TextStyle(color: Colors.grey[800]),
+                    ),
+                  ),
+                ]
+                : jobs.map((job) {
+                  final status = AvailabilityStatus.fromJob(
+                    context,
+                    enterprise: enterprise,
+                    job: job,
+                    availableJobs: availableJobs,
+                  );
+
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 8),
+                    child: Row(
+                      children: [
+                        DisponibilityCircle(
+                          positionsOffered: job.positionsOffered[schoolId] ?? 0,
+                          positionsOccupied: job.positionsOccupied(
+                            context,
+                            listen: true,
+                          ),
+                          enabled: status.isEnabled,
+                        ),
+                        const SizedBox(width: 8),
+                        Flexible(
                           child: Text(
-                            'Aucun métier actif pour cette entreprise',
+                            job.specialization.idWithName,
                             style: TextStyle(color: Colors.grey[800]),
                           ),
-                        )
-                      ]
-                    : jobs.map((job) {
-                        final status = AvailabilityStatus.fromJob(context,
-                            enterprise: enterprise,
-                            job: job,
-                            availableJobs: availableJobs);
-
-                        return Padding(
-                            padding: const EdgeInsets.only(top: 8),
-                            child: Row(children: [
-                              DisponibilityCircle(
-                                  positionsOffered:
-                                      job.positionsOffered[schoolId] ?? 0,
-                                  positionsOccupied: job
-                                      .positionsOccupied(context, listen: true),
-                                  enabled: status.isEnabled),
-                              const SizedBox(width: 8),
-                              Flexible(
-                                child: Text(
-                                  job.specialization.idWithName,
-                                  style: TextStyle(color: Colors.grey[800]),
-                                ),
-                              ),
-                            ]));
-                      })),
+                        ),
+                      ],
+                    ),
+                  );
+                })),
           ],
         ),
         trailing: Visibility(
@@ -116,7 +122,9 @@ class EnterpriseCard extends StatelessWidget {
             message:
                 'Il y a au moins eu un accident répertorié pour cette entreprise',
             margin: EdgeInsets.only(
-                left: MediaQuery.of(context).size.width / 4, right: 12),
+              left: MediaQuery.of(context).size.width / 4,
+              right: 12,
+            ),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Icon(
