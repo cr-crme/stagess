@@ -59,10 +59,15 @@ class TeacherListTileState extends State<TeacherListTile> {
     _addressController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
+    _disposeCurrentGroupsControllers();
+    super.dispose();
+  }
+
+  void _disposeCurrentGroupsControllers() {
     for (var controller in _currentGroups) {
       controller.dispose();
     }
-    super.dispose();
+    _currentGroups.clear();
   }
 
   var _fetchFullDataCompleter = Completer<void>();
@@ -77,9 +82,14 @@ class TeacherListTileState extends State<TeacherListTile> {
   late final _lastNameController = TextEditingController(
     text: widget.teacher.lastName,
   );
-  late final List<TextEditingController> _currentGroups = [
-    for (var group in widget.teacher.groups) TextEditingController(text: group),
-  ];
+  final List<TextEditingController> _currentGroups = [];
+  void _fillCurrentGroupsControllers() {
+    _currentGroups.clear();
+    for (var group in widget.teacher.groups) {
+      _currentGroups.add(TextEditingController(text: group));
+    }
+  }
+
   late final _addressController = AddressController(
     initialValue: widget.teacher.address,
   );
@@ -110,6 +120,7 @@ class TeacherListTileState extends State<TeacherListTile> {
   @override
   void initState() {
     super.initState();
+    _fillCurrentGroupsControllers();
     if (widget.forceEditingMode) {
       _fetchFullDataCompleter.complete();
       _onClickedEditing();
@@ -228,39 +239,24 @@ class TeacherListTileState extends State<TeacherListTile> {
   @override
   void didUpdateWidget(covariant TeacherListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.teacher.getDifference(editedTeacher).isEmpty) return;
 
-    if (_firstNameController.text != widget.teacher.firstName) {
-      _firstNameController.text = widget.teacher.firstName;
-    }
-    if (_lastNameController.text != widget.teacher.lastName) {
-      _lastNameController.text = widget.teacher.lastName;
-    }
+    _firstNameController.text = widget.teacher.firstName;
+    _lastNameController.text = widget.teacher.lastName;
 
-    if (_addressController.address != widget.teacher.address) {
-      if (widget.teacher.address == null) {
-        _addressController.address = null;
-      } else {
-        _addressController.setAddressAndForceValidated(widget.teacher.address!);
-      }
-    }
-    if (_phoneController.text != (widget.teacher.phone?.toString() ?? '')) {
-      _phoneController.text = widget.teacher.phone?.toString() ?? '';
-    }
-    if (_emailController.text != widget.teacher.email) {
-      _emailController.text = widget.teacher.email.toString();
-    }
+    _addressController.setAddress(
+      widget.teacher.address,
+      forceIsValid: widget.teacher.address != null,
+    );
+    _phoneController.text = widget.teacher.phone?.toString() ?? '';
+    _emailController.text = widget.teacher.email.toString();
 
     if (areListsNotEqual(
       _currentGroups.map((e) => e.text).toList(),
       widget.teacher.groups,
     )) {
-      for (var controller in _currentGroups) {
-        controller.dispose();
-      }
-      _currentGroups.clear();
-      for (var group in widget.teacher.groups) {
-        _currentGroups.add(TextEditingController(text: group));
-      }
+      _disposeCurrentGroupsControllers();
+      _fillCurrentGroupsControllers();
     }
   }
 

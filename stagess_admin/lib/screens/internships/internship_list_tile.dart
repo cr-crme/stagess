@@ -305,7 +305,24 @@ class InternshipListTileState extends State<InternshipListTile> {
 
       // Finish editing
       final newInternship = editedInternship;
-      if (newInternship.getDifference(widget.internship).isNotEmpty) {
+
+      // Mutable will always be different here, since a new version is created
+      // Therefore we need to manually check if the last version is different
+      // from the previous one to avoid creating trial new versions.
+      final differences = newInternship.getDifference(widget.internship);
+      bool areDifferent = differences.length > 1;
+      if (!areDifferent) {
+        areDifferent = areMapsNotEqual(
+          newInternship.hasVersions
+              ? newInternship.serializedMutables.last
+              : null,
+          widget.internship.hasVersions
+              ? widget.internship.serializedMutables.last
+              : null,
+          ignoreKeys: ['id', 'creation_date'],
+        );
+      }
+      if (areDifferent) {
         final isSuccess = await internships.replaceWithConfirmation(
           newInternship,
         );
@@ -349,83 +366,50 @@ class InternshipListTileState extends State<InternshipListTile> {
   @override
   void didUpdateWidget(covariant InternshipListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    final teachers = TeachersProvider.of(context, listen: false);
+    if (widget.internship.getDifference(editedInternship).isEmpty) return;
 
-    if (_teacherPickerController.teacher?.id !=
-        widget.internship.signatoryTeacherId) {
-      _teacherPickerController.teacher = teachers.fromIdOrNull(
-        widget.internship.signatoryTeacherId,
-      );
-    }
+    _teacherPickerController.teacher = TeachersProvider.of(
+      context,
+      listen: false,
+    ).fromIdOrNull(widget.internship.signatoryTeacherId);
 
     final supervisor =
         widget.internship.hasVersions
             ? widget.internship.supervisor
             : Person.empty;
-    if (_contactFirstNameController.text != supervisor.firstName) {
-      _contactFirstNameController.text = supervisor.firstName;
-    }
-    if (_contactLastNameController.text != supervisor.lastName) {
-      _contactLastNameController.text = supervisor.lastName;
-    }
-    if (_contactPhoneController.text != (supervisor.phone?.toString() ?? '')) {
-      _contactPhoneController.text = supervisor.phone?.toString() ?? '';
-    }
-    if (_contactEmailController.text != supervisor.email) {
-      _contactEmailController.text = supervisor.email ?? '';
-    }
+    _contactFirstNameController.text = supervisor.firstName;
+    _contactLastNameController.text = supervisor.lastName;
+    _contactPhoneController.text = supervisor.phone?.toString() ?? '';
+    _contactEmailController.text = supervisor.email ?? '';
 
-    final dates =
+    _weeklySchedulesController.dateRange =
         widget.internship.hasVersions ? widget.internship.dates : null;
-    if (_weeklySchedulesController.dateRange != dates) {
-      _weeklySchedulesController.dateRange = dates;
-    }
-    final weeklySchedules =
-        widget.internship.hasVersions
-            ? widget.internship.weeklySchedules
-            : <WeeklySchedule>[];
-    if (!InternshipHelpers.areSchedulesEqual(
-      _weeklySchedulesController.weeklySchedules,
-      weeklySchedules,
-    )) {
-      _weeklySchedulesController.weeklySchedules =
-          InternshipHelpers.copySchedules(weeklySchedules, keepId: true);
-    }
 
-    if (_expectedDurationController.text !=
-        widget.internship.expectedDuration.toString()) {
-      _expectedDurationController.text =
-          widget.internship.expectedDuration.toString();
-    }
-    final transportations =
-        widget.internship.hasVersions
-            ? widget.internship.transportations
-            : <Transportation>[];
-    if (_transportations.toSet() != transportations.toSet()) {
-      _transportations
-        ..clear()
-        ..addAll(transportations);
-    }
-    final visitFrequencies =
+    _weeklySchedulesController
+        .weeklySchedules = InternshipHelpers.copySchedules(
+      widget.internship.hasVersions ? widget.internship.weeklySchedules : [],
+      keepId: true,
+    );
+
+    _expectedDurationController.text =
+        widget.internship.expectedDuration.toString();
+
+    _transportations
+      ..clear()
+      ..addAll(
+        widget.internship.hasVersions ? widget.internship.transportations : [],
+      );
+
+    _visitFrequenciesController.text =
         widget.internship.hasVersions ? widget.internship.visitFrequencies : '';
-    if (_visitFrequenciesController.text != visitFrequencies) {
-      _visitFrequenciesController.text = visitFrequencies;
-    }
 
-    if (_endDate != widget.internship.endDate) {
-      _endDate = widget.internship.endDate;
-    }
-    if (_achievedDurationController.text !=
-        (widget.internship.achievedDuration < 0
+    _endDate = widget.internship.endDate;
+    _achievedDurationController.text =
+        widget.internship.achievedDuration < 0
             ? ''
-            : widget.internship.achievedDuration.toString())) {
-      _achievedDurationController.text =
-          widget.internship.achievedDuration.toString();
-    }
+            : widget.internship.achievedDuration.toString();
 
-    if (_teacherNotesController.text != widget.internship.teacherNotes) {
-      _teacherNotesController.text = widget.internship.teacherNotes;
-    }
+    _teacherNotesController.text = widget.internship.teacherNotes;
   }
 
   Future<void> _fetchData() async {

@@ -272,8 +272,10 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
 
   Future<void> _insertToSchools(School school, SchoolBoard schoolBoard,
       {required DatabaseUser user}) async {
-    if (user.accessLevel < AccessLevel.admin ||
-        schoolBoard.id != user.schoolBoardId) {
+    final isOkay = user.accessLevel >= AccessLevel.superAdmin ||
+        (user.accessLevel == AccessLevel.admin &&
+            schoolBoard.id == user.schoolBoardId);
+    if (!isOkay) {
       throw InvalidRequestException('You must be a admin to create a school');
     }
 

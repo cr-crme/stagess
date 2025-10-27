@@ -318,14 +318,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     }
   }
 
-  @override
-  void didUpdateWidget(covariant EnterpriseListTile oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    if (_enterpriseStatusController.value != widget.enterprise.status) {
-      _enterpriseStatusController.forceSet(widget.enterprise.status);
-    }
-
+  void _updateJobControllersIfNeeded() {
     // Replace the job controllers if the jobs have changed
     final keysToRemove = <String>[];
     for (final key in _jobControllers.keys) {
@@ -350,75 +343,45 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
         _jobControllers[job.id] = _controllerFromJob(context, job: job);
       }
     }
+  }
 
-    if (_nameController.text != widget.enterprise.name) {
-      _nameController.text = widget.enterprise.name;
-    }
-    if (_teacherPickerController.teacher?.id != widget.enterprise.recruiterId) {
-      _teacherPickerController.teacher = TeachersProvider.of(
-        context,
-        listen: false,
-      ).firstWhereOrNull(
-        (teacher) => teacher.id == widget.enterprise.recruiterId,
-      );
-    }
-    if (_addressController.address != widget.enterprise.address) {
-      if (widget.enterprise.address == null) {
-        _addressController.address = null;
-      } else {
-        _addressController.setAddressAndForceValidated(
-          widget.enterprise.address!,
-        );
-      }
-    }
-    if (_phoneController.text != widget.enterprise.phone?.toString()) {
-      _phoneController.text = widget.enterprise.phone?.toString() ?? '';
-    }
-    if (_faxController.text != widget.enterprise.fax?.toString()) {
-      _faxController.text = widget.enterprise.fax?.toString() ?? '';
-    }
-    if (_websiteController.text != widget.enterprise.website) {
-      _websiteController.text = widget.enterprise.website ?? '';
-    }
-    if (_headquartersAddressController.address !=
-        widget.enterprise.headquartersAddress) {
-      if (widget.enterprise.headquartersAddress == null) {
-        _headquartersAddressController.address = null;
-      } else {
-        _headquartersAddressController.setAddressAndForceValidated(
-          widget.enterprise.headquartersAddress!,
-        );
-      }
-    }
-    if (_contactFirstNameController.text !=
-        widget.enterprise.contact.firstName) {
-      _contactFirstNameController.text = widget.enterprise.contact.firstName;
-    }
-    if (_contactLastNameController.text != widget.enterprise.contact.lastName) {
-      _contactLastNameController.text = widget.enterprise.contact.lastName;
-    }
-    if (_contactFunctionController.text != widget.enterprise.contactFunction) {
-      _contactFunctionController.text = widget.enterprise.contactFunction;
-    }
-    if (_contactPhoneController.text !=
-        widget.enterprise.contact.phone?.toString()) {
-      _contactPhoneController.text =
-          widget.enterprise.contact.phone?.toString() ?? '';
-    }
-    if (_contactEmailController.text != widget.enterprise.contact.email) {
-      _contactEmailController.text = widget.enterprise.contact.email ?? '';
-    }
-    if (_neqController.text != widget.enterprise.neq) {
-      _neqController.text = widget.enterprise.neq ?? '';
-    }
-    if (areSetsNotEqual(
-      _activityTypeController.activityTypes,
-      widget.enterprise.activityTypes,
-    )) {
-      _activityTypeController.updateActivityTypes({
-        ...widget.enterprise.activityTypes,
-      }, refresh: false);
-    }
+  @override
+  void didUpdateWidget(covariant EnterpriseListTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.enterprise.getDifference(editedEnterprise).isEmpty) return;
+    final teachers = TeachersProvider.of(context, listen: false);
+
+    _enterpriseStatusController.forceSet(widget.enterprise.status);
+
+    _updateJobControllersIfNeeded();
+    _nameController.text = widget.enterprise.name;
+
+    _teacherPickerController.teacher = teachers.fromIdOrNull(
+      widget.enterprise.recruiterId,
+    );
+
+    _addressController.setAddress(
+      widget.enterprise.address,
+      forceIsValid: widget.enterprise.address != null,
+    );
+    _phoneController.text = widget.enterprise.phone?.toString() ?? '';
+    _faxController.text = widget.enterprise.fax?.toString() ?? '';
+    _websiteController.text = widget.enterprise.website ?? '';
+    _headquartersAddressController.setAddress(
+      widget.enterprise.headquartersAddress,
+      forceIsValid: widget.enterprise.headquartersAddress != null,
+    );
+    _contactFirstNameController.text = widget.enterprise.contact.firstName;
+    _contactLastNameController.text = widget.enterprise.contact.lastName;
+    _contactFunctionController.text = widget.enterprise.contactFunction;
+    _contactPhoneController.text =
+        widget.enterprise.contact.phone?.toString() ?? '';
+
+    _contactEmailController.text = widget.enterprise.contact.email ?? '';
+    _neqController.text = widget.enterprise.neq ?? '';
+    _activityTypeController.updateActivityTypes({
+      ...widget.enterprise.activityTypes,
+    }, refresh: false);
   }
 
   Future<void> _fetchData() async {

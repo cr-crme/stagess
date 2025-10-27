@@ -1,14 +1,21 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 
-bool areListsEqual<T>(List<T> list1, List<T> list2) {
+bool areListsEqual<T>(List<T> list1, List<T> list2,
+    {List<String> ignoreKeys = const []}) {
   if (list1.length != list2.length) return false;
 
   for (int i = 0; i < list1.length; i++) {
     if (list1[i] is List) {
-      if (areListsNotEqual(list1[i] as List, list2[i] as List)) return false;
+      if (areListsNotEqual(list1[i] as List, list2[i] as List,
+          ignoreKeys: ignoreKeys)) {
+        return false;
+      }
     } else if (list1[i] is Map) {
-      if (areMapsNotEqual(list1[i] as Map, list2[i] as Map)) return false;
+      if (areMapsNotEqual(list1[i] as Map, list2[i] as Map,
+          ignoreKeys: ignoreKeys)) {
+        return false;
+      }
     } else {
       if (list1[i] != list2[i]) return false;
     }
@@ -17,8 +24,9 @@ bool areListsEqual<T>(List<T> list1, List<T> list2) {
   return true;
 }
 
-bool areListsNotEqual<T>(List<T> list1, List<T> list2) {
-  return !areListsEqual(list1, list2);
+bool areListsNotEqual<T>(List<T> list1, List<T> list2,
+    {List<String> ignoreKeys = const []}) {
+  return !areListsEqual(list1, list2, ignoreKeys: ignoreKeys);
 }
 
 bool areSetsEqual<T>(Set<T>? a, Set<T>? b) {
@@ -41,7 +49,8 @@ bool areSetsNotEqual<T>(Set<T>? a, Set<T>? b) {
   return !areSetsEqual(a, b);
 }
 
-bool areMapsEqual<T, U>(Map<T, U>? a, Map<T, U>? b) {
+bool areMapsEqual<T, U>(Map<T, U>? a, Map<T, U>? b,
+    {List<String> ignoreKeys = const []}) {
   if (a == null) {
     return b == null;
   }
@@ -52,11 +61,19 @@ bool areMapsEqual<T, U>(Map<T, U>? a, Map<T, U>? b) {
     return true;
   }
   for (final T key in a.keys) {
+    if (ignoreKeys.contains(key)) continue;
+
     if (!b.containsKey(key)) return false;
     if (a[key] is List) {
-      if (areListsNotEqual(a[key] as List, b[key] as List? ?? [])) return false;
+      if (areListsNotEqual(a[key] as List, b[key] as List? ?? [],
+          ignoreKeys: ignoreKeys)) {
+        return false;
+      }
     } else if (a[key] is Map) {
-      if (areMapsNotEqual(a[key] as Map, b[key] as Map? ?? {})) return false;
+      if (areMapsNotEqual(a[key] as Map, b[key] as Map? ?? {},
+          ignoreKeys: ignoreKeys)) {
+        return false;
+      }
     } else if (a[key] != b[key]) {
       return false;
     }
@@ -64,8 +81,9 @@ bool areMapsEqual<T, U>(Map<T, U>? a, Map<T, U>? b) {
   return true;
 }
 
-bool areMapsNotEqual<T, U>(Map<T, U>? a, Map<T, U>? b) {
-  return !areMapsEqual(a, b);
+bool areMapsNotEqual<T, U>(Map<T, U>? a, Map<T, U>? b,
+    {List<String> ignoreKeys = const []}) {
+  return !areMapsEqual(a, b, ignoreKeys: ignoreKeys);
 }
 
 extension IterableExtensions<T> on Iterable<T> {

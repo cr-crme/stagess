@@ -760,16 +760,12 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
 
         await sqlInterface.performDeleteQuery(
             tableName: 'enterprise_jobs', filters: {'id': job.id});
-
-        out.deletedData ??= {};
-        out.deletedData![RequestFields.internship] ??= {
-          enterprise.id: FetchableFields.none
-        };
-        // TODO Validate this
-        out.deletedData![RequestFields.internship]![enterprise.id]!
-            .addAll(Enterprise.fetchableFields.extractFrom([job.id]));
       }
     }
+    out.deletedData ??= {};
+    out.deletedData![RequestFields.internship] ??= {
+      enterprise.id: Enterprise.fetchableFields.extractFrom(['jobs'])
+    };
 
     // Add the new jobs
     final toWait = <Future>[];
@@ -1168,15 +1164,11 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
         for (final job in enterprise!.jobs) {
           await _deleteInternshipsFromJob(job.id,
               user: user, internshipsRepository: internshipsRepository);
-
-          out.deletedData ??= {};
-          out.deletedData![RequestFields.internship] ??= {
-            enterprise.id: FetchableFields.none
-          };
-          // TODO Validate this
-          out.deletedData![RequestFields.internship]![enterprise.id]!
-              .addAll(Enterprise.fetchableFields.extractFrom([job.id]));
         }
+        out.deletedData ??= {};
+        out.deletedData![RequestFields.internship] = {
+          enterprise.id: Enterprise.fetchableFields.extractFrom(['jobs'])
+        };
       }
 
       await sqlInterface.performDeleteQuery(

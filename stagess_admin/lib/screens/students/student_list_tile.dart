@@ -274,64 +274,32 @@ class StudentListTileState extends State<StudentListTile> {
   @override
   void didUpdateWidget(covariant StudentListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.student.getDifference(editedStudent).isEmpty) return;
 
-    if (_firstNameController.text != widget.student.firstName) {
-      _firstNameController.text = widget.student.firstName;
-    }
-    if (_lastNameController.text != widget.student.lastName) {
-      _lastNameController.text = widget.student.lastName;
-    }
+    _firstNameController.text = widget.student.firstName;
+    _lastNameController.text = widget.student.lastName;
 
-    if (_birthController.value != widget.student.dateBirth) {
-      _birthController.updateValue(widget.student.dateBirth);
-    }
-    if (_addressController.address != widget.student.address) {
-      if (widget.student.address == null) {
-        _addressController.address = null;
-      } else {
-        _addressController.setAddressAndForceValidated(widget.student.address!);
-      }
-    }
-    if (_phoneController.text != widget.student.phone.toString()) {
-      _phoneController.text = widget.student.phone.toString();
-    }
-    if (_emailController.text != widget.student.email) {
-      _emailController.text = widget.student.email.toString();
-    }
+    _birthController.updateValue(widget.student.dateBirth);
+    _addressController.setAddress(
+      widget.student.address,
+      forceIsValid: widget.student.address != null,
+    );
+    _phoneController.text = widget.student.phone.toString();
+    _emailController.text = widget.student.email.toString();
 
-    if (_groupController.text != widget.student.group) {
-      _groupController.text =
-          widget.student.group == '-1' ? '' : widget.student.group;
-    }
-    if (_selectedProgram != widget.student.program) {
-      _selectedProgram = widget.student.program;
-    }
+    _groupController.text =
+        widget.student.group == '-1' ? '' : widget.student.group;
+    _selectedProgram = widget.student.program;
 
-    if (_contactFirstNameController.text != widget.student.contact.firstName) {
-      _contactFirstNameController.text = widget.student.contact.firstName;
-    }
-    if (_contactLastNameController.text != widget.student.contact.lastName) {
-      _contactLastNameController.text = widget.student.contact.lastName;
-    }
-    if (_contactLinkController.text != widget.student.contactLink) {
-      _contactLinkController.text = widget.student.contactLink;
-    }
-    if (_contactAddressController.address != widget.student.contact.address) {
-      if (widget.student.contact.address == null) {
-        _contactAddressController.address = null;
-      } else {
-        _contactAddressController.setAddressAndForceValidated(
-          widget.student.contact.address!,
-        );
-      }
-    }
-    if (_contactPhoneController.text !=
-        widget.student.contact.phone.toString()) {
-      _contactPhoneController.text = widget.student.contact.phone.toString();
-    }
-    if (_contactEmailController.text != widget.student.contact.email) {
-      _contactEmailController.text = widget.student.contact.email.toString();
-    }
+    _contactFirstNameController.text = widget.student.contact.firstName;
+    _contactLastNameController.text = widget.student.contact.lastName;
+    _contactLinkController.text = widget.student.contactLink;
+    _contactAddressController.setAddress(
+      widget.student.contact.address,
+      forceIsValid: widget.student.contact.address != null,
+    );
+    _contactPhoneController.text = widget.student.contact.phone.toString();
+    _contactEmailController.text = widget.student.contact.email.toString();
   }
 
   Future<void> _fetchData() async {

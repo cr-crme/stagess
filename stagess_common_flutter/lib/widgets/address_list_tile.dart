@@ -20,7 +20,7 @@ class AddressController {
   bool Function()? _isValidating;
   Address? Function()? _getAddress;
   Address? Function(Address)? _setAddress;
-  void Function(Address address, {String? validationMessage})?
+  void Function(Address? address, {String? validationMessage})?
   _setAddressAndForceValidation;
   bool Function()? _isMandatory;
   Address? _initialValue;
@@ -40,7 +40,12 @@ class AddressController {
     requestValidation();
   }
 
-  void setAddressAndForceValidated(Address value) {
+  void setAddress(Address? value, {bool forceIsValid = false}) {
+    if (!forceIsValid) {
+      address = value; // call the normal setter
+      return;
+    }
+
     if (_textController.text == value.toString()) return;
 
     if (_setAddressAndForceValidation == null) {
@@ -135,7 +140,7 @@ class _AddressListTileState extends State<AddressListTile> {
   Address? getAddress() => _address;
   Address? setAddress(newAddress) => _address = newAddress;
 
-  void _setAndForceValidation(Address address, {String? validationMessage}) {
+  void _setAndForceValidation(Address? address, {String? validationMessage}) {
     _address = address;
     addressHasChanged = false;
     widget.addressController._textController.text = _address.toString();

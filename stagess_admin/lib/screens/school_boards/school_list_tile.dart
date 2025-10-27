@@ -210,7 +210,7 @@ class SchoolListTileState extends State<SchoolListTile> {
     if (widget.school.getDifference(editedSchool).isEmpty) return;
 
     _nameController.text = widget.school.name;
-    _addressController.setAddressAndForceValidated(widget.school.address);
+    _addressController.setAddress(widget.school.address, forceIsValid: true);
     _phoneController.text = widget.school.phone.toString();
   }
 

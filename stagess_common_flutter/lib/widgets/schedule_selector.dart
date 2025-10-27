@@ -31,6 +31,10 @@ class WeeklySchedulesController {
   final List<WeeklySchedule> _weeklySchedules;
   List<WeeklySchedule> get weeklySchedules => _weeklySchedules;
   set weeklySchedules(List<WeeklySchedule> newSchedules) {
+    if (InternshipHelpers.areSchedulesEqual(_weeklySchedules, newSchedules)) {
+      return;
+    }
+
     _weeklySchedules
       ..clear()
       ..addAll(newSchedules);
@@ -57,6 +61,8 @@ class WeeklySchedulesController {
 
   bool get hasChanged => _hasChanged;
   set dateRange(time_utils.DateTimeRange? newRange) {
+    if (_dateRange == newRange) return;
+
     _dateRange = newRange;
     if (_weeklySchedules.length == 1) {
       _weeklySchedules[0] = _weeklySchedules[0].copyWith(period: newRange);

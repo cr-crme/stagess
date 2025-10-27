@@ -186,16 +186,11 @@ class AdminListTileState extends State<AdminListTile> {
   @override
   void didUpdateWidget(covariant AdminListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.admin.getDifference(editedAdmin).isEmpty) return;
 
-    if (_firstNameController.text != widget.admin.firstName) {
-      _firstNameController.text = widget.admin.firstName;
-    }
-    if (_lastNameController.text != widget.admin.lastName) {
-      _lastNameController.text = widget.admin.lastName;
-    }
-    if (_emailController.text != widget.admin.email) {
-      _emailController.text = widget.admin.email.toString();
-    }
+    _firstNameController.text = widget.admin.firstName;
+    _lastNameController.text = widget.admin.lastName;
+    _emailController.text = widget.admin.email.toString();
   }
 
   Future<void> _fetchData() async {

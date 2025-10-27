@@ -1784,7 +1784,7 @@ Future<void> _addDummyInternships(
         dateBirth: null,
         phone: PhoneNumber.fromString('514-555-1234'),
         address: null,
-        email: 'Coucou@coucou.coucou',
+        email: 'r.marceau@mon_entreprise.com',
       ),
       dates: period,
       expectedDuration: 135,
