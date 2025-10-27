@@ -153,6 +153,21 @@ class TeacherListTileState extends State<TeacherListTile> {
   }
 
   @override
+  void didUpdateWidget(covariant TeacherListTile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.teacher.getDifference(editedTeacher).isEmpty) return;
+
+    _firstNameController.text = widget.teacher.firstName;
+    _lastNameController.text = widget.teacher.lastName;
+    _addressController.setAddress(
+      widget.teacher.address,
+      forceIsValid: widget.teacher.address != null,
+    );
+    _phoneController.text = widget.teacher.phone?.toString() ?? '';
+    _emailController.text = widget.teacher.email ?? '';
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AnimatedExpandingCard(
       initialExpandedState: true,

@@ -11,14 +11,17 @@ import 'package:stagess/common/widgets/main_drawer.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess/screens/visiting_students/itinerary_screen.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
@@ -131,16 +134,53 @@ extension _InternshipMetaDataList on List<_InternshipMetaData> {
   }
 }
 
-class SupervisionChart extends StatefulWidget {
+class SupervisionChart extends StatelessWidget {
   const SupervisionChart({super.key});
-
   static const route = '/supervision';
 
+  Future<void> _fetchEnterprise(BuildContext context) async {
+    final authProvider = AuthProvider.of(context, listen: false);
+    final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
+    final teachers = TeachersProvider.of(context, listen: false);
+    // TODO Fix not being able to save new trajectories
+    await Future.wait([
+      teachers.fetchData(
+        id: authProvider.teacherId ?? '-1',
+        fields: FetchableFields.all,
+      ),
+      ...schoolBoards
+          .where((e) => e.id == authProvider.schoolBoardId)
+          .map(
+            (e) =>
+                schoolBoards.fetchData(id: e.id, fields: FetchableFields.all),
+          ),
+    ]);
+    return;
+  }
+
   @override
-  State<SupervisionChart> createState() => _SupervisionChartState();
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _fetchEnterprise(context),
+      builder: (context, snapshot) {
+        final hasFullData = snapshot.connectionState == ConnectionState.done;
+        return _SupervisionChartInternal(hasFullData: hasFullData);
+      },
+    );
+  }
 }
 
-class _SupervisionChartState extends State<SupervisionChart>
+class _SupervisionChartInternal extends StatefulWidget {
+  const _SupervisionChartInternal({required this.hasFullData});
+
+  final bool hasFullData;
+
+  @override
+  State<_SupervisionChartInternal> createState() =>
+      _SupervisionChartInternalState();
+}
+
+class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
     with SingleTickerProviderStateMixin {
   late final _tabController = TabController(
     initialIndex: 0,
@@ -376,57 +416,65 @@ class _SupervisionChartState extends State<SupervisionChart>
         ],
         bottom: _buildBottomTabBar(context),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          Column(
-            children: [
-              _buildFilters(context),
-              if (internships.isEmpty)
-                Center(
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      top: 12.0,
-                      left: 36,
-                      right: 36,
-                    ),
-                    child: Text(
-                      'Aucun élève en stage',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ),
-                ),
-              if (internships.isNotEmpty)
-                Expanded(
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount:
-                        _editSignatoriesMode
-                            ? internships.length
-                            : internships.supervizedCount,
-                    itemBuilder: ((ctx, i) {
-                      final meta =
-                          _editSignatoriesMode
-                              ? internships[i]
-                              : internships.getSupervized(i);
-                      if (meta == null) return Container();
+      body:
+          widget.hasFullData
+              ? TabBarView(
+                controller: _tabController,
+                children: [
+                  Column(
+                    children: [
+                      _buildFilters(context),
+                      if (internships.isEmpty)
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              top: 12.0,
+                              left: 36,
+                              right: 36,
+                            ),
+                            child: Text(
+                              'Aucun élève en stage',
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ),
+                        ),
+                      if (internships.isNotEmpty)
+                        Expanded(
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            itemCount:
+                                _editSignatoriesMode
+                                    ? internships.length
+                                    : internships.supervizedCount,
+                            itemBuilder: ((ctx, i) {
+                              final meta =
+                                  _editSignatoriesMode
+                                      ? internships[i]
+                                      : internships.getSupervized(i);
+                              if (meta == null) return Container();
 
-                      return _StudentTile(
-                        key: Key(meta.student.id),
-                        meta: meta,
-                        onTap: () => _navigateToStudentInfo(meta.student),
-                        editPrioritiesMode: _editPrioritiesMode,
-                        editSignatoriesMode: _editSignatoriesMode,
-                      );
-                    }),
+                              return _StudentTile(
+                                key: Key(meta.student.id),
+                                meta: meta,
+                                onTap:
+                                    () => _navigateToStudentInfo(meta.student),
+                                editPrioritiesMode: _editPrioritiesMode,
+                                editSignatoriesMode: _editSignatoriesMode,
+                              );
+                            }),
+                          ),
+                        ),
+                    ],
                   ),
+                  const ItineraryMainScreen(),
+                ],
+              )
+              : Center(
+                child: CircularProgressIndicator(
+                  color: Theme.of(context).primaryColor,
                 ),
-            ],
-          ),
-          const ItineraryMainScreen(),
-        ],
-      ),
+              ),
     );
   }
 

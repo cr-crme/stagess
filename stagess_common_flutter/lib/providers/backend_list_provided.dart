@@ -407,7 +407,8 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
         ),
       );
       return response.response == Response.success;
-    } on Exception {
+    } on Exception catch (e) {
+      dev.log('Error while replacing item: $e');
       // Make sure to keep the list in sync with the database
       notifyListeners();
       return false;

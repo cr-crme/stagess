@@ -58,8 +58,8 @@ class Waypoint extends ItemSerializable {
       id: data['id'],
       title: data['title'] ?? '',
       subtitle: data['subtitle'] ?? '',
-      latitude: data['latitude'] ?? 0,
-      longitude: data['longitude'] ?? 0,
+      latitude: (data['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (data['longitude'] as num?)?.toDouble() ?? 0.0,
       address: Address.fromSerialized(data['address'] ?? {}),
       priority: data['priority'] == null
           ? VisitingPriority.notApplicable
