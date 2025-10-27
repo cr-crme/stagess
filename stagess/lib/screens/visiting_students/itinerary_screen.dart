@@ -16,6 +16,7 @@ import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
+import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('ItineraryMainScreen');
 
@@ -159,7 +160,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
   // and update it each time we would have used it
   late var _teachersProvider = TeachersProvider.of(context, listen: false);
   final _itineraries = <DateTime, Itinerary>{};
-  Future<void> _selectItinerary(DateTime date) async {
+  Future<bool> _selectItinerary(DateTime date) async {
     _teachersProvider = TeachersProvider.of(context, listen: false);
 
     if (_itineraries[date] == null) {
@@ -170,7 +171,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
           )?.copyWith() ??
           Itinerary(date: date);
     }
-    _routingController.setItinerary(
+    return await _routingController.setItinerary(
       _itineraries[date]!,
       teachers: _teachersProvider,
     );
@@ -301,7 +302,18 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
             child: IconButton(
               onPressed:
                   _routingController.hasChanged
-                      ? () => _selectItinerary(_currentDate)
+                      ? () async {
+                        final isSuccess = await _selectItinerary(_currentDate);
+                        if (mounted) {
+                          showSnackBar(
+                            context,
+                            message:
+                                isSuccess
+                                    ? 'Itinéraire enregistré avec succès.'
+                                    : 'Une erreur est survenue lors du l\'enregistrement de l\'itinéraire.',
+                          );
+                        }
+                      }
                       : null,
               icon: Icon(
                 Icons.save,

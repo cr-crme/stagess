@@ -25,16 +25,24 @@ class RoutingController {
   bool _hasChanged = false;
   bool get hasChanged => _hasChanged;
 
-  void saveItinerary({required TeachersProvider teachers}) {
-    if (_hasChanged) ItinerariesHelpers.add(_itinerary, teachers: teachers);
+  Future<bool> saveItinerary({required TeachersProvider teachers}) async {
+    if (_hasChanged) {
+      return ItinerariesHelpers.add(_itinerary, teachers: teachers);
+    }
+    return true;
   }
 
-  void setItinerary(Itinerary itinerary, {required TeachersProvider teachers}) {
-    saveItinerary(teachers: teachers);
+  Future<bool> setItinerary(
+    Itinerary itinerary, {
+    required TeachersProvider teachers,
+  }) async {
+    final isSuccess = await saveItinerary(teachers: teachers);
 
     _itinerary = itinerary;
     _hasChanged = false;
     _updateInternal();
+
+    return isSuccess;
   }
 
   final _routingManager = routing_client.RoutingManager();
@@ -82,14 +90,19 @@ class RoutingController {
     if (_itinerary.length <= 1) return null;
 
     final out = await _routingManager.getRoute(
-        request: routing_client.OSRMRequest.route(
-      waypoints: _itinerary
-          .map((e) => routing_client.LngLat(lat: e.latitude, lng: e.longitude))
-          .toList(),
-      geometries: routing_client.Geometries.polyline,
-      steps: true,
-      languages: routing_client.Languages.en,
-    ));
+      request: routing_client.OSRMRequest.route(
+        waypoints:
+            _itinerary
+                .map(
+                  (e) =>
+                      routing_client.LngLat(lat: e.latitude, lng: e.longitude),
+                )
+                .toList(),
+        geometries: routing_client.Geometries.polyline,
+        steps: true,
+        languages: routing_client.Languages.en,
+      ),
+    );
 
     return out;
   }
@@ -151,13 +164,14 @@ class _RoutingMapState extends State<RoutingMap> {
         points: route.polyline!.map((e) => LatLng(e.lat, e.lng)).toList(),
         strokeWidth: 4,
         color: Theme.of(context).primaryColor,
-      )
+      ),
     ];
   }
 
   void _toggleName(index) {
-    widget.waypoints[index] = widget.waypoints[index]
-        .copyWith(showTitle: !widget.waypoints[index].showTitle);
+    widget.waypoints[index] = widget.waypoints[index].copyWith(
+      showTitle: !widget.waypoints[index].showTitle,
+    );
     setState(() {});
   }
 
@@ -172,50 +186,57 @@ class _RoutingMapState extends State<RoutingMap> {
       double nameHeight = 100;
 
       final previous = out.fold<double>(
-          0.0,
-          (prev, e) =>
-              prev +
-              (e.point.latitude == waypoint.latitude &&
-                      e.point.longitude == waypoint.longitude
-                  ? 1.0
-                  : 0.0));
+        0.0,
+        (prev, e) =>
+            prev +
+            (e.point.latitude == waypoint.latitude &&
+                    e.point.longitude == waypoint.longitude
+                ? 1.0
+                : 0.0),
+      );
       out.add(
         Marker(
           point: LatLng(waypoint.latitude, waypoint.longitude),
-          alignment:
-              Alignment(0.8, 0.4 * previous), // Centered almost at max right,
+          alignment: Alignment(
+            0.8,
+            0.4 * previous,
+          ), // Centered almost at max right,
           width: markerSize + nameWidth,
           height: markerSize + nameHeight,
           child: MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: () => widget.controller.addToItinerary(i),
-                onLongPress: () => _toggleName(i),
-                child: Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white.withAlpha(75),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        waypoint.priority.icon,
-                        color: waypoint.priority.color,
-                        size: markerSize,
-                      ),
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => widget.controller.addToItinerary(i),
+              onLongPress: () => _toggleName(i),
+              child: Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(75),
+                      shape: BoxShape.circle,
                     ),
-                    if (waypoint.showTitle)
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 5, vertical: 2),
-                        decoration: BoxDecoration(
-                            color: Colors.white.withAlpha(125),
-                            shape: BoxShape.rectangle),
-                        child: Text(waypoint.title),
-                      )
-                  ],
-                ),
-              )),
+                    child: Icon(
+                      waypoint.priority.icon,
+                      color: waypoint.priority.color,
+                      size: markerSize,
+                    ),
+                  ),
+                  if (waypoint.showTitle)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 2,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(125),
+                        shape: BoxShape.rectangle,
+                      ),
+                      child: Text(waypoint.title),
+                    ),
+                ],
+              ),
+            ),
+          ),
         ),
       );
     }
@@ -228,9 +249,12 @@ class _RoutingMapState extends State<RoutingMap> {
       padding: const EdgeInsets.all(8),
       child: FlutterMap(
         options: MapOptions(
-            initialCenter: LatLng(widget.centerWaypoint.latitude,
-                widget.centerWaypoint.longitude),
-            initialZoom: 12),
+          initialCenter: LatLng(
+            widget.centerWaypoint.latitude,
+            widget.centerWaypoint.longitude,
+          ),
+          initialZoom: 12,
+        ),
         children: [
           TileLayer(
             urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -239,7 +263,8 @@ class _RoutingMapState extends State<RoutingMap> {
           ),
           if (widget.controller._route != null)
             PolylineLayer(
-                polylines: _routeToPolyline(widget.controller._route)),
+              polylines: _routeToPolyline(widget.controller._route),
+            ),
           MarkerLayer(markers: _waypointsToMarkers()),
           const ZoomButtons(),
         ],

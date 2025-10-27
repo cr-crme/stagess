@@ -4,7 +4,10 @@ import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 class ItinerariesHelpers {
-  static void add(Itinerary item, {required TeachersProvider teachers}) {
+  static Future<bool> add(
+    Itinerary item, {
+    required TeachersProvider teachers,
+  }) async {
     final me = teachers.currentTeacher;
     if (me == null) throw Exception('No teacher found in context');
 
@@ -15,7 +18,9 @@ class ItinerariesHelpers {
     } else {
       itineraries[index] = item;
     }
-    teachers.replace(me.copyWith(itineraries: itineraries));
+    return await teachers.replaceWithConfirmation(
+      me.copyWith(itineraries: itineraries),
+    );
   }
 
   static final _dateFormat = DateFormat('dd_MM_yyyy');
