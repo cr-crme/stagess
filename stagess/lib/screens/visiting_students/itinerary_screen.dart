@@ -143,13 +143,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     setState(() {});
   }
 
-  // We need to access TeachersProvider when dispose is called so we save it
-  // and update it each time we would have used it
-  late var _teachersProvider = TeachersProvider.of(context, listen: false);
-  final _itineraries = <DateTime, Itinerary>{};
-  Future<void> _selectItinerary(DateTime date) async {
-    _teachersProvider = TeachersProvider.of(context, listen: false);
-
+  void _acquireLock() async {
     while (!(await _teachersProvider.getLockForItem(
       _teachersProvider.currentTeacher!,
     ))) {
@@ -159,6 +153,14 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     setState(() {
       _hasLock = true;
     });
+  }
+
+  // We need to access TeachersProvider when dispose is called so we save it
+  // and update it each time we would have used it
+  late var _teachersProvider = TeachersProvider.of(context, listen: false);
+  final _itineraries = <DateTime, Itinerary>{};
+  Future<void> _selectItinerary(DateTime date) async {
+    _teachersProvider = TeachersProvider.of(context, listen: false);
 
     if (_itineraries[date] == null) {
       _itineraries[date] =
@@ -186,6 +188,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
 
     final date = DateTime.now();
     _currentDate = DateTime(date.year, date.month, date.day);
+    _acquireLock();
     _selectItinerary(_currentDate);
   }
 

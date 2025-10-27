@@ -72,6 +72,8 @@ class Itinerary extends ListSerializable<Waypoint>
   }
 
   Itinerary copyWithData(Map<String, dynamic>? data) {
+    // TODO Fix order of waypoints not preserved when serialized/deserialized
+    // TODO Waypoints are not deleted when deleted
     if (data == null || data.isEmpty) return copyWith();
     return Itinerary(
       id: data['id'] ?? id,
@@ -81,8 +83,7 @@ class Itinerary extends ListSerializable<Waypoint>
       waypoints: ListExt.mergeWithData<Waypoint>(
         toList(),
         data['waypoints'],
-        copyWithData: (original, serialized) =>
-            original.copyWithData(serialized),
+        copyWithData: (original, serialized) => original,
         deserializer: Waypoint.fromSerialized,
       ),
     );

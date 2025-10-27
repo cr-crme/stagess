@@ -142,7 +142,7 @@ class SupervisionChart extends StatelessWidget {
     final authProvider = AuthProvider.of(context, listen: false);
     final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
     final teachers = TeachersProvider.of(context, listen: false);
-    // TODO Fix not being able to save new trajectories
+
     await Future.wait([
       teachers.fetchData(
         id: authProvider.teacherId ?? '-1',
