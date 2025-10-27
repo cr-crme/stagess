@@ -253,10 +253,10 @@ class InternshipMutableElements extends ItemSerializable {
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
-        'creation_date': FetchableFields.optional,
+        'creation_date': FetchableFields.mandatory,
         'supervisor': Person.fetchableFields,
-        'starting_date': FetchableFields.optional,
-        'ending_date': FetchableFields.optional,
+        'starting_date': FetchableFields.mandatory,
+        'ending_date': FetchableFields.mandatory,
         'schedules': WeeklySchedule.fetchableFields,
         'transportations': FetchableFields.optional,
         'visit_frequencies': FetchableFields.optional,

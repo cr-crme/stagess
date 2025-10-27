@@ -24,7 +24,41 @@ Future<Enterprise?> showJobSstFormDialog(
 }) async {
   _logger.info('Showing JobSstFormDialog for jobId: $jobId');
   final enterprises = EnterprisesProvider.of(context, listen: false);
-  final hasLock = await enterprises.getLockForItem(enterprises[enterpriseId]);
+
+  final hasLock = await showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder:
+        (context) => FutureBuilder(
+          future: Future.wait([
+            enterprises.getLockForItem(enterprises[enterpriseId]),
+            enterprises.fetchData(
+              id: enterpriseId,
+              fields: Enterprise.fetchableFields,
+            ),
+          ]),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              final hasLock = (snapshot.data as List).first as bool;
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.of(context).pop(hasLock);
+              });
+            }
+            return Dialog(
+              child: SizedBox(
+                width: 100,
+                height: 100,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+  );
+
   if (!hasLock || !context.mounted) {
     _logger.warning('Could not get lock for enterpriseId: $enterpriseId');
     if (context.mounted) {
