@@ -362,7 +362,6 @@ class InternshipListTileState extends State<InternshipListTile> {
     }
   }
 
-  // TODO Fix not possible to modify the internships anymore
   @override
   void didUpdateWidget(covariant InternshipListTile oldWidget) {
     super.didUpdateWidget(oldWidget);

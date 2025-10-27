@@ -493,8 +493,9 @@ class Internship extends ExtendedItemSerializable {
                 deserializer: (map) =>
                     InternshipEvaluationVisa.fromSerialized(map)) ??
             [],
-        enterpriseEvaluation =
-            PostInternshipEnterpriseEvaluation.fromSerialized(
+        enterpriseEvaluation = map?['enterprise_evaluation'] == null
+            ? null
+            : PostInternshipEnterpriseEvaluation.fromSerialized(
                 map?['enterprise_evaluation']),
         super.fromSerialized() {
     _finalizeInitialization();
