@@ -45,13 +45,13 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
   @override
   void didUpdateWidget(covariant SchoolBoardListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.schoolBoard.getDifference(editedSchoolBoard).isEmpty) return;
 
-    if (widget.schoolBoard.getDifference(oldWidget.schoolBoard).isNotEmpty) {
-      // The logo controller won't update automatically, so we need to do it manually
-      setState(() {
-        _logoController = Uint8List.fromList([...widget.schoolBoard.logo]);
-      });
-    }
+    _logoController = Uint8List.fromList([...widget.schoolBoard.logo]);
+    _nameController.text = widget.schoolBoard.name;
+    _cnesstController.text = widget.schoolBoard.cnesstNumber;
+
+    setState(() {});
   }
 
   @override

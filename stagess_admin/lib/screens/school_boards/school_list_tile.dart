@@ -204,20 +204,14 @@ class SchoolListTileState extends State<SchoolListTile> {
     }
   }
 
-  // TODO Fix not possible to modify the schools anymore
   @override
   void didUpdateWidget(covariant SchoolListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (widget.school.getDifference(editedSchool).isEmpty) return;
 
-    if (_nameController.text != widget.school.name) {
-      _nameController.text = widget.school.name;
-    }
-    if (_addressController.address != widget.school.address) {
-      _addressController.setAddressAndForceValidated(widget.school.address);
-    }
-    if (_phoneController.text != widget.school.phone.toString()) {
-      _phoneController.text = widget.school.phone.toString();
-    }
+    _nameController.text = widget.school.name;
+    _addressController.setAddressAndForceValidated(widget.school.address);
+    _phoneController.text = widget.school.phone.toString();
   }
 
   @override

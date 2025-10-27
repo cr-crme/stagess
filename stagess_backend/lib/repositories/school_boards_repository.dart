@@ -272,7 +272,8 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
 
   Future<void> _insertToSchools(School school, SchoolBoard schoolBoard,
       {required DatabaseUser user}) async {
-    if (user.accessLevel < AccessLevel.admin) {
+    if (user.accessLevel < AccessLevel.admin ||
+        schoolBoard.id != user.schoolBoardId) {
       throw InvalidRequestException('You must be a admin to create a school');
     }
 
@@ -292,12 +293,12 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
   }
 
   Future<void> _updateToSchools(School school, School previous,
-      {required DatabaseUser user}) async {
+      {required SchoolBoard schoolBoard, required DatabaseUser user}) async {
     final toUpdate = school.getDifference(previous);
     final isOkay = toUpdate.isEmpty ||
         user.accessLevel >= AccessLevel.superAdmin ||
         (user.accessLevel == AccessLevel.admin &&
-            school.id == user.schoolBoardId);
+            schoolBoard.id == user.schoolBoardId);
     if (!isOkay) {
       throw InvalidRequestException(
           'You must be a valid admin to update a school');
@@ -344,7 +345,8 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
       if (previousSchool == null) {
         toWait.add(_insertToSchools(school, schoolBoard, user: user));
       } else {
-        toWait.add(_updateToSchools(school, previousSchool, user: user));
+        toWait.add(_updateToSchools(school, previousSchool,
+            schoolBoard: schoolBoard, user: user));
       }
     }
 
