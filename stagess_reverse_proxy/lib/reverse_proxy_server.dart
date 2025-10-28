@@ -15,6 +15,8 @@ class ReverseProxyServer {
   final String backendHost;
   final int backendPort;
 
+  final int maxLiveConnections;
+
   ServerSocket? _unsecuredServer;
   SecureServerSocket? _securedServer;
   get _server => useSecure ? _securedServer : _unsecuredServer;
@@ -27,6 +29,7 @@ class ReverseProxyServer {
   ReverseProxyServer({
     String? certPath,
     String? keyPath,
+    required this.maxLiveConnections,
     required this.bindPort,
     required this.backendHost,
     required this.backendPort,
@@ -64,7 +67,7 @@ class ReverseProxyServer {
 
       // Backend is reachable — start TLS server
       try {
-        await _startReverseProxyServer();
+        await _startReverseProxyServer(maxLiveConnections: maxLiveConnections);
 
         // wait until we need to reconnection (set when any backend socket closes)
         while (_isStarted && !_isReconnecting) {
@@ -99,7 +102,8 @@ class ReverseProxyServer {
     }
   }
 
-  Future<void> _startReverseProxyServer() async {
+  Future<void> _startReverseProxyServer(
+      {required int maxLiveConnections}) async {
     if (_server != null) return;
     _logger.info(
         'starting reverse proxy server on ${bindAddress.address}:$bindPort ...');
@@ -113,14 +117,17 @@ class ReverseProxyServer {
         bindAddress,
         bindPort,
         ctx,
-        backlog: 128,
+        backlog: maxLiveConnections,
       );
 
       _securedServer!.listen(_handleIncoming,
           onError: _handleOnError, onDone: _handleOnDone);
     } else {
-      _unsecuredServer =
-          await ServerSocket.bind(bindAddress, bindPort, backlog: 128);
+      _unsecuredServer = await ServerSocket.bind(
+        bindAddress,
+        bindPort,
+        backlog: maxLiveConnections,
+      );
 
       _unsecuredServer!.listen(_handleIncoming,
           onError: _handleOnError, onDone: _handleOnDone);

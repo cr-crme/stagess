@@ -15,6 +15,7 @@ Future<void> main(List<String> args) async {
 
   final useSsl = bool.fromEnvironment('STAGESS_USE_SSL', defaultValue: true);
   final reverseProxyServer = ReverseProxyServer(
+    maxLiveConnections: 128,
     certPath: useSsl ? Platform.environment['STAGESS_CERT_PEM'] : null,
     keyPath: useSsl ? Platform.environment['STAGESS_KEY_PEM'] : null,
     bindPort:
