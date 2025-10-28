@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stagess/main.dart';
 import 'package:stagess/program_helpers.dart';
-import 'package:stagess_common/services/backend_helpers.dart';
 
 import '../utils.dart';
 
@@ -17,15 +16,7 @@ void main() {
       // Load the app and navigate to the home page.
       await tester.pumpWidgetWithNotifiers(
         withAuthentication: true,
-        StagessApp(
-          useMockers: true,
-          backendUri: BackendHelpers.backendUri(
-            isLocal: true,
-            useProxy: false,
-            useSsl: false,
-            isDev: true,
-          ),
-        ),
+        StagessApp(useMockers: true, backendUri: Uri()),
       );
 
       // Verify that the home page is "My enterprises"
@@ -48,15 +39,7 @@ void main() {
       // Load the app and navigate and open the drawer.
       await tester.pumpWidgetWithNotifiers(
         withAuthentication: true,
-        StagessApp(
-          useMockers: true,
-          backendUri: BackendHelpers.backendUri(
-            isLocal: true,
-            useProxy: false,
-            useSsl: false,
-            isDev: true,
-          ),
-        ),
+        StagessApp(useMockers: true, backendUri: Uri()),
       );
 
       // Verify that the drawer contains the expected tiles

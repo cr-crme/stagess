@@ -42,6 +42,12 @@ echo "Running pub get in external\pdf_generation directory..."
 call flutter pub get
 popd
 
+REM Pub get in the stagess_reverse_proxy directory
+pushd stagess_reverse_proxy
+echo "Running pub get in stagess_reverse_proxy directory..."
+call dart pub get
+popd
+
 REM Pub get in the stagess_backend directory
 pushd stagess_backend
 echo "Running pub get in stagess_backend directory..."

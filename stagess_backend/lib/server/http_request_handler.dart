@@ -85,7 +85,7 @@ class HttpRequestHandler {
         'to endpoint ${request.uri.path}');
 
     if (request.uri.path ==
-        '/${BackendHelpers.connectEndpoint(isDev: false)}') {
+        '/${BackendHelpers.connectEndpoint(useDevDatabase: false)}') {
       try {
         _productionConnexions?.add(CustomWebSocket(
             socket: await WebSocketTransformer.upgrade(request),
@@ -96,7 +96,7 @@ class HttpRequestHandler {
         throw ConnexionRefusedException('WebSocket upgrade failed');
       }
     } else if (request.uri.path ==
-        '/${BackendHelpers.connectEndpoint(isDev: true)}') {
+        '/${BackendHelpers.connectEndpoint(useDevDatabase: true)}') {
       try {
         _devConnexions?.add(CustomWebSocket(
             socket: await WebSocketTransformer.upgrade(request),

@@ -5,14 +5,31 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Reverse proxy",
+            "request": "launch",
+            "type": "dart",
+            "program": "stagess_reverse_proxy/bin/stagess_reverse_proxy.dart",
+            "toolArgs": [
+                "--define=STAGESS_USE_SSL=< [true] | false >",
+                "--define=STAGESS_REVERSED_PROXY_PORT=< PORT | [443] >",
+                "--define=STAGESS_BACKEND_PORT=< PORT | [3456] >",
+            ],
+        },
+        {
             "name": "Backend",
             "request": "launch",
             "type": "dart",
             "program": "stagess_backend/bin/backend.dart",
+            "args": [
+            "toolArgs": [
+                "--define=STAGESS_USE_SSL=< [true] | false >",
+                "--define=STAGESS_BACKEND_PORT=< PORT | [3456] >",
+            ],
+            ],
             "env": {
                 "STAGESS_FIREBASE_WEB_API_KEY": "<PUT YOUR FIREBASE WEB API KEY HERE>",
-                "STAGESS_USE_REVERSE_PROXY": "< true | false >",
-                "STAGESS_USE_SSL": "< true | false >", 
+                "STAGESS_USE_SSL": "< [true] | false >", 
+                "STAGESS_BACKEND_PORT": "< PORT | [3456] >",
                 "STAGESS_DATABASE_BACKEND": "< mariadb | mysql | mock >",
                 "STAGESS_DATABASE_DEV_PORT": "<PUT YOUR DEV DATABASE PORT HERE>",
                 "STAGESS_DATABASE_DEV_NAME": "<PUT YOUR DEV DATABASE NAME HERE>",
@@ -30,9 +47,10 @@
             "type": "dart",
             "program": "stagess/lib/main.dart",
             "args": [
-                "--dart-define=STAGESS_WEB_USE_LOCAL_DB=< true | false >",
-                "--dart-define=STAGESS_WEB_USE_SSL=< true | false >",
-                "--dart-define=STAGESS_WEB_USE_DEV_DB=< true | false >",
+                "--dart-define=STAGESS_USE_SSL=< [true] | false >",
+                "--dart-define=STAGESS_BACKEND_IP=< IP_ADDRESS | [stagessserver.adoprevit.org] | localhost >",
+                "--dart-define=STAGESS_USE_DEV_DB=< true | [false] >",
+                "--dart-define=STAGESS_BACKEND_PORT=< PORT | [443] >",
             ],
         },
         {
@@ -41,9 +59,10 @@
             "type": "dart",
             "program": "stagess_admin/lib/main.dart",
             "args": [
-                "--dart-define=STAGESS_WEB_USE_LOCAL_DB=< true | false >",
-                "--dart-define=STAGESS_WEB_USE_SSL=< true | false >",
-                "--dart-define=STAGESS_WEB_USE_DEV_DB=< true | false >",
+                "--dart-define=STAGESS_USE_SSL=< [true] | false >",
+                "--dart-define=STAGESS_BACKEND_IP=< "IP_ADDRESS" | ["stagessserver.adoprevit.org"] | "localhost" >",
+                "--dart-define=STAGESS_USE_DEV_DB=< true | [false] >",
+                "--dart-define=STAGESS_BACKEND_PORT=< PORT | [443] >",
             ],
         },
         {

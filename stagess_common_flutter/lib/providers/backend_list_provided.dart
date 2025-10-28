@@ -198,7 +198,6 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
 
     final field = getField(false);
     await _getFromBackend(field, id: id, fields: unregisteredFields);
-    await Future.delayed(Duration(seconds: 1));
 
     return;
   }

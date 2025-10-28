@@ -22,37 +22,13 @@ import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
-const _useLocalDatabase = bool.fromEnvironment(
-  'STAGESS_WEB_USE_LOCAL_DB',
-  defaultValue: false,
-);
-const _useSsl = bool.fromEnvironment('STAGESS_WEB_USE_SSL', defaultValue: true);
-const _useDevDatabase = bool.fromEnvironment(
-  'STAGESS_WEB_USE_DEV_DB',
-  defaultValue: false,
-);
-
 // coverage:ignore-start
 void main() async {
-  debugPrint('Welcome to Stagess!');
-  debugPrint('Is using local database: $_useLocalDatabase');
-  debugPrint('Is using SSL: $_useSsl');
-  debugPrint('Is using dev database: $_useDevDatabase');
-
   BugReporter.loggerSetup();
   const showDebugElements = true;
   const useMockers = false;
-  final backendUri = BackendHelpers.backendUri(
-    isLocal: _useLocalDatabase,
-    useProxy: !_useLocalDatabase,
-    useSsl: _useSsl,
-    isDev: _useDevDatabase,
-  );
-  final errorReportUri = BackendHelpers.backendUriForBugReport(
-    isLocal: _useLocalDatabase,
-    useProxy: !_useLocalDatabase,
-    useSsl: _useSsl,
-  );
+  final backendUri = BackendHelpers.backendConnectUri(useDevDatabase: true);
+  final errorReportUri = BackendHelpers.backendUriForBugReport();
 
   await runZonedGuarded(
     () async {

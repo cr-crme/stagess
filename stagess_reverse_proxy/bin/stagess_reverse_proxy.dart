@@ -3,25 +3,28 @@ import 'dart:io';
 
 import 'package:logging/logging.dart';
 import 'package:stagess_reverse_proxy/reverse_proxy_server.dart';
-import 'package:stagess_common/services/backend_helpers.dart';
 
-final _logger = Logger('BackendServer');
+final _logger = Logger('StagessReverseProxy');
 
 Future<void> main(List<String> args) async {
-  final useSecure = _getFromEnvironment('STAGESS_USE_SSL') == 'true';
-  final certPem = useSecure ? _getFromEnvironment('STAGESS_CERT_PEM') : null;
-  final keyPem = useSecure ? _getFromEnvironment('STAGESS_KEY_PEM') : null;
-  final backendHost = InternetAddress.loopbackIPv4.address;
-  final backendPort = BackendHelpers.backendPort;
+  Logger.root.level = Level.INFO;
+  Logger.root.onRecord.listen((record) {
+    // ignore: avoid_print
+    print('${record.level.name}: ${record.time}: ${record.message}');
+  });
 
+  final useSsl = bool.fromEnvironment('STAGESS_USE_SSL', defaultValue: true);
   final reverseProxyServer = ReverseProxyServer(
-    certPath: certPem,
-    keyPath: keyPem,
-    backendHost: backendHost,
-    backendPort: backendPort,
+    certPath: useSsl ? Platform.environment['STAGESS_CERT_PEM'] : null,
+    keyPath: useSsl ? Platform.environment['STAGESS_KEY_PEM'] : null,
+    bindPort:
+        int.fromEnvironment('STAGESS_REVERSED_PROXY_PORT', defaultValue: 443),
+    backendHost: InternetAddress.loopbackIPv4.address,
+    backendPort:
+        int.fromEnvironment('STAGESS_BACKEND_PORT', defaultValue: 3456),
   );
 
-  // graceful shutdown handlers
+  // Shutdown handlers
   ProcessSignal.sigint.watch().listen((_) async {
     _logger.info('SIGINT received, shutting down...');
     await reverseProxyServer.stop();
@@ -34,13 +37,4 @@ Future<void> main(List<String> args) async {
   });
 
   await reverseProxyServer.start();
-}
-
-String _getFromEnvironment(String key) {
-  final value = Platform.environment[key];
-  if (value == null || value.isEmpty) {
-    _logger.severe('$key environment variable is not set.');
-    exit(1);
-  }
-  return value;
 }

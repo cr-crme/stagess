@@ -17,29 +17,20 @@ import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
 
-const _useLocalDatabase = bool.fromEnvironment(
-  'STAGESS_WEB_USE_LOCAL_DB',
-  defaultValue: false,
-);
-const _useSsl = bool.fromEnvironment('STAGESS_WEB_USE_SSL', defaultValue: true);
-const _useDevDatabase = bool.fromEnvironment(
-  'STAGESS_WEB_USE_DEV_DB',
-  defaultValue: false,
-);
-
 void main() async {
-  debugPrint('Welcome to Stagess!');
-  debugPrint('Is using local database: $_useLocalDatabase');
-  debugPrint('Is using SSL: $_useSsl');
-  debugPrint('Is using dev database: $_useDevDatabase');
+  const useDevDb = bool.fromEnvironment(
+    'STAGESS_USE_DEV_DB',
+    defaultValue: false,
+  );
+  debugPrint('Welcome to Admin Stagess!');
+  debugPrint(
+    'We are connecting to the ${useDevDb ? 'development' : 'production'} database '
+    'situated at ${BackendHelpers.backendIp}:${BackendHelpers.backendPort}, '
+    '${BackendHelpers.useSsl ? 'not ' : ''}using a secured connection',
+  );
 
   final useMockers = false;
-  final backendUri = BackendHelpers.backendUri(
-    isLocal: _useLocalDatabase,
-    useProxy: !_useLocalDatabase,
-    useSsl: _useSsl,
-    isDev: _useDevDatabase,
-  );
+  final backendUri = BackendHelpers.backendConnectUri(useDevDatabase: useDevDb);
 
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);

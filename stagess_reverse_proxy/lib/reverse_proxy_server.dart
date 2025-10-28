@@ -6,12 +6,12 @@ import 'package:logging/logging.dart';
 final _logger = Logger('ReverseProxyServer');
 
 class ReverseProxyServer {
-  final String? certPath;
-  final String? keyPath;
-  bool get useSecure => certPath != null && keyPath != null;
+  final String? _certPath;
+  final String? _keyPath;
+  bool get useSecure => _certPath != null && _keyPath != null;
 
   final InternetAddress bindAddress = InternetAddress.anyIPv4;
-  final int bindPort = 3457;
+  final int bindPort;
   final String backendHost;
   final int backendPort;
 
@@ -25,11 +25,13 @@ class ReverseProxyServer {
   bool _isReconnecting = false;
 
   ReverseProxyServer({
-    this.certPath,
-    this.keyPath,
+    String? certPath,
+    String? keyPath,
+    required this.bindPort,
     required this.backendHost,
     required this.backendPort,
-  }) {
+  })  : _certPath = (certPath?.isEmpty ?? true) ? null : certPath,
+        _keyPath = (keyPath?.isEmpty ?? true) ? null : keyPath {
     if ((certPath == null && keyPath != null) ||
         (certPath != null && keyPath == null)) {
       throw ArgumentError(
@@ -75,8 +77,7 @@ class ReverseProxyServer {
         // teardown when reconnecting or stopping
         await _closeServer();
         await _closeAllClients(
-          'backend disconnected / proxy restarting listener',
-        );
+            'backend disconnected / proxy restarting listener');
         _isReconnecting = false;
       }
     }
@@ -105,8 +106,8 @@ class ReverseProxyServer {
 
     if (useSecure) {
       final ctx = SecurityContext();
-      ctx.useCertificateChain(certPath!);
-      ctx.usePrivateKey(keyPath!);
+      ctx.useCertificateChain(_certPath!);
+      ctx.usePrivateKey(_keyPath!);
 
       _securedServer = await SecureServerSocket.bind(
         bindAddress,
@@ -115,26 +116,14 @@ class ReverseProxyServer {
         backlog: 128,
       );
 
-      _securedServer!.listen(
-        (SecureSocket clientSocket) {
-          if (!_isStarted) {
-            try {
-              clientSocket.destroy();
-            } catch (_) {}
-            return;
-          }
-          _handleIncomingClient(clientSocket);
-        },
-        onError: (e, st) {
-          _logger.severe('TLS server listen error: $e\n$st');
-        },
-        onDone: () {
-          _logger.info('TLS server done');
-        },
-      );
+      _securedServer!.listen(_handleIncoming,
+          onError: _handleOnError, onDone: _handleOnDone);
     } else {
       _unsecuredServer =
           await ServerSocket.bind(bindAddress, bindPort, backlog: 128);
+
+      _unsecuredServer!.listen(_handleIncoming,
+          onError: _handleOnError, onDone: _handleOnDone);
     }
 
     _logger.info('TLS server bound; accepting connections');
@@ -156,18 +145,43 @@ class ReverseProxyServer {
     }
   }
 
-  Future<void> _handleIncomingClient(SecureSocket clientSock) async {
-    _logger.info(
-      'incoming client from ${clientSock.remoteAddress.address}:${clientSock.remotePort}',
-    );
+  void _handleIncoming(Socket clientSocket) {
+    if (!_isStarted) {
+      try {
+        clientSocket.destroy();
+      } catch (_) {}
+      return;
+    }
+    _handleIncomingClient(clientSocket);
+  }
+
+  void _handleOnError(e, st) {
+    _logger.severe('TLS server listen error: $e\n$st');
+    _isReconnecting = true;
+    // TODO Add disconnect all the clients
+    // TODO Find why this does not trigger when backend crashes
+    // TODO Add a makefile for the reverse proxy
+  }
+
+  void _handleOnDone() {
+    _logger.info('TLS server done');
+    _isReconnecting = true;
+    // TODO Add disconnect all the clients
+  }
+
+  Future<void> _handleIncomingClient(Socket clientSock) async {
+    final remote =
+        '${clientSock.remoteAddress.address}:${clientSock.remotePort}';
+    bool clientIsDone = false;
+    _logger.info('incoming client from $remote');
+
     Socket? backendSock;
     try {
       // try connect to backend for this client
       backendSock = await Socket.connect(backendHost, backendPort);
     } catch (e) {
-      _logger.severe(
-        'failed to connect to backend for client ${clientSock.remoteAddress.address}:${clientSock.remotePort}: $e',
-      );
+      _logger.severe('failed to connect to backend for client $remote: $e');
+
       // respond with 503 and close
       try {
         clientSock.write(
@@ -186,36 +200,21 @@ class ReverseProxyServer {
     _clientSockets.add(clientSock);
     _backendSockets.add(backendSock);
 
-    // When either side closes/error, we must close both and — if this was a backend socket — trigger global reconnect.
-    void handleBackendDone([dynamic err]) {
-      _logger.severe(
-        'backend socket for client ${clientSock.remoteAddress.address}:${clientSock.remotePort} closed/errored: $err',
-      );
-      // mark to trigger global reconnect sequence
-      _isReconnecting = true;
-      _closeSocketIfMounted(backendSock);
-      _closeSocketIfMounted(clientSock);
-    }
-
     void handleClientDone([dynamic err]) {
-      _logger.severe(
-        'client ${clientSock.remoteAddress.address}:${clientSock.remotePort} closed/errored: $err',
-      );
+      if (clientIsDone) return;
+      clientIsDone = true;
+
+      _logger.info('client $remote closed/errored: $err');
       _closeSocketIfMounted(clientSock);
       _closeSocketIfMounted(backendSock);
-      // If the client disconnected normally not necessarily meaning backend died; do not trigger reconnect here.
     }
 
     backendSock.done
-        .then((_) => handleBackendDone())
-        .catchError((e) => handleBackendDone(e));
-    clientSock.done
         .then((_) => handleClientDone())
         .catchError((e) => handleClientDone(e));
-
     backendSock.listen(
       (data) {
-        // forward bytes to client (re-encrypt automatically by SecureSocket)
+        // Forward to client (re-encrypt automatically by SecureSocket)
         try {
           clientSock.add(data);
         } catch (e) {
@@ -223,15 +222,14 @@ class ReverseProxyServer {
           handleClientDone(e);
         }
       },
-      onError: (e) {
-        handleBackendDone(e);
-      },
-      onDone: () {
-        handleBackendDone();
-      },
+      onError: (e) => handleClientDone(e),
+      onDone: () => handleClientDone(),
       cancelOnError: true,
     );
 
+    clientSock.done
+        .then((_) => handleClientDone())
+        .catchError((e) => handleClientDone(e));
     clientSock.listen(
       (data) {
         // forward bytes to backend
@@ -239,20 +237,17 @@ class ReverseProxyServer {
           backendSock!.add(data);
         } catch (e) {
           _logger.severe('error writing to backend socket: $e');
-          handleBackendDone(e);
+          handleClientDone(e);
         }
       },
-      onError: (e) {
-        handleClientDone(e);
-      },
-      onDone: () {
-        handleClientDone();
-      },
+      onError: (e) => handleClientDone(e),
+      onDone: () => handleClientDone(),
       cancelOnError: true,
     );
 
     _logger.info(
-      'tunneling established between client ${clientSock.remoteAddress.address}:${clientSock.remotePort} and backend $backendHost:$backendPort',
+      'Tunneling established between client $remote '
+      'and backend $backendHost:$backendPort',
     );
   }
 
