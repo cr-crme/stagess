@@ -15,13 +15,14 @@ import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
-import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
+import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
@@ -138,22 +139,63 @@ class SupervisionChart extends StatelessWidget {
   const SupervisionChart({super.key});
   static const route = '/supervision';
 
-  Future<void> _fetchEnterprise(BuildContext context) async {
-    final authProvider = AuthProvider.of(context, listen: false);
+  Future<void> _fetchInfo(BuildContext context) async {
     final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
     final teachers = TeachersProvider.of(context, listen: false);
+    final students = StudentsProvider.of(context, listen: false);
+    final internships = InternshipsProvider.of(context, listen: false);
+    final enterprises = EnterprisesProvider.of(context, listen: false);
+
+    final teachersToFetch = <Teacher>[];
+    for (final teacher in teachers) {
+      if (teacher.id != teachers.currentTeacher?.id) continue;
+      teachersToFetch.add(teacher);
+    }
+
+    final studentsToFetch = StudentsHelpers.studentsInMyGroups(
+      context,
+      listen: false,
+    );
+    final studentIds = studentsToFetch.map((e) => e.id).toSet();
+
+    final internshipsToFetch = <Internship>[];
+    for (final internship in internships) {
+      if (!internship.isActive || !studentIds.contains(internship.studentId)) {
+        continue;
+      }
+      internshipsToFetch.add(internship);
+    }
+
+    final enterprisesToFetch = <Enterprise>[];
+    final enterprisesIds =
+        internshipsToFetch.map((e) => e.enterpriseId).toSet();
+    for (final enterprise in enterprises) {
+      if (!enterprisesIds.contains(enterprise.id)) continue;
+      enterprisesToFetch.add(enterprise);
+    }
 
     await Future.wait([
-      teachers.fetchData(
-        id: authProvider.teacherId ?? '-1',
-        fields: FetchableFields.all,
+      ...schoolBoards.map(
+        (e) => schoolBoards.fetchData(id: e.id, fields: FetchableFields.all),
       ),
-      ...schoolBoards
-          .where((e) => e.id == authProvider.schoolBoardId)
-          .map(
-            (e) =>
-                schoolBoards.fetchData(id: e.id, fields: FetchableFields.all),
-          ),
+      ...teachersToFetch.map(
+        (e) => teachers.fetchData(
+          id: e.id,
+          fields: FetchableFields({
+            'itineraries': FetchableFields.all,
+            'visiting_priorities': FetchableFields.all,
+          }),
+        ),
+      ),
+      ...studentsToFetch.map(
+        (e) => students.fetchData(id: e.id, fields: FetchableFields.all),
+      ),
+      ...internshipsToFetch.map(
+        (e) => internships.fetchData(id: e.id, fields: FetchableFields.all),
+      ),
+      ...enterprisesToFetch.map(
+        (e) => enterprises.fetchData(id: e.id, fields: FetchableFields.all),
+      ),
     ]);
     return;
   }
@@ -161,7 +203,7 @@ class SupervisionChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _fetchEnterprise(context),
+      future: _fetchInfo(context),
       builder: (context, snapshot) {
         final hasFullData = snapshot.connectionState == ConnectionState.done;
         return _SupervisionChartInternal(hasFullData: hasFullData);

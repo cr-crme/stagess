@@ -46,10 +46,10 @@ class Waypoint extends ItemSerializable {
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
         'title': FetchableFields.mandatory,
-        'subtitle': FetchableFields.optional,
+        'subtitle': FetchableFields.mandatory,
         'latitude': FetchableFields.mandatory,
         'longitude': FetchableFields.mandatory,
-        'address': Address.fetchableFields,
+        'address': Address.mandatoryFetchableFields,
         'priority': FetchableFields.mandatory,
       });
 
