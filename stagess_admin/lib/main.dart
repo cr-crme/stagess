@@ -36,6 +36,7 @@ void main() async {
   final useMockers = false;
   final backendUri = BackendHelpers.backendUri(
     isLocal: _useLocalDatabase,
+    useProxy: !_useLocalDatabase,
     useSsl: _useSsl,
     isDev: _useDevDatabase,
   );

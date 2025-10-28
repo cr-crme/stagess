@@ -11,6 +11,7 @@
             "program": "stagess_backend/bin/backend.dart",
             "env": {
                 "STAGESS_FIREBASE_WEB_API_KEY": "<PUT YOUR FIREBASE WEB API KEY HERE>",
+                "STAGESS_USE_REVERSE_PROXY": "< true | false >",
                 "STAGESS_USE_SSL": "< true | false >", 
                 "STAGESS_DATABASE_BACKEND": "< mariadb | mysql | mock >",
                 "STAGESS_DATABASE_DEV_PORT": "<PUT YOUR DEV DATABASE PORT HERE>",

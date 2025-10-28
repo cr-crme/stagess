@@ -71,7 +71,10 @@ void main() async {
   final firebaseApiKey = _getFromEnvironment('STAGESS_FIREBASE_WEB_API_KEY');
 
   // Create an HTTP server listening on localhost:_backendPort
-  final useSecure = _getFromEnvironment('STAGESS_USE_SSL') == 'true';
+  final useReverseProxy =
+      _getFromEnvironment('STAGESS_USE_REVERSE_PROXY') == 'true';
+  final useSecure =
+      _getFromEnvironment('STAGESS_USE_SSL') == 'true' && !useReverseProxy;
   final server = await _bindServer(useSecure: useSecure);
 
   _logger.info(

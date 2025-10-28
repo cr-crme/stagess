@@ -21,6 +21,7 @@ void main() {
           useMockers: true,
           backendUri: BackendHelpers.backendUri(
             isLocal: true,
+            useProxy: false,
             useSsl: false,
             isDev: true,
           ),
@@ -51,6 +52,7 @@ void main() {
           useMockers: true,
           backendUri: BackendHelpers.backendUri(
             isLocal: true,
+            useProxy: false,
             useSsl: false,
             isDev: true,
           ),
