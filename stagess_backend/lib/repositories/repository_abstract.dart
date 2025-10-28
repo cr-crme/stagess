@@ -6,7 +6,6 @@ import 'package:stagess_backend/utils/lock.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 
-// TODO use cache
 class RepositoryResponse {
   Map<String, dynamic>? data;
   Map<RequestFields, Map<String, FetchableFields>>? updatedData;
