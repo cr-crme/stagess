@@ -10,22 +10,109 @@ import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/schedule_selector.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final _logger = Logger('SupervisionStudentDetailsScreen');
 
+Internship? _getInternship(BuildContext context, {required String studentId}) {
+  final internships = InternshipsProvider.of(context, listen: false);
+  final internship = internships.byStudentId(studentId).lastOrNull;
+  return (internship?.isActive ?? false) ? internship : null;
+}
+
+Enterprise? _getEnterprise(BuildContext context, {required String studentId}) {
+  final internship = _getInternship(context, studentId: studentId);
+  if (internship == null) return null;
+  final enterprises = EnterprisesProvider.of(context, listen: false);
+  return enterprises.fromIdOrNull(internship.enterpriseId);
+}
+
+Job? _getJob(BuildContext context, {required String studentId}) {
+  final internship = _getInternship(context, studentId: studentId);
+  final enterprise = _getEnterprise(context, studentId: studentId);
+  if (internship == null || enterprise == null) return null;
+  return enterprise.jobs[internship.jobId];
+}
+
+Student? _getStudent(BuildContext context, {required String studentId}) {
+  final students = StudentsHelpers.studentsInMyGroups(context);
+  return students.firstWhereOrNull((e) => e.id == studentId);
+}
+
 class SupervisionStudentDetailsScreen extends StatelessWidget {
   const SupervisionStudentDetailsScreen({super.key, required this.studentId});
-
   static const route = '/student-details';
+
   final String studentId;
+
+  Future<void> _fetchInfo(BuildContext context) async {
+    final students = StudentsProvider.of(context, listen: false);
+    final enterprises = EnterprisesProvider.of(context, listen: false);
+    final internships = InternshipsProvider.of(context, listen: false);
+
+    Student? student;
+    Enterprise? enterprise;
+    Internship? internship;
+
+    final endTime = DateTime.now().add(Duration(seconds: 5));
+    while ((student == null || enterprise == null || internship == null) &&
+        DateTime.now().isBefore(endTime)) {
+      student = _getStudent(context, studentId: studentId);
+      enterprise = _getEnterprise(context, studentId: studentId);
+      internship = _getInternship(context, studentId: studentId);
+    }
+    await Future.wait([
+      if (student == null)
+        students.fetchData(id: studentId, fields: FetchableFields.all),
+      enterprises.fetchData(
+        id: enterprise?.id ?? '-1',
+        fields: FetchableFields({
+          'jobs': FetchableFields.all,
+          'contact': FetchableFields.all,
+        }),
+      ),
+      internships.fetchData(
+        id: internship?.id ?? '-1',
+        fields: FetchableFields({
+          'mutables': FetchableFields.all,
+          'teacher_notes': FetchableFields.all,
+        }),
+      ),
+    ]);
+    return;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _fetchInfo(context),
+      builder: (context, snapshot) {
+        return _SupervisionStudentDetailsScreenInternal(
+          studentId: studentId,
+          hasFullData: snapshot.connectionState == ConnectionState.done,
+        );
+      },
+    );
+  }
+}
+
+class _SupervisionStudentDetailsScreenInternal extends StatelessWidget {
+  const _SupervisionStudentDetailsScreenInternal({
+    required this.studentId,
+    required this.hasFullData,
+  });
+
+  final String studentId;
+  final bool hasFullData;
 
   void _navigateToStudentInternship(BuildContext context) {
     GoRouter.of(context).pushNamed(
@@ -35,158 +122,97 @@ class SupervisionStudentDetailsScreen extends StatelessWidget {
     );
   }
 
-  Future<Internship?> _getInternship(BuildContext context) async {
-    while (true) {
-      if (!context.mounted) return null;
-      final internships = InternshipsProvider.of(context, listen: false);
-      final internship = internships.byStudentId(studentId).lastOrNull;
-      if (internship != null) return internship.isActive ? internship : null;
-      await Future.delayed(const Duration(milliseconds: 100));
-    }
-  }
-
-  Future<Enterprise?> _getEnterprise(BuildContext context) async {
-    final internship = await _getInternship(context);
-    if (internship == null) return null;
-
-    while (true) {
-      if (!context.mounted) return null;
-      final enterprises = EnterprisesProvider.of(context, listen: false);
-      final enterprise = enterprises.fromIdOrNull(internship.enterpriseId);
-      if (enterprise != null) return enterprise;
-      await Future.delayed(const Duration(milliseconds: 100));
-    }
-  }
-
-  Future<Job?> _getJob(BuildContext context) async {
-    final internship = await _getInternship(context);
-    if (internship == null || !context.mounted) return null;
-    final enterprise = await _getEnterprise(context);
-    if (enterprise == null || !context.mounted) return null;
-
-    return enterprise.jobs[internship.jobId];
-  }
-
-  Future<Student?> _getStudent(BuildContext context) async {
-    while (true) {
-      if (!context.mounted) return null;
-      final students = StudentsHelpers.studentsInMyGroups(context);
-      final student = students.firstWhereOrNull((e) => e.id == studentId);
-      if (student != null) return student;
-      await Future.delayed(const Duration(milliseconds: 100));
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-        'Building SupervisionStudentDetailsScreen for student: $studentId');
+      'Building SupervisionStudentDetailsScreen for student: $studentId',
+    );
+    final internship = _getInternship(context, studentId: studentId);
+    final enterprise = _getEnterprise(context, studentId: studentId);
+    final job = _getJob(context, studentId: studentId);
+    final student = _getStudent(context, studentId: studentId);
 
     return ResponsiveService.scaffoldOf(
       context,
       appBar: ResponsiveService.appBarOf(
         context,
-        title: FutureBuilder<List>(
-            future: Future.wait([
-              _getInternship(context),
-              _getEnterprise(context),
-              _getJob(context),
-              _getStudent(context),
-            ]),
-            builder: (context, snapshot) {
-              _logger.finer(
-                  'Building app bar for SupervisionStudentDetailsScreen with: '
-                  'hasInternship: ${snapshot.data?[0] != null}, '
-                  'hasEnterprise: ${snapshot.data?[1] != null}, '
-                  'hasJob: ${snapshot.data?[2] != null}, '
-                  'hasStudent: ${snapshot.data?[3] != null}');
-
-              if (snapshot.connectionState == ConnectionState.waiting ||
-                  snapshot.data == null) {
-                return Text('En attente des données');
-              }
-
-              final enterprise = snapshot.data?[1] as Enterprise?;
-              final student = snapshot.data?[3] as Student?;
-              if (student == null) return const Text('Aucun élève trouvé');
-
-              return Row(children: [
-                student.avatar,
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        title:
+            student == null || !hasFullData
+                ? Text(
+                  hasFullData
+                      ? 'Aucun élève trouvé'
+                      : 'Chargement des informations',
+                )
+                : Row(
                   children: [
-                    Text(student.fullName),
-                    Text(
-                      enterprise?.name ?? 'Aucun stage',
-                      style: const TextStyle(fontSize: 14),
-                    )
+                    student.avatar,
+                    const SizedBox(width: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(student.fullName),
+                        Text(
+                          enterprise?.name ?? 'Aucun stage',
+                          style: const TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
-              ]);
-            }),
       ),
       smallDrawer: null,
       mediumDrawer: MainDrawer.medium,
       largeDrawer: MainDrawer.large,
-      body: SingleChildScrollView(
-        child: FutureBuilder<List>(
-            future: Future.wait([
-              _getInternship(context),
-              _getEnterprise(context),
-              _getJob(context),
-              _getStudent(context),
-            ]),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting ||
-                  snapshot.data == null) {
-                return const Center(child: CircularProgressIndicator());
-              }
+      body:
+          hasFullData
+              ? SingleChildScrollView(
+                child: Builder(
+                  builder: (context) {
+                    if (student == null) {
+                      return const Center(child: Text('Aucun élève trouvé'));
+                    }
+                    if (internship == null) {
+                      return const Center(child: Text('Aucun stage trouvé'));
+                    }
+                    if (enterprise == null) {
+                      return const Center(
+                        child: Text('Aucune entreprise trouvée'),
+                      );
+                    }
+                    if (job == null) {
+                      return const Center(child: Text('Aucun emploi trouvé'));
+                    }
 
-              final internship = snapshot.data?[0] as Internship?;
-              final enterprise = snapshot.data?[1] as Enterprise?;
-              final job = snapshot.data?[2] as Job?;
-              final student = snapshot.data?[3] as Student?;
-              if (student == null) {
-                return const Center(child: Text('Aucun élève trouvé'));
-              }
-              if (internship == null) {
-                return const Center(child: Text('Aucun stage trouvé'));
-              }
-              if (enterprise == null) {
-                return const Center(child: Text('Aucune entreprise trouvée'));
-              }
-              if (job == null) {
-                return const Center(child: Text('Aucun emploi trouvé'));
-              }
-
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 10.0),
-                    child: Center(child: Text('Aucun stage pour l\'élève')),
-                  ),
-                  _IsOver(
-                    studentId: studentId,
-                    onTapGoToInternship: () =>
-                        _navigateToStudentInternship(context),
-                  ),
-                  _Contact(
-                      student: student,
-                      enterprise: enterprise,
-                      internship: internship),
-                  _PersonalNotes(internship: internship),
-                  _Schedule(internship: internship),
-                  _buildUniformAndEpi(context, job),
-                  _MoreInfoButton(
-                    studentId: studentId,
-                    onTap: () => _navigateToStudentInternship(context),
-                  ),
-                ],
-              );
-            }),
-      ),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _IsOver(
+                          studentId: studentId,
+                          onTapGoToInternship:
+                              () => _navigateToStudentInternship(context),
+                        ),
+                        _Contact(
+                          student: student,
+                          enterprise: enterprise,
+                          internship: internship,
+                        ),
+                        _PersonalNotes(internship: internship),
+                        _Schedule(internship: internship),
+                        _buildUniformAndEpi(context, job),
+                        _MoreInfoButton(
+                          studentId: studentId,
+                          onTap: () => _navigateToStudentInternship(context),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              )
+              : Center(
+                child: CircularProgressIndicator(
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
     );
   }
 
@@ -217,10 +243,7 @@ class SupervisionStudentDetailsScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Tenue de travail',
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
+        Text('Tenue de travail', style: Theme.of(context).textTheme.titleSmall),
         uniforms.status == UniformStatus.none
             ? const Text('Aucune consigne de l\'entreprise')
             : ItemizedText(uniforms.uniforms),
@@ -241,16 +264,13 @@ Widget _buildProtections(BuildContext context, Job job) {
       ),
       protections.status == ProtectionsStatus.none
           ? const Text('Aucun équipement requis')
-          : ItemizedText(protections.protections)
+          : ItemizedText(protections.protections),
     ],
   );
 }
 
 class _IsOver extends StatelessWidget {
-  const _IsOver({
-    required this.studentId,
-    required this.onTapGoToInternship,
-  });
+  const _IsOver({required this.studentId, required this.onTapGoToInternship});
 
   final String studentId;
   final Function() onTapGoToInternship;
@@ -265,37 +285,37 @@ class _IsOver extends StatelessWidget {
 
     return isOver
         ? Center(
-            child: Column(
-              children: [
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.priority_high,
-                      color: Theme.of(context).primaryColor,
-                      size: 35,
-                    ),
-                    Text(
-                      'La date de fin du stage est dépassée.',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                  ],
+          child: Column(
+            children: [
+              const SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.priority_high,
+                    color: Theme.of(context).primaryColor,
+                    size: 35,
+                  ),
+                  Text(
+                    'La date de fin du stage est dépassée.',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: onTapGoToInternship,
+                child: Text(
+                  'Aller au stage',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleMedium!.copyWith(color: Colors.white),
                 ),
-                const SizedBox(height: 8),
-                TextButton(
-                    onPressed: onTapGoToInternship,
-                    child: Text(
-                      'Aller au stage',
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium!
-                          .copyWith(color: Colors.white),
-                    ))
-              ],
-            ),
-          )
+              ),
+            ],
+          ),
+        )
         : SizedBox.shrink();
   }
 }
@@ -310,14 +330,16 @@ class _PersonalNotes extends StatefulWidget {
 }
 
 class _PersonalNotesState extends State<_PersonalNotes> {
-  late final _textController = TextEditingController()
-    ..text = widget.internship.teacherNotes;
+  late final _textController =
+      TextEditingController()..text = widget.internship.teacherNotes;
 
   void _sendComments() {
     final internships = InternshipsProvider.of(context, listen: false);
     if (_textController.text == widget.internship.teacherNotes) return;
     internships.updateTeacherNote(
-        widget.internship.studentId, _textController.text);
+      widget.internship.studentId,
+      _textController.text,
+    );
   }
 
   @override
@@ -341,42 +363,48 @@ class _PersonalNotesState extends State<_PersonalNotes> {
             const Padding(
               padding: EdgeInsets.only(left: 32.0, bottom: 8),
               child: Text(
-                  '(ex. entrer par la porte 5 réservée au personnel, ...)'),
+                '(ex. entrer par la porte 5 réservée au personnel, ...)',
+              ),
             ),
             IconButton(
-                onPressed: () => setState(() {
-                      _editMode = !_editMode;
-                      if (!_editMode) _sendComments();
-                    }),
-                icon: Icon(
-                  _editMode ? Icons.save : Icons.edit,
-                  color: Theme.of(context).primaryColor,
-                ))
+              onPressed:
+                  () => setState(() {
+                    _editMode = !_editMode;
+                    if (!_editMode) _sendComments();
+                  }),
+              icon: Icon(
+                _editMode ? Icons.save : Icons.edit,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
           ],
         ),
         Padding(
           padding: const EdgeInsets.only(left: 32.0),
           child: Container(
             width: MediaQuery.of(context).size.width * 5 / 6,
-            decoration: _editMode
-                ? BoxDecoration(border: Border.all(color: Colors.grey))
-                : null,
-            child: _editMode
-                ? TextField(
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      focusedBorder: InputBorder.none,
+            decoration:
+                _editMode
+                    ? BoxDecoration(border: Border.all(color: Colors.grey))
+                    : null,
+            child:
+                _editMode
+                    ? TextField(
+                      decoration: const InputDecoration(
+                        border: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                      ),
+                      keyboardType: TextInputType.multiline,
+                      minLines: 4,
+                      maxLines: null,
+                      controller: _textController,
+                    )
+                    : Text(
+                      _textController.text.isEmpty
+                          ? 'Aucun commentaire'
+                          : _textController.text,
+                      style: const TextStyle(fontStyle: FontStyle.italic),
                     ),
-                    keyboardType: TextInputType.multiline,
-                    minLines: 4,
-                    maxLines: null,
-                    controller: _textController,
-                  )
-                : Text(
-                    _textController.text.isEmpty
-                        ? 'Aucun commentaire'
-                        : _textController.text,
-                    style: const TextStyle(fontStyle: FontStyle.italic)),
           ),
         ),
       ],
@@ -385,10 +413,11 @@ class _PersonalNotesState extends State<_PersonalNotes> {
 }
 
 class _Contact extends StatelessWidget {
-  const _Contact(
-      {required this.student,
-      required this.enterprise,
-      required this.internship});
+  const _Contact({
+    required this.student,
+    required this.enterprise,
+    required this.internship,
+  });
 
   final Student student;
   final Enterprise enterprise;
@@ -406,10 +435,7 @@ class _Contact extends StatelessWidget {
             children: [
               InkWell(
                 onTap: () => launchUrl(Uri.parse('tel:${student.phone}')),
-                child: Icon(
-                  Icons.phone,
-                  color: Theme.of(context).primaryColor,
-                ),
+                child: Icon(Icons.phone, color: Theme.of(context).primaryColor),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
@@ -420,8 +446,10 @@ class _Contact extends StatelessWidget {
                       'Élève',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Text('${student.fullName}\n'
-                        '${student.phone.toString() == '' ? 'Aucun téléphone enregistré' : student.phone}'),
+                    Text(
+                      '${student.fullName}\n'
+                      '${student.phone.toString() == '' ? 'Aucun téléphone enregistré' : student.phone}',
+                    ),
                   ],
                 ),
               ),
@@ -432,10 +460,7 @@ class _Contact extends StatelessWidget {
           padding: const EdgeInsets.only(left: 32.0, top: 8.0),
           child: Row(
             children: [
-              const Icon(
-                Icons.home,
-                color: Colors.black,
-              ),
+              const Icon(Icons.home, color: Colors.black),
               Flexible(
                 child: Padding(
                   padding: const EdgeInsets.only(left: 8.0),
@@ -446,11 +471,13 @@ class _Contact extends StatelessWidget {
                         'Adresse de l\'entreprise',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      Text(enterprise.address == null
-                          ? 'Aucune adresse'
-                          : '${enterprise.address!.civicNumber} ${enterprise.address!.street}\n'
-                              '${enterprise.address!.city}\n'
-                              '${enterprise.address!.postalCode}'),
+                      Text(
+                        enterprise.address == null
+                            ? 'Aucune adresse'
+                            : '${enterprise.address!.civicNumber} ${enterprise.address!.street}\n'
+                                '${enterprise.address!.city}\n'
+                                '${enterprise.address!.postalCode}',
+                      ),
                     ],
                   ),
                 ),
@@ -463,12 +490,11 @@ class _Contact extends StatelessWidget {
           child: Row(
             children: [
               InkWell(
-                onTap: () =>
-                    launchUrl(Uri.parse('tel:${internship.supervisor.phone}')),
-                child: Icon(
-                  Icons.phone,
-                  color: Theme.of(context).primaryColor,
-                ),
+                onTap:
+                    () => launchUrl(
+                      Uri.parse('tel:${internship.supervisor.phone}'),
+                    ),
+                child: Icon(Icons.phone, color: Theme.of(context).primaryColor),
               ),
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
@@ -479,8 +505,10 @@ class _Contact extends StatelessWidget {
                       'Responsable en milieu de stage',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
-                    Text('${internship.supervisor.fullName}\n'
-                        '${internship.supervisor.phone.toString() == '' ? 'Aucun téléphone enregistré' : internship.supervisor.phone}'),
+                    Text(
+                      '${internship.supervisor.fullName}\n'
+                      '${internship.supervisor.phone.toString() == '' ? 'Aucun téléphone enregistré' : internship.supervisor.phone}',
+                    ),
                   ],
                 ),
               ),
@@ -498,7 +526,9 @@ class _Schedule extends StatelessWidget {
   final Internship internship;
 
   Widget _scheduleBuilder(
-      BuildContext context, List<WeeklySchedule> schedules) {
+    BuildContext context,
+    List<WeeklySchedule> schedules,
+  ) {
     return ScheduleSelector(
       editMode: false,
       scheduleController: WeeklySchedulesController(
@@ -537,9 +567,12 @@ class _MoreInfoButton extends StatelessWidget {
       padding: const EdgeInsets.only(top: 50.0, bottom: 40),
       child: Center(
         child: ElevatedButton(
-            onPressed: onTap,
-            child: const Text('Plus de détails\nsur le stage',
-                textAlign: TextAlign.center)),
+          onPressed: onTap,
+          child: const Text(
+            'Plus de détails\nsur le stage',
+            textAlign: TextAlign.center,
+          ),
+        ),
       ),
     );
   }
