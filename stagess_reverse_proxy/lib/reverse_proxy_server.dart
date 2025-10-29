@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:logging/logging.dart';
 
@@ -15,16 +16,13 @@ class ReverseProxyServer {
   final String backendHost;
   final int backendPort;
 
-  final int maxLiveConnections;
-
-  ServerSocket? _unsecuredServer;
-  SecureServerSocket? _securedServer;
-  get _server => useSecure ? _securedServer : _unsecuredServer;
-
-  final Set<Socket> _clientSockets = {};
-  final Set<Socket> _backendSockets = {};
+  Stream<Socket>? _server;
   bool _isStarted = false;
   bool _isReconnecting = false;
+
+  final int maxLiveConnections;
+  final Set<Socket> _clientSockets = {};
+  final Set<Socket> _backendSockets = {};
 
   ReverseProxyServer({
     String? certPath,
@@ -56,11 +54,14 @@ class ReverseProxyServer {
   Future<void> _mainLoop() async {
     while (_isStarted) {
       _logger
-          .info('checking backend availability $backendHost:$backendPort ...');
+          .info('Checking backend availability $backendHost:$backendPort ...');
+      // We need to "test" the connection because there is never a persistent
+      // connection to the backend; each client connection creates its own
+      // backend connection.
       if (!(await _testBackendConnect())) {
         final delay = Duration(seconds: 5);
         _logger.warning(
-            'The backend is not reachable; will retry in ${delay.inSeconds}s');
+            'The backend is not reachable; will retry in ${delay.inSeconds}s...');
         await Future.delayed(delay);
         continue;
       }
@@ -68,19 +69,16 @@ class ReverseProxyServer {
       // Backend is reachable — start TLS server
       try {
         await _startReverseProxyServer(maxLiveConnections: maxLiveConnections);
-
-        // wait until we need to reconnection (set when any backend socket closes)
         while (_isStarted && !_isReconnecting) {
-          // simple sleep loop to yield; server accepts connections via listener
           await Future.delayed(Duration(milliseconds: 200));
         }
       } catch (e, st) {
-        _logger.severe('error while running server: $e\n$st');
+        _logger.severe('Error while running server: $e\n$st');
       } finally {
         // teardown when reconnecting or stopping
         await _closeServer();
         await _closeAllClients(
-            'backend disconnected / proxy restarting listener');
+            'Backend disconnected / proxy restarting listener');
         _isReconnecting = false;
       }
     }
@@ -106,186 +104,177 @@ class ReverseProxyServer {
       {required int maxLiveConnections}) async {
     if (_server != null) return;
     _logger.info(
-        'starting reverse proxy server on ${bindAddress.address}:$bindPort ...');
+        'Starting reverse proxy server on ${bindAddress.address}:$bindPort ...');
 
-    if (useSecure) {
-      final ctx = SecurityContext();
-      ctx.useCertificateChain(_certPath!);
-      ctx.usePrivateKey(_keyPath!);
+    _server = await (useSecure
+        ? SecureServerSocket.bind(
+            bindAddress,
+            bindPort,
+            SecurityContext()
+              ..useCertificateChain(_certPath!)
+              ..usePrivateKey(_keyPath!),
+            backlog: maxLiveConnections,
+          )
+        : ServerSocket.bind(
+            bindAddress,
+            bindPort,
+            backlog: maxLiveConnections,
+          ));
+    _server!.listen(_handleIncomingClient,
+        onError: (e, st) => _logger.severe('TLS server listen error: $e\n$st'),
+        onDone: () => _logger.info('TLS server done'));
 
-      _securedServer = await SecureServerSocket.bind(
-        bindAddress,
-        bindPort,
-        ctx,
-        backlog: maxLiveConnections,
-      );
-
-      _securedServer!.listen(_handleIncoming,
-          onError: _handleOnError, onDone: _handleOnDone);
-    } else {
-      _unsecuredServer = await ServerSocket.bind(
-        bindAddress,
-        bindPort,
-        backlog: maxLiveConnections,
-      );
-
-      _unsecuredServer!.listen(_handleIncoming,
-          onError: _handleOnError, onDone: _handleOnDone);
-    }
-
+    // TODO Add a makefile for the reverse proxy
     _logger.info('TLS server bound; accepting connections');
   }
 
   Future<void> _closeServer() async {
     if (_server == null) return;
 
-    _logger.info(
-        'closing secured reverse proxy server (stop accepting new clients)');
+    _logger.info('Closing reverse proxy server (stop accepting new clients)');
     try {
-      await _securedServer?.close();
-      await _unsecuredServer?.close();
+      await (useSecure
+          ? (_server as SecureServerSocket).close()
+          : (_server as ServerSocket).close());
     } catch (e) {
-      _logger.severe('error closing secured reverse proxy server: $e');
+      _logger.severe('Error closing reverse proxy server: $e');
     } finally {
-      _securedServer = null;
-      _unsecuredServer = null;
+      _server = null;
     }
   }
 
-  void _handleIncoming(Socket clientSocket) {
+  Future<void> _handleIncomingClient(Socket clientSocket) async {
+    // If the server is not started, close the client socket immediately
     if (!_isStarted) {
       try {
         clientSocket.destroy();
       } catch (_) {}
       return;
     }
-    _handleIncomingClient(clientSocket);
-  }
 
-  void _handleOnError(e, st) {
-    _logger.severe('TLS server listen error: $e\n$st');
-    _isReconnecting = true;
-    // TODO Add disconnect all the clients
-    // TODO Find why this does not trigger when backend crashes
-    // TODO Add a makefile for the reverse proxy
-  }
-
-  void _handleOnDone() {
-    _logger.info('TLS server done');
-    _isReconnecting = true;
-    // TODO Add disconnect all the clients
-  }
-
-  Future<void> _handleIncomingClient(Socket clientSock) async {
     final remote =
-        '${clientSock.remoteAddress.address}:${clientSock.remotePort}';
-    bool clientIsDone = false;
-    _logger.info('incoming client from $remote');
+        '${clientSocket.remoteAddress.address}:${clientSocket.remotePort}';
+    _logger.info('Incoming client from $remote');
 
-    Socket? backendSock;
+    // Prepare the tunneling by connecting to backend for this client
+    Socket? backendSocket;
     try {
-      // try connect to backend for this client
-      backendSock = await Socket.connect(backendHost, backendPort);
+      backendSocket = await Socket.connect(backendHost, backendPort);
     } catch (e) {
-      _logger.severe('failed to connect to backend for client $remote: $e');
-
-      // respond with 503 and close
+      // If we cannot connect to backend, inform client and close connection
+      _logger.severe('Failed to connect to backend for client $remote: $e');
       try {
-        clientSock.write(
+        clientSocket.write(
           'HTTP/1.1 503 Service Unavailable\r\n'
           'Connection: close\r\n'
           'Content-Length: 0\r\n'
           '\r\n',
         );
-        await clientSock.flush();
+        await clientSocket.flush();
       } catch (_) {}
-      clientSock.destroy();
+      clientSocket.destroy();
+
+      // Prepare a full reconnect of the server
+      _isReconnecting = true;
       return;
     }
 
-    // Register
-    _clientSockets.add(clientSock);
-    _backendSockets.add(backendSock);
+    // Register sockets
+    _clientSockets.add(clientSocket);
+    _backendSockets.add(backendSocket);
 
-    void handleClientDone([dynamic err]) {
-      if (clientIsDone) return;
-      clientIsDone = true;
+    // Setup the callbacks for handling all the communication protocols
+    bool clientIsDisconnected = false;
+    void handleConnexionDone([err]) {
+      if (clientIsDisconnected) return;
+      clientIsDisconnected = true;
 
-      _logger.info('client $remote closed/errored: $err');
-      _closeSocketIfMounted(clientSock);
-      _closeSocketIfMounted(backendSock);
+      _closeSocketIfMounted(clientSocket);
+      _closeSocketIfMounted(backendSocket);
     }
 
-    backendSock.done
-        .then((_) => handleClientDone())
-        .catchError((e) => handleClientDone(e));
-    backendSock.listen(
-      (data) {
-        // Forward to client (re-encrypt automatically by SecureSocket)
-        try {
-          clientSock.add(data);
-        } catch (e) {
-          _logger.severe('error writing to client socket: $e');
-          handleClientDone(e);
-        }
-      },
-      onError: (e) => handleClientDone(e),
-      onDone: () => handleClientDone(),
-      cancelOnError: true,
-    );
+    void handleBackendDone([e]) => handleConnexionDone(e);
+    void handleBackendError(e) {
+      _logger.severe('Error on backend socket: $e.\nKilling all connexions.');
+      _isReconnecting = true;
+      handleConnexionDone(e);
+    }
 
-    clientSock.done
-        .then((_) => handleClientDone())
-        .catchError((e) => handleClientDone(e));
-    clientSock.listen(
-      (data) {
-        // forward bytes to backend
-        try {
-          backendSock!.add(data);
-        } catch (e) {
-          _logger.severe('error writing to backend socket: $e');
-          handleClientDone(e);
-        }
-      },
-      onError: (e) => handleClientDone(e),
-      onDone: () => handleClientDone(),
-      cancelOnError: true,
-    );
+    void handleClientDone([e]) => handleConnexionDone(e);
+    void handleClientError(e) {
+      _logger
+          .severe('Error on client ($remote) socket: $e.\nClosing connexion.');
+      handleConnexionDone(e);
+    }
+
+    void forwardToBackend(Uint8List data) {
+      try {
+        backendSocket!.add(data);
+      } catch (e) {
+        handleBackendError(e);
+      }
+    }
+
+    void forwardToClient(Uint8List data) {
+      // Forward to client
+      try {
+        clientSocket.add(data);
+      } catch (e) {
+        handleClientError(e);
+      }
+    }
+
+    // Setup the tunneling between client and backend
+    backendSocket
+      ..done.then(handleBackendDone).catchError(handleBackendError)
+      ..listen(
+        forwardToClient,
+        onDone: handleBackendDone,
+        onError: handleBackendError,
+        cancelOnError: true,
+      );
+    clientSocket
+      ..done.then(handleClientDone).catchError(handleClientError)
+      ..listen(
+        forwardToBackend,
+        onDone: handleClientDone,
+        onError: handleClientError,
+        cancelOnError: true,
+      );
 
     _logger.info(
-      'Tunneling established between client $remote '
-      'and backend $backendHost:$backendPort',
+      'Tunneling established between client $remote and backend $backendHost:$backendPort',
     );
   }
 
-  void _closeSocketIfMounted(Socket? s) {
-    if (s == null) return;
-    if (_clientSockets.remove(s) || _backendSockets.remove(s)) {
+  void _closeSocketIfMounted(Socket? socket) {
+    if (socket == null) return;
+    if (_clientSockets.remove(socket) || _backendSockets.remove(socket)) {
       try {
-        s.destroy();
+        socket.destroy();
       } catch (_) {}
     }
   }
 
   Future<void> _closeAllClients(String reason) async {
     if (_clientSockets.isEmpty && _backendSockets.isEmpty) return;
+
     _logger.info(
-      'closing all client/backend sockets: $reason (clients=${_clientSockets.length}, backends=${_backendSockets.length})',
+      'Closing all client/backend sockets: $reason (clients=${_clientSockets.length}, backends=${_backendSockets.length})',
     );
     final clients = Set<Socket>.from(_clientSockets);
     final backends = Set<Socket>.from(_backendSockets);
     _clientSockets.clear();
     _backendSockets.clear();
 
-    for (final s in clients) {
+    for (final socket in clients) {
       try {
-        // best-effort notify — but client might be mid-protocol; destroy afterwards
-        s.destroy();
+        socket.destroy();
       } catch (_) {}
     }
-    for (final s in backends) {
+    for (final socket in backends) {
       try {
-        s.destroy();
+        socket.destroy();
       } catch (_) {}
     }
   }
