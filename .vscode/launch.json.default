@@ -20,11 +20,9 @@
             "request": "launch",
             "type": "dart",
             "program": "stagess_backend/bin/backend.dart",
-            "args": [
             "toolArgs": [
                 "--define=STAGESS_USE_SSL=< [true] | false >",
                 "--define=STAGESS_BACKEND_PORT=< PORT | [3456] >",
-            ],
             ],
             "env": {
                 "STAGESS_FIREBASE_WEB_API_KEY": "<PUT YOUR FIREBASE WEB API KEY HERE>",

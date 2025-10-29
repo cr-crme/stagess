@@ -9,7 +9,6 @@ final _logger = Logger('StagessReverseProxy');
 Future<void> main(List<String> args) async {
   Logger.root.level = Level.INFO;
   Logger.root.onRecord.listen((record) {
-    // ignore: avoid_print
     print('${record.level.name}: ${record.time}: ${record.message}');
   });
 
