@@ -99,6 +99,7 @@ class StagessApp extends StatelessWidget {
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
       ],
+
       child: InactivityLayout(
         navigatorKey: rootNavigatorKey,
         timeout: const Duration(minutes: 10),

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:stagess_common_flutter/providers/backend_list_provided.dart';
 
 final _logger = Logger('InactivityLayout');
 
@@ -55,6 +56,12 @@ class _InactivityLayoutState extends State<InactivityLayout> {
         return;
       }
 
+      // If the reconnecting dialog is showing, close it first
+      if (_isShowingWaitForReconnexionDialog) {
+        Navigator.of(context).pop();
+        _isShowingWaitForReconnexionDialog = false;
+      }
+
       final restartTimer = await widget.onTimedout(context);
       if (restartTimer) _inactivityService.userHasInteracted();
     },
@@ -66,12 +73,46 @@ class _InactivityLayoutState extends State<InactivityLayout> {
     _inactivityService.dispose();
   }
 
+  bool _isShowingWaitForReconnexionDialog = false;
+  void _onConnexionStatusChanged(isConnected) async {
+    if (isConnected) {
+      if (_isShowingWaitForReconnexionDialog) {
+        Navigator.of(widget.navigatorKey.currentContext!).pop();
+      }
+      _isShowingWaitForReconnexionDialog = false;
+      return;
+    }
+
+    if (_isShowingWaitForReconnexionDialog) return;
+    _isShowingWaitForReconnexionDialog = true;
+    await showDialog(
+      context: widget.navigatorKey.currentContext!,
+      barrierDismissible: false,
+      builder:
+          (context) => AlertDialog(
+            title: Text('Connexion perdue'),
+            content: Text(
+              'La connexion au serveur a été perdue. Nous tentons de nous reconnecter.',
+            ),
+          ),
+    );
+    _isShowingWaitForReconnexionDialog = false;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Listener(
       behavior: HitTestBehavior.translucent,
       onPointerDown: (_) => _inactivityService.userHasInteracted(),
-      child: widget.child,
+      child: Builder(
+        builder: (context) {
+          BackendListProvided.onConnexionStatusChanged.listen(
+            _onConnexionStatusChanged,
+          );
+
+          return widget.child;
+        },
+      ),
     );
   }
 }

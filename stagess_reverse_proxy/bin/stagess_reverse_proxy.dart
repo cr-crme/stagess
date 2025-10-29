@@ -30,11 +30,13 @@ Future<void> main(List<String> args) async {
     await reverseProxyServer.stop();
     exit(0);
   });
-  ProcessSignal.sigterm.watch().listen((_) async {
-    _logger.info('SIGTERM received, shutting down...');
-    await reverseProxyServer.stop();
-    exit(0);
-  });
+  if (!Platform.isWindows) {
+    ProcessSignal.sigterm.watch().listen((_) async {
+      _logger.info('SIGTERM received, shutting down...');
+      await reverseProxyServer.stop();
+      exit(0);
+    });
+  }
 
   await reverseProxyServer.start();
 }

@@ -60,14 +60,16 @@ class BugReporter {
     required errorReportUri,
   }) async {
     // Handle uncaught errors
-    await http.post(
-      errorReportUri,
-      body: jsonEncode({
-        'breadcrumbs': _breadcrumbs,
-        'error': error.toString(),
-        'stack_trace': stackTrace.toString(),
-      }),
-    );
+    try {
+      await http.post(
+        errorReportUri,
+        body: jsonEncode({
+          'breadcrumbs': _breadcrumbs,
+          'error': error.toString(),
+          'stack_trace': stackTrace.toString(),
+        }),
+      );
+    } catch (_) {}
 
     debugPrint('Uncaught error: $error');
     debugPrint('Stack trace: $stackTrace');

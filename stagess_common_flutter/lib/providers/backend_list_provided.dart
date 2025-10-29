@@ -11,6 +11,7 @@ import 'package:stagess_common/models/generic/extended_item_serializable.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:web_socket_client/web_socket_client.dart';
+import 'package:stagess_common/services/generic_listener.dart';
 
 class _Selector {
   final Function(Map<String, dynamic> items, {bool notify}) addOrReplaceItems;
@@ -37,6 +38,11 @@ class _Selector {
 abstract class BackendListProvided<T extends ExtendedItemSerializable>
     extends DatabaseListProvided<T> {
   final Uri uri;
+
+  static final onConnexionStatusChanged =
+      GenericListener<Function(bool isConnected)>();
+
+  DateTime? _startedConnectingAt;
   bool _hasProblemConnecting = false;
   bool get hasProblemConnecting => _hasProblemConnecting;
   bool _connexionRefused = false;
@@ -77,24 +83,32 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
         _socket = WebSocket(
           uri,
           headers: {HttpHeaders.contentTypeHeader: 'application/json'},
-          timeout: const Duration(seconds: 5),
+          timeout: const Duration(seconds: 600),
+          backoff: ConstantBackoff(Duration(seconds: 5)),
         );
 
         _socket!.connection.listen((event) {
           if (_socket == null) return;
 
           if (event is Connected || event is Reconnected) {
-            _socket!.send(
-              jsonEncode(
-                CommunicationProtocol(
-                  requestType: RequestType.handshake,
-                  data: {'token': token},
-                ).serialize(),
+            _sendMessage(
+              message: CommunicationProtocol(
+                requestType: RequestType.handshake,
+                data: {'token': token},
               ),
             );
-          } else if (event is Disconnected) {
+            onConnexionStatusChanged.notifyListeners(
+              (callback) => callback(true),
+            );
+          } else if (event is Disconnected || event is Reconnecting) {
+            // Setup the reconnection logic
+            _startedConnectingAt = DateTime.now();
+            _hasProblemConnecting = false;
+            _connexionRefused = false;
             _handshakeReceived = false;
-            notifyListeners();
+            onConnexionStatusChanged.notifyListeners(
+              (callback) => callback(false),
+            );
           }
         });
         _socket!.messages.listen((data) {
@@ -113,16 +127,21 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
           _incomingMessage(protocol, authProvider: authProvider);
         });
 
-        final started = DateTime.now();
-        while (!_handshakeReceived) {
-          await Future.delayed(const Duration(milliseconds: 100));
+        _startedConnectingAt = DateTime.now();
+        while (true) {
           if (_socket == null) {
             // If the socket is null, it means the connection failed
             dev.log('Connection to the server was canceled');
             return;
           }
+          if (_handshakeReceived) {
+            await Future.delayed(const Duration(seconds: 1));
+            continue;
+          }
 
-          if (DateTime.now().isAfter(started.add(const Duration(seconds: 5)))) {
+          if (DateTime.now().isAfter(
+            _startedConnectingAt!.add(const Duration(seconds: 5)),
+          )) {
             if (!_hasProblemConnecting) {
               // Only notify once
               _hasProblemConnecting = true;
@@ -130,6 +149,8 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
               notifyListeners();
             }
           }
+
+          await Future.delayed(const Duration(milliseconds: 200));
         }
       } catch (e) {
         dev.log(
@@ -137,6 +158,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
           error: e,
           stackTrace: StackTrace.current,
         );
+      } finally {
         disconnect();
       }
     }
