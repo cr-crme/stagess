@@ -7,6 +7,9 @@ WEB_BUILD_DIR = build
 backend: 
 	$(MAKE) -C stagess_backend
 
+reverse_proxy:
+	$(MAKE) -C stagess_reverse_proxy
+
 web: 
 	rm -rf $(WEB_BUILD_DIR)
 	mkdir -p $(WEB_BUILD_DIR)
