@@ -12,16 +12,16 @@ Future<void> main(List<String> args) async {
     print('${record.level.name}: ${record.time}: ${record.message}');
   });
 
-  final useSsl = bool.fromEnvironment('STAGESS_USE_SSL', defaultValue: true);
+  const useSsl = bool.fromEnvironment('STAGESS_USE_SSL', defaultValue: true);
   final reverseProxyServer = ReverseProxyServer(
     maxLiveConnections: 128,
     certPath: useSsl ? Platform.environment['STAGESS_CERT_PEM'] : null,
     keyPath: useSsl ? Platform.environment['STAGESS_KEY_PEM'] : null,
-    bindPort:
-        int.fromEnvironment('STAGESS_REVERSED_PROXY_PORT', defaultValue: 443),
+    bindPort: const int.fromEnvironment('STAGESS_REVERSED_PROXY_PORT',
+        defaultValue: 443),
     backendHost: InternetAddress.loopbackIPv4.address,
     backendPort:
-        int.fromEnvironment('STAGESS_BACKEND_PORT', defaultValue: 3456),
+        const int.fromEnvironment('STAGESS_BACKEND_PORT', defaultValue: 3456),
   );
 
   // Shutdown handlers

@@ -17,8 +17,6 @@ BUILD_DIR = build
 INSTALL_DIR = ~/services/$(TARGET)
 LAUNCHER_FILE_NAME = $(TARGET).sh
 LOG_FILE = stagess_backend.log
-SERVICE_FILE_NAME = $(TARGET).service
-SERVICE_FILE_PATH = /etc/systemd/system/$(SERVICE_FILE_NAME)
 
 # Default target
 all: compile launcher
@@ -27,75 +25,37 @@ all: compile launcher
 compile:
 	mkdir -p $(BUILD_DIR)
 	cp $(API_KEY_FILE) ${BUILD_DIR}/
-	$(DART) compile exe $(MAIN) -o $(BUILD_DIR)/$(TARGET)
+	$(DART) compile exe  \
+		--define=STAGESS_USE_SSL=false \
+		--define=STAGESS_BACKEND_PORT=3456 \
+		$(MAIN) -o $(BUILD_DIR)/$(TARGET)
 
 launcher:
-	mkdir -p $(BUILD_DIR)
-	echo "#!/bin/bash" | tee ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "# Define the required exports" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_SQL_COMMAND=${STAGESS_SQL_COMMAND}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_USE_SSL=${STAGESS_USE_SSL}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_CERT_PEM=${STAGESS_CERT_PEM}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_KEY_PEM=${STAGESS_KEY_PEM}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_FIREBASE_WEB_API_KEY=${STAGESS_FIREBASE_WEB_API_KEY}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_USE_LOCAL_DATABASE=${STAGESS_USE_LOCAL_DATABASE}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_SUPERADMIN_EMAIL=${STAGESS_SUPERADMIN_EMAIL}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_DATABASE_BACKEND=${STAGESS_DATABASE_BACKEND}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_DATABASE_DEV_PORT=${STAGESS_DATABASE_DEV_PORT}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_DATABASE_DEV_NAME=${STAGESS_DATABASE_DEV_NAME}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_DATABASE_DEV_USER=${STAGESS_DATABASE_DEV_USER}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_DATABASE_DEV_PASSWORD=${STAGESS_DATABASE_DEV_PASSWORD}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_DATABASE_PRODUCTION_PORT=${STAGESS_DATABASE_PRODUCTION_PORT}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_DATABASE_PRODUCTION_NAME=${STAGESS_DATABASE_PRODUCTION_NAME}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_DATABASE_PRODUCTION_USER=${STAGESS_DATABASE_PRODUCTION_USER}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "export STAGESS_DATABASE_PRODUCTION_PASSWORD=${STAGESS_DATABASE_PRODUCTION_PASSWORD}" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "# Define the log file name" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "LOG_FILE=$(LOG_FILE)" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "# Run the backend" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
-	echo "./$(TARGET) > $(LOG_FILE) 2>&1" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
+	mkdir -p $(BUILD_DIR); \
+	rm -f ${BUILD_DIR}/$(LAUNCHER_FILE_NAME); \
+	touch ${BUILD_DIR}/$(LAUNCHER_FILE_NAME); \
+	append_to_file() { echo "$$1" | tee -a ${BUILD_DIR}/$(LAUNCHER_FILE_NAME); }; \
+	append_to_file "#!/bin/bash"; \
+	append_to_file ""; \
+	append_to_file "# Define the required exports"; \
+	append_to_file "export STAGESS_FIREBASE_WEB_API_KEY=${STAGESS_FIREBASE_WEB_API_KEY}"; \
+	append_to_file "export STAGESS_DATABASE_BACKEND=${STAGESS_DATABASE_BACKEND}"; \
+	append_to_file "export STAGESS_DATABASE_DEV_PORT=${STAGESS_DATABASE_DEV_PORT}"; \
+	append_to_file "export STAGESS_DATABASE_DEV_NAME=${STAGESS_DATABASE_DEV_NAME}"; \
+	append_to_file "export STAGESS_DATABASE_DEV_USER=${STAGESS_DATABASE_DEV_USER}"; \
+	append_to_file "export STAGESS_DATABASE_DEV_PASSWORD=${STAGESS_DATABASE_DEV_PASSWORD}"; \
+	append_to_file "export STAGESS_DATABASE_PRODUCTION_PORT=${STAGESS_DATABASE_PRODUCTION_PORT}"; \
+	append_to_file "export STAGESS_DATABASE_PRODUCTION_NAME=${STAGESS_DATABASE_PRODUCTION_NAME}"; \
+	append_to_file "export STAGESS_DATABASE_PRODUCTION_USER=${STAGESS_DATABASE_PRODUCTION_USER}"; \
+	append_to_file "export STAGESS_DATABASE_PRODUCTION_PASSWORD=${STAGESS_DATABASE_PRODUCTION_PASSWORD}"; \
+	append_to_file ""; \
+	append_to_file "# Define the log file name"; \
+	append_to_file "LOG_FILE=$(LOG_FILE)"; \
+	append_to_file ""; \
+	append_to_file "# Run the backend"; \
+	append_to_file "./$(TARGET) > $(LOG_FILE) 2>&1"; \
 	chmod +x ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
 
-service:
-	mkdir -p $(BUILD_DIR)
-	echo "[Unit]" | tee ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Description=$(TARGET) Dart Service" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "After=network.target" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "[Service]" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "ExecStart=$(INSTALL_DIR)/$(LAUNCHER_FILE_NAME)" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "WorkingDirectory=$(INSTALL_DIR)" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Restart=always" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "RestartSec=5" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "User=www-data" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Environment=STAGESS_SQL_COMMAND="${STAGESS_SQL_COMMAND}"" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Environment=STAGESS_FIREBASE_WEB_API_KEY="${STAGESS_FIREBASE_WEB_API_KEY}"" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Environment=STAGESS_USE_SSL="${STAGESS_USE_SSL}"" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Environment=STAGESS_CERT_PEM="${STAGESS_CERT_PEM}"" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Environment=STAGESS_KEY_PEM="${STAGESS_KEY_PEM}"" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Environment=STAGESS_USE_LOCAL_DATABASE="${STAGESS_USE_LOCAL_DATABASE}"" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Environment=STAGESS_DATABASE_BACKEND="${STAGESS_DATABASE_BACKEND}"" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Environment=STAGESS_DATABASE_DEV_PORT="${STAGESS_DATABASE_DEV_PORT}"" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Environment=STAGESS_DATABASE_DEV_NAME="${STAGESS_DATABASE_DEV_NAME}"" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Environment=STAGESS_DATABASE_DEV_USER="${STAGESS_DATABASE_DEV_USER}"" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Environment=STAGESS_DATABASE_DEV_PASSWORD="${STAGESS_DATABASE_DEV_PASSWORD}"" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Environment=STAGESS_DATABASE_PRODUCTION_PORT="${STAGESS_DATABASE_PRODUCTION_PORT}"" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Environment=STAGESS_DATABASE_PRODUCTION_NAME="${STAGESS_DATABASE_PRODUCTION_NAME}"" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Environment=STAGESS_DATABASE_PRODUCTION_USER="${STAGESS_DATABASE_PRODUCTION_USER}"" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "Environment=STAGESS_DATABASE_PRODUCTION_PASSWORD="${STAGESS_DATABASE_PRODUCTION_PASSWORD}"" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "StandardOutput=file:$(INSTALL_DIR)/backend.log" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "StandardError=file:$(INSTALL_DIR)/backend_error.log" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "[Install]" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-	echo "WantedBy=multi-user.target" | tee -a ${BUILD_DIR}/$(SERVICE_FILE_NAME)
-
-deamon: service
-	sudo cp $(BUILD_DIR)/$(SERVICE_FILE_NAME) $(SERVICE_FILE_PATH)
-	sudo systemctl daemon-reload
-	sudo systemctl enable $(TARGET)
-	sudo systemctl start $(TARGET)
 
 install: all
 	mkdir -p $(INSTALL_DIR)
@@ -103,11 +63,11 @@ install: all
 	cp $(BUILD_DIR)/$(API_KEY_FILE) $(INSTALL_DIR)/
 	cp $(BUILD_DIR)/$(LAUNCHER_FILE_NAME) $(INSTALL_DIR)/
 
-deploy: install deamon
+deploy: install
 
 # Clean build files
 clean:
 	rm -rf $(BUILD_DIR)
 
 # Phony targets (not files)
-.PHONY: all clean deamon
+.PHONY: all clean install deploy

@@ -124,7 +124,6 @@ class ReverseProxyServer {
         onError: (e, st) => _logger.severe('TLS server listen error: $e\n$st'),
         onDone: () => _logger.info('TLS server done'));
 
-    // TODO Add a makefile for the reverse proxy
     _logger.info('TLS server bound; accepting connections');
   }
 
