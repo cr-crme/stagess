@@ -26,8 +26,6 @@
             ],
             "env": {
                 "STAGESS_FIREBASE_WEB_API_KEY": "<PUT YOUR FIREBASE WEB API KEY HERE>",
-                "STAGESS_USE_SSL": "< [true] | false >", 
-                "STAGESS_BACKEND_PORT": "< PORT | [3456] >",
                 "STAGESS_DATABASE_BACKEND": "< mariadb | mysql | mock >",
                 "STAGESS_DATABASE_DEV_PORT": "<PUT YOUR DEV DATABASE PORT HERE>",
                 "STAGESS_DATABASE_DEV_NAME": "<PUT YOUR DEV DATABASE NAME HERE>",

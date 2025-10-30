@@ -118,7 +118,7 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     }
 
     // Put enterprise can remove internships if a job is removed
-    final deletedData = await _putEnterprise(
+    await _putEnterprise(
         enterprise: newEnterprise,
         previous: previous,
         user: user,
@@ -131,7 +131,6 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
               .extractFrom(newEnterprise.getDifference(previous))
         },
       },
-      deletedData: deletedData.deletedData,
     );
   }
 
@@ -205,7 +204,7 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     required DatabaseUser user,
   });
 
-  Future<RepositoryResponse> _putEnterprise({
+  Future<void> _putEnterprise({
     required Enterprise enterprise,
     required Enterprise? previous,
     required DatabaseUser user,
@@ -762,10 +761,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
             tableName: 'enterprise_jobs', filters: {'id': job.id});
       }
     }
-    out.deletedData ??= {};
-    out.deletedData![RequestFields.internship] ??= {
-      enterprise.id: Enterprise.fetchableFields.extractFrom(['jobs'])
-    };
 
     // Add the new jobs
     final toWait = <Future>[];
@@ -1075,7 +1070,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
   }
 
   @override
-  Future<RepositoryResponse> _putEnterprise({
+  Future<void> _putEnterprise({
     required Enterprise enterprise,
     required Enterprise? previous,
     required DatabaseUser user,
@@ -1087,7 +1082,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       await _updateToEnterprises(enterprise, previous);
     }
 
-    var out = RepositoryResponse();
     final toWait = <Future>[];
     if (previous == null) {
       toWait.add(_insertToEnterprisesActivityTypes(enterprise));
@@ -1107,21 +1101,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       toWait.add(_updateToEnterprisePhoneNumber(enterprise, previous));
       toWait.add(_updateToEnterpriseFax(enterprise, previous));
     }
-
-    final response = await Future.wait(toWait);
-    for (final res in response) {
-      if (res is RepositoryResponse) {
-        if (res.deletedData != null) {
-          out.deletedData ??= {};
-          out.deletedData!.addAll(res.deletedData!);
-        }
-        if (res.updatedData != null) {
-          out.updatedData ??= {};
-          out.updatedData!.addAll(res.updatedData!);
-        }
-      }
-    }
-    return out;
   }
 
   Future<void> _deleteInternshipsFromJob(
@@ -1276,19 +1255,13 @@ class EnterprisesRepositoryMock extends EnterprisesRepository {
       _dummyDatabase[id];
 
   @override
-  Future<RepositoryResponse> _putEnterprise({
+  Future<void> _putEnterprise({
     required Enterprise enterprise,
     required Enterprise? previous,
     required DatabaseUser user,
     required InternshipsRepository internshipsRepository,
   }) async {
     _dummyDatabase[enterprise.id] = enterprise;
-    return RepositoryResponse(updatedData: {
-      RequestFields.enterprise: {
-        enterprise.id: Enterprise.fetchableFields
-            .extractFrom(enterprise.getDifference(previous))
-      }
-    });
   }
 
   @override

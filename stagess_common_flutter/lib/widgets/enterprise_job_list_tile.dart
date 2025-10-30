@@ -27,9 +27,7 @@ class EnterpriseJobListController {
   late final _minimumAgeController = TextEditingController(
     text: _job.minimumAge.toString(),
   );
-  late Map<String, int> _positionsOffered = _job.positionsOffered.map(
-    (key, value) => MapEntry(key, value),
-  );
+  final Map<String, int> _positionsOffered;
   Map<String, int> get _realPositionsOffered {
     final statuses =
         enterpriseStatus == EnterpriseStatus.active
@@ -49,7 +47,7 @@ class EnterpriseJobListController {
     return statuses;
   }
 
-  final Map<String, int> _positionsOccupied = {};
+  final Map<String, int> _positionsOccupied;
   Map<String, int> get positionsOccupied =>
       enterpriseStatus == EnterpriseStatus.active ? _positionsOccupied : {};
 
@@ -79,9 +77,31 @@ class EnterpriseJobListController {
     List<Specialization>? specializationBlackList,
     EntityPickerController? reservedForPickerController,
   }) : _job = job.copyWith(),
+       _positionsOffered = job.positionsOffered.map(
+         (key, value) => MapEntry(key, value),
+       ),
+       _positionsOccupied = {},
        _specializationsWhiteList = specializationWhiteList,
        _specializationBlacklist = specializationBlackList,
-       _reservedForPickerController = reservedForPickerController;
+       _reservedForPickerController = reservedForPickerController {
+    final students = StudentsProvider.of(context, listen: true);
+    final internships = InternshipsProvider.of(context, listen: true);
+
+    _positionsOccupied.clear();
+    for (final intership in internships) {
+      if (intership.jobId == job.id && intership.isActive) {
+        final schoolId =
+            students
+                .firstWhereOrNull(
+                  (student) => student.id == intership.studentId,
+                )
+                ?.schoolId;
+        if (schoolId == null) continue;
+
+        _positionsOccupied[schoolId] = (_positionsOccupied[schoolId] ?? 0) + 1;
+      }
+    }
+  }
 
   Job get job => _job.copyWith(
     specialization: _specialization,
@@ -154,31 +174,6 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
 
   void _refresh() => setState(() {});
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-
-    final students = StudentsProvider.of(context, listen: true);
-    final internships = InternshipsProvider.of(context, listen: true);
-    widget.controller._positionsOffered = job.positionsOffered;
-
-    widget.controller._positionsOccupied.clear();
-    for (final intership in internships) {
-      if (intership.jobId == job.id && intership.isActive) {
-        final schoolId =
-            students
-                .firstWhereOrNull(
-                  (student) => student.id == intership.studentId,
-                )
-                ?.schoolId;
-        if (schoolId == null) continue;
-
-        widget.controller._positionsOccupied[schoolId] =
-            (widget.controller._positionsOccupied[schoolId] ?? 0) + 1;
-      }
-    }
-  }
-
   void _updatePositions(String schoolId, int newCount) {
     setState(() => widget.controller._positionsOffered[schoolId] = newCount);
   }
@@ -192,8 +187,6 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
   @override
   void didUpdateWidget(covariant EnterpriseJobListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.editMode) return;
-
     _preInternshipRequestsController.forceSetIfDifferent(
       comparator: CheckboxWithOtherController(
         elements: PreInternshipRequestTypes.values,

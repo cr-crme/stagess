@@ -255,6 +255,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       );
     }
     await enterprises.releaseLockForItem(widget.enterprise);
+    if (!mounted) return;
     setState(() {
       _forceDisabled = false;
     });
