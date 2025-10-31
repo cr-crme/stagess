@@ -53,7 +53,9 @@ launcher:
 	append_to_file "LOG_FILE=$(LOG_FILE)"; \
 	append_to_file ""; \
 	append_to_file "# Run the backend"; \
-	append_to_file "./$(TARGET) > $(LOG_FILE) 2>&1"; \
+	append_to_file "nohup ./$(TARGET)"; \
+	append_to_file "current_date_time="`date "+%Y-%m-%d %H:%M:%S"`""; \
+	append_to_file "echo "The server has shutdown at ${current_date_time}... Damn..." >> nohup.out"; \
 	chmod +x ${BUILD_DIR}/$(LAUNCHER_FILE_NAME)
 
 
