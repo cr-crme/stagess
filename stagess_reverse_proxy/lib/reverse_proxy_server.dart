@@ -134,7 +134,7 @@ class ReverseProxyServer {
           )
         : ServerSocket.bind(
             bindAddress,
-            22,
+            bindPort,
             backlog: maxLiveConnections,
           ));
     _server!.listen(_handleIncomingClient,
