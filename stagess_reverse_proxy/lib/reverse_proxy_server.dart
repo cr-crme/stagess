@@ -84,6 +84,12 @@ class ReverseProxyServer {
           _logger
               .warning('Retrying to start server ($retryCount/$maxRetries)...');
           await Future.delayed(Duration(seconds: 5));
+        } else {
+          _logger.severe(
+              'Max retries reached ($maxRetries). Stopping reverse proxy server.');
+          _isStarted = false;
+          _isReconnecting = false;
+          return;
         }
       } finally {
         // teardown when reconnecting or stopping
