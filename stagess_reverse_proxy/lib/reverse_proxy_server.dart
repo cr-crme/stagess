@@ -40,7 +40,7 @@ class ReverseProxyServer {
     }
   }
 
-  Future<void> start() async {
+  Future<void> run() async {
     _isStarted = true;
     await _mainLoop();
   }
@@ -75,10 +75,10 @@ class ReverseProxyServer {
           retryCount = 0;
           await Future.delayed(Duration(seconds: 5));
         }
-      } catch (e, st) {
+      } catch (e) {
         // This error can only happen during server starting
         // If it happens retry up to max retries and then exit
-        _logger.severe('Error while running server: $e\n$st');
+        _logger.severe('Error while starting the server: $e');
         if (retryCount < maxRetries) {
           retryCount++;
           _logger
@@ -134,7 +134,7 @@ class ReverseProxyServer {
           )
         : ServerSocket.bind(
             bindAddress,
-            bindPort,
+            22,
             backlog: maxLiveConnections,
           ));
     _server!.listen(_handleIncomingClient,

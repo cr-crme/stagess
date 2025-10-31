@@ -76,7 +76,7 @@ void main() async {
   final server = await _bindServer(useSecure: useSecure);
 
   _logger.info(
-      'Server running on ${useSecure ? 'https' : 'http'}://$_backendIp:$_backendPort/');
+      'Server running on ${useSecure ? 'https' : 'http'}://${_backendIp.address}:$_backendPort/');
   _logger.info('Using database backend: ${_databaseBackend.name}');
 
   final devConnexions = await _connectDatabase(

@@ -38,5 +38,8 @@ Future<void> main(List<String> args) async {
     });
   }
 
-  await reverseProxyServer.start();
+  await reverseProxyServer.run();
+
+  _logger.info('Reverse proxy server is now shut down.');
+  exit(0);
 }
