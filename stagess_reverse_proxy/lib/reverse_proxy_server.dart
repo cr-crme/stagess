@@ -52,6 +52,8 @@ class ReverseProxyServer {
   }
 
   Future<void> _mainLoop() async {
+    final maxRetries = 5;
+    var retryCount = 0;
     while (_isStarted) {
       _logger
           .info('Checking backend availability $backendHost:$backendPort ...');
@@ -70,10 +72,19 @@ class ReverseProxyServer {
       try {
         await _startReverseProxyServer(maxLiveConnections: maxLiveConnections);
         while (_isStarted && !_isReconnecting) {
-          await Future.delayed(Duration(milliseconds: 200));
+          retryCount = 0;
+          await Future.delayed(Duration(seconds: 5));
         }
       } catch (e, st) {
+        // This error can only happen during server starting
+        // If it happens retry up to max retries and then exit
         _logger.severe('Error while running server: $e\n$st');
+        if (retryCount < maxRetries) {
+          retryCount++;
+          _logger
+              .warning('Retrying to start server ($retryCount/$maxRetries)...');
+          await Future.delayed(Duration(seconds: 5));
+        }
       } finally {
         // teardown when reconnecting or stopping
         await _closeServer();
