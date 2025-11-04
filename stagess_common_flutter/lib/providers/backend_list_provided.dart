@@ -688,8 +688,8 @@ Future<void> _incomingMessage(
       case RequestType.releaseLock:
         throw Exception('Unsupported request type: ${protocol.requestType}');
     }
-  } catch (e) {
-    dev.log(e.toString(), error: e, stackTrace: StackTrace.current);
+  } catch (e, st) {
+    dev.log(e.toString(), error: e, stackTrace: st);
     return;
   } finally {
     final completer = _completers.remove(protocol.id);

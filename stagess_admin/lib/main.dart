@@ -26,7 +26,7 @@ void main() async {
   debugPrint(
     'We are connecting to the ${useDevDb ? 'development' : 'production'} database '
     'situated at ${BackendHelpers.backendIp}:${BackendHelpers.backendPort}, '
-    '${BackendHelpers.useSsl ? 'not ' : ''}using a secured connection',
+    '${BackendHelpers.useSsl ? '' : 'not '}using a secured connection',
   );
 
   final useMockers = false;
