@@ -38,32 +38,31 @@ class Question extends ItemSerializable {
   final String? followUpQuestionSummary;
 
   Question.fromSerialized(super.map)
-    : idSummary = map?['idSummary'],
-      question = map?['question'],
-      questionSummary = map?['summary'],
-      type = QuestionType.fromSerialized(map?['type']),
-      hasOther = map?['hasOther'] == 'Oui',
-      choices =
-          map?['choices'] == null
-              ? null
-              : Set.from(
+      : idSummary = map?['idSummary'],
+        question = map?['question'],
+        questionSummary = map?['summary'],
+        type = QuestionType.fromSerialized(map?['type']),
+        hasOther = map?['hasOther'] == 'Oui',
+        choices = map?['choices'] == null
+            ? null
+            : Set.from(
                 (map?['choices'] as List).map((e) => (e as String).trim()),
               ),
-      followUpQuestion = map?['followUp'],
-      followUpQuestionSummary = map?['followUpSummary'],
-      super.fromSerialized();
+        followUpQuestion = map?['followUp'],
+        followUpQuestionSummary = map?['followUpSummary'],
+        super.fromSerialized();
 
   @override
   Map<String, dynamic> serializedMap() => {
-    'idSummary': idSummary,
-    'question': question,
-    'summary': questionSummary,
-    'type': type.toString(),
-    'hasOther': hasOther ? 'Oui' : 'Non',
-    'choices': choices?.toList(),
-    'followUp': followUpQuestion,
-    'followUpSummary': followUpQuestionSummary,
-  };
+        'idSummary': idSummary,
+        'question': question,
+        'summary': questionSummary,
+        'type': type.toString(),
+        'hasOther': hasOther ? 'Oui' : 'Non',
+        'choices': choices?.toList(),
+        'followUp': followUpQuestion,
+        'followUpSummary': followUpQuestionSummary,
+      };
 }
 
 enum QuestionType {
@@ -71,7 +70,7 @@ enum QuestionType {
   radio,
   checkbox;
 
-  static QuestionType fromSerialized(data) {
+  static QuestionType fromSerialized(String? data) {
     switch (data) {
       case 'Texte':
         return QuestionType.text;

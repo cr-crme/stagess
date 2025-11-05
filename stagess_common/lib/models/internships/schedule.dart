@@ -32,7 +32,7 @@ enum Day {
     }
   }
 
-  static fromName(String name) {
+  static Day fromName(String name) {
     return Day.values.firstWhere(
       (element) => element.name.toLowerCase() == name.toLowerCase(),
       orElse: () => Day.monday,

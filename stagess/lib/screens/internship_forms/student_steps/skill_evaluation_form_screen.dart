@@ -97,24 +97,23 @@ class _SkillEvaluationFormScreenState extends State<SkillEvaluationFormScreen> {
       final result = await showDialog(
         context: context,
         barrierDismissible: false,
-        builder:
-            (context) => AlertDialog(
-              title: const Text('Soumettre l\'évaluation?'),
-              content: const Text(
-                '**Attention, toutes les compétences n\'ont pas été évaluées**',
-                style: TextStyle(color: Colors.black),
-              ),
-              actions: [
-                OutlinedButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: const Text('Non'),
-                ),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(true),
-                  child: const Text('Oui'),
-                ),
-              ],
+        builder: (context) => AlertDialog(
+          title: const Text('Soumettre l\'évaluation?'),
+          content: const Text(
+            '**Attention, toutes les compétences n\'ont pas été évaluées**',
+            style: TextStyle(color: Colors.black),
+          ),
+          actions: [
+            OutlinedButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Non'),
             ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Oui'),
+            ),
+          ],
+        ),
       );
       if (result == null || !result) return;
     }
@@ -207,58 +206,55 @@ class _SkillEvaluationFormScreenState extends State<SkillEvaluationFormScreen> {
           ),
         ),
         body: PopScope(
-          child:
-              student == null
-                  ? const Center(child: CircularProgressIndicator())
-                  : ScrollableStepper(
-                    scrollController: _scrollController,
-                    type: StepperType.vertical,
-                    currentStep: _currentStep,
-                    onTapContinue: _nextStep,
-                    onStepTapped:
-                        (int tapped) => setState(() {
-                          _currentStep = tapped;
-                          _scrollToCurrentTab();
-                        }),
-                    onTapCancel: _cancel,
-                    steps: [
-                      ...skills.map(
-                        (skill) => Step(
-                          isActive: true,
-                          state:
-                              widget.formController.appreciations[skill.id] ==
-                                      SkillAppreciation.notSelected
-                                  ? StepState.indexed
-                                  : StepState.complete,
-                          title: SubTitle(
-                            '${skill.id}${skill.isOptional ? ' (Facultative)' : ''}',
-                            top: 0,
-                            bottom: 0,
-                          ),
-                          content: _EvaluateSkill(
-                            formController: widget.formController,
-                            skill: skill,
-                            editMode: widget.editMode,
-                          ),
-                        ),
-                      ),
-                      Step(
+          child: student == null
+              ? const Center(child: CircularProgressIndicator())
+              : ScrollableStepper(
+                  scrollController: _scrollController,
+                  type: StepperType.vertical,
+                  currentStep: _currentStep,
+                  onTapContinue: _nextStep,
+                  onStepTapped: (int tapped) => setState(() {
+                    _currentStep = tapped;
+                    _scrollToCurrentTab();
+                  }),
+                  onTapCancel: _cancel,
+                  steps: [
+                    ...skills.map(
+                      (skill) => Step(
                         isActive: true,
-                        title: const SubTitle(
-                          'Commentaires',
+                        state: widget.formController.appreciations[skill.id] ==
+                                SkillAppreciation.notSelected
+                            ? StepState.indexed
+                            : StepState.complete,
+                        title: SubTitle(
+                          '${skill.id}${skill.isOptional ? ' (Facultative)' : ''}',
                           top: 0,
                           bottom: 0,
                         ),
-                        content: _Comments(
+                        content: _EvaluateSkill(
                           formController: widget.formController,
+                          skill: skill,
                           editMode: widget.editMode,
                         ),
                       ),
-                    ],
-                    controlsBuilder:
-                        (BuildContext context, ControlsDetails details) =>
-                            _controlBuilder(context, details, skills),
-                  ),
+                    ),
+                    Step(
+                      isActive: true,
+                      title: const SubTitle(
+                        'Commentaires',
+                        top: 0,
+                        bottom: 0,
+                      ),
+                      content: _Comments(
+                        formController: widget.formController,
+                        editMode: widget.editMode,
+                      ),
+                    ),
+                  ],
+                  controlsBuilder:
+                      (BuildContext context, ControlsDetails details) =>
+                          _controlBuilder(context, details, skills),
+                ),
         ),
       ),
     );
@@ -323,17 +319,17 @@ class _EvaluateSkill extends StatelessWidget {
         formController.evaluationGranularity ==
                 SkillEvaluationGranularity.global
             ? _TaskEvaluation(
-              spacing: spacing,
-              skill: skill,
-              formController: formController,
-              editMode: editMode,
-            )
+                spacing: spacing,
+                skill: skill,
+                formController: formController,
+                editMode: editMode,
+              )
             : _TaskEvaluationDetailed(
-              spacing: spacing,
-              skill: skill,
-              formController: formController,
-              editMode: editMode,
-            ),
+                spacing: spacing,
+                skill: skill,
+                formController: formController,
+                editMode: editMode,
+              ),
         TextFormField(
           decoration: const InputDecoration(label: Text('Commentaires')),
           controller: formController.skillCommentsControllers[skill.id]!,
@@ -372,14 +368,13 @@ class _TaskEvaluation extends StatefulWidget {
 class _TaskEvaluationState extends State<_TaskEvaluation> {
   late final _checkboxController = CheckboxWithOtherController(
     elements: widget.skill.tasks,
-    initialValues:
-        widget.formController.taskCompleted[widget.skill.id]!.keys
-            .where(
-              (e) =>
-                  widget.formController.taskCompleted[widget.skill.id]![e]! !=
-                  TaskAppreciationLevel.notEvaluated,
-            )
-            .toList(),
+    initialValues: widget.formController.taskCompleted[widget.skill.id]!.keys
+        .where(
+          (e) =>
+              widget.formController.taskCompleted[widget.skill.id]![e]! !=
+              TaskAppreciationLevel.notEvaluated,
+        )
+        .toList(),
   );
 
   @override
@@ -419,7 +414,7 @@ class _TaskEvaluationDetailed extends StatelessWidget {
   final SkillEvaluationFormController formController;
   final bool editMode;
 
-  void _showHelpOnTask(context) {
+  void _showHelpOnTask(BuildContext context) {
     List<String> texts = [];
     for (final task in byTaskAppreciationLevel) {
       texts.add('${task.abbreviation()}: $task\n');
@@ -427,21 +422,20 @@ class _TaskEvaluationDetailed extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder:
-          (BuildContext context) => AlertDialog(
-            title: const Text('Explication des boutons'),
-            content: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: texts.map((e) => Text(e)).toList(),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'OK'),
-                child: const Text('OK'),
-              ),
-            ],
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Explication des boutons'),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: texts.map((e) => Text(e)).toList(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
           ),
+        ],
+      ),
     );
   }
 
@@ -515,7 +509,8 @@ class _TaskAppreciationSelectionState
   late TaskAppreciationLevel _current =
       widget.formController.taskCompleted[widget.skillId]![widget.task]!;
 
-  void _select(value) {
+  void _select(TaskAppreciationLevel? value) {
+    if (value == null) return;
     _current = value;
     widget.formController.taskCompleted[widget.skillId]![widget.task] = value;
     setState(() {});
@@ -532,28 +527,27 @@ class _TaskAppreciationSelectionState
           onChanged: _select,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children:
-                byTaskAppreciationLevel
-                    .map(
-                      (e) => InkWell(
-                        onTap: widget.enabled ? () => _select(e) : null,
-                        child: Row(
-                          children: [
-                            Radio(
-                              enabled: widget.enabled,
-                              fillColor: WidgetStateColor.resolveWith((state) {
-                                return widget.enabled
-                                    ? Theme.of(context).primaryColor
-                                    : Colors.grey;
-                              }),
-                              value: e,
-                            ),
-                            Text(e.abbreviation()),
-                          ],
+            children: byTaskAppreciationLevel
+                .map(
+                  (e) => InkWell(
+                    onTap: widget.enabled ? () => _select(e) : null,
+                    child: Row(
+                      children: [
+                        Radio(
+                          enabled: widget.enabled,
+                          fillColor: WidgetStateColor.resolveWith((state) {
+                            return widget.enabled
+                                ? Theme.of(context).primaryColor
+                                : Colors.grey;
+                          }),
+                          value: e,
                         ),
-                      ),
-                    )
-                    .toList(),
+                        Text(e.abbreviation()),
+                      ],
+                    ),
+                  ),
+                )
+                .toList(),
           ),
         ),
       ],
@@ -586,11 +580,9 @@ class _AppreciationEvaluationState extends State<_AppreciationEvaluation> {
       padding: EdgeInsets.only(bottom: widget.spacing),
       child: RadioGroup(
         groupValue: widget.formController.appreciations[widget.skill.id],
-        onChanged:
-            (value) => setState(
-              () =>
-                  widget.formController.appreciations[widget.skill.id] = value!,
-            ),
+        onChanged: (value) => setState(
+          () => widget.formController.appreciations[widget.skill.id] = value!,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,

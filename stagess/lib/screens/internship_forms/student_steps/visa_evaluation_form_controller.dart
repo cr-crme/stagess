@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_visa.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
@@ -7,11 +8,11 @@ class VisaEvaluationFormController {
 
   VisaEvaluationFormController({required this.internshipId});
   final String internshipId;
-  Internship internship(context, {listen = true}) =>
+  Internship internship(BuildContext context, {bool listen = true}) =>
       InternshipsProvider.of(context, listen: listen)[internshipId];
 
   factory VisaEvaluationFormController.fromInternshipId(
-    context, {
+    BuildContext context, {
     required String internshipId,
     required int evaluationIndex,
   }) {

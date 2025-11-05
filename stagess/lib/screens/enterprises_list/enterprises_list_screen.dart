@@ -143,8 +143,8 @@ class _EnterprisesByList extends StatefulWidget {
 
 class _EnterprisesByListState extends State<_EnterprisesByList> {
   bool _hideNotAvailable = false;
-  late final searchController =
-      TextEditingController()..addListener(() => setState(() {}));
+  late final searchController = TextEditingController()
+    ..addListener(() => setState(() {}));
 
   List<Enterprise> _sortEnterprisesByName(List<Enterprise> enterprises) {
     _logger.finer('Sorting enterprises by name');
@@ -167,9 +167,7 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
     return enterprises.where((enterprise) {
       // Remove if should not be shown by filter availability filter
       if (_hideNotAvailable &&
-          enterprise
-              .availablejobs(context)
-              .every(
+          enterprise.availablejobs(context).every(
                 (job) =>
                     job.positionsRemaining(
                       context,
@@ -188,12 +186,11 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
         return true;
       }
       if (enterprise.availablejobs(context).any((job) {
-        final hasSpecialization = job.specialization.name
-            .toLowerCase()
-            .contains(textToSearch);
+        final hasSpecialization =
+            job.specialization.name.toLowerCase().contains(textToSearch);
         final hasSector = job.specialization.sector.name.toLowerCase().contains(
-          textToSearch,
-        );
+              textToSearch,
+            );
         return hasSpecialization || hasSector;
       })) {
         return true;
@@ -237,16 +234,14 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
           child: ListView.builder(
             shrinkWrap: true,
             itemCount: enterprises.length,
-            itemBuilder:
-                (context, index) => EnterpriseCard(
-                  enterprise: enterprises.elementAt(index),
-                  onTap:
-                      (enterprise) => GoRouter.of(context).goNamed(
-                        Screens.enterprise,
-                        pathParameters: Screens.params(enterprise),
-                        queryParameters: Screens.queryParams(pageIndex: '0'),
-                      ),
-                ),
+            itemBuilder: (context, index) => EnterpriseCard(
+              enterprise: enterprises.elementAt(index),
+              onTap: (enterprise) => GoRouter.of(context).goNamed(
+                Screens.enterprise,
+                pathParameters: Screens.params(enterprise),
+                queryParameters: Screens.queryParams(pageIndex: '0'),
+              ),
+            ),
           ),
         ),
       ],
@@ -260,7 +255,7 @@ class _EnterprisesByMap extends StatelessWidget {
   final List<Enterprise> enterprises;
 
   List<Marker> _latlngToMarkers(
-    context,
+    BuildContext context,
     Map<Enterprise, Waypoint> enterprises,
   ) {
     _logger.finer(
@@ -279,10 +274,9 @@ class _EnterprisesByMap extends StatelessWidget {
       double nameWidth = 160;
       double nameHeight = 100;
       final waypoint = enterprises[enterprise]!;
-      final color =
-          i == 0
-              ? Colors.purple
-              : enterprise
+      final color = i == 0
+          ? Colors.purple
+          : enterprise
                   .withRemainingPositions(
                     context,
                     schoolId: schoolId,
@@ -301,10 +295,9 @@ class _EnterprisesByMap extends StatelessWidget {
           child: Row(
             children: [
               GestureDetector(
-                onTap:
-                    i == 0
-                        ? null
-                        : () => GoRouter.of(context).goNamed(
+                onTap: i == 0
+                    ? null
+                    : () => GoRouter.of(context).goNamed(
                           Screens.enterprise,
                           pathParameters: Screens.params(enterprise),
                           queryParameters: Screens.queryParams(pageIndex: '0'),

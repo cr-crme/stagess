@@ -13,10 +13,10 @@ class GeographicCoordinateSystem extends ItemSerializable {
   Map<String, dynamic> serializedMap() =>
       {'latitude': latitude, 'longitude': longitude};
 
-  static GeographicCoordinateSystem fromSerialized(data) =>
+  static GeographicCoordinateSystem fromSerialized(Map? data) =>
       GeographicCoordinateSystem(
-        latitude: data['latitude'],
-        longitude: data['longitude'],
+        latitude: data?['latitude'],
+        longitude: data?['longitude'],
       );
 
   static Future<GeographicCoordinateSystem> fromAddress(String address) async {

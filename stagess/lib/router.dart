@@ -39,36 +39,31 @@ abstract class Screens {
   static const incidentHistorySst = IncidentHistoryScreen.route;
   static const jobSst = SpecializationListScreen.route;
 
-  static Map<String, String> params(id, {jobId}) {
+  static Map<String, String> params(dynamic id, {dynamic jobId}) {
     return {
-      'id':
-          (id is String)
-              ? id
-              : (id is ItemSerializable ? id.id : throw TypeError()),
+      'id': (id is String)
+          ? id
+          : (id is ItemSerializable ? id.id : throw TypeError()),
       if (jobId != null)
-        'jobId':
-            (jobId is String)
-                ? jobId
-                : (jobId is ItemSerializable ? jobId.id : throw TypeError()),
+        'jobId': (jobId is String)
+            ? jobId
+            : (jobId is ItemSerializable ? jobId.id : throw TypeError()),
     };
   }
 
-  static Map<String, String> queryParams({pageIndex, editMode}) {
+  static Map<String, String> queryParams(
+      {dynamic pageIndex, dynamic editMode}) {
     return {
       if (pageIndex != null)
-        'pageIndex':
-            (pageIndex is String)
-                ? pageIndex
-                : (pageIndex is ItemSerializable
-                    ? pageIndex.id
-                    : throw TypeError()),
+        'pageIndex': (pageIndex is String)
+            ? pageIndex
+            : (pageIndex is ItemSerializable
+                ? pageIndex.id
+                : throw TypeError()),
       if (editMode != null)
-        'editMode':
-            (editMode is String)
-                ? editMode
-                : (editMode is ItemSerializable
-                    ? editMode.id
-                    : throw TypeError()),
+        'editMode': (editMode is String)
+            ? editMode
+            : (editMode is ItemSerializable ? editMode.id : throw TypeError()),
     };
   }
 }
@@ -76,27 +71,22 @@ abstract class Screens {
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
-  redirect:
-      (context, state) =>
-          AuthProvider.of(context).isFullySignedIn ? null : Screens.login,
+  redirect: (context, state) =>
+      AuthProvider.of(context).isFullySignedIn ? null : Screens.login,
   routes: [
     GoRoute(
       path: '/',
-      redirect:
-          (context, state) =>
-              AuthProvider.of(context).isFullySignedIn
-                  ? Screens.home
-                  : Screens.login,
+      redirect: (context, state) => AuthProvider.of(context).isFullySignedIn
+          ? Screens.home
+          : Screens.login,
     ),
     GoRoute(
       path: Screens.login,
       name: Screens.login,
       builder: (context, state) => const LoginScreen(),
-      redirect:
-          (context, state) =>
-              AuthProvider.of(context).isFullySignedIn
-                  ? Screens.home
-                  : Screens.login,
+      redirect: (context, state) => AuthProvider.of(context).isFullySignedIn
+          ? Screens.home
+          : Screens.login,
     ),
     GoRoute(
       path: Screens.myAccountScreen,
@@ -111,11 +101,10 @@ final router = GoRouter(
         GoRoute(
           path: '${Screens.enterprise}_id=:id',
           name: Screens.enterprise,
-          builder:
-              (context, state) => EnterpriseScreen(
-                id: state.pathParameters['id']!,
-                pageIndex: int.parse(state.pathParameters['pageIndex'] ?? '0'),
-              ),
+          builder: (context, state) => EnterpriseScreen(
+            id: state.pathParameters['id']!,
+            pageIndex: int.parse(state.pathParameters['pageIndex'] ?? '0'),
+          ),
         ),
       ],
     ),
@@ -127,13 +116,12 @@ final router = GoRouter(
         GoRoute(
           path: '${Screens.student}_id=:id',
           name: Screens.student,
-          builder:
-              (context, state) => StudentScreen(
-                id: state.pathParameters['id']!,
-                initialPage: int.parse(
-                  state.uri.queryParameters['pageIndex'] ?? '0',
-                ),
-              ),
+          builder: (context, state) => StudentScreen(
+            id: state.pathParameters['id']!,
+            initialPage: int.parse(
+              state.uri.queryParameters['pageIndex'] ?? '0',
+            ),
+          ),
         ),
       ],
     ),
@@ -145,10 +133,9 @@ final router = GoRouter(
         GoRoute(
           path: '${Screens.supervisionStudentDetails}/:id',
           name: Screens.supervisionStudentDetails,
-          builder:
-              (context, state) => SupervisionStudentDetailsScreen(
-                studentId: state.pathParameters['id']!,
-              ),
+          builder: (context, state) => SupervisionStudentDetailsScreen(
+            studentId: state.pathParameters['id']!,
+          ),
         ),
       ],
     ),

@@ -18,7 +18,7 @@ enum Transportation {
     }
   }
 
-  static Transportation deserialize(index) {
+  static Transportation deserialize(dynamic index) {
     if (index is int) {
       if (index < 0 || index >= Transportation.values.length) {
         return Transportation.none;

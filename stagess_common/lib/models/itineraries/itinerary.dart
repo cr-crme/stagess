@@ -71,7 +71,7 @@ class Itinerary extends ListSerializable<Waypoint>
     return itinerary;
   }
 
-  Itinerary copyWithData(Map<String, dynamic>? data) {
+  Itinerary copyWithData(Map? data) {
     if (data == null || data.isEmpty) return copyWith();
     return Itinerary(
       id: data['id'] ?? id,
@@ -84,14 +84,14 @@ class Itinerary extends ListSerializable<Waypoint>
     );
   }
 
-  static Itinerary fromSerialized(map) {
+  static Itinerary fromSerialized(dynamic map) {
     final out = Itinerary(
-      id: map['id'],
-      date: map['date'] == null
+      id: map?['id'],
+      date: map?['date'] == null
           ? DateTime(0)
-          : DateTime.fromMillisecondsSinceEpoch(map['date']),
+          : DateTime.fromMillisecondsSinceEpoch(map!['date']),
     );
-    for (final waypoint in map['waypoints'] ?? []) {
+    for (final waypoint in map?['waypoints'] ?? []) {
       out.add(Waypoint.fromSerialized(waypoint));
     }
     return out;

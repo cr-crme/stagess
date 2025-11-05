@@ -26,13 +26,13 @@ class SkillEvaluationFormController {
       SkillEvaluationGranularity.global;
 
   final String internshipId;
-  Internship internship(context, {listen = true}) =>
+  Internship internship(BuildContext context, {bool listen = true}) =>
       InternshipsProvider.of(context, listen: listen)[internshipId];
 
   final Map<String, Skill> _idToSkill = {};
 
   factory SkillEvaluationFormController.fromInternshipId(
-    context, {
+    BuildContext context, {
     required String internshipId,
     required int evaluationIndex,
     required bool canModify,
@@ -70,7 +70,7 @@ class SkillEvaluationFormController {
     }
   }
 
-  void removeSkill(context, String skillId) {
+  void removeSkill(BuildContext context, String skillId) {
     _evaluatedSkills[skillId] = 0;
     if (isFilledUsingPreviousEvaluation) {
       final evaluation = _previousEvaluation(context);
@@ -88,13 +88,12 @@ class SkillEvaluationFormController {
     }
   }
 
-  void clearForm(context) {
+  void clearForm(BuildContext context) {
     _resetForm(context);
 
     final internshipTp = internship(context, listen: false);
-    final enterprise =
-        EnterprisesProvider.of(context, listen: false)[internshipTp
-            .enterpriseId];
+    final enterprise = EnterprisesProvider.of(context,
+        listen: false)[internshipTp.enterpriseId];
     final specialization = enterprise.jobs[internshipTp.jobId].specialization;
 
     for (final skill in specialization.skills) {
@@ -102,7 +101,7 @@ class SkillEvaluationFormController {
     }
   }
 
-  InternshipEvaluationSkill? _previousEvaluation(context) {
+  InternshipEvaluationSkill? _previousEvaluation(BuildContext context) {
     if (!isFilledUsingPreviousEvaluation) return null;
 
     final internshipTp = internship(context, listen: false);
@@ -113,7 +112,8 @@ class SkillEvaluationFormController {
         : internshipTp.skillEvaluations[_previousEvaluationIndex!];
   }
 
-  void fillFromPreviousEvaluation(context, int previousEvaluationIndex) {
+  void fillFromPreviousEvaluation(
+      BuildContext context, int previousEvaluationIndex) {
     // Reset the form to fresh
     _resetForm(context);
     _previousEvaluationIndex = previousEvaluationIndex;
@@ -142,8 +142,7 @@ class SkillEvaluationFormController {
 
       final skill = _idToSkill[skillId]!;
       for (final task in skill.tasks) {
-        taskCompleted[skillId]![task.title] =
-            skillEvaluation.tasks
+        taskCompleted[skillId]![task.title] = skillEvaluation.tasks
                 .firstWhereOrNull((e) => e.title == task.title)
                 ?.level ??
             TaskAppreciationLevel.notEvaluated;
@@ -156,15 +155,15 @@ class SkillEvaluationFormController {
   InternshipEvaluationSkill toInternshipEvaluation() {
     final List<SkillEvaluation> skillEvaluation = [];
     for (final skillId in taskCompleted.keys) {
-      final List<TaskAppreciation> tasks =
-          taskCompleted[skillId]!.keys
-              .map(
-                (task) => TaskAppreciation(
-                  title: task,
-                  level: taskCompleted[skillId]![task]!,
-                ),
-              )
-              .toList();
+      final List<TaskAppreciation> tasks = taskCompleted[skillId]!
+          .keys
+          .map(
+            (task) => TaskAppreciation(
+              title: task,
+              level: taskCompleted[skillId]![task]!,
+            ),
+          )
+          .toList();
 
       final skill = _idToSkill[skillId]!;
       skillEvaluation.add(
@@ -237,13 +236,12 @@ class SkillEvaluationFormController {
 
   final Map<String, String> _skillsAreFromSpecializationId = {};
 
-  void _initializeSkills(context) {
+  void _initializeSkills(BuildContext context) {
     _idToSkill.clear();
 
     final internshipTp = internship(context, listen: false);
-    final enterprise =
-        EnterprisesProvider.of(context, listen: false)[internshipTp
-            .enterpriseId];
+    final enterprise = EnterprisesProvider.of(context,
+        listen: false)[internshipTp.enterpriseId];
 
     final specialization = enterprise.jobs[internshipTp.jobId].specialization;
     for (final skill in specialization.skills) {
@@ -253,10 +251,9 @@ class SkillEvaluationFormController {
     }
 
     for (final extraSpecializationId in internshipTp.extraSpecializationIds) {
-      for (final skill
-          in ActivitySectorsService.specialization(
-            extraSpecializationId,
-          ).skills) {
+      for (final skill in ActivitySectorsService.specialization(
+        extraSpecializationId,
+      ).skills) {
         // Do not override main specializations
         if (!_idToSkill.containsKey(skill.id)) _idToSkill[skill.id] = skill;
         _evaluatedSkills[skill.id] = 0;
@@ -308,7 +305,7 @@ class SkillEvaluationFormController {
     }
   }
 
-  void _resetForm(context) {
+  void _resetForm(BuildContext context) {
     evaluationDate = DateTime.now();
     _previousEvaluationIndex = null;
     evaluationGranularity = SkillEvaluationGranularity.global;

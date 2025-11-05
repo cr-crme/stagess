@@ -67,7 +67,8 @@ class _AutoCompleteSstSearchBarState extends State<_AutoCompleteSstSearchBar> {
     );
   }
 
-  Iterable<String> _optionsBuilder(value, List<Specialization> options) {
+  Iterable<String> _optionsBuilder(
+      TextEditingValue value, List<Specialization> options) {
     if (value.text == '') return const Iterable<String>.empty();
     return options
         .map<String?>((e) {
@@ -121,7 +122,7 @@ class _AutoCompleteSstSearchBarState extends State<_AutoCompleteSstSearchBar> {
     );
   }
 
-  goTo(BuildContext context, String choice, List<Specialization> options) {
+  void goTo(BuildContext context, String choice, List<Specialization> options) {
     final index = options.indexWhere((e) => e.idWithName == choice);
 
     if (_textController != null) _clearText(_textController!);

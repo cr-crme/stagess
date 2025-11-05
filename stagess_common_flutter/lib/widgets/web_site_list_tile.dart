@@ -44,7 +44,8 @@ class _WebSiteListTileState extends State<WebSiteListTile> {
   }
 
   // coverage:ignore-start
-  _visit() async => await launchUrl(Uri.parse(_websiteController.text));
+  Future<bool> _visit() async =>
+      await launchUrl(Uri.parse(_websiteController.text));
   // coverage:ignore-end
 
   void _addHttp(String value) {
@@ -100,10 +101,9 @@ class _WebSiteListTileState extends State<WebSiteListTile> {
               padding: const EdgeInsets.all(8.0),
               child: Icon(
                 widget.icon,
-                color:
-                    widget.canVisit
-                        ? Theme.of(context).primaryColor
-                        : Colors.grey,
+                color: widget.canVisit
+                    ? Theme.of(context).primaryColor
+                    : Colors.grey,
               ),
             ),
           ],

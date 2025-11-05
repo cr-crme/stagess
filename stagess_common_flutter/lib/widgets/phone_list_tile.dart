@@ -46,7 +46,8 @@ class _PhoneListTileState extends State<PhoneListTile> {
   }
 
   // coverage:ignore-start
-  _call() async => await launchUrl(Uri.parse('tel:${_phoneController.text}'));
+  Future<bool> _call() async =>
+      await launchUrl(Uri.parse('tel:${_phoneController.text}'));
   // coverage:ignore-end
 
   @override
@@ -74,10 +75,9 @@ class _PhoneListTileState extends State<PhoneListTile> {
         }
       },
       child: InkWell(
-        onTap:
-            kIsWeb || widget.enabled || _phoneController.text == ''
-                ? null
-                : _call,
+        onTap: kIsWeb || widget.enabled || _phoneController.text == ''
+            ? null
+            : _call,
         child: Stack(
           alignment: Alignment.centerLeft,
           children: [
@@ -87,8 +87,7 @@ class _PhoneListTileState extends State<PhoneListTile> {
                 icon: const SizedBox(width: 30),
                 labelText:
                     '${widget.isMandatory && widget.enabled ? '* ' : ''}${widget.title}',
-                labelStyle:
-                    widget.titleStyle ??
+                labelStyle: widget.titleStyle ??
                     (widget.enabled ? null : TextStyle(color: Colors.black)),
                 disabledBorder: InputBorder.none,
               ),
@@ -100,8 +99,7 @@ class _PhoneListTileState extends State<PhoneListTile> {
                 }
                 return FormService.phoneValidator(value);
               },
-              style:
-                  widget.contentStyle ??
+              style: widget.contentStyle ??
                   (widget.enabled ? null : TextStyle(color: Colors.black)),
               enabled: widget.enabled,
               onSaved: widget.onSaved,
@@ -111,10 +109,9 @@ class _PhoneListTileState extends State<PhoneListTile> {
               padding: const EdgeInsets.all(8.0),
               child: Icon(
                 widget.icon,
-                color:
-                    widget.canCall
-                        ? Theme.of(context).primaryColor
-                        : Colors.grey,
+                color: widget.canCall
+                    ? Theme.of(context).primaryColor
+                    : Colors.grey,
               ),
             ),
           ],

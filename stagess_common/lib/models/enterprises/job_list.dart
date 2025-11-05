@@ -4,7 +4,7 @@ import 'package:stagess_common/models/enterprises/job.dart';
 class JobList extends ListSerializable<Job> {
   JobList();
 
-  static JobList? from(map) {
+  static JobList? from(Map? map) {
     if (map == null) return null;
     return JobList.fromSerialized(map);
   }

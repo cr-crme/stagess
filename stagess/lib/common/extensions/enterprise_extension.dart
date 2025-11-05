@@ -37,15 +37,15 @@ extension EnterpriseExtension on Enterprise {
     final currentSchoolId = authProvider.schoolId!;
     final currentTeacherId = authProvider.teacherId!;
     return [...jobs]..removeWhere(
-      (job) =>
-          job.reservedForId.isNotEmpty &&
-          job.reservedForId != currentSchoolId &&
-          job.reservedForId != currentTeacherId,
-    );
+        (job) =>
+            job.reservedForId.isNotEmpty &&
+            job.reservedForId != currentSchoolId &&
+            job.reservedForId != currentTeacherId,
+      );
   }
 
   Iterable<Job> withRemainingPositions(
-    context, {
+    BuildContext context, {
     required String schoolId,
     bool listen = false,
   }) {

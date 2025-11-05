@@ -41,7 +41,7 @@ class ProgramInitializer {
 class BugReporter {
   static final _breadcrumbs = [];
 
-  static loggerSetup() {
+  static void loggerSetup() {
     Logger.root.level = Level.ALL;
     Logger.root.onRecord.listen((record) {
       _breadcrumbs.add({
@@ -54,7 +54,7 @@ class BugReporter {
     });
   }
 
-  static report(
+  static void report(
     Object error,
     StackTrace stackTrace, {
     required errorReportUri,

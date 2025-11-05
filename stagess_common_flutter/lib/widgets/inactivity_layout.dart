@@ -40,17 +40,15 @@ class _InactivityLayoutState extends State<InactivityLayout> {
       final shouldShowGracePeriod = await widget.showGracePeriod(context);
       if (!context.mounted) return;
 
-      final hasTimedout =
-          shouldShowGracePeriod
-              ? (await showDialog<bool>(
-                    barrierDismissible: false,
-                    context: context,
-                    builder:
-                        (context) =>
-                            _TimingOutDialog(gracePeriod: widget.gracePeriod),
-                  ) ??
-                  true)
-              : true;
+      final hasTimedout = shouldShowGracePeriod
+          ? (await showDialog<bool>(
+                barrierDismissible: false,
+                context: context,
+                builder: (context) =>
+                    _TimingOutDialog(gracePeriod: widget.gracePeriod),
+              ) ??
+              true)
+          : true;
       if (!hasTimedout || !context.mounted) {
         _inactivityService.userHasInteracted();
         return;
@@ -74,7 +72,7 @@ class _InactivityLayoutState extends State<InactivityLayout> {
   }
 
   bool _isShowingWaitForReconnexionDialog = false;
-  void _onConnexionStatusChanged(isConnected) async {
+  void _onConnexionStatusChanged(bool isConnected) async {
     if (isConnected) {
       if (_isShowingWaitForReconnexionDialog) {
         Navigator.of(widget.navigatorKey.currentContext!).pop();
@@ -88,13 +86,12 @@ class _InactivityLayoutState extends State<InactivityLayout> {
     await showDialog(
       context: widget.navigatorKey.currentContext!,
       barrierDismissible: false,
-      builder:
-          (context) => AlertDialog(
-            title: Text('Connexion perdue'),
-            content: Text(
-              'La connexion au serveur a été perdue. Nous tentons de nous reconnecter.',
-            ),
-          ),
+      builder: (context) => AlertDialog(
+        title: Text('Connexion perdue'),
+        content: Text(
+          'La connexion au serveur a été perdue. Nous tentons de nous reconnecter.',
+        ),
+      ),
     );
     _isShowingWaitForReconnexionDialog = false;
   }

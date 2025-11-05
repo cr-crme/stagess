@@ -14,7 +14,7 @@ enum VisitingPriority {
 
   int serialize() => index;
 
-  static VisitingPriority? deserialize(element) {
+  static VisitingPriority? deserialize(dynamic element) {
     if (element == null) return null;
     try {
       return VisitingPriority.values[element as int];

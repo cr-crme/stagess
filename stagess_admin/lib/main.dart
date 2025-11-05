@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess_admin/extensions/auth_provider_extension.dart';
 import 'package:stagess_admin/firebase_options.dart';
@@ -18,6 +19,17 @@ import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
 
 void main() async {
+  // Setup logger to INFO
+  Logger.root.level = Level.INFO;
+  Logger.root.onRecord.listen((record) {
+    // ignore: avoid_print
+    print(
+      '[${record.level.name}] ${record.time}: ${record.loggerName}: ${record.message}'
+      '${record.error != null ? ' Error: ${record.error}' : ''}'
+      '${record.stackTrace != null ? ' StackTrace: ${record.stackTrace}' : ''}',
+    );
+  });
+
   const useDevDb = bool.fromEnvironment(
     'STAGESS_USE_DEV_DB',
     defaultValue: false,
@@ -50,43 +62,37 @@ class Home extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create:
-              (context) =>
-                  AuthProvider(mockMe: useMockers, requiredAdminAccess: true),
+          create: (context) =>
+              AuthProvider(mockMe: useMockers, requiredAdminAccess: true),
         ),
         ChangeNotifierProxyProvider<AuthProvider, SchoolBoardsProvider>(
-          create:
-              (context) =>
-                  SchoolBoardsProvider(uri: backendUri, mockMe: useMockers),
+          create: (context) =>
+              SchoolBoardsProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, AdminsProvider>(
-          create:
-              (context) => AdminsProvider(uri: backendUri, mockMe: useMockers),
+          create: (context) =>
+              AdminsProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, TeachersProvider>(
-          create:
-              (context) =>
-                  TeachersProvider(uri: backendUri, mockMe: useMockers),
+          create: (context) =>
+              TeachersProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, StudentsProvider>(
-          create:
-              (context) =>
-                  StudentsProvider(uri: backendUri, mockMe: useMockers),
+          create: (context) =>
+              StudentsProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, EnterprisesProvider>(
-          create:
-              (context) =>
-                  EnterprisesProvider(uri: backendUri, mockMe: useMockers),
+          create: (context) =>
+              EnterprisesProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, InternshipsProvider>(
-          create:
-              (context) =>
-                  InternshipsProvider(uri: backendUri, mockMe: useMockers),
+          create: (context) =>
+              InternshipsProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
       ],
@@ -94,9 +100,8 @@ class Home extends StatelessWidget {
         navigatorKey: rootNavigatorKey,
         timeout: const Duration(minutes: 10),
         gracePeriod: const Duration(seconds: 60),
-        showGracePeriod:
-            (context) async =>
-                AuthProvider.of(context, listen: false).isFullySignedIn,
+        showGracePeriod: (context) async =>
+            AuthProvider.of(context, listen: false).isFullySignedIn,
         onTimedout: (context) async {
           if (!AuthProvider.of(context, listen: false).isFullySignedIn) {
             return true;

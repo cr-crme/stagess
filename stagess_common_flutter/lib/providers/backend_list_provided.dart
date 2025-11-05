@@ -1,17 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer' as dev;
 import 'dart:io';
 
 import 'package:enhanced_containers/database_list_provided.dart';
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
+import 'package:logging/logging.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/extended_item_serializable.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
+import 'package:stagess_common/services/generic_listener.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:web_socket_client/web_socket_client.dart';
-import 'package:stagess_common/services/generic_listener.dart';
+
+final _logger = Logger('BackendListProvided');
 
 class _Selector {
   final Function(Map<String, dynamic> items, {bool notify}) addOrReplaceItems;
@@ -131,7 +133,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
         while (true) {
           if (_socket == null) {
             // If the socket is null, it means the connection failed
-            dev.log('Connection to the server was canceled');
+            _logger.severe('Connection to the server was canceled');
             return;
           }
           if (_handshakeReceived) {
@@ -145,19 +147,15 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
             if (!_hasProblemConnecting) {
               // Only notify once
               _hasProblemConnecting = true;
-              dev.log('Handshake takes more time than expected');
+              _logger.warning('Handshake takes more time than expected');
               notifyListeners();
             }
           }
 
           await Future.delayed(const Duration(milliseconds: 200));
         }
-      } catch (e) {
-        dev.log(
-          'Error while connecting to the server: $e',
-          error: e,
-          stackTrace: StackTrace.current,
-        );
+      } catch (e, st) {
+        _logger.severe('Error while connecting to the server', e, st);
       } finally {
         disconnect();
       }
@@ -209,13 +207,12 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
   }) async {
     // Get the not yet fetched fields (that is the non-intersecting fields between
     // the registered fields and the requested fields)
-    final unregisteredFields =
-        forceRefetchAll
-            ? fields
-            : _referenceFetchableFields.getNonIntersectingFieldNames(
-              getRegisteredFieldsOf(id),
-              fields,
-            );
+    final unregisteredFields = forceRefetchAll
+        ? fields
+        : _referenceFetchableFields.getNonIntersectingFieldNames(
+            getRegisteredFieldsOf(id),
+            fields,
+          );
     if (unregisteredFields.isEmpty) return;
 
     final field = getField(false);
@@ -363,7 +360,8 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
         ),
       );
       return response.response == Response.success;
-    } on Exception {
+    } on Exception catch (e, st) {
+      _logger.severe('Error while adding item', e, st);
       // Make sure to keep the list in sync with the database
       notifyListeners();
       return false;
@@ -428,8 +426,8 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
         ),
       );
       return response.response == Response.success;
-    } on Exception catch (e) {
-      dev.log('Error while replacing item: $e');
+    } on Exception catch (e, st) {
+      _logger.severe('Error while replacing item', e, st);
       // Make sure to keep the list in sync with the database
       notifyListeners();
       return false;
@@ -479,7 +477,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
 
   ///
   /// Actually performs the remove from the self list
-  void _removeFromSelf(value, {bool notify = true}) {
+  void _removeFromSelf(dynamic value, {bool notify = true}) {
     super.remove(value, notify: notify);
   }
 
@@ -535,8 +533,8 @@ Future<void> _getFromBackend(
   try {
     final selector = _getSelector(requestField);
     final toFetch = selector.getReferenceFetchableFields().filter(
-      fields ?? FetchableFields.all,
-    );
+          fields ?? FetchableFields.all,
+        );
 
     await _sendMessageWithResponse(
       message: CommunicationProtocol(
@@ -545,8 +543,8 @@ Future<void> _getFromBackend(
         data: {'id': id, 'fields': toFetch.serialized},
       ),
     );
-  } catch (e) {
-    dev.log('Error while getting data from the backend: $e');
+  } catch (e, st) {
+    _logger.severe('Error while getting data from the backend', e, st);
   }
 }
 
@@ -630,7 +628,8 @@ Future<void> _incomingMessage(
               mainField,
             ).getRegisteredFieldsOf(id);
             registeredFieldsOfId.addAll(
-              referenceFields.extractFrom(protocol.data?.keys ?? []),
+              referenceFields
+                  .extractFrom(protocol.data?.keys ?? Iterable.empty()),
             );
           }
 
@@ -689,7 +688,7 @@ Future<void> _incomingMessage(
         throw Exception('Unsupported request type: ${protocol.requestType}');
     }
   } catch (e, st) {
-    dev.log(e.toString(), error: e, stackTrace: st);
+    _logger.severe('Error while processing incoming message', e, st);
     return;
   } finally {
     final completer = _completers.remove(protocol.id);

@@ -5,7 +5,7 @@ version: 1.0.0
 publish_to: none # Remove this line if you wish to publish to pub.dev
 
 environment:
-  sdk: ^3.6.1
+  sdk: ">=3.0.0 <4.0.0"
 
 # Add regular dependencies here.
 dependencies:
@@ -21,5 +21,5 @@ dependency_overrides:
     path: ../external/enhanced_containers/plugins/enhanced_containers_foundation
 
 dev_dependencies:
-  lints: ^5.0.0
+  lints: ^6.0.0
   test: ^1.24.0

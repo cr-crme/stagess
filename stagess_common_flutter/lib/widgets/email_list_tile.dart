@@ -44,7 +44,7 @@ class _EmailListTileState extends State<EmailListTile> {
   }
 
   // coverage:ignore-start
-  _email() async =>
+  Future<bool> _email() async =>
       await launchUrl(Uri.parse('mailto:${_emailController.text}'));
   // coverage:ignore-end
 
@@ -77,15 +77,13 @@ class _EmailListTileState extends State<EmailListTile> {
                 icon: const SizedBox(width: 30),
                 labelText:
                     '${widget.isMandatory && widget.enabled ? '* ' : ''}${widget.title}',
-                labelStyle:
-                    widget.titleStyle ??
+                labelStyle: widget.titleStyle ??
                     (widget.enabled
                         ? null
                         : const TextStyle(color: Colors.black)),
                 disabledBorder: InputBorder.none,
               ),
-              style:
-                  widget.contentStyle ??
+              style: widget.contentStyle ??
                   (widget.enabled
                       ? null
                       : const TextStyle(color: Colors.black)),
@@ -106,10 +104,9 @@ class _EmailListTileState extends State<EmailListTile> {
               padding: const EdgeInsets.all(8.0),
               child: Icon(
                 widget.icon,
-                color:
-                    canTap || widget.enabled
-                        ? Theme.of(context).primaryColor
-                        : Colors.grey,
+                color: canTap || widget.enabled
+                    ? Theme.of(context).primaryColor
+                    : Colors.grey,
               ),
             ),
           ],

@@ -23,7 +23,7 @@ class Job extends ItemSerializable {
     if (_specialization == null) {
       throw ArgumentError('No specialization found for this job');
     }
-    return _specialization;
+    return _specialization!;
   }
 
   // Reserved to a specific ID (i.e., school, teacher)
@@ -98,7 +98,7 @@ class Job extends ItemSerializable {
     );
   }
 
-  Job copyWithData(Map<String, dynamic>? map) {
+  Job copyWithData(Map? map) {
     if (map == null || map.isEmpty) return copyWith();
     return Job(
       id: StringExt.from(map['id']) ?? id,

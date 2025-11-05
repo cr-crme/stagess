@@ -70,7 +70,7 @@ class SupervisionExpansionPanel extends ExpansionPanel {
   }
 }
 
-Widget _printCountedList<T>(Iterable iterable, String Function(T) toString) {
+Widget _printCountedList<T>(Iterable<T> iterable, String Function(T) toString) {
   var out = iterable.map<String>((e) => toString(e)).toList();
 
   out = out
@@ -242,8 +242,8 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
     );
   }
 
-  Widget _buildComments(
-      context, List<PostInternshipEnterpriseEvaluation> evaluations) {
+  Widget _buildComments(BuildContext context,
+      List<PostInternshipEnterpriseEvaluation> evaluations) {
     final comments = evaluations
         .map((e) => e.supervisionComments)
         .where((e) => e != '')
@@ -262,7 +262,8 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
           );
   }
 
-  Widget _buildTaskVariety(evaluations) {
+  Widget _buildTaskVariety(
+      Iterable<PostInternshipEnterpriseEvaluation> evaluations) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -276,7 +277,8 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
     );
   }
 
-  Widget _buildTrainingPlanRespect(evaluations) {
+  Widget _buildTrainingPlanRespect(
+      Iterable<PostInternshipEnterpriseEvaluation> evaluations) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -308,7 +310,7 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
     );
   }
 
-  Widget _buildAutonomy(evaluations) {
+  Widget _buildAutonomy(List<PostInternshipEnterpriseEvaluation> evaluations) {
     return _TitledFixSlider(
       title: 'Niveau d\'autonomie souhaité',
       value: _meanOf(evaluations, (e) => e.autonomyExpected),
@@ -317,7 +319,8 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
     );
   }
 
-  Widget _buildEfficiency(evaluations) {
+  Widget _buildEfficiency(
+      List<PostInternshipEnterpriseEvaluation> evaluations) {
     return _TitledFixSlider(
       title: 'Rendement de l\'élève attendu',
       value: _meanOf(evaluations, (e) => e.efficiencyExpected),
@@ -326,7 +329,8 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
     );
   }
 
-  Widget _buildSupervisionStyle(evaluations) {
+  Widget _buildSupervisionStyle(
+      List<PostInternshipEnterpriseEvaluation> evaluations) {
     return _TitledFixSlider(
       title: 'Type d\'encadrement',
       value: _meanOf(evaluations, (e) => e.supervisionStyle),
@@ -335,7 +339,8 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
     );
   }
 
-  Widget _buildEaseOfCommunication(evaluations) {
+  Widget _buildEaseOfCommunication(
+      List<PostInternshipEnterpriseEvaluation> evaluations) {
     return _TitledFixSlider(
       title: 'Communication avec l\'entreprise',
       value: _meanOf(evaluations, (e) => e.easeOfCommunication),
@@ -344,7 +349,8 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
     );
   }
 
-  Widget _buildAbsenceAcceptance(evaluations) {
+  Widget _buildAbsenceAcceptance(
+      List<PostInternshipEnterpriseEvaluation> evaluations) {
     return _TitledFixSlider(
       title:
           'Tolérance du milieu à l\'égard des retards et absences de l\'élève',

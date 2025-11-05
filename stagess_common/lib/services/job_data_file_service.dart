@@ -56,9 +56,9 @@ class ActivitySector extends NamedItemSerializable {
 class ActivitySectorList extends _NamedItemSerializableList<ActivitySector> {
   ActivitySectorList._();
 
-  factory ActivitySectorList.fromSerialized(map) {
+  factory ActivitySectorList.fromSerialized(List? map) {
     final out = ActivitySectorList._();
-    for (final activity in map) {
+    for (final activity in (map ?? [])) {
       out.add(ActivitySector.fromSerialized(activity));
     }
     return out;
@@ -119,9 +119,9 @@ class Specialization extends NamedItemSerializable {
 class SpecializationList extends _NamedItemSerializableList<Specialization> {
   SpecializationList._();
 
-  factory SpecializationList.fromSerialized(map) {
+  factory SpecializationList.fromSerialized(List? map) {
     final out = SpecializationList._();
-    for (final specialization in map) {
+    for (final specialization in (map ?? [])) {
       out.add(Specialization.fromSerialized(specialization));
     }
     return out;
@@ -194,9 +194,9 @@ class SkillList extends _NamedItemSerializableList<Skill> {
     return SkillList._();
   }
 
-  factory SkillList.fromSerialized(map) {
+  factory SkillList.fromSerialized(List? map) {
     final out = SkillList._();
-    for (final skill in map) {
+    for (final skill in (map ?? [])) {
       out.add(Skill.fromSerialized(skill));
     }
     return out;

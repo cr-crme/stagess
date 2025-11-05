@@ -167,13 +167,11 @@ Future<void> _addDummyAdmins(
 }) async {
   dev.log('Adding dummy admins');
 
-  final schoolBoardId =
-      schoolBoards
-          .firstWhere(
-            (schoolBoard) =>
-                schoolBoard.name == 'Mon centre de services scolaire',
-          )
-          .id;
+  final schoolBoardId = schoolBoards
+      .firstWhere(
+        (schoolBoard) => schoolBoard.name == 'Mon centre de services scolaire',
+      )
+      .id;
 
   admins.add(
     Admin(
@@ -360,6 +358,7 @@ Future<void> _addDummyTeachers(
       email: 'b2@moncentre.qc',
     ),
   );
+
   teachers.add(
     Teacher.empty.copyWith(
       firstName: 'Enseignant',
@@ -1877,11 +1876,10 @@ Future<void> _addDummyInternships(
       extraSupervisingTeacherIds: [],
       enterpriseId:
           enterprises.firstWhere((e) => e.name == 'Boucherie Marien').id,
-      jobId:
-          enterprises
-              .firstWhere((e) => e.name == 'Boucherie Marien')
-              .jobs[0]
-              .id,
+      jobId: enterprises
+          .firstWhere((e) => e.name == 'Boucherie Marien')
+          .jobs[0]
+          .id,
       extraSpecializationIds: [],
       supervisor: Person(
         firstName: 'Claude',
@@ -2623,17 +2621,15 @@ Future<void> _addDummyInternships(
   // Set the visiting priorities of the internships for teacherA1Id
   final currentTeacher = teachers.firstWhere((t) => t.id == teacherA1Id);
   var studentId = students.firstWhere((e) => e.fullName == 'Cedric Masson').id;
-  var internshipId =
-      internships
-          .firstWhere((internship) => internship.studentId == studentId)
-          .id;
+  var internshipId = internships
+      .firstWhere((internship) => internship.studentId == studentId)
+      .id;
   currentTeacher.setVisitingPriority(internshipId, VisitingPriority.values[2]);
 
   studentId = students.firstWhere((e) => e.fullName == 'Thomas Caron').id;
-  internshipId =
-      internships
-          .firstWhere((internship) => internship.studentId == studentId)
-          .id;
+  internshipId = internships
+      .firstWhere((internship) => internship.studentId == studentId)
+      .id;
   currentTeacher.setVisitingPriority(internshipId, VisitingPriority.values[1]);
 
   await teachers.replaceWithConfirmation(currentTeacher);

@@ -99,7 +99,7 @@ class _DateRange extends StatefulWidget {
 class _DateRangeState extends State<_DateRange> {
   bool _isValid = true;
 
-  Future<void> _promptDateRange(context) async {
+  Future<void> _promptDateRange(BuildContext context) async {
     final range = await showCustomDateRangePicker(
       helpText: 'Sélectionner les dates',
       saveText: 'Confirmer',

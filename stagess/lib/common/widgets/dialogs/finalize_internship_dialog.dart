@@ -43,7 +43,7 @@ class FinalizeInternshipDialog extends StatelessWidget {
   final String internshipId;
 
   void _saveInternship(
-    context,
+    BuildContext context,
     GlobalKey<FormState> formKey,
     TextEditingController textController,
   ) async {
@@ -65,10 +65,9 @@ class FinalizeInternshipDialog extends StatelessWidget {
     final internship =
         InternshipsProvider.of(context, listen: false)[internshipId];
     final hourController = TextEditingController(
-      text:
-          internship.achievedDuration < 0
-              ? '0'
-              : internship.achievedDuration.toString(),
+      text: internship.achievedDuration < 0
+          ? '0'
+          : internship.achievedDuration.toString(),
     );
 
     return PopScope(
@@ -117,8 +116,8 @@ class FinalizeInternshipDialog extends StatelessWidget {
                 child: const Text('Non'),
               ),
               TextButton(
-                onPressed:
-                    () => _saveInternship(context, formKey, hourController),
+                onPressed: () =>
+                    _saveInternship(context, formKey, hourController),
                 child: const Text('Oui'),
               ),
             ],

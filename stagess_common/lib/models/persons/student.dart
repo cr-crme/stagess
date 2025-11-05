@@ -59,7 +59,7 @@ class Student extends Person {
   final Person contact;
   final String contactLink;
 
-  static get empty => Student(
+  static Student get empty => Student(
         schoolBoardId: '-1',
         schoolId: '-1',
         firstName: '',

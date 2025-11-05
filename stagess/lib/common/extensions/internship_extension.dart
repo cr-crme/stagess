@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 extension InternshipExtension on Internship {
-  Internship copyWithTeacher(context, {required String teacherId}) {
+  Internship copyWithTeacher(BuildContext context,
+      {required String teacherId}) {
     if (teacherId == signatoryTeacherId ||
         supervisingTeacherIds.contains(teacherId)) {
       // If the teacher is already assigned, do nothing
@@ -25,7 +27,8 @@ extension InternshipExtension on Internship {
     );
   }
 
-  Internship copyWithoutTeacher(context, {required String teacherId}) {
+  Internship copyWithoutTeacher(BuildContext context,
+      {required String teacherId}) {
     if (teacherId == signatoryTeacherId ||
         !supervisingTeacherIds.contains(teacherId)) {
       // If the teacher is not assigned, do nothing

@@ -21,7 +21,7 @@ class AddressController {
   Address? Function()? _getAddress;
   Address? Function(Address)? _setAddress;
   void Function(Address? address, {String? validationMessage})?
-  _setAddressAndForceValidation;
+      _setAddressAndForceValidation;
   bool Function()? _isMandatory;
   Address? _initialValue;
   set initialValue(Address? value) {
@@ -138,7 +138,7 @@ class _AddressListTileState extends State<AddressListTile> {
 
   Address? _address;
   Address? getAddress() => _address;
-  Address? setAddress(newAddress) => _address = newAddress;
+  Address? setAddress(Address? newAddress) => _address = newAddress;
 
   void _setAndForceValidation(Address? address, {String? validationMessage}) {
     _address = address;
@@ -170,8 +170,7 @@ class _AddressListTileState extends State<AddressListTile> {
     setState(() => _isValidating = true);
     late Address? newAddress;
     try {
-      final toCall =
-          widget.addressController.fromStringOverrideForDebug ??
+      final toCall = widget.addressController.fromStringOverrideForDebug ??
           Address.fromString;
       newAddress =
           (await toCall(widget.addressController._textController.text))!;
@@ -206,39 +205,38 @@ class _AddressListTileState extends State<AddressListTile> {
     final confirmAddress =
         widget.addressController.confirmAddressForDebug == null
             ? await showDialog<bool>(
-              barrierDismissible: false,
-              context: context,
-              builder:
-                  (context) => AlertDialog(
-                    title: const Text('Confirmer l\'adresse'),
-                    content: SingleChildScrollView(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'L\'adresse trouvée est\u00a0:\n${newAddress!.isValid ? newAddress.toString() : 'Aucune'}',
-                          ),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height * 1 / 2,
-                            width: MediaQuery.of(context).size.width * 2 / 3,
-                            child: ShowAddressDialog(newAddress),
-                          ),
-                        ],
-                      ),
+                barrierDismissible: false,
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Confirmer l\'adresse'),
+                  content: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'L\'adresse trouvée est\u00a0:\n${newAddress!.isValid ? newAddress.toString() : 'Aucune'}',
+                        ),
+                        const SizedBox(height: 10),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height * 1 / 2,
+                          width: MediaQuery.of(context).size.width * 2 / 3,
+                          child: ShowAddressDialog(newAddress),
+                        ),
+                      ],
                     ),
-                    actions: [
-                      OutlinedButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Annuler'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Confirmer'),
-                      ),
-                    ],
                   ),
-            )
+                  actions: [
+                    OutlinedButton(
+                      onPressed: () => Navigator.pop(context, false),
+                      child: const Text('Annuler'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, true),
+                      child: const Text('Confirmer'),
+                    ),
+                  ],
+                ),
+              )
             : widget.addressController.confirmAddressForDebug!(newAddress);
     // coverage:ignore-end
 
@@ -265,22 +263,21 @@ class _AddressListTileState extends State<AddressListTile> {
   }
 
   // coverage:ignore-start
-  void _showAddress(context) async {
+  void _showAddress(BuildContext context) async {
     if (_address == null) return;
 
     await showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: Text(widget.title ?? 'Adresse'),
-            content: SingleChildScrollView(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * 1 / 2,
-                width: MediaQuery.of(context).size.width * 2 / 3,
-                child: ShowAddressDialog(_address!),
-              ),
-            ),
+      builder: (context) => AlertDialog(
+        title: Text(widget.title ?? 'Adresse'),
+        content: SingleChildScrollView(
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 1 / 2,
+            width: MediaQuery.of(context).size.width * 2 / 3,
+            child: ShowAddressDialog(_address!),
           ),
+        ),
+      ),
     );
   }
   // coverage:ignore-end
@@ -295,8 +292,7 @@ class _AddressListTileState extends State<AddressListTile> {
 
   @override
   Widget build(BuildContext context) {
-    final searchIsClickable =
-        addressHasChanged &&
+    final searchIsClickable = addressHasChanged &&
         widget.addressController._textController.text.isNotEmpty &&
         !_isValidating;
 
@@ -321,32 +317,28 @@ class _AddressListTileState extends State<AddressListTile> {
                 decoration: InputDecoration(
                   labelText:
                       '${widget.isMandatory && widget.enabled ? '* ' : ''}${widget.title ?? 'Adresse'}',
-                  labelStyle:
-                      widget.titleStyle ??
+                  labelStyle: widget.titleStyle ??
                       (widget.enabled ? null : TextStyle(color: Colors.black)),
                   disabledBorder: InputBorder.none,
                 ),
-                style:
-                    widget.contentStyle ??
+                style: widget.contentStyle ??
                     (widget.enabled ? null : TextStyle(color: Colors.black)),
                 enabled: widget.enabled && !_isValidating,
                 maxLines: null,
                 onSaved: (newAddress) => validate(),
-                validator:
-                    (_) => _isValid() ? null : 'Entrer une adresse valide.',
+                validator: (_) =>
+                    _isValid() ? null : 'Entrer une adresse valide.',
                 keyboardType: TextInputType.streetAddress,
-                onChanged:
-                    (value) => setState(() {
-                      addressHasChanged = true;
-                    }),
+                onChanged: (value) => setState(() {
+                  addressHasChanged = true;
+                }),
               ),
             ),
             if (widget.enabled)
               InkWell(
-                onTap:
-                    searchIsClickable
-                        ? () => validate(forceShowIfNotFound: true)
-                        : null,
+                onTap: searchIsClickable
+                    ? () => validate(forceShowIfNotFound: true)
+                    : null,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     vertical: 4.0,
@@ -354,10 +346,9 @@ class _AddressListTileState extends State<AddressListTile> {
                   ),
                   child: Icon(
                     Icons.search,
-                    color:
-                        searchIsClickable
-                            ? Theme.of(context).primaryColor
-                            : Colors.grey,
+                    color: searchIsClickable
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey,
                   ),
                 ),
               ),

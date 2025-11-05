@@ -75,18 +75,18 @@ class Address extends ItemSerializable {
         'postal_code': FetchableFields.mandatory,
       });
 
-  static Address? from(map) {
+  static Address? from(Map? map) {
     if (map == null) return null;
     return Address.fromSerialized(map);
   }
 
-  static Address fromSerialized(map) => Address(
-      id: StringExt.from(map['id']),
-      civicNumber: IntExt.from(map['civic']),
-      street: StringExt.from(map['street']),
-      apartment: StringExt.from(map['apartment']),
-      city: StringExt.from(map['city']),
-      postalCode: StringExt.from(map['postal_code']));
+  static Address fromSerialized(Map? map) => Address(
+      id: StringExt.from(map?['id']),
+      civicNumber: IntExt.from(map?['civic']),
+      street: StringExt.from(map?['street']),
+      apartment: StringExt.from(map?['apartment']),
+      city: StringExt.from(map?['city']),
+      postalCode: StringExt.from(map?['postal_code']));
 
   Address copyWith({
     String? id,

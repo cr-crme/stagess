@@ -19,8 +19,9 @@ class Photo extends ItemSerializable {
     };
   }
 
-  static Photo fromSerialized(Map<String, dynamic> map) {
+  static Photo fromSerialized(Map? map) {
     return Photo(
-        bytes: Uint8List.fromList((map['bytes'] as List<dynamic>).cast<int>()));
+        bytes: Uint8List.fromList(
+            (map?['bytes'] as List<dynamic>?)?.cast<int>() ?? []));
   }
 }

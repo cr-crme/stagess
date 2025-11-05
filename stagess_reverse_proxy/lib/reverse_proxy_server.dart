@@ -123,7 +123,7 @@ class ReverseProxyServer {
     _logger.info(
         'Starting reverse proxy server on ${bindAddress.address}:$bindPort ...');
 
-    _server = await (useSecure
+    _server = (await (useSecure
         ? SecureServerSocket.bind(
             bindAddress,
             bindPort,
@@ -136,7 +136,7 @@ class ReverseProxyServer {
             bindAddress,
             bindPort,
             backlog: maxLiveConnections,
-          ));
+          )) as Stream<Socket>);
     _server!.listen(_handleIncomingClient,
         onError: (e, st) => _logger.severe('TLS server listen error: $e\n$st'),
         onDone: () => _logger.info('TLS server done'));

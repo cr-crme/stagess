@@ -136,37 +136,36 @@ class _InternshipEnrollmentScreenState
     ).firstWhere((e) => e.id == _caracteristicsKey.currentState!.student!.id);
     await showDialog(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const SubTitle('Inscription réussie', left: 0, bottom: 0),
-            content: RichText(
-              text: TextSpan(
-                children: [
-                  TextSpan(
-                    text: '${student.fullName} ',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const TextSpan(
-                    text: ' a bien été inscrit comme stagiaire chez ',
-                  ),
-                  TextSpan(
-                    text: enterprise.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const TextSpan(
-                    text:
-                        '.\n\nVous pouvez maintenant accéder au contrat de stage dans la section "Documents".',
-                  ),
-                ],
+      builder: (ctx) => AlertDialog(
+        title: const SubTitle('Inscription réussie', left: 0, bottom: 0),
+        content: RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: '${student.fullName} ',
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Ok'),
+              const TextSpan(
+                text: ' a bien été inscrit comme stagiaire chez ',
+              ),
+              TextSpan(
+                text: enterprise.name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(
+                text:
+                    '.\n\nVous pouvez maintenant accéder au contrat de stage dans la section "Documents".',
               ),
             ],
           ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Ok'),
+          ),
+        ],
+      ),
     );
 
     _logger.finer('Internship enrollment form submitted successfully');
@@ -180,13 +179,12 @@ class _InternshipEnrollmentScreenState
   }
 
   Internship? get _newInternship {
-    final enterprise =
-        _caracteristicsKey.currentState == null
-            ? null
-            : EnterprisesProvider.of(
-              context,
-              listen: false,
-            ).fromIdOrNull(_caracteristicsKey.currentState!.enterprise.id);
+    final enterprise = _caracteristicsKey.currentState == null
+        ? null
+        : EnterprisesProvider.of(
+            context,
+            listen: false,
+          ).fromIdOrNull(_caracteristicsKey.currentState!.enterprise.id);
     if (enterprise == null) return null;
 
     final signatoryTeacher =
@@ -211,23 +209,19 @@ class _InternshipEnrollmentScreenState
       signatoryTeacherId: signatoryTeacher.id,
       extraSupervisingTeacherIds: [],
       enterpriseId: _caracteristicsKey.currentState!.enterprise.id,
-      jobId:
-          enterprise.jobs
-              .firstWhere(
-                (job) =>
-                    job.specialization ==
-                    _caracteristicsKey
-                        .currentState!
-                        .primaryJobController
-                        .job
-                        .specialization,
-              )
-              .id,
-      extraSpecializationIds:
-          _caracteristicsKey.currentState!.extraJobControllers
-              .map<String>((e) => e.job.specializationOrNull?.id ?? '')
-              .where((e) => e.isNotEmpty)
-              .toList(),
+      jobId: enterprise.jobs
+          .firstWhere(
+            (job) =>
+                job.specialization ==
+                _caracteristicsKey
+                    .currentState!.primaryJobController.job.specialization,
+          )
+          .id,
+      extraSpecializationIds: _caracteristicsKey
+          .currentState!.extraJobControllers
+          .map<String>((e) => e.job.specializationOrNull?.id ?? '')
+          .where((e) => e.isNotEmpty)
+          .toList(),
       supervisor: Person(
         firstName: _caracteristicsKey.currentState!.supervisorFirstName ?? '',
         middleName: null,
@@ -235,15 +229,13 @@ class _InternshipEnrollmentScreenState
         dateBirth: null,
         email: _caracteristicsKey.currentState!.supervisorEmail ?? '',
         address: Address.empty,
-        phone:
-            _caracteristicsKey.currentState?.supervisorPhone == null
-                ? null
-                : PhoneNumber.fromString(
-                  _caracteristicsKey.currentState!.supervisorPhone,
-                ),
+        phone: _caracteristicsKey.currentState?.supervisorPhone == null
+            ? null
+            : PhoneNumber.fromString(
+                _caracteristicsKey.currentState!.supervisorPhone!,
+              ),
       ),
-      dates:
-          _scheduleKey.currentState?.weeklyScheduleController.dateRange ??
+      dates: _scheduleKey.currentState?.weeklyScheduleController.dateRange ??
           time_utils.DateTimeRange(
             start: DateTime.now(),
             end: DateTime.now().add(const Duration(days: 30)),
@@ -253,7 +245,7 @@ class _InternshipEnrollmentScreenState
       endDate: DateTime(0),
       weeklySchedules:
           _scheduleKey.currentState?.weeklyScheduleController.weeklySchedules ??
-          [],
+              [],
       transportations: _caracteristicsKey.currentState?.transportations ?? [],
       visitFrequencies: _scheduleKey.currentState?.visitFrequencies ?? '',
     );
@@ -360,8 +352,8 @@ class _InternshipEnrollmentScreenState
               _currentStep == 2
                   ? 'Valider'
                   : _currentStep == 1
-                  ? 'Enregistrer'
-                  : 'Suivant',
+                      ? 'Enregistrer'
+                      : 'Suivant',
             ),
           ),
         ],

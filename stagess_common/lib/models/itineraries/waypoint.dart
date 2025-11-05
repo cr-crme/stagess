@@ -53,17 +53,17 @@ class Waypoint extends ItemSerializable {
         'priority': FetchableFields.mandatory,
       });
 
-  static Waypoint fromSerialized(data) {
+  static Waypoint fromSerialized(dynamic data) {
     return Waypoint(
-      id: data['id'],
-      title: data['title'] ?? '',
-      subtitle: data['subtitle'] ?? '',
-      latitude: (data['latitude'] as num?)?.toDouble() ?? 0.0,
-      longitude: (data['longitude'] as num?)?.toDouble() ?? 0.0,
-      address: Address.fromSerialized(data['address'] ?? {}),
-      priority: data['priority'] == null
+      id: data?['id'],
+      title: data?['title'] ?? '',
+      subtitle: data?['subtitle'] ?? '',
+      latitude: (data?['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (data?['longitude'] as num?)?.toDouble() ?? 0.0,
+      address: Address.fromSerialized(data?['address'] ?? {}),
+      priority: data?['priority'] == null
           ? VisitingPriority.notApplicable
-          : VisitingPriority.values[data['priority']],
+          : VisitingPriority.values[data!['priority']],
     );
   }
 
@@ -165,20 +165,20 @@ class Waypoint extends ItemSerializable {
     );
   }
 
-  Waypoint copyWithData(data) {
+  Waypoint copyWithData(Map? data) {
     return Waypoint(
-      id: data['id'] ?? id,
-      title: data['title'] ?? title,
-      subtitle: data['subtitle'] ?? subtitle,
-      latitude: (data['latitude'] as num?)?.toDouble() ?? latitude,
-      longitude: (data['longitude'] as num?)?.toDouble() ?? longitude,
-      address: data['address'] != null
-          ? Address.fromSerialized(data['address'])
+      id: data?['id'] ?? id,
+      title: data?['title'] ?? title,
+      subtitle: data?['subtitle'] ?? subtitle,
+      latitude: (data?['latitude'] as num?)?.toDouble() ?? latitude,
+      longitude: (data?['longitude'] as num?)?.toDouble() ?? longitude,
+      address: data?['address'] != null
+          ? Address.fromSerialized(data!['address'])
           : address,
-      priority: data['priority'] != null
-          ? VisitingPriority.values[data['priority']]
+      priority: data?['priority'] != null
+          ? VisitingPriority.values[data!['priority']]
           : priority,
-      showTitle: data['showTitle'] ?? showTitle,
+      showTitle: data?['showTitle'] ?? showTitle,
     );
   }
 

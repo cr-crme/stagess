@@ -91,13 +91,11 @@ class RoutingController {
 
     final out = await _routingManager.getRoute(
       request: routing_client.OSRMRequest.route(
-        waypoints:
-            _itinerary
-                .map(
-                  (e) =>
-                      routing_client.LngLat(lat: e.latitude, lng: e.longitude),
-                )
-                .toList(),
+        waypoints: _itinerary
+            .map(
+              (e) => routing_client.LngLat(lat: e.latitude, lng: e.longitude),
+            )
+            .toList(),
         geometries: routing_client.Geometries.polyline,
         steps: true,
         languages: routing_client.Languages.en,
@@ -168,7 +166,7 @@ class _RoutingMapState extends State<RoutingMap> {
     ];
   }
 
-  void _toggleName(index) {
+  void _toggleName(int index) {
     widget.waypoints[index] = widget.waypoints[index].copyWith(
       showTitle: !widget.waypoints[index].showTitle,
     );

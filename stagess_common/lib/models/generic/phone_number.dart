@@ -33,7 +33,7 @@ class PhoneNumber extends ItemSerializable {
     );
   }
 
-  factory PhoneNumber.fromString(number, {String? id}) {
+  factory PhoneNumber.fromString(String number, {String? id}) {
     final reg = RegExp(_regExp);
     if (!reg.hasMatch(number)) return PhoneNumber.empty.copyWith(id: id);
 
@@ -58,13 +58,13 @@ class PhoneNumber extends ItemSerializable {
         'phone_number': FetchableFields.optional,
       });
 
-  static PhoneNumber? from(map) {
+  static PhoneNumber? from(Map? map) {
     if (map == null) return null;
     return PhoneNumber.fromSerialized(map);
   }
 
-  static PhoneNumber fromSerialized(map) =>
-      PhoneNumber.fromString(map['phone_number'] ?? '', id: map['id']);
+  static PhoneNumber fromSerialized(Map? map) =>
+      PhoneNumber.fromString(map?['phone_number'] ?? '', id: map?['id']);
 
   @override
   String toString() {

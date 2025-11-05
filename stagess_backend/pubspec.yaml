@@ -5,7 +5,7 @@ version: 1.0.0
 publish_to: none 
 
 environment:
-  sdk: ^3.6.1
+  sdk: ">=3.0.0 <4.0.0"
 
 # Add regular dependencies here.
 dependencies:
@@ -16,7 +16,7 @@ dependencies:
     path: ../stagess_common
   mysql1: ^0.20.0
   http: ^1.4.0
-  pointycastle: ^3.0.0
+  pointycastle: ^4.0.0
   firebase_admin: ^0.3.0+2
 
 dependency_overrides:
@@ -25,5 +25,5 @@ dependency_overrides:
 
   
 dev_dependencies:
-  lints: ^5.0.0
+  lints: ^6.0.0
   test: ^1.24.0

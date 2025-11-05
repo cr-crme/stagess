@@ -9,11 +9,11 @@ class AttitudeEvaluationFormController {
 
   AttitudeEvaluationFormController({required this.internshipId});
   final String internshipId;
-  Internship internship(context, {listen = true}) =>
+  Internship internship(BuildContext context, {bool listen = true}) =>
       InternshipsProvider.of(context, listen: listen)[internshipId];
 
   factory AttitudeEvaluationFormController.fromInternshipId(
-    context, {
+    BuildContext context, {
     required String internshipId,
     required int evaluationIndex,
   }) {

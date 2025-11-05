@@ -33,7 +33,7 @@ extension ListExt on List {
     required T Function(dynamic serialized) deserializer,
   }) {
     final out = from(elements, deserializer: (serialized) {
-          final e = original.firstWhereOrNull((e) => e.id == serialized['id']);
+          final e = original.firstWhereOrNull((e) => e.id == serialized?['id']);
           return e == null
               ? deserializer(serialized)
               : copyWithData(e, serialized);
@@ -80,13 +80,13 @@ extension MapExt<T> on Map<String, T> {
 extension StringExt on String {
   String serialize() => this;
 
-  static String? from(element) => element?.toString();
+  static String? from(dynamic element) => element?.toString();
 }
 
 extension BoolExt on bool {
   bool serialize() => this;
 
-  static bool? from(element) {
+  static bool? from(dynamic element) {
     if (element is bool) {
       return element;
     } else if (element is int) {
@@ -100,7 +100,7 @@ extension BoolExt on bool {
 extension IntExt on int {
   int serialize() => this;
 
-  static int? from(element) {
+  static int? from(dynamic element) {
     if (element is int) {
       return element;
     } else if (element is String) {
@@ -114,7 +114,7 @@ extension IntExt on int {
 extension DateTimeExt on DateTime {
   int serialize() => millisecondsSinceEpoch;
 
-  static DateTime? from(element) {
+  static DateTime? from(dynamic element) {
     if (element == null) return null;
     try {
       final date = DateTime.fromMillisecondsSinceEpoch(element as int);

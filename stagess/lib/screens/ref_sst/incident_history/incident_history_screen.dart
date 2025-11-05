@@ -73,7 +73,8 @@ class _IncidentHistoryScreenInternalState
     _searchController.dispose();
   }
 
-  Map<Specialization, IncidentsByEnterprise> _fetchAllIncidents(context) {
+  Map<Specialization, IncidentsByEnterprise> _fetchAllIncidents(
+      BuildContext context) {
     final enterprises = EnterprisesProviderExtension.availableEnterprisesOf(
       context,
     )..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
@@ -88,8 +89,8 @@ class _IncidentHistoryScreenInternalState
         // If a search filter is added
         if (_showSearchBar && textToSearch != '') {
           if (!job.specialization.idWithName.toLowerCase().contains(
-            textToSearch,
-          )) {
+                textToSearch,
+              )) {
             continue;
           }
         }
@@ -162,78 +163,71 @@ class _IncidentHistoryScreenInternalState
       smallDrawer: null,
       mediumDrawer: MainDrawer.medium,
       largeDrawer: MainDrawer.large,
-      body:
-          widget.hasFullData
-              ? Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _FilterTile(
-                          title: 'Tri par métier',
-                          icon: Icons.work,
-                          onTap:
-                              () => setState(
-                                () =>
-                                    _currentFilter =
-                                        _FilterType.bySpecialization,
-                              ),
-                          isSelected:
-                              _currentFilter == _FilterType.bySpecialization,
-                        ),
-                      ),
-                      Expanded(
-                        child: _FilterTile(
-                          title: 'Tri par nombre accidents',
-                          icon: Icons.personal_injury_outlined,
-                          onTap:
-                              () => setState(
-                                () =>
-                                    _currentFilter =
-                                        _FilterType.byNumberOfIncident,
-                              ),
-                          isSelected:
-                              _currentFilter == _FilterType.byNumberOfIncident,
-                        ),
-                      ),
-                    ],
-                  ),
-                  if (incidents.isEmpty)
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(
-                          top: 12.0,
-                          left: 36,
-                          right: 36,
-                        ),
-                        child: Text(
-                          'Aucun incident ou blessure d\'élève n\'a été rapporté '
-                          'par le personnel enseignant',
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ),
-                    ),
-                  if (incidents.isNotEmpty)
+      body: widget.hasFullData
+          ? Column(
+              children: [
+                Row(
+                  children: [
                     Expanded(
-                      child: ListView.builder(
-                        itemCount: incidents.length,
-                        itemBuilder: (context, index) {
-                          final specialization = sortedSpecializationId[index];
-                          return IncidentListTile(
-                            specializationId: specialization.id,
-                            incidents: incidents[specialization]!,
-                          );
-                        },
+                      child: _FilterTile(
+                        title: 'Tri par métier',
+                        icon: Icons.work,
+                        onTap: () => setState(
+                          () => _currentFilter = _FilterType.bySpecialization,
+                        ),
+                        isSelected:
+                            _currentFilter == _FilterType.bySpecialization,
                       ),
                     ),
-                ],
-              )
-              : Center(
-                child: CircularProgressIndicator(
-                  color: Theme.of(context).primaryColor,
+                    Expanded(
+                      child: _FilterTile(
+                        title: 'Tri par nombre accidents',
+                        icon: Icons.personal_injury_outlined,
+                        onTap: () => setState(
+                          () => _currentFilter = _FilterType.byNumberOfIncident,
+                        ),
+                        isSelected:
+                            _currentFilter == _FilterType.byNumberOfIncident,
+                      ),
+                    ),
+                  ],
                 ),
+                if (incidents.isEmpty)
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        top: 12.0,
+                        left: 36,
+                        right: 36,
+                      ),
+                      child: Text(
+                        'Aucun incident ou blessure d\'élève n\'a été rapporté '
+                        'par le personnel enseignant',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                  ),
+                if (incidents.isNotEmpty)
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: incidents.length,
+                      itemBuilder: (context, index) {
+                        final specialization = sortedSpecializationId[index];
+                        return IncidentListTile(
+                          specializationId: specialization.id,
+                          incidents: incidents[specialization]!,
+                        );
+                      },
+                    ),
+                  ),
+              ],
+            )
+          : Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
               ),
+            ),
     );
   }
 }
@@ -268,8 +262,8 @@ class _FilterTile extends StatelessWidget {
             Text(
               title,
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: isSelected ? Colors.white : null,
-              ),
+                    color: isSelected ? Colors.white : null,
+                  ),
             ),
           ],
         ),

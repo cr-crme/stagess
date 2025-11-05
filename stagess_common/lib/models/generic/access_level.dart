@@ -24,7 +24,7 @@ enum AccessLevel {
     return index;
   }
 
-  static AccessLevel fromSerialized(value) {
+  static AccessLevel fromSerialized(dynamic value) {
     if (value == null) return AccessLevel.invalid;
     if (value < 0 || value >= AccessLevel.values.length) {
       throw ArgumentError('Invalid access level value: $value');

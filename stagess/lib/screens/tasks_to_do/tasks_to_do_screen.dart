@@ -20,7 +20,7 @@ import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 final _logger = Logger('TasksToDoScreen');
 
-int numberOfTasksToDo(context) {
+int numberOfTasksToDo(BuildContext context) {
   final taskFunctions = [
     _enterprisesToEvaluate,
     _internshipsToTerminate,
@@ -29,7 +29,8 @@ int numberOfTasksToDo(context) {
   return taskFunctions.fold<int>(0, (prev, e) => prev + e(context).length);
 }
 
-List<_JobEnterpriseInternshipStudent> _enterprisesToEvaluate(context) {
+List<_JobEnterpriseInternshipStudent> _enterprisesToEvaluate(
+    BuildContext context) {
   // We should evaluate a job of an enterprise if there is at least one
   // internship in this job and the no evaluation was ever performed
   final myId = TeachersProvider.of(context).currentTeacher?.id;
@@ -46,15 +47,14 @@ List<_JobEnterpriseInternshipStudent> _enterprisesToEvaluate(context) {
   for (final enterprise in enterprises) {
     for (final job in enterprise.availablejobs(context)) {
       if (!job.sstEvaluation.isFilled) {
-        final interns =
-            internships
-                .where(
-                  (e) =>
-                      e.isActive &&
-                      e.jobId == job.id &&
-                      e.supervisingTeacherIds.contains(myId),
-                )
-                .toList();
+        final interns = internships
+            .where(
+              (e) =>
+                  e.isActive &&
+                  e.jobId == job.id &&
+                  e.supervisingTeacherIds.contains(myId),
+            )
+            .toList();
         if (interns.isEmpty) continue;
 
         interns.sort((a, b) => a.dates.start.compareTo(b.dates.start));
@@ -74,7 +74,8 @@ List<_JobEnterpriseInternshipStudent> _enterprisesToEvaluate(context) {
   return out;
 }
 
-List<_JobEnterpriseInternshipStudent> _internshipsToTerminate(context) {
+List<_JobEnterpriseInternshipStudent> _internshipsToTerminate(
+    BuildContext context) {
   // We should terminate an internship if the end date is passed for more that
   // one day
   final internships = InternshipsProvider.of(context);
@@ -114,7 +115,8 @@ List<_JobEnterpriseInternshipStudent> _internshipsToTerminate(context) {
   return out;
 }
 
-List<_JobEnterpriseInternshipStudent> _postInternshipEvaluationToDo(context) {
+List<_JobEnterpriseInternshipStudent> _postInternshipEvaluationToDo(
+    BuildContext context) {
   // We should evaluate an internship as soon as it is terminated
   final internships = InternshipsProvider.of(context);
   final students = StudentsHelpers.mySupervizedStudents(context);
@@ -224,25 +226,24 @@ class _SstRisk extends StatelessWidget {
         ...(jobs.isEmpty
             ? [const _AllTasksDone()]
             : jobs.map((e) {
-              final enterprise = e.enterprise!;
-              final job = e.job!;
-              final internship = e.internship!;
+                final enterprise = e.enterprise!;
+                final job = e.job!;
+                final internship = e.internship!;
 
-              return _TaskTile(
-                title: enterprise.name,
-                subtitle: job.specialization.name,
-                icon: Icons.warning,
-                iconColor: Theme.of(context).colorScheme.secondary,
-                date: internship.dates.start,
-                buttonTitle: 'Remplir le\nquestionnaire SST',
-                onTap:
-                    () => showJobSstFormDialog(
-                      context,
-                      enterpriseId: enterprise.id,
-                      jobId: job.id,
-                    ),
-              );
-            })),
+                return _TaskTile(
+                  title: enterprise.name,
+                  subtitle: job.specialization.name,
+                  icon: Icons.warning,
+                  iconColor: Theme.of(context).colorScheme.secondary,
+                  date: internship.dates.start,
+                  buttonTitle: 'Remplir le\nquestionnaire SST',
+                  onTap: () => showJobSstFormDialog(
+                    context,
+                    enterpriseId: enterprise.id,
+                    jobId: job.id,
+                  ),
+                );
+              })),
       ],
     );
   }
@@ -266,25 +267,24 @@ class _EndingInternship extends StatelessWidget {
         ...(internships.isEmpty
             ? [const _AllTasksDone()]
             : internships.map((e) {
-              final internship = e.internship!;
-              final student = e.student!;
-              final enterprise = e.enterprise!;
+                final internship = e.internship!;
+                final student = e.student!;
+                final enterprise = e.enterprise!;
 
-              return _TaskTile(
-                title: student.fullName,
-                subtitle: enterprise.name,
-                icon: Icons.flag,
-                iconColor: Colors.yellow.shade700,
-                date: internship.dates.end,
-                buttonTitle: 'Aller au stage',
-                onTap:
-                    () => GoRouter.of(context).pushNamed(
-                      Screens.student,
-                      pathParameters: Screens.params(student),
-                      queryParameters: Screens.queryParams(pageIndex: '1'),
-                    ),
-              );
-            })),
+                return _TaskTile(
+                  title: student.fullName,
+                  subtitle: enterprise.name,
+                  icon: Icons.flag,
+                  iconColor: Colors.yellow.shade700,
+                  date: internship.dates.end,
+                  buttonTitle: 'Aller au stage',
+                  onTap: () => GoRouter.of(context).pushNamed(
+                    Screens.student,
+                    pathParameters: Screens.params(student),
+                    queryParameters: Screens.queryParams(pageIndex: '1'),
+                  ),
+                );
+              })),
       ],
     );
   }
@@ -308,24 +308,23 @@ class _PostInternshipEvaluation extends StatelessWidget {
         ...(internships.isEmpty
             ? [const _AllTasksDone()]
             : internships.map((e) {
-              final internship = e.internship!;
-              final student = e.student!;
-              final enterprise = e.enterprise!;
+                final internship = e.internship!;
+                final student = e.student!;
+                final enterprise = e.enterprise!;
 
-              return _TaskTile(
-                title: student.fullName,
-                subtitle: enterprise.name,
-                icon: Icons.rate_review,
-                iconColor: Colors.blueGrey,
-                date: internship.endDate,
-                buttonTitle: 'Évaluer l\'entreprise',
-                onTap:
-                    () => showEnterpriseEvaluationDialog(
-                      context,
-                      internshipId: internship.id,
-                    ),
-              );
-            })),
+                return _TaskTile(
+                  title: student.fullName,
+                  subtitle: enterprise.name,
+                  icon: Icons.rate_review,
+                  iconColor: Colors.blueGrey,
+                  date: internship.endDate,
+                  buttonTitle: 'Évaluer l\'entreprise',
+                  onTap: () => showEnterpriseEvaluationDialog(
+                    context,
+                    internshipId: internship.id,
+                  ),
+                );
+              })),
       ],
     );
   }

@@ -20,7 +20,7 @@ final _protectedTables = [
 abstract class SqlInterface {
   ///
   /// The current connection to the database
-  get connection;
+  dynamic get connection;
 
   ///
   /// Try to perform a query, and catch any database exception to rethrow
@@ -208,7 +208,7 @@ class MySqlInterface implements SqlInterface {
             fieldsToFetch: fieldsToFetch,
             filters: filters,
             sublists: subqueries),
-        [...filters?.values ?? []]);
+        [...(filters?.values ?? Iterable.empty())]);
 
     final List<Map<String, dynamic>> list = [];
     for (final row in results) {
@@ -275,7 +275,7 @@ class MySqlInterface implements SqlInterface {
   }) async =>
       await tryQuery(
           craftUpdateQuery(tableName: tableName, filters: filters, data: data),
-          [...data.values, ...(filters?.values ?? [])]);
+          [...data.values, ...(filters?.values ?? Iterable.empty())]);
 // coverage:ignore-end
 
   String craftUpdateQuery({

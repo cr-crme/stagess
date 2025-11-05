@@ -36,7 +36,7 @@ class Person extends ExtendedItemSerializable {
       id: null,
       phone: null);
 
-  static Person? from(map) {
+  static Person? from(Map? map) {
     if (map == null) return null;
     return Person.fromSerialized(map);
   }

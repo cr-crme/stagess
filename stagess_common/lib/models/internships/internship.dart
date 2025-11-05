@@ -227,7 +227,7 @@ class InternshipMutableElements extends ItemSerializable {
     );
   }
 
-  InternshipMutableElements copyWithData(Map<String, dynamic>? serialized) {
+  InternshipMutableElements copyWithData(Map? serialized) {
     if (serialized == null || serialized.isEmpty) return copyWith();
 
     return InternshipMutableElements(

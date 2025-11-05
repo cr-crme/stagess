@@ -1,21 +1,22 @@
+import 'package:flutter/material.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 
 extension JobExtension on Job {
-  int positionsOccupied(context, {bool listen = false}) =>
+  int positionsOccupied(BuildContext context, {bool listen = false}) =>
       InternshipsProvider.of(context, listen: listen)
           .where((e) => e.jobId == id && e.isActive)
           .length;
 
-  int positionsRemaining(context,
+  int positionsRemaining(BuildContext context,
           {required String schoolId, bool listen = false}) =>
       (positionsOffered[schoolId] ?? 0) -
       positionsOccupied(context, listen: listen);
 
   // Post-internship evaluations
   List<PostInternshipEnterpriseEvaluation> postInternshipEnterpriseEvaluations(
-      context) {
+      BuildContext context) {
     final internships = [
       for (final internship in InternshipsProvider.of(context, listen: false))
         if (internship.jobId == id) internship

@@ -25,10 +25,9 @@ class _ScheduleListTileState extends State<ScheduleListTile> {
         widget.scheduleController.weeklySchedules.isEmpty) {
       widget.scheduleController.addWeeklySchedule(
         WeeklySchedulesController.fillNewScheduleList(
-          schedule:
-              widget.scheduleController.weeklySchedules.isEmpty
-                  ? {}
-                  : widget.scheduleController.weeklySchedules.last.schedule,
+          schedule: widget.scheduleController.weeklySchedules.isEmpty
+              ? {}
+              : widget.scheduleController.weeklySchedules.last.schedule,
           periode: widget.scheduleController.dateRange!,
         ),
       );
@@ -80,23 +79,21 @@ class _DateRangeState extends State<_DateRange> {
   bool _isValid = true;
 
   late final _scheduleStartController = TextEditingController(
-    text:
-        widget.scheduleController.dateRange == null
-            ? null
-            : DateFormat.yMMMEd(
-              'fr_CA',
-            ).format(widget.scheduleController.dateRange!.start),
+    text: widget.scheduleController.dateRange == null
+        ? null
+        : DateFormat.yMMMEd(
+            'fr_CA',
+          ).format(widget.scheduleController.dateRange!.start),
   );
   late final _scheduleEndController = TextEditingController(
-    text:
-        widget.scheduleController.dateRange == null
-            ? null
-            : DateFormat.yMMMEd(
-              'fr_CA',
-            ).format(widget.scheduleController.dateRange!.end),
+    text: widget.scheduleController.dateRange == null
+        ? null
+        : DateFormat.yMMMEd(
+            'fr_CA',
+          ).format(widget.scheduleController.dateRange!.end),
   );
 
-  Future<void> _promptDateRange(context) async {
+  Future<void> _promptDateRange(BuildContext context) async {
     final referenceDate =
         (widget.scheduleController.dateRange?.start ?? DateTime.now());
     final range = await showCustomDateRangePicker(
@@ -128,23 +125,21 @@ class _DateRangeState extends State<_DateRange> {
     super.didUpdateWidget(oldWidget);
     if (widget.editMode) return;
 
-    final startDate =
-        (widget.scheduleController.dateRange == null
+    final startDate = (widget.scheduleController.dateRange == null
             ? null
             : DateFormat.yMMMEd(
-              'fr_CA',
-            ).format(widget.scheduleController.dateRange!.start)) ??
+                'fr_CA',
+              ).format(widget.scheduleController.dateRange!.start)) ??
         '';
     if (_scheduleStartController.text != startDate) {
       _scheduleStartController.text = startDate;
     }
 
-    final endDate =
-        (widget.scheduleController.dateRange == null
+    final endDate = (widget.scheduleController.dateRange == null
             ? null
             : DateFormat.yMMMEd(
-              'fr_CA',
-            ).format(widget.scheduleController.dateRange!.end)) ??
+                'fr_CA',
+              ).format(widget.scheduleController.dateRange!.end)) ??
         '';
     if (_scheduleEndController.text != endDate) {
       _scheduleEndController.text = endDate;
@@ -157,7 +152,6 @@ class _DateRangeState extends State<_DateRange> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Dates de stage'),
-
         Padding(
           padding: const EdgeInsets.only(left: 12.0),
           child: Column(
@@ -178,15 +172,14 @@ class _DateRangeState extends State<_DateRange> {
                           return null;
                         }
                       },
-                      builder:
-                          (state) => Text(
-                            '* Sélectionner les dates',
-                            style: Theme.of(
-                              context,
-                            ).textTheme.titleSmall!.copyWith(
+                      builder: (state) => Text(
+                        '* Sélectionner les dates',
+                        style: Theme.of(
+                          context,
+                        ).textTheme.titleSmall!.copyWith(
                               color: _isValid ? Colors.black : Colors.red,
                             ),
-                          ),
+                      ),
                     ),
                     IconButton(
                       icon: const Icon(

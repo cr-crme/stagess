@@ -10,7 +10,8 @@ class StudentsHelpers {
   /// This returns the students the teacher should have read/write access too.
   /// These are the students from the group the teacher teaches too (even though
   /// they are not supervising them personnally)
-  static List<Student> studentsInMyGroups(context, {listen = true}) {
+  static List<Student> studentsInMyGroups(BuildContext context,
+      {bool listen = true}) {
     final acceptedGroups =
         TeachersProvider.of(context, listen: false).currentTeacher?.groups;
     if (acceptedGroups == null || acceptedGroups.isEmpty) return [];

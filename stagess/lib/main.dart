@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:crcrme_material_theme/crcrme_material_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess/common/extensions/auth_provider_extension.dart';
 import 'package:stagess/program_helpers.dart';
@@ -18,6 +19,17 @@ import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
 
 // coverage:ignore-start
 void main() async {
+  // Setup logger to INFO
+  Logger.root.level = Level.INFO;
+  Logger.root.onRecord.listen((record) {
+    // ignore: avoid_print
+    print(
+      '[${record.level.name}] ${record.time}: ${record.loggerName}: ${record.message}'
+      '${record.error != null ? ' Error: ${record.error}' : ''}'
+      '${record.stackTrace != null ? ' StackTrace: ${record.stackTrace}' : ''}',
+    );
+  });
+
   const useDevDb = bool.fromEnvironment(
     'STAGESS_USE_DEV_DB',
     defaultValue: false,
@@ -69,44 +81,37 @@ class StagessApp extends StatelessWidget {
           create: (context) => AuthProvider(mockMe: useMockers),
         ),
         ChangeNotifierProxyProvider<AuthProvider, SchoolBoardsProvider>(
-          create:
-              (context) =>
-                  SchoolBoardsProvider(uri: backendUri, mockMe: useMockers),
+          create: (context) =>
+              SchoolBoardsProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, EnterprisesProvider>(
-          create:
-              (context) =>
-                  EnterprisesProvider(uri: backendUri, mockMe: useMockers),
+          create: (context) =>
+              EnterprisesProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, InternshipsProvider>(
-          create:
-              (context) =>
-                  InternshipsProvider(uri: backendUri, mockMe: useMockers),
+          create: (context) =>
+              InternshipsProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, TeachersProvider>(
-          create:
-              (context) =>
-                  TeachersProvider(uri: backendUri, mockMe: useMockers),
+          create: (context) =>
+              TeachersProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, StudentsProvider>(
-          create:
-              (context) =>
-                  StudentsProvider(uri: backendUri, mockMe: useMockers),
+          create: (context) =>
+              StudentsProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
       ],
-
       child: InactivityLayout(
         navigatorKey: rootNavigatorKey,
         timeout: const Duration(minutes: 10),
         gracePeriod: const Duration(seconds: 60),
-        showGracePeriod:
-            (context) async =>
-                AuthProvider.of(context, listen: false).isFullySignedIn,
+        showGracePeriod: (context) async =>
+            AuthProvider.of(context, listen: false).isFullySignedIn,
         onTimedout: (context) async {
           if (!AuthProvider.of(context, listen: false).isFullySignedIn) {
             return true;

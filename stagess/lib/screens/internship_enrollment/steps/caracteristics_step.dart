@@ -20,7 +20,8 @@ import 'package:stagess_common_flutter/widgets/student_picker_tile.dart';
 
 final _logger = Logger('GeneralInformationsStep');
 
-List<Student> _studentsWithoutInternship(context, List<Student> students) {
+List<Student> _studentsWithoutInternship(
+    BuildContext context, List<Student> students) {
   final List<Student> out = [];
   for (final student in students) {
     if (!student.hasActiveInternship(context)) out.add(student);
@@ -59,12 +60,10 @@ class CaracteristicsStepState extends State<CaracteristicsStep> {
   late final primaryJobController = EnterpriseJobListController(
     context: context,
     enterpriseStatus: EnterpriseStatus.active,
-    job:
-        widget.enterprise.availablejobs(context).length == 1
-            ? widget.enterprise.availablejobs(context).first
-            : Job.empty,
-    specializationWhiteList:
-        widget.specifiedSpecialization ??
+    job: widget.enterprise.availablejobs(context).length == 1
+        ? widget.enterprise.availablejobs(context).first
+        : Job.empty,
+    specializationWhiteList: widget.specifiedSpecialization ??
         widget.enterprise
             .withRemainingPositions(
               context,
@@ -229,7 +228,7 @@ class _ExtraSpecialization extends StatelessWidget {
   final List<EnterpriseJobListController> controllers;
   final Function(void Function()) setState;
 
-  Widget _extraJobTileBuilder(context, int index) {
+  Widget _extraJobTileBuilder(BuildContext context, int index) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -281,11 +280,11 @@ class _ExtraSpecialization extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ...controllers.asMap().keys.map<Widget>(
-            (i) => Padding(
-              padding: const EdgeInsets.only(bottom: 24.0),
-              child: _extraJobTileBuilder(context, i),
-            ),
-          ),
+                (i) => Padding(
+                  padding: const EdgeInsets.only(bottom: 24.0),
+                  child: _extraJobTileBuilder(context, i),
+                ),
+              ),
           Text(
             'Besoin d\'ajouter des compétences d\'un autre métier pour ce stage?',
             style: Theme.of(context).textTheme.titleMedium,
@@ -295,9 +294,11 @@ class _ExtraSpecialization extends StatelessWidget {
             controllers: controllers,
             onJobAdded: () => setState(() {}),
             style: Theme.of(context).textButtonTheme.style!.copyWith(
-              backgroundColor:
-                  Theme.of(context).elevatedButtonTheme.style!.backgroundColor,
-            ),
+                  backgroundColor: Theme.of(context)
+                      .elevatedButtonTheme
+                      .style!
+                      .backgroundColor,
+                ),
           ),
         ],
       ),
@@ -374,10 +375,9 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
               ),
             ),
             Switch(
-              onChanged:
-                  widget.enterprise == null
-                      ? null
-                      : (newValue) => _toggleUseContactInfo(),
+              onChanged: widget.enterprise == null
+                  ? null
+                  : (newValue) => _toggleUseContactInfo(),
               value: _useContactInfo,
             ),
           ],
@@ -397,8 +397,8 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
                       labelStyle: TextStyle(color: Colors.black),
                     ),
                     style: TextStyle(color: Colors.black),
-                    validator:
-                        (text) => text!.isEmpty ? 'Ajouter un prénom.' : null,
+                    validator: (text) =>
+                        text!.isEmpty ? 'Ajouter un prénom.' : null,
                     enabled: !_useContactInfo,
                   ),
                   TextFormField(
@@ -408,9 +408,8 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
                       labelStyle: TextStyle(color: Colors.black),
                     ),
                     style: TextStyle(color: Colors.black),
-                    validator:
-                        (text) =>
-                            text!.isEmpty ? 'Ajouter un nom de famille.' : null,
+                    validator: (text) =>
+                        text!.isEmpty ? 'Ajouter un nom de famille.' : null,
                     enabled: !_useContactInfo,
                   ),
                 ],
@@ -471,36 +470,33 @@ class _TransportationsCheckBoxesState extends State<TransportationsCheckBoxes> {
           const SubTitle('Transport de l\'élève vers l\'entreprise', left: 0),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children:
-              Transportation.values.map((e) {
-                return InkWell(
-                  onTap:
-                      widget.editMode ? () => _updateTransportations(e) : null,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 12.0, right: 8.0),
-                    child: Row(
-                      children: [
-                        Text(e.toString()),
-                        Checkbox(
-                          value: widget.transportations.contains(e),
-                          side: WidgetStateBorderSide.resolveWith(
-                            (states) => BorderSide(
-                              color: Theme.of(context).primaryColor,
-                              width: 2.0,
-                            ),
-                          ),
-                          fillColor: WidgetStatePropertyAll(Colors.transparent),
-                          checkColor: Colors.black,
-                          onChanged:
-                              widget.editMode
-                                  ? (value) => _updateTransportations(e)
-                                  : null,
+          children: Transportation.values.map((e) {
+            return InkWell(
+              onTap: widget.editMode ? () => _updateTransportations(e) : null,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 12.0, right: 8.0),
+                child: Row(
+                  children: [
+                    Text(e.toString()),
+                    Checkbox(
+                      value: widget.transportations.contains(e),
+                      side: WidgetStateBorderSide.resolveWith(
+                        (states) => BorderSide(
+                          color: Theme.of(context).primaryColor,
+                          width: 2.0,
                         ),
-                      ],
+                      ),
+                      fillColor: WidgetStatePropertyAll(Colors.transparent),
+                      checkColor: Colors.black,
+                      onChanged: widget.editMode
+                          ? (value) => _updateTransportations(e)
+                          : null,
                     ),
-                  ),
-                );
-              }).toList(),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ],
     );
