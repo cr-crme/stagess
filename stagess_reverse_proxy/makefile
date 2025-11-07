@@ -35,6 +35,9 @@ launcher:
 	append_to_file "#!/bin/bash"; \
 	append_to_file ""; \
 	append_to_file "# Define the required exports"; \
+	append_to_file "export STAGESS_REVERSED_PROXY_PORT=${STAGESS_REVERSED_PROXY_PORT}"; \
+	append_to_file "export STAGESS_BACKEND_PORT=${STAGESS_BACKEND_PORT}"; \
+	append_to_file "export STAGESS_USE_SSL=true"; \
 	append_to_file "export STAGESS_CERT_PEM=${STAGESS_CERT_PEM}"; \
 	append_to_file "export STAGESS_KEY_PEM=${STAGESS_KEY_PEM}"; \
 	append_to_file ""; \
@@ -61,6 +64,9 @@ service:
 	append_to_file "Restart=always"; \
 	append_to_file "RestartSec=5"; \
 	append_to_file "User=www-data"; \
+	append_to_file "Environment=STAGESS_REVERSED_PROXY_PORT="${STAGESS_REVERSED_PROXY_PORT}""; \
+	append_to_file "Environment=STAGESS_BACKEND_PORT="${STAGESS_BACKEND_PORT}""; \
+	append_to_file "Environment=STAGESS_USE_SSL=true"; \
 	append_to_file "Environment=STAGESS_CERT_PEM="${STAGESS_CERT_PEM}""; \
 	append_to_file "Environment=STAGESS_KEY_PEM="${STAGESS_KEY_PEM}""; \
 	append_to_file "StandardOutput=file:$(INSTALL_DIR)/reverse_proxy.log"; \
