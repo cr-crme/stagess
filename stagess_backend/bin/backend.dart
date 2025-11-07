@@ -15,7 +15,6 @@ import 'package:stagess_backend/server/connexions.dart';
 import 'package:stagess_backend/server/database_manager.dart';
 import 'package:stagess_backend/server/http_request_handler.dart';
 import 'package:stagess_backend/utils/network_rate_limiter.dart';
-import 'package:stagess_common/services/backend_helpers.dart';
 
 final _logger = Logger('BackendServer');
 
@@ -37,7 +36,8 @@ enum DatabaseBackend {
 final _databaseBackend =
     DatabaseBackend.fromString(_getFromEnvironment('STAGESS_DATABASE_BACKEND'));
 final _backendIp = InternetAddress.anyIPv4;
-final _backendPort = BackendHelpers.backendPort;
+final _backendPort =
+    int.parse(Platform.environment['STAGESS_BACKEND_PORT'] ?? '3456');
 final _devSettings = ConnectionSettings(
   host: 'localhost',
   port: int.parse(_getFromEnvironment('STAGESS_DATABASE_DEV_PORT')),
@@ -71,8 +71,8 @@ void main() async {
   final firebaseApiKey = _getFromEnvironment('STAGESS_FIREBASE_WEB_API_KEY');
 
   // Create an HTTP server listening on localhost:_backendPort
-  const useSecure = bool.fromEnvironment('STAGESS_USE_SSL', defaultValue: true);
-  print(useSecure);
+  final useSecure =
+      (Platform.environment['STAGESS_USE_SSL'] ?? 'true') == 'true';
   final server = await _bindServer(useSecure: useSecure);
 
   _logger.info(
