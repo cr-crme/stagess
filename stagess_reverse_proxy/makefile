@@ -25,11 +25,7 @@ all: compile launcher service
 # Compile Dart to native executable
 compile:
 	mkdir -p $(BUILD_DIR)
-	$(DART) compile exe  \
-		--define=STAGESS_USE_SSL=true \
-		--define=STAGESS_REVERSED_PROXY_PORT=443 \
-		--define=STAGESS_BACKEND_PORT=3456 \
-		$(MAIN) -o $(BUILD_DIR)/$(TARGET)
+	$(DART) compile exe $(MAIN) -o $(BUILD_DIR)/$(TARGET)
 
 launcher:
 	mkdir -p $(BUILD_DIR); \

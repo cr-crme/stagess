@@ -25,10 +25,7 @@ all: compile launcher
 compile:
 	mkdir -p $(BUILD_DIR)
 	cp $(API_KEY_FILE) ${BUILD_DIR}/
-	$(DART) compile exe  \
-		--define=STAGESS_USE_SSL=false \
-		--define=STAGESS_BACKEND_PORT=3456 \
-		$(MAIN) -o $(BUILD_DIR)/$(TARGET)
+	$(DART) compile exe  $(MAIN) -o $(BUILD_DIR)/$(TARGET)
 
 launcher:
 	mkdir -p $(BUILD_DIR); \
