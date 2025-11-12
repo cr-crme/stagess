@@ -37,7 +37,7 @@ final _databaseBackend =
     DatabaseBackend.fromString(_getFromEnvironment('STAGESS_DATABASE_BACKEND'));
 final _backendIp = InternetAddress.anyIPv4;
 final _backendPort =
-    int.parse(Platform.environment['STAGESS_BACKEND_PORT'] ?? '3456');
+    int.parse(Platform.environment['STAGESS_BACKEND_PORT'] ?? '3457');
 final _devSettings = ConnectionSettings(
   host: 'localhost',
   port: int.parse(_getFromEnvironment('STAGESS_DATABASE_DEV_PORT')),

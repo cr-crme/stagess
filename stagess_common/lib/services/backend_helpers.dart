@@ -10,7 +10,7 @@ class BackendHelpers {
           defaultValue: 'stagessserver.adoprevit.org');
 
   static int get backendPort =>
-      const int.fromEnvironment('STAGESS_BACKEND_PORT', defaultValue: 443);
+      const int.fromEnvironment('STAGESS_BACKEND_PORT', defaultValue: 8443);
 
   static Uri backendConnectUri({required bool useDevDatabase}) => Uri.parse(
       '$_wsProtocol://$backendIp:$backendPort/${connectEndpoint(useDevDatabase: useDevDatabase)}');

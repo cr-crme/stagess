@@ -17,11 +17,11 @@ Future<void> main(List<String> args) async {
     maxLiveConnections: 128,
     certPath: useSsl ? Platform.environment['STAGESS_CERT_PEM'] : null,
     keyPath: useSsl ? Platform.environment['STAGESS_KEY_PEM'] : null,
-    bindPort:
-        int.parse(Platform.environment['STAGESS_REVERSED_PROXY_PORT'] ?? '443'),
+    bindPort: int.parse(
+        Platform.environment['STAGESS_REVERSED_PROXY_PORT'] ?? '8443'),
     backendHost: InternetAddress.loopbackIPv4.address,
     backendPort:
-        int.parse(Platform.environment['STAGESS_BACKEND_PORT'] ?? '3456'),
+        int.parse(Platform.environment['STAGESS_BACKEND_PORT'] ?? '3457'),
   );
 
   // Shutdown handlers

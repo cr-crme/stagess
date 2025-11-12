@@ -11,8 +11,8 @@
             "program": "stagess_reverse_proxy/bin/stagess_reverse_proxy.dart",
             "toolArgs": [
                 "--define=STAGESS_USE_SSL=< [true] | false >",
-                "--define=STAGESS_REVERSED_PROXY_PORT=< PORT | [443] >",
-                "--define=STAGESS_BACKEND_PORT=< PORT | [3456] >",
+                "--define=STAGESS_REVERSED_PROXY_PORT=< PORT | [8443] >",
+                "--define=STAGESS_BACKEND_PORT=< PORT | [3457] >",
             ],
         },
         {
@@ -22,7 +22,7 @@
             "program": "stagess_backend/bin/backend.dart",
             "toolArgs": [
                 "--define=STAGESS_USE_SSL=< [true] | false >",
-                "--define=STAGESS_BACKEND_PORT=< PORT | [3456] >",
+                "--define=STAGESS_BACKEND_PORT=< PORT | [3457] >",
             ],
             "env": {
                 "STAGESS_FIREBASE_WEB_API_KEY": "<PUT YOUR FIREBASE WEB API KEY HERE>",
@@ -46,7 +46,7 @@
                 "--dart-define=STAGESS_USE_SSL=< [true] | false >",
                 "--dart-define=STAGESS_BACKEND_IP=< IP_ADDRESS | [stagessserver.adoprevit.org] | localhost >",
                 "--dart-define=STAGESS_USE_DEV_DB=< true | [false] >",
-                "--dart-define=STAGESS_BACKEND_PORT=< PORT | [443] >",
+                "--dart-define=STAGESS_BACKEND_PORT=< PORT | [8443] >",
             ],
         },
         {
@@ -58,7 +58,7 @@
                 "--dart-define=STAGESS_USE_SSL=< [true] | false >",
                 "--dart-define=STAGESS_BACKEND_IP=< "IP_ADDRESS" | ["stagessserver.adoprevit.org"] | "localhost" >",
                 "--dart-define=STAGESS_USE_DEV_DB=< true | [false] >",
-                "--dart-define=STAGESS_BACKEND_PORT=< PORT | [443] >",
+                "--dart-define=STAGESS_BACKEND_PORT=< PORT | [8443] >",
             ],
         },
         {

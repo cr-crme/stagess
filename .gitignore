@@ -64,8 +64,6 @@ lib/localizations/untranslated-messages.txt
 
 */Flutter/ephemeral/
 
-utilities/
-
 coverage/
 
 backendFirebaseServiceAccountKey.json

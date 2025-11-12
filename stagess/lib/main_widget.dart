@@ -53,24 +53,24 @@ class StagessApp extends StatelessWidget {
   final Uri backendUri;
 
   Address get dummyAddress => Address(
-    civicNumber: 100,
-    street: 'Wunderbar',
-    apartment: 'A',
-    city: 'Wonderland',
-    postalCode: 'H0H 0H0',
-  );
+        civicNumber: 100,
+        street: 'Wunderbar',
+        apartment: 'A',
+        city: 'Wonderland',
+        postalCode: 'H0H 0H0',
+      );
 
   PhoneNumber get dummyPhoneNumber => PhoneNumber.fromString('800-555-5555');
 
   Person get dummyPerson => Person(
-    firstName: 'Jeanne',
-    middleName: 'Kathlin',
-    lastName: 'Doe',
-    address: dummyAddress,
-    dateBirth: DateTime(2000, 1, 1),
-    email: 'jeanne.k.doe@test.com',
-    phone: dummyPhoneNumber,
-  );
+        firstName: 'Jeanne',
+        middleName: 'Kathlin',
+        lastName: 'Doe',
+        address: dummyAddress,
+        dateBirth: DateTime(2000, 1, 1),
+        email: 'jeanne.k.doe@test.com',
+        phone: dummyPhoneNumber,
+      );
 
   Enterprise get dummyEnterprise {
     final jobs = JobList();
@@ -89,19 +89,19 @@ class StagessApp extends StatelessWidget {
   }
 
   School get dummySchool => School(
-    id: 'MockedSchoolId',
-    name: 'Mocked School',
-    address: dummyAddress,
-    phone: dummyPhoneNumber,
-  );
+        id: 'MockedSchoolId',
+        name: 'Mocked School',
+        address: dummyAddress,
+        phone: dummyPhoneNumber,
+      );
 
   SchoolBoard get dummySchoolBoard => SchoolBoard(
-    id: 'MockedSchoolBoardId',
-    name: 'Mocked School Board',
-    logo: null,
-    cnesstNumber: '123456789',
-    schools: [dummySchool],
-  );
+        id: 'MockedSchoolBoardId',
+        name: 'Mocked School Board',
+        logo: null,
+        cnesstNumber: '123456789',
+        schools: [dummySchool],
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -192,7 +192,7 @@ class StagessApp extends StatelessWidget {
 //   final GlobalKey<NavigatorState> navigatorKey;
 //   static const String tenant = 'd9e685e2-1e5c-4bb8-bbae-e8ab8ba845a9';
 //   static const String clientId = 'dd26538f-ec32-49d9-8625-ebe2bf1ef53a';
-//   static const String redirectUri = 'http://localhost:3456/auth';
+//   static const String redirectUri = 'http://localhost:3457/auth';
 //   static const String scope = 'openid profile'; //'email offline_access';
 //   static const String responseType = 'code';
 //   static const String responseMode = 'post_form';
