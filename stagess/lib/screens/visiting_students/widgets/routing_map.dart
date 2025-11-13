@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
@@ -5,12 +8,87 @@ import 'package:latlong2/latlong.dart';
 import 'package:routing_client_dart/routing_client_dart.dart' as routing_client;
 // ignore: implementation_imports
 import 'package:routing_client_dart/src/models/osrm/road.dart' as routing_hack;
+// ignore: implementation_imports
+import 'package:routing_client_dart/src/models/osrm/road_helper.dart'
+    as routing_helper_hack;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stagess/common/extensions/visiting_priorities_extension.dart';
 import 'package:stagess/common/provider_helpers/itineraries_helpers.dart';
 import 'package:stagess/screens/visiting_students/widgets/zoom_button.dart';
 import 'package:stagess_common/models/itineraries/itinerary.dart';
 import 'package:stagess_common/models/itineraries/waypoint.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+
+extension OSRMRoadExtension on routing_hack.OSRMRoad {
+  Map<String, dynamic> toJson() {
+    return {
+      'distance': distance,
+      'duration': duration,
+      'geometry': polylineEncoded,
+      'legs': roadLegs.map((leg) => leg.toJson()).toList(),
+    };
+  }
+}
+
+extension RoadLegExtension on routing_hack.RoadLeg {
+  Map<String, dynamic> toJson() {
+    return {
+      'distance': distance,
+      'duration': duration,
+      'steps': steps.map((step) => step.toJson()).toList(),
+    };
+  }
+}
+
+extension RoadStepExtension on routing_helper_hack.RoadStep {
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'ref': ref,
+      'rotary_name': rotaryName,
+      'destinations': destinations,
+      'exits': exits,
+      'maneuver': maneuver.toJson(),
+      'duration': duration,
+      'distance': distance,
+      'driving_side': drivingSide,
+      'mode': mode,
+      'intersections': intersections.map((i) => i.toJson()).toList(),
+    };
+  }
+}
+
+extension IntersectionsExtension on routing_helper_hack.Intersections {
+  Map<String, dynamic> toJson() {
+    return {
+      'location': [location.lng, location.lat],
+      'bearings': bearings,
+      'lanes': lanes?.map((lane) => lane.toJson()).toList(),
+    };
+  }
+}
+
+extension LaneExtension on routing_helper_hack.Lane {
+  Map<String, dynamic> toJson() {
+    return {
+      'indications': indications,
+      'valid': valid,
+    };
+  }
+}
+
+extension ManeuverExtension on routing_helper_hack.Maneuver {
+  Map<String, dynamic> toJson() {
+    return {
+      'location': [location.lng, location.lat],
+      'bearing_before': bearingBefore,
+      'bearing_after': bearingAfter,
+      'type': maneuverType,
+      'modifier': modifier,
+      'exit': exit,
+    };
+  }
+}
 
 class RoutingController {
   RoutingController({
@@ -89,6 +167,27 @@ class RoutingController {
   Future<routing_client.Route?> _getActivateRoute() async {
     if (_itinerary.length <= 1) return null;
 
+    final serializedTitle = _itinerary.fold(
+      'Start',
+      (previous, current) =>
+          '$previous -> (${current.address.latitude},${current.address.longitude})',
+    );
+    final prefs = await SharedPreferences.getInstance();
+
+    // Check if the route is cached
+    final cachedRoute = (prefs.getStringList('cached_routes') ?? [])
+        .firstWhereOrNull((e) => e.startsWith(serializedTitle));
+    if (cachedRoute != null) {
+      try {
+        return routing_hack.OSRMRoad.fromOSRMJson(
+            route:
+                jsonDecode(cachedRoute.substring(serializedTitle.length + 3)));
+      } catch (_) {
+        // Ignore cache errors and recompute route.
+      }
+    }
+
+    // If we reach here, we need to compute the route.
     final out = await _routingManager.getRoute(
       request: routing_client.OSRMRequest.route(
         waypoints: _itinerary.map((e) => e.toLngLat()).toList(),
@@ -96,6 +195,15 @@ class RoutingController {
         steps: true,
         languages: routing_client.Languages.en,
       ),
+    ) as routing_hack.OSRMRoad;
+
+    // Cache the route for future use.
+    await prefs.setStringList(
+      'cached_routes',
+      [
+        ...?prefs.getStringList('cached_routes'),
+        '$serializedTitle:: ${jsonEncode(out.toJson())}',
+      ],
     );
 
     return out;
