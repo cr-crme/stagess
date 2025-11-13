@@ -12,16 +12,17 @@ Future<void> main(List<String> args) async {
     print('${record.level.name}: ${record.time}: ${record.message}');
   });
 
-  final useSsl = (Platform.environment['STAGESS_USE_SSL'] ?? 'true') == 'true';
+  final useSsl =
+      _getFromEnvironment('STAGESS_USE_SSL', defaultValue: 'true') == 'true';
   final reverseProxyServer = ReverseProxyServer(
     maxLiveConnections: 128,
-    certPath: useSsl ? Platform.environment['STAGESS_CERT_PEM'] : null,
-    keyPath: useSsl ? Platform.environment['STAGESS_KEY_PEM'] : null,
-    bindPort: int.parse(
-        Platform.environment['STAGESS_REVERSED_PROXY_PORT'] ?? '8443'),
+    certPath: useSsl ? _getFromEnvironment('STAGESS_CERT_PEM') : null,
+    keyPath: useSsl ? _getFromEnvironment('STAGESS_KEY_PEM') : null,
+    bindPort: int.parse(_getFromEnvironment('STAGESS_REVERSED_PROXY_PORT',
+        defaultValue: '8443')),
     backendHost: InternetAddress.loopbackIPv4.address,
-    backendPort:
-        int.parse(Platform.environment['STAGESS_BACKEND_PORT'] ?? '3457'),
+    backendPort: int.parse(
+        _getFromEnvironment('STAGESS_BACKEND_PORT', defaultValue: '3457')),
   );
 
   // Shutdown handlers
@@ -42,4 +43,13 @@ Future<void> main(List<String> args) async {
 
   _logger.info('Reverse proxy server is now shut down.');
   exit(0);
+}
+
+String _getFromEnvironment(String key, {String? defaultValue}) {
+  final value = Platform.environment[key] ?? defaultValue;
+  if (value == null || value.isEmpty) {
+    _logger.severe('$key environment variable is not set.');
+    exit(1);
+  }
+  return value;
 }

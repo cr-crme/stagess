@@ -36,8 +36,8 @@ enum DatabaseBackend {
 final _databaseBackend =
     DatabaseBackend.fromString(_getFromEnvironment('STAGESS_DATABASE_BACKEND'));
 final _backendIp = InternetAddress.anyIPv4;
-final _backendPort =
-    int.parse(Platform.environment['STAGESS_BACKEND_PORT'] ?? '3457');
+final _backendPort = int.parse(
+    _getFromEnvironment('STAGESS_BACKEND_PORT', defaultValue: '3457'));
 final _devSettings = ConnectionSettings(
   host: 'localhost',
   port: int.parse(_getFromEnvironment('STAGESS_DATABASE_DEV_PORT')),
@@ -72,7 +72,7 @@ void main() async {
 
   // Create an HTTP server listening on localhost:_backendPort
   final useSecure =
-      (Platform.environment['STAGESS_USE_SSL'] ?? 'true') == 'true';
+      _getFromEnvironment('STAGESS_USE_SSL', defaultValue: 'true') == 'true';
   final server = await _bindServer(useSecure: useSecure);
 
   _logger.info(
@@ -117,8 +117,8 @@ void main() async {
   }
 }
 
-String _getFromEnvironment(String key) {
-  final value = Platform.environment[key];
+String _getFromEnvironment(String key, {String? defaultValue}) {
+  final value = Platform.environment[key] ?? defaultValue;
   if (value == null || value.isEmpty) {
     _logger.severe('$key environment variable is not set.');
     exit(1);
