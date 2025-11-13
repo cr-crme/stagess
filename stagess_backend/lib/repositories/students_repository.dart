@@ -208,7 +208,9 @@ class MySqlStudentsRepository extends StudentsRepository {
                 'street',
                 'apartment',
                 'city',
-                'postal_code'
+                'postal_code',
+                'latitude',
+                'longitude',
               ]),
           sqlInterface.joinSubquery(
               dataTableName: 'persons',
@@ -241,7 +243,9 @@ class MySqlStudentsRepository extends StudentsRepository {
                     'street',
                     'apartment',
                     'city',
-                    'postal_code'
+                    'postal_code',
+                    'latitude',
+                    'longitude',
                   ]),
               sqlInterface.selectSubquery(
                   dataTableName: 'phone_numbers',

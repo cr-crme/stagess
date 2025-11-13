@@ -445,6 +445,12 @@ class MySqlInterface implements SqlInterface {
     required Address address,
     required String entityId,
   }) async {
+    if (address.latitude == null || address.longitude == null) {
+      // Have one try at finding the coordinates for that address
+      address = await Address.fromString(address.toString(), id: address.id) ??
+          address;
+    }
+
     await performInsertQuery(tableName: 'addresses', data: {
       'id': address.id,
       'entity_id': entityId,
@@ -452,7 +458,9 @@ class MySqlInterface implements SqlInterface {
       'street': address.street,
       'apartment': address.apartment,
       'city': address.city,
-      'postal_code': address.postalCode
+      'postal_code': address.postalCode,
+      'latitude': address.latitude,
+      'longitude': address.longitude,
     });
   }
 
@@ -479,6 +487,14 @@ class MySqlInterface implements SqlInterface {
     if (address.postalCode != previous.postalCode) {
       toUpdate['postal_code'] = address.postalCode;
     }
+    if (address.toString() != previous.toString()) {
+      // If the address changed, do not trust the previous coordinates
+      final updatedAddress =
+          await Address.fromString(address.toString()) ?? address;
+      toUpdate['latitude'] = updatedAddress.latitude;
+      toUpdate['longitude'] = updatedAddress.longitude;
+    }
+
     if (toUpdate.isNotEmpty) {
       await performUpdateQuery(
           tableName: 'addresses', filters: {'id': previous.id}, data: toUpdate);

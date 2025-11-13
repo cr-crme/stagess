@@ -207,7 +207,9 @@ class MySqlTeachersRepository extends TeachersRepository {
                 'street',
                 'apartment',
                 'city',
-                'postal_code'
+                'postal_code',
+                'latitude',
+                'longitude',
               ]),
           sqlInterface.selectSubquery(
             dataTableName: 'teaching_groups',
@@ -255,14 +257,14 @@ class MySqlTeachersRepository extends TeachersRepository {
                 'id': waypoint['step_index']?.toString(),
                 'title': waypoint['title'],
                 'subtitle': waypoint['subtitle'],
-                'latitude': waypoint['latitude'],
-                'longitude': waypoint['longitude'],
                 'address': {
                   'civic': waypoint['address_civic'],
                   'street': waypoint['address_street'],
                   'apartment': waypoint['address_apartment'],
                   'city': waypoint['address_city'],
-                  'postal_code': waypoint['address_postal_code']
+                  'postal_code': waypoint['address_postal_code'],
+                  'latitude': waypoint['address_latitude'],
+                  'longitude': waypoint['address_longitude'],
                 },
                 'priority': waypoint['visiting_priority'],
               }
@@ -520,13 +522,13 @@ Future<void> _sendItineraries(
       'itinerary_id': serialized['id'],
       'title': waypoint['title'],
       'subtitle': waypoint['subtitle'],
-      'latitude': waypoint['latitude'],
-      'longitude': waypoint['longitude'],
       'address_civic': waypoint['address']['civic'],
       'address_street': waypoint['address']['street'],
       'address_apartment': waypoint['address']['apartment'],
       'address_city': waypoint['address']['city'],
       'address_postal_code': waypoint['address']['postal_code'],
+      'address_latitude': waypoint['address']['latitude'],
+      'address_longitude': waypoint['address']['longitude'],
       'visiting_priority': waypoint['priority'],
     });
   }

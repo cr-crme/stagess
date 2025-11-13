@@ -20,6 +20,9 @@
             "request": "launch",
             "type": "dart",
             "program": "stagess_backend/bin/backend.dart",
+            "toolArgs": [
+                "--define=STAGESS_GOOGLE_MAPS_API_KEY=< YOUR_GOOGLE_MAPS_API_KEY >",
+            ],
             "env": {
                 "STAGESS_USE_SSL": "< [true] | false >",
                 "STAGESS_BACKEND_PORT": "< PORT | [3457] >",
@@ -41,6 +44,7 @@
             "type": "dart",
             "program": "stagess/lib/main.dart",
             "args": [
+                "--dart-define=STAGESS_GOOGLE_MAPS_API_KEY=< YOUR_GOOGLE_MAPS_API_KEY >",
                 "--dart-define=STAGESS_USE_SSL=< [true] | false >",
                 "--dart-define=STAGESS_BACKEND_IP=< IP_ADDRESS | [stagessserver.adoprevit.org] | localhost >",
                 "--dart-define=STAGESS_USE_DEV_DB=< true | [false] >",
@@ -53,6 +57,7 @@
             "type": "dart",
             "program": "stagess_admin/lib/main.dart",
             "args": [
+                "--dart-define=STAGESS_GOOGLE_MAPS_API_KEY=< YOUR_GOOGLE_MAPS_API_KEY >",
                 "--dart-define=STAGESS_USE_SSL=< [true] | false >",
                 "--dart-define=STAGESS_BACKEND_IP=< "IP_ADDRESS" | ["stagessserver.adoprevit.org"] | "localhost" >",
                 "--dart-define=STAGESS_USE_DEV_DB=< true | [false] >",

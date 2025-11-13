@@ -93,7 +93,7 @@ class DatabaseManager {
           user: user),
     };
 
-    if (response.data == null || response.data!.isEmpty) {
+    if (response.data == null) {
       throw MissingDataException('No data found for the requested field');
     }
     if (response.updatedData != null) {

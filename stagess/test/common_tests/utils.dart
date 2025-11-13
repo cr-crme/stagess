@@ -33,36 +33,37 @@ void expectNear(double a, double b, {double epsilon = 1e-8}) {
 }
 
 School dummySchool({String? id}) => School(
-  id: id,
-  name: 'Meine Schule',
-  address: Address.empty,
-  phone: PhoneNumber.empty,
-);
+      id: id,
+      name: 'Meine Schule',
+      address: Address.empty,
+      phone: PhoneNumber.empty,
+    );
 
 Teacher dummyTeacher({
   String id = 'teacherId',
   String schoolBoardId = 'school_board_id',
   String schoolId = 'school_id',
   List<String> groups = const ['101', '102'],
-}) => Teacher(
-  id: id,
-  firstName: 'Pierre',
-  middleName: 'Jean',
-  lastName: 'Jacques',
-  schoolBoardId: schoolBoardId,
-  schoolId: schoolId,
-  hasRegisteredAccount: false,
-  groups: groups,
-  email: 'peter.john.jakob@test.com',
-  phone: dummyPhoneNumber(),
-  address: null,
-  dateBirth: null,
-  itineraries: [],
-  visitingPriorities: {
-    'element1': VisitingPriority.low,
-    'element2': VisitingPriority.high,
-  },
-);
+}) =>
+    Teacher(
+      id: id,
+      firstName: 'Pierre',
+      middleName: 'Jean',
+      lastName: 'Jacques',
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolId,
+      hasRegisteredAccount: false,
+      groups: groups,
+      email: 'peter.john.jakob@test.com',
+      phone: dummyPhoneNumber(),
+      address: null,
+      dateBirth: null,
+      itineraries: [],
+      visitingPriorities: {
+        'element1': VisitingPriority.low,
+        'element2': VisitingPriority.high,
+      },
+    );
 
 Student dummyStudent({
   String firstName = 'Jeanne',
@@ -104,20 +105,21 @@ Person dummyPerson({
   String id = 'personId',
   String firstName = 'Jeanne',
   String lastName = 'Doe',
-}) => Person(
-  id: id,
-  firstName: firstName,
-  middleName: 'Kathlin',
-  lastName: lastName,
-  address: dummyAddress(),
-  dateBirth: DateTime(2000, 1, 1),
-  email: 'jeanne.k.doe@test.com',
-  phone: dummyPhoneNumber(),
-);
+}) =>
+    Person(
+      id: id,
+      firstName: firstName,
+      middleName: 'Kathlin',
+      lastName: lastName,
+      address: dummyAddress(),
+      dateBirth: DateTime(2000, 1, 1),
+      email: 'jeanne.k.doe@test.com',
+      phone: dummyPhoneNumber(),
+    );
 
 PhoneNumber dummyPhoneNumber({int? extension}) => PhoneNumber.fromString(
-  '800-555-5555${extension == null ? '' : ' poste $extension'}',
-);
+      '800-555-5555${extension == null ? '' : ' poste $extension'}',
+    );
 
 Address dummyAddress({
   bool skipCivicNumber = false,
@@ -125,63 +127,64 @@ Address dummyAddress({
   bool skipApartment = false,
   bool skipCity = false,
   bool skipPostalCode = false,
-}) => Address(
-  civicNumber: skipCivicNumber ? null : 100,
-  street: skipStreet ? null : 'Wunderbar',
-  apartment: skipApartment ? null : 'A',
-  city: skipCity ? null : 'Wonderland',
-  postalCode: skipPostalCode ? null : 'H0H 0H0',
-);
+}) =>
+    Address(
+      civicNumber: skipCivicNumber ? null : 100,
+      street: skipStreet ? null : 'Wunderbar',
+      apartment: skipApartment ? null : 'A',
+      city: skipCity ? null : 'Wonderland',
+      postalCode: skipPostalCode ? null : 'H0H 0H0',
+    );
 
 JobList dummyJobList() {
   return JobList()..add(dummyJob());
 }
 
 Uniforms dummyUniforms({String? id}) => Uniforms(
-  id: id,
-  status: UniformStatus.suppliedByEnterprise,
-  uniforms: [
-    'Un beau chapeu bleu',
-    'Une belle chemise rouge',
-    'Une cravate jaune peu désirable',
-  ],
-);
+      id: id,
+      status: UniformStatus.suppliedByEnterprise,
+      uniforms: [
+        'Un beau chapeu bleu',
+        'Une belle chemise rouge',
+        'Une cravate jaune peu désirable',
+      ],
+    );
 
 Protections dummyProtections({String? id}) => Protections(
-  id: id,
-  status: ProtectionsStatus.suppliedByEnterprise,
-  protections: [
-    'Une veste de mithril',
-    'Une cotte de maille',
-    'Une drole de bague',
-  ],
-);
+      id: id,
+      status: ProtectionsStatus.suppliedByEnterprise,
+      protections: [
+        'Une veste de mithril',
+        'Une cotte de maille',
+        'Une drole de bague',
+      ],
+    );
 
 Incidents dummyIncidents({String? id}) => Incidents(
-  id: id,
-  severeInjuries: [],
-  minorInjuries: [
-    Incident('Un "petit" truc avec la scie sauteuse'),
-    Incident('Une "légère" entaille de la main au couteau'),
-  ],
-  verbalAbuses: [Incident('Vaut mieux ne pas détailler...')],
-);
+      id: id,
+      severeInjuries: [],
+      minorInjuries: [
+        Incident('Un "petit" truc avec la scie sauteuse'),
+        Incident('Une "légère" entaille de la main au couteau'),
+      ],
+      verbalAbuses: [Incident('Vaut mieux ne pas détailler...')],
+    );
 
 JobSstEvaluation dummyJobSstEvaluation({String? id}) => JobSstEvaluation(
-  id: id,
-  questions: {
-    'Q1': ['Oui'],
-    'Q1+t': ['Peu souvent, à la discrétion des employés.'],
-    'Q3': ['Un diable'],
-    'Q5': ['Des ciseaux'],
-    'Q9': ['Des solvants', 'Des produits de nettoyage'],
-    'Q12': ['Bruyant'],
-    'Q12+t': ['Bouchons a oreilles'],
-    'Q15': ['Oui'],
-    'Q18': ['Non'],
-  },
-  date: DateTime(2000, 1, 1),
-);
+      id: id,
+      questions: {
+        'Q1': ['Oui'],
+        'Q1+t': ['Peu souvent, à la discrétion des employés.'],
+        'Q3': ['Un diable'],
+        'Q5': ['Des ciseaux'],
+        'Q9': ['Des solvants', 'Des produits de nettoyage'],
+        'Q12': ['Bruyant'],
+        'Q12+t': ['Bouchons a oreilles'],
+        'Q15': ['Oui'],
+        'Q18': ['Non'],
+      },
+      date: DateTime(2000, 1, 1),
+    );
 
 PreInternshipRequests dummyPreInternshipRequests({String? id}) =>
     PreInternshipRequests(
@@ -192,20 +195,21 @@ PreInternshipRequests dummyPreInternshipRequests({String? id}) =>
     );
 
 Photo dummyPhoto() => Photo(
-  id: 'photoId',
-  bytes: Uint8List.fromList(List.generate(100, (index) => index % 256)),
-);
+      id: 'photoId',
+      bytes: Uint8List.fromList(List.generate(100, (index) => index % 256)),
+    );
 
 JobComment dummyJobComment({
   String comment = 'This is a comment',
   String teacherId = 'teacherId',
   DateTime? date,
-}) => JobComment(
-  id: 'jobCommentId',
-  comment: 'newComment',
-  teacherId: 'teacherId',
-  date: DateTime(2023, 10, 1),
-);
+}) =>
+    JobComment(
+      id: 'jobCommentId',
+      comment: 'newComment',
+      teacherId: 'teacherId',
+      date: DateTime(2023, 10, 1),
+    );
 
 Job dummyJob({
   String id = 'jobId',
@@ -214,18 +218,21 @@ Job dummyJob({
   String? preInternshipId,
   String? uniformId,
   String? protectionsId,
-}) => Job(
-  id: id,
-  specialization: ActivitySectorsService.activitySectors[2].specializations[9],
-  positionsOffered: {'school_id': 2},
-  sstEvaluation: dummyJobSstEvaluation(id: sstEvaluationId ?? id),
-  incidents: dummyIncidents(id: incidentsId ?? id),
-  minimumAge: 12,
-  preInternshipRequests: dummyPreInternshipRequests(id: preInternshipId ?? id),
-  uniforms: dummyUniforms(id: uniformId ?? id),
-  protections: dummyProtections(id: protectionsId ?? id),
-  reservedForId: '',
-);
+}) =>
+    Job(
+      id: id,
+      specialization:
+          ActivitySectorsService.activitySectors[2].specializations[9],
+      positionsOffered: {'school_id': 2},
+      sstEvaluation: dummyJobSstEvaluation(id: sstEvaluationId ?? id),
+      incidents: dummyIncidents(id: incidentsId ?? id),
+      minimumAge: 12,
+      preInternshipRequests:
+          dummyPreInternshipRequests(id: preInternshipId ?? id),
+      uniforms: dummyUniforms(id: uniformId ?? id),
+      protections: dummyProtections(id: protectionsId ?? id),
+      reservedForId: '',
+    );
 
 Enterprise dummyEnterprise({bool addJob = false}) {
   final jobs = JobList();
@@ -250,47 +257,49 @@ PostInternshipEnterpriseEvaluation dummyPostInternshipEnterpriseEvaluation({
   String id = 'postInternshipEnterpriseEvaluationId',
   String internshipId = 'internshipId',
   bool hasDisorder = true,
-}) => PostInternshipEnterpriseEvaluation(
-  id: id,
-  internshipId: internshipId,
-  skillsRequired: ['Communiquer à l\'écrit', 'Interagir avec des clients'],
-  taskVariety: 0,
-  trainingPlanRespect: 1,
-  autonomyExpected: 4,
-  efficiencyExpected: 2,
-  supervisionStyle: 1,
-  easeOfCommunication: 5,
-  absenceAcceptance: 4,
-  supervisionComments: 'Milieu peu aidant, mais ouvert',
-  acceptanceTsa: -1,
-  acceptanceLanguageDisorder: hasDisorder ? 4 : -1,
-  acceptanceIntellectualDisability: hasDisorder ? 4 : -1,
-  acceptancePhysicalDisability: hasDisorder ? 4 : -1,
-  acceptanceMentalHealthDisorder: hasDisorder ? 2 : -1,
-  acceptanceBehaviorDifficulties: hasDisorder ? 2 : -1,
-);
+}) =>
+    PostInternshipEnterpriseEvaluation(
+      id: id,
+      internshipId: internshipId,
+      skillsRequired: ['Communiquer à l\'écrit', 'Interagir avec des clients'],
+      taskVariety: 0,
+      trainingPlanRespect: 1,
+      autonomyExpected: 4,
+      efficiencyExpected: 2,
+      supervisionStyle: 1,
+      easeOfCommunication: 5,
+      absenceAcceptance: 4,
+      supervisionComments: 'Milieu peu aidant, mais ouvert',
+      acceptanceTsa: -1,
+      acceptanceLanguageDisorder: hasDisorder ? 4 : -1,
+      acceptanceIntellectualDisability: hasDisorder ? 4 : -1,
+      acceptancePhysicalDisability: hasDisorder ? 4 : -1,
+      acceptanceMentalHealthDisorder: hasDisorder ? 2 : -1,
+      acceptanceBehaviorDifficulties: hasDisorder ? 2 : -1,
+    );
 
 visa.InternshipEvaluationVisa dummyInternshipVisaEvaluation({
   String id = 'internshipVisaEvaluationId',
-}) => visa.InternshipEvaluationVisa(
-  id: id,
-  date: DateTime(1980, 5, 20),
-  formVersion: visa.InternshipEvaluationVisa.currentVersion,
-  form: visa.VisaEvaluation(
-    id: 'visaEvaluationId',
-    inattendance: visa.Inattendance.rarely,
-    ponctuality: visa.Ponctuality.sometimeLate,
-    sociability: visa.Sociability.veryLow,
-    politeness: visa.Politeness.alwaysSuitable,
-    motivation: visa.Motivation.low,
-    dressCode: visa.DressCode.notAppropriate,
-    qualityOfWork: visa.QualityOfWork.high,
-    productivity: visa.Productivity.low,
-    autonomy: visa.Autonomy.none,
-    cautiousness: visa.Cautiousness.mostly,
-    generalAppreciation: visa.GeneralAppreciation.passable,
-  ),
-);
+}) =>
+    visa.InternshipEvaluationVisa(
+      id: id,
+      date: DateTime(1980, 5, 20),
+      formVersion: visa.InternshipEvaluationVisa.currentVersion,
+      form: visa.VisaEvaluation(
+        id: 'visaEvaluationId',
+        inattendance: visa.Inattendance.rarely,
+        ponctuality: visa.Ponctuality.sometimeLate,
+        sociability: visa.Sociability.veryLow,
+        politeness: visa.Politeness.alwaysSuitable,
+        motivation: visa.Motivation.low,
+        dressCode: visa.DressCode.notAppropriate,
+        qualityOfWork: visa.QualityOfWork.high,
+        productivity: visa.Productivity.low,
+        autonomy: visa.Autonomy.none,
+        cautiousness: visa.Cautiousness.mostly,
+        generalAppreciation: visa.GeneralAppreciation.passable,
+      ),
+    );
 
 Internship dummyInternship({
   String id = 'internshipId',
@@ -376,8 +385,7 @@ WeeklySchedule dummyWeeklySchedule({
       Day.thursday: dummyDailySchedule(id: 'dailyScheduleId4'),
       Day.friday: dummyDailySchedule(id: 'dailyScheduleId5'),
     },
-    period:
-        period ??
+    period: period ??
         DateTimeRange(start: DateTime(2026, 1, 2), end: DateTime(2026, 1, 22)),
   );
 }
@@ -386,19 +394,20 @@ Waypoint dummyWaypoint({
   String id = 'waypointId',
   double latitude = 40.0,
   double longitude = 50.0,
-}) => Waypoint(
-  id: id,
-  title: 'Waypoint',
-  subtitle: 'Subtitle',
-  latitude: latitude,
-  longitude: longitude,
-  address: Address(
-    civicNumber: 123,
-    street: 'rue de la rue',
-    city: 'Ville',
-    postalCode: 'H0H 0H0',
-  ),
-);
+}) =>
+    Waypoint(
+      id: id,
+      title: 'Waypoint',
+      subtitle: 'Subtitle',
+      address: Address(
+        civicNumber: 123,
+        street: 'rue de la rue',
+        city: 'Ville',
+        postalCode: 'H0H 0H0',
+        latitude: latitude,
+        longitude: longitude,
+      ),
+    );
 
 Itinerary dummyItinerary({
   String id = 'itineraryId',
@@ -414,37 +423,39 @@ Itinerary dummyItinerary({
 
 attitude.AttitudeEvaluation dummyAttitudeEvaluation({
   String id = 'attitudeEvaluationId',
-}) => attitude.AttitudeEvaluation(
-  id: id,
-  inattendance: attitude.Inattendance.rarely,
-  ponctuality: attitude.Ponctuality.sometimeLate,
-  sociability: attitude.Sociability.veryLow,
-  politeness: attitude.Politeness.alwaysSuitable,
-  motivation: attitude.Motivation.low,
-  dressCode: attitude.DressCode.notAppropriate,
-  qualityOfWork: attitude.QualityOfWork.high,
-  productivity: attitude.Productivity.low,
-  autonomy: attitude.Autonomy.none,
-  cautiousness: attitude.Cautiousness.mostly,
-  generalAppreciation: attitude.GeneralAppreciation.passable,
-);
+}) =>
+    attitude.AttitudeEvaluation(
+      id: id,
+      inattendance: attitude.Inattendance.rarely,
+      ponctuality: attitude.Ponctuality.sometimeLate,
+      sociability: attitude.Sociability.veryLow,
+      politeness: attitude.Politeness.alwaysSuitable,
+      motivation: attitude.Motivation.low,
+      dressCode: attitude.DressCode.notAppropriate,
+      qualityOfWork: attitude.QualityOfWork.high,
+      productivity: attitude.Productivity.low,
+      autonomy: attitude.Autonomy.none,
+      cautiousness: attitude.Cautiousness.mostly,
+      generalAppreciation: attitude.GeneralAppreciation.passable,
+    );
 
 attitude.InternshipEvaluationAttitude dummyInternshipEvaluationAttitude({
   String id = 'internshipEvaluationAttitudeId',
-}) => attitude.InternshipEvaluationAttitude(
-  id: id,
-  date: DateTime(1980, 5, 20),
-  presentAtEvaluation: ['Me', 'You'],
-  attitude: dummyAttitudeEvaluation(),
-  comments: 'No comment',
-  formVersion: '1.0.0',
-);
+}) =>
+    attitude.InternshipEvaluationAttitude(
+      id: id,
+      date: DateTime(1980, 5, 20),
+      presentAtEvaluation: ['Me', 'You'],
+      attitude: dummyAttitudeEvaluation(),
+      comments: 'No comment',
+      formVersion: '1.0.0',
+    );
 
 TaskAppreciation dummyTaskAppreciation() => TaskAppreciation(
-  id: 'taskAppreciationId',
-  title: 'Task title',
-  level: TaskAppreciationLevel.autonomous,
-);
+      id: 'taskAppreciationId',
+      title: 'Task title',
+      level: TaskAppreciationLevel.autonomous,
+    );
 
 SkillEvaluation dummySkillEvaluation({String id = 'skillEvaluationId'}) =>
     SkillEvaluation(
@@ -458,12 +469,13 @@ SkillEvaluation dummySkillEvaluation({String id = 'skillEvaluationId'}) =>
 
 InternshipEvaluationSkill dummyInternshipEvaluationSkill({
   String id = 'internshipEvaluationSkillId',
-}) => InternshipEvaluationSkill(
-  id: id,
-  date: DateTime(1980, 5, 20),
-  presentAtEvaluation: ['Me', 'You'],
-  skillGranularity: SkillEvaluationGranularity.byTask,
-  skills: [dummySkillEvaluation()],
-  comments: 'No comment',
-  formVersion: '1.0.0',
-);
+}) =>
+    InternshipEvaluationSkill(
+      id: id,
+      date: DateTime(1980, 5, 20),
+      presentAtEvaluation: ['Me', 'You'],
+      skillGranularity: SkillEvaluationGranularity.byTask,
+      skills: [dummySkillEvaluation()],
+      comments: 'No comment',
+      formVersion: '1.0.0',
+    );

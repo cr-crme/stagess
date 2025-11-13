@@ -11,8 +11,13 @@ all: main tutorial
 .FORCE:
 build/%.zip: .FORCE
 	$(call safe_rmdir, $(OUT_DIR)/$*)
+	@if [ -z "$${STAGESS_GOOGLE_MAPS_API_KEY}" ]; then \
+	  echo "Error: STAGESS_GOOGLE_MAPS_API_KEY is not set in the environment."; \
+	  exit 1; \
+	fi
 	flutter      build web --base-href=/$*/ \
-		    	    --dart-define=STAGESS_USE_DEV_DB=$(USE_DEV_DB)
+		    	    --dart-define=STAGESS_USE_DEV_DB=$(USE_DEV_DB) \
+					--dart-define=STAGESS_GOOGLE_MAPS_API_KEY=$${STAGESS_GOOGLE_MAPS_API_KEY}
 	$(MoveDir)   $(OUT_DIR)/web $(OUT_DIR)/$*
 	$(ChangeDir) $(OUT_DIR) && $(ZIP) $*.zip $*
 

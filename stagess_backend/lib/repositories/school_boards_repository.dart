@@ -189,13 +189,13 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
           tableName: 'addresses',
           filters: {'entity_id': schoolId},
         );
-        school['address'] = address.first;
+        school['address'] = address.isNotEmpty ? address.first : null;
         final phone = await sqlInterface.performSelectQuery(
           user: user,
           tableName: 'phone_numbers',
           filters: {'entity_id': schoolId},
         );
-        school['phone'] = phone.first;
+        school['phone'] = phone.isNotEmpty ? phone.first : null;
       }
       schoolBoard['schools'] = schools;
 

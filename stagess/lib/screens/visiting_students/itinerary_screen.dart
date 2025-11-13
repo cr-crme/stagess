@@ -39,7 +39,7 @@ class _ItineraryMainScreenState extends State<ItineraryMainScreen> {
     super.dispose();
   }
 
-  Future<void> _fillAllWaypoints() async {
+  void _fillAllWaypoints() {
     _logger.fine('Filling all waypoints');
     final internships = InternshipsProvider.of(context, listen: false);
     final currentTeacher =
@@ -64,13 +64,12 @@ class _ItineraryMainScreenState extends State<ItineraryMainScreen> {
     // Add the school as the first waypoint
     _waypoints.clear();
     _waypoints.add(
-      await Waypoint.fromAddress(
+      Waypoint(
         title: 'École',
         address: school.address,
         priority: VisitingPriority.school,
       ),
     );
-    setState(() {});
 
     // Get the students from the registered students, but we copy them so
     // we don't mess with them
@@ -83,7 +82,7 @@ class _ItineraryMainScreenState extends State<ItineraryMainScreen> {
       if (enterprise == null) continue;
 
       _waypoints.add(
-        await Waypoint.fromAddress(
+        Waypoint(
           title: '${student.firstName} ${student.lastName[0]}.',
           subtitle: enterprise.name,
           address: enterprise.address ?? Address.empty,
@@ -91,15 +90,6 @@ class _ItineraryMainScreenState extends State<ItineraryMainScreen> {
         ),
       );
     }
-
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) => _fillAllWaypoints());
   }
 
   @override
@@ -108,6 +98,7 @@ class _ItineraryMainScreenState extends State<ItineraryMainScreen> {
       'Building ItineraryMainScreen with ${_waypoints.length} waypoints',
     );
 
+    _fillAllWaypoints();
     return RawScrollbar(
       controller: _scrollController,
       thumbVisibility: true,
@@ -164,8 +155,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     _teachersProvider = TeachersProvider.of(context, listen: false);
 
     if (_itineraries[date] == null) {
-      _itineraries[date] =
-          ItinerariesHelpers.fromDate(
+      _itineraries[date] = ItinerariesHelpers.fromDate(
             date,
             teachers: _teachersProvider,
           )?.copyWith() ??
@@ -209,8 +199,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
 
     // We need to define small 200px over actual small screen width because of the
     // row nature of the page.
-    final isSmall =
-        MediaQuery.of(context).size.width <
+    final isSmall = MediaQuery.of(context).size.width <
         ResponsiveService.smallScreenWidth + 200;
 
     return Column(
@@ -300,27 +289,24 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
           child: Padding(
             padding: const EdgeInsets.only(right: 12.0),
             child: IconButton(
-              onPressed:
-                  _routingController.hasChanged
-                      ? () async {
-                        final isSuccess = await _selectItinerary(_currentDate);
-                        if (mounted) {
-                          showSnackBar(
-                            context,
-                            message:
-                                isSuccess
-                                    ? 'Itinéraire enregistré avec succès.'
-                                    : 'Une erreur est survenue lors du l\'enregistrement de l\'itinéraire.',
-                          );
-                        }
+              onPressed: _routingController.hasChanged
+                  ? () async {
+                      final isSuccess = await _selectItinerary(_currentDate);
+                      if (mounted) {
+                        showSnackBar(
+                          context,
+                          message: isSuccess
+                              ? 'Itinéraire enregistré avec succès.'
+                              : 'Une erreur est survenue lors du l\'enregistrement de l\'itinéraire.',
+                        );
                       }
-                      : null,
+                    }
+                  : null,
               icon: Icon(
                 Icons.save,
-                color:
-                    _routingController.hasChanged
-                        ? Theme.of(context).primaryColor
-                        : Colors.grey,
+                color: _routingController.hasChanged
+                    ? Theme.of(context).primaryColor
+                    : Colors.grey,
               ),
             ),
           ),
@@ -352,28 +338,25 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
         return SizedBox(
           width: constraints.maxWidth,
           height: MediaQuery.of(context).size.height * 0.5,
-          child:
-              widget.waypoints.isEmpty
-                  ? Center(child: CircularProgressIndicator())
-                  : Stack(
-                    children: [
-                      RoutingMap(
-                        controller: _routingController,
-                        waypoints:
-                            widget.waypoints.length == 1
-                                ? []
-                                : widget.waypoints,
-                        centerWaypoint: widget.waypoints.first,
-                        itinerary: currentItinerary,
-                        onItineraryChanged: (_) => setState(() {}),
+          child: widget.waypoints.isEmpty
+              ? Center(child: CircularProgressIndicator())
+              : Stack(
+                  children: [
+                    RoutingMap(
+                      controller: _routingController,
+                      waypoints:
+                          widget.waypoints.length == 1 ? [] : widget.waypoints,
+                      centerWaypoint: widget.waypoints.first,
+                      itinerary: currentItinerary,
+                      onItineraryChanged: (_) => setState(() {}),
+                    ),
+                    if (widget.waypoints.length == 1)
+                      Container(
+                        color: Colors.white.withAlpha(100),
+                        child: Center(child: CircularProgressIndicator()),
                       ),
-                      if (widget.waypoints.length == 1)
-                        Container(
-                          color: Colors.white.withAlpha(100),
-                          child: Center(child: CircularProgressIndicator()),
-                        ),
-                    ],
-                  ),
+                  ],
+                ),
         );
       },
     );

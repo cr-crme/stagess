@@ -302,7 +302,9 @@ class MySqlInternshipsRepository extends InternshipsRepository {
                         'street',
                         'apartment',
                         'city',
-                        'postal_code'
+                        'postal_code',
+                        'latitude',
+                        'longitude',
                       ]),
                 ]) as List?)
                 ?.first ??
@@ -682,7 +684,9 @@ class MySqlInternshipsRepository extends InternshipsRepository {
                         'street',
                         'apartment',
                         'city',
-                        'postal_code'
+                        'postal_code',
+                        'latitude',
+                        'longitude',
                       ]),
                 ]) as List?)
                 ?.firstOrNull as Map<String, dynamic>? ??

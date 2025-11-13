@@ -65,7 +65,7 @@ class CaracteristicsStepState extends State<CaracteristicsStep> {
         : Job.empty,
     specializationWhiteList: widget.specifiedSpecialization ??
         widget.enterprise
-            .withRemainingPositions(
+            .jobsWithRemainingPositions(
               context,
               schoolId: AuthProvider.of(context, listen: false).schoolId!,
               listen: false,

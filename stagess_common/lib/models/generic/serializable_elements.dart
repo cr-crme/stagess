@@ -111,6 +111,22 @@ extension IntExt on int {
   }
 }
 
+extension DoubleExt on double {
+  double serialize() => this;
+
+  static double? from(dynamic element) {
+    if (element is double) {
+      return element;
+    } else if (element is int) {
+      return element.toDouble();
+    } else if (element is String) {
+      return double.tryParse(element);
+    } else {
+      return null;
+    }
+  }
+}
+
 extension DateTimeExt on DateTime {
   int serialize() => millisecondsSinceEpoch;
 

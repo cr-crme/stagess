@@ -254,7 +254,9 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
               'street',
               'apartment',
               'city',
-              'postal_code'
+              'postal_code',
+              'latitude',
+              'longitude',
             ]),
         sqlInterface.joinSubquery(
             dataTableName: 'addresses',
@@ -268,7 +270,9 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
               'street',
               'apartment',
               'city',
-              'postal_code'
+              'postal_code',
+              'latitude',
+              'longitude',
             ]),
         sqlInterface.joinSubquery(
             dataTableName: 'phone_numbers',
@@ -311,7 +315,9 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
                     'street',
                     'apartment',
                     'city',
-                    'postal_code'
+                    'postal_code',
+                    'latitude',
+                    'longitude',
                   ]),
               sqlInterface.selectSubquery(
                   dataTableName: 'phone_numbers',

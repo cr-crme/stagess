@@ -44,7 +44,7 @@ extension EnterpriseExtension on Enterprise {
       );
   }
 
-  Iterable<Job> withRemainingPositions(
+  Iterable<Job> jobsWithRemainingPositions(
     BuildContext context, {
     required String schoolId,
     bool listen = false,

@@ -1,10 +1,12 @@
-import 'dart:convert';
+import 'dart:async';
 
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
-import 'package:stagess_common/models/generic/geographic_coordinate_system.dart';
 import 'package:stagess_common/models/internships/internship.dart';
+import 'package:xml/xml.dart';
+
+final _apiKey = const String.fromEnvironment('STAGESS_GOOGLE_MAPS_API_KEY');
 
 class Address extends ItemSerializable {
   Address({
@@ -14,6 +16,8 @@ class Address extends ItemSerializable {
     this.apartment,
     this.city,
     this.postalCode,
+    this.latitude,
+    this.longitude,
   });
 
   static Address get empty => Address();
@@ -23,29 +27,64 @@ class Address extends ItemSerializable {
   final String? apartment;
   final String? city;
   final String? postalCode;
-
-  static Future<Address?> fromCoordinates(
-      GeographicCoordinateSystem gcs) async {
-    final String url =
-        'https://nominatim.openstreetmap.org/reverse?format=json&lat=${gcs.latitude}&lon=${gcs.longitude}';
-    final response = await http.get(Uri.parse(url));
-    if (response.statusCode != 200) return null;
-
-    final data = json.decode(response.body) as Map<String, dynamic>;
-    if (data.isEmpty) return null;
-
-    return Address(
-      civicNumber: int.tryParse(data['address']?['house_number'] ?? ''),
-      street: data['address']?['road'],
-      city: data['address']?['city'],
-      postalCode: data['address']?['postcode'],
-    );
-  }
+  final double? latitude;
+  final double? longitude;
 
   // coverage:ignore-start
-  static Future<Address?> fromString(String address) async {
-    final gcs = await GeographicCoordinateSystem.fromAddress(address);
-    return await Address.fromCoordinates(gcs);
+  static Future<Address?> fromString(String value, {String? id}) async {
+    if (value.isEmpty) return null;
+
+    final response = await http.get(Uri.parse(
+      'https://maps.googleapis.com/maps/api/geocode/xml?'
+      'address=${value.replaceAll(' ', '+').replaceAll('#', '')}'
+      '&key=$_apiKey',
+    ));
+    if (response.statusCode != 200) return null;
+
+    try {
+      final data = XmlDocument.parse(response.body);
+
+      final location = data.findAllElements('location').first;
+      final latitude =
+          double.parse(location.findElements('lat').first.innerText);
+      final longitude =
+          double.parse(location.findElements('lng').first.innerText);
+
+      int? civicNumber;
+      String? street;
+      String? city;
+      String? postalCode;
+      String? apartment;
+      for (final component in data.findAllElements('address_component')) {
+        final types =
+            component.findAllElements('type').map((e) => e.innerText).toList();
+        final longName = component.findElements('long_name').first.innerText;
+        if (types.contains('street_number')) {
+          civicNumber = int.tryParse(longName);
+        } else if (types.contains('route')) {
+          street = longName;
+        } else if (types.contains('locality')) {
+          city = longName;
+        } else if (types.contains('postal_code')) {
+          postalCode = longName;
+        } else if (types.contains('subpremise')) {
+          apartment = longName;
+        }
+      }
+
+      return Address(
+        id: id,
+        civicNumber: civicNumber,
+        street: street,
+        city: city,
+        postalCode: postalCode,
+        apartment: apartment,
+        latitude: latitude,
+        longitude: longitude,
+      );
+    } catch (e) {
+      return null;
+    }
   }
   // coverage:ignore-end
 
@@ -56,6 +95,8 @@ class Address extends ItemSerializable {
         'apartment': apartment?.serialize(),
         'city': city?.serialize(),
         'postal_code': postalCode?.serialize(),
+        'latitude': latitude?.serialize(),
+        'longitude': longitude?.serialize(),
       };
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
@@ -65,6 +106,8 @@ class Address extends ItemSerializable {
         'apartment': FetchableFields.optional,
         'city': FetchableFields.optional,
         'postal_code': FetchableFields.optional,
+        'latitude': FetchableFields.optional,
+        'longitude': FetchableFields.optional,
       });
   static FetchableFields get mandatoryFetchableFields =>
       FetchableFields.reference({
@@ -73,6 +116,8 @@ class Address extends ItemSerializable {
         'street': FetchableFields.mandatory,
         'city': FetchableFields.mandatory,
         'postal_code': FetchableFields.mandatory,
+        'latitude': FetchableFields.mandatory,
+        'longitude': FetchableFields.mandatory,
       });
 
   static Address? from(Map? map) {
@@ -81,12 +126,15 @@ class Address extends ItemSerializable {
   }
 
   static Address fromSerialized(Map? map) => Address(
-      id: StringExt.from(map?['id']),
-      civicNumber: IntExt.from(map?['civic']),
-      street: StringExt.from(map?['street']),
-      apartment: StringExt.from(map?['apartment']),
-      city: StringExt.from(map?['city']),
-      postalCode: StringExt.from(map?['postal_code']));
+        id: StringExt.from(map?['id']),
+        civicNumber: IntExt.from(map?['civic']),
+        street: StringExt.from(map?['street']),
+        apartment: StringExt.from(map?['apartment']),
+        city: StringExt.from(map?['city']),
+        postalCode: StringExt.from(map?['postal_code']),
+        latitude: DoubleExt.from(map?['latitude']),
+        longitude: DoubleExt.from(map?['longitude']),
+      );
 
   Address copyWith({
     String? id,
@@ -95,14 +143,19 @@ class Address extends ItemSerializable {
     String? apartment,
     String? city,
     String? postalCode,
+    double? latitude,
+    double? longitude,
   }) {
     return Address(
-        id: id ?? this.id,
-        civicNumber: civicNumber ?? this.civicNumber,
-        street: street ?? this.street,
-        apartment: apartment ?? this.apartment,
-        city: city ?? this.city,
-        postalCode: postalCode ?? this.postalCode);
+      id: id ?? this.id,
+      civicNumber: civicNumber ?? this.civicNumber,
+      street: street ?? this.street,
+      apartment: apartment ?? this.apartment,
+      city: city ?? this.city,
+      postalCode: postalCode ?? this.postalCode,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+    );
   }
 
   Address copyWithData(Map<String, dynamic>? data) {
@@ -114,6 +167,8 @@ class Address extends ItemSerializable {
       apartment: StringExt.from(data['apartment']) ?? apartment,
       city: StringExt.from(data['city']) ?? city,
       postalCode: StringExt.from(data['postal_code']) ?? postalCode,
+      latitude: DoubleExt.from(data['latitude']) ?? latitude,
+      longitude: DoubleExt.from(data['longitude']) ?? longitude,
     );
   }
 
@@ -156,5 +211,7 @@ class Address extends ItemSerializable {
       street.hashCode ^
       apartment.hashCode ^
       city.hashCode ^
-      postalCode.hashCode;
+      postalCode.hashCode ^
+      latitude.hashCode ^
+      longitude.hashCode;
 }

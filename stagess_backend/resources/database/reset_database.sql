@@ -80,6 +80,8 @@ CREATE TABLE addresses (
     apartment VARCHAR(20),
     city VARCHAR(50),
     postal_code VARCHAR(10),
+    latitude FLOAT,
+    longitude FLOAT,
     FOREIGN KEY (entity_id) REFERENCES entities(shared_id) ON DELETE CASCADE
 );
 
@@ -202,13 +204,13 @@ CREATE TABLE teacher_itinerary_waypoints (
     itinerary_id VARCHAR(36) NOT NULL,
     title VARCHAR(50) NOT NULL,
     subtitle VARCHAR(50) NOT NULL,
-    latitude FLOAT NOT NULL,
-    longitude FLOAT NOT NULL,
     address_civic INT,
     address_street VARCHAR(100),
     address_apartment VARCHAR(20),
     address_city VARCHAR(50),
     address_postal_code VARCHAR(10),
+    address_latitude FLOAT NOT NULL,
+    address_longitude FLOAT NOT NULL,
     visiting_priority INT NOT NULL,
     FOREIGN KEY (itinerary_id) REFERENCES teacher_itineraries(id) ON DELETE CASCADE
 );

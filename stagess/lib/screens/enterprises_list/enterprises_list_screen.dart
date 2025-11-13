@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:go_router/go_router.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/extensions/enterprise_extension.dart';
 import 'package:stagess/common/extensions/job_extension.dart';
@@ -270,25 +269,21 @@ class _EnterprisesByMap extends StatelessWidget {
     for (final i in enterprises.keys.toList().asMap().keys) {
       // i == 0 is the school
       final enterprise = enterprises.keys.toList()[i];
+      final remainingPositions = enterprise.jobsWithRemainingPositions(context,
+          schoolId: schoolId, listen: true);
 
       double nameWidth = 160;
       double nameHeight = 100;
       final waypoint = enterprises[enterprise]!;
       final color = i == 0
           ? Colors.purple
-          : enterprise
-                  .withRemainingPositions(
-                    context,
-                    schoolId: schoolId,
-                    listen: true,
-                  )
-                  .isNotEmpty
-              ? Colors.green
-              : Colors.red;
+          : enterprise.status == EnterpriseStatus.active
+              ? (remainingPositions.isNotEmpty ? Colors.green : Colors.red)
+              : Colors.grey;
 
       out.add(
         Marker(
-          point: LatLng(waypoint.latitude, waypoint.longitude),
+          point: waypoint.toLatLng(),
           alignment: const Alignment(0.8, 0.0), // Centered almost at max right
           width: markerSize + nameWidth,
           height: markerSize + nameHeight,
@@ -334,9 +329,9 @@ class _EnterprisesByMap extends StatelessWidget {
     return out;
   }
 
-  Future<Map<Enterprise, Waypoint>> _fetchEnterprisesCoordinates(
+  Map<Enterprise, Waypoint> _fetchEnterprisesCoordinates(
     BuildContext context,
-  ) async {
+  ) {
     _logger.finer(
       'Fetching enterprises coordinates (enterprises: ${enterprises.length})',
     );
@@ -359,13 +354,11 @@ class _EnterprisesByMap extends StatelessWidget {
       contact: Person.empty,
       address: school.address,
     );
-    out[schoolAsEnterprise] = await Waypoint.fromAddress(
-      title: school.name,
-      address: school.address,
-    );
+    out[schoolAsEnterprise] =
+        Waypoint(title: school.name, address: school.address);
 
     for (final enterprise in enterprises) {
-      out[enterprise] = await Waypoint.fromAddress(
+      out[enterprise] = Waypoint(
         title: enterprise.name,
         address: enterprise.address ?? Address.empty,
       );
@@ -376,40 +369,28 @@ class _EnterprisesByMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _logger.finer('Building _EnterprisesByMap');
+    Map<Enterprise, Waypoint> locations = _fetchEnterprisesCoordinates(context);
+    final waypoint = locations[locations.keys.first]!;
 
     return SingleChildScrollView(
       physics: const ScrollPhysics(),
-      child: FutureBuilder<Map<Enterprise, Waypoint>>(
-        future: _fetchEnterprisesCoordinates(context),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return SizedBox(
-              height: MediaQuery.of(context).size.height,
-              child: const Center(child: CircularProgressIndicator()),
-            );
-          }
-
-          Map<Enterprise, Waypoint> locations = snapshot.data!;
-          final waypoint = locations[locations.keys.first]!;
-          return SizedBox(
-            height: MediaQuery.of(context).size.height - 150,
-            child: FlutterMap(
-              options: MapOptions(
-                initialCenter: LatLng(waypoint.latitude, waypoint.longitude),
-                initialZoom: 14,
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'dev.fleaflet.flutter_map.example',
-                  tileProvider: CancellableNetworkTileProvider(),
-                ),
-                MarkerLayer(markers: _latlngToMarkers(context, locations)),
-                const ZoomButtons(),
-              ],
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height - 150,
+        child: FlutterMap(
+          options: MapOptions(
+            initialCenter: waypoint.toLatLng(),
+            initialZoom: 14,
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'dev.fleaflet.flutter_map.example',
+              tileProvider: CancellableNetworkTileProvider(),
             ),
-          );
-        },
+            MarkerLayer(markers: _latlngToMarkers(context, locations)),
+            const ZoomButtons(),
+          ],
+        ),
       ),
     );
   }

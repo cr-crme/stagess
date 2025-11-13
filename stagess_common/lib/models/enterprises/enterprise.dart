@@ -196,7 +196,7 @@ class Enterprise extends ExtendedItemSerializable {
         'id': FetchableFields.mandatory,
         'school_board_id': FetchableFields.mandatory,
         'name': FetchableFields.mandatory,
-        'status': FetchableFields.optional,
+        'status': FetchableFields.mandatory,
         'activity_types': FetchableFields.optional,
         'recruiter_id': FetchableFields.optional,
         'jobs': FetchableFields.optional

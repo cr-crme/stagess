@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess_common/models/generic/geographic_coordinate_system.dart';
+import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/itineraries/itinerary.dart';
 
 import '../utils.dart';
@@ -46,14 +46,14 @@ void main() {
     test('"next" behave properly', () {
       final itinerary = dummyItinerary();
       final gcs = itinerary
-          .map((e) => GeographicCoordinateSystem(
-              latitude: e.latitude, longitude: e.longitude))
+          .map((e) => Address(
+              latitude: e.address.latitude, longitude: e.address.longitude))
           .toList();
 
       int i = 0;
       for (final next in itinerary) {
-        expect(gcs[i].latitude, next.latitude);
-        expect(gcs[i].longitude, next.longitude);
+        expect(gcs[i].latitude, next.address.latitude);
+        expect(gcs[i].longitude, next.address.longitude);
         i++;
       }
       expect(i, 2);

@@ -91,11 +91,7 @@ class RoutingController {
 
     final out = await _routingManager.getRoute(
       request: routing_client.OSRMRequest.route(
-        waypoints: _itinerary
-            .map(
-              (e) => routing_client.LngLat(lat: e.latitude, lng: e.longitude),
-            )
-            .toList(),
+        waypoints: _itinerary.map((e) => e.toLngLat()).toList(),
         geometries: routing_client.Geometries.polyline,
         steps: true,
         languages: routing_client.Languages.en,
@@ -187,14 +183,14 @@ class _RoutingMapState extends State<RoutingMap> {
         0.0,
         (prev, e) =>
             prev +
-            (e.point.latitude == waypoint.latitude &&
-                    e.point.longitude == waypoint.longitude
+            (e.point.latitude == waypoint.address.latitude &&
+                    e.point.longitude == waypoint.address.longitude
                 ? 1.0
                 : 0.0),
       );
       out.add(
         Marker(
-          point: LatLng(waypoint.latitude, waypoint.longitude),
+          point: waypoint.toLatLng(),
           alignment: Alignment(
             0.8,
             0.4 * previous,
@@ -247,10 +243,7 @@ class _RoutingMapState extends State<RoutingMap> {
       padding: const EdgeInsets.all(8),
       child: FlutterMap(
         options: MapOptions(
-          initialCenter: LatLng(
-            widget.centerWaypoint.latitude,
-            widget.centerWaypoint.longitude,
-          ),
+          initialCenter: widget.centerWaypoint.toLatLng(),
           initialZoom: 12,
         ),
         children: [

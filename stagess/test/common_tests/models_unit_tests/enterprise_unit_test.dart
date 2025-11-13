@@ -143,7 +143,7 @@ void main() {
       // One job with two positions was created, so it should be available
       expect(
         enterprise
-            .withRemainingPositions(context, schoolId: 'school_id')
+            .jobsWithRemainingPositions(context, schoolId: 'school_id')
             .length,
         1,
       );
@@ -157,7 +157,7 @@ void main() {
       );
       expect(
         enterprise
-            .withRemainingPositions(context, schoolId: 'school_id')
+            .jobsWithRemainingPositions(context, schoolId: 'school_id')
             .length,
         1,
       );
@@ -172,7 +172,7 @@ void main() {
       );
       expect(
         enterprise
-            .withRemainingPositions(context, schoolId: 'school_id')
+            .jobsWithRemainingPositions(context, schoolId: 'school_id')
             .length,
         0,
       );
@@ -185,7 +185,7 @@ void main() {
       );
       expect(
         enterprise
-            .withRemainingPositions(context, schoolId: 'school_id')
+            .jobsWithRemainingPositions(context, schoolId: 'school_id')
             .length,
         1,
       );

@@ -32,21 +32,8 @@ class Itinerary extends ListSerializable<Waypoint>
     }
   }
 
-  List<LatLng> toLatLng() {
-    List<LatLng> out = [];
-    for (final address in this) {
-      out.add(LatLng(address.latitude, address.longitude));
-    }
-    return out;
-  }
-
-  List<LngLat> toLngLat() {
-    List<LngLat> out = [];
-    for (final address in this) {
-      out.add(LngLat(lng: address.longitude, lat: address.latitude));
-    }
-    return out;
-  }
+  List<LatLng> toLatLng() => [for (final waypoint in this) waypoint.toLatLng()];
+  List<LngLat> toLngLat() => [for (final waypoint in this) waypoint.toLngLat()];
 
   @override
   bool moveNext() {
