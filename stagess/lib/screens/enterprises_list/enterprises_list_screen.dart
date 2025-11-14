@@ -9,7 +9,6 @@ import 'package:stagess/common/widgets/search.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess/screens/add_enterprise/add_enterprise_screen.dart';
 import 'package:stagess/screens/enterprises_list/widgets/enterprise_card.dart';
-import 'package:stagess/screens/visiting_students/widgets/zoom_button.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
@@ -20,7 +19,7 @@ import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
-import 'package:stagess_common_flutter/widgets/cached_tile_layer.dart';
+import 'package:stagess_common_flutter/widgets/cached_flutter_map.dart';
 
 final _logger = Logger('EnterprisesListScreen');
 
@@ -373,21 +372,16 @@ class _EnterprisesByMap extends StatelessWidget {
     final waypoint = locations[locations.keys.first]!;
 
     return SingleChildScrollView(
-      physics: const ScrollPhysics(),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height - 150,
-        child: FlutterMap(
-          options: MapOptions(
-            initialCenter: waypoint.toLatLng(),
-            initialZoom: 14,
+        physics: const ScrollPhysics(),
+        child: SizedBox(
+          height: MediaQuery.of(context).size.height - 150,
+          child: CachedFlutterMap(
+            options:
+                MapOptions(initialCenter: waypoint.toLatLng(), initialZoom: 14),
+            markersOverlayBuilder: (context) => MarkerLayer(
+              markers: _latlngToMarkers(context, locations),
+            ),
           ),
-          children: [
-            const CachedTileLayer(),
-            MarkerLayer(markers: _latlngToMarkers(context, locations)),
-            const ZoomButtons(),
-          ],
-        ),
-      ),
-    );
+        ));
   }
 }

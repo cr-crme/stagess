@@ -15,7 +15,6 @@ import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
-import 'package:stagess_common_flutter/widgets/cached_tile_layer.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
 
 // coverage:ignore-start
@@ -55,9 +54,6 @@ void main() async {
         showDebugElements: showDebugElements,
         mockMe: useMockers,
       );
-
-      // For flutter_map_tile_caching
-      await CachedTileLayer.initializeCache();
 
       runApp(StagessApp(useMockers: useMockers, backendUri: backendUri));
     },

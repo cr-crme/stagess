@@ -13,11 +13,10 @@ import 'package:routing_client_dart/src/models/osrm/road_helper.dart'
     as routing_helper_hack;
 import 'package:stagess/common/extensions/visiting_priorities_extension.dart';
 import 'package:stagess/common/provider_helpers/itineraries_helpers.dart';
-import 'package:stagess/screens/visiting_students/widgets/zoom_button.dart';
 import 'package:stagess_common/models/itineraries/itinerary.dart';
 import 'package:stagess_common/models/itineraries/waypoint.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
-import 'package:stagess_common_flutter/widgets/cached_tile_layer.dart';
+import 'package:stagess_common_flutter/widgets/cached_flutter_map.dart';
 
 String _makeRouteKey(Itinerary points) {
   final s = points.map((e) {
@@ -349,20 +348,18 @@ class _RoutingMapState extends State<RoutingMap> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8),
-      child: FlutterMap(
+      child: CachedFlutterMap(
         options: MapOptions(
-          initialCenter: widget.centerWaypoint.toLatLng(),
-          initialZoom: 12,
-        ),
-        children: [
-          const CachedTileLayer(),
-          if (widget.controller._route != null)
-            PolylineLayer(
-              polylines: _routeToPolyline(widget.controller._route),
-            ),
-          MarkerLayer(markers: _waypointsToMarkers()),
-          const ZoomButtons(),
-        ],
+            initialCenter: widget.centerWaypoint.toLatLng(), initialZoom: 12),
+        routeOverlayBuilder: widget.controller._route == null
+            ? null
+            : (context) {
+                return PolylineLayer(
+                  polylines: _routeToPolyline(widget.controller._route),
+                );
+              },
+        markersOverlayBuilder: (context) =>
+            MarkerLayer(markers: _waypointsToMarkers()),
       ),
     );
   }

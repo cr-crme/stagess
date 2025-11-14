@@ -47,6 +47,7 @@
                 "--dart-define=STAGESS_BACKEND_IP=< IP_ADDRESS | [stagessserver.adoprevit.org] | localhost >",
                 "--dart-define=STAGESS_USE_DEV_DB=< true | [false] >",
                 "--dart-define=STAGESS_BACKEND_PORT=< PORT | [8443] >",
+                "--dart-define=flutter.flutter_map.unblockOSM=Our tile servers are not.",
             ],
         },
         {
@@ -60,6 +61,7 @@
                 "--dart-define=STAGESS_BACKEND_IP=< IP_ADDRESS | [stagessserver.adoprevit.org] | localhost >",
                 "--dart-define=STAGESS_USE_DEV_DB=< true | [false] >",
                 "--dart-define=STAGESS_BACKEND_PORT=< PORT | [8443] >",
+                "--dart-define=flutter.flutter_map.unblockOSM=Our tile servers are not.",
             ],
         },
         {
