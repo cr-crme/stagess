@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/extensions/enterprise_extension.dart';
@@ -21,6 +20,7 @@ import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
+import 'package:stagess_common_flutter/widgets/cached_tile_layer.dart';
 
 final _logger = Logger('EnterprisesListScreen');
 
@@ -382,11 +382,7 @@ class _EnterprisesByMap extends StatelessWidget {
             initialZoom: 14,
           ),
           children: [
-            TileLayer(
-              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-              userAgentPackageName: 'dev.fleaflet.flutter_map.example',
-              tileProvider: CancellableNetworkTileProvider(),
-            ),
+            const CachedTileLayer(),
             MarkerLayer(markers: _latlngToMarkers(context, locations)),
             const ZoomButtons(),
           ],

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:hive/hive.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:routing_client_dart/routing_client_dart.dart' as routing_client;
@@ -18,6 +17,7 @@ import 'package:stagess/screens/visiting_students/widgets/zoom_button.dart';
 import 'package:stagess_common/models/itineraries/itinerary.dart';
 import 'package:stagess_common/models/itineraries/waypoint.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/widgets/cached_tile_layer.dart';
 
 String _makeRouteKey(Itinerary points) {
   final s = points.map((e) {
@@ -355,11 +355,7 @@ class _RoutingMapState extends State<RoutingMap> {
           initialZoom: 12,
         ),
         children: [
-          TileLayer(
-            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            userAgentPackageName: 'dev.fleaflet.flutter_map.example',
-            tileProvider: CancellableNetworkTileProvider(),
-          ),
+          const CachedTileLayer(),
           if (widget.controller._route != null)
             PolylineLayer(
               polylines: _routeToPolyline(widget.controller._route),

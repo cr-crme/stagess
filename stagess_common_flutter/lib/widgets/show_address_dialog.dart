@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/itineraries/waypoint.dart';
+import 'package:stagess_common_flutter/widgets/cached_tile_layer.dart';
 
 // coverage:ignore-file
 class ShowAddressDialog extends StatelessWidget {
@@ -20,11 +20,7 @@ class ShowAddressDialog extends StatelessWidget {
         initialZoom: 16,
       ),
       children: [
-        TileLayer(
-          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'dev.fleaflet.flutter_map.example',
-          tileProvider: CancellableNetworkTileProvider(),
-        ),
+        const CachedTileLayer(),
         MarkerLayer(
           markers: [
             Marker(
