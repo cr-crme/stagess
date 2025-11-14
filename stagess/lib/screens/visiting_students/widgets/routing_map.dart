@@ -1,9 +1,10 @@
 import 'dart:convert';
 
-import 'package:collection/collection.dart';
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
+import 'package:hive/hive.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:routing_client_dart/routing_client_dart.dart' as routing_client;
 // ignore: implementation_imports
@@ -11,13 +12,32 @@ import 'package:routing_client_dart/src/models/osrm/road.dart' as routing_hack;
 // ignore: implementation_imports
 import 'package:routing_client_dart/src/models/osrm/road_helper.dart'
     as routing_helper_hack;
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stagess/common/extensions/visiting_priorities_extension.dart';
 import 'package:stagess/common/provider_helpers/itineraries_helpers.dart';
 import 'package:stagess/screens/visiting_students/widgets/zoom_button.dart';
 import 'package:stagess_common/models/itineraries/itinerary.dart';
 import 'package:stagess_common/models/itineraries/waypoint.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+
+String _makeRouteKey(Itinerary points) {
+  final s = points.map((e) {
+    final tp = e.toLatLng();
+    return '${tp.latitude},${tp.longitude}';
+  }).join('|');
+  return sha1.convert(utf8.encode(s)).toString();
+}
+
+dynamic _deepCast(dynamic value) {
+  if (value is Map) {
+    return value.map((key, val) => MapEntry(key.toString(), _deepCast(val)));
+  }
+
+  if (value is List) {
+    return value.map((e) => _deepCast(e)).toList();
+  }
+
+  return value;
+}
 
 extension OSRMRoadExtension on routing_hack.OSRMRoad {
   Map<String, dynamic> toJson() {
@@ -167,27 +187,14 @@ class RoutingController {
   Future<routing_client.Route?> _getActivateRoute() async {
     if (_itinerary.length <= 1) return null;
 
-    final serializedTitle = _itinerary.fold(
-      'Start',
-      (previous, current) =>
-          '$previous -> (${current.address.latitude},${current.address.longitude})',
-    );
-    final prefs = await SharedPreferences.getInstance();
+    var box = await Hive.openBox('route_cache');
+    final key = _makeRouteKey(_itinerary);
 
     // Check if the route is cached
-    final cachedRoute = (prefs.getStringList('cached_routes') ?? [])
-        .firstWhereOrNull((e) => e.startsWith(serializedTitle));
-    if (cachedRoute != null) {
-      try {
-        return routing_hack.OSRMRoad.fromOSRMJson(
-            route:
-                jsonDecode(cachedRoute.substring(serializedTitle.length + 3)));
-      } catch (_) {
-        // Ignore cache errors and recompute route.
-      }
+    if (box.containsKey(key)) {
+      return routing_hack.OSRMRoad.fromOSRMJson(route: _deepCast(box.get(key)));
     }
 
-    // If we reach here, we need to compute the route.
     final out = await _routingManager.getRoute(
       request: routing_client.OSRMRequest.route(
         waypoints: _itinerary.map((e) => e.toLngLat()).toList(),
@@ -197,15 +204,8 @@ class RoutingController {
       ),
     ) as routing_hack.OSRMRoad;
 
-    // Cache the route for future use.
-    await prefs.setStringList(
-      'cached_routes',
-      [
-        ...?prefs.getStringList('cached_routes'),
-        '$serializedTitle:: ${jsonEncode(out.toJson())}',
-      ],
-    );
-
+    // Cache and return the route
+    await box.put(key, out.toJson());
     return out;
   }
 
