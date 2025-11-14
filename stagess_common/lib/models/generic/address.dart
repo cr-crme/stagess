@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
 import 'package:http/http.dart' as http;
@@ -6,7 +7,13 @@ import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:xml/xml.dart';
 
-final _apiKey = const String.fromEnvironment('STAGESS_GOOGLE_MAPS_API_KEY');
+String get _apiKey {
+  const fromDartDefined = String.fromEnvironment('STAGESS_GOOGLE_MAPS_API_KEY');
+  if (fromDartDefined.isNotEmpty) return fromDartDefined;
+  final fromEnvironment = Platform.environment['STAGESS_GOOGLE_MAPS_API_KEY'];
+  if (fromEnvironment?.isNotEmpty ?? false) return fromEnvironment!;
+  throw Exception('Google Maps API key is not defined');
+}
 
 class Address extends ItemSerializable {
   Address({

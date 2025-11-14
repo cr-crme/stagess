@@ -20,12 +20,10 @@
             "request": "launch",
             "type": "dart",
             "program": "stagess_backend/bin/backend.dart",
-            "toolArgs": [
-                "--define=STAGESS_GOOGLE_MAPS_API_KEY=< YOUR_GOOGLE_MAPS_API_KEY >",
-            ],
             "env": {
                 "STAGESS_USE_SSL": "< [true] | false >",
                 "STAGESS_BACKEND_PORT": "< PORT | [3457] >",
+                "STAGESS_GOOGLE_MAPS_API_KEY": "< YOUR_GOOGLE_MAPS_API_KEY >",
                 "STAGESS_FIREBASE_WEB_API_KEY": "<PUT YOUR FIREBASE WEB API KEY HERE>",
                 "STAGESS_DATABASE_BACKEND": "< mariadb | mysql | mock >",
                 "STAGESS_DATABASE_DEV_PORT": "<PUT YOUR DEV DATABASE PORT HERE>",
@@ -59,7 +57,7 @@
             "args": [
                 "--dart-define=STAGESS_GOOGLE_MAPS_API_KEY=< YOUR_GOOGLE_MAPS_API_KEY >",
                 "--dart-define=STAGESS_USE_SSL=< [true] | false >",
-                "--dart-define=STAGESS_BACKEND_IP=< "IP_ADDRESS" | ["stagessserver.adoprevit.org"] | "localhost" >",
+                "--dart-define=STAGESS_BACKEND_IP=< IP_ADDRESS | [stagessserver.adoprevit.org] | localhost >",
                 "--dart-define=STAGESS_USE_DEV_DB=< true | [false] >",
                 "--dart-define=STAGESS_BACKEND_PORT=< PORT | [8443] >",
             ],

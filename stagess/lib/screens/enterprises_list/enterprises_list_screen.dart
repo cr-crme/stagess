@@ -59,7 +59,7 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen>
         IconButton(
           onPressed: () {
             _withSearchBar = false;
-            _enterpriseKey.currentState!.searchController.text = '';
+            _enterpriseKey.currentState?.searchController.text = '';
             showDialog(
               context: context,
               barrierDismissible: false,
