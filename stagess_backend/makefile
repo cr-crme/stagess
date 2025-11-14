@@ -35,9 +35,10 @@ launcher:
 	append_to_file "#!/bin/bash"; \
 	append_to_file ""; \
 	append_to_file "# Define the required exports"; \
-	append_to_file "export STAGESS_FIREBASE_WEB_API_KEY=${STAGESS_FIREBASE_WEB_API_KEY}"; \
 	append_to_file "export STAGESS_USE_SSL=false"; \
 	append_to_file "export STAGESS_BACKEND_PORT=${STAGESS_BACKEND_PORT}"; \
+	append_to_file "export STAGESS_GOOGLE_MAPS_API_KEY=${STAGESS_GOOGLE_MAPS_API_KEY}"; \
+	append_to_file "export STAGESS_FIREBASE_WEB_API_KEY=${STAGESS_FIREBASE_WEB_API_KEY}"; \
 	append_to_file "export STAGESS_DATABASE_BACKEND=${STAGESS_DATABASE_BACKEND}"; \
 	append_to_file "export STAGESS_DATABASE_DEV_PORT=${STAGESS_DATABASE_DEV_PORT}"; \
 	append_to_file "export STAGESS_DATABASE_DEV_NAME=${STAGESS_DATABASE_DEV_NAME}"; \
