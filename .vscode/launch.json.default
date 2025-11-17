@@ -20,6 +20,9 @@
             "request": "launch",
             "type": "dart",
             "program": "stagess_backend/bin/backend.dart",
+            "toolArgs": [
+                "--define=STAGESS_SKIP_LOG=< [true] | false >",
+            ],
             "env": {
                 "STAGESS_USE_SSL": "< [true] | false >",
                 "STAGESS_BACKEND_PORT": "< PORT | [3457] >",

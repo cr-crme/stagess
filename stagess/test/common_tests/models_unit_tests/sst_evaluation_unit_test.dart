@@ -1,12 +1,12 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common/models/internships/sst_evaluation.dart';
 
 import '../utils.dart';
 
 void main() {
   group('SstEvaluation', () {
     test('empty one is tagged non-filled', () {
-      final sstEvaluation = JobSstEvaluation.empty;
+      final sstEvaluation = SstEvaluation.empty;
       expect(sstEvaluation.isFilled, isFalse);
 
       sstEvaluation.update(questions: {
@@ -16,7 +16,7 @@ void main() {
     });
 
     test('"update" erases old answers', () {
-      final sstEvaluation = JobSstEvaluation.empty;
+      final sstEvaluation = SstEvaluation.empty;
       sstEvaluation.update(questions: {
         'Q1': ['My first answer']
       });
@@ -35,9 +35,9 @@ void main() {
     });
 
     test('serialization and deserialization works', () {
-      final sstEvaluation = dummyJobSstEvaluation();
+      final sstEvaluation = dummySstEvaluation();
       final serialized = sstEvaluation.serialize();
-      final deserialized = JobSstEvaluation.fromSerialized(serialized);
+      final deserialized = SstEvaluation.fromSerialized(serialized);
 
       expect(serialized, {
         'id': sstEvaluation.id,
@@ -49,8 +49,7 @@ void main() {
       expect(deserialized.questions, sstEvaluation.questions);
 
       // Test for empty deserialize to make sure it doesn't crash
-      final emptyDeserialized =
-          JobSstEvaluation.fromSerialized({'id': 'emptyId'});
+      final emptyDeserialized = SstEvaluation.fromSerialized({'id': 'emptyId'});
       expect(emptyDeserialized.id, 'emptyId');
       expect(emptyDeserialized.questions, {});
       expect(emptyDeserialized.date.millisecondsSinceEpoch,

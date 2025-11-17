@@ -7,6 +7,7 @@ import 'package:stagess_common/models/internships/internship_evaluation_attitude
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_visa.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
+import 'package:stagess_common/models/internships/sst_evaluation.dart';
 import 'package:stagess_common/models/internships/time_utils.dart';
 import 'package:stagess_common/models/internships/transportation.dart';
 import 'package:stagess_common/models/persons/person.dart';
@@ -323,6 +324,7 @@ class Internship extends ExtendedItemSerializable {
   final List<InternshipEvaluationAttitude> attitudeEvaluations;
   final List<InternshipEvaluationVisa> visaEvaluations;
 
+  SstEvaluation? sstEvaluation;
   PostInternshipEnterpriseEvaluation? enterpriseEvaluation;
 
   bool get isClosed => isNotActive && !isEnterpriseEvaluationPending;
@@ -397,6 +399,7 @@ class Internship extends ExtendedItemSerializable {
     required this.skillEvaluations,
     required this.attitudeEvaluations,
     required this.visaEvaluations,
+    required this.sstEvaluation,
     required this.enterpriseEvaluation,
   }) : _mutables = mutables {
     _finalizeInitialization();
@@ -424,6 +427,7 @@ class Internship extends ExtendedItemSerializable {
     List<InternshipEvaluationSkill>? skillEvaluations,
     List<InternshipEvaluationAttitude>? attitudeEvaluations,
     List<InternshipEvaluationVisa>? visaEvaluations,
+    this.sstEvaluation,
     this.enterpriseEvaluation,
   })  : _mutables = [
           InternshipMutableElements(
@@ -457,6 +461,7 @@ class Internship extends ExtendedItemSerializable {
         skillEvaluations: [],
         attitudeEvaluations: [],
         visaEvaluations: [],
+        sstEvaluation: null,
         enterpriseEvaluation: null,
       );
 
@@ -493,6 +498,9 @@ class Internship extends ExtendedItemSerializable {
                 deserializer: (map) =>
                     InternshipEvaluationVisa.fromSerialized(map)) ??
             [],
+        sstEvaluation = map?['sst_evaluation'] == null
+            ? null
+            : SstEvaluation.fromSerialized(map?['sst_evaluation']),
         enterpriseEvaluation = map?['enterprise_evaluation'] == null
             ? null
             : PostInternshipEnterpriseEvaluation.fromSerialized(
@@ -519,6 +527,7 @@ class Internship extends ExtendedItemSerializable {
         'skill_evaluations': skillEvaluations.serialize(),
         'attitude_evaluations': attitudeEvaluations.serialize(),
         'visa_evaluations': visaEvaluations.serialize(),
+        'sst_evaluation': sstEvaluation?.serialize(),
         'enterprise_evaluation': enterpriseEvaluation?.serialize(),
       };
 
@@ -539,6 +548,7 @@ class Internship extends ExtendedItemSerializable {
         'skill_evaluations': InternshipEvaluationSkill.fetchableFields,
         'attitude_evaluations': InternshipEvaluationAttitude.fetchableFields,
         'visa_evaluations': InternshipEvaluationVisa.fetchableFields,
+        'sst_evaluation': FetchableFields.optional,
         'enterprise_evaluation':
             PostInternshipEnterpriseEvaluation.fetchableFields,
       });
@@ -577,6 +587,7 @@ class Internship extends ExtendedItemSerializable {
     List<InternshipEvaluationSkill>? skillEvaluations,
     List<InternshipEvaluationAttitude>? attitudeEvaluations,
     List<InternshipEvaluationVisa>? visaEvaluations,
+    SstEvaluation? sstEvaluation,
     PostInternshipEnterpriseEvaluation? enterpriseEvaluation,
   }) {
     return Internship._(
@@ -599,6 +610,7 @@ class Internship extends ExtendedItemSerializable {
       attitudeEvaluations:
           attitudeEvaluations?.toList() ?? this.attitudeEvaluations,
       visaEvaluations: visaEvaluations?.toList() ?? this.visaEvaluations,
+      sstEvaluation: sstEvaluation ?? this.sstEvaluation,
       enterpriseEvaluation: enterpriseEvaluation ?? this.enterpriseEvaluation,
     );
   }
@@ -625,6 +637,7 @@ class Internship extends ExtendedItemSerializable {
       'skill_evaluations',
       'attitude_evaluations',
       'visa_evaluations',
+      'sst_evaluation',
       'enterprise_evaluation',
     ];
     // Make sure data does not contain unrecognized fields
@@ -676,6 +689,9 @@ class Internship extends ExtendedItemSerializable {
               deserializer: (map) =>
                   InternshipEvaluationVisa.fromSerialized(map)) ??
           visaEvaluations,
+      sstEvaluation: data['sst_evaluation'] == null
+          ? sstEvaluation
+          : SstEvaluation.fromSerialized(data['sst_evaluation']),
       enterpriseEvaluation: data['enterprise_evaluation'] == null
           ? enterpriseEvaluation
           : PostInternshipEnterpriseEvaluation.fromSerialized(

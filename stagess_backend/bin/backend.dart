@@ -15,6 +15,7 @@ import 'package:stagess_backend/server/connexions.dart';
 import 'package:stagess_backend/server/database_manager.dart';
 import 'package:stagess_backend/server/http_request_handler.dart';
 import 'package:stagess_backend/utils/network_rate_limiter.dart';
+import 'package:stagess_common/models/generic/map_providers.dart';
 
 final _logger = Logger('BackendServer');
 
@@ -70,6 +71,9 @@ void main() async {
   // Get the Firebase API key from the environment variable
   final firebaseApiKey = _getFromEnvironment('STAGESS_FIREBASE_WEB_API_KEY');
 
+  await ReverseGeocodingProvider.instance
+      .initialize(provider: MapReverseGeocodingProvider.googleMaps);
+
   // Create an HTTP server listening on localhost:_backendPort
   final useSecure =
       _getFromEnvironment('STAGESS_USE_SSL', defaultValue: 'true') == 'true';
@@ -83,7 +87,7 @@ void main() async {
     databaseBackend: _databaseBackend,
     firebaseApiKey: firebaseApiKey,
     settings: _devSettings,
-    skipLog: true,
+    skipLog: const bool.fromEnvironment('STAGESS_SKIP_LOG', defaultValue: true),
   );
 
   final productionConnexions = await _connectDatabase(

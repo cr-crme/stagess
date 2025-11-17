@@ -3,9 +3,9 @@ import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
 import 'package:stagess/misc/question_file_service.dart';
-import 'package:stagess/screens/job_sst_form/job_sst_form_screen.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
-import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common_flutter/providers/internships_provider.dart';
 
 final _logger = Logger('SstExpansionPanel');
 
@@ -13,11 +13,9 @@ class SstExpansionPanel extends ExpansionPanel {
   SstExpansionPanel({
     required super.isExpanded,
     required Enterprise enterprise,
-    required Job job,
-    required void Function(Job job) addSstEvent,
   }) : super(
           canTapOnHeader: true,
-          body: _SstBody(enterprise, job, addSstEvent),
+          body: _SstBody(enterprise),
           headerBuilder: (context, isExpanded) => const ListTile(
             title: Text('Repérage des risques SST'),
           ),
@@ -25,20 +23,19 @@ class SstExpansionPanel extends ExpansionPanel {
 }
 
 class _SstBody extends StatelessWidget {
-  const _SstBody(
-    this.enterprise,
-    this.job,
-    this.addSstEvent,
-  );
+  const _SstBody(this.enterprise);
 
   final Enterprise enterprise;
-  final Job job;
-  final void Function(Job job) addSstEvent;
 
   @override
   Widget build(BuildContext context) {
-    _logger.finer(
-        'Building SstExpansionPanel for job: ${job.specialization.name}');
+    _logger
+        .finer('Building SstExpansionPanel for enterprise: ${enterprise.name}');
+
+    final internships = InternshipsProvider.of(context, listen: true);
+    // TODO CHANGE THIS FOR COLLECTION OF RESULTS
+    final internship =
+        internships.firstWhereOrNull((e) => e.enterpriseId == enterprise.id);
 
     return SizedBox(
       width: Size.infinite.width,
@@ -47,30 +44,15 @@ class _SstBody extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(job.sstEvaluation.isFilled
+            Text(internship?.sstEvaluation?.isFilled ?? false
                 ? 'Le questionnaire «\u00a0Repérer les risques SST\u00a0» a '
                     'été rempli pour ce poste de travail.\n'
                     'Dernière modification le '
-                    '${DateFormat.yMMMEd('fr_CA').format(job.sstEvaluation.date)}'
+                    '${DateFormat.yMMMEd('fr_CA').format(internship!.sstEvaluation!.date)}'
                 : 'Le questionnaire «\u00a0Repérer les risques SST\u00a0» n\'a '
                     'jamais été rempli pour ce poste de travail.'),
             const SizedBox(height: 12),
-            _buildAnswers(context),
-            Center(
-              child: TextButton(
-                onPressed: () => showJobSstFormDialog(context,
-                    enterpriseId: enterprise.id, jobId: job.id),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 4.0),
-                  child: Text(
-                    job.sstEvaluation.isFilled
-                        ? 'Afficher le détail\ndes risques et\nmoyens de prévention'
-                        : 'Remplir le\nquestionnaire SST',
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
+            _buildAnswers(context, enterprise, internship),
             const SizedBox(height: 12),
           ],
         ),
@@ -78,7 +60,16 @@ class _SstBody extends StatelessWidget {
     );
   }
 
-  Widget _buildAnswers(BuildContext context) {
+  Widget _buildAnswers(
+      BuildContext context, Enterprise enterprise, Internship? internship) {
+    final job =
+        enterprise.jobs.firstWhereOrNull((e) => e.id == internship?.jobId);
+    if (job == null ||
+        internship?.sstEvaluation == null ||
+        !internship!.sstEvaluation!.isFilled) {
+      return SizedBox.shrink();
+    }
+
     final questionIds = [...job.specialization.questions.map((e) => e)];
     final questions =
         questionIds.map((e) => QuestionFileService.fromId(e)).toList();
@@ -87,8 +78,8 @@ class _SstBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: questions.map((q) {
-        final answer = job.sstEvaluation.questions['Q${q.id}'];
-        final answerT = job.sstEvaluation.questions['Q${q.id}+t'];
+        final answer = internship.sstEvaluation!.questions['Q${q.id}'];
+        final answerT = internship.sstEvaluation!.questions['Q${q.id}+t'];
         if ((q.questionSummary == null && q.followUpQuestionSummary == null) ||
             (answer == null && answerT == null)) {
           return Container();

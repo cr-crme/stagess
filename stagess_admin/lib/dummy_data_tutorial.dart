@@ -11,6 +11,7 @@ import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
+import 'package:stagess_common/models/internships/sst_evaluation.dart';
 import 'package:stagess_common/models/internships/time_utils.dart'
     as time_utils;
 import 'package:stagess_common/models/internships/transportation.dart';
@@ -1121,7 +1122,6 @@ Future<void> _addDummyEnterprises(
       specialization:
           ActivitySectorsService.activitySectors[2].specializations[9],
       positionsOffered: {schoolAId: 2, schoolBId: 5, schoolCId: 1},
-      sstEvaluation: JobSstEvaluation.empty,
       incidents: Incidents(
         severeInjuries: [
           Incident(
@@ -1150,7 +1150,6 @@ Future<void> _addDummyEnterprises(
       specialization:
           ActivitySectorsService.activitySectors[0].specializations[7],
       positionsOffered: {schoolAId: 3, schoolBId: 5},
-      sstEvaluation: JobSstEvaluation.empty,
       incidents: Incidents(
         minorInjuries: [
           Incident(
@@ -1228,7 +1227,6 @@ Future<void> _addDummyEnterprises(
       specialization:
           ActivitySectorsService.activitySectors[0].specializations[7],
       positionsOffered: {schoolAId: 3, schoolBId: 5},
-      sstEvaluation: JobSstEvaluation.empty,
       incidents: Incidents.empty,
       minimumAge: 15,
       preInternshipRequests: PreInternshipRequests.fromStrings([]),
@@ -1284,20 +1282,6 @@ Future<void> _addDummyEnterprises(
       specialization:
           ActivitySectorsService.activitySectors[9].specializations[3],
       positionsOffered: {schoolAId: 3, schoolBId: 5},
-      sstEvaluation: JobSstEvaluation(
-        questions: {
-          'Q1': ['Oui'],
-          'Q1+t': ['Peu souvent, à la discrétion des employés.'],
-          'Q3': ['Un diable'],
-          'Q5': ['Des ciseaux'],
-          'Q9': ['Des solvants', 'Des produits de nettoyage'],
-          'Q12': ['Bruyant'],
-          'Q12+t': ['Bouchons a oreilles'],
-          'Q15': ['Oui'],
-          'Q18': ['Non'],
-        },
-        date: DateTime.now(),
-      ),
       incidents: Incidents.empty,
       minimumAge: 15,
       preInternshipRequests: PreInternshipRequests.fromStrings([
@@ -1362,7 +1346,6 @@ Future<void> _addDummyEnterprises(
       specialization:
           ActivitySectorsService.activitySectors[9].specializations[3],
       positionsOffered: {schoolAId: 2, schoolBId: 5},
-      sstEvaluation: JobSstEvaluation.empty,
       incidents: Incidents.empty,
       minimumAge: 15,
       preInternshipRequests: PreInternshipRequests.fromStrings([]),
@@ -1418,7 +1401,6 @@ Future<void> _addDummyEnterprises(
       specialization:
           ActivitySectorsService.activitySectors[2].specializations[9],
       positionsOffered: {schoolAId: 2, schoolBId: 5},
-      sstEvaluation: JobSstEvaluation.empty,
       incidents: Incidents.empty,
       minimumAge: 15,
       preInternshipRequests: PreInternshipRequests.fromStrings([]),
@@ -1475,7 +1457,6 @@ Future<void> _addDummyEnterprises(
       specialization:
           ActivitySectorsService.activitySectors[2].specializations[7],
       positionsOffered: {schoolAId: 1, schoolBId: 5},
-      sstEvaluation: JobSstEvaluation.empty,
       incidents: Incidents.empty,
       minimumAge: 15,
       preInternshipRequests: PreInternshipRequests.fromStrings([]),
@@ -1532,7 +1513,6 @@ Future<void> _addDummyEnterprises(
       specialization:
           ActivitySectorsService.activitySectors[0].specializations[7],
       positionsOffered: {schoolAId: 2, schoolBId: 5},
-      sstEvaluation: JobSstEvaluation.empty,
       incidents: Incidents.empty,
       minimumAge: 15,
       preInternshipRequests: PreInternshipRequests.fromStrings([]),
@@ -1589,7 +1569,6 @@ Future<void> _addDummyEnterprises(
       specialization:
           ActivitySectorsService.activitySectors[2].specializations[14],
       positionsOffered: {schoolAId: 1, schoolBId: 5, schoolCId: 1},
-      sstEvaluation: JobSstEvaluation.empty,
       incidents: Incidents.empty,
       minimumAge: 15,
       preInternshipRequests: PreInternshipRequests.fromStrings([]),
@@ -1641,7 +1620,6 @@ Future<void> _addDummyEnterprises(
       specialization:
           ActivitySectorsService.activitySectors[0].specializations[7],
       positionsOffered: {schoolAId: 3, schoolBId: 5},
-      sstEvaluation: JobSstEvaluation.empty,
       incidents: Incidents.empty,
       minimumAge: 15,
       preInternshipRequests: PreInternshipRequests.fromStrings([]),
@@ -1702,22 +1680,6 @@ Future<void> _addDummyEnterprises(
       specialization:
           ActivitySectorsService.activitySectors[1].specializations[2],
       positionsOffered: {schoolAId: 1, schoolBId: 5},
-      sstEvaluation: JobSstEvaluation(
-        questions: {
-          'Q1': ['Oui'],
-          'Q1+t': ['Plusieurs fois par jour, surtout des pots de fleurs.'],
-          'Q3': ['Un diable'],
-          'Q5': ['Un couteau', 'Des ciseaux', 'Un sécateur'],
-          'Q7': ['Des pesticides', 'Engrais'],
-          'Q12': ['Bruyant'],
-          'Q15': ['Non'],
-          'Q18': ['Oui'],
-          'Q18+t': [
-            'L\'élève ne portait pas ses gants malgré plusieurs avertissements, '
-                'et il s\'est ouvert profondément la paume en voulant couper une tige.',
-          ],
-        },
-      ),
       incidents: Incidents.empty,
       minimumAge: 15,
       preInternshipRequests: PreInternshipRequests.fromStrings([]),
@@ -1772,22 +1734,6 @@ Future<void> _addDummyEnterprises(
       specialization:
           ActivitySectorsService.activitySectors[1].specializations[2],
       positionsOffered: {schoolAId: 1, schoolBId: 5},
-      sstEvaluation: JobSstEvaluation(
-        questions: {
-          'Q1': ['Oui'],
-          'Q1+t': [
-            'En début et en fin de journée, surtout des pots de fleurs.',
-          ],
-          'Q3': ['Un diable'],
-          'Q5': ['Un couteau', 'Des ciseaux'],
-          'Q7': ['Des pesticides', 'Engrais'],
-          'Q12': ['__NOT_APPLICABLE_INTERNAL__'],
-          'Q15': ['Oui'],
-          'Q15+t': ['Aucun'],
-          'Q16': ['Ranger le local avant de quitter'],
-          'Q18': ['Non'],
-        },
-      ),
       incidents: Incidents.empty,
       minimumAge: 15,
       preInternshipRequests: PreInternshipRequests.fromStrings([]),
@@ -1964,6 +1910,20 @@ Future<void> _addDummyInternships(
         ),
       ],
       transportations: [Transportation.yes, Transportation.pass],
+      sstEvaluation: SstEvaluation(
+        questions: {
+          'Q1': ['Oui'],
+          'Q1+t': ['Peu souvent, à la discrétion des employés.'],
+          'Q3': ['Un diable'],
+          'Q5': ['Des ciseaux'],
+          'Q9': ['Des solvants', 'Des produits de nettoyage'],
+          'Q12': ['Bruyant'],
+          'Q12+t': ['Bouchons a oreilles'],
+          'Q15': ['Oui'],
+          'Q18': ['Non'],
+        },
+        date: DateTime.now(),
+      ),
       visitFrequencies: 'Une visite par semaine',
     ),
   );
@@ -1975,101 +1935,116 @@ Future<void> _addDummyInternships(
   );
   internships.add(
     Internship(
-      schoolBoardId: schoolBoardId,
-      creationDate: DateTime.now(),
-      studentId: students.firstWhere((e) => e.fullName == 'Thomas Caron').id,
-      signatoryTeacherId: teacherA1Id,
-      extraSupervisingTeacherIds: [],
-      enterpriseId:
-          enterprises.firstWhere((e) => e.name == 'Boucherie Marien').id,
-      jobId: enterprises
-          .firstWhere((e) => e.name == 'Boucherie Marien')
-          .jobs[0]
-          .id,
-      extraSpecializationIds: [],
-      supervisor: Person(
-        firstName: 'Claude',
-        middleName: null,
-        lastName: 'Simard',
-        dateBirth: null,
-        phone: null,
-        address: null,
-        email: '',
-      ),
-      dates: period,
-      expectedDuration: 135,
-      achievedDuration: -1,
-      endDate: DateTime(0),
-      weeklySchedules: [
-        WeeklySchedule(
-          schedule: {
-            Day.monday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.tuesday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.wednesday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.thursday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.friday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-          },
-          period: period,
+        schoolBoardId: schoolBoardId,
+        creationDate: DateTime.now(),
+        studentId: students.firstWhere((e) => e.fullName == 'Thomas Caron').id,
+        signatoryTeacherId: teacherA1Id,
+        extraSupervisingTeacherIds: [],
+        enterpriseId:
+            enterprises.firstWhere((e) => e.name == 'Boucherie Marien').id,
+        jobId: enterprises
+            .firstWhere((e) => e.name == 'Boucherie Marien')
+            .jobs[0]
+            .id,
+        extraSpecializationIds: [],
+        supervisor: Person(
+          firstName: 'Claude',
+          middleName: null,
+          lastName: 'Simard',
+          dateBirth: null,
+          phone: null,
+          address: null,
+          email: '',
         ),
-      ],
-      transportations: [Transportation.pass],
-      visitFrequencies: 'Une visite par semaine',
-    ),
+        dates: period,
+        expectedDuration: 135,
+        achievedDuration: -1,
+        endDate: DateTime(0),
+        weeklySchedules: [
+          WeeklySchedule(
+            schedule: {
+              Day.monday: DailySchedule(
+                blocks: [
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                  ),
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                  ),
+                ],
+              ),
+              Day.tuesday: DailySchedule(
+                blocks: [
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                  ),
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                  ),
+                ],
+              ),
+              Day.wednesday: DailySchedule(
+                blocks: [
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                  ),
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                  ),
+                ],
+              ),
+              Day.thursday: DailySchedule(
+                blocks: [
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                  ),
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                  ),
+                ],
+              ),
+              Day.friday: DailySchedule(
+                blocks: [
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                  ),
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                  ),
+                ],
+              ),
+            },
+            period: period,
+          ),
+        ],
+        transportations: [Transportation.pass],
+        visitFrequencies: 'Une visite par semaine',
+        sstEvaluation: SstEvaluation(
+          questions: {
+            'Q1': ['Oui'],
+            'Q1+t': [
+              'En début et en fin de journée, surtout des pots de fleurs.',
+            ],
+            'Q3': ['Un diable'],
+            'Q5': ['Un couteau', 'Des ciseaux'],
+            'Q7': ['Des pesticides', 'Engrais'],
+            'Q12': ['__NOT_APPLICABLE_INTERNAL__'],
+            'Q15': ['Oui'],
+            'Q15+t': ['Aucun'],
+            'Q16': ['Ranger le local avant de quitter'],
+            'Q18': ['Non'],
+          },
+        )),
   );
 
   startingPeriod = DateTime.now();
@@ -2537,61 +2512,77 @@ Future<void> _addDummyInternships(
   );
   internships.add(
     Internship(
-      schoolBoardId: schoolBoardId,
-      creationDate: DateTime.now(),
-      studentId: students.firstWhere((e) => e.fullName == 'Vanessa Monette').id,
-      signatoryTeacherId: teacherA1Id,
-      extraSupervisingTeacherIds: [],
-      enterpriseId: enterprises.firstWhere((e) => e.name == 'Jean Coutu').id,
-      jobId: enterprises.firstWhere((e) => e.name == 'Jean Coutu').jobs[0].id,
-      extraSpecializationIds: [],
-      supervisor: Person(
-        firstName: 'Francis',
-        middleName: null,
-        lastName: 'Beaudet',
-        dateBirth: null,
-        phone: null,
-        address: null,
-        email: '',
-      ),
-      dates: period,
-      endDate: period.end,
-      expectedDuration: 135,
-      achievedDuration: 100,
-      weeklySchedules: [
-        WeeklySchedule(
-          schedule: {
-            Day.monday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.tuesday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-          },
-          period: period,
+        schoolBoardId: schoolBoardId,
+        creationDate: DateTime.now(),
+        studentId:
+            students.firstWhere((e) => e.fullName == 'Vanessa Monette').id,
+        signatoryTeacherId: teacherA1Id,
+        extraSupervisingTeacherIds: [],
+        enterpriseId: enterprises.firstWhere((e) => e.name == 'Jean Coutu').id,
+        jobId: enterprises.firstWhere((e) => e.name == 'Jean Coutu').jobs[0].id,
+        extraSpecializationIds: [],
+        supervisor: Person(
+          firstName: 'Francis',
+          middleName: null,
+          lastName: 'Beaudet',
+          dateBirth: null,
+          phone: null,
+          address: null,
+          email: '',
         ),
-      ],
-      transportations: [Transportation.none],
-      visitFrequencies: 'Une visite par semaine',
-    ),
+        dates: period,
+        endDate: period.end,
+        expectedDuration: 135,
+        achievedDuration: 100,
+        weeklySchedules: [
+          WeeklySchedule(
+            schedule: {
+              Day.monday: DailySchedule(
+                blocks: [
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                  ),
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                  ),
+                ],
+              ),
+              Day.tuesday: DailySchedule(
+                blocks: [
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                  ),
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                  ),
+                ],
+              ),
+            },
+            period: period,
+          ),
+        ],
+        transportations: [Transportation.none],
+        visitFrequencies: 'Une visite par semaine',
+        sstEvaluation: SstEvaluation(
+          questions: {
+            'Q1': ['Oui'],
+            'Q1+t': ['Plusieurs fois par jour, surtout des pots de fleurs.'],
+            'Q3': ['Un diable'],
+            'Q5': ['Un couteau', 'Des ciseaux', 'Un sécateur'],
+            'Q7': ['Des pesticides', 'Engrais'],
+            'Q12': ['Bruyant'],
+            'Q15': ['Non'],
+            'Q18': ['Oui'],
+            'Q18+t': [
+              'L\'élève ne portait pas ses gants malgré plusieurs avertissements, '
+                  'et il s\'est ouvert profondément la paume en voulant couper une tige.',
+            ],
+          },
+        )),
   );
 
   startingPeriod = DateTime.now().subtract(Duration(days: 30));

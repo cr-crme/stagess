@@ -380,11 +380,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
               asName: 'incidents',
               idNameToDataTable: 'job_id',
               fieldsToFetch: ['id', 'incident_type', 'incident', 'date']),
-          sqlInterface.selectSubquery(
-              dataTableName: 'enterprise_job_sst_evaluation_questions',
-              asName: 'sst_evaluations',
-              idNameToDataTable: 'job_id',
-              fieldsToFetch: ['question', 'answers', 'date']),
         ],
       );
       final jobs = <String, dynamic>{};
@@ -457,17 +452,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
                 'minor_injuries': incidents
                     .where((e) => e['incident_type'] == 'minor_injuries')
                     .toList(),
-              };
-        final sstEvaluations = job['sst_evaluations'] as List? ?? [];
-        jobs[job['id']]['sst_evaluations'] = sstEvaluations.isEmpty
-            ? null
-            : {
-                'questions': {
-                  for (final Map question in sstEvaluations)
-                    question['question']:
-                        (question['answers'] as String?)?.split('\n') ?? []
-                },
-                'date': sstEvaluations.first['date'] ?? 0
               };
       }
       enterprise['jobs'] = jobs;
@@ -687,24 +671,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     await Future.wait(toWait);
   }
 
-  Future<void> _insertJobSstEvaluation(
-      JobSstEvaluation sstEvaluation, String jobId) async {
-    final serialized =
-        sstEvaluation.serialize()['questions'] as Map<String, dynamic>;
-    final toWait = <Future>[];
-    for (final question in serialized.keys) {
-      toWait.add(sqlInterface.performInsertQuery(
-          tableName: 'enterprise_job_sst_evaluation_questions',
-          data: {
-            'job_id': jobId.serialize(),
-            'date': sstEvaluation.date.serialize(),
-            'question': question,
-            'answers': (serialized[question] as List?)?.join('\n'),
-          }));
-    }
-    await Future.wait(toWait);
-  }
-
   Future<void> _insertToEnterprisesJob(String enterpriseId, Job job) async {
     await sqlInterface.performInsertQuery(tableName: 'enterprise_jobs', data: {
       'id': job.id.serialize(),
@@ -726,7 +692,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     toWait.add(_insertJobUniforms(job.uniforms, job.id.serialize()));
     toWait.add(_insertJobProtections(job.protections, job.id.serialize()));
     toWait.add(_insertJobIncidents(job.incidents, job.id.serialize()));
-    toWait.add(_insertJobSstEvaluation(job.sstEvaluation, job.id.serialize()));
 
     await Future.wait(toWait);
   }
@@ -916,17 +881,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
             tableName: 'enterprise_job_incidents',
             filters: {'job_id': job.id}));
         toWait.add(_insertJobIncidents(job.incidents, job.id.serialize()));
-      }
-
-      // It would be possible to update properly the sst evaluation, but
-      // it is not so important, so we use the same trick of deleting and
-      // reinserting.
-      if (differences.contains('sst_evaluations')) {
-        toWaitDeleted.add(sqlInterface.performDeleteQuery(
-            tableName: 'enterprise_job_sst_evaluation_questions',
-            filters: {'job_id': job.id}));
-        toWait.add(
-            _insertJobSstEvaluation(job.sstEvaluation, job.id.serialize()));
       }
 
       // Wait for all the deletions and insertions to finish

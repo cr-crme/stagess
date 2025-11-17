@@ -11,7 +11,6 @@ import 'package:stagess/router.dart';
 import 'package:stagess/screens/internship_forms/enterprise_steps/enterprise_evaluation_screen.dart';
 import 'package:stagess/screens/job_sst_form/job_sst_form_screen.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
-import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
@@ -29,7 +28,7 @@ int numberOfTasksToDo(BuildContext context) {
   return taskFunctions.fold<int>(0, (prev, e) => prev + e(context).length);
 }
 
-List<_JobEnterpriseInternshipStudent> _enterprisesToEvaluate(
+List<_EnterpriseInternshipStudent> _enterprisesToEvaluate(
     BuildContext context) {
   // We should evaluate a job of an enterprise if there is at least one
   // internship in this job and the no evaluation was ever performed
@@ -43,30 +42,12 @@ List<_JobEnterpriseInternshipStudent> _enterprisesToEvaluate(
   // This happens sometimes, so we need to wait a frame
   if (internships.isEmpty || enterprises.isEmpty) return [];
 
-  List<_JobEnterpriseInternshipStudent> out = [];
-  for (final enterprise in enterprises) {
-    for (final job in enterprise.availablejobs(context)) {
-      if (!job.sstEvaluation.isFilled) {
-        final interns = internships
-            .where(
-              (e) =>
-                  e.isActive &&
-                  e.jobId == job.id &&
-                  e.supervisingTeacherIds.contains(myId),
-            )
-            .toList();
-        if (interns.isEmpty) continue;
-
-        interns.sort((a, b) => a.dates.start.compareTo(b.dates.start));
-
-        out.add(
-          _JobEnterpriseInternshipStudent(
-            enterprise: enterprise,
-            job: job,
-            internship: interns[0],
-          ),
-        );
-      }
+  List<_EnterpriseInternshipStudent> out = [];
+  for (final internship in internships) {
+    if (!(internship.sstEvaluation?.isFilled ?? false)) {
+      out.add(
+        _EnterpriseInternshipStudent(internship: internship),
+      );
     }
   }
 
@@ -74,7 +55,7 @@ List<_JobEnterpriseInternshipStudent> _enterprisesToEvaluate(
   return out;
 }
 
-List<_JobEnterpriseInternshipStudent> _internshipsToTerminate(
+List<_EnterpriseInternshipStudent> _internshipsToTerminate(
     BuildContext context) {
   // We should terminate an internship if the end date is passed for more that
   // one day
@@ -87,7 +68,7 @@ List<_JobEnterpriseInternshipStudent> _internshipsToTerminate(
   // This happens sometimes, so we need to wait a frame
   if (internships.isEmpty || students.isEmpty || enterprises.isEmpty) return [];
 
-  List<_JobEnterpriseInternshipStudent> out = [];
+  List<_EnterpriseInternshipStudent> out = [];
 
   for (final internship in internships) {
     if (internship.shouldTerminate) {
@@ -102,7 +83,7 @@ List<_JobEnterpriseInternshipStudent> _internshipsToTerminate(
       if (enterprise == null) continue;
 
       out.add(
-        _JobEnterpriseInternshipStudent(
+        _EnterpriseInternshipStudent(
           internship: internship,
           student: student,
           enterprise: enterprise,
@@ -115,7 +96,7 @@ List<_JobEnterpriseInternshipStudent> _internshipsToTerminate(
   return out;
 }
 
-List<_JobEnterpriseInternshipStudent> _postInternshipEvaluationToDo(
+List<_EnterpriseInternshipStudent> _postInternshipEvaluationToDo(
     BuildContext context) {
   // We should evaluate an internship as soon as it is terminated
   final internships = InternshipsProvider.of(context);
@@ -127,7 +108,7 @@ List<_JobEnterpriseInternshipStudent> _postInternshipEvaluationToDo(
   // This happens sometimes, so we need to wait a frame
   if (internships.isEmpty || students.isEmpty || enterprises.isEmpty) return [];
 
-  List<_JobEnterpriseInternshipStudent> out = [];
+  List<_EnterpriseInternshipStudent> out = [];
 
   for (final internship in internships) {
     if (internship.isEnterpriseEvaluationPending) {
@@ -142,7 +123,7 @@ List<_JobEnterpriseInternshipStudent> _postInternshipEvaluationToDo(
       if (enterprise == null) continue;
 
       out.add(
-        _JobEnterpriseInternshipStudent(
+        _EnterpriseInternshipStudent(
           internship: internship,
           student: student,
           enterprise: enterprise,
@@ -227,8 +208,9 @@ class _SstRisk extends StatelessWidget {
             ? [const _AllTasksDone()]
             : jobs.map((e) {
                 final enterprise = e.enterprise!;
-                final job = e.job!;
                 final internship = e.internship!;
+                final job =
+                    enterprise.jobs.firstWhere((j) => j.id == internship.jobId);
 
                 return _TaskTile(
                   title: enterprise.name,
@@ -237,11 +219,8 @@ class _SstRisk extends StatelessWidget {
                   iconColor: Theme.of(context).colorScheme.secondary,
                   date: internship.dates.start,
                   buttonTitle: 'Remplir le\nquestionnaire SST',
-                  onTap: () => showJobSstFormDialog(
-                    context,
-                    enterpriseId: enterprise.id,
-                    jobId: job.id,
-                  ),
+                  onTap: () => showJobSstFormDialog(context,
+                      internshipId: internship.id),
                 );
               })),
       ],
@@ -405,15 +384,13 @@ class _TaskTile extends StatelessWidget {
   }
 }
 
-class _JobEnterpriseInternshipStudent {
+class _EnterpriseInternshipStudent {
   final Enterprise? enterprise;
-  final Job? job;
   final Internship? internship;
   final Student? student;
 
-  _JobEnterpriseInternshipStudent({
+  _EnterpriseInternshipStudent({
     this.enterprise,
-    this.job,
     this.internship,
     this.student,
   });

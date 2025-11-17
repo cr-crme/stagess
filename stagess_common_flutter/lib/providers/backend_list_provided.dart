@@ -570,7 +570,8 @@ Future<CommunicationProtocol> _sendMessageWithResponse({
     },
   );
   if (answer.response == Response.failure) {
-    throw Exception('Error while processing the request: ${answer.field}');
+    throw Exception(
+        'Error while processing the request: ${answer.field} (${answer.data?['error']})');
   }
   return answer;
 }

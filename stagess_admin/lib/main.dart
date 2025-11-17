@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:stagess_admin/extensions/auth_provider_extension.dart';
 import 'package:stagess_admin/firebase_options.dart';
 import 'package:stagess_admin/screens/router.dart';
+import 'package:stagess_common/models/generic/map_providers.dart';
 import 'package:stagess_common/services/backend_helpers.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
@@ -47,6 +48,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   initializeDateFormatting('fr_CA');
+
+  await TileProvider.instance.initialize(provider: MapTileProvider.googleMaps);
+  await ReverseGeocodingProvider.instance
+      .initialize(provider: MapReverseGeocodingProvider.googleMaps);
 
   runApp(Home(useMockers: useMockers, backendUri: backendUri));
 }

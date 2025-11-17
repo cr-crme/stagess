@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:stagess_admin/dummy_data.dart';
 import 'package:stagess_admin/dummy_data_tutorial.dart';
 import 'package:stagess_admin/extensions/auth_provider_extension.dart';
 import 'package:stagess_admin/screens/router.dart';
@@ -33,27 +32,25 @@ class MainDrawer extends StatelessWidget {
 
     return Drawer(
       width: iconOnly ? 80.0 : null,
-      shape:
-          roundedCorners
-              ? null
-              : RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(0.0),
-              ),
+      shape: roundedCorners
+          ? null
+          : RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(0.0),
+            ),
       child: Scaffold(
-        appBar:
-            showTitle
-                ? AppBar(
-                  title: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(Icons.menu),
-                      SizedBox(width: 8.0),
-                      if (!iconOnly) const Text('Menu'),
-                    ],
-                  ),
-                  automaticallyImplyLeading: false,
-                )
-                : null,
+        appBar: showTitle
+            ? AppBar(
+                title: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.menu),
+                    SizedBox(width: 8.0),
+                    if (!iconOnly) const Text('Menu'),
+                  ],
+                ),
+                automaticallyImplyLeading: false,
+              )
+            : null,
         body: SizedBox.expand(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -64,11 +61,10 @@ class MainDrawer extends StatelessWidget {
                 _DrawerItem(
                   titleText: 'Se déconnecter',
                   icon: Icons.logout,
-                  onTap:
-                      () => AuthProviderExtension.disconnectAll(
-                        context,
-                        showConfirmDialog: false,
-                      ),
+                  onTap: () => AuthProviderExtension.disconnectAll(
+                    context,
+                    showConfirmDialog: false,
+                  ),
                   iconOnly: iconOnly,
                   canPop: canPop,
                 ),
@@ -125,11 +121,10 @@ class MainDrawer extends StatelessWidget {
                         _DrawerItem(
                           titleText: 'Se déconnecter',
                           icon: Icons.logout,
-                          onTap:
-                              () => AuthProviderExtension.disconnectAll(
-                                context,
-                                showConfirmDialog: true,
-                              ),
+                          onTap: () => AuthProviderExtension.disconnectAll(
+                            context,
+                            showConfirmDialog: true,
+                          ),
                           iconOnly: iconOnly,
                           canPop: canPop,
                         ),
@@ -147,17 +142,6 @@ class MainDrawer extends StatelessWidget {
                       icon: Icons.restore_from_trash_outlined,
                       onTap: () async {
                         await resetDummyDataTutorial(context);
-                        if (context.mounted && canPop) Navigator.pop(context);
-                      },
-                      tileColor: Colors.red,
-                      iconOnly: iconOnly,
-                      canPop: canPop,
-                    ),
-                    _DrawerItem(
-                      titleText: 'Réinitialiser la base de données (Dev)',
-                      icon: Icons.restore_from_trash_outlined,
-                      onTap: () async {
-                        await resetDummyData(context);
                         if (context.mounted && canPop) Navigator.pop(context);
                       },
                       tileColor: Colors.red,
@@ -184,9 +168,9 @@ class _DrawerItem extends StatelessWidget {
     required this.iconOnly,
     required this.canPop,
   }) : assert(
-         (route != null || onTap != null) && (route == null || onTap == null),
-         'One parameter has to be null while the other one is not.',
-       );
+          (route != null || onTap != null) && (route == null || onTap == null),
+          'One parameter has to be null while the other one is not.',
+        );
 
   final String? route;
   final IconData icon;
@@ -201,8 +185,7 @@ class _DrawerItem extends StatelessWidget {
     final isCurrentlySelectedTile =
         ModalRoute.of(context)!.settings.name == route;
 
-    final onPressed =
-        onTap ??
+    final onPressed = onTap ??
         () {
           if (isCurrentlySelectedTile && canPop) Navigator.pop(context);
           GoRouter.of(context).goNamed(route!);
@@ -210,18 +193,16 @@ class _DrawerItem extends StatelessWidget {
 
     final leadingIcon = Icon(
       icon,
-      color:
-          isCurrentlySelectedTile
-              ? Theme.of(context).primaryColor
-              : Colors.black54,
+      color: isCurrentlySelectedTile
+          ? Theme.of(context).primaryColor
+          : Colors.black54,
     );
 
     return Card(
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12.0),
-          color:
-              tileColor ??
+          color: tileColor ??
               (isCurrentlySelectedTile
                   ? Theme.of(context).primaryColor.withAlpha(40)
                   : null),
@@ -229,13 +210,12 @@ class _DrawerItem extends StatelessWidget {
         child: ListTile(
           onTap: onPressed,
           leading: leadingIcon,
-          title:
-              iconOnly
-                  ? null
-                  : Text(
-                    titleText,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
+          title: iconOnly
+              ? null
+              : Text(
+                  titleText,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
         ),
       ),
     );

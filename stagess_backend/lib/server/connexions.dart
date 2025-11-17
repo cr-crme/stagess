@@ -140,10 +140,11 @@ class Connexions {
               requestType: RequestType.response,
               data: {'error': e.toString()},
               response: Response.failure));
-    } catch (e) {
+    } catch (e, st) {
       if (!skipLog) {
         _logger.severe(
-            'Internal error while processing request from client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $e');
+            'Internal error while processing request from client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $e',
+            st);
       }
       await _send(client,
           message: CommunicationProtocol(

@@ -258,6 +258,11 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             ],
             idNameToDataTable: 'internship_id',
           ),
+          sqlInterface.selectSubquery(
+              dataTableName: 'internship_sst_evaluation_questions',
+              asName: 'sst_questions',
+              idNameToDataTable: 'internship_id',
+              fieldsToFetch: ['question', 'answers', 'date']),
         ]);
 
     final map = <String, Internship>{};
@@ -520,6 +525,18 @@ class MySqlInternshipsRepository extends InternshipsRepository {
         visaEvaluations.add(evaluation);
       }
       internship['visa_evaluations'] = visaEvaluations;
+
+      final sstQuestions = internship['sst_questions'] as List? ?? [];
+      internship['sst_evaluation'] = sstQuestions.isEmpty
+          ? null
+          : {
+              'questions': {
+                for (final Map question in sstQuestions)
+                  question['question']:
+                      (question['answers'] as String?)?.split('\n') ?? []
+              },
+              'date': sstQuestions.first['date'] ?? 0
+            };
 
       internship['enterprise_evaluation'] =
           (internship['enterprise_evaluation'] as List?)?.firstOrNull;
@@ -934,6 +951,37 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     _insertToVisaEvaluations(internship, previous);
   }
 
+  Future<void> _insertJobSstEvaluation(Internship internship) async {
+    final serialized = internship.sstEvaluation?.serialize()['questions']
+        as Map<String, dynamic>?;
+
+    final toWait = <Future>[];
+    for (final question in (serialized?.keys.toList() ?? [])) {
+      toWait.add(sqlInterface.performInsertQuery(
+          tableName: 'internship_sst_evaluation_questions',
+          data: {
+            'internship_id': internship.id.serialize(),
+            'date': internship.sstEvaluation!.date.serialize(),
+            'question': question,
+            'answers': (serialized![question] as List?)?.join('\n'),
+          }));
+    }
+    await Future.wait(toWait);
+  }
+
+  Future<void> _updateJobSstEvaluation(
+      Internship internship, Internship previous) async {
+    final differences = internship.getDifference(previous);
+    if (!differences.contains('sst_evaluation')) return;
+
+    // It would be possible to update properly the sst evaluation, but
+    // it is not so important, so we use the trick of deleting and reinserting.
+    await sqlInterface.performDeleteQuery(
+        tableName: 'internship_sst_evaluation_questions',
+        filters: {'internship_id': internship.id});
+    await _insertJobSstEvaluation(internship);
+  }
+
   Future<void> _insertToEnterpriseEvaluation(Internship internship) async {
     if (internship.enterpriseEvaluation != null) {
       final evaluation = internship.enterpriseEvaluation!.serialize();
@@ -1009,6 +1057,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
       toWait.add(_insertToAttitudeEvaluations(internship));
       toWait.add(_insertToVisaEvaluations(internship));
       toWait.add(_insertToEnterpriseEvaluation(internship));
+      toWait.add(_insertJobSstEvaluation(internship));
     } else {
       toWait.add(_updateToSupervisingTeachers(internship, previous));
       toWait.add(_updateToExtraSpecializations(internship, previous));
@@ -1017,6 +1066,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
       toWait.add(_updateToAttitudeEvaluations(internship, previous));
       toWait.add(_updateToVisaEvaluations(internship, previous));
       toWait.add(_updateToEnterpriseEvaluation(internship, previous));
+      toWait.add(_updateJobSstEvaluation(internship, previous));
     }
     await Future.wait(toWait);
   }

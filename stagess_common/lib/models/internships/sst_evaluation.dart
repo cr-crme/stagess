@@ -1,6 +1,7 @@
-part of 'package:stagess_common/models/enterprises/job.dart';
+import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
+import 'package:stagess_common/models/internships/internship.dart';
 
-class JobSstEvaluation extends ItemSerializable {
+class SstEvaluation extends ItemSerializable {
   final Map<String, List<String>?> questions;
   DateTime date;
 
@@ -16,27 +17,27 @@ class JobSstEvaluation extends ItemSerializable {
     date = DateTime.now();
   }
 
-  JobSstEvaluation({
+  SstEvaluation({
     super.id,
     required this.questions,
     DateTime? date,
   }) : date = date ?? DateTime.now();
 
-  static JobSstEvaluation get empty =>
-      JobSstEvaluation(questions: {}, date: DateTime(0));
+  static SstEvaluation get empty =>
+      SstEvaluation(questions: {}, date: DateTime(0));
 
-  JobSstEvaluation copyWith({
+  SstEvaluation copyWith({
     String? id,
     Map<String, List<String>?>? questions,
     DateTime? date,
   }) =>
-      JobSstEvaluation(
+      SstEvaluation(
         id: id ?? this.id,
         questions: questions ?? this.questions,
         date: date ?? this.date,
       );
 
-  JobSstEvaluation.fromSerialized(super.map)
+  SstEvaluation.fromSerialized(super.map)
       : questions = {
           for (final entry in (map?['questions'] as Map? ?? {}).entries)
             entry.key: (entry.value as List?)?.map((e) => e as String).toList()

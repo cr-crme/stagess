@@ -7,7 +7,6 @@ import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 
 part 'package:stagess_common/models/enterprises/incidents.dart';
-part 'package:stagess_common/models/enterprises/job_sst_evaluation.dart';
 part 'package:stagess_common/models/enterprises/pre_internship_requests.dart';
 part 'package:stagess_common/models/enterprises/protections.dart';
 part 'package:stagess_common/models/enterprises/uniforms.dart';
@@ -42,7 +41,6 @@ class Job extends ItemSerializable {
   final List<Photo> photos;
 
   // SST
-  final JobSstEvaluation sstEvaluation;
   final Incidents incidents;
 
   // Comments
@@ -57,7 +55,6 @@ class Job extends ItemSerializable {
     required this.uniforms,
     required this.protections,
     List<Photo>? photos,
-    required this.sstEvaluation,
     required this.incidents,
     List<JobComment>? comments,
     required this.reservedForId,
@@ -74,7 +71,6 @@ class Job extends ItemSerializable {
     Uniforms? uniforms,
     Protections? protections,
     List<Photo>? photos,
-    JobSstEvaluation? sstEvaluation,
     Incidents? incidents,
     List<JobComment>? comments,
     String? reservedForId,
@@ -91,7 +87,6 @@ class Job extends ItemSerializable {
       protections:
           protections?.copyWith(id: this.protections.id) ?? this.protections,
       photos: photos ?? this.photos,
-      sstEvaluation: sstEvaluation ?? this.sstEvaluation,
       incidents: incidents ?? this.incidents,
       comments: comments ?? this.comments,
       reservedForId: reservedForId ?? this.reservedForId,
@@ -121,9 +116,6 @@ class Job extends ItemSerializable {
       photos: ListExt.from(map['photos'],
               deserializer: (e) => Photo.fromSerialized(e)) ??
           photos,
-      sstEvaluation: JobSstEvaluation.fromSerialized(
-          (map['sst_evaluations'] as Map? ?? {}).cast<String, dynamic>()
-            ..addAll({'id': map['id']})),
       incidents: Incidents.fromSerialized(
           (map['incidents'] as Map? ?? {}).cast<String, dynamic>()
             ..addAll({'id': map['id']})),
@@ -143,7 +135,6 @@ class Job extends ItemSerializable {
       uniforms: Uniforms.empty,
       protections: Protections.empty,
       photos: [],
-      sstEvaluation: JobSstEvaluation.empty,
       incidents: Incidents.empty,
       comments: [],
       reservedForId: '',
@@ -151,7 +142,6 @@ class Job extends ItemSerializable {
     return job.copyWith(
       uniforms: job.uniforms.copyWith(id: job.id),
       protections: job.protections.copyWith(id: job.id),
-      sstEvaluation: job.sstEvaluation.copyWith(id: job.id),
     );
   }
 
@@ -166,7 +156,6 @@ class Job extends ItemSerializable {
         'uniforms': uniforms.serialize(),
         'protections': protections.serialize(),
         'photos': photos.serialize(),
-        'sst_evaluations': sstEvaluation.serialize(),
         'incidents': incidents.serialize(),
         'comments': comments.serialize(),
         'reserved_for_id': reservedForId.serialize(),
@@ -182,7 +171,6 @@ class Job extends ItemSerializable {
         'uniforms': FetchableFields.optional,
         'protections': FetchableFields.optional,
         'photos': FetchableFields.optional,
-        'sst_evaluations': FetchableFields.optional,
         'incidents': FetchableFields.optional,
         'comments': FetchableFields.optional,
         'reserved_for_id': FetchableFields.optional,
@@ -207,9 +195,6 @@ class Job extends ItemSerializable {
         photos = ListExt.from(map?['photos'],
                 deserializer: (e) => Photo.fromSerialized(e)) ??
             [],
-        sstEvaluation = JobSstEvaluation.fromSerialized(
-            (map?['sst_evaluations'] as Map? ?? {}).cast<String, dynamic>()
-              ..addAll({'id': map?['id']})),
         incidents = Incidents.fromSerialized((map?['incidents'] as Map? ?? {})
             .cast<String, dynamic>()
             .map((key, value) => MapEntry(key, value))
@@ -230,7 +215,6 @@ class Job extends ItemSerializable {
         'comments: $comments, '
         'uniforms: $uniforms, '
         'protections: $protections, '
-        'incidents: $incidents, '
-        'sstEvaluation: $sstEvaluation)';
+        'incidents: $incidents)';
   }
 }

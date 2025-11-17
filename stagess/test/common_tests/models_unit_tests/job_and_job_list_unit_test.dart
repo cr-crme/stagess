@@ -34,7 +34,6 @@ void main() {
         preInternshipId: 'newPreInternshipId',
         uniformId: 'newUniformId',
         protectionsId: 'newProtectionsId',
-        sstEvaluationId: 'newSstEvaluationId',
         incidentsId: 'newIncidentsId',
       );
 
@@ -47,7 +46,6 @@ void main() {
       expect(jobSame.uniforms, job.uniforms);
       expect(jobSame.protections, job.protections);
       expect(jobSame.photos, job.photos);
-      expect(jobSame.sstEvaluation, job.sstEvaluation);
       expect(jobSame.incidents, job.incidents);
       expect(jobSame.comments, job.comments);
 
@@ -63,7 +61,6 @@ void main() {
         uniforms: dummyUniforms(id: 'newUniformId'),
         protections: dummyProtections(id: 'newProtectionsId'),
         photos: [dummyPhoto()],
-        sstEvaluation: dummyJobSstEvaluation(id: 'newSstEvaluationId'),
         incidents: dummyIncidents(id: 'newIncidentsId'),
         comments: [dummyJobComment()],
       );
@@ -81,7 +78,6 @@ void main() {
       expect(jobDifferent.photos, isA<List<Photo>>());
       expect(jobDifferent.photos.length, 1);
       expect(jobDifferent.photos[0].id, 'photoId');
-      expect(jobDifferent.sstEvaluation.id, 'newSstEvaluationId');
       expect(jobDifferent.incidents.id, 'newIncidentsId');
       expect(jobDifferent.preInternshipRequests.id, 'newPreInternshipId');
       expect(jobDifferent.uniforms.id, 'newUniformId');
@@ -116,7 +112,6 @@ void main() {
         'uniforms': job.uniforms.serialize(),
         'protections': job.protections.serialize(),
         'photos': job.photos.serialize(),
-        'sst_evaluations': job.sstEvaluation.serialize(),
         'incidents': job.incidents.serialize(),
         'comments': job.comments,
         'reserved_for_id': job.reservedForId,
@@ -133,7 +128,6 @@ void main() {
       expect(deserialized.uniforms.id, job.uniforms.id);
       expect(deserialized.protections.id, job.protections.id);
       expect(deserialized.photos, job.photos);
-      expect(deserialized.sstEvaluation.id, job.sstEvaluation.id);
       expect(deserialized.incidents.id, job.incidents.id);
       expect(deserialized.comments, job.comments);
 
@@ -146,7 +140,6 @@ void main() {
       expect(emptyDeserialized.uniforms.id, isNotNull);
       expect(emptyDeserialized.protections.id, isNotNull);
       expect(emptyDeserialized.photos, []);
-      expect(emptyDeserialized.sstEvaluation.id, isNotNull);
       expect(emptyDeserialized.incidents.id, isNotNull);
       expect(emptyDeserialized.comments, []);
     });
@@ -169,7 +162,6 @@ void main() {
             'uniforms': e.uniforms.serialize(),
             'protections': e.protections.serialize(),
             'photos': e.photos,
-            'sst_evaluations': e.sstEvaluation.serialize(),
             'incidents': e.incidents.serialize(),
             'comments': e.comments,
             'reserved_for_id': e.reservedForId,
@@ -179,7 +171,6 @@ void main() {
       expect(deserialized[0].id, jobList[0].id);
       expect(deserialized[0].specialization.id, jobList[0].specialization.id);
       expect(deserialized[0].positionsOffered, jobList[0].positionsOffered);
-      expect(deserialized[0].sstEvaluation.id, jobList[0].sstEvaluation.id);
       expect(deserialized[0].incidents.id, jobList[0].incidents.id);
       expect(deserialized[0].minimumAge, jobList[0].minimumAge);
       expect(

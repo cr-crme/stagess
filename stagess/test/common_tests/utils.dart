@@ -14,6 +14,7 @@ import 'package:stagess_common/models/internships/internship_evaluation_skill.da
 import 'package:stagess_common/models/internships/internship_evaluation_visa.dart'
     as visa;
 import 'package:stagess_common/models/internships/schedule.dart';
+import 'package:stagess_common/models/internships/sst_evaluation.dart';
 import 'package:stagess_common/models/internships/task_appreciation.dart';
 import 'package:stagess_common/models/internships/time_utils.dart';
 import 'package:stagess_common/models/internships/transportation.dart';
@@ -170,7 +171,7 @@ Incidents dummyIncidents({String? id}) => Incidents(
       verbalAbuses: [Incident('Vaut mieux ne pas détailler...')],
     );
 
-JobSstEvaluation dummyJobSstEvaluation({String? id}) => JobSstEvaluation(
+SstEvaluation dummySstEvaluation({String? id}) => SstEvaluation(
       id: id,
       questions: {
         'Q1': ['Oui'],
@@ -213,7 +214,6 @@ JobComment dummyJobComment({
 
 Job dummyJob({
   String id = 'jobId',
-  String? sstEvaluationId,
   String? incidentsId,
   String? preInternshipId,
   String? uniformId,
@@ -224,7 +224,6 @@ Job dummyJob({
       specialization:
           ActivitySectorsService.activitySectors[2].specializations[9],
       positionsOffered: {'school_id': 2},
-      sstEvaluation: dummyJobSstEvaluation(id: sstEvaluationId ?? id),
       incidents: dummyIncidents(id: incidentsId ?? id),
       minimumAge: 12,
       preInternshipRequests:
@@ -342,9 +341,9 @@ Internship dummyInternship({
     endDate: hasEndDate ? DateTime(2034, 10, 28) : DateTime(0),
     expectedDuration: 135,
     achievedDuration: achievedLength,
-    enterpriseEvaluation: dummyPostInternshipEnterpriseEvaluation(
-      internshipId: id,
-    ),
+    enterpriseEvaluation:
+        dummyPostInternshipEnterpriseEvaluation(internshipId: id),
+    sstEvaluation: dummySstEvaluation(id: id),
     weeklySchedules: [dummyWeeklySchedule(period: period)],
     skillEvaluations: [dummyInternshipEvaluationSkill()],
     attitudeEvaluations: [dummyInternshipEvaluationAttitude()],

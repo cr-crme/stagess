@@ -5,12 +5,12 @@ import 'package:stagess/common/widgets/form_fields/text_with_form.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/misc/question_file_service.dart';
-import 'package:stagess_common/models/enterprises/enterprise.dart';
-import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
+import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common_flutter/helpers/form_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
+import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/radio_with_follow_up.dart';
@@ -18,50 +18,45 @@ import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('JobSstFormScreen');
 
-Future<Enterprise?> showJobSstFormDialog(
+Future<Internship?> showJobSstFormDialog(
   BuildContext context, {
-  required String enterpriseId,
-  required String jobId,
+  required String internshipId,
 }) async {
-  _logger.info('Showing JobSstFormDialog for jobId: $jobId');
-  final enterprises = EnterprisesProvider.of(context, listen: false);
+  _logger.info('Showing JobSstFormDialog for internship: $internshipId');
+  final internships = InternshipsProvider.of(context, listen: false);
 
   final hasLock = await showDialog(
     context: context,
     barrierDismissible: false,
-    builder:
-        (context) => FutureBuilder(
-          future: Future.wait([
-            enterprises.getLockForItem(enterprises[enterpriseId]),
-            enterprises.fetchData(
-              id: enterpriseId,
-              fields: FetchableFields.all,
-            ),
-          ]),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final hasLock = (snapshot.data as List).first as bool;
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                Navigator.of(context).pop(hasLock);
-              });
-            }
-            return Dialog(
-              child: SizedBox(
-                width: 100,
-                height: 100,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
+    builder: (context) => FutureBuilder(
+      future: Future.wait([
+        internships.getLockForItem(internships[internshipId]),
+        internships.fetchData(id: internshipId, fields: FetchableFields.all),
+      ]),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final hasLock = (snapshot.data as List).first as bool;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context).pop(hasLock);
+          });
+        }
+        return Dialog(
+          child: SizedBox(
+            width: 100,
+            height: 100,
+            child: Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
               ),
-            );
-          },
-        ),
+            ),
+          ),
+        );
+      },
+    ),
   );
 
   if (!hasLock || !context.mounted) {
-    _logger.warning('Could not get lock for enterpriseId: $enterpriseId');
+    _logger.warning('Could not get lock for internshipId: $internshipId');
     if (context.mounted) {
       showSnackBar(
         context,
@@ -72,45 +67,39 @@ Future<Enterprise?> showJobSstFormDialog(
     return null;
   }
 
-  final editedEnterprise = await showDialog<Enterprise?>(
+  final editedInternship = await showDialog<Internship?>(
     context: context,
     barrierDismissible: false,
-    builder:
-        (context) => Navigator(
-          onGenerateRoute:
-              (settings) => MaterialPageRoute(
-                builder:
-                    (ctx) => Dialog(
-                      child: JobSstFormScreen(
-                        rootContext: context,
-                        enterpriseId: enterpriseId,
-                        jobId: jobId,
-                      ),
-                    ),
-              ),
+    builder: (context) => Navigator(
+      onGenerateRoute: (settings) => MaterialPageRoute(
+        builder: (ctx) => Dialog(
+          child: JobSstFormScreen(
+            rootContext: context,
+            internshipId: internshipId,
+          ),
         ),
+      ),
+    ),
   );
-  if (editedEnterprise != null) {
-    await enterprises.replaceWithConfirmation(editedEnterprise);
+  if (editedInternship != null) {
+    await internships.replaceWithConfirmation(editedInternship);
   }
 
-  await enterprises.releaseLockForItem(enterprises[enterpriseId]);
-  return editedEnterprise;
+  await internships.releaseLockForItem(internships[internshipId]);
+  return editedInternship;
 }
 
 class JobSstFormScreen extends StatefulWidget {
   const JobSstFormScreen({
     super.key,
     required this.rootContext,
-    required this.enterpriseId,
-    required this.jobId,
+    required this.internshipId,
   });
 
   static const route = '/job-sst-form';
 
   final BuildContext rootContext;
-  final String enterpriseId;
-  final String jobId;
+  final String internshipId;
 
   @override
   State<JobSstFormScreen> createState() => _JobSstFormScreenState();
@@ -120,7 +109,8 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
   final _questionsKey = GlobalKey<_QuestionsStepState>();
 
   void _submit() {
-    _logger.info('Submitting JobSstFormScreen for jobId: ${widget.jobId}');
+    _logger.info(
+        'Submitting JobSstFormScreen for internshipId: ${widget.internshipId}');
 
     if (!FormService.validateForm(_questionsKey.currentState!.formKey)) {
       setState(() {});
@@ -129,23 +119,23 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
 
     _questionsKey.currentState!.formKey.currentState!.save();
 
-    final enterprises = EnterprisesProvider.of(context, listen: false);
-    final enterprise = enterprises.fromId(widget.enterpriseId);
-    enterprise.jobs[widget.jobId].sstEvaluation.update(
+    final internships = InternshipsProvider.of(context, listen: false);
+    final internship = internships.fromId(widget.internshipId);
+    // TODO Check why "?"
+    internship.sstEvaluation?.update(
       questions: _questionsKey.currentState!.answer,
     );
 
-    enterprise.jobs.replace(enterprise.jobs[widget.jobId]);
-
     _logger.fine(
-      'JobSstFormScreen submitted successfully for jobId: ${widget.jobId}',
+      'JobSstFormScreen submitted successfully for internshipId: ${widget.internshipId}',
     );
     if (!widget.rootContext.mounted) return;
-    Navigator.of(widget.rootContext).pop(enterprise);
+    Navigator.of(widget.rootContext).pop(internship);
   }
 
   void _cancel() async {
-    _logger.info('Cancelling JobSstFormScreen for jobId: ${widget.jobId}');
+    _logger.info(
+        'Cancelling JobSstFormScreen for internshipId: ${widget.internshipId}');
     final answer = await ConfirmExitDialog.show(
       context,
       content: const Text('Toutes les modifications seront perdues.'),
@@ -176,90 +166,89 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
     if (!mounted) return;
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('REPÈRES', textAlign: TextAlign.center),
-            content: RawScrollbar(
-              controller: scrollController,
-              thumbVisibility: true,
-              thickness: 7,
-              minThumbLength: 75,
-              thumbColor: Theme.of(context).primaryColor,
-              radius: const Radius.circular(20),
-              child: SingleChildScrollView(
-                controller: scrollController,
-                child: Container(
-                  margin: const EdgeInsets.only(right: 12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Objectifs du questionnaire',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      ItemizedText(const [
-                        'S\'informer sur les risques auxquels est exposé l\'élève à ce '
-                            'poste de travail.',
-                        'Susciter un dialogue avec l\'entreprise sur les mesures '
-                            'de prévention.\n'
-                            'Les différentes sous-questions visent spécifiquement à '
-                            'favoriser les échanges.',
-                      ], style: Theme.of(context).textTheme.bodyMedium),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Avec qui le remplir\u00a0?',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      Text(
-                        'La personne qui est en charge de former l\'élève sur le plancher\u00a0:',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                      ItemizedText(const [
-                        'C\'est elle qui connait le mieux le poste de travail de l\'élève',
-                        'Il sera plus facile d\'aborder avec elle qu\'avec l\'employeur '
-                            'les questions relatives aux dangers et aux accidents',
-                      ], style: Theme.of(context).textTheme.bodyMedium),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Quand',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      ItemizedText(const [
-                        'La première semaine de stage',
-                        'Pendant (ou après) une visite du poste de travail de l\'élève',
-                      ], style: Theme.of(context).textTheme.bodyMedium),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Durée',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      Text(
-                        '15 minutes',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Cibles',
-                        style: Theme.of(context).textTheme.titleSmall,
-                      ),
-                      ItemizedText(const [
-                        'Nouvelle entreprise : remplissage initial',
-                        'Milieu de stage récurrent : validation et mise à jour des '
-                            'réponses des années précédentes',
-                      ], style: Theme.of(context).textTheme.bodyMedium),
-                    ],
+      builder: (context) => AlertDialog(
+        title: const Text('REPÈRES', textAlign: TextAlign.center),
+        content: RawScrollbar(
+          controller: scrollController,
+          thumbVisibility: true,
+          thickness: 7,
+          minThumbLength: 75,
+          thumbColor: Theme.of(context).primaryColor,
+          radius: const Radius.circular(20),
+          child: SingleChildScrollView(
+            controller: scrollController,
+            child: Container(
+              margin: const EdgeInsets.only(right: 12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Objectifs du questionnaire',
+                    style: Theme.of(context).textTheme.titleSmall,
                   ),
-                ),
+                  ItemizedText(const [
+                    'S\'informer sur les risques auxquels est exposé l\'élève à ce '
+                        'poste de travail.',
+                    'Susciter un dialogue avec l\'entreprise sur les mesures '
+                        'de prévention.\n'
+                        'Les différentes sous-questions visent spécifiquement à '
+                        'favoriser les échanges.',
+                  ], style: Theme.of(context).textTheme.bodyMedium),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Avec qui le remplir\u00a0?',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  Text(
+                    'La personne qui est en charge de former l\'élève sur le plancher\u00a0:',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  ItemizedText(const [
+                    'C\'est elle qui connait le mieux le poste de travail de l\'élève',
+                    'Il sera plus facile d\'aborder avec elle qu\'avec l\'employeur '
+                        'les questions relatives aux dangers et aux accidents',
+                  ], style: Theme.of(context).textTheme.bodyMedium),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Quand',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  ItemizedText(const [
+                    'La première semaine de stage',
+                    'Pendant (ou après) une visite du poste de travail de l\'élève',
+                  ], style: Theme.of(context).textTheme.bodyMedium),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Durée',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  Text(
+                    '15 minutes',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Cibles',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                  ItemizedText(const [
+                    'Nouvelle entreprise : remplissage initial',
+                    'Milieu de stage récurrent : validation et mise à jour des '
+                        'réponses des années précédentes',
+                  ], style: Theme.of(context).textTheme.bodyMedium),
+                ],
               ),
             ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, 'OK'),
-                child: const Text('OK'),
-              ),
-            ],
           ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
     );
 
     final prefs = await SharedPreferences.getInstance();
@@ -268,13 +257,13 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _logger.finer('Building JobSstFormScreen for jobId: ${widget.jobId}');
+    _logger.finer(
+        'Building JobSstFormScreen for internshipId: ${widget.internshipId}');
 
     _showHelp(force: false);
 
-    final enterprise = EnterprisesProvider.of(
-      context,
-    ).fromId(widget.enterpriseId);
+    final internship = InternshipsProvider.of(context, listen: false)
+        .fromId(widget.internshipId);
 
     return SizedBox(
       width: ResponsiveService.maxBodyWidth,
@@ -303,11 +292,7 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _QuestionsStep(
-                    key: _questionsKey,
-                    enterprise: enterprise,
-                    job: enterprise.jobs[widget.jobId],
-                  ),
+                  _QuestionsStep(key: _questionsKey, internship: internship),
                   _controlBuilder(),
                 ],
               ),
@@ -336,12 +321,10 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
 class _QuestionsStep extends StatefulWidget {
   const _QuestionsStep({
     super.key,
-    required this.enterprise,
-    required this.job,
+    required this.internship,
   });
 
-  final Enterprise enterprise;
-  final Job job;
+  final Internship internship;
 
   @override
   State<_QuestionsStep> createState() => _QuestionsStepState();
@@ -365,8 +348,12 @@ class _QuestionsStepState extends State<_QuestionsStep> {
   }
 
   Widget _buildQuestions() {
+    final enterprise = EnterprisesProvider.of(context, listen: false)
+        .fromId(widget.internship.enterpriseId);
+    final job = enterprise.jobs.fromId(widget.internship.jobId);
+
     // Sort the question by "id"
-    final questionIds = [...widget.job.specialization.questions];
+    final questionIds = [...job.specialization.questions];
     questionIds.sort((a, b) => int.parse(a) - int.parse(b));
     final questions =
         questionIds.map((e) => QuestionFileService.fromId(e)).toList();
@@ -384,9 +371,9 @@ class _QuestionsStepState extends State<_QuestionsStep> {
 
             // Fill the initial answer
             answer['Q${question.id}'] =
-                widget.job.sstEvaluation.questions['Q${question.id}'];
+                widget.internship.sstEvaluation?.questions['Q${question.id}'];
             answer['Q${question.id}+t'] =
-                widget.job.sstEvaluation.questions['Q${question.id}+t'];
+                widget.internship.sstEvaluation?.questions['Q${question.id}+t'];
 
             switch (question.type) {
               case QuestionType.radio:
@@ -394,11 +381,8 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                   padding: const EdgeInsets.only(bottom: 24.0),
                   child: RadioWithFollowUp<String>(
                     title: '${index + 1}. ${question.question}',
-                    initialValue:
-                        widget
-                            .job
-                            .sstEvaluation
-                            .questions['Q${question.id}']?[0],
+                    initialValue: widget.internship.sstEvaluation
+                        ?.questions['Q${question.id}']?[0],
                     elements: question.choices!.toList(),
                     elementsThatShowChild: [question.choices!.first],
                     onChanged: (value) {
@@ -408,10 +392,9 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                         answer['Q${question.id}+t'] = null;
                       }
                     },
-                    followUpChild:
-                        question.followUpQuestion == null
-                            ? null
-                            : _buildFollowUpQuestion(question, context),
+                    followUpChild: question.followUpQuestion == null
+                        ? null
+                        : _buildFollowUpQuestion(question, context),
                   ),
                 );
 
@@ -423,11 +406,10 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                     controller: CheckboxWithOtherController(
                       elements: question.choices!.toList(),
                       hasNotApplicableOption: true,
-                      initialValues:
-                          (widget.job.sstEvaluation.questions['Q${question.id}']
-                                  as List?)
-                              ?.map((e) => e as String)
-                              .toList(),
+                      initialValues: (widget.internship.sstEvaluation
+                              ?.questions['Q${question.id}'] as List?)
+                          ?.map((e) => e as String)
+                          .toList(),
                     ),
                     onOptionSelected: (values) {
                       answer['Q${question.id}'] = values;
@@ -436,10 +418,9 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                         _followUpController['Q${question.id}+t']!.text = '';
                       }
                     },
-                    followUpChild:
-                        question.followUpQuestion == null
-                            ? null
-                            : _buildFollowUpQuestion(question, context),
+                    followUpChild: question.followUpQuestion == null
+                        ? null
+                        : _buildFollowUpQuestion(question, context),
                   ),
                 );
 
@@ -448,17 +429,11 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                   padding: const EdgeInsets.only(bottom: 36.0),
                   child: TextWithForm(
                     title: '${index + 1}. ${question.question}',
-                    initialValue:
-                        widget
-                            .job
-                            .sstEvaluation
-                            .questions['Q${question.id}']
-                            ?.first ??
+                    initialValue: widget.internship.sstEvaluation
+                            ?.questions['Q${question.id}']?.first ??
                         '',
-                    onChanged:
-                        (text) =>
-                            answer['Q${question.id}'] =
-                                text == null ? null : [text],
+                    onChanged: (text) => answer['Q${question.id}'] =
+                        text == null ? null : [text],
                   ),
                 );
             }
@@ -470,8 +445,9 @@ class _QuestionsStepState extends State<_QuestionsStep> {
 
   Padding _buildFollowUpQuestion(Question question, BuildContext context) {
     _followUpController['Q${question.id}+t'] = TextEditingController(
-      text:
-          widget.job.sstEvaluation.questions['Q${question.id}+t']?.first ?? '',
+      text: widget.internship.sstEvaluation?.questions['Q${question.id}+t']
+              ?.first ??
+          '',
     );
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
@@ -479,9 +455,8 @@ class _QuestionsStepState extends State<_QuestionsStep> {
         controller: _followUpController['Q${question.id}+t'],
         title: question.followUpQuestion!,
         titleStyle: Theme.of(context).textTheme.bodyMedium,
-        onChanged:
-            (text) =>
-                answer['Q${question.id}+t'] = text == null ? null : [text],
+        onChanged: (text) =>
+            answer['Q${question.id}+t'] = text == null ? null : [text],
       ),
     );
   }
@@ -489,6 +464,10 @@ class _QuestionsStepState extends State<_QuestionsStep> {
   Widget _buildHeader() {
     // ThemeData does not work anymore so we have to override the style manually
     const styleOverride = TextStyle(color: Colors.black);
+
+    final enterprise = EnterprisesProvider.of(context, listen: false)
+        .fromId(widget.internship.enterpriseId);
+    final job = enterprise.jobs.fromId(widget.internship.jobId);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -501,7 +480,7 @@ class _QuestionsStepState extends State<_QuestionsStep> {
             labelStyle: styleOverride,
           ),
           style: styleOverride,
-          controller: TextEditingController(text: widget.enterprise.name),
+          controller: TextEditingController(text: enterprise.name),
           maxLines: null,
           enabled: false,
         ),
@@ -513,7 +492,7 @@ class _QuestionsStepState extends State<_QuestionsStep> {
           ),
           style: styleOverride,
           controller: TextEditingController(
-            text: widget.job.specialization.name,
+            text: job.specialization.name,
           ),
           maxLines: null,
           enabled: false,
