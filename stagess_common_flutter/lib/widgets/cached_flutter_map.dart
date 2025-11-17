@@ -1,43 +1,49 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map/flutter_map.dart' as fm;
 import 'package:latlong2/latlong.dart';
+import 'package:stagess_common_flutter/widgets/map_providers.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CachedFlutterMap extends StatelessWidget {
   const CachedFlutterMap({
     super.key,
-    this.options = const MapOptions(
+    this.options = const fm.MapOptions(
         initialCenter: LatLng(45.508888, -73.561668), initialZoom: 12),
     this.routeOverlayBuilder,
     this.markersOverlayBuilder,
   });
 
-  final MapOptions options;
+  final fm.MapOptions options;
   final WidgetBuilder? routeOverlayBuilder;
   final WidgetBuilder? markersOverlayBuilder;
 
   @override
   Widget build(BuildContext context) {
-    return FlutterMap(
+    final tileProvider = TileProvider.instance;
+    if (!tileProvider.isInitialized) {
+      throw Exception('Tile provider is not initialized');
+    }
+
+    return fm.FlutterMap(
       options: options,
       children: [
-        TileLayer(
-            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        fm.TileLayer(
+            urlTemplate: tileProvider.urlTile,
             userAgentPackageName: 'org.crcrme.stagess',
-            tileProvider: NetworkTileProvider(
-              cachingProvider: BuiltInMapCachingProvider.getOrCreateInstance(
+            tileProvider: fm.NetworkTileProvider(
+              cachingProvider: fm.BuiltInMapCachingProvider.getOrCreateInstance(
                 maxCacheSize: 500000000, // ~500 MB
               ),
             )),
         if (routeOverlayBuilder != null) routeOverlayBuilder!(context),
         if (markersOverlayBuilder != null) markersOverlayBuilder!(context),
         _ZoomButtons(),
-        RichAttributionWidget(
+        fm.RichAttributionWidget(
           attributions: [
             // Suggested attribution for the OpenStreetMap public tile server
-            TextSourceAttribution(
+            fm.TextSourceAttribution(
               'OpenStreetMap',
               onTap: () =>
                   launchUrl(Uri.parse('https://openstreetmap.org/copyright')),
@@ -59,8 +65,8 @@ class _ZoomButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = MapController.of(context);
-    final camera = MapCamera.maybeOf(context)!;
+    final controller = fm.MapController.of(context);
+    final camera = fm.MapCamera.maybeOf(context)!;
 
     return Align(
       alignment: alignment,

@@ -16,6 +16,7 @@ import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
+import 'package:stagess_common_flutter/widgets/map_providers.dart';
 
 // coverage:ignore-start
 void main() async {
@@ -54,6 +55,9 @@ void main() async {
         showDebugElements: showDebugElements,
         mockMe: useMockers,
       );
+
+      await TileProvider.instance
+          .initialize(tileProvider: MapProvider.googleMaps);
 
       runApp(StagessApp(useMockers: useMockers, backendUri: backendUri));
     },

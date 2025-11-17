@@ -29,6 +29,7 @@ dependencies:
   url_launcher: ^6.1.10
   logging: ^1.3.0
   collection: ^1.16.0
+  http: ^1.6.0
 
 dependency_overrides:
   enhanced_containers_foundation:
