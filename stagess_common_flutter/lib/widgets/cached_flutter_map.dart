@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart' as fm;
 import 'package:latlong2/latlong.dart';
-import 'package:stagess_common_flutter/widgets/map_providers.dart';
+import 'package:stagess_common/models/generic/map_providers.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class CachedFlutterMap extends StatelessWidget {
@@ -40,16 +40,17 @@ class CachedFlutterMap extends StatelessWidget {
         if (routeOverlayBuilder != null) routeOverlayBuilder!(context),
         if (markersOverlayBuilder != null) markersOverlayBuilder!(context),
         _ZoomButtons(),
-        fm.RichAttributionWidget(
-          attributions: [
-            // Suggested attribution for the OpenStreetMap public tile server
-            fm.TextSourceAttribution(
-              'OpenStreetMap',
-              onTap: () =>
-                  launchUrl(Uri.parse('https://openstreetmap.org/copyright')),
-            ),
-          ],
-        ),
+        if (tileProvider.mapTileProvider == MapTileProvider.openStreetMap)
+          fm.RichAttributionWidget(
+            attributions: [
+              // Suggested attribution for the OpenStreetMap public tile server
+              fm.TextSourceAttribution(
+                'OpenStreetMap',
+                onTap: () =>
+                    launchUrl(Uri.parse('https://openstreetmap.org/copyright')),
+              ),
+            ],
+          ),
       ],
     );
   }

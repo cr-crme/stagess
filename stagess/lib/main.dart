@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:stagess/common/extensions/auth_provider_extension.dart';
 import 'package:stagess/program_helpers.dart';
 import 'package:stagess/router.dart';
+import 'package:stagess_common/models/generic/map_providers.dart';
 import 'package:stagess_common/services/backend_helpers.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
@@ -16,7 +17,6 @@ import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
-import 'package:stagess_common_flutter/widgets/map_providers.dart';
 
 // coverage:ignore-start
 void main() async {
@@ -57,7 +57,9 @@ void main() async {
       );
 
       await TileProvider.instance
-          .initialize(tileProvider: MapProvider.googleMaps);
+          .initialize(provider: MapTileProvider.googleMaps);
+      await ReverseGeocodingProvider.instance
+          .initialize(provider: MapReverseGeocodingProvider.googleMaps);
 
       runApp(StagessApp(useMockers: useMockers, backendUri: backendUri));
     },
