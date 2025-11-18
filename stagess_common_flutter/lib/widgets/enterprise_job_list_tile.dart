@@ -537,7 +537,8 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
       enabled: widget.editMode,
       onChanged: (values) {
         widget.controller._preInternshipRequests =
-            PreInternshipRequests.fromStrings(values);
+            PreInternshipRequests.fromStrings(values,
+                notApplicableTag: CheckboxWithOther.notApplicableTag);
       },
     );
   }

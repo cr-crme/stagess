@@ -44,7 +44,7 @@ class CheckboxWithOtherController<T> {
     if (hasNotApplicableOption &&
         initialValues != null &&
         initialValues.length == 1 &&
-        initialValues[0] == '__NOT_APPLICABLE_INTERNAL__') {
+        initialValues[0] == CheckboxWithOther.notApplicableTag) {
       _isNotApplicable = true;
       return;
     }
@@ -54,10 +54,9 @@ class CheckboxWithOtherController<T> {
       for (final initial in initialValues) {
         if (initial.isNotEmpty && !elementsAsString.contains(initial)) {
           _hasOther = true;
-          _otherTextController.text =
-              _otherTextController.text.isEmpty
-                  ? initial
-                  : '${_otherTextController.text}\n$initial';
+          _otherTextController.text = _otherTextController.text.isEmpty
+              ? initial
+              : '${_otherTextController.text}\n$initial';
         }
       }
     }
@@ -66,7 +65,7 @@ class CheckboxWithOtherController<T> {
   ///
   /// This returns all the element in the form of a list of String
   List<String> get values {
-    if (_isNotApplicable) return ['__NOT_APPLICABLE_INTERNAL__'];
+    if (_isNotApplicable) return [CheckboxWithOther.notApplicableTag];
 
     final List<String> out = [];
 
@@ -159,6 +158,8 @@ class CheckboxWithOtherController<T> {
 }
 
 class CheckboxWithOther<T> extends StatefulWidget {
+  static const notApplicableTag = '__NOT_APPLICABLE_INTERNAL__';
+
   const CheckboxWithOther({
     super.key,
     required this.controller,
@@ -195,7 +196,7 @@ class _CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
   void _checkForShowingChild() {
     widget.controller._hasFollowUp =
         widget.controller._elementValues.values.any((e) => e) ||
-        widget.controller._hasOther;
+            widget.controller._hasOther;
   }
 
   @override
@@ -236,13 +237,12 @@ class _CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
                 controlAffinity: ListTileControlAffinity.leading,
                 title: Text(
                   element.toString(),
-                  style:
-                      widget.elementStyleBuilder == null
-                          ? Theme.of(context).textTheme.bodyMedium
-                          : widget.elementStyleBuilder!(
-                            element,
-                            widget.controller._elementValues[element]!,
-                          ),
+                  style: widget.elementStyleBuilder == null
+                      ? Theme.of(context).textTheme.bodyMedium
+                      : widget.elementStyleBuilder!(
+                          element,
+                          widget.controller._elementValues[element]!,
+                        ),
                 ),
                 enabled: widget.enabled && !widget.controller._isNotApplicable,
                 value: widget.controller._elementValues[element]!,
@@ -320,13 +320,11 @@ class _CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
                     }
                   },
                   enabled: widget.enabled,
-                  validator:
-                      (value) =>
-                          widget.controller._hasOther &&
-                                  (value == null ||
-                                      !RegExp('[a-zA-Z0-9]').hasMatch(value))
-                              ? widget.errorMessageOther
-                              : null,
+                  validator: (value) => widget.controller._hasOther &&
+                          (value == null ||
+                              !RegExp('[a-zA-Z0-9]').hasMatch(value))
+                      ? widget.errorMessageOther
+                      : null,
                 ),
               ],
             ),

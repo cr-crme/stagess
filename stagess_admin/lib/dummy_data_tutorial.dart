@@ -30,6 +30,7 @@ import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 
 Future<void> resetDummyDataTutorial(BuildContext context) async {
   // Show a waiting dialog
@@ -1130,10 +1131,13 @@ Future<void> _addDummyEnterprises(
         ],
       ),
       minimumAge: 15,
-      preInternshipRequests: PreInternshipRequests.fromStrings([
-        'Ne pas avoir peur de travailler dans le froid',
-        PreInternshipRequestTypes.soloInterview.index.toString(),
-      ]),
+      preInternshipRequests: PreInternshipRequests.fromStrings(
+        [
+          'Ne pas avoir peur de travailler dans le froid',
+          PreInternshipRequestTypes.soloInterview.index.toString(),
+        ],
+        notApplicableTag: CheckboxWithOther.notApplicableTag,
+      ),
       uniforms: Uniforms(
         status: UniformStatus.suppliedByEnterprise,
         uniforms: ['Un pantalon de cuisine, un tablier'],
@@ -1161,9 +1165,12 @@ Future<void> _addDummyEnterprises(
         ],
       ),
       minimumAge: 15,
-      preInternshipRequests: PreInternshipRequests.fromStrings([
-        'Savoir manoeuvrer un transpalette électrique',
-      ]),
+      preInternshipRequests: PreInternshipRequests.fromStrings(
+        [
+          'Savoir manoeuvrer un transpalette électrique',
+        ],
+        notApplicableTag: CheckboxWithOther.notApplicableTag,
+      ),
       uniforms: Uniforms(
         status: UniformStatus.suppliedByEnterprise,
         uniforms: ['Un pantalon noir et un polo vert'],
@@ -1229,7 +1236,10 @@ Future<void> _addDummyEnterprises(
       positionsOffered: {schoolAId: 3, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
-      preInternshipRequests: PreInternshipRequests.fromStrings([]),
+      preInternshipRequests: PreInternshipRequests.fromStrings(
+        [],
+        notApplicableTag: CheckboxWithOther.notApplicableTag,
+      ),
       uniforms: Uniforms(status: UniformStatus.none),
       protections: Protections(status: ProtectionsStatus.none),
       reservedForId: teacherB1Id,
@@ -1284,10 +1294,13 @@ Future<void> _addDummyEnterprises(
       positionsOffered: {schoolAId: 3, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
-      preInternshipRequests: PreInternshipRequests.fromStrings([
-        PreInternshipRequestTypes.soloInterview.toString(),
-        'Faire le ménage',
-      ]),
+      preInternshipRequests: PreInternshipRequests.fromStrings(
+        [
+          PreInternshipRequestTypes.soloInterview.toString(),
+          'Faire le ménage',
+        ],
+        notApplicableTag: CheckboxWithOther.notApplicableTag,
+      ),
       uniforms: Uniforms(
         status: UniformStatus.suppliedByEnterprise,
         uniforms: ['Un bleu de travail'],
@@ -1348,7 +1361,10 @@ Future<void> _addDummyEnterprises(
       positionsOffered: {schoolAId: 2, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
-      preInternshipRequests: PreInternshipRequests.fromStrings([]),
+      preInternshipRequests: PreInternshipRequests.fromStrings(
+        [],
+        notApplicableTag: CheckboxWithOther.notApplicableTag,
+      ),
       uniforms: Uniforms(status: UniformStatus.none),
       protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
@@ -1403,7 +1419,10 @@ Future<void> _addDummyEnterprises(
       positionsOffered: {schoolAId: 2, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
-      preInternshipRequests: PreInternshipRequests.fromStrings([]),
+      preInternshipRequests: PreInternshipRequests.fromStrings(
+        [],
+        notApplicableTag: CheckboxWithOther.notApplicableTag,
+      ),
       uniforms: Uniforms(status: UniformStatus.none),
       protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
@@ -1459,7 +1478,10 @@ Future<void> _addDummyEnterprises(
       positionsOffered: {schoolAId: 1, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
-      preInternshipRequests: PreInternshipRequests.fromStrings([]),
+      preInternshipRequests: PreInternshipRequests.fromStrings(
+        [],
+        notApplicableTag: CheckboxWithOther.notApplicableTag,
+      ),
       uniforms: Uniforms(status: UniformStatus.none),
       protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
@@ -1515,7 +1537,10 @@ Future<void> _addDummyEnterprises(
       positionsOffered: {schoolAId: 2, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
-      preInternshipRequests: PreInternshipRequests.fromStrings([]),
+      preInternshipRequests: PreInternshipRequests.fromStrings(
+        [],
+        notApplicableTag: CheckboxWithOther.notApplicableTag,
+      ),
       uniforms: Uniforms(status: UniformStatus.none),
       protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
@@ -1571,7 +1596,10 @@ Future<void> _addDummyEnterprises(
       positionsOffered: {schoolAId: 1, schoolBId: 5, schoolCId: 1},
       incidents: Incidents.empty,
       minimumAge: 15,
-      preInternshipRequests: PreInternshipRequests.fromStrings([]),
+      preInternshipRequests: PreInternshipRequests.fromStrings(
+        [],
+        notApplicableTag: CheckboxWithOther.notApplicableTag,
+      ),
       uniforms: Uniforms(status: UniformStatus.none),
       protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
@@ -1622,7 +1650,10 @@ Future<void> _addDummyEnterprises(
       positionsOffered: {schoolAId: 3, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
-      preInternshipRequests: PreInternshipRequests.fromStrings([]),
+      preInternshipRequests: PreInternshipRequests.fromStrings(
+        [],
+        notApplicableTag: CheckboxWithOther.notApplicableTag,
+      ),
       uniforms: Uniforms(status: UniformStatus.none),
       protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
@@ -1682,7 +1713,10 @@ Future<void> _addDummyEnterprises(
       positionsOffered: {schoolAId: 1, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
-      preInternshipRequests: PreInternshipRequests.fromStrings([]),
+      preInternshipRequests: PreInternshipRequests.fromStrings(
+        [],
+        notApplicableTag: CheckboxWithOther.notApplicableTag,
+      ),
       uniforms: Uniforms(status: UniformStatus.none),
       protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
@@ -1736,7 +1770,10 @@ Future<void> _addDummyEnterprises(
       positionsOffered: {schoolAId: 1, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
-      preInternshipRequests: PreInternshipRequests.fromStrings([]),
+      preInternshipRequests: PreInternshipRequests.fromStrings(
+        [],
+        notApplicableTag: CheckboxWithOther.notApplicableTag,
+      ),
       uniforms: Uniforms(status: UniformStatus.none),
       protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
@@ -1920,7 +1957,11 @@ Future<void> _addDummyInternships(
           'Q12': ['Bruyant'],
           'Q12+t': ['Bouchons a oreilles'],
           'Q15': ['Oui'],
-          'Q18': ['Non'],
+          'Q18': ['Oui'],
+          'Q18+t': [
+            'L\'élève ne portait pas ses gants malgré plusieurs avertissements, '
+                'et il s\'est ouvert profondément la paume en voulant ouvrir une boite.',
+          ],
         },
         date: DateTime.now(),
       ),
@@ -2235,74 +2276,86 @@ Future<void> _addDummyInternships(
   );
   internships.add(
     Internship(
-      schoolBoardId: schoolBoardId,
-      creationDate: DateTime.now(),
-      studentId: students.firstWhere((e) => e.fullName == 'Simon Gingras').id,
-      // This is a Roméo Montaigu's student
-      signatoryTeacherId: teacherB1Id,
-      extraSupervisingTeacherIds: [],
-      enterpriseId: enterprises.firstWhere((e) => e.name == 'Auto Repair').id,
-      jobId: enterprises.firstWhere((e) => e.name == 'Auto Repair').jobs[0].id,
-      extraSpecializationIds: [],
-      supervisor: Person(
-        firstName: 'Thomas',
-        middleName: null,
-        lastName: 'Giroud',
-        dateBirth: null,
-        phone: null,
-        address: null,
-        email: '',
-      ),
-      dates: period,
-      endDate: DateTime.now().add(const Duration(days: 10)),
-      expectedDuration: 135,
-      achievedDuration: -1,
-      weeklySchedules: [
-        WeeklySchedule(
-          schedule: {
-            Day.monday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.wednesday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.friday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-          },
-          period: period,
+        schoolBoardId: schoolBoardId,
+        creationDate: DateTime.now(),
+        studentId: students.firstWhere((e) => e.fullName == 'Simon Gingras').id,
+        // This is a Roméo Montaigu's student
+        signatoryTeacherId: teacherB1Id,
+        extraSupervisingTeacherIds: [],
+        enterpriseId: enterprises.firstWhere((e) => e.name == 'Auto Care').id,
+        jobId: enterprises.firstWhere((e) => e.name == 'Auto Care').jobs[0].id,
+        extraSpecializationIds: [],
+        supervisor: Person(
+          firstName: 'Thomas',
+          middleName: null,
+          lastName: 'Giroud',
+          dateBirth: null,
+          phone: null,
+          address: null,
+          email: '',
         ),
-      ],
-      transportations: [Transportation.ticket],
-      visitFrequencies: 'Une visite par semaine',
-    ),
+        dates: period,
+        endDate: DateTime.now().add(const Duration(days: 10)),
+        expectedDuration: 135,
+        achievedDuration: -1,
+        weeklySchedules: [
+          WeeklySchedule(
+            schedule: {
+              Day.monday: DailySchedule(
+                blocks: [
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                  ),
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                  ),
+                ],
+              ),
+              Day.wednesday: DailySchedule(
+                blocks: [
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                  ),
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                  ),
+                ],
+              ),
+              Day.friday: DailySchedule(
+                blocks: [
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                  ),
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                  ),
+                ],
+              ),
+            },
+            period: period,
+          ),
+        ],
+        transportations: [Transportation.ticket],
+        visitFrequencies: 'Une visite par semaine',
+        sstEvaluation: SstEvaluation(
+          questions: {
+            'Q1': ['Non'],
+            'Q5': ['Des couteaux'],
+            'Q9': ['Des solvants', 'Des produits ménagers'],
+            'Q12': ['__NOT_APPLICABLE_INTERNAL__'],
+            'Q12+t': ['Bouchons a oreilles'],
+            'Q15': ['Oui'],
+            'Q15+t': ['Travail quotidien avec les clients'],
+            'Q18': ['Non'],
+          },
+          date: DateTime.now(),
+        )),
   );
 
   startingPeriod = DateTime.now().subtract(const Duration(days: 100));

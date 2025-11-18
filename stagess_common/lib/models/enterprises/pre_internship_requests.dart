@@ -56,12 +56,13 @@ class PreInternshipRequests extends ItemSerializable {
         isApplicable: true,
       );
 
-  factory PreInternshipRequests.fromStrings(List<String> values, {String? id}) {
+  factory PreInternshipRequests.fromStrings(List<String> values,
+      {String? id, required String notApplicableTag}) {
     final requests = <PreInternshipRequestTypes>[];
     bool isApplicable = true;
     String? other;
     for (final e in values) {
-      if (e == '__NOT_APPLICABLE_INTERNAL__') {
+      if (e == notApplicableTag) {
         isApplicable = false;
         continue;
       }

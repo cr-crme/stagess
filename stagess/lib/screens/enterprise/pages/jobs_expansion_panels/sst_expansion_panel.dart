@@ -6,6 +6,7 @@ import 'package:stagess/misc/question_file_service.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 
 final _logger = Logger('SstExpansionPanel');
 
@@ -32,10 +33,12 @@ class _SstBody extends StatelessWidget {
     _logger
         .finer('Building SstExpansionPanel for enterprise: ${enterprise.name}');
 
-    final internships = InternshipsProvider.of(context, listen: true);
-    // TODO CHANGE THIS FOR COLLECTION OF RESULTS
-    final internship =
-        internships.firstWhereOrNull((e) => e.enterpriseId == enterprise.id);
+    final internships = InternshipsProvider.of(context, listen: true).where(
+        (e) => e.enterpriseId == enterprise.id && e.sstEvaluation != null);
+    final latestInternship = internships.isNotEmpty
+        ? internships.reduce((a, b) =>
+            a.sstEvaluation!.date.isAfter(b.sstEvaluation!.date) ? a : b)
+        : null;
 
     return SizedBox(
       width: Size.infinite.width,
@@ -44,15 +47,15 @@ class _SstBody extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(internship?.sstEvaluation?.isFilled ?? false
+            Text(internships.isNotEmpty
                 ? 'Le questionnaire «\u00a0Repérer les risques SST\u00a0» a '
                     'été rempli pour ce poste de travail.\n'
                     'Dernière modification le '
-                    '${DateFormat.yMMMEd('fr_CA').format(internship!.sstEvaluation!.date)}'
+                    '${DateFormat.yMMMEd('fr_CA').format(latestInternship!.sstEvaluation!.date)}'
                 : 'Le questionnaire «\u00a0Repérer les risques SST\u00a0» n\'a '
                     'jamais été rempli pour ce poste de travail.'),
             const SizedBox(height: 12),
-            _buildAnswers(context, enterprise, internship),
+            _buildAnswers(context, internships),
             const SizedBox(height: 12),
           ],
         ),
@@ -60,17 +63,14 @@ class _SstBody extends StatelessWidget {
     );
   }
 
-  Widget _buildAnswers(
-      BuildContext context, Enterprise enterprise, Internship? internship) {
-    final job =
-        enterprise.jobs.firstWhereOrNull((e) => e.id == internship?.jobId);
-    if (job == null ||
-        internship?.sstEvaluation == null ||
-        !internship!.sstEvaluation!.isFilled) {
-      return SizedBox.shrink();
-    }
+  Widget _buildAnswers(BuildContext context, Iterable<Internship> internships) {
+    final evaluatedJobs =
+        enterprise.jobs.where((j) => internships.any((i) => i.jobId == j.id));
+    final questionIds = evaluatedJobs
+        .map((e) => e.specialization.questions)
+        .expand((x) => x)
+        .toSet();
 
-    final questionIds = [...job.specialization.questions.map((e) => e)];
     final questions =
         questionIds.map((e) => QuestionFileService.fromId(e)).toList();
     questions.sort((a, b) => int.parse(a.idSummary) - int.parse(b.idSummary));
@@ -78,12 +78,21 @@ class _SstBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: questions.map((q) {
-        final answer = internship.sstEvaluation!.questions['Q${q.id}'];
-        final answerT = internship.sstEvaluation!.questions['Q${q.id}+t'];
-        if ((q.questionSummary == null && q.followUpQuestionSummary == null) ||
-            (answer == null && answerT == null)) {
-          return Container();
+        if (q.questionSummary == null && q.followUpQuestionSummary == null) {
+          return SizedBox.shrink();
         }
+
+        final answers = internships
+            .map((e) => e.sstEvaluation!.questions['Q${q.id}'] ?? [])
+            .expand((x) => x)
+            .toSet()
+            .toList();
+        final answerT = internships
+            .map((e) => e.sstEvaluation!.questions['Q${q.id}+t'] ?? [])
+            .expand((x) => x)
+            .toSet()
+            .toList();
+        if (answers.isEmpty && answerT.isEmpty) return SizedBox.shrink();
 
         late Widget question;
         late Widget answerWidget;
@@ -95,20 +104,19 @@ class _SstBody extends StatelessWidget {
 
           switch (q.type) {
             case QuestionType.radio:
-              answerWidget = Text(
-                answer!.first,
-                style: Theme.of(context).textTheme.bodyMedium,
-              );
+              // TODO Confirm that all answers should be shown for radio
+              answerWidget = ItemizedText(answers);
               break;
             case QuestionType.checkbox:
-              if (answer!.isEmpty ||
-                  answer[0] == '__NOT_APPLICABLE_INTERNAL__') {
-                return Container();
-              }
-              answerWidget = ItemizedText(answer);
+              final filteredAnswers = answers
+                  .where((a) => a != CheckboxWithOther.notApplicableTag)
+                  .toList();
+              if (filteredAnswers.isEmpty) return SizedBox.shrink();
+
+              answerWidget = ItemizedText(filteredAnswers);
               break;
             case QuestionType.text:
-              answerWidget = Text(answer!.first);
+              answerWidget = ItemizedText(answerT);
               break;
           }
         } else {
@@ -117,19 +125,21 @@ class _SstBody extends StatelessWidget {
                 'is not implemented yet';
           }
 
-          if (answer!.first == q.choices!.last) {
-            // No follow up question was needed
-            return Container();
+          // Check if no follow up question was needed (e.g. answer is "no")
+          if (answers.every((e) => e == q.choices!.last)) {
+            return SizedBox.shrink();
           }
 
-          question = question = Text(
+          question = Text(
             q.followUpQuestionSummary!,
             style: Theme.of(context).textTheme.titleSmall,
           );
-          answerWidget = Text(
-            answerT?.first ?? 'Aucune réponse fournie',
-            style: Theme.of(context).textTheme.bodyMedium,
-          );
+          answerWidget = answerT.isEmpty
+              ? Text(
+                  'Aucune réponse fournie',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                )
+              : ItemizedText(answerT);
         }
 
         return Column(
