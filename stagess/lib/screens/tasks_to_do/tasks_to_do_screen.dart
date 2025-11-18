@@ -9,45 +9,50 @@ import 'package:stagess/common/widgets/main_drawer.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess/screens/internship_forms/enterprise_steps/enterprise_evaluation_screen.dart';
-import 'package:stagess/screens/job_sst_form/job_sst_form_screen.dart';
+import 'package:stagess/screens/sst_evaluation_form/sst_evaluation_form_screen.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
+import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 final _logger = Logger('TasksToDoScreen');
 
 int numberOfTasksToDo(BuildContext context) {
   final taskFunctions = [
-    _enterprisesToEvaluate,
+    _sstToEvaluate,
     _internshipsToTerminate,
     _postInternshipEvaluationToDo,
   ];
   return taskFunctions.fold<int>(0, (prev, e) => prev + e(context).length);
 }
 
-List<_EnterpriseInternshipStudent> _enterprisesToEvaluate(
-    BuildContext context) {
-  // We should evaluate a job of an enterprise if there is at least one
-  // internship in this job and the no evaluation was ever performed
-  final myId = TeachersProvider.of(context).currentTeacher?.id;
-  if (myId == null) return [];
-  final enterprises = EnterprisesProviderExtension.availableEnterprisesOf(
-    context,
-  );
-  final internships = InternshipsProvider.of(context);
+List<_EnterpriseInternshipStudent> _sstToEvaluate(BuildContext context) {
+  // We should evaluate a job of an enterprise for the sst if there for each
+  // internship where one of our students is doing this job
+  final teacherId =
+      TeachersProvider.of(context, listen: false).currentTeacher?.id;
+  if (teacherId == null) return [];
+  final internships = InternshipsProvider.of(context, listen: false);
+  final enterprises = EnterprisesProvider.of(context, listen: false);
+  final students = StudentsProvider.of(context, listen: false);
 
   // This happens sometimes, so we need to wait a frame
-  if (internships.isEmpty || enterprises.isEmpty) return [];
+  if (internships.isEmpty) return [];
 
   List<_EnterpriseInternshipStudent> out = [];
   for (final internship in internships) {
-    if (!(internship.sstEvaluation?.isFilled ?? false)) {
-      out.add(
-        _EnterpriseInternshipStudent(internship: internship),
-      );
+    final isSstFilled = internship.sstEvaluation?.isFilled ?? false;
+    if (!isSstFilled && internship.supervisingTeacherIds.contains(teacherId)) {
+      final enterprise =
+          enterprises.firstWhereOrNull((e) => e.id == internship.enterpriseId);
+      final student =
+          students.firstWhereOrNull((e) => e.id == internship.studentId);
+      out.add(_EnterpriseInternshipStudent(
+          internship: internship, enterprise: enterprise, student: student));
     }
   }
 
@@ -194,9 +199,9 @@ class _SstRisk extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final jobs = _enterprisesToEvaluate(context);
+    final data = _sstToEvaluate(context);
 
-    jobs.sort(
+    data.sort(
       (a, b) => a.internship!.dates.start.compareTo(b.internship!.dates.start),
     );
 
@@ -204,22 +209,32 @@ class _SstRisk extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SubTitle('Repérer les risques SST'),
-        ...(jobs.isEmpty
+        ...(data.isEmpty
             ? [const _AllTasksDone()]
-            : jobs.map((e) {
-                final enterprise = e.enterprise!;
-                final internship = e.internship!;
-                final job =
-                    enterprise.jobs.firstWhere((j) => j.id == internship.jobId);
+            : data.map((e) {
+                final internship = e.internship;
+                final enterprise = e.enterprise;
+                final job = enterprise?.jobs
+                    .firstWhere((j) => j.id == internship?.jobId);
+                final student = e.student;
+                if (internship == null ||
+                    enterprise == null ||
+                    job == null ||
+                    student == null) {
+                  _logger.severe(
+                      'Missing data for SST task tile: internship=${internship?.id}, '
+                      'enterprise=${enterprise?.id}, job=${job?.id}, student=${student?.id}');
+                  return const SizedBox.shrink();
+                }
 
                 return _TaskTile(
-                  title: enterprise.name,
-                  subtitle: job.specialization.name,
+                  title: student.fullName,
+                  subtitle: '${enterprise.name} (${job.specialization.name})',
                   icon: Icons.warning,
                   iconColor: Theme.of(context).colorScheme.secondary,
                   date: internship.dates.start,
                   buttonTitle: 'Remplir le\nquestionnaire SST',
-                  onTap: () => showJobSstFormDialog(context,
+                  onTap: () => showSstEvaluationFormDialog(context,
                       internshipId: internship.id),
                 );
               })),
@@ -368,6 +383,7 @@ class _TaskTile extends StatelessWidget {
                     Text(
                       subtitle,
                       style: Theme.of(context).textTheme.bodyMedium,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
                   ],

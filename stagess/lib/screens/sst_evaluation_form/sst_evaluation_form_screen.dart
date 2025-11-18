@@ -16,13 +16,13 @@ import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/radio_with_follow_up.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
-final _logger = Logger('JobSstFormScreen');
+final _logger = Logger('SstEvaluationFormScreen');
 
-Future<Internship?> showJobSstFormDialog(
+Future<Internship?> showSstEvaluationFormDialog(
   BuildContext context, {
   required String internshipId,
 }) async {
-  _logger.info('Showing JobSstFormDialog for internship: $internshipId');
+  _logger.info('Showing SstEvaluationFormDialog for internship: $internshipId');
   final internships = InternshipsProvider.of(context, listen: false);
 
   final hasLock = await showDialog(
@@ -73,7 +73,7 @@ Future<Internship?> showJobSstFormDialog(
     builder: (context) => Navigator(
       onGenerateRoute: (settings) => MaterialPageRoute(
         builder: (ctx) => Dialog(
-          child: JobSstFormScreen(
+          child: SstEvaluationFormScreen(
             rootContext: context,
             internshipId: internshipId,
           ),
@@ -89,28 +89,29 @@ Future<Internship?> showJobSstFormDialog(
   return editedInternship;
 }
 
-class JobSstFormScreen extends StatefulWidget {
-  const JobSstFormScreen({
+class SstEvaluationFormScreen extends StatefulWidget {
+  const SstEvaluationFormScreen({
     super.key,
     required this.rootContext,
     required this.internshipId,
   });
 
-  static const route = '/job-sst-form';
+  static const route = '/sst-evaluation-form';
 
   final BuildContext rootContext;
   final String internshipId;
 
   @override
-  State<JobSstFormScreen> createState() => _JobSstFormScreenState();
+  State<SstEvaluationFormScreen> createState() =>
+      _SstEvaluationFormScreenState();
 }
 
-class _JobSstFormScreenState extends State<JobSstFormScreen> {
+class _SstEvaluationFormScreenState extends State<SstEvaluationFormScreen> {
   final _questionsKey = GlobalKey<_QuestionsStepState>();
 
   void _submit() {
     _logger.info(
-        'Submitting JobSstFormScreen for internshipId: ${widget.internshipId}');
+        'Submitting SstEvaluationFormScreen for internshipId: ${widget.internshipId}');
 
     if (!FormService.validateForm(_questionsKey.currentState!.formKey)) {
       setState(() {});
@@ -127,7 +128,7 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
     );
 
     _logger.fine(
-      'JobSstFormScreen submitted successfully for internshipId: ${widget.internshipId}',
+      'SstEvaluationFormScreen submitted successfully for internshipId: ${widget.internshipId}',
     );
     if (!widget.rootContext.mounted) return;
     Navigator.of(widget.rootContext).pop(internship);
@@ -135,7 +136,7 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
 
   void _cancel() async {
     _logger.info(
-        'Cancelling JobSstFormScreen for internshipId: ${widget.internshipId}');
+        'Cancelling SstEvaluationFormScreen for internshipId: ${widget.internshipId}');
     final answer = await ConfirmExitDialog.show(
       context,
       content: const Text('Toutes les modifications seront perdues.'),
@@ -150,7 +151,7 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
   }
 
   void _showHelp({required bool force}) async {
-    _logger.info('Showing help for JobSstFormScreen');
+    _logger.info('Showing help for SstEvaluationFormScreen');
 
     bool shouldShowHelp = force;
     if (!shouldShowHelp) {
@@ -258,7 +259,7 @@ class _JobSstFormScreenState extends State<JobSstFormScreen> {
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-        'Building JobSstFormScreen for internshipId: ${widget.internshipId}');
+        'Building SstEvaluationFormScreen for internshipId: ${widget.internshipId}');
 
     _showHelp(force: false);
 

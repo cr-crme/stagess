@@ -21,19 +21,19 @@ final _logger = Logger('InternshipDetails');
 
 class _InternshipController {
   _InternshipController(Internship internship)
-    : supervisor = internship.supervisor.copyWith(),
-      _achievedLength = internship.achievedDuration,
-      weeklyScheduleController = WeeklySchedulesController(
-        weeklySchedules: InternshipHelpers.copySchedules(
-          internship.weeklySchedules,
+      : supervisor = internship.supervisor.copyWith(),
+        _achievedLength = internship.achievedDuration,
+        weeklyScheduleController = WeeklySchedulesController(
+          weeklySchedules: InternshipHelpers.copySchedules(
+            internship.weeklySchedules,
+          ),
+          dateRange: internship.dates,
         ),
-        dateRange: internship.dates,
-      ),
-      transportations =
-          internship.hasVersions ? [...internship.transportations] : [],
-      visitFrequenciesController = TextEditingController(
-        text: internship.hasVersions ? internship.visitFrequencies : '',
-      );
+        transportations =
+            internship.hasVersions ? [...internship.transportations] : [],
+        visitFrequenciesController = TextEditingController(
+          text: internship.hasVersions ? internship.visitFrequencies : '',
+        );
 
   bool get hasChanged =>
       weeklyScheduleController.hasChanged || supervisorChanged;
@@ -174,8 +174,7 @@ class InternshipDetailsState extends State<InternshipDetails> {
       _internship.transportations,
       _internshipController.transportations,
     );
-    final visitFrequenciesHasChanged =
-        _internship.visitFrequencies !=
+    final visitFrequenciesHasChanged = _internship.visitFrequencies !=
         _internshipController.visitFrequenciesController.text;
 
     // Saving the values that require an extra version
@@ -195,10 +194,10 @@ class InternshipDetailsState extends State<InternshipDetails> {
         dates: _internshipController.weeklyScheduleController.dateRange!,
         transportations: _internshipController.transportations,
         visitFrequencies: _internshipController.visitFrequenciesController.text,
-        weeklySchedules:
-            _internshipController.weeklyScheduleController.weeklySchedules
-                .map((e) => e.duplicate())
-                .toList(),
+        weeklySchedules: _internshipController
+            .weeklyScheduleController.weeklySchedules
+            .map((e) => e.duplicate())
+            .toList(),
       );
 
       hasChanged = true;
@@ -242,8 +241,7 @@ class InternshipDetailsState extends State<InternshipDetails> {
         TextSpan(
           children: [
             const TextSpan(
-              text:
-                  '** Vous quittez la page sans avoir '
+              text: '** Vous quittez la page sans avoir '
                   'cliqué sur Enregistrer ',
             ),
             WidgetSpan(
@@ -275,8 +273,8 @@ class InternshipDetailsState extends State<InternshipDetails> {
   Widget build(BuildContext context) {
     _logger.finer('Building InternshipDetails for ID: ${widget.internshipId}');
 
-    final myId = TeachersProvider.of(context).currentTeacher?.id;
-    if (myId == null) {
+    final teacherId = TeachersProvider.of(context).currentTeacher?.id;
+    if (teacherId == null) {
       return const Center(child: Text('Vous n\'êtes pas connecté.'));
     }
     return Padding(
@@ -293,32 +291,30 @@ class InternshipDetailsState extends State<InternshipDetails> {
           ExpansionPanel(
             isExpanded: _isExpanded,
             canTapOnHeader: true,
-            headerBuilder:
-                (context, isExpanded) => Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Détails du stage',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.titleLarge!.copyWith(color: Colors.black),
-                    ),
-                    if (_isExpanded &&
-                        _internship.isActive &&
-                        _internship.supervisingTeacherIds.contains(myId))
-                      IconButton(
-                        onPressed: _forceDisabled ? null : _toggleEditMode,
-                        icon: Icon(
-                          editMode ? Icons.save : Icons.edit,
-                          color:
-                              _forceDisabled
-                                  ? Colors.grey
-                                  : Theme.of(context).primaryColor,
-                        ),
-                      ),
-                  ],
+            headerBuilder: (context, isExpanded) => Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Détails du stage',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge!.copyWith(color: Colors.black),
                 ),
+                if (_isExpanded &&
+                    _internship.isActive &&
+                    _internship.supervisingTeacherIds.contains(teacherId))
+                  IconButton(
+                    onPressed: _forceDisabled ? null : _toggleEditMode,
+                    icon: Icon(
+                      editMode ? Icons.save : Icons.edit,
+                      color: _forceDisabled
+                          ? Colors.grey
+                          : Theme.of(context).primaryColor,
+                    ),
+                  ),
+              ],
+            ),
             body: _InternshipBody(
               internship: _internship,
               editMode: _editMode,
@@ -388,30 +384,27 @@ class _InternshipBody extends StatelessWidget {
               children: [
                 editMode
                     ? Column(
-                      children: [
-                        TextFormField(
-                          controller:
-                              internshipController
-                                  .supervisorFirstNameController,
-                          decoration: const InputDecoration(
-                            label: Text('* Prénom'),
+                        children: [
+                          TextFormField(
+                            controller: internshipController
+                                .supervisorFirstNameController,
+                            decoration: const InputDecoration(
+                              label: Text('* Prénom'),
+                            ),
+                            validator: (value) =>
+                                value!.isEmpty ? 'Ajouter un prénom' : null,
                           ),
-                          validator:
-                              (value) =>
-                                  value!.isEmpty ? 'Ajouter un prénom' : null,
-                        ),
-                        TextFormField(
-                          controller:
-                              internshipController.supervisorLastNameController,
-                          decoration: const InputDecoration(
-                            label: Text('* Nom'),
+                          TextFormField(
+                            controller: internshipController
+                                .supervisorLastNameController,
+                            decoration: const InputDecoration(
+                              label: Text('* Nom'),
+                            ),
+                            validator: (value) =>
+                                value!.isEmpty ? 'Ajouter un nom' : null,
                           ),
-                          validator:
-                              (value) =>
-                                  value!.isEmpty ? 'Ajouter un nom' : null,
-                        ),
-                      ],
-                    )
+                        ],
+                      )
                     : Text(internship.supervisor.fullName),
                 const SizedBox(height: 8),
                 PhoneListTile(
@@ -453,18 +446,14 @@ class _InternshipBody extends StatelessWidget {
                       Text(
                         DateFormat.yMMMEd('fr_CA').format(
                           internshipController
-                                  .weeklyScheduleController
-                                  .dateRange
-                                  ?.start ??
+                                  .weeklyScheduleController.dateRange?.start ??
                               DateTime.now(),
                         ),
                       ),
                       Text(
                         DateFormat.yMMMEd('fr_CA').format(
                           internshipController
-                                  .weeklyScheduleController
-                                  .dateRange
-                                  ?.end ??
+                                  .weeklyScheduleController.dateRange?.end ??
                               DateTime.now(),
                         ),
                       ),
@@ -485,10 +474,9 @@ class _InternshipBody extends StatelessWidget {
   }
 
   Widget _buildTime() {
-    final achievedDuration =
-        internshipController.achievedLength < 0
-            ? 0
-            : internshipController.achievedLength;
+    final achievedDuration = internshipController.achievedLength < 0
+        ? 0
+        : internshipController.achievedLength;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -507,20 +495,17 @@ class _InternshipBody extends StatelessWidget {
                       const Text('Total fait : '),
                       editMode
                           ? SizedBox(
-                            width: 45,
-                            child: TextFormField(
-                              textAlign: TextAlign.right,
-                              initialValue: achievedDuration.toString(),
-                              onChanged:
-                                  (newValue) =>
-                                      internshipController.achievedLength =
-                                          newValue == ''
-                                              ? 0
-                                              : int.parse(newValue),
-                              keyboardType:
-                                  const TextInputType.numberWithOptions(),
-                            ),
-                          )
+                              width: 45,
+                              child: TextFormField(
+                                textAlign: TextAlign.right,
+                                initialValue: achievedDuration.toString(),
+                                onChanged: (newValue) => internshipController
+                                        .achievedLength =
+                                    newValue == '' ? 0 : int.parse(newValue),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(),
+                              ),
+                            )
                           : Text(achievedDuration.toString()),
                       const Text('h'),
                     ],
@@ -562,15 +547,15 @@ class _InternshipBody extends StatelessWidget {
         ),
         editMode
             ? Padding(
-              padding: const EdgeInsets.only(top: 2, bottom: _interline),
-              child: TextFormField(
-                controller: internshipController.visitFrequenciesController,
-              ),
-            )
+                padding: const EdgeInsets.only(top: 2, bottom: _interline),
+                child: TextFormField(
+                  controller: internshipController.visitFrequenciesController,
+                ),
+              )
             : Padding(
-              padding: const EdgeInsets.only(top: 2, bottom: _interline),
-              child: Text(internship.visitFrequencies),
-            ),
+                padding: const EdgeInsets.only(top: 2, bottom: _interline),
+                child: Text(internship.visitFrequencies),
+              ),
       ],
     );
   }
@@ -666,41 +651,35 @@ class _TransportationsState extends State<_Transportations> {
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children:
-              Transportation.values.map((e) {
-                return MouseRegion(
-                  cursor:
-                      widget.editMode
-                          ? SystemMouseCursors.click
-                          : SystemMouseCursors.basic,
-                  child: GestureDetector(
-                    onTap:
-                        widget.editMode
-                            ? () => _updateTransportations(e)
-                            : null,
-                    child: Row(
-                      children: [
-                        Text(e.toString()),
-                        Checkbox(
-                          value: widget.transportations.contains(e),
-                          side: WidgetStateBorderSide.resolveWith(
-                            (states) => BorderSide(
-                              color: Theme.of(context).primaryColor,
-                              width: 2.0,
-                            ),
-                          ),
-                          fillColor: WidgetStatePropertyAll(Colors.transparent),
-                          checkColor: Colors.black,
-                          onChanged:
-                              widget.editMode
-                                  ? (value) => _updateTransportations(e)
-                                  : null,
+          children: Transportation.values.map((e) {
+            return MouseRegion(
+              cursor: widget.editMode
+                  ? SystemMouseCursors.click
+                  : SystemMouseCursors.basic,
+              child: GestureDetector(
+                onTap: widget.editMode ? () => _updateTransportations(e) : null,
+                child: Row(
+                  children: [
+                    Text(e.toString()),
+                    Checkbox(
+                      value: widget.transportations.contains(e),
+                      side: WidgetStateBorderSide.resolveWith(
+                        (states) => BorderSide(
+                          color: Theme.of(context).primaryColor,
+                          width: 2.0,
                         ),
-                      ],
+                      ),
+                      fillColor: WidgetStatePropertyAll(Colors.transparent),
+                      checkColor: Colors.black,
+                      onChanged: widget.editMode
+                          ? (value) => _updateTransportations(e)
+                          : null,
                     ),
-                  ),
-                );
-              }).toList(),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
         ),
       ],
     );
