@@ -36,6 +36,23 @@ class SstEvaluation extends ItemSerializable {
         date: date ?? this.date,
       );
 
+  SstEvaluation copyWithData(Map<String, dynamic>? serialized) {
+    if (serialized == null || serialized.isEmpty) return copyWith();
+
+    return SstEvaluation(
+      id: serialized['id'] ?? id,
+      questions: serialized['questions'] == null
+          ? questions
+          : {
+              for (final entry
+                  in (serialized['questions'] as Map? ?? {}).entries)
+                entry.key:
+                    (entry.value as List?)?.map((e) => e as String).toList()
+            },
+      date: DateTimeExt.from(serialized['date']) ?? date,
+    );
+  }
+
   SstEvaluation.fromSerialized(super.map)
       : questions = {
           for (final entry in (map?['questions'] as Map? ?? {}).entries)

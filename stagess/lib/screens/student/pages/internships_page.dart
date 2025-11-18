@@ -8,7 +8,7 @@ import 'package:stagess/router.dart';
 import 'package:stagess/screens/internship_forms/enterprise_steps/enterprise_evaluation_screen.dart';
 import 'package:stagess/screens/student/pages/widgets/internship_details.dart';
 import 'package:stagess/screens/student/pages/widgets/internship_documents.dart';
-import 'package:stagess/screens/student/pages/widgets/internship_skills.dart';
+import 'package:stagess/screens/student/pages/widgets/internship_evaluations.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/student.dart';

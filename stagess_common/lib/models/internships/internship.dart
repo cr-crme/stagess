@@ -68,6 +68,88 @@ class PostInternshipEnterpriseEvaluation extends ItemSerializable {
             _doubleFromSerialized(map?['acceptance_behavior_difficulties']),
         super.fromSerialized();
 
+  PostInternshipEnterpriseEvaluation copyWith({
+    String? id,
+    String? internshipId,
+    List<String>? skillsRequired,
+    double? taskVariety,
+    double? trainingPlanRespect,
+    double? autonomyExpected,
+    double? efficiencyExpected,
+    double? supervisionStyle,
+    double? easeOfCommunication,
+    double? absenceAcceptance,
+    String? supervisionComments,
+    double? acceptanceTsa,
+    double? acceptanceLanguageDisorder,
+    double? acceptanceIntellectualDisability,
+    double? acceptancePhysicalDisability,
+    double? acceptanceMentalHealthDisorder,
+    double? acceptanceBehaviorDifficulties,
+  }) {
+    return PostInternshipEnterpriseEvaluation(
+        id: id ?? this.id,
+        internshipId: internshipId ?? this.internshipId,
+        skillsRequired: skillsRequired ?? this.skillsRequired,
+        taskVariety: taskVariety ?? this.taskVariety,
+        trainingPlanRespect: trainingPlanRespect ?? this.trainingPlanRespect,
+        autonomyExpected: autonomyExpected ?? this.autonomyExpected,
+        efficiencyExpected: efficiencyExpected ?? this.efficiencyExpected,
+        supervisionStyle: supervisionStyle ?? this.supervisionStyle,
+        easeOfCommunication: easeOfCommunication ?? this.easeOfCommunication,
+        absenceAcceptance: absenceAcceptance ?? this.absenceAcceptance,
+        supervisionComments: supervisionComments ?? this.supervisionComments,
+        acceptanceTsa: acceptanceTsa ?? this.acceptanceTsa,
+        acceptanceLanguageDisorder:
+            acceptanceLanguageDisorder ?? this.acceptanceLanguageDisorder,
+        acceptanceIntellectualDisability: acceptanceIntellectualDisability ??
+            this.acceptanceIntellectualDisability,
+        acceptancePhysicalDisability:
+            acceptancePhysicalDisability ?? this.acceptancePhysicalDisability,
+        acceptanceMentalHealthDisorder: acceptanceMentalHealthDisorder ??
+            this.acceptanceMentalHealthDisorder,
+        acceptanceBehaviorDifficulties: acceptanceBehaviorDifficulties ??
+            this.acceptanceBehaviorDifficulties);
+  }
+
+  PostInternshipEnterpriseEvaluation copyWithData(
+      Map<String, dynamic>? serialized) {
+    if (serialized == null || serialized.isEmpty) return copyWith();
+
+    return PostInternshipEnterpriseEvaluation(
+        id: serialized['id'] ?? id,
+        internshipId: serialized['internship_id'] ?? internshipId,
+        skillsRequired: ListExt.from(serialized['skills_required'], deserializer: (e) => StringExt.from(e)!) ??
+            skillsRequired,
+        taskVariety: _doubleFromSerialized(serialized['task_variety'],
+            defaultValue: taskVariety),
+        trainingPlanRespect: _doubleFromSerialized(serialized['training_plan_respect'],
+            defaultValue: trainingPlanRespect),
+        autonomyExpected: _doubleFromSerialized(serialized['autonomy_expected'],
+            defaultValue: autonomyExpected),
+        efficiencyExpected: _doubleFromSerialized(serialized['efficiency_expected'],
+            defaultValue: efficiencyExpected),
+        supervisionStyle: _doubleFromSerialized(serialized['supervision_style'],
+            defaultValue: supervisionStyle),
+        easeOfCommunication: _doubleFromSerialized(serialized['ease_of_communication'],
+            defaultValue: easeOfCommunication),
+        absenceAcceptance: _doubleFromSerialized(serialized['absence_acceptance'],
+            defaultValue: absenceAcceptance),
+        supervisionComments:
+            serialized['supervision_comments'] ?? supervisionComments,
+        acceptanceTsa: _doubleFromSerialized(serialized['acceptance_tsa'],
+            defaultValue: acceptanceTsa),
+        acceptanceLanguageDisorder: _doubleFromSerialized(
+            serialized['acceptance_language_disorder'],
+            defaultValue: acceptanceLanguageDisorder),
+        acceptanceIntellectualDisability: _doubleFromSerialized(
+            serialized['acceptance_intellectual_disability'],
+            defaultValue: acceptanceIntellectualDisability),
+        acceptancePhysicalDisability: _doubleFromSerialized(serialized['acceptance_physical_disability'], defaultValue: acceptancePhysicalDisability),
+        acceptanceMentalHealthDisorder: _doubleFromSerialized(serialized['acceptance_mental_health_disorder'], defaultValue: acceptanceMentalHealthDisorder),
+        acceptanceBehaviorDifficulties: _doubleFromSerialized(serialized['acceptance_behavior_difficulties'], defaultValue: acceptanceBehaviorDifficulties));
+  }
+
   String internshipId;
 
   // Prerequisites
@@ -504,9 +586,7 @@ class Internship extends ExtendedItemSerializable {
         enterpriseEvaluation = map?['enterprise_evaluation'] == null
             ? null
             : PostInternshipEnterpriseEvaluation.fromSerialized(
-                (map?['enterprise_evaluation'] as Map<String, dynamic>?)
-                  ?..addAll(
-                      {'internship_id': StringExt.from(map?['id']) ?? ''})),
+                (map?['enterprise_evaluation'] as Map<String, dynamic>?)),
         super.fromSerialized() {
     _finalizeInitialization();
   }
@@ -691,14 +771,16 @@ class Internship extends ExtendedItemSerializable {
               deserializer: (map) =>
                   InternshipEvaluationVisa.fromSerialized(map)) ??
           visaEvaluations,
-      sstEvaluation: data['sst_evaluation'] == null
-          ? sstEvaluation
-          : SstEvaluation.fromSerialized(data['sst_evaluation']),
-      enterpriseEvaluation: data['enterprise_evaluation'] == null
-          ? enterpriseEvaluation
-          : PostInternshipEnterpriseEvaluation.fromSerialized(
-              (data['enterprise_evaluation'] as Map<String, dynamic>?)
-                ?..addAll({'internship_id': StringExt.from(data['id']) ?? ''})),
+      sstEvaluation: sstEvaluation?.copyWithData(data['sst_evaluation']) ??
+          (data['sst_evaluation'] == null
+              ? null
+              : SstEvaluation.fromSerialized(data['sst_evaluation'])),
+      enterpriseEvaluation:
+          enterpriseEvaluation?.copyWithData(data['sst_evaluation']) ??
+              (data['enterprise_evaluation'] == null
+                  ? null
+                  : PostInternshipEnterpriseEvaluation.fromSerialized(
+                      data['enterprise_evaluation'])),
     );
   }
 

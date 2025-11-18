@@ -96,40 +96,9 @@ Future<Internship?> showSstEvaluationFormDialog(
     final student = StudentsProvider.of(context, listen: false)
         .fromId(editedInternship.studentId);
 
-    await showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title:
-            const SubTitle('L\'évaluation SST enregistrée', left: 0, bottom: 0),
-        content: RichText(
-          text: TextSpan(
-            children: [
-              const TextSpan(text: 'L\'évaluation SST de l\'entreprise '),
-              TextSpan(
-                text: enterprise.name,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const TextSpan(
-                text: ' a bien été enregistrée pour l\'élève ',
-              ),
-              TextSpan(
-                text: student.fullName,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const TextSpan(
-                text: '.',
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Ok'),
-          ),
-        ],
-      ),
-    );
+    showSnackBar(context,
+        message: 'L\'évaluation SST a bien été enregistrée pour '
+            'l\'élève ${student.fullName} dans l\'entreprise ${enterprise.name}.');
   }
   return editedInternship;
 }

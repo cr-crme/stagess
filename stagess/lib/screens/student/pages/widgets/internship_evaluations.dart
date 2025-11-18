@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
+import 'package:stagess/misc/question_file_service.dart';
 import 'package:stagess/screens/internship_forms/student_steps/attitude_evaluation_form_controller.dart';
 import 'package:stagess/screens/internship_forms/student_steps/attitude_evaluation_screen.dart';
 import 'package:stagess/screens/internship_forms/student_steps/skill_evaluation_form_controller.dart';
@@ -9,6 +10,7 @@ import 'package:stagess/screens/internship_forms/student_steps/skill_evaluation_
 import 'package:stagess/screens/internship_forms/student_steps/skill_evaluation_main_screen.dart';
 import 'package:stagess/screens/internship_forms/student_steps/visa_evaluation_form_controller.dart';
 import 'package:stagess/screens/internship_forms/student_steps/visa_evaluation_screen.dart';
+import 'package:stagess/screens/sst_evaluation_form/sst_evaluation_form_screen.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart'
@@ -65,19 +67,18 @@ class _InternshipSkillsState extends State<InternshipSkills> {
       padding: const EdgeInsets.only(left: 24, right: 24),
       child: ExpansionPanelList(
         elevation: 0,
-        expansionCallback:
-            (index, isExpanded) => setState(() => _isExpanded = !_isExpanded),
+        expansionCallback: (index, isExpanded) =>
+            setState(() => _isExpanded = !_isExpanded),
         children: [
           ExpansionPanel(
             isExpanded: _isExpanded,
             canTapOnHeader: true,
-            headerBuilder:
-                (context, isExpanded) => Text(
-                  'Évaluations',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge!.copyWith(color: Colors.black),
-                ),
+            headerBuilder: (context, isExpanded) => Text(
+              'Évaluations',
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge!.copyWith(color: Colors.black),
+            ),
             body: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -87,13 +88,13 @@ class _InternshipSkillsState extends State<InternshipSkills> {
                 ),
                 if (internship.extraSpecializationIds.isNotEmpty)
                   ...internship.extraSpecializationIds.asMap().keys.map(
-                    (indexExtra) => _buildJob(
-                      'Métier supplémentaire${internship.extraSpecializationIds.length > 1 ? ' (${indexExtra + 1})' : ''}',
-                      specialization: ActivitySectorsService.specialization(
-                        internship.extraSpecializationIds[indexExtra],
+                        (indexExtra) => _buildJob(
+                          'Métier supplémentaire${internship.extraSpecializationIds.length > 1 ? ' (${indexExtra + 1})' : ''}',
+                          specialization: ActivitySectorsService.specialization(
+                            internship.extraSpecializationIds[indexExtra],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
                 _SpecificSkillBody(
                   internship: internship,
                   evaluation: internship.skillEvaluations,
@@ -103,6 +104,8 @@ class _InternshipSkillsState extends State<InternshipSkills> {
                   internship: internship,
                   evaluation: internship.attitudeEvaluations,
                 ),
+                const SizedBox(height: 16.0),
+                _SstBody(internship: internship),
                 const SizedBox(height: 16.0),
                 _VisaBody(
                   internship: internship,
@@ -173,24 +176,23 @@ class _SpecificSkillBodyState extends State<_SpecificSkillBody> {
           const Text('Évaluation du\u00a0: '),
           DropdownButton<int>(
             value: _currentEvaluationIndex,
-            onChanged:
-                (value) => setState(() => _currentEvaluationIndex = value!),
-            items:
-                widget.evaluation
-                    .asMap()
-                    .keys
-                    .map(
-                      (index) => DropdownMenuItem(
-                        value: index,
-                        child: Text(
-                          DateFormat(
-                            'dd MMMM yyyy',
-                            'fr_CA',
-                          ).format(widget.evaluation[index].date),
-                        ),
-                      ),
-                    )
-                    .toList(),
+            onChanged: (value) =>
+                setState(() => _currentEvaluationIndex = value!),
+            items: widget.evaluation
+                .asMap()
+                .keys
+                .map(
+                  (index) => DropdownMenuItem(
+                    value: index,
+                    child: Text(
+                      DateFormat(
+                        'dd MMMM yyyy',
+                        'fr_CA',
+                      ).format(widget.evaluation[index].date),
+                    ),
+                  ),
+                )
+                .toList(),
           ),
         ],
       ),
@@ -204,22 +206,21 @@ class _SpecificSkillBodyState extends State<_SpecificSkillBody> {
           widget.evaluation[_currentEvaluationIndex].presentAtEvaluation.isEmpty
               ? Container()
               : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Personnes présentes',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 12.0),
-                    child: ItemizedText(
-                      widget
-                          .evaluation[_currentEvaluationIndex]
-                          .presentAtEvaluation,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Personnes présentes',
+                      style: Theme.of(context).textTheme.titleSmall,
                     ),
-                  ),
-                ],
-              ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 12.0),
+                      child: ItemizedText(
+                        widget.evaluation[_currentEvaluationIndex]
+                            .presentAtEvaluation,
+                      ),
+                    ),
+                  ],
+                ),
     );
   }
 
@@ -235,50 +236,47 @@ class _SpecificSkillBodyState extends State<_SpecificSkillBody> {
             .isEmpty
         ? Container()
         : Padding(
-          padding: const EdgeInsets.only(bottom: _interline),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                specialization.idWithName,
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              _buildSkill(
-                title: 'Compétences réussies',
-                skills:
-                    widget.evaluation[_currentEvaluationIndex].skills
-                        .where(
-                          (e) =>
-                              e.specializationId == specialization.id &&
-                              e.appreciation == SkillAppreciation.acquired,
-                        )
-                        .toList(),
-              ),
-              _buildSkill(
-                title: 'Compétences à poursuivre',
-                skills:
-                    widget.evaluation[_currentEvaluationIndex].skills
-                        .where(
-                          (e) =>
-                              e.specializationId == specialization.id &&
-                              e.appreciation == SkillAppreciation.toPursuit,
-                        )
-                        .toList(),
-              ),
-              _buildSkill(
-                title: 'Compétences non réussies',
-                skills:
-                    widget.evaluation[_currentEvaluationIndex].skills
-                        .where(
-                          (e) =>
-                              e.specializationId == specialization.id &&
-                              e.appreciation == SkillAppreciation.failed,
-                        )
-                        .toList(),
-              ),
-            ],
-          ),
-        );
+            padding: const EdgeInsets.only(bottom: _interline),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  specialization.idWithName,
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                _buildSkill(
+                  title: 'Compétences réussies',
+                  skills: widget.evaluation[_currentEvaluationIndex].skills
+                      .where(
+                        (e) =>
+                            e.specializationId == specialization.id &&
+                            e.appreciation == SkillAppreciation.acquired,
+                      )
+                      .toList(),
+                ),
+                _buildSkill(
+                  title: 'Compétences à poursuivre',
+                  skills: widget.evaluation[_currentEvaluationIndex].skills
+                      .where(
+                        (e) =>
+                            e.specializationId == specialization.id &&
+                            e.appreciation == SkillAppreciation.toPursuit,
+                      )
+                      .toList(),
+                ),
+                _buildSkill(
+                  title: 'Compétences non réussies',
+                  skills: widget.evaluation[_currentEvaluationIndex].skills
+                      .where(
+                        (e) =>
+                            e.specializationId == specialization.id &&
+                            e.appreciation == SkillAppreciation.failed,
+                      )
+                      .toList(),
+                ),
+              ],
+            ),
+          );
   }
 
   Widget _buildSkill({
@@ -288,18 +286,19 @@ class _SpecificSkillBodyState extends State<_SpecificSkillBody> {
     return skills.isEmpty
         ? const SizedBox()
         : Padding(
-          padding: const EdgeInsets.only(bottom: _interline),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Padding(
-                padding: const EdgeInsets.only(left: 12.0),
-                child: ItemizedText(skills.map((e) => e.skillName).toList()),
-              ),
-            ],
-          ),
-        );
+            padding: const EdgeInsets.only(bottom: _interline),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                Padding(
+                  padding: const EdgeInsets.only(left: 12.0),
+                  child: ItemizedText(skills.map((e) => e.skillName).toList()),
+                ),
+              ],
+            ),
+          );
   }
 
   Widget _buildComment() {
@@ -333,20 +332,19 @@ class _SpecificSkillBodyState extends State<_SpecificSkillBody> {
           onPressed: () {
             showDialog(
               context: context,
-              builder:
-                  (context) => Dialog(
-                    child: SkillEvaluationFormScreen(
-                      rootContext: context,
-                      formController:
-                          SkillEvaluationFormController.fromInternshipId(
-                            context,
-                            internshipId: widget.internship.id,
-                            evaluationIndex: _currentEvaluationIndex,
-                            canModify: false,
-                          ),
-                      editMode: false,
-                    ),
+              builder: (context) => Dialog(
+                child: SkillEvaluationFormScreen(
+                  rootContext: context,
+                  formController:
+                      SkillEvaluationFormController.fromInternshipId(
+                    context,
+                    internshipId: widget.internship.id,
+                    evaluationIndex: _currentEvaluationIndex,
+                    canModify: false,
                   ),
+                  editMode: false,
+                ),
+              ),
             );
           },
           child: const Text('Voir l\'évaluation détaillée'),
@@ -364,12 +362,11 @@ class _SpecificSkillBodyState extends State<_SpecificSkillBody> {
 
     late final Specialization specialization;
     try {
-      specialization =
-          EnterprisesProvider.of(context)
-              .fromId(widget.internship.enterpriseId)
-              .jobs
-              .fromId(widget.internship.jobId)
-              .specialization;
+      specialization = EnterprisesProvider.of(context)
+          .fromId(widget.internship.enterpriseId)
+          .jobs
+          .fromId(widget.internship.jobId)
+          .specialization;
     } catch (e) {
       return SizedBox(
         height: 50,
@@ -383,41 +380,39 @@ class _SpecificSkillBodyState extends State<_SpecificSkillBody> {
 
     return AnimatedExpandingCard(
       elevation: 0.0,
-      header:
-          (ctx, isExpanded) => Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              const Text(
-                'C1. Compétences spécifiques du métier',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Visibility(
-                visible: widget.internship.supervisingTeacherIds.contains(
-                  teacherId,
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: 3,
-                    ),
-                    borderRadius: const BorderRadius.all(Radius.circular(18)),
-                  ),
-                  child: IconButton(
-                    onPressed:
-                        () => showSkillEvaluationDialog(
-                          context: context,
-                          internshipId: widget.internship.id,
-                          editMode: true,
-                        ),
-                    icon: const Icon(Icons.add_chart_rounded),
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-              ),
-            ],
+      header: (ctx, isExpanded) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          const Text(
+            'C1. Compétences spécifiques du métier',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
+          Visibility(
+            visible: widget.internship.supervisingTeacherIds.contains(
+              teacherId,
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 3,
+                ),
+                borderRadius: const BorderRadius.all(Radius.circular(18)),
+              ),
+              child: IconButton(
+                onPressed: () => showSkillEvaluationDialog(
+                  context: context,
+                  internshipId: widget.internship.id,
+                  editMode: true,
+                ),
+                icon: const Icon(Icons.add_chart_rounded),
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -435,17 +430,17 @@ class _SpecificSkillBodyState extends State<_SpecificSkillBody> {
                 _buillSkillSection(specialization),
                 if (widget.internship.extraSpecializationIds.isNotEmpty)
                   ...widget.internship.extraSpecializationIds.asMap().keys.map(
-                    (index) => Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buillSkillSection(
-                          ActivitySectorsService.specialization(
-                            widget.internship.extraSpecializationIds[index],
-                          ),
+                        (index) => Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buillSkillSection(
+                              ActivitySectorsService.specialization(
+                                widget.internship.extraSpecializationIds[index],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
                 _buildComment(),
                 _buildShowOtherDate(),
               ],
@@ -486,24 +481,23 @@ class _AttitudeBodyState extends State<_AttitudeBody> {
           const Text('Évaluation du\u00a0: '),
           DropdownButton<int>(
             value: _currentEvaluationIndex,
-            onChanged:
-                (value) => setState(() => _currentEvaluationIndex = value!),
-            items:
-                widget.evaluation
-                    .asMap()
-                    .keys
-                    .map(
-                      (index) => DropdownMenuItem(
-                        value: index,
-                        child: Text(
-                          DateFormat(
-                            'dd MMMM yyyy',
-                            'fr_CA',
-                          ).format(widget.evaluation[index].date),
-                        ),
-                      ),
-                    )
-                    .toList(),
+            onChanged: (value) =>
+                setState(() => _currentEvaluationIndex = value!),
+            items: widget.evaluation
+                .asMap()
+                .keys
+                .map(
+                  (index) => DropdownMenuItem(
+                    value: index,
+                    child: Text(
+                      DateFormat(
+                        'dd MMMM yyyy',
+                        'fr_CA',
+                      ).format(widget.evaluation[index].date),
+                    ),
+                  ),
+                )
+                .toList(),
           ),
         ],
       ),
@@ -523,9 +517,7 @@ class _AttitudeBodyState extends State<_AttitudeBody> {
           Padding(
             padding: const EdgeInsets.only(left: 12.0),
             child: ItemizedText(
-              widget
-                  .evaluation[_currentEvaluationIndex]
-                  .attitude
+              widget.evaluation[_currentEvaluationIndex].attitude
                   .meetsRequirements,
             ),
           ),
@@ -547,9 +539,7 @@ class _AttitudeBodyState extends State<_AttitudeBody> {
           Padding(
             padding: const EdgeInsets.only(left: 12.0),
             child: ItemizedText(
-              widget
-                  .evaluation[_currentEvaluationIndex]
-                  .attitude
+              widget.evaluation[_currentEvaluationIndex].attitude
                   .doesNotMeetRequirements,
             ),
           ),
@@ -573,11 +563,8 @@ class _AttitudeBodyState extends State<_AttitudeBody> {
             child: Text(
               attitude
                   .GeneralAppreciation
-                  .values[widget
-                      .evaluation[_currentEvaluationIndex]
-                      .attitude
-                      .generalAppreciation
-                      .index]
+                  .values[widget.evaluation[_currentEvaluationIndex].attitude
+                      .generalAppreciation.index]
                   .name,
             ),
           ),
@@ -614,17 +601,15 @@ class _AttitudeBodyState extends State<_AttitudeBody> {
       padding: const EdgeInsets.only(bottom: _interline),
       child: Center(
         child: OutlinedButton(
-          onPressed:
-              () => showAttitudeEvaluationDialog(
-                context: context,
-                formController:
-                    AttitudeEvaluationFormController.fromInternshipId(
-                      context,
-                      internshipId: widget.internship.id,
-                      evaluationIndex: _currentEvaluationIndex,
-                    ),
-                editMode: false,
-              ),
+          onPressed: () => showAttitudeEvaluationDialog(
+            context: context,
+            formController: AttitudeEvaluationFormController.fromInternshipId(
+              context,
+              internshipId: widget.internship.id,
+              evaluationIndex: _currentEvaluationIndex,
+            ),
+            editMode: false,
+          ),
           child: const Text('Voir l\'évaluation détaillée'),
         ),
       ),
@@ -639,43 +624,41 @@ class _AttitudeBodyState extends State<_AttitudeBody> {
 
     return AnimatedExpandingCard(
       elevation: 0.0,
-      header:
-          (ctx, isExpanded) => Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              const Text(
-                'C2. Attitudes et comportements',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              Visibility(
-                visible: widget.internship.supervisingTeacherIds.contains(
-                  teacherId,
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: 3,
-                    ),
-                    borderRadius: const BorderRadius.all(Radius.circular(18)),
-                  ),
-                  child: IconButton(
-                    onPressed:
-                        () => showAttitudeEvaluationDialog(
-                          context: context,
-                          formController: AttitudeEvaluationFormController(
-                            internshipId: widget.internship.id,
-                          ),
-                          editMode: true,
-                        ),
-                    icon: const Icon(Icons.playlist_add_sharp),
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
-              ),
-            ],
+      header: (ctx, isExpanded) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          const Text(
+            'C2. Attitudes et comportements',
+            style: TextStyle(fontWeight: FontWeight.bold),
           ),
+          Visibility(
+            visible: widget.internship.supervisingTeacherIds.contains(
+              teacherId,
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 3,
+                ),
+                borderRadius: const BorderRadius.all(Radius.circular(18)),
+              ),
+              child: IconButton(
+                onPressed: () => showAttitudeEvaluationDialog(
+                  context: context,
+                  formController: AttitudeEvaluationFormController(
+                    internshipId: widget.internship.id,
+                  ),
+                  editMode: true,
+                ),
+                icon: const Icon(Icons.playlist_add_sharp),
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+        ],
+      ),
       child: Column(
         children: [
           if (widget.evaluation.isEmpty)
@@ -697,6 +680,155 @@ class _AttitudeBodyState extends State<_AttitudeBody> {
             ),
         ],
       ),
+    );
+  }
+}
+
+class _SstBody extends StatelessWidget {
+  const _SstBody({required this.internship});
+
+  final Internship internship;
+
+  @override
+  Widget build(BuildContext context) {
+    _logger.finer('Building _SstBody for job: ${internship.id}');
+
+    final teacherId =
+        TeachersProvider.of(context, listen: false).currentTeacher?.id;
+    final isFilled = internship.sstEvaluation != null;
+
+    return AnimatedExpandingCard(
+      elevation: 0.0,
+      header: (ctx, isExpanded) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          const Text(
+            'SST en entreprise',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Visibility(
+            visible: internship.supervisingTeacherIds.contains(
+              teacherId,
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 3,
+                ),
+                borderRadius: const BorderRadius.all(Radius.circular(18)),
+              ),
+              child: IconButton(
+                onPressed: () => showSstEvaluationFormDialog(context,
+                    internshipId: internship.id),
+                icon: const Icon(Icons.health_and_safety),
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          )
+        ],
+      ),
+      child: SizedBox(
+        width: Size.infinite.width,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(isFilled
+                  ? 'Le questionnaire «\u00a0Repérer les risques SST\u00a0» a '
+                      'été rempli pour ce poste de travail.\n'
+                      'Dernière modification le '
+                      '${DateFormat.yMMMEd('fr_CA').format(internship.sstEvaluation!.date)}'
+                  : 'Le questionnaire «\u00a0Repérer les risques SST\u00a0» n\'a '
+                      'jamais été rempli pour ce poste de travail.'),
+              const SizedBox(height: 12),
+              _buildAnswers(context),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAnswers(BuildContext context) {
+    final enterprise =
+        EnterprisesProvider.of(context).fromId(internship.enterpriseId);
+    final job = enterprise.jobs.fromId(internship.jobId);
+
+    final questionIds = [...job.specialization.questions.map((e) => e)];
+    final questions =
+        questionIds.map((e) => QuestionFileService.fromId(e)).toList();
+    questions.sort((a, b) => int.parse(a.idSummary) - int.parse(b.idSummary));
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: questions.map((q) {
+        final answer = internship.sstEvaluation?.questions['Q${q.id}'];
+        final answerT = internship.sstEvaluation?.questions['Q${q.id}+t'];
+        if ((q.questionSummary == null && q.followUpQuestionSummary == null) ||
+            (answer == null && answerT == null)) {
+          return Container();
+        }
+
+        late Widget question;
+        late Widget answerWidget;
+        if (q.followUpQuestionSummary == null) {
+          question = Text(
+            q.questionSummary!,
+            style: Theme.of(context).textTheme.titleSmall,
+          );
+
+          switch (q.type) {
+            case QuestionType.radio:
+              answerWidget = Text(
+                answer!.first,
+                style: Theme.of(context).textTheme.bodyMedium,
+              );
+              break;
+            case QuestionType.checkbox:
+              if (answer!.isEmpty ||
+                  answer[0] == '__NOT_APPLICABLE_INTERNAL__') {
+                return Container();
+              }
+              answerWidget = ItemizedText(answer);
+              break;
+            case QuestionType.text:
+              answerWidget = Text(answer!.first);
+              break;
+          }
+        } else {
+          if (q.type == QuestionType.checkbox || q.type == QuestionType.text) {
+            throw 'Showing follow up question for Checkbox or Text '
+                'is not implemented yet';
+          }
+
+          if (answer!.first == q.choices!.last) {
+            // No follow up question was needed
+            return Container();
+          }
+
+          question = question = Text(
+            q.followUpQuestionSummary!,
+            style: Theme.of(context).textTheme.titleSmall,
+          );
+          answerWidget = Text(
+            answerT?.first ?? 'Aucune réponse fournie',
+            style: Theme.of(context).textTheme.bodyMedium,
+          );
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            question,
+            answerWidget,
+            const SizedBox(height: 12),
+          ],
+        );
+      }).toList(),
     );
   }
 }
@@ -731,24 +863,23 @@ class _VisaBodyState extends State<_VisaBody> {
           const Text('Évaluation du\u00a0: '),
           DropdownButton<int>(
             value: _currentEvaluationIndex,
-            onChanged:
-                (value) => setState(() => _currentEvaluationIndex = value!),
-            items:
-                widget.evaluations
-                    .asMap()
-                    .keys
-                    .map(
-                      (index) => DropdownMenuItem(
-                        value: index,
-                        child: Text(
-                          DateFormat(
-                            'dd MMMM yyyy',
-                            'fr_CA',
-                          ).format(widget.evaluations[index].date),
-                        ),
-                      ),
-                    )
-                    .toList(),
+            onChanged: (value) =>
+                setState(() => _currentEvaluationIndex = value!),
+            items: widget.evaluations
+                .asMap()
+                .keys
+                .map(
+                  (index) => DropdownMenuItem(
+                    value: index,
+                    child: Text(
+                      DateFormat(
+                        'dd MMMM yyyy',
+                        'fr_CA',
+                      ).format(widget.evaluations[index].date),
+                    ),
+                  ),
+                )
+                .toList(),
           ),
         ],
       ),
@@ -769,9 +900,7 @@ class _VisaBodyState extends State<_VisaBody> {
             padding: const EdgeInsets.only(left: 12.0),
             child: ItemizedText(
               widget
-                  .evaluations[_currentEvaluationIndex]
-                  .form
-                  .meetsRequirements,
+                  .evaluations[_currentEvaluationIndex].form.meetsRequirements,
             ),
           ),
         ],
@@ -792,9 +921,7 @@ class _VisaBodyState extends State<_VisaBody> {
           Padding(
             padding: const EdgeInsets.only(left: 12.0),
             child: ItemizedText(
-              widget
-                  .evaluations[_currentEvaluationIndex]
-                  .form
+              widget.evaluations[_currentEvaluationIndex].form
                   .doesNotMeetRequirements,
             ),
           ),
@@ -818,11 +945,8 @@ class _VisaBodyState extends State<_VisaBody> {
             child: Text(
               visa
                   .GeneralAppreciation
-                  .values[widget
-                      .evaluations[_currentEvaluationIndex]
-                      .form
-                      .generalAppreciation
-                      .index]
+                  .values[widget.evaluations[_currentEvaluationIndex].form
+                      .generalAppreciation.index]
                   .name,
             ),
           ),
@@ -836,16 +960,15 @@ class _VisaBodyState extends State<_VisaBody> {
       padding: const EdgeInsets.only(bottom: _interline),
       child: Center(
         child: OutlinedButton(
-          onPressed:
-              () => showVisaEvaluationDialog(
-                context: context,
-                formController: VisaEvaluationFormController.fromInternshipId(
-                  context,
-                  internshipId: widget.internship.id,
-                  evaluationIndex: _currentEvaluationIndex,
-                ),
-                editMode: false,
-              ),
+          onPressed: () => showVisaEvaluationDialog(
+            context: context,
+            formController: VisaEvaluationFormController.fromInternshipId(
+              context,
+              internshipId: widget.internship.id,
+              evaluationIndex: _currentEvaluationIndex,
+            ),
+            editMode: false,
+          ),
           child: const Text('Voir l\'évaluation détaillée'),
         ),
       ),
@@ -860,40 +983,38 @@ class _VisaBodyState extends State<_VisaBody> {
 
     return AnimatedExpandingCard(
       elevation: 0.0,
-      header:
-          (ctx, isExpanded) => Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              const Text('VISA', style: TextStyle(fontWeight: FontWeight.bold)),
-              Visibility(
-                visible: widget.internship.supervisingTeacherIds.contains(
-                  teacherId,
+      header: (ctx, isExpanded) => Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          const Text('VISA', style: TextStyle(fontWeight: FontWeight.bold)),
+          Visibility(
+            visible: widget.internship.supervisingTeacherIds.contains(
+              teacherId,
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).colorScheme.primary,
+                  width: 3,
                 ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: 3,
-                    ),
-                    borderRadius: const BorderRadius.all(Radius.circular(18)),
-                  ),
-                  child: IconButton(
-                    onPressed:
-                        () => showVisaEvaluationDialog(
-                          context: context,
-                          formController: VisaEvaluationFormController(
-                            internshipId: widget.internship.id,
-                          ),
-                          editMode: true,
-                        ),
-                    icon: const Icon(Icons.post_add),
-                    color: Theme.of(context).colorScheme.primary,
-                  ),
-                ),
+                borderRadius: const BorderRadius.all(Radius.circular(18)),
               ),
-            ],
+              child: IconButton(
+                onPressed: () => showVisaEvaluationDialog(
+                  context: context,
+                  formController: VisaEvaluationFormController(
+                    internshipId: widget.internship.id,
+                  ),
+                  editMode: true,
+                ),
+                icon: const Icon(Icons.post_add),
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
           ),
+        ],
+      ),
       child: Column(
         children: [
           if (widget.evaluations.isEmpty)
