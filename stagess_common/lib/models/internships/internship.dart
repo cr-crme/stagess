@@ -66,11 +66,7 @@ class PostInternshipEnterpriseEvaluation extends ItemSerializable {
             _doubleFromSerialized(map?['acceptance_mental_health_disorder']),
         acceptanceBehaviorDifficulties =
             _doubleFromSerialized(map?['acceptance_behavior_difficulties']),
-        super.fromSerialized() {
-    if (internshipId.isEmpty) {
-      print('coucou');
-    }
-  }
+        super.fromSerialized();
 
   String internshipId;
 
@@ -508,7 +504,9 @@ class Internship extends ExtendedItemSerializable {
         enterpriseEvaluation = map?['enterprise_evaluation'] == null
             ? null
             : PostInternshipEnterpriseEvaluation.fromSerialized(
-                map?['enterprise_evaluation']),
+                (map?['enterprise_evaluation'] as Map<String, dynamic>?)
+                  ?..addAll(
+                      {'internship_id': StringExt.from(map?['id']) ?? ''})),
         super.fromSerialized() {
     _finalizeInitialization();
   }
@@ -699,7 +697,8 @@ class Internship extends ExtendedItemSerializable {
       enterpriseEvaluation: data['enterprise_evaluation'] == null
           ? enterpriseEvaluation
           : PostInternshipEnterpriseEvaluation.fromSerialized(
-              data['enterprise_evaluation']),
+              (data['enterprise_evaluation'] as Map<String, dynamic>?)
+                ?..addAll({'internship_id': StringExt.from(data['id']) ?? ''})),
     );
   }
 

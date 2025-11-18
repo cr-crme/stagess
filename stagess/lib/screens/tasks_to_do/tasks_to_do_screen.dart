@@ -200,6 +200,7 @@ class _SstRisk extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    InternshipsProvider.of(context); // Force rebuild when internships change
     final data = _sstToEvaluate(context);
 
     data.sort(
