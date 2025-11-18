@@ -45,8 +45,9 @@ List<_EnterpriseInternshipStudent> _sstToEvaluate(BuildContext context) {
 
   List<_EnterpriseInternshipStudent> out = [];
   for (final internship in internships) {
-    final isSstFilled = internship.sstEvaluation?.isFilled ?? false;
-    if (!isSstFilled && internship.supervisingTeacherIds.contains(teacherId)) {
+    final isSstNotFilled = internship.sstEvaluation == null;
+    if (isSstNotFilled &&
+        internship.supervisingTeacherIds.contains(teacherId)) {
       final enterprise =
           enterprises.firstWhereOrNull((e) => e.id == internship.enterpriseId);
       final student =

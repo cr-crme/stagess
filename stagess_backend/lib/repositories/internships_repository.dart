@@ -541,6 +541,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
       internship['enterprise_evaluation'] =
           (internship['enterprise_evaluation'] as List?)?.firstOrNull;
       if (internship['enterprise_evaluation'] != null) {
+        // TODO find why internship.id does not follow
         final skills = await sqlInterface.performSelectQuery(
             user: user,
             tableName: 'post_internship_enterprise_evaluation_skills',

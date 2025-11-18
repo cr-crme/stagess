@@ -128,10 +128,11 @@ class Connexions {
               requestType: RequestType.response,
               data: {'error': e.toString()},
               response: Response.connexionRefused));
-    } on InternshipBankException catch (e) {
+    } on InternshipBankException catch (e, st) {
       if (!skipLog) {
         _logger.severe(
-            'Error while processing request from client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $e');
+            'Error while processing request from client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $e',
+            st);
       }
       await _send(client,
           message: CommunicationProtocol(

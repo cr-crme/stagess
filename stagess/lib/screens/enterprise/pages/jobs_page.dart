@@ -612,7 +612,8 @@ class JobsPageState extends State<JobsPage> {
                     ),
                     SstExpansionPanel(
                         isExpanded: _expandedSections[job.id]![1],
-                        enterprise: widget.enterprise),
+                        enterprise: widget.enterprise,
+                        jobId: job.id),
                     IncidentsExpansionPanel(
                       isExpanded: _expandedSections[job.id]![2],
                       enterprise: widget.enterprise,

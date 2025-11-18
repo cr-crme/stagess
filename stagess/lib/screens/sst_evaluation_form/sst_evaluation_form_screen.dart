@@ -7,10 +7,12 @@ import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/misc/question_file_service.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common/models/internships/sst_evaluation.dart';
 import 'package:stagess_common_flutter/helpers/form_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/radio_with_follow_up.dart';
@@ -24,6 +26,8 @@ Future<Internship?> showSstEvaluationFormDialog(
 }) async {
   _logger.info('Showing SstEvaluationFormDialog for internship: $internshipId');
   final internships = InternshipsProvider.of(context, listen: false);
+  await internships.fetchData(id: internshipId, fields: FetchableFields.all);
+  if (!context.mounted) return null;
 
   final hasLock = await showDialog(
     context: context,
@@ -67,7 +71,7 @@ Future<Internship?> showSstEvaluationFormDialog(
     return null;
   }
 
-  final editedInternship = await showDialog<Internship?>(
+  final editedInternship = await showDialog<Internship>(
     context: context,
     barrierDismissible: false,
     builder: (context) => Navigator(
@@ -81,11 +85,52 @@ Future<Internship?> showSstEvaluationFormDialog(
       ),
     ),
   );
-  if (editedInternship != null) {
-    await internships.replaceWithConfirmation(editedInternship);
-  }
 
+  final isSuccess = editedInternship != null &&
+      await internships.replaceWithConfirmation(editedInternship);
   await internships.releaseLockForItem(internships[internshipId]);
+
+  if (isSuccess && context.mounted) {
+    final enterprise = EnterprisesProvider.of(context, listen: false)
+        .fromId(editedInternship.enterpriseId);
+    final student = StudentsProvider.of(context, listen: false)
+        .fromId(editedInternship.studentId);
+
+    await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title:
+            const SubTitle('L\'évaluation SST enregistrée', left: 0, bottom: 0),
+        content: RichText(
+          text: TextSpan(
+            children: [
+              const TextSpan(text: 'L\'évaluation SST de l\'entreprise '),
+              TextSpan(
+                text: enterprise.name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(
+                text: ' a bien été enregistrée pour l\'élève ',
+              ),
+              TextSpan(
+                text: student.fullName,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(
+                text: '.',
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Ok'),
+          ),
+        ],
+      ),
+    );
+  }
   return editedInternship;
 }
 
@@ -122,10 +167,10 @@ class _SstEvaluationFormScreenState extends State<SstEvaluationFormScreen> {
 
     final internships = InternshipsProvider.of(context, listen: false);
     final internship = internships.fromId(widget.internshipId);
-    // TODO Check why "?"
-    internship.sstEvaluation?.update(
-      questions: _questionsKey.currentState!.answer,
-    );
+
+    internship.sstEvaluation ??= SstEvaluation.empty;
+    internship.sstEvaluation!
+        .update(questions: _questionsKey.currentState!.answer);
 
     _logger.fine(
       'SstEvaluationFormScreen submitted successfully for internshipId: ${widget.internshipId}',
@@ -293,7 +338,11 @@ class _SstEvaluationFormScreenState extends State<SstEvaluationFormScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _QuestionsStep(key: _questionsKey, internship: internship),
+                  _QuestionsStep(
+                      key: _questionsKey,
+                      initialSstEvaluation: internship.sstEvaluation,
+                      enterpriseId: internship.enterpriseId,
+                      jobId: internship.jobId),
                   _controlBuilder(),
                 ],
               ),
@@ -322,10 +371,14 @@ class _SstEvaluationFormScreenState extends State<SstEvaluationFormScreen> {
 class _QuestionsStep extends StatefulWidget {
   const _QuestionsStep({
     super.key,
-    required this.internship,
+    required this.initialSstEvaluation,
+    required this.enterpriseId,
+    required this.jobId,
   });
 
-  final Internship internship;
+  final SstEvaluation? initialSstEvaluation;
+  final String enterpriseId;
+  final String jobId;
 
   @override
   State<_QuestionsStep> createState() => _QuestionsStepState();
@@ -350,12 +403,12 @@ class _QuestionsStepState extends State<_QuestionsStep> {
 
   Widget _buildQuestions() {
     final enterprise = EnterprisesProvider.of(context, listen: false)
-        .fromId(widget.internship.enterpriseId);
-    final job = enterprise.jobs.fromId(widget.internship.jobId);
+        .fromId(widget.enterpriseId);
+    final job = enterprise.jobs.fromId(widget.jobId);
 
-    // Sort the question by "id"
-    final questionIds = [...job.specialization.questions];
-    questionIds.sort((a, b) => int.parse(a) - int.parse(b));
+    // // Sort the question by "id"
+    final questionIds = [...job.specialization.questions]
+      ..sort((a, b) => int.parse(a) - int.parse(b));
     final questions =
         questionIds.map((e) => QuestionFileService.fromId(e)).toList();
 
@@ -372,9 +425,9 @@ class _QuestionsStepState extends State<_QuestionsStep> {
 
             // Fill the initial answer
             answer['Q${question.id}'] =
-                widget.internship.sstEvaluation?.questions['Q${question.id}'];
+                widget.initialSstEvaluation?.questions['Q${question.id}'];
             answer['Q${question.id}+t'] =
-                widget.internship.sstEvaluation?.questions['Q${question.id}+t'];
+                widget.initialSstEvaluation?.questions['Q${question.id}+t'];
 
             switch (question.type) {
               case QuestionType.radio:
@@ -382,8 +435,8 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                   padding: const EdgeInsets.only(bottom: 24.0),
                   child: RadioWithFollowUp<String>(
                     title: '${index + 1}. ${question.question}',
-                    initialValue: widget.internship.sstEvaluation
-                        ?.questions['Q${question.id}']?[0],
+                    initialValue: widget
+                        .initialSstEvaluation?.questions['Q${question.id}']?[0],
                     elements: question.choices!.toList(),
                     elementsThatShowChild: [question.choices!.first],
                     onChanged: (value) {
@@ -407,7 +460,7 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                     controller: CheckboxWithOtherController(
                       elements: question.choices!.toList(),
                       hasNotApplicableOption: true,
-                      initialValues: (widget.internship.sstEvaluation
+                      initialValues: (widget.initialSstEvaluation
                               ?.questions['Q${question.id}'] as List?)
                           ?.map((e) => e as String)
                           .toList(),
@@ -430,7 +483,7 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                   padding: const EdgeInsets.only(bottom: 36.0),
                   child: TextWithForm(
                     title: '${index + 1}. ${question.question}',
-                    initialValue: widget.internship.sstEvaluation
+                    initialValue: widget.initialSstEvaluation
                             ?.questions['Q${question.id}']?.first ??
                         '',
                     onChanged: (text) => answer['Q${question.id}'] =
@@ -446,9 +499,9 @@ class _QuestionsStepState extends State<_QuestionsStep> {
 
   Padding _buildFollowUpQuestion(Question question, BuildContext context) {
     _followUpController['Q${question.id}+t'] = TextEditingController(
-      text: widget.internship.sstEvaluation?.questions['Q${question.id}+t']
-              ?.first ??
-          '',
+      text:
+          widget.initialSstEvaluation?.questions['Q${question.id}+t']?.first ??
+              '',
     );
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
@@ -467,8 +520,8 @@ class _QuestionsStepState extends State<_QuestionsStep> {
     const styleOverride = TextStyle(color: Colors.black);
 
     final enterprise = EnterprisesProvider.of(context, listen: false)
-        .fromId(widget.internship.enterpriseId);
-    final job = enterprise.jobs.fromId(widget.internship.jobId);
+        .fromId(widget.enterpriseId);
+    final job = enterprise.jobs.fromId(widget.jobId);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

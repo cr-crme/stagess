@@ -1,11 +1,10 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 
 class SstEvaluation extends ItemSerializable {
   final Map<String, List<String>?> questions;
   DateTime date;
-
-  bool get isFilled => questions.isNotEmpty;
 
   void update({
     required Map<String, List<String>?> questions,
@@ -51,6 +50,11 @@ class SstEvaluation extends ItemSerializable {
         'questions': questions,
         'date': date.serialize(),
       };
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'questions': FetchableFields.optional,
+        'date': FetchableFields.mandatory,
+      });
 
   @override
   String toString() => 'JobSstEvaluation($questions, $date)';

@@ -14,9 +14,10 @@ class SstExpansionPanel extends ExpansionPanel {
   SstExpansionPanel({
     required super.isExpanded,
     required Enterprise enterprise,
+    required String jobId,
   }) : super(
           canTapOnHeader: true,
-          body: _SstBody(enterprise),
+          body: _SstBody(enterprise, jobId: jobId),
           headerBuilder: (context, isExpanded) => const ListTile(
             title: Text('Repérage des risques SST'),
           ),
@@ -24,9 +25,10 @@ class SstExpansionPanel extends ExpansionPanel {
 }
 
 class _SstBody extends StatelessWidget {
-  const _SstBody(this.enterprise);
+  const _SstBody(this.enterprise, {required this.jobId});
 
   final Enterprise enterprise;
+  final String jobId;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +36,10 @@ class _SstBody extends StatelessWidget {
         .finer('Building SstExpansionPanel for enterprise: ${enterprise.name}');
 
     final internships = InternshipsProvider.of(context, listen: true).where(
-        (e) => e.enterpriseId == enterprise.id && e.sstEvaluation != null);
+        (e) =>
+            e.sstEvaluation != null &&
+            e.enterpriseId == enterprise.id &&
+            e.jobId == jobId);
     final latestInternship = internships.isNotEmpty
         ? internships.reduce((a, b) =>
             a.sstEvaluation!.date.isAfter(b.sstEvaluation!.date) ? a : b)

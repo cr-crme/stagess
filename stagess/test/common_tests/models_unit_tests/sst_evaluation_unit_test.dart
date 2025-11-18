@@ -5,16 +5,6 @@ import '../utils.dart';
 
 void main() {
   group('SstEvaluation', () {
-    test('empty one is tagged non-filled', () {
-      final sstEvaluation = SstEvaluation.empty;
-      expect(sstEvaluation.isFilled, isFalse);
-
-      sstEvaluation.update(questions: {
-        'Q1': ['My answer']
-      });
-      expect(sstEvaluation.isFilled, isTrue);
-    });
-
     test('"update" erases old answers', () {
       final sstEvaluation = SstEvaluation.empty;
       sstEvaluation.update(questions: {

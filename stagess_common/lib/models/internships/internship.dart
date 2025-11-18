@@ -66,7 +66,11 @@ class PostInternshipEnterpriseEvaluation extends ItemSerializable {
             _doubleFromSerialized(map?['acceptance_mental_health_disorder']),
         acceptanceBehaviorDifficulties =
             _doubleFromSerialized(map?['acceptance_behavior_difficulties']),
-        super.fromSerialized();
+        super.fromSerialized() {
+    if (internshipId.isEmpty) {
+      print('coucou');
+    }
+  }
 
   String internshipId;
 
@@ -548,7 +552,7 @@ class Internship extends ExtendedItemSerializable {
         'skill_evaluations': InternshipEvaluationSkill.fetchableFields,
         'attitude_evaluations': InternshipEvaluationAttitude.fetchableFields,
         'visa_evaluations': InternshipEvaluationVisa.fetchableFields,
-        'sst_evaluation': FetchableFields.optional,
+        'sst_evaluation': SstEvaluation.fetchableFields,
         'enterprise_evaluation':
             PostInternshipEnterpriseEvaluation.fetchableFields,
       });
