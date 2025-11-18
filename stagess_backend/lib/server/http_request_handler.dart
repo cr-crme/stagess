@@ -58,11 +58,17 @@ class HttpRequestHandler {
 
   Future<void> _sendFailedAndClose(HttpRequest request,
       {required int statusCode, required String message}) async {
-    _logger.info(
-        'Request from ${request.connectionInfo?.remoteAddress.address}:${request.connectionInfo?.remotePort} failed: $message');
-    request.response.statusCode = statusCode;
-    request.response.write(message);
-    await request.response.close();
+    try {
+      _logger.info(
+          'Request from ${request.connectionInfo?.remoteAddress.address}:${request.connectionInfo?.remotePort} failed: $message');
+      request.response.statusCode = statusCode;
+      request.response.write(message);
+      await request.response.close();
+    } catch (e) {
+      //coverage:ignore-start
+      _logger.severe('Failed to send error response: $e');
+      //coverage:ignore-end
+    }
   }
 
   Future<void> _answerOptionsRequest(HttpRequest request) async {
