@@ -259,8 +259,13 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             idNameToDataTable: 'internship_id',
           ),
           sqlInterface.selectSubquery(
+              dataTableName: 'internship_sst_evaluation_persons',
+              asName: 'sst_evaluation_persons',
+              idNameToDataTable: 'internship_id',
+              fieldsToFetch: ['question', 'answers', 'date']),
+            sqlInterface.selectSubquery(
               dataTableName: 'internship_sst_evaluation_questions',
-              asName: 'sst_questions',
+              asName: 'sst_evaluation_questions',
               idNameToDataTable: 'internship_id',
               fieldsToFetch: ['question', 'answers', 'date']),
         ]);
@@ -537,6 +542,30 @@ class MySqlInternshipsRepository extends InternshipsRepository {
               },
               'date': sstQuestions.first['date'] ?? 0
             };
+
+            sqlInterface.selectSubquery(
+                dataTableName: 'internship_sst_evaluation_persons',
+                asName: 'present',
+                fieldsToFetch: ['person_name'],
+                idNameToDataTable: 'evaluation_id',
+              )
+              evaluation['present'] = [
+          for (final person in (evaluationSubquery['present'] as List? ?? []))
+            person['person_name']
+        ];
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       internship['enterprise_evaluation'] =
           (internship['enterprise_evaluation'] as List?)?.firstOrNull;

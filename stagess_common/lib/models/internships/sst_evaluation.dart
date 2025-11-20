@@ -3,12 +3,17 @@ import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 
 class SstEvaluation extends ItemSerializable {
+  final List<String> presentAtEvaluation;
   final Map<String, List<String>?> questions;
   DateTime date;
 
   void update({
+    required List<String> presentAtEvaluation,
     required Map<String, List<String>?> questions,
   }) {
+    this.presentAtEvaluation.clear();
+    this.presentAtEvaluation.addAll(presentAtEvaluation);
+
     this.questions.clear();
     this.questions.addAll({...questions});
     this.questions.removeWhere((key, value) => value == null);
@@ -18,20 +23,23 @@ class SstEvaluation extends ItemSerializable {
 
   SstEvaluation({
     super.id,
+    required this.presentAtEvaluation,
     required this.questions,
     DateTime? date,
   }) : date = date ?? DateTime.now();
 
   static SstEvaluation get empty =>
-      SstEvaluation(questions: {}, date: DateTime(0));
+      SstEvaluation(presentAtEvaluation: [], questions: {}, date: DateTime(0));
 
   SstEvaluation copyWith({
     String? id,
+    List<String>? presentAtEvaluation,
     Map<String, List<String>?>? questions,
     DateTime? date,
   }) =>
       SstEvaluation(
         id: id ?? this.id,
+        presentAtEvaluation: presentAtEvaluation ?? this.presentAtEvaluation,
         questions: questions ?? this.questions,
         date: date ?? this.date,
       );
@@ -41,6 +49,9 @@ class SstEvaluation extends ItemSerializable {
 
     return SstEvaluation(
       id: serialized['id'] ?? id,
+      presentAtEvaluation: ListExt.from(serialized['present_at_evaluation'],
+              deserializer: (e) => e as String)?.toList() ??
+          presentAtEvaluation,
       questions: serialized['questions'] == null
           ? questions
           : {
@@ -54,7 +65,10 @@ class SstEvaluation extends ItemSerializable {
   }
 
   SstEvaluation.fromSerialized(super.map)
-      : questions = {
+      : presentAtEvaluation = ListExt.from(map?['present_at_evaluation'],
+                deserializer: (e) => e as String)?.toList() ??
+            [],
+        questions = {
           for (final entry in (map?['questions'] as Map? ?? {}).entries)
             entry.key: (entry.value as List?)?.map((e) => e as String).toList()
         },
@@ -64,11 +78,13 @@ class SstEvaluation extends ItemSerializable {
   @override
   Map<String, dynamic> serializedMap() => {
         'id': id.serialize(),
+        'present_at_evaluation': presentAtEvaluation.serialize(),
         'questions': questions,
         'date': date.serialize(),
       };
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
+        'present_at_evaluation': FetchableFields.optional,
         'questions': FetchableFields.optional,
         'date': FetchableFields.mandatory,
       });

@@ -122,6 +122,17 @@ class SstEvaluationFormScreen extends StatefulWidget {
 
 class _SstEvaluationFormScreenState extends State<SstEvaluationFormScreen> {
   final _questionsKey = GlobalKey<_QuestionsStepState>();
+  late final wereAtMeetingController = CheckboxWithOtherController(
+    elements: [
+      'Stagiaire',
+      'Responsable en milieu de stage',
+    ],
+    initialValues: InternshipsProvider.of(context, listen: false)
+            .fromId(widget.internshipId)
+            .sstEvaluation
+            ?.presentAtEvaluation ??
+        [],
+  );
 
   void _submit() {
     _logger.info(
@@ -138,8 +149,9 @@ class _SstEvaluationFormScreenState extends State<SstEvaluationFormScreen> {
     final internship = internships.fromId(widget.internshipId);
 
     internship.sstEvaluation ??= SstEvaluation.empty;
-    internship.sstEvaluation!
-        .update(questions: _questionsKey.currentState!.answer);
+    internship.sstEvaluation!.update(
+        presentAtEvaluation: wereAtMeetingController.values,
+        questions: _questionsKey.currentState!.answer);
 
     _logger.fine(
       'SstEvaluationFormScreen submitted successfully for internshipId: ${widget.internshipId}',
@@ -310,6 +322,7 @@ class _SstEvaluationFormScreenState extends State<SstEvaluationFormScreen> {
                   _QuestionsStep(
                       key: _questionsKey,
                       initialSstEvaluation: internship.sstEvaluation,
+                      wereAtMeetingController: wereAtMeetingController,
                       enterpriseId: internship.enterpriseId,
                       jobId: internship.jobId),
                   _controlBuilder(),
@@ -341,11 +354,13 @@ class _QuestionsStep extends StatefulWidget {
   const _QuestionsStep({
     super.key,
     required this.initialSstEvaluation,
+    required this.wereAtMeetingController,
     required this.enterpriseId,
     required this.jobId,
   });
 
   final SstEvaluation? initialSstEvaluation;
+  final CheckboxWithOtherController wereAtMeetingController;
   final String enterpriseId;
   final String jobId;
 
@@ -366,7 +381,8 @@ class _QuestionsStepState extends State<_QuestionsStep> {
   Widget build(BuildContext context) {
     return Form(
       key: formKey,
-      child: Column(children: [_buildHeader(), _buildQuestions()]),
+      child: Column(
+          children: [_buildHeader(), _buildWereAtMeeting(), _buildQuestions()]),
     );
   }
 
@@ -461,6 +477,22 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                 );
             }
           },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWereAtMeeting() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SubTitle('Personnes présentes lors de l\'évaluation'),
+        Padding(
+          padding: const EdgeInsets.only(left: 24.0),
+          child: CheckboxWithOther(
+            controller: widget.wereAtMeetingController,
+            enabled: true,
+          ),
         ),
       ],
     );

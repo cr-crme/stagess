@@ -173,6 +173,7 @@ Incidents dummyIncidents({String? id}) => Incidents(
 
 SstEvaluation dummySstEvaluation({String? id}) => SstEvaluation(
       id: id,
+      presentAtEvaluation: ['Responsable en milieu de stage'],
       questions: {
         'Q1': ['Oui'],
         'Q1+t': ['Peu souvent, à la discrétion des employés.'],

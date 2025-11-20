@@ -1948,6 +1948,7 @@ Future<void> _addDummyInternships(
       ],
       transportations: [Transportation.yes, Transportation.pass],
       sstEvaluation: SstEvaluation(
+        presentAtEvaluation: ['Responsable en milieu de stage', 'Mme Marcotte'],
         questions: {
           'Q1': ['Oui'],
           'Q1+t': ['Peu souvent, à la discrétion des employés.'],
@@ -2071,6 +2072,7 @@ Future<void> _addDummyInternships(
         transportations: [Transportation.pass],
         visitFrequencies: 'Une visite par semaine',
         sstEvaluation: SstEvaluation(
+          presentAtEvaluation: ['Responsable en milieu de stage'],
           questions: {
             'Q1': ['Oui'],
             'Q1+t': [
@@ -2344,6 +2346,7 @@ Future<void> _addDummyInternships(
         transportations: [Transportation.ticket],
         visitFrequencies: 'Une visite par semaine',
         sstEvaluation: SstEvaluation(
+          presentAtEvaluation: ['Responsable en milieu de stage'],
           questions: {
             'Q1': ['Non'],
             'Q5': ['Des couteaux'],
@@ -2621,6 +2624,7 @@ Future<void> _addDummyInternships(
         transportations: [Transportation.none],
         visitFrequencies: 'Une visite par semaine',
         sstEvaluation: SstEvaluation(
+          presentAtEvaluation: ['Responsable en milieu de stage'],
           questions: {
             'Q1': ['Oui'],
             'Q1+t': ['Plusieurs fois par jour, surtout des pots de fleurs.'],
