@@ -8,6 +8,7 @@ import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
+import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/person.dart';
 
 final _protectedTables = [
@@ -567,10 +568,16 @@ class MariaDbSqlInterface extends MySqlInterface {
     // sanitized.
 
     if (values != null && values.isNotEmpty) {
-      for (final value in values) {
+      // Identify the "?" indices in the last line query
+      final questionMarkIndices = query.allIndicesOf('?');
+
+      for (int i = values.length - 1; i >= 0; i--) {
+        final value = values[i];
+        final index = questionMarkIndices[i];
+
         final escaped = _escapeValue(value); // safe escaping
         // replace only the first "?" at a time
-        query = query.replaceFirst('?', escaped);
+        query = query.replaceRange(index, index + 1, escaped);
       }
     }
     return await super.tryQuery(query, null);

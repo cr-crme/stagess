@@ -81,6 +81,21 @@ extension StringExt on String {
   String serialize() => this;
 
   static String? from(dynamic element) => element?.toString();
+
+  List<int> allIndicesOf(String searchString) {
+    List<int> indices = [];
+    int startIndex = 0;
+    while (true) {
+      int foundIndex = indexOf(searchString, startIndex);
+      if (foundIndex == -1) {
+        break; // No more occurrences found
+      }
+      indices.add(foundIndex);
+      startIndex = foundIndex +
+          searchString.length; // Start searching after the found occurrence
+    }
+    return indices;
+  }
 }
 
 extension BoolExt on bool {

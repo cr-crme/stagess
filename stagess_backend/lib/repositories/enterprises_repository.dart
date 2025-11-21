@@ -1068,6 +1068,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       toWait.add(_updateToEnterprisePhoneNumber(enterprise, previous));
       toWait.add(_updateToEnterpriseFax(enterprise, previous));
     }
+    await Future.wait(toWait);
   }
 
   Future<void> _deleteInternshipsFromJob(
