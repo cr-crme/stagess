@@ -65,14 +65,14 @@ class SstEvaluation extends ItemSerializable {
   }
 
   SstEvaluation.fromSerialized(super.map)
-      : presentAtEvaluation = ListExt.from(map?['present_at_evaluation'],
+      : date = DateTimeExt.from(map?['date']) ?? DateTime(0),
+        presentAtEvaluation = ListExt.from(map?['present_at_evaluation'],
                 deserializer: (e) => e as String)?.toList() ??
             [],
         questions = {
           for (final entry in (map?['questions'] as Map? ?? {}).entries)
             entry.key: (entry.value as List?)?.map((e) => e as String).toList()
         },
-        date = DateTimeExt.from(map?['date']) ?? DateTime(0),
         super.fromSerialized();
 
   @override

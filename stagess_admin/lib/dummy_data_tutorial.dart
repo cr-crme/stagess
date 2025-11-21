@@ -10,6 +10,7 @@ import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/sst_evaluation.dart';
 import 'package:stagess_common/models/internships/time_utils.dart'
@@ -2177,6 +2178,7 @@ Future<void> _addDummyInternships(
   );
   internship.enterpriseEvaluation = PostInternshipEnterpriseEvaluation(
     internshipId: internship.id,
+    date: period.end.add(Duration(days: 5)),
     skillsRequired: ['Communiquer à l\'écrit', 'Interagir avec des clients'],
     taskVariety: 0,
     trainingPlanRespect: 1,

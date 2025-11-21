@@ -240,6 +240,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             asName: 'enterprise_evaluation',
             fieldsToFetch: [
               'id',
+              'date',
               'internship_id',
               'task_variety',
               'training_plan_respect',
@@ -1036,6 +1037,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
           tableName: 'post_internship_enterprise_evaluations',
           data: {
             'id': evaluation['id'],
+            'date': evaluation['date'],
             'internship_id': internship.id,
             'task_variety': evaluation['task_variety'],
             'training_plan_respect': evaluation['training_plan_respect'],

@@ -7,7 +7,7 @@ import 'package:stagess/screens/internship_forms/enterprise_steps/supervision_st
 import 'package:stagess/screens/internship_forms/enterprise_steps/task_and_ability_step.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
-import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
@@ -25,35 +25,34 @@ Future<void> showEnterpriseEvaluationDialog(
   final hasLock = await showDialog(
     context: context,
     barrierDismissible: false,
-    builder:
-        (context) => FutureBuilder(
-          future: Future.wait([
-            internships.getLockForItem(internships[internshipId]),
-            internships.fetchData(
-              id: internshipId,
-              fields: FetchableFields.all,
-            ),
-          ]),
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              final hasLock = (snapshot.data as List).first as bool;
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                Navigator.of(context).pop(hasLock);
-              });
-            }
-            return Dialog(
-              child: SizedBox(
-                width: 100,
-                height: 100,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    color: Theme.of(context).primaryColor,
-                  ),
-                ),
-              ),
-            );
-          },
+    builder: (context) => FutureBuilder(
+      future: Future.wait([
+        internships.getLockForItem(internships[internshipId]),
+        internships.fetchData(
+          id: internshipId,
+          fields: FetchableFields.all,
         ),
+      ]),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final hasLock = (snapshot.data as List).first as bool;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            Navigator.of(context).pop(hasLock);
+          });
+        }
+        return Dialog(
+          child: SizedBox(
+            width: 100,
+            height: 100,
+            child: Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          ),
+        );
+      },
+    ),
   );
 
   if (!hasLock || !context.mounted) {
@@ -71,9 +70,8 @@ Future<void> showEnterpriseEvaluationDialog(
   final editedInternship = await showDialog(
     context: context,
     barrierDismissible: false,
-    builder:
-        (context) =>
-            Dialog(child: EnterpriseEvaluationScreen(id: internship.id)),
+    builder: (context) =>
+        Dialog(child: EnterpriseEvaluationScreen(id: internship.id)),
   );
   if (editedInternship == null) {
     await internships.releaseLockForItem(internship);
@@ -201,6 +199,7 @@ class _EnterpriseEvaluationScreenState
     final internship = internships.firstWhere((e) => e.id == widget.id);
 
     internship.enterpriseEvaluation = PostInternshipEnterpriseEvaluation(
+      date: DateTime.now(),
       internshipId: internship.id,
       skillsRequired: _taskAndAbilityKey.currentState!.requiredSkills,
       taskVariety: _taskAndAbilityKey.currentState!.taskVariety!,
@@ -214,10 +213,8 @@ class _EnterpriseEvaluationScreenState
       acceptanceTsa: _specializedStudentsKey.currentState!.acceptanceTsa,
       acceptanceLanguageDisorder:
           _specializedStudentsKey.currentState!.acceptanceLanguageDisorder,
-      acceptanceIntellectualDisability:
-          _specializedStudentsKey
-              .currentState!
-              .acceptanceIntellectualDisability,
+      acceptanceIntellectualDisability: _specializedStudentsKey
+          .currentState!.acceptanceIntellectualDisability,
       acceptancePhysicalDisability:
           _specializedStudentsKey.currentState!.acceptancePhysicalDisability,
       acceptanceMentalHealthDisorder:
@@ -265,51 +262,48 @@ class _EnterpriseEvaluationScreenState
         ),
         body: PopScope(
           child: Selector<EnterprisesProvider, Job>(
-            builder:
-                (context, job, _) => ScrollableStepper(
-                  type: StepperType.horizontal,
-                  scrollController: _scrollController,
-                  currentStep: _currentStep,
-                  onTapContinue: _nextStep,
-                  onStepTapped:
-                      (int tapped) => setState(() {
-                        _scrollController.jumpTo(0);
-                        _currentStep = tapped;
-                      }),
-                  onTapCancel: () => Navigator.pop(context),
-                  steps: [
-                    Step(
-                      state: _stepStatus[0],
-                      isActive: _currentStep == 0,
-                      title: const Text(
-                        'Tâches et\nhabiletés',
-                        textAlign: TextAlign.center,
-                      ),
-                      content: TaskAndAbilityStep(
-                        key: _taskAndAbilityKey,
-                        internship: internship,
-                      ),
-                    ),
-                    Step(
-                      state: _stepStatus[1],
-                      isActive: _currentStep == 1,
-                      title: const Text('Encadrement'),
-                      content: SupervisionStep(key: _supervisionKey, job: job),
-                    ),
-                    Step(
-                      state: _stepStatus[2],
-                      isActive: _currentStep == 2,
-                      title: const Text('Clientèle\nspécialisée'),
-                      content: SpecializedStudentsStep(
-                        key: _specializedStudentsKey,
-                      ),
-                    ),
-                  ],
-                  controlsBuilder: _controlBuilder,
+            builder: (context, job, _) => ScrollableStepper(
+              type: StepperType.horizontal,
+              scrollController: _scrollController,
+              currentStep: _currentStep,
+              onTapContinue: _nextStep,
+              onStepTapped: (int tapped) => setState(() {
+                _scrollController.jumpTo(0);
+                _currentStep = tapped;
+              }),
+              onTapCancel: () => Navigator.pop(context),
+              steps: [
+                Step(
+                  state: _stepStatus[0],
+                  isActive: _currentStep == 0,
+                  title: const Text(
+                    'Tâches et\nhabiletés',
+                    textAlign: TextAlign.center,
+                  ),
+                  content: TaskAndAbilityStep(
+                    key: _taskAndAbilityKey,
+                    internship: internship,
+                  ),
                 ),
-            selector:
-                (context, enterprises) =>
-                    enterprises[internship.enterpriseId].jobs[internship.jobId],
+                Step(
+                  state: _stepStatus[1],
+                  isActive: _currentStep == 1,
+                  title: const Text('Encadrement'),
+                  content: SupervisionStep(key: _supervisionKey, job: job),
+                ),
+                Step(
+                  state: _stepStatus[2],
+                  isActive: _currentStep == 2,
+                  title: const Text('Clientèle\nspécialisée'),
+                  content: SpecializedStudentsStep(
+                    key: _specializedStudentsKey,
+                  ),
+                ),
+              ],
+              controlsBuilder: _controlBuilder,
+            ),
+            selector: (context, enterprises) =>
+                enterprises[internship.enterpriseId].jobs[internship.jobId],
           ),
         ),
       ),
@@ -330,10 +324,9 @@ class _EnterpriseEvaluationScreenState
           const SizedBox(width: 20),
           TextButton(
             onPressed: details.onStepContinue,
-            child:
-                _currentStep == 2
-                    ? const Text('Confirmer')
-                    : const Text('Suivant'),
+            child: _currentStep == 2
+                ? const Text('Confirmer')
+                : const Text('Suivant'),
           ),
         ],
       ),

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
+import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 
 import '../utils.dart';
 

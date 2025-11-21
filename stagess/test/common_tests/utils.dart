@@ -13,6 +13,7 @@ import 'package:stagess_common/models/internships/internship_evaluation_attitude
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_visa.dart'
     as visa;
+import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/sst_evaluation.dart';
 import 'package:stagess_common/models/internships/task_appreciation.dart';
@@ -260,6 +261,7 @@ PostInternshipEnterpriseEvaluation dummyPostInternshipEnterpriseEvaluation({
 }) =>
     PostInternshipEnterpriseEvaluation(
       id: id,
+      date: DateTime(2005, 11, 25),
       internshipId: internshipId,
       skillsRequired: ['Communiquer à l\'écrit', 'Interagir avec des clients'],
       taskVariety: 0,

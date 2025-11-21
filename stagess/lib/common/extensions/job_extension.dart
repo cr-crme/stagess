@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
-import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 
 extension JobExtension on Job {

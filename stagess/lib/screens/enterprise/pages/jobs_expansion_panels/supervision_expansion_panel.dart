@@ -1,14 +1,14 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/extensions/job_extension.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/common/widgets/form_fields/low_high_slider_form_field.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
+import 'package:stagess/common/widgets/rating_bar_tile.dart';
 import 'package:stagess/screens/internship_forms/enterprise_steps/supervision_step.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
-import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
@@ -196,7 +196,7 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
 
   Widget _buildAcceptanceTsa(
       List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return _RatingBar(
+    return RatingBarTile(
       title: 'Un trouble du spectre de l\'autisme (TSA)',
       rating: _meanOf(evaluations, (e) => e.acceptanceTsa),
     );
@@ -204,7 +204,7 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
 
   Widget _buildAcceptanceLanguageDeficiency(
       List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return _RatingBar(
+    return RatingBarTile(
       title: 'Un trouble du langage',
       rating: _meanOf(evaluations, (e) => e.acceptanceLanguageDisorder),
     );
@@ -212,7 +212,7 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
 
   Widget _buildAcceptanceMentalDeficiency(
       List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return _RatingBar(
+    return RatingBarTile(
       title: 'Une déficience intellectuelle',
       rating: _meanOf(evaluations, (e) => e.acceptanceIntellectualDisability),
     );
@@ -220,7 +220,7 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
 
   Widget _buildAcceptancePhysicalDeficiency(
       List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return _RatingBar(
+    return RatingBarTile(
       title: 'Une déficience physique',
       rating: _meanOf(evaluations, (e) => e.acceptancePhysicalDisability),
     );
@@ -228,7 +228,7 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
 
   Widget _buildAcceptanceMentalHealtyIssue(
       List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return _RatingBar(
+    return RatingBarTile(
       title: 'Un trouble de santé mentale',
       rating: _meanOf(evaluations, (e) => e.acceptanceMentalHealthDisorder),
     );
@@ -236,7 +236,7 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
 
   Widget _buildAcceptanceBehaviorIssue(
       List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return _RatingBar(
+    return RatingBarTile(
       title: 'Des difficultés comportementales',
       rating: _meanOf(evaluations, (e) => e.acceptanceBehaviorDifficulties),
     );
@@ -388,53 +388,6 @@ class _TitledFixSlider extends StatelessWidget {
           highLabel: highLabel,
         ),
       ],
-    );
-  }
-}
-
-class _RatingBar extends StatelessWidget {
-  const _RatingBar({
-    required this.title,
-    required this.rating,
-  });
-
-  final String title;
-  final double rating;
-
-  @override
-  Widget build(BuildContext context) {
-    return Visibility(
-      visible: rating >= 0 && rating <= 5,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          RatingBar(
-            initialRating: rating,
-            onRatingUpdate: (value) {},
-            allowHalfRating: true,
-            ignoreGestures: true,
-            ratingWidget: RatingWidget(
-              full: Icon(
-                Icons.star,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-              half: Icon(
-                Icons.star_half,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-              empty: Icon(
-                Icons.star_border,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-        ],
-      ),
     );
   }
 }
