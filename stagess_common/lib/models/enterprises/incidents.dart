@@ -2,12 +2,18 @@ part of 'package:stagess_common/models/enterprises/job.dart';
 
 class Incident extends ItemSerializable {
   String incident;
+  String teacherId;
   DateTime date;
 
-  Incident(this.incident, {DateTime? date}) : date = date ?? DateTime.now();
+  Incident(
+    this.incident, {
+    required this.date,
+    required this.teacherId,
+  });
 
   Incident.fromSerialized(super.map)
       : incident = map?['incident'] ?? '',
+        teacherId = map?['teacher_id'] ?? '',
         date = map?['date'] == null
             ? DateTime(0)
             : DateTime.fromMillisecondsSinceEpoch(map!['date']),
@@ -16,6 +22,7 @@ class Incident extends ItemSerializable {
   @override
   Map<String, dynamic> serializedMap() => {
         'id': id,
+        'teacher_id': teacherId,
         'incident': incident,
         'date': date.millisecondsSinceEpoch,
       };

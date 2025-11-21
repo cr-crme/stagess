@@ -8,11 +8,23 @@ void main() {
     test('"isEmpty" behaves properly', () {
       expect(Incidents().isEmpty, isTrue);
       expect(Incidents().isNotEmpty, isFalse);
-      expect(Incidents(severeInjuries: [Incident('Not important')]).isEmpty,
+      expect(
+          Incidents(severeInjuries: [
+            Incident(
+                teacherId: 'teacher1', date: DateTime.now(), 'Not important')
+          ]).isEmpty,
           isFalse);
-      expect(Incidents(verbalAbuses: [Incident('Not important')]).isEmpty,
+      expect(
+          Incidents(verbalAbuses: [
+            Incident(
+                teacherId: 'teacher1', date: DateTime.now(), 'Not important')
+          ]).isEmpty,
           isFalse);
-      expect(Incidents(minorInjuries: [Incident('Not important')]).isEmpty,
+      expect(
+          Incidents(minorInjuries: [
+            Incident(
+                teacherId: 'teacher1', date: DateTime.now(), 'Not important')
+          ]).isEmpty,
           isFalse);
     });
 
@@ -49,17 +61,21 @@ void main() {
     });
 
     test('serialization and deserialization of Incident works', () {
-      final incident =
-          Incident('Je ne désire pas décrire...', date: DateTime(2000));
+      final incident = Incident(
+          teacherId: 'teacher1',
+          date: DateTime(2000),
+          'Je ne désire pas décrire...');
       final serialized = incident.serialize();
       final deserialized = Incident.fromSerialized(serialized);
 
       expect(serialized, {
+        'teacher_id': incident.teacherId,
         'id': incident.id,
         'incident': incident.incident,
         'date': incident.date.millisecondsSinceEpoch,
       });
 
+      expect(deserialized.teacherId, incident.teacherId);
       expect(deserialized.id, incident.id);
       expect(deserialized.incident, incident.incident);
       expect(deserialized.date, incident.date);

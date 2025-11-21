@@ -166,10 +166,21 @@ Incidents dummyIncidents({String? id}) => Incidents(
       id: id,
       severeInjuries: [],
       minorInjuries: [
-        Incident('Un "petit" truc avec la scie sauteuse'),
-        Incident('Une "légère" entaille de la main au couteau'),
+        Incident(
+            teacherId: 'teacher1',
+            date: DateTime.now(),
+            'Un "petit" truc avec la scie sauteuse'),
+        Incident(
+            teacherId: 'teacher1',
+            date: DateTime.now(),
+            'Une "légère" entaille de la main au couteau'),
       ],
-      verbalAbuses: [Incident('Vaut mieux ne pas détailler...')],
+      verbalAbuses: [
+        Incident(
+            teacherId: 'teacher1',
+            date: DateTime.now(),
+            'Vaut mieux ne pas détailler...')
+      ],
     );
 
 SstEvaluation dummySstEvaluation({String? id}) => SstEvaluation(

@@ -1127,6 +1127,8 @@ Future<void> _addDummyEnterprises(
       incidents: Incidents(
         severeInjuries: [
           Incident(
+            teacherId: teacherC1Id,
+            date: DateTime.now(),
             'L\'élève s\'est sectionné le tendon du pouce en coupant un morceau de viande.',
           ),
         ],
@@ -1158,9 +1160,13 @@ Future<void> _addDummyEnterprises(
       incidents: Incidents(
         minorInjuries: [
           Incident(
+            teacherId: teacherA1Id,
+            date: DateTime.now(),
             'L\'élève a eu une entorse de cheville en tombant de l\'escabeau.',
           ),
           Incident(
+            teacherId: teacherB1Id,
+            date: DateTime.now(),
             'Une élève s\'est fait mal au dos en soulevant des boites de lessive',
           ),
         ],

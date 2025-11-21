@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 final _logger = Logger('IncidentsExpansionPanel');
 
@@ -103,7 +105,11 @@ class _IncidentsBody extends StatelessWidget {
           style: Theme.of(context).textTheme.titleSmall,
         ),
         if (incidents.isNotEmpty)
-          ItemizedText(incidents.map((e) => e.toString()).toList()),
+          ItemizedText(incidents.map((e) {
+            final teacher =
+                TeachersProvider.of(context, listen: false).fromId(e.teacherId);
+            return '${e.toString()}\nIncident rapporté par ${teacher.fullName}, le ${DateFormat.yMMMEd('fr_CA').format(e.date)}';
+          }).toList()),
       ],
     );
   }

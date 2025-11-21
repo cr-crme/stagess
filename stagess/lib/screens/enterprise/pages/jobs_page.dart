@@ -230,6 +230,9 @@ class JobsPageState extends State<JobsPage> {
     });
     _logger.finer('Adding SST event to job: ${job.specialization.name}');
     final enterprises = EnterprisesProvider.of(context, listen: false);
+    final teacherId =
+        TeachersProvider.of(context, listen: false).currentTeacher?.id;
+    if (teacherId == null) return;
 
     final hasLock = await enterprises.getLockForItem(widget.enterprise);
     if (!hasLock || !mounted) {
@@ -259,7 +262,8 @@ class JobsPageState extends State<JobsPage> {
       return;
     }
 
-    final incident = Incident(result['description']);
+    final incident = Incident(
+        teacherId: teacherId, date: DateTime.now(), result['description']);
     switch (result['eventType']) {
       case SstEventType.severe:
         job.incidents.severeInjuries.add(incident);
