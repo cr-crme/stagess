@@ -725,7 +725,7 @@ class _SstBody extends StatelessWidget {
               child: IconButton(
                 onPressed: () => showSstEvaluationFormDialog(context,
                     internshipId: internship.id),
-                icon: const Icon(Icons.health_and_safety),
+                icon: const Icon(Icons.health_and_safety_outlined),
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),
@@ -875,7 +875,7 @@ class _PostInternshipEnterpriseBody extends StatelessWidget {
               child: IconButton(
                 onPressed: () => showEnterpriseEvaluationDialog(context,
                     internshipId: internship.id),
-                icon: const Icon(Icons.health_and_safety),
+                icon: const Icon(Icons.factory_outlined),
                 color: Theme.of(context).colorScheme.primary,
               ),
             ),
