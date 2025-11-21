@@ -1,12 +1,9 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
-import 'package:stagess/common/widgets/dialogs/finalize_internship_dialog.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
-import 'package:stagess/common/widgets/rating_bar_tile.dart';
 import 'package:stagess/misc/question_file_service.dart';
+import 'package:stagess/screens/internship_forms/enterprise_steps/enterprise_evaluation_screen.dart';
 import 'package:stagess/screens/internship_forms/student_steps/attitude_evaluation_form_controller.dart';
 import 'package:stagess/screens/internship_forms/student_steps/attitude_evaluation_screen.dart';
 import 'package:stagess/screens/internship_forms/student_steps/skill_evaluation_form_controller.dart';
@@ -22,11 +19,9 @@ import 'package:stagess_common/models/internships/internship_evaluation_attitude
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_visa.dart'
     as visa;
-import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
-import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 
@@ -878,7 +873,7 @@ class _PostInternshipEnterpriseBody extends StatelessWidget {
                 borderRadius: const BorderRadius.all(Radius.circular(18)),
               ),
               child: IconButton(
-                onPressed: () => showFinalizeInternshipDialog(context,
+                onPressed: () => showEnterpriseEvaluationDialog(context,
                     internshipId: internship.id),
                 icon: const Icon(Icons.health_and_safety),
                 color: Theme.of(context).colorScheme.primary,
@@ -902,216 +897,11 @@ class _PostInternshipEnterpriseBody extends StatelessWidget {
                   : 'Le questionnaire «\u00a0Repérer les risques SST\u00a0» n\'a '
                       'jamais été rempli pour ce poste de travail.'),
               const SizedBox(height: 12),
-              _buildEvaluation(context),
               const SizedBox(height: 12),
             ],
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildEvaluation(BuildContext context) {
-    final evaluation = internship.enterpriseEvaluation;
-    final program = StudentsProvider.of(context, listen: false)
-        .fromId(internship.studentId)
-        .program;
-    final isFilled = evaluation != null;
-
-    return Column(
-      children: [
-        _buildStudentSelector(),
-        Padding(
-          padding: const EdgeInsets.only(left: 24.0, right: 24, top: 8),
-          child: isFilled
-              ? Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(bottom: 12.0),
-                    child: Text(
-                        'L\'entreprise n\'a pas encore été évaluée pour des '
-                        'élèves de $program.'),
-                  ),
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-          'Tâches données à l\'élève',
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-        ItemizedText([evaluation!.taskVariety == 0 ? 'Peu variées' : 'Très variées'])
-                    const SizedBox(height: 12),
-                    _buildTrainingPlanRespect(evaluation),
-                    const SizedBox(height: 12),
-                    _buildSkillsRequired(evaluation),
-                    const SizedBox(height: 12),
-                    _buildAutonomy(evaluation),
-                    const SizedBox(height: 12),
-                    _buildEfficiency(evaluation),
-                    const SizedBox(height: 12),
-                    _buildSupervisionStyle(evaluation),
-                    const SizedBox(height: 12),
-                    _buildEaseOfCommunication(evaluation),
-                    const SizedBox(height: 12),
-                    _buildAbsenceAcceptance(evaluation),
-                    const SizedBox(height: 12),
-                    Visibility(
-                      visible: evaluation.hasDisorder,
-                      child: Text(
-                        'Évaluation de l\'accueil de stagiaires avec',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleSmall!
-                            .copyWith(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    RatingBarTile(
-                      title: 'Un trouble du spectre de l\'autisme (TSA)',
-                      rating: evaluation.acceptanceTsa,
-                    ),
-                    RatingBarTile(
-                      title: 'Un trouble du langage',
-                      rating: evaluation.acceptanceLanguageDisorder,
-                    ),
-                    RatingBarTile(
-                      title: 'Une déficience intellectuelle',
-                      rating: evaluation.acceptanceIntellectualDisability,
-                    ),
-                    RatingBarTile(
-                      title: 'Une déficience physique',
-                      rating: evaluation.acceptancePhysicalDisability,
-                    ),
-                    RatingBarTile(
-                      title: 'Un trouble de santé mentale',
-                      rating: evaluation.acceptanceMentalHealthDisorder,
-                    ),
-                    RatingBarTile(
-                      title: 'Des difficultés comportementales',
-                      rating: evaluation.acceptanceBehaviorDifficulties,
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Autres commentaires sur l\'encadrement',
-                          style: Theme.of(context).textTheme.titleSmall,
-                        ),
-                        ItemizedText([
-                          evaluation.isEmpty
-                              ? 'Aucun commentaire'
-                              : evaluation.supervisionComments
-                        ]),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-                ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStudentSelector() {
-    return Row(
-      children: [
-        Expanded(
-          child: _FilterTile(
-            title: 'Élèves FMS',
-            onTap: () => setState(() => _currentProgramToShow = Program.fms),
-            isSelected: _currentProgramToShow == Program.fms,
-          ),
-        ),
-        Expanded(
-          child: _FilterTile(
-            title: 'Élèves FPT',
-            onTap: () => setState(() => _currentProgramToShow = Program.fpt),
-            isSelected: _currentProgramToShow == Program.fpt,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTrainingPlanRespect(
-      Iterable<PostInternshipEnterpriseEvaluation> evaluations) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Plan de formation\n'
-          'Tâches et compétences prévues dans le plan ont été faites par l\'élève',
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-        _printCountedList<PostInternshipEnterpriseEvaluation>(evaluations,
-            (e) => e.trainingPlanRespect == 0 ? 'En partie' : 'En totalité'),
-      ],
-    );
-  }
-
-  Widget _buildSkillsRequired(
-      List<PostInternshipEnterpriseEvaluation> evaluations) {
-    final List<String> allSkills =
-        evaluations.expand((eval) => eval.skillsRequired).toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Habiletés requises pour le stage',
-          style: Theme.of(context).textTheme.titleSmall,
-        ),
-        _printCountedList<String>(allSkills, (e) => e),
-      ],
-    );
-  }
-
-  Widget _buildAutonomy(List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return _TitledFixSlider(
-      title: 'Niveau d\'autonomie souhaité',
-      value: _meanOf(evaluations, (e) => e.autonomyExpected),
-      lowLabel: labelAutonomyExpected[0],
-      highLabel: labelAutonomyExpected[1],
-    );
-  }
-
-  Widget _buildEfficiency(
-      List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return _TitledFixSlider(
-      title: 'Rendement de l\'élève attendu',
-      value: _meanOf(evaluations, (e) => e.efficiencyExpected),
-      lowLabel: labelEfficiencyExpected[0],
-      highLabel: labelEfficiencyExpected[1],
-    );
-  }
-
-  Widget _buildSupervisionStyle(
-      List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return _TitledFixSlider(
-      title: 'Type d\'encadrement',
-      value: _meanOf(evaluations, (e) => e.supervisionStyle),
-      lowLabel: labelSupervisionStyle[0],
-      highLabel: labelSupervisionStyle[1],
-    );
-  }
-
-  Widget _buildEaseOfCommunication(
-      List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return _TitledFixSlider(
-      title: 'Communication avec l\'entreprise',
-      value: _meanOf(evaluations, (e) => e.easeOfCommunication),
-      lowLabel: labelEaseOfCommunication[0],
-      highLabel: labelEaseOfCommunication[1],
-    );
-  }
-
-  Widget _buildAbsenceAcceptance(
-      List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return _TitledFixSlider(
-      title:
-          'Tolérance du milieu à l\'égard des retards et absences de l\'élève',
-      value: _meanOf(evaluations, (e) => e.absenceAcceptance),
-      lowLabel: labelAbsenceAcceptance[0],
-      highLabel: labelAbsenceAcceptance[1],
     );
   }
 }
@@ -1317,41 +1107,6 @@ class _VisaBodyState extends State<_VisaBody> {
               ],
             ),
         ],
-      ),
-    );
-  }
-}
-
-class _FilterTile extends StatelessWidget {
-  const _FilterTile({
-    required this.title,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  final String title;
-  final bool isSelected;
-  final Function() onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Card(
-        color:
-            isSelected ? Theme.of(context).primaryColor.withAlpha(150) : null,
-        child: Row(
-          children: [
-            const SizedBox(height: 48, width: 12),
-            Text(
-              title,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(color: isSelected ? Colors.white : null),
-            ),
-          ],
-        ),
       ),
     );
   }

@@ -289,7 +289,8 @@ class _EnterpriseEvaluationScreenState
                   state: _stepStatus[1],
                   isActive: _currentStep == 1,
                   title: const Text('Encadrement'),
-                  content: SupervisionStep(key: _supervisionKey, job: job),
+                  content: SupervisionStep(
+                      key: _supervisionKey, internship: internship),
                 ),
                 Step(
                   state: _stepStatus[2],
@@ -297,6 +298,7 @@ class _EnterpriseEvaluationScreenState
                   title: const Text('Clientèle\nspécialisée'),
                   content: SpecializedStudentsStep(
                     key: _specializedStudentsKey,
+                    internship: internship,
                   ),
                 ),
               ],

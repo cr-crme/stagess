@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/form_fields/low_high_slider_form_field.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
-import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common/models/internships/internship.dart';
 
 final _logger = Logger('SupervisionStep');
 
@@ -30,10 +30,10 @@ List<String> labelAutonomyExpected = [
 class SupervisionStep extends StatefulWidget {
   const SupervisionStep({
     super.key,
-    required this.job,
+    required this.internship,
   });
 
-  final Job job;
+  final Internship internship;
 
   @override
   State<SupervisionStep> createState() => SupervisionStepState();
@@ -43,7 +43,7 @@ class SupervisionStepState extends State<SupervisionStep> {
   final _formKey = GlobalKey<FormState>();
 
   // Expectations
-  double? autonomyExpected;
+  late double? autonomyExpected;
   double? efficiencyExpected;
 
   // Management
@@ -52,7 +52,8 @@ class SupervisionStepState extends State<SupervisionStep> {
   double? absenceAcceptance;
 
   // Commentaires
-  final _commentsController = TextEditingController();
+  late final _commentsController = TextEditingController(
+      text: widget.internship.enterpriseEvaluation?.supervisionComments ?? '');
   String get supervisionComments => _commentsController.text;
 
   Future<String?> validate() async {
@@ -104,6 +105,8 @@ class SupervisionStepState extends State<SupervisionStep> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: LowHighSliderFormField(
+            initialValue:
+                widget.internship.enterpriseEvaluation?.absenceAcceptance ?? 3,
             onSaved: (value) => absenceAcceptance = value,
             lowLabel: labelAbsenceAcceptance[0],
             highLabel: labelAbsenceAcceptance[1],
@@ -124,6 +127,9 @@ class SupervisionStepState extends State<SupervisionStep> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: LowHighSliderFormField(
+            initialValue:
+                widget.internship.enterpriseEvaluation?.easeOfCommunication ??
+                    3,
             onSaved: (value) => easeOfCommunication = value,
             lowLabel: labelEaseOfCommunication[0],
             highLabel: labelEaseOfCommunication[1],
@@ -144,6 +150,8 @@ class SupervisionStepState extends State<SupervisionStep> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: LowHighSliderFormField(
+            initialValue:
+                widget.internship.enterpriseEvaluation?.supervisionStyle ?? 3,
             onSaved: (value) => supervisionStyle = value,
             lowLabel: labelSupervisionStyle[0],
             highLabel: labelSupervisionStyle[1],
@@ -164,6 +172,8 @@ class SupervisionStepState extends State<SupervisionStep> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: LowHighSliderFormField(
+            initialValue:
+                widget.internship.enterpriseEvaluation?.efficiencyExpected ?? 3,
             onSaved: (value) => efficiencyExpected = value,
             lowLabel: labelEfficiencyExpected[0],
             highLabel: labelEfficiencyExpected[1],
@@ -184,6 +194,8 @@ class SupervisionStepState extends State<SupervisionStep> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: LowHighSliderFormField(
+            initialValue:
+                widget.internship.enterpriseEvaluation?.autonomyExpected ?? 3,
             onSaved: (value) => autonomyExpected = value,
             lowLabel: labelAutonomyExpected[0],
             highLabel: labelAutonomyExpected[1],

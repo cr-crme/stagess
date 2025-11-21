@@ -1075,10 +1075,13 @@ class MySqlInternshipsRepository extends InternshipsRepository {
       Internship internship, Internship previous) async {
     final toUpdate = internship.getDifference(previous);
     if (toUpdate.contains('enterprise_evaluation')) {
-      if (previous.enterpriseEvaluation != null) {
-        throw InvalidRequestException(
-            'Enterprise evaluation cannot be changed');
-      }
+      // First remove the previous evaluation
+      await sqlInterface.performDeleteQuery(
+          tableName: 'post_internship_enterprise_evaluations',
+          filters: {'internship_id': internship.id});
+      await sqlInterface.performDeleteQuery(
+          tableName: 'post_internship_enterprise_evaluation_skills',
+          filters: {'post_evaluation_id': previous.enterpriseEvaluation!.id});
 
       await _insertToEnterpriseEvaluation(internship);
     }

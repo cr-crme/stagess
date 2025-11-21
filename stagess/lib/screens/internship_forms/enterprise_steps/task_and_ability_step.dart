@@ -52,24 +52,33 @@ class TaskAndAbilityStepState extends State<TaskAndAbilityStep> {
   final _formKey = GlobalKey<FormState>();
 
   // Tasks
-  var _taskVariety = _TaskVariety.none;
-  double? get taskVariety =>
-      _taskVariety == _TaskVariety.none
-          ? null
-          : _taskVariety == _TaskVariety.low
-          ? 0.0
-          : 1.0;
-  var _trainingPlan = _TrainingPlan.none;
-  double? get trainingPlan =>
-      _trainingPlan == _TrainingPlan.none
-          ? null
-          : _trainingPlan == _TrainingPlan.notFilled
+  late var _taskVariety = widget.internship.enterpriseEvaluation == null
+      ? _TaskVariety.none
+      : (widget.internship.enterpriseEvaluation?.taskVariety == 0
+          ? _TaskVariety.low
+          : _TaskVariety.high);
+  double? get taskVariety => _taskVariety == _TaskVariety.none
+      ? null
+      : _taskVariety == _TaskVariety.low
           ? 0.0
           : 1.0;
 
-  final _skillController = CheckboxWithOtherController(
-    elements: _RequiredSkills.values,
-  );
+  late var _trainingPlan = widget.internship.enterpriseEvaluation == null
+      ? _TrainingPlan.none
+      : (widget.internship.enterpriseEvaluation?.trainingPlanRespect == 0
+          ? _TrainingPlan.notFilled
+          : _TrainingPlan.filled);
+  double? get trainingPlan => _trainingPlan == _TrainingPlan.none
+      ? null
+      : _trainingPlan == _TrainingPlan.notFilled
+          ? 0.0
+          : 1.0;
+
+  late final _skillController = CheckboxWithOtherController(
+      elements: _RequiredSkills.values,
+      initialValues: [
+        ...?widget.internship.enterpriseEvaluation?.skillsRequired
+      ]);
   List<String> get requiredSkills => _skillController.values;
 
   Future<String?> validate() async {
@@ -105,25 +114,25 @@ class TaskAndAbilityStepState extends State<TaskAndAbilityStep> {
     return student == null
         ? Container()
         : Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SubTitle('Informations générales', left: 0),
-                _buildEnterpriseName(enterprise),
-                _buildStudentName(student),
-                const SubTitle('Tâches', left: 0),
-                _buildVariety(context),
-                const SizedBox(height: 8),
-                _buildTrainingPlan(context),
-                const SubTitle('Habiletés', left: 0),
-                const SizedBox(height: 16),
-                _buildSkillsRequired(context),
-              ],
+            key: _formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SubTitle('Informations générales', left: 0),
+                  _buildEnterpriseName(enterprise),
+                  _buildStudentName(student),
+                  const SubTitle('Tâches', left: 0),
+                  _buildVariety(context),
+                  const SizedBox(height: 8),
+                  _buildTrainingPlan(context),
+                  const SubTitle('Habiletés', left: 0),
+                  const SizedBox(height: 16),
+                  _buildSkillsRequired(context),
+                ],
+              ),
             ),
-          ),
-        );
+          );
   }
 
   Widget _buildSkillsRequired(BuildContext context) {

@@ -546,7 +546,7 @@ class Internship extends ExtendedItemSerializable {
               ? null
               : SstEvaluation.fromSerialized(data['sst_evaluation'])),
       enterpriseEvaluation:
-          enterpriseEvaluation?.copyWithData(data['sst_evaluation']) ??
+          enterpriseEvaluation?.copyWithData(data['enterprise_evaluation']) ??
               (data['enterprise_evaluation'] == null
                   ? null
                   : PostInternshipEnterpriseEvaluation.fromSerialized(

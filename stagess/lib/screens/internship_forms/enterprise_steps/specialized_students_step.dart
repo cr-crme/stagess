@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:logging/logging.dart';
+import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 
 final _logger = Logger('SpecializedStudentsStep');
@@ -33,7 +34,9 @@ enum _Disabilities {
 }
 
 class SpecializedStudentsStep extends StatefulWidget {
-  const SpecializedStudentsStep({super.key});
+  const SpecializedStudentsStep({super.key, required this.internship});
+
+  final Internship internship;
 
   @override
   State<SpecializedStudentsStep> createState() =>
@@ -42,44 +45,79 @@ class SpecializedStudentsStep extends StatefulWidget {
 
 class SpecializedStudentsStepState extends State<SpecializedStudentsStep> {
   final _formKey = GlobalKey<FormState>();
-  final _disabilityController = CheckboxWithOtherController(
+  late final _disabilityController = CheckboxWithOtherController(
     elements: _Disabilities.values,
+    initialValues: [
+      ..._Disabilities.values
+          .map((e) {
+            final eval = widget.internship.enterpriseEvaluation;
+            if (eval == null) return null;
+            return switch (e) {
+              _Disabilities.autismSpectrumDisorder => eval.acceptanceTsa != -1,
+              _Disabilities.languageDisorder =>
+                eval.acceptanceLanguageDisorder != -1,
+              _Disabilities.intellectualDisability =>
+                eval.acceptanceIntellectualDisability != -1,
+              _Disabilities.physicalDisability =>
+                eval.acceptancePhysicalDisability != -1,
+              _Disabilities.mentalHealthDisorder =>
+                eval.acceptanceMentalHealthDisorder != -1,
+              _Disabilities.behavioralDifficulties =>
+                eval.acceptanceBehaviorDifficulties != -1,
+            }
+                ? e.toString()
+                : null;
+          })
+          .where((e) => e != null)
+          .cast<String>()
+    ],
   );
 
-  bool _hasStudentHadDisabilities = false;
+  late bool _hasStudentHadDisabilities =
+      widget.internship.enterpriseEvaluation?.hasDisorder ?? false;
   List<_Disabilities> _disabilities = [];
 
-  double _acceptanceTsa = -1;
+  late double _acceptanceTsa =
+      widget.internship.enterpriseEvaluation?.acceptanceTsa ?? -1;
   double get acceptanceTsa =>
       _disabilities.contains(_Disabilities.autismSpectrumDisorder)
           ? _acceptanceTsa
           : -1;
 
-  double _acceptanceLanguageDisorder = -1;
+  late double _acceptanceLanguageDisorder =
+      widget.internship.enterpriseEvaluation?.acceptanceLanguageDisorder ?? -1;
   double get acceptanceLanguageDisorder =>
       _disabilities.contains(_Disabilities.languageDisorder)
           ? _acceptanceLanguageDisorder
           : -1;
 
-  double _acceptanceIntellectualDisability = -1;
+  late double _acceptanceIntellectualDisability = widget
+          .internship.enterpriseEvaluation?.acceptanceIntellectualDisability ??
+      -1;
   double get acceptanceIntellectualDisability =>
       _disabilities.contains(_Disabilities.intellectualDisability)
           ? _acceptanceIntellectualDisability
           : -1;
 
-  double _acceptancePhysicalDisability = -1;
+  late double _acceptancePhysicalDisability =
+      widget.internship.enterpriseEvaluation?.acceptancePhysicalDisability ??
+          -1;
   double get acceptancePhysicalDisability =>
       _disabilities.contains(_Disabilities.physicalDisability)
           ? _acceptancePhysicalDisability
           : -1;
 
-  double _acceptanceMentalHealthDisorder = -1;
+  late double _acceptanceMentalHealthDisorder =
+      widget.internship.enterpriseEvaluation?.acceptanceMentalHealthDisorder ??
+          -1;
   double get acceptanceMentalHealthDisorder =>
       _disabilities.contains(_Disabilities.mentalHealthDisorder)
           ? _acceptanceMentalHealthDisorder
           : -1;
 
-  double _acceptanceBehaviorDifficulties = -1;
+  late double _acceptanceBehaviorDifficulties =
+      widget.internship.enterpriseEvaluation?.acceptanceBehaviorDifficulties ??
+          -1;
   double get acceptanceBehaviorDifficulties =>
       _disabilities.contains(_Disabilities.behavioralDifficulties)
           ? _acceptanceBehaviorDifficulties
@@ -163,12 +201,11 @@ class SpecializedStudentsStepState extends State<SpecializedStudentsStep> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _YesOrNoRadioTile(
-            title:
-                '* Est-ce que le ou la stagiaire avait des besoins '
+            title: '* Est-ce que le ou la stagiaire avait des besoins '
                 'particuliers\u00a0?',
             value: _hasStudentHadDisabilities,
-            onChanged:
-                (value) => setState(() => _hasStudentHadDisabilities = value),
+            onChanged: (value) =>
+                setState(() => _hasStudentHadDisabilities = value),
           ),
           if (_hasStudentHadDisabilities)
             FormField(
@@ -180,57 +217,52 @@ class SpecializedStudentsStepState extends State<SpecializedStudentsStep> {
                 }
                 return null;
               },
-              builder:
-                  (errorState) => CheckboxWithOther(
-                    controller: _disabilityController,
-                    title:
-                        '* Évaluer la prise en charge de l\'entreprise par rapport '
-                        'aux différents besoins de l\'élève s\'il ou elle avait:\u00a0:',
-                    titleStyle: Theme.of(context).textTheme.titleSmall,
-                    elementStyleBuilder: (element, isSelected) {
-                      var out = Theme.of(context).textTheme.titleSmall!;
+              builder: (errorState) => CheckboxWithOther(
+                controller: _disabilityController,
+                title:
+                    '* Évaluer la prise en charge de l\'entreprise par rapport '
+                    'aux différents besoins de l\'élève s\'il ou elle avait:\u00a0:',
+                titleStyle: Theme.of(context).textTheme.titleSmall,
+                elementStyleBuilder: (element, isSelected) {
+                  var out = Theme.of(context).textTheme.titleSmall!;
 
-                      if (errorState.hasError &&
-                          _disabilityController.selected.contains(element) &&
-                          _getDisabilityValue(element) <= 0) {
-                        out = out.copyWith(
-                          color: Theme.of(context).colorScheme.error,
-                        );
-                      }
+                  if (errorState.hasError &&
+                      _disabilityController.selected.contains(element) &&
+                      _getDisabilityValue(element) <= 0) {
+                    out = out.copyWith(
+                      color: Theme.of(context).colorScheme.error,
+                    );
+                  }
 
-                      return out;
-                    },
-                    showOtherOption: false,
-                    subWidgetBuilder: (element, isSelected) {
-                      return isSelected
-                          ? Align(
-                            alignment: Alignment.centerLeft,
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                left: 24.0,
-                                bottom: 8.0,
-                              ),
-                              child: _RatingBarForm(
-                                key: _disabilityKey(element),
-                                initialValue: _getDisabilityValue(element),
-                                validator:
-                                    (value) =>
-                                        value! <= 0
-                                            ? 'Sélectionner une valeur'
-                                            : null,
-                                onRatingChanged:
-                                    (newValue) =>
-                                        _setDisabilityValue(element, newValue!),
-                              ),
+                  return out;
+                },
+                showOtherOption: false,
+                subWidgetBuilder: (element, isSelected) {
+                  return isSelected
+                      ? Align(
+                          alignment: Alignment.centerLeft,
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                              left: 24.0,
+                              bottom: 8.0,
                             ),
-                          )
-                          : Container();
-                    },
-                    onOptionSelected:
-                        (value) => setState(
-                          () => _disabilities = _disabilityController.selected,
-                        ),
-                  ),
+                            child: _RatingBarForm(
+                              key: _disabilityKey(element),
+                              initialValue: _getDisabilityValue(element),
+                              validator: (value) => value! <= 0
+                                  ? 'Sélectionner une valeur'
+                                  : null,
+                              onRatingChanged: (newValue) =>
+                                  _setDisabilityValue(element, newValue!),
+                            ),
+                          ),
+                        )
+                      : Container();
+                },
+                onOptionSelected: (value) => setState(
+                  () => _disabilities = _disabilityController.selected,
+                ),
+              ),
             ),
         ],
       ),
