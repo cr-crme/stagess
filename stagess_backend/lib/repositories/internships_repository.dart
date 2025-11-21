@@ -259,15 +259,22 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             idNameToDataTable: 'internship_id',
           ),
           sqlInterface.selectSubquery(
-              dataTableName: 'internship_sst_evaluation_persons',
-              asName: 'sst_evaluation_persons',
-              idNameToDataTable: 'internship_id',
-              fieldsToFetch: ['question', 'answers', 'date']),
-            sqlInterface.selectSubquery(
+            dataTableName: 'internship_sst_evaluation_info',
+            asName: 'sst_evaluation_info',
+            idNameToDataTable: 'internship_id',
+            fieldsToFetch: ['internship_id', 'date'],
+          ),
+          sqlInterface.selectSubquery(
+            dataTableName: 'internship_sst_evaluation_persons',
+            asName: 'sst_evaluation_persons_present',
+            idNameToDataTable: 'internship_id',
+            fieldsToFetch: ['person_name'],
+          ),
+          sqlInterface.selectSubquery(
               dataTableName: 'internship_sst_evaluation_questions',
               asName: 'sst_evaluation_questions',
               idNameToDataTable: 'internship_id',
-              fieldsToFetch: ['question', 'answers', 'date']),
+              fieldsToFetch: ['question', 'answers']),
         ]);
 
     final map = <String, Internship>{};
@@ -531,41 +538,29 @@ class MySqlInternshipsRepository extends InternshipsRepository {
       }
       internship['visa_evaluations'] = visaEvaluations;
 
-      final sstQuestions = internship['sst_questions'] as List? ?? [];
-      internship['sst_evaluation'] = sstQuestions.isEmpty
-          ? null
-          : {
-              'questions': {
-                for (final Map question in sstQuestions)
-                  question['question']:
-                      (question['answers'] as String?)?.split('\n') ?? []
-              },
-              'date': sstQuestions.first['date'] ?? 0
-            };
-
-            sqlInterface.selectSubquery(
-                dataTableName: 'internship_sst_evaluation_persons',
-                asName: 'present',
-                fieldsToFetch: ['person_name'],
-                idNameToDataTable: 'evaluation_id',
-              )
-              evaluation['present'] = [
-          for (final person in (evaluationSubquery['present'] as List? ?? []))
-            person['person_name']
-        ];
-
-
-
-
-
-
-
-
-
-
-
-
-
+      final sstEvaluationInfo =
+          internship['sst_evaluation_info'] as List? ?? [];
+      final sstEvaluationPersonsPresent =
+          internship['sst_evaluation_persons_present'] as List? ?? [];
+      final sstEvaluationQuestions =
+          internship['sst_evaluation_questions'] as List? ?? [];
+      if (sstEvaluationInfo.length != 1) {
+        internship['sst_evaluation'] = null;
+      } else {
+        internship['sst_evaluation'] = {
+          'id': sstEvaluationInfo.first['internship_id'],
+          'date': sstEvaluationInfo.first['date'] ?? 0,
+          'present_at_evaluation': [
+            for (final person in sstEvaluationPersonsPresent)
+              person['person_name']
+          ],
+          'questions': {
+            for (final Map question in sstEvaluationQuestions)
+              question['question']:
+                  (question['answers'] as String?)?.split('\n') ?? []
+          }
+        };
+      }
 
       internship['enterprise_evaluation'] =
           (internship['enterprise_evaluation'] as List?)?.firstOrNull;
@@ -981,20 +976,34 @@ class MySqlInternshipsRepository extends InternshipsRepository {
   }
 
   Future<void> _insertJobSstEvaluation(Internship internship) async {
-    final serialized = internship.sstEvaluation?.serialize()['questions']
-        as Map<String, dynamic>?;
+    final serialized = internship.sstEvaluation?.serialize();
+    if (serialized == null) return;
 
     final toWait = <Future>[];
-    for (final question in (serialized?.keys.toList() ?? [])) {
+
+    toWait.add(sqlInterface
+        .performInsertQuery(tableName: 'internship_sst_evaluation_info', data: {
+      'internship_id': internship.id,
+      'date': serialized['date'],
+    }));
+
+    for (final person in (serialized['present_at_evaluation'] as List? ?? [])) {
+      toWait.add(sqlInterface.performInsertQuery(
+          tableName: 'internship_sst_evaluation_persons',
+          data: {'internship_id': internship.id, 'person_name': person}));
+    }
+
+    final questions = serialized['questions'] as Map?;
+    for (final question in (questions?.keys.toList() ?? [])) {
       toWait.add(sqlInterface.performInsertQuery(
           tableName: 'internship_sst_evaluation_questions',
           data: {
-            'internship_id': internship.id.serialize(),
-            'date': internship.sstEvaluation!.date.serialize(),
+            'internship_id': internship.id,
             'question': question,
-            'answers': (serialized![question] as List?)?.join('\n'),
+            'answers': (questions![question] as List?)?.join('\n'),
           }));
     }
+
     await Future.wait(toWait);
   }
 
@@ -1005,9 +1014,18 @@ class MySqlInternshipsRepository extends InternshipsRepository {
 
     // It would be possible to update properly the sst evaluation, but
     // it is not so important, so we use the trick of deleting and reinserting.
-    await sqlInterface.performDeleteQuery(
+    final toWait = <Future>[];
+    toWait.add(sqlInterface.performDeleteQuery(
+        tableName: 'internship_sst_evaluation_info',
+        filters: {'internship_id': internship.id}));
+    toWait.add(sqlInterface.performDeleteQuery(
+        tableName: 'internship_sst_evaluation_persons',
+        filters: {'internship_id': internship.id}));
+    toWait.add(sqlInterface.performDeleteQuery(
         tableName: 'internship_sst_evaluation_questions',
-        filters: {'internship_id': internship.id});
+        filters: {'internship_id': internship.id}));
+    await Future.wait(toWait);
+
     await _insertJobSstEvaluation(internship);
   }
 

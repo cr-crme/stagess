@@ -51,7 +51,9 @@ DROP TABLE IF EXISTS internship_attitude_evaluation_persons;
 DROP TABLE IF EXISTS internship_attitude_evaluation_items;
 DROP TABLE IF EXISTS internship_visa_evaluations;
 DROP TABLE IF EXISTS internship_visa_evaluation_items;
+DROP TABLE IF EXISTS internship_sst_evaluation_info;
 DROP TABLE IF EXISTS internship_sst_evaluation_questions;
+DROP TABLE IF EXISTS internship_sst_evaluation_persons;
 DROP TABLE IF EXISTS post_internship_enterprise_evaluations;
 DROP TABLE IF EXISTS post_internship_enterprise_evaluation_skills;
 DROP TABLE IF EXISTS internships;
@@ -491,7 +493,7 @@ CREATE TABLE internship_visa_evaluations (
     internship_id VARCHAR(36) NOT NULL,
     date BIGINT NOT NULL,
     form_version VARCHAR(36) NOT NULL,
-    FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE   
+    FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE
 );
 
 CREATE TABLE internship_visa_evaluation_items (
@@ -511,9 +513,20 @@ CREATE TABLE internship_visa_evaluation_items (
     FOREIGN KEY (evaluation_id) REFERENCES internship_visa_evaluations(id) ON DELETE CASCADE
 );
 
-CREATE TABLE internship_sst_evaluation_questions(
+CREATE TABLE internship_sst_evaluation_info(
     internship_id VARCHAR(36) NOT NULL,
     date BIGINT NOT NULL,
+    FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE
+);
+
+CREATE TABLE internship_sst_evaluation_persons (
+    internship_id VARCHAR(36) NOT NULL,
+    person_name VARCHAR(100) NOT NULL,
+    FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE
+);
+
+CREATE TABLE internship_sst_evaluation_questions(
+    internship_id VARCHAR(36) NOT NULL,
     question VARCHAR(255) NOT NULL,
     answers VARCHAR(2000) NOT NULL,
     FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE

@@ -23,9 +23,9 @@ class SstEvaluation extends ItemSerializable {
 
   SstEvaluation({
     super.id,
+    DateTime? date,
     required this.presentAtEvaluation,
     required this.questions,
-    DateTime? date,
   }) : date = date ?? DateTime.now();
 
   static SstEvaluation get empty =>
@@ -78,15 +78,15 @@ class SstEvaluation extends ItemSerializable {
   @override
   Map<String, dynamic> serializedMap() => {
         'id': id.serialize(),
+        'date': date.serialize(),
         'present_at_evaluation': presentAtEvaluation.serialize(),
         'questions': questions,
-        'date': date.serialize(),
       };
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
+        'date': FetchableFields.mandatory,
         'present_at_evaluation': FetchableFields.optional,
         'questions': FetchableFields.optional,
-        'date': FetchableFields.mandatory,
       });
 
   @override

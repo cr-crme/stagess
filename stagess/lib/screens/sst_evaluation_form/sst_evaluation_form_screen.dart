@@ -122,7 +122,7 @@ class SstEvaluationFormScreen extends StatefulWidget {
 
 class _SstEvaluationFormScreenState extends State<SstEvaluationFormScreen> {
   final _questionsKey = GlobalKey<_QuestionsStepState>();
-  late final wereAtMeetingController = CheckboxWithOtherController(
+  late final wereAtMeetingController = CheckboxWithOtherController<String>(
     elements: [
       'Stagiaire',
       'Responsable en milieu de stage',
@@ -360,7 +360,7 @@ class _QuestionsStep extends StatefulWidget {
   });
 
   final SstEvaluation? initialSstEvaluation;
-  final CheckboxWithOtherController wereAtMeetingController;
+  final CheckboxWithOtherController<String> wereAtMeetingController;
   final String enterpriseId;
   final String jobId;
 
