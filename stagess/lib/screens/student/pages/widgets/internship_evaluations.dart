@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
+import 'package:stagess/common/widgets/dialogs/show_pdf_dialog.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
 import 'package:stagess/misc/question_file_service.dart';
 import 'package:stagess/screens/internship_forms/enterprise_steps/enterprise_evaluation_screen.dart';
@@ -12,6 +13,7 @@ import 'package:stagess/screens/internship_forms/student_steps/skill_evaluation_
 import 'package:stagess/screens/internship_forms/student_steps/visa_evaluation_form_controller.dart';
 import 'package:stagess/screens/internship_forms/student_steps/visa_evaluation_screen.dart';
 import 'package:stagess/screens/sst_evaluation_form/sst_evaluation_form_screen.dart';
+import 'package:stagess/screens/student/pages/pdf/attitude_pdf_template.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart'
@@ -600,20 +602,41 @@ class _AttitudeBodyState extends State<_AttitudeBody> {
   }
 
   Widget _buildShowOtherForms() {
+    final controller = AttitudeEvaluationFormController.fromInternshipId(
+      context,
+      internshipId: widget.internship.id,
+      evaluationIndex: _currentEvaluationIndex,
+    );
+
     return Padding(
       padding: const EdgeInsets.only(bottom: _interline),
       child: Center(
-        child: OutlinedButton(
-          onPressed: () => showAttitudeEvaluationDialog(
-            context: context,
-            formController: AttitudeEvaluationFormController.fromInternshipId(
-              context,
-              internshipId: widget.internship.id,
-              evaluationIndex: _currentEvaluationIndex,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OutlinedButton(
+              onPressed: () => showAttitudeEvaluationDialog(
+                context: context,
+                formController: controller,
+                editMode: false,
+              ),
+              child: const Text('Voir l\'évaluation détaillée'),
             ),
-            editMode: false,
-          ),
-          child: const Text('Voir l\'évaluation détaillée'),
+            SizedBox(width: 12),
+            IconButton(
+                onPressed: () {
+                  showPdfDialog(
+                    context,
+                    pdfGeneratorCallback: (context, format) =>
+                        generateAttitudePdf(context, format,
+                            controller: controller),
+                  );
+                },
+                icon: Icon(
+                  Icons.picture_as_pdf,
+                  color: Theme.of(context).colorScheme.primary,
+                ))
+          ],
         ),
       ),
     );

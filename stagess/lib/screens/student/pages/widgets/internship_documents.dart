@@ -1,10 +1,8 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:pdf/pdf.dart';
-import 'package:printing/printing.dart';
-import 'package:stagess/screens/internship_forms/pdf_templates/generate_documents.dart';
+import 'package:stagess/common/widgets/dialogs/show_pdf_dialog.dart';
+import 'package:stagess/screens/student/pages/pdf/internship_contract_pdf_template.dart';
+import 'package:stagess/screens/student/pages/pdf/visa_pdf_template.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 
 final _logger = Logger('InternshipDocuments');
@@ -45,19 +43,45 @@ class _InternshipDocumentsState extends State<InternshipDocuments> {
               body: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildPdfTile(
-                    context,
-                    title: 'Contrat de stage',
-                    pdfGeneratorCallback: (context, format,
-                            {required internshipId}) =>
-                        GenerateDocuments.generateInternshipContractPdf(
-                            context, format,
-                            internshipId: internshipId),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () => showPdfDialog(
+                          context,
+                          pdfGeneratorCallback: (context, format) =>
+                              generateInternshipContractPdf(context, format,
+                                  internshipId: widget.internship.id),
+                        ),
+                        child: Text(
+                          'Contrat de stage',
+                          style: const TextStyle(
+                              color: Colors.blue,
+                              decoration: TextDecoration.underline),
+                        ),
+                      ),
+                    ),
                   ),
-                  _buildPdfTile(
-                    context,
-                    title: 'VISA',
-                    pdfGeneratorCallback: GenerateDocuments.generateVisaPdf,
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12.0),
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: GestureDetector(
+                        onTap: () => showPdfDialog(
+                          context,
+                          pdfGeneratorCallback: (context, format) =>
+                              generateVisaPdf(context, format,
+                                  internshipId: widget.internship.id),
+                        ),
+                        child: Text(
+                          'VISA',
+                          style: const TextStyle(
+                              color: Colors.blue,
+                              decoration: TextDecoration.underline),
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -73,59 +97,5 @@ class _InternshipDocumentsState extends State<InternshipDocuments> {
                 color: Theme.of(context).primaryColor)),
       );
     }
-  }
-
-  Widget _buildPdfTile(
-    BuildContext context, {
-    required String title,
-    required Future<Uint8List> Function(
-            BuildContext context, PdfPageFormat format,
-            {required String internshipId})
-        pdfGeneratorCallback,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: () => showDialog(
-              context: context,
-              builder: (ctx) => Dialog(
-                    backgroundColor: Colors.grey[700],
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Align(
-                            alignment: Alignment.topRight,
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 12.0),
-                              child: IconButton(
-                                icon: Icon(Icons.close),
-                                onPressed: () => Navigator.of(ctx).pop(),
-                              ),
-                            )),
-                        Expanded(
-                          child: PdfPreview(
-                            allowPrinting: true,
-                            allowSharing: true,
-                            canChangeOrientation: false,
-                            canChangePageFormat: false,
-                            canDebug: false,
-                            build: (format) => pdfGeneratorCallback(
-                                context, format,
-                                internshipId: widget.internship.id),
-                          ),
-                        ),
-                      ],
-                    ),
-                  )),
-          child: Text(
-            title,
-            style: const TextStyle(
-                color: Colors.blue, decoration: TextDecoration.underline),
-          ),
-        ),
-      ),
-    );
   }
 }
