@@ -382,7 +382,7 @@ class JobsPageState extends State<JobsPage> {
       _cardKey.putIfAbsent(job.id, () => UniqueKey());
       _expandedSections.putIfAbsent(
         job.id,
-        () => [false, false, false, false, false, false],
+        () => [false, false, false, false, false],
       );
       _prerequisitesFormKeys.putIfAbsent(
         job.id,
@@ -617,23 +617,23 @@ class JobsPageState extends State<JobsPage> {
                       onClickEdit: () => _onClickPrerequisiteEdit(job),
                     ),
                     IncidentsExpansionPanel(
-                      isExpanded: _expandedSections[job.id]![2],
+                      isExpanded: _expandedSections[job.id]![1],
                       enterprise: widget.enterprise,
                       job: job,
                       addSstEvent: _addSstEvent,
                     ),
                     SupervisionExpansionPanel(
-                      isExpanded: _expandedSections[job.id]![3],
+                      isExpanded: _expandedSections[job.id]![2],
                       job: job,
                     ),
                     PhotoExpansionPanel(
-                      isExpanded: _expandedSections[job.id]![4],
+                      isExpanded: _expandedSections[job.id]![3],
                       job: job,
                       addImage: _addImage,
                       removeImage: _removeImage,
                     ),
                     CommentsExpansionPanel(
-                      isExpanded: _expandedSections[job.id]![5],
+                      isExpanded: _expandedSections[job.id]![4],
                       job: job,
                       addComment: _addComment,
                     ),
