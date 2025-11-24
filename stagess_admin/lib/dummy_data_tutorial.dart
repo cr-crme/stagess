@@ -1299,7 +1299,16 @@ Future<void> _addDummyEnterprises(
       specialization:
           ActivitySectorsService.activitySectors[9].specializations[3],
       positionsOffered: {schoolAId: 3, schoolBId: 5},
-      incidents: Incidents.empty,
+      incidents: Incidents.empty.copyWith(
+        autoReportedIncidents: [
+          Incident(
+            'L\'élève ne portait pas ses gants malgré plusieurs avertissements, '
+            'et il s\'est ouvert profondément la paume en voulant couper une tige.',
+            teacherId: teacherA1Id,
+            date: DateTime.now(),
+          )
+        ],
+      ),
       minimumAge: 15,
       preInternshipRequests: PreInternshipRequests.fromStrings(
         [
@@ -1366,7 +1375,14 @@ Future<void> _addDummyEnterprises(
       specialization:
           ActivitySectorsService.activitySectors[9].specializations[3],
       positionsOffered: {schoolAId: 2, schoolBId: 5},
-      incidents: Incidents.empty,
+      incidents: Incidents.empty.copyWith(autoReportedIncidents: [
+        Incident(
+          'L\'élève ne portait pas ses gants malgré plusieurs avertissements, '
+          'et il s\'est ouvert profondément la paume en voulant ouvrir une boite.',
+          teacherId: teacherA1Id,
+          date: DateTime.now(),
+        )
+      ]),
       minimumAge: 15,
       preInternshipRequests: PreInternshipRequests.fromStrings(
         [],
@@ -1965,11 +1981,6 @@ Future<void> _addDummyInternships(
           'Q12': ['Bruyant'],
           'Q12+t': ['Bouchons a oreilles'],
           'Q15': ['Oui'],
-          'Q18': ['Oui'],
-          'Q18+t': [
-            'L\'élève ne portait pas ses gants malgré plusieurs avertissements, '
-                'et il s\'est ouvert profondément la paume en voulant ouvrir une boite.',
-          ],
         },
         date: DateTime.now(),
       ),
@@ -2092,7 +2103,6 @@ Future<void> _addDummyInternships(
             'Q15': ['Oui'],
             'Q15+t': ['Aucun'],
             'Q16': ['Ranger le local avant de quitter'],
-            'Q18': ['Non'],
           },
         )),
   );
@@ -2363,7 +2373,6 @@ Future<void> _addDummyInternships(
             'Q12+t': ['Bouchons a oreilles'],
             'Q15': ['Oui'],
             'Q15+t': ['Travail quotidien avec les clients'],
-            'Q18': ['Non'],
           },
           date: DateTime.now(),
         )),
@@ -2641,11 +2650,6 @@ Future<void> _addDummyInternships(
             'Q7': ['Des pesticides', 'Engrais'],
             'Q12': ['Bruyant'],
             'Q15': ['Non'],
-            'Q18': ['Oui'],
-            'Q18+t': [
-              'L\'élève ne portait pas ses gants malgré plusieurs avertissements, '
-                  'et il s\'est ouvert profondément la paume en voulant couper une tige.',
-            ],
           },
         )),
   );

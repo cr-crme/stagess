@@ -264,7 +264,7 @@ class JobsPageState extends State<JobsPage> {
 
     final incident = Incident(
         teacherId: teacherId, date: DateTime.now(), result['description']);
-    switch (result['eventType']) {
+    switch (result['eventType'] as SstEventType) {
       case SstEventType.severe:
         job.incidents.severeInjuries.add(incident);
         break;
@@ -273,6 +273,9 @@ class JobsPageState extends State<JobsPage> {
         break;
       case SstEventType.minor:
         job.incidents.minorInjuries.add(incident);
+        break;
+      case SstEventType.autoReported:
+        job.incidents.autoReportedIncidents.add(incident);
         break;
     }
     enterprises[widget.enterprise].jobs.replace(job);

@@ -77,6 +77,12 @@ class _IncidentsBody extends StatelessWidget {
                 titleIfNotHasIncidents: 'Aucune blessure mineure',
                 titleIfHasIncidents: 'Blessures mineures d\'élèves',
                 incidents: job.incidents.minorInjuries),
+            const SizedBox(height: 16),
+            _buildIncidents(context,
+                titleIfNotHasIncidents:
+                    'Aucun incident rapporté par l\'entreprise',
+                titleIfHasIncidents: 'Incidents rapportés par l\'entreprise',
+                incidents: job.incidents.autoReportedIncidents),
             const SizedBox(height: 24),
             Center(
               child: ElevatedButton(

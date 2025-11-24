@@ -195,7 +195,6 @@ SstEvaluation dummySstEvaluation({String? id}) => SstEvaluation(
         'Q12': ['Bruyant'],
         'Q12+t': ['Bouchons a oreilles'],
         'Q15': ['Oui'],
-        'Q18': ['Non'],
       },
       date: DateTime(2000, 1, 1),
     );
