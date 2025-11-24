@@ -319,8 +319,8 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     final newDate = await showCustomDatePicker(
       context: context,
       initialDate: _currentDate,
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 31)),
+      firstDate: DateTime.now().subtract(const Duration(days: 365)),
+      lastDate: DateTime.now().add(const Duration(days: 365)),
     );
 
     if (newDate == null || !mounted) return;
