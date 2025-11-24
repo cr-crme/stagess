@@ -16,7 +16,6 @@ import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/comments_
 import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/incidents_expansion_panel.dart';
 import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/photo_expansion_panel.dart';
 import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/prerequisites_expansion_panel.dart';
-import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/sst_expansion_panel.dart';
 import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/supervision_expansion_panel.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
@@ -617,10 +616,6 @@ class JobsPageState extends State<JobsPage> {
                       job: job,
                       onClickEdit: () => _onClickPrerequisiteEdit(job),
                     ),
-                    SstExpansionPanel(
-                        isExpanded: _expandedSections[job.id]![1],
-                        enterprise: widget.enterprise,
-                        jobId: job.id),
                     IncidentsExpansionPanel(
                       isExpanded: _expandedSections[job.id]![2],
                       enterprise: widget.enterprise,
