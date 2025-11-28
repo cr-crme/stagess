@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
+import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
@@ -27,91 +28,94 @@ Future<Uint8List> generateAttitudePdf(
   );
 
   document.addPage(
-    pw.Page(
-      build: (pw.Context context) => pw.Align(
-          alignment: pw.Alignment.topLeft,
-          child: pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.start,
-              children: [
-                // TODO Rendu ici
-                _buildSectionTitle(
-                    title: '1. ${Inattendance.title}',
-                    controller: controller,
-                    elements: Inattendance.values),
-                pw.SizedBox(height: 16),
-                _buildSectionTitle(
-                    title: '2. ${Politeness.title}',
-                    controller: controller,
-                    elements: Politeness.values),
-
-                // _AttitudeRadioChoices(
-                //         title: '1. *${Inattendance.title}',
-                //         formController: widget.formController,
-                //         elements: Inattendance.values,
-                //         editMode: widget.editMode,
-                //       ),
-                //       _AttitudeRadioChoices(
-                //         title: '2. *${Ponctuality.title}',
-                //         formController: widget.formController,
-                //         elements: Ponctuality.values,
-                //         editMode: widget.editMode,
-                //       ),
-                //       _AttitudeRadioChoices(
-                //         title: '3. *${Sociability.title}',
-                //         formController: widget.formController,
-                //         elements: Sociability.values,
-                //         editMode: widget.editMode,
-                //       ),
-                //       _AttitudeRadioChoices(
-                //         title: '4. *${Politeness.title}',
-                //         formController: widget.formController,
-                //         elements: Politeness.values,
-                //         editMode: widget.editMode,
-                //       ),
-                //       _AttitudeRadioChoices(
-                //         title: '5. *${Motivation.title}',
-                //         formController: widget.formController,
-                //         elements: Motivation.values,
-                //         editMode: widget.editMode,
-                //       ),
-                //       _AttitudeRadioChoices(
-                //         title: '6. *${DressCode.title}',
-                //         formController: widget.formController,
-                //         elements: DressCode.values,
-                //         editMode: widget.editMode,
-                //       ),
-                // _AttitudeRadioChoices(
-                //         title: '7. *${QualityOfWork.title}',
-                //         formController: widget.formController,
-                //         elements: QualityOfWork.values,
-                //         editMode: widget.editMode,
-                //       ),
-                //       _AttitudeRadioChoices(
-                //         title: '8. *${Productivity.title}',
-                //         formController: widget.formController,
-                //         elements: Productivity.values,
-                //         editMode: widget.editMode,
-                //       ),
-                //       _AttitudeRadioChoices(
-                //         title: '9. *${Autonomy.title}',
-                //         formController: widget.formController,
-                //         elements: Autonomy.values,
-                //         editMode: widget.editMode,
-                //       ),
-                //       _AttitudeRadioChoices(
-                //         title: '10. *${Cautiousness.title}',
-                //         formController: widget.formController,
-                //         elements: Cautiousness.values,
-                //         editMode: widget.editMode,
-                //       ),
-              ])),
+    pw.MultiPage(
+      build: (pw.Context context) => [
+        pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
+          _buildPersonsPresent(controller: controller),
+          pw.SizedBox(height: 24),
+          _buildAttitudeTile(
+              title: '1. ${Inattendance.title}',
+              controller: controller,
+              elements: Inattendance.values),
+          pw.SizedBox(height: 24),
+          _buildAttitudeTile(
+              title: '2. ${Ponctuality.title}',
+              controller: controller,
+              elements: Ponctuality.values),
+          pw.SizedBox(height: 24),
+          _buildAttitudeTile(
+              title: '3. ${Sociability.title}',
+              controller: controller,
+              elements: Sociability.values),
+          pw.SizedBox(height: 24),
+          _buildAttitudeTile(
+              title: '4. ${Politeness.title}',
+              controller: controller,
+              elements: Politeness.values),
+          pw.SizedBox(height: 24),
+          _buildAttitudeTile(
+              title: '5. ${Motivation.title}',
+              controller: controller,
+              elements: Motivation.values),
+          pw.SizedBox(height: 24),
+          _buildAttitudeTile(
+              title: '6. ${DressCode.title}',
+              controller: controller,
+              elements: DressCode.values),
+          pw.SizedBox(height: 24),
+          _buildAttitudeTile(
+              title: '7. ${QualityOfWork.title}',
+              controller: controller,
+              elements: QualityOfWork.values),
+          pw.SizedBox(height: 24),
+          _buildAttitudeTile(
+              title: '8. ${Productivity.title}',
+              controller: controller,
+              elements: Productivity.values),
+          pw.SizedBox(height: 24),
+          _buildAttitudeTile(
+              title: '9. ${Autonomy.title}',
+              controller: controller,
+              elements: Autonomy.values),
+          pw.SizedBox(height: 24),
+          _buildAttitudeTile(
+              title: '10. ${Cautiousness.title}',
+              controller: controller,
+              elements: Cautiousness.values),
+          pw.SizedBox(height: 24),
+          _buildAttitudeTile(
+              title: '11. ${GeneralAppreciation.title}',
+              controller: controller,
+              elements: GeneralAppreciation.values),
+          pw.SizedBox(height: 24),
+          _buildGeneralComments(controller: controller),
+        ])
+      ],
     ),
   );
 
   return document.save();
 }
 
-pw.Widget _buildSectionTitle({
+pw.Widget _buildPersonsPresent({
+  required AttitudeEvaluationFormController controller,
+}) {
+  return pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
+    pw.Text(
+        'Personnes présentes à l\'évaluation du ${DateFormat(
+          'dd MMMM yyyy',
+          'fr_CA',
+        ).format(controller.evaluationDate)} :',
+        style: _textStyleBold),
+    ...controller.wereAtMeeting.map(
+      (e) => pw.Padding(
+          padding: pw.EdgeInsets.only(top: 8),
+          child: pw.Text('- $e', style: _textStyle)),
+    ),
+  ]);
+}
+
+pw.Widget _buildAttitudeTile({
   required String title,
   required List<AttitudeCategoryEnum> elements,
   required AttitudeEvaluationFormController controller,
@@ -155,4 +159,25 @@ pw.Widget _buildSectionTitle({
                 ))),
           ],
         );
+}
+
+pw.Widget _buildGeneralComments(
+    {required AttitudeEvaluationFormController controller}) {
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.start,
+    children: [
+      pw.Text('Commentaires généraux :', style: _textStyleBold),
+      pw.SizedBox(height: 8),
+      pw.Container(
+        width: double.infinity,
+        decoration: pw.BoxDecoration(
+          border: pw.Border.all(color: PdfColors.black),
+        ),
+        child: pw.Padding(
+            padding: pw.EdgeInsets.all(8),
+            child:
+                pw.Text(controller.commentsController.text, style: _textStyle)),
+      ),
+    ],
+  );
 }
