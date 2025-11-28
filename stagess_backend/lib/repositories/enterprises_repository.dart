@@ -117,6 +117,11 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
           'You do not have permission to put this enterprise');
     }
 
+    if (newEnterprise.jobs.any((job) => job.photos.length > 3)) {
+      throw InvalidRequestException(
+          'You cannot upload more than 3 photos per job');
+    }
+
     // Put enterprise can remove internships if a job is removed
     await _putEnterprise(
         enterprise: newEnterprise,

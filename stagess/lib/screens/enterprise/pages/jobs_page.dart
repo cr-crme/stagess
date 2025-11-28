@@ -175,10 +175,14 @@ class JobsPageState extends State<JobsPage> {
       job.photos.add(Photo(bytes: bytes));
     }
 
-    await enterprises.replaceWithConfirmation(widget.enterprise);
+    final isSuccess =
+        await enterprises.replaceWithConfirmation(widget.enterprise);
     await enterprises.releaseLockForItem(widget.enterprise);
     if (mounted) {
-      showSnackBar(context, message: 'L\'image a été ajoutée');
+      showSnackBar(context,
+          message: isSuccess
+              ? 'L\'image a été ajoutée'
+              : 'Une erreur est survenue lors de l\'ajout de l\'image');
     }
     setState(() {
       _forceDisabled = false;

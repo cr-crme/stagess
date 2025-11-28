@@ -13,19 +13,18 @@ class PhotoExpansionPanel extends ExpansionPanel {
     required void Function(Job job, ImageSource source) addImage,
     required void Function(Job job, int index) removeImage,
   }) : super(
-         headerBuilder:
-             (context, isExpanded) => ListTile(
-               title: Row(
-                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                 children: [
-                   const Text('Photos du poste de travail'),
-                   if (isExpanded) _buildInfoButton(context),
-                 ],
-               ),
-             ),
-         canTapOnHeader: true,
-         body: _PhotoBody(job, addImage, removeImage),
-       );
+          headerBuilder: (context, isExpanded) => ListTile(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Photos du poste de travail'),
+                if (isExpanded) _buildInfoButton(context),
+              ],
+            ),
+          ),
+          canTapOnHeader: true,
+          body: _PhotoBody(job, addImage, removeImage),
+        );
   static Widget _buildInfoButton(BuildContext context) {
     return Align(
       alignment: Alignment.topRight,
@@ -35,14 +34,13 @@ class PhotoExpansionPanel extends ExpansionPanel {
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(25)),
         child: InkWell(
           borderRadius: BorderRadius.circular(25),
-          onTap:
-              () => showSnackBar(
-                context,
-                message:
-                    'Les photos doivent représenter un poste de travail vide, ou '
-                    'encore des travailleurs de dos.\n'
-                    'Ne pas prendre des photos où on peut les reconnaitre.',
-              ),
+          onTap: () => showSnackBar(
+            context,
+            message:
+                'Les photos doivent représenter un poste de travail vide, ou '
+                'encore des travailleurs de dos.\n'
+                'Ne pas prendre des photos où on peut les reconnaitre.',
+          ),
           child: Icon(Icons.info, color: Theme.of(context).primaryColor),
         ),
       ),
@@ -62,8 +60,8 @@ class _PhotoBody extends StatefulWidget {
 }
 
 class _PhotoBodyState extends State<_PhotoBody> {
-  late final _scrollController =
-      ScrollController()..addListener(() => setState(() {}));
+  late final _scrollController = ScrollController()
+    ..addListener(() => setState(() {}));
 
   @override
   void dispose() {
@@ -83,30 +81,29 @@ class _PhotoBodyState extends State<_PhotoBody> {
   void _showPhoto(int index) {
     showDialog(
       context: context,
-      builder:
-          (context) => Dialog(
-            child: Padding(
-              padding: const EdgeInsets.only(right: 20.0, top: 20, left: 20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Image.memory(widget.job.photos[index].bytes),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: InkWell(
-                      onTap: () {
-                        widget.removeImage(widget.job, index);
-                        setState(() {});
-                        Navigator.of(context).pop();
-                      },
-                      borderRadius: BorderRadius.circular(25),
-                      child: const Icon(Icons.delete, color: Colors.red),
-                    ),
-                  ),
-                ],
+      builder: (context) => Dialog(
+        child: Padding(
+          padding: const EdgeInsets.only(right: 20.0, top: 20, left: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.memory(widget.job.photos[index].bytes),
+              Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: InkWell(
+                  onTap: () {
+                    widget.removeImage(widget.job, index);
+                    setState(() {});
+                    Navigator.of(context).pop();
+                  },
+                  borderRadius: BorderRadius.circular(25),
+                  child: const Icon(Icons.delete, color: Colors.red),
+                ),
               ),
-            ),
+            ],
           ),
+        ),
+      ),
     );
   }
 
@@ -120,8 +117,7 @@ class _PhotoBodyState extends State<_PhotoBody> {
         _scrollController.hasClients && _scrollController.offset > 0;
 
     // The || is a hack because the maxScrollExtend is zero when first opening the card
-    final canRightScroll =
-        _scrollController.hasClients &&
+    final canRightScroll = _scrollController.hasClients &&
         (_scrollController.offset <
                 _scrollController.position.maxScrollExtent ||
             (widget.job.photos.length > 2 && _scrollController.offset == 0));
@@ -139,10 +135,9 @@ class _PhotoBodyState extends State<_PhotoBody> {
                   borderRadius: BorderRadius.circular(25),
                   child: Icon(
                     Icons.arrow_left,
-                    color:
-                        canLeftScroll
-                            ? Theme.of(context).primaryColor
-                            : Colors.grey,
+                    color: canLeftScroll
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey,
                     size: 40,
                   ),
                 ),
@@ -156,16 +151,16 @@ class _PhotoBodyState extends State<_PhotoBody> {
                       ...widget.job.photos.isEmpty
                           ? [const Text('Aucune image disponible')]
                           : widget.job.photos.asMap().keys.map(
-                            (i) => InkWell(
-                              onTap: () => _showPhoto(i),
-                              child: Card(
-                                child: Image.memory(
-                                  widget.job.photos[i].bytes,
-                                  height: 250,
+                                (i) => InkWell(
+                                  onTap: () => _showPhoto(i),
+                                  child: Card(
+                                    child: Image.memory(
+                                      widget.job.photos[i].bytes,
+                                      height: 250,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ),
                     ],
                   ),
                 ),
@@ -176,10 +171,9 @@ class _PhotoBodyState extends State<_PhotoBody> {
                   borderRadius: BorderRadius.circular(25),
                   child: Icon(
                     Icons.arrow_right,
-                    color:
-                        canRightScroll
-                            ? Theme.of(context).primaryColor
-                            : Colors.grey,
+                    color: canRightScroll
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey,
                     size: 40,
                   ),
                 ),
@@ -191,21 +185,27 @@ class _PhotoBodyState extends State<_PhotoBody> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  onPressed:
-                      () => widget.addImage(widget.job, ImageSource.gallery),
+                  onPressed: widget.job.photos.length < 3
+                      ? () => widget.addImage(widget.job, ImageSource.gallery)
+                      : null,
                   icon: Icon(
                     Icons.image,
-                    color: Theme.of(context).primaryColor,
+                    color: widget.job.photos.length < 3
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey,
                     size: 36,
                   ),
                 ),
                 const SizedBox(width: 12),
                 IconButton(
-                  onPressed:
-                      () => widget.addImage(widget.job, ImageSource.camera),
+                  onPressed: widget.job.photos.length < 3
+                      ? () => widget.addImage(widget.job, ImageSource.camera)
+                      : null,
                   icon: Icon(
                     Icons.camera_alt,
-                    color: Theme.of(context).primaryColor,
+                    color: widget.job.photos.length < 3
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey,
                     size: 36,
                   ),
                 ),
