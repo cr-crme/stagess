@@ -13,17 +13,18 @@ final _logger = Logger('GenerateAttitudePdf');
 final _textStyle = pw.TextStyle(font: pw.Font.times());
 final _textStyleBold = pw.TextStyle(font: pw.Font.timesBold());
 
-Future<Uint8List> generateAttitudePdf(
+Future<Uint8List> generateAttitudeEvaluationPdf(
     BuildContext context, PdfPageFormat format,
     {required AttitudeEvaluationFormController controller}) async {
   _logger.info(
-      'Generating attitude PDF for internship: ${controller.internshipId}');
+      'Generating attitude evaluation PDF for internship: ${controller.internshipId}');
 
   final document = pw.Document(pageMode: PdfPageMode.outlines);
 
   document.addPage(
     pw.Page(
-      build: (pw.Context context) => pw.Center(child: pw.Text('ATTITUDE')),
+      build: (pw.Context context) =>
+          pw.Center(child: pw.Text('Évaluation de l\'attitude au travail')),
     ),
   );
 

@@ -14,6 +14,7 @@ import 'package:stagess/screens/internship_forms/student_steps/visa_evaluation_f
 import 'package:stagess/screens/internship_forms/student_steps/visa_evaluation_screen.dart';
 import 'package:stagess/screens/sst_evaluation_form/sst_evaluation_form_screen.dart';
 import 'package:stagess/screens/student/pages/pdf/attitude_pdf_template.dart';
+import 'package:stagess/screens/student/pages/pdf/skill_pdf_template.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart'
@@ -330,29 +331,49 @@ class _SpecificSkillBodyState extends State<_SpecificSkillBody> {
   }
 
   Widget _buildShowOtherDate() {
+    final controller = SkillEvaluationFormController.fromInternshipId(
+      context,
+      internshipId: widget.internship.id,
+      evaluationIndex: _currentEvaluationIndex,
+      canModify: false,
+    );
+
     return Padding(
       padding: const EdgeInsets.only(bottom: _interline),
       child: Center(
-        child: OutlinedButton(
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => Dialog(
-                child: SkillEvaluationFormScreen(
-                  rootContext: context,
-                  formController:
-                      SkillEvaluationFormController.fromInternshipId(
-                    context,
-                    internshipId: widget.internship.id,
-                    evaluationIndex: _currentEvaluationIndex,
-                    canModify: false,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            OutlinedButton(
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => Dialog(
+                    child: SkillEvaluationFormScreen(
+                      rootContext: context,
+                      formController: controller,
+                      editMode: false,
+                    ),
                   ),
-                  editMode: false,
-                ),
-              ),
-            );
-          },
-          child: const Text('Voir l\'évaluation détaillée'),
+                );
+              },
+              child: const Text('Voir l\'évaluation détaillée'),
+            ),
+            SizedBox(width: 12),
+            IconButton(
+                onPressed: () {
+                  showPdfDialog(
+                    context,
+                    pdfGeneratorCallback: (context, format) =>
+                        generateSkillEvaluationPdf(context, format,
+                            controller: controller),
+                  );
+                },
+                icon: Icon(
+                  Icons.picture_as_pdf,
+                  color: Theme.of(context).colorScheme.primary,
+                ))
+          ],
         ),
       ),
     );
@@ -628,7 +649,7 @@ class _AttitudeBodyState extends State<_AttitudeBody> {
                   showPdfDialog(
                     context,
                     pdfGeneratorCallback: (context, format) =>
-                        generateAttitudePdf(context, format,
+                        generateAttitudeEvaluationPdf(context, format,
                             controller: controller),
                   );
                 },
