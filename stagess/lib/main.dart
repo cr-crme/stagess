@@ -17,6 +17,7 @@ import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
+import 'package:stagess_common_flutter/widgets/single_instance_manager.dart';
 
 // coverage:ignore-start
 void main() async {
@@ -112,33 +113,53 @@ class StagessApp extends StatelessWidget {
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
       ],
-      child: InactivityLayout(
-        navigatorKey: rootNavigatorKey,
-        timeout: const Duration(minutes: 10),
-        gracePeriod: const Duration(seconds: 60),
-        showGracePeriod: (context) async =>
-            AuthProvider.of(context, listen: false).isFullySignedIn,
-        onTimedout: (context) async {
-          if (!AuthProvider.of(context, listen: false).isFullySignedIn) {
-            return true;
-          }
-          await AuthProviderExtension.disconnectAll(
-            context,
-            showConfirmDialog: false,
-          );
-          return true;
-        },
-        child: MaterialApp.router(
+      child: SingleInstanceManager(
+        isNotAllowedChild: MaterialApp(
           debugShowCheckedModeBanner: false,
           onGenerateTitle: (context) => 'Stagess',
           theme: crcrmeMaterialTheme,
-          routerConfig: router,
+          home: Scaffold(
+            body: Center(
+              child: Text(
+                  'Une seule page de Stagess ne peut être ouverte à la fois.\n'
+                  'Veuillez fermer les autres onglets ou fenêtres et rafraîchir cette page.'),
+            ),
+          ),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
           supportedLocales: const [Locale('fr', 'CA')],
+        ),
+        child: InactivityLayout(
+          navigatorKey: rootNavigatorKey,
+          timeout: const Duration(minutes: 10),
+          gracePeriod: const Duration(seconds: 60),
+          showGracePeriod: (context) async =>
+              AuthProvider.of(context, listen: false).isFullySignedIn,
+          onTimedout: (context) async {
+            if (!AuthProvider.of(context, listen: false).isFullySignedIn) {
+              return true;
+            }
+            await AuthProviderExtension.disconnectAll(
+              context,
+              showConfirmDialog: false,
+            );
+            return true;
+          },
+          child: MaterialApp.router(
+            debugShowCheckedModeBanner: false,
+            onGenerateTitle: (context) => 'Stagess',
+            theme: crcrmeMaterialTheme,
+            routerConfig: router,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('fr', 'CA')],
+          ),
         ),
       ),
     );
