@@ -30,9 +30,7 @@ class EnterpriseScreen extends StatelessWidget {
     final internships = InternshipsProvider.of(context, listen: false);
     await Future.wait([
       enterprises.fetchData(id: id, fields: FetchableFields.all),
-      ...internships
-          .where((e) => e.enterpriseId == id)
-          .map(
+      ...internships.where((e) => e.enterpriseId == id).map(
             (e) => internships.fetchData(id: e.id, fields: FetchableFields.all),
           ),
     ]);
@@ -120,10 +118,9 @@ class _EnterpriseScreenInternalState extends State<_EnterpriseScreenInternal>
     if (_tabController.index == 0) {
       icon = const Icon(Icons.add);
     } else if (_tabController.index == 1) {
-      icon =
-          _aboutPageKey.currentState?.editing ?? false
-              ? const Icon(Icons.save)
-              : const Icon(Icons.edit);
+      icon = _aboutPageKey.currentState?.editing ?? false
+          ? const Icon(Icons.save)
+          : const Icon(Icons.edit);
     } else if (_tabController.index == 2) {
       icon = const Icon(Icons.add);
     }
@@ -138,8 +135,7 @@ class _EnterpriseScreenInternalState extends State<_EnterpriseScreenInternal>
                 TextSpan(
                   children: [
                     const TextSpan(
-                      text:
-                          '** Vous quittez la page sans avoir '
+                      text: '** Vous quittez la page sans avoir '
                           'cliqué sur Enregistrer ',
                     ),
                     WidgetSpan(
@@ -194,13 +190,12 @@ class _EnterpriseScreenInternalState extends State<_EnterpriseScreenInternal>
     await showDialog(
       barrierDismissible: false,
       context: context,
-      builder:
-          (context) => Dialog(
-            child: InternshipEnrollmentScreen(
-              enterprise: enterprise,
-              specifiedSpecialization: specialization,
-            ),
-          ),
+      builder: (context) => Dialog(
+        child: InternshipEnrollmentScreen(
+          enterprise: enterprise,
+          specifiedSpecialization: specialization,
+        ),
+      ),
     );
     _logger.fine('Internship added for enterprise: ${enterprise.name}');
   }
@@ -234,87 +229,83 @@ class _EnterpriseScreenInternalState extends State<_EnterpriseScreenInternal>
         context,
         title: Text(enterprise.name),
         actions: [_actionButton],
-        leading:
-            ResponsiveService.getScreenSize(context) == ScreenSize.small
-                ? null
-                : SizedBox.shrink(),
-        bottom:
-            widget.hasFullData
-                ? TabBar(
-                  onTap: (index) async {
-                    if (!_editing || !_tabController.indexIsChanging) {
-                      return;
-                    }
+        leading: ResponsiveService.getScreenSize(context) == ScreenSize.small
+            ? null
+            : SizedBox.shrink(),
+        bottom: widget.hasFullData
+            ? TabBar(
+                onTap: (index) async {
+                  if (!_editing || !_tabController.indexIsChanging) {
+                    return;
+                  }
 
-                    _tabController.index = _tabController.previousIndex;
-                    if (await ConfirmExitDialog.show(
-                      context,
-                      content: Text.rich(
-                        TextSpan(
-                          children: [
-                            const TextSpan(
-                              text:
-                                  '** Vous quittez la page sans avoir '
-                                  'cliqué sur Enregistrer ',
-                            ),
-                            WidgetSpan(
-                              child: SizedBox(
-                                height: 22,
-                                width: 22,
-                                child: Icon(
-                                  Icons.save,
-                                  color: Theme.of(context).primaryColor,
-                                ),
+                  _tabController.index = _tabController.previousIndex;
+                  if (await ConfirmExitDialog.show(
+                    context,
+                    content: Text.rich(
+                      TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: '** Vous quittez la page sans avoir '
+                                'cliqué sur Enregistrer ',
+                          ),
+                          WidgetSpan(
+                            child: SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: Icon(
+                                Icons.save,
+                                color: Theme.of(context).primaryColor,
                               ),
                             ),
-                            const TextSpan(
-                              text:
-                                  '. **\n\nToutes vos modifications seront perdues.',
-                            ),
-                          ],
-                        ),
+                          ),
+                          const TextSpan(
+                            text:
+                                '. **\n\nToutes vos modifications seront perdues.',
+                          ),
+                        ],
                       ),
-                    )) {
-                      cancelEditing();
-                      _tabController.animateTo(index);
-                    }
-                  },
-                  controller: _tabController,
-                  tabs: const [
-                    Tab(icon: Icon(Icons.work), text: 'Métiers offerts'),
-                    Tab(icon: Icon(Icons.info_outlined), text: 'À propos'),
-                    Tab(icon: Icon(Icons.assignment), text: 'Stages'),
-                  ],
-                )
-                : null,
-      ),
-      body:
-          widget.hasFullData
-              ? TabBarView(
+                    ),
+                  )) {
+                    cancelEditing();
+                    _tabController.animateTo(index);
+                  }
+                },
                 controller: _tabController,
-                physics: _editing ? const NeverScrollableScrollPhysics() : null,
-                children: [
-                  JobsPage(
-                    key: _jobsPageKey,
-                    enterprise: enterprise,
-                    onAddInternshipRequest: addInternship,
-                  ),
-                  EnterpriseAboutPage(
-                    key: _aboutPageKey,
-                    enterprise: enterprise,
-                  ),
-                  InternshipsPage(
-                    key: _stagePageKey,
-                    enterprise: enterprise,
-                    onAddInternshipRequest: addInternship,
-                  ),
+                tabs: const [
+                  Tab(icon: Icon(Icons.work), text: 'Métiers offerts'),
+                  Tab(icon: Icon(Icons.info_outlined), text: 'À propos'),
+                  Tab(icon: Icon(Icons.assignment), text: 'Stages'),
                 ],
               )
-              : Center(
-                child: CircularProgressIndicator(
-                  color: Theme.of(context).primaryColor,
+            : null,
+      ),
+      body: widget.hasFullData
+          ? TabBarView(
+              controller: _tabController,
+              physics: _editing ? const NeverScrollableScrollPhysics() : null,
+              children: [
+                JobsPage(
+                  key: _jobsPageKey,
+                  enterprise: enterprise,
+                  onAddInternshipRequest: addInternship,
                 ),
+                EnterpriseAboutPage(
+                  key: _aboutPageKey,
+                  enterprise: enterprise,
+                ),
+                InternshipsPage(
+                  key: _stagePageKey,
+                  enterprise: enterprise,
+                  onAddInternshipRequest: addInternship,
+                ),
+              ],
+            )
+          : Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
               ),
+            ),
     );
   }
 }

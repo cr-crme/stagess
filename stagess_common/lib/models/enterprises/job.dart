@@ -173,7 +173,7 @@ class Job extends ItemSerializable {
         'photos': FetchableFields.optional,
         'incidents': FetchableFields.optional,
         'comments': FetchableFields.optional,
-        'reserved_for_id': FetchableFields.optional,
+        'reserved_for_id': FetchableFields.mandatory,
       });
 
   Job.fromSerialized(super.map)

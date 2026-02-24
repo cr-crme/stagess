@@ -233,6 +233,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       await _providerSelector[selectorKey]?.stopFetchingData();
     }
     _providerSelector.clear();
+    _registeredFields.clear();
   }
 
   @override
