@@ -10,6 +10,7 @@ import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
@@ -89,7 +90,6 @@ class InternshipDetails extends StatefulWidget {
 }
 
 class InternshipDetailsState extends State<InternshipDetails> {
-  bool _isExpanded = false;
   bool _editMode = false;
   bool _forceDisabled = false;
   bool get editMode => _editMode;
@@ -278,52 +278,46 @@ class InternshipDetailsState extends State<InternshipDetails> {
       return const Center(child: Text('Vous n\'êtes pas connecté.'));
     }
     return Padding(
-      padding: const EdgeInsets.only(left: 24, right: 24),
-      child: ExpansionPanelList(
+      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      child: AnimatedExpandingCard(
         elevation: 0,
-        expansionCallback: (index, isExpanded) async {
-          if (_isExpanded && _editMode) {
-            if (await preventClosingIfEditing()) return;
+        tappingPermitted: (isExpanded) async {
+          if (_editMode) {
+            if (await preventClosingIfEditing()) return false;
           }
-          setState(() => _isExpanded = !_isExpanded);
+          return true;
         },
-        children: [
-          ExpansionPanel(
-            isExpanded: _isExpanded,
-            canTapOnHeader: true,
-            headerBuilder: (context, isExpanded) => Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Détails du stage',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleLarge!.copyWith(color: Colors.black),
+        initialExpandedState: false,
+        header: (context, isExpanded) => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Détails du contrat de stage',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium!.copyWith(color: Colors.black),
+            ),
+            if (isExpanded &&
+                _internship.isActive &&
+                _internship.supervisingTeacherIds.contains(teacherId))
+              IconButton(
+                onPressed: _forceDisabled ? null : _toggleEditMode,
+                icon: Icon(
+                  editMode ? Icons.save : Icons.edit,
+                  color: _forceDisabled
+                      ? Colors.grey
+                      : Theme.of(context).primaryColor,
                 ),
-                if (_isExpanded &&
-                    _internship.isActive &&
-                    _internship.supervisingTeacherIds.contains(teacherId))
-                  IconButton(
-                    onPressed: _forceDisabled ? null : _toggleEditMode,
-                    icon: Icon(
-                      editMode ? Icons.save : Icons.edit,
-                      color: _forceDisabled
-                          ? Colors.grey
-                          : Theme.of(context).primaryColor,
-                    ),
-                  ),
-              ],
-            ),
-            body: _InternshipBody(
-              internship: _internship,
-              editMode: _editMode,
-              onSave: _toggleEditMode,
-              onRequestChangedDates: _promptDateRange,
-              internshipController: _internshipController,
-            ),
-          ),
-        ],
+              ),
+          ],
+        ),
+        child: _InternshipBody(
+          internship: _internship,
+          editMode: _editMode,
+          onSave: _toggleEditMode,
+          onRequestChangedDates: _promptDateRange,
+          internshipController: _internshipController,
+        ),
       ),
     );
   }

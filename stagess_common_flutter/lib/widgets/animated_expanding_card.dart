@@ -10,6 +10,7 @@ class AnimatedExpandingCard extends StatefulWidget {
     this.canChangeExpandedState = true,
     this.initialExpandedState = false,
     this.preventTapWhenAnimating = true,
+    this.tappingPermitted,
     this.elevation = 10.0,
   });
 
@@ -20,6 +21,7 @@ class AnimatedExpandingCard extends StatefulWidget {
   final bool canChangeExpandedState;
   final bool initialExpandedState;
   final bool preventTapWhenAnimating;
+  final Future<bool> Function(bool currentExpandedState)? tappingPermitted;
   final double elevation;
 
   @override
@@ -67,7 +69,12 @@ class _AnimatedExpandingCardState extends State<AnimatedExpandingCard>
         mainAxisSize: MainAxisSize.min,
         children: [
           InkWell(
-            onTap: () {
+            onTap: () async {
+              if (widget.tappingPermitted != null &&
+                  !await widget.tappingPermitted!(_isExpanded)) {
+                return;
+              }
+
               if (_isAnimating && widget.preventTapWhenAnimating) {
                 return;
               }
@@ -89,13 +96,13 @@ class _AnimatedExpandingCardState extends State<AnimatedExpandingCard>
                 Flexible(child: widget.header(context, _isExpanded)),
                 widget.canChangeExpandedState
                     ? Padding(
-                      padding: const EdgeInsets.only(left: 12.0, right: 16.0),
-                      child: Icon(
-                        _isExpanded ? Icons.expand_less : Icons.expand_more,
-                        size: 30,
-                        color: Colors.grey[700],
-                      ),
-                    )
+                        padding: const EdgeInsets.only(left: 12.0, right: 16.0),
+                        child: Icon(
+                          _isExpanded ? Icons.expand_less : Icons.expand_more,
+                          size: 30,
+                          color: Colors.grey[700],
+                        ),
+                      )
                     : const SizedBox.shrink(),
               ],
             ),
@@ -103,9 +110,9 @@ class _AnimatedExpandingCardState extends State<AnimatedExpandingCard>
           _expandingAnimation.value == 0 && !_isExpanded
               ? Container()
               : SizeTransition(
-                sizeFactor: _expandingTween.animate(_expandingAnimation),
-                child: widget.child,
-              ),
+                  sizeFactor: _expandingTween.animate(_expandingAnimation),
+                  child: widget.child,
+                ),
         ],
       ),
     );

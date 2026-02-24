@@ -7,8 +7,9 @@ import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess/screens/internship_forms/enterprise_steps/enterprise_evaluation_screen.dart';
 import 'package:stagess/screens/student/pages/widgets/internship_details.dart';
-import 'package:stagess/screens/student/pages/widgets/internship_documents.dart';
-import 'package:stagess/screens/student/pages/widgets/internship_evaluations.dart';
+import 'package:stagess/screens/student/pages/widgets/internship_evaluation_attitude.dart';
+import 'package:stagess/screens/student/pages/widgets/internship_evaluation_skill.dart';
+import 'package:stagess/screens/student/pages/widgets/internship_visa.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/student.dart';
@@ -113,7 +114,7 @@ class InternshipsPageState extends State<InternshipsPage> {
           if (closedInternships.isNotEmpty)
             _StudentInternshipListView(
               key: closedKey,
-              title: 'Historique des stages',
+              title: 'Historique',
               internships: closedInternships,
             ),
         ],
@@ -294,9 +295,9 @@ class _StudentInternshipListViewState
                       key: detailKeys[internship.id],
                       internshipId: internship.id,
                     ),
-                    InternshipSkills(internshipId: internship.id),
-                    if (internship.supervisingTeacherIds.contains(teacherId))
-                      InternshipDocuments(internship: internship),
+                    EvaluationSkill(internshipId: internship.id),
+                    EvaluationAttitude(internshipId: internship.id),
+                    InternshipVisa(internshipId: internship.id),
                   ],
                 ),
               );
