@@ -19,36 +19,36 @@ class PrerequisitesExpansionPanel extends ExpansionPanel {
     required Function() onClickEdit,
     required Job job,
   }) : super(
-         canTapOnHeader: true,
-         body: _PrerequisitesBody(
-           key: key,
-           job: job,
-           enterprise: enterprise,
-           isEditing: isEditing,
-         ),
-         headerBuilder:
-             (context, isExpanded) => ListTile(
-               title: Row(
-                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                 children: [
-                   const Text('Prérequis et équipements'),
-                   if (isExpanded)
-                     SizedBox(
-                       width: 50,
-                       height: 50,
-                       child: InkWell(
-                         onTap: onClickEdit,
-                         borderRadius: BorderRadius.circular(25),
-                         child: Icon(
-                           isEditing ? Icons.save : Icons.edit,
-                           color: Theme.of(context).primaryColor,
-                         ),
-                       ),
-                     ),
-                 ],
-               ),
-             ),
-       );
+          canTapOnHeader: true,
+          body: _PrerequisitesBody(
+            key: key,
+            job: job,
+            enterprise: enterprise,
+            isEditing: isEditing,
+            onClickSave: onClickEdit,
+          ),
+          headerBuilder: (context, isExpanded) => ListTile(
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Prérequis et équipements'),
+                if (isExpanded)
+                  SizedBox(
+                    width: 50,
+                    height: 50,
+                    child: InkWell(
+                      onTap: onClickEdit,
+                      borderRadius: BorderRadius.circular(25),
+                      child: Icon(
+                        isEditing ? Icons.save : Icons.edit,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        );
 }
 
 class _PrerequisitesBody extends StatefulWidget {
@@ -57,11 +57,13 @@ class _PrerequisitesBody extends StatefulWidget {
     required this.job,
     required this.enterprise,
     required this.isEditing,
+    required this.onClickSave,
   });
 
   final Job job;
   final Enterprise enterprise;
   final bool isEditing;
+  final Function() onClickSave;
 
   @override
   State<_PrerequisitesBody> createState() => PrerequisitesBodyState();
@@ -79,24 +81,23 @@ class PrerequisitesBodyState extends State<_PrerequisitesBody> {
   late final _uniformRequestKey = ValueKey('${widget.job.id}_uniform_form');
   late final _uniformRequestController =
       RadioWithFollowUpController<UniformStatus>(
-        initialValue: widget.job.uniforms.status,
-      );
+    initialValue: widget.job.uniforms.status,
+  );
   final _uniformTextController = TextEditingController();
   Uniforms get uniforms => Uniforms(
-    status: _uniformRequestController.value!,
-    uniforms:
-        _uniformRequestController.value! == UniformStatus.none
+        status: _uniformRequestController.value!,
+        uniforms: _uniformRequestController.value! == UniformStatus.none
             ? null
             : [_uniformTextController.text],
-  );
+      );
 
   late final _protectionsRadioKey = ValueKey(
     '${widget.job.id}_protections_radio',
   );
   late final _protectionsRadioController =
       RadioWithFollowUpController<ProtectionsStatus>(
-        initialValue: widget.job.protections.status,
-      );
+    initialValue: widget.job.protections.status,
+  );
   late final _protectionsCheckboxKey = ValueKey(
     '${widget.job.id}_protections_checkbox',
   );
@@ -106,12 +107,12 @@ class PrerequisitesBodyState extends State<_PrerequisitesBody> {
         widget.job.protections.protections.map((e) => e.toString()).toList(),
   );
   Protections get protections => Protections(
-    status: _protectionsRadioController.value!,
-    protections:
-        _protectionsRadioController.value! == ProtectionsStatus.none
-            ? []
-            : _protectionsCheckboxController.values,
-  );
+        status: _protectionsRadioController.value!,
+        protections:
+            _protectionsRadioController.value! == ProtectionsStatus.none
+                ? []
+                : _protectionsCheckboxController.values,
+      );
 
   late final _preInternshipRequestKey = ValueKey(
     '${widget.job.id}_preinternship_requests',
@@ -158,10 +159,9 @@ class PrerequisitesBodyState extends State<_PrerequisitesBody> {
     _protectionsCheckboxController.forceSetIfDifferent(
       comparator: CheckboxWithOtherController(
         elements: ProtectionsType.values,
-        initialValues:
-            widget.job.protections.protections
-                .map((e) => e.toString())
-                .toList(),
+        initialValues: widget.job.protections.protections
+            .map((e) => e.toString())
+            .toList(),
       ),
     );
   }
@@ -190,6 +190,12 @@ class PrerequisitesBodyState extends State<_PrerequisitesBody> {
                 const SizedBox(height: 12),
                 _buildProtections(),
                 const SizedBox(height: 12),
+                if (widget.isEditing)
+                  Center(
+                      child: TextButton(
+                          onPressed: widget.onClickSave,
+                          child: const Text('Enregistrer'))),
+                const SizedBox(height: 12),
               ],
             ),
           ),
@@ -208,27 +214,27 @@ class PrerequisitesBodyState extends State<_PrerequisitesBody> {
         ),
         widget.isEditing
             ? Row(
-              children: [
-                SizedBox(
-                  width: 100,
-                  height: 35,
-                  child: TextFormField(
-                    controller: _ageController,
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      final current = int.tryParse(value!);
-                      if (current == null) return 'Préciser';
-                      if (current < 10 || current > 30) {
-                        return 'Entre 10 et 30';
-                      }
-                      return null;
-                    },
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                children: [
+                  SizedBox(
+                    width: 100,
+                    height: 35,
+                    child: TextFormField(
+                      controller: _ageController,
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        final current = int.tryParse(value!);
+                        if (current == null) return 'Préciser';
+                        if (current < 10 || current > 30) {
+                          return 'Entre 10 et 30';
+                        }
+                        return null;
+                      },
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    ),
                   ),
-                ),
-                const Text(' ans'),
-              ],
-            )
+                  const Text(' ans'),
+                ],
+              )
             : Text('${widget.job.minimumAge} ans'),
       ],
     );
@@ -247,33 +253,32 @@ class PrerequisitesBodyState extends State<_PrerequisitesBody> {
         ),
         widget.isEditing
             ? BuildUniformRadio(
-              hideTitle: true,
-              uniformKey: _uniformRequestKey,
-              controller: _uniformRequestController,
-              uniformTextController: _uniformTextController,
-              onChanged: (value) => setState(() {}),
-            )
+                hideTitle: true,
+                uniformKey: _uniformRequestKey,
+                controller: _uniformRequestController,
+                uniformTextController: _uniformTextController,
+                onChanged: (value) => setState(() {}),
+              )
             : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (uniforms.status == UniformStatus.none)
-                  const Text('Aucune consigne de l\'entreprise'),
-                if (uniforms.status == UniformStatus.suppliedByEnterprise)
-                  const Text('Fournie par l\'entreprise\u00a0:'),
-                if (uniforms.status == UniformStatus.suppliedByStudent)
-                  const Text('Fournie par l\'élève\u00a0:'),
-                ItemizedText(uniforms.uniforms),
-              ],
-            ),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (uniforms.status == UniformStatus.none)
+                    const Text('Aucune consigne de l\'entreprise'),
+                  if (uniforms.status == UniformStatus.suppliedByEnterprise)
+                    const Text('Fournie par l\'entreprise\u00a0:'),
+                  if (uniforms.status == UniformStatus.suppliedByStudent)
+                    const Text('Fournie par l\'élève\u00a0:'),
+                  ItemizedText(uniforms.uniforms),
+                ],
+              ),
       ],
     );
   }
 
   Widget _buildEntepriseRequests() {
-    final requests =
-        widget.job.preInternshipRequests.requests
-            .map((e) => e.toString())
-            .toList();
+    final requests = widget.job.preInternshipRequests.requests
+        .map((e) => e.toString())
+        .toList();
     if (widget.job.preInternshipRequests.other != null) {
       requests.add(widget.job.preInternshipRequests.other!);
     }
@@ -286,13 +291,13 @@ class PrerequisitesBodyState extends State<_PrerequisitesBody> {
         ),
         widget.isEditing
             ? BuildPrerequisitesCheckboxes(
-              checkboxKey: _preInternshipRequestKey,
-              controller: _preInternshipRequestsController,
-              hideTitle: true,
-            )
+                checkboxKey: _preInternshipRequestKey,
+                controller: _preInternshipRequestsController,
+                hideTitle: true,
+              )
             : requests.isEmpty
-            ? const Text('Aucune exigence particulière')
-            : ItemizedText(requests),
+                ? const Text('Aucune exigence particulière')
+                : ItemizedText(requests),
       ],
     );
   }
@@ -309,28 +314,28 @@ class PrerequisitesBodyState extends State<_PrerequisitesBody> {
         ),
         widget.isEditing
             ? BuildProtectionsRadio(
-              hideTitle: true,
-              radioKey: _protectionsRadioKey,
-              radioController: _protectionsRadioController,
-              checkboxKey: _protectionsCheckboxKey,
-              checkboxController: _protectionsCheckboxController,
-              onChanged: (status, protections) => setState(() {}),
-            )
+                hideTitle: true,
+                radioKey: _protectionsRadioKey,
+                radioController: _protectionsRadioController,
+                checkboxKey: _protectionsCheckboxKey,
+                checkboxController: _protectionsCheckboxController,
+                onChanged: (status, protections) => setState(() {}),
+              )
             : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (protections.status == ProtectionsStatus.none)
-                  const Text('Aucun équipement requis'),
-                if (protections.status ==
-                    ProtectionsStatus.suppliedByEnterprise)
-                  const Text('Fournis par l\'entreprise\u00a0:'),
-                if (protections.status == ProtectionsStatus.suppliedBySchool)
-                  const Text(
-                    'Non fournis par l\'entreprise.\n L\'élève devra porter\u00a0:',
-                  ),
-                ItemizedText(protections.protections),
-              ],
-            ),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (protections.status == ProtectionsStatus.none)
+                    const Text('Aucun équipement requis'),
+                  if (protections.status ==
+                      ProtectionsStatus.suppliedByEnterprise)
+                    const Text('Fournis par l\'entreprise\u00a0:'),
+                  if (protections.status == ProtectionsStatus.suppliedBySchool)
+                    const Text(
+                      'Non fournis par l\'entreprise.\n L\'élève devra porter\u00a0:',
+                    ),
+                  ItemizedText(protections.protections),
+                ],
+              ),
       ],
     );
   }
