@@ -14,7 +14,6 @@ import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
-import 'package:stagess_common_flutter/widgets/address_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
@@ -45,10 +44,8 @@ class TeacherListTileState extends State<TeacherListTile> {
   final _radioKey = GlobalKey<FormFieldState>();
   Future<bool> validate() async {
     // We do both like so, so all the fields get validated even if one is not valid
-    await _addressController.waitForValidation();
     bool isValid = _formKey.currentState?.validate() ?? false;
     isValid = (_radioKey.currentState?.validate() ?? false) && isValid;
-    isValid = _addressController.isValid && isValid;
     return isValid;
   }
 
@@ -56,7 +53,6 @@ class TeacherListTileState extends State<TeacherListTile> {
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
-    _addressController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
     _disposeCurrentGroupsControllers();
@@ -90,9 +86,6 @@ class TeacherListTileState extends State<TeacherListTile> {
     }
   }
 
-  late final _addressController = AddressController(
-    initialValue: widget.teacher.address,
-  );
   late final _phoneController = TextEditingController(
     text: widget.teacher.phone?.toString() ?? '',
   );
@@ -101,21 +94,21 @@ class TeacherListTileState extends State<TeacherListTile> {
   );
 
   Teacher get editedTeacher => widget.teacher.copyWith(
-    schoolId: _selectedSchoolId,
-    schoolBoardId: widget.schoolBoard.id,
-    firstName: _firstNameController.text,
-    lastName: _lastNameController.text,
-    address:
-        _addressController.address ??
-        Address.empty.copyWith(id: widget.teacher.address?.id),
-    phone: PhoneNumber.fromString(
-      _phoneController.text,
-      id: widget.teacher.phone?.id,
-    ),
-    email: _emailController.text,
-    groups:
-        _currentGroups.map((e) => e.text).where((e) => e.isNotEmpty).toList(),
-  );
+        schoolId: _selectedSchoolId,
+        schoolBoardId: widget.schoolBoard.id,
+        firstName: _firstNameController.text,
+        lastName: _lastNameController.text,
+        address: Address.empty.copyWith(id: widget.teacher.address?.id),
+        phone: PhoneNumber.fromString(
+          _phoneController.text,
+          id: widget.teacher.phone?.id,
+        ),
+        email: _emailController.text,
+        groups: _currentGroups
+            .map((e) => e.text)
+            .where((e) => e.isNotEmpty)
+            .toList(),
+      );
 
   @override
   void initState() {
@@ -166,10 +159,9 @@ class TeacherListTileState extends State<TeacherListTile> {
     if (mounted) {
       showSnackBar(
         context,
-        message:
-            isSuccess
-                ? 'Enseignant supprimé avec succès'
-                : 'Échec de la suppression de l\'enseignant',
+        message: isSuccess
+            ? 'Enseignant supprimé avec succès'
+            : 'Échec de la suppression de l\'enseignant',
       );
     }
     await teachers.releaseLockForItem(widget.teacher);
@@ -203,10 +195,9 @@ class TeacherListTileState extends State<TeacherListTile> {
         if (mounted) {
           showSnackBar(
             context,
-            message:
-                isSuccess
-                    ? 'Enseignant modifié avec succès'
-                    : 'Échec de la modification de l\'enseignant',
+            message: isSuccess
+                ? 'Enseignant modifié avec succès'
+                : 'Échec de la modification de l\'enseignant',
           );
         }
       }
@@ -244,10 +235,6 @@ class TeacherListTileState extends State<TeacherListTile> {
     _firstNameController.text = widget.teacher.firstName;
     _lastNameController.text = widget.teacher.lastName;
 
-    _addressController.setAddress(
-      widget.teacher.address,
-      forceIsValid: widget.teacher.address != null,
-    );
     _phoneController.text = widget.teacher.phone?.toString() ?? '';
     _emailController.text = widget.teacher.email.toString();
 
@@ -281,75 +268,67 @@ class TeacherListTileState extends State<TeacherListTile> {
     return widget.forceEditingMode
         ? _buildEditingForm()
         : AnimatedExpandingCard(
-          expandingDuration: ConfigurationService.expandingTileDuration,
-          initialExpandedState: _isExpanded,
-          onTapHeader: (isExpanded) {
-            setState(() => _isExpanded = isExpanded);
-            _fetchData();
-          },
-          header:
-              (ctx, isExpanded) => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 12.0,
-                      top: 8,
-                      bottom: 8,
-                    ),
-                    child: Text(
-                      '${widget.teacher.firstName} ${widget.teacher.lastName}',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+            expandingDuration: ConfigurationService.expandingTileDuration,
+            initialExpandedState: _isExpanded,
+            onTapHeader: (isExpanded) {
+              setState(() => _isExpanded = isExpanded);
+              _fetchData();
+            },
+            header: (ctx, isExpanded) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 12.0,
+                    top: 8,
+                    bottom: 8,
                   ),
-                  if (_isExpanded)
-                    FutureBuilder(
-                      future: _fetchFullDataCompleter.future,
-                      builder:
-                          (context, snapshot) =>
-                              snapshot.connectionState == ConnectionState.done
-                                  ? Row(
-                                    children: [
-                                      if (widget.canDelete)
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.delete,
-                                            color:
-                                                _forceDisabled
-                                                    ? Colors.grey
-                                                    : Colors.red,
-                                          ),
-                                          onPressed:
-                                              _forceDisabled
-                                                  ? null
-                                                  : _onClickedDeleting,
-                                        ),
-                                      if (widget.canEdit)
-                                        IconButton(
-                                          icon: Icon(
-                                            _isEditing
-                                                ? Icons.save
-                                                : Icons.edit,
-                                            color:
-                                                _forceDisabled
-                                                    ? Colors.grey
-                                                    : Theme.of(
-                                                      context,
-                                                    ).primaryColor,
-                                          ),
-                                          onPressed:
-                                              _forceDisabled
-                                                  ? null
-                                                  : _onClickedEditing,
-                                        ),
-                                    ],
-                                  )
-                                  : const SizedBox.shrink(),
-                    ),
-                ],
-              ),
-          child: _buildEditingForm(),
-        );
+                  child: Text(
+                    '${widget.teacher.firstName} ${widget.teacher.lastName}',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                if (_isExpanded)
+                  FutureBuilder(
+                    future: _fetchFullDataCompleter.future,
+                    builder: (context, snapshot) =>
+                        snapshot.connectionState == ConnectionState.done
+                            ? Row(
+                                children: [
+                                  if (widget.canDelete)
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: _forceDisabled
+                                            ? Colors.grey
+                                            : Colors.red,
+                                      ),
+                                      onPressed: _forceDisabled
+                                          ? null
+                                          : _onClickedDeleting,
+                                    ),
+                                  if (widget.canEdit)
+                                    IconButton(
+                                      icon: Icon(
+                                        _isEditing ? Icons.save : Icons.edit,
+                                        color: _forceDisabled
+                                            ? Colors.grey
+                                            : Theme.of(
+                                                context,
+                                              ).primaryColor,
+                                      ),
+                                      onPressed: _forceDisabled
+                                          ? null
+                                          : _onClickedEditing,
+                                    ),
+                                ],
+                              )
+                            : const SizedBox.shrink(),
+                  ),
+              ],
+            ),
+            child: _buildEditingForm(),
+          );
   }
 
   Widget _buildEditingForm() {
@@ -381,8 +360,6 @@ class TeacherListTileState extends State<TeacherListTile> {
                 const SizedBox(height: 8),
                 _buildName(),
                 const SizedBox(height: 8),
-                _buildAddress(),
-                const SizedBox(height: 8),
                 _buildPhone(),
                 const SizedBox(height: 8),
                 _buildEmail(),
@@ -409,50 +386,49 @@ class TeacherListTileState extends State<TeacherListTile> {
   Widget _buildSchoolSelection() {
     return _isEditing
         ? FormBuilderRadioGroup(
-          key: _radioKey,
-          initialValue: widget.teacher.schoolId,
-          name: 'School selection',
-          orientation: OptionsOrientation.vertical,
-          decoration: InputDecoration(labelText: 'Assigner à une école'),
-          onChanged:
-              (value) => setState(() => _selectedSchoolId = value ?? '-1'),
-          validator: (_) {
-            return _selectedSchoolId == '-1' ? 'Sélectionner une école' : null;
-          },
-          options:
-              widget.schoolBoard.schools
-                  .map(
-                    (e) => FormBuilderFieldOption(
-                      value: e.id,
-                      child: Text(e.name),
-                    ),
-                  )
-                  .toList(),
-        )
+            key: _radioKey,
+            initialValue: widget.teacher.schoolId,
+            name: 'School selection',
+            orientation: OptionsOrientation.vertical,
+            decoration: InputDecoration(labelText: 'Assigner à une école'),
+            onChanged: (value) =>
+                setState(() => _selectedSchoolId = value ?? '-1'),
+            validator: (_) {
+              return _selectedSchoolId == '-1'
+                  ? 'Sélectionner une école'
+                  : null;
+            },
+            options: widget.schoolBoard.schools
+                .map(
+                  (e) => FormBuilderFieldOption(
+                    value: e.id,
+                    child: Text(e.name),
+                  ),
+                )
+                .toList(),
+          )
         : Container();
   }
 
   Widget _buildName() {
     return _isEditing
         ? Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextFormField(
-              controller: _firstNameController,
-              validator:
-                  (value) =>
-                      value?.isEmpty == true ? 'Le prénom est requis' : null,
-              decoration: const InputDecoration(labelText: 'Prénom'),
-            ),
-            TextFormField(
-              controller: _lastNameController,
-              validator:
-                  (value) =>
-                      value?.isEmpty == true ? 'Le nom est requis' : null,
-              decoration: const InputDecoration(labelText: 'Nom de famille'),
-            ),
-          ],
-        )
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: _firstNameController,
+                validator: (value) =>
+                    value?.isEmpty == true ? 'Le prénom est requis' : null,
+                decoration: const InputDecoration(labelText: 'Prénom'),
+              ),
+              TextFormField(
+                controller: _lastNameController,
+                validator: (value) =>
+                    value?.isEmpty == true ? 'Le nom est requis' : null,
+                decoration: const InputDecoration(labelText: 'Nom de famille'),
+              ),
+            ],
+          )
         : Container();
   }
 
@@ -475,18 +451,17 @@ class TeacherListTileState extends State<TeacherListTile> {
                       child: TextFormField(
                         controller: _currentGroups[i],
                         keyboardType: TextInputType.number,
-                        decoration:
-                            i == 0
-                                ? const InputDecoration(labelText: 'Groupes')
-                                : null,
+                        decoration: i == 0
+                            ? const InputDecoration(labelText: 'Groupes')
+                            : null,
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
                         ],
                       ),
                     ),
                     IconButton(
-                      onPressed:
-                          () => setState(() => _currentGroups.removeAt(i)),
+                      onPressed: () =>
+                          setState(() => _currentGroups.removeAt(i)),
                       icon: Icon(Icons.delete, color: Colors.red),
                     ),
                   ],
@@ -495,10 +470,9 @@ class TeacherListTileState extends State<TeacherListTile> {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: TextButton(
-                    onPressed:
-                        () => setState(
-                          () => _currentGroups.add(TextEditingController()),
-                        ),
+                    onPressed: () => setState(
+                      () => _currentGroups.add(TextEditingController()),
+                    ),
                     child: const Text('Ajouter un groupe'),
                   ),
                 ),
@@ -510,24 +484,12 @@ class TeacherListTileState extends State<TeacherListTile> {
     );
   }
 
-  Widget _buildAddress() {
-    return Padding(
-      padding: const EdgeInsets.only(right: 12.0),
-      child: AddressListTile(
-        title: 'Adresse',
-        addressController: _addressController,
-        isMandatory: false,
-        enabled: _isEditing,
-      ),
-    );
-  }
-
   Widget _buildPhone() {
     return PhoneListTile(
       controller: _phoneController,
       isMandatory: false,
       enabled: _isEditing,
-      title: 'Téléphone',
+      title: 'Téléphone professionnel',
     );
   }
 
@@ -558,10 +520,9 @@ class TeacherListTileState extends State<TeacherListTile> {
 
                 showSnackBar(
                   context,
-                  message:
-                      isSuccess
-                          ? 'Compte utilisateur créé avec succès.'
-                          : 'Échec de la création du compte utilisateur.',
+                  message: isSuccess
+                      ? 'Compte utilisateur créé avec succès.'
+                      : 'Échec de la création du compte utilisateur.',
                 );
               },
               child: const Text('Créer un compte'),
@@ -578,10 +539,9 @@ class TeacherListTileState extends State<TeacherListTile> {
 
                 showSnackBar(
                   context,
-                  message:
-                      isSuccess
-                          ? 'Compte utilisateur supprimé avec succès.'
-                          : 'Échec de la suppression du compte utilisateur.',
+                  message: isSuccess
+                      ? 'Compte utilisateur supprimé avec succès.'
+                      : 'Échec de la suppression du compte utilisateur.',
                 );
               },
               child: const Text('Supprimer un compte'),

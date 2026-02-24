@@ -376,7 +376,9 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       if (contains(items['id'])) {
         super.replace(this[items['id']].copyWithData(items), notify: notify);
       } else {
-        super.add(deserializeItem(items), notify: notify);
+        final item = deserializeItem(items);
+        if (item == null) return;
+        super.add(item, notify: notify);
       }
     } else {
       // A map of items was received, callback the add function for each item
