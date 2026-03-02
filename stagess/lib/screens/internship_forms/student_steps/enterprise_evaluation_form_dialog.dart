@@ -303,8 +303,8 @@ class _EnterpriseEvaluationScreenState
                   canModify: false));
 
   final _taskAndAbilityKey = GlobalKey<_TaskAndAbilityStepState>();
-  final _supervisionKey = GlobalKey<SupervisionStepState>();
-  final _specializedStudentsKey = GlobalKey<SpecializedStudentsStepState>();
+  final _supervisionKey = GlobalKey<_SupervisionStepState>();
+  final _specializedStudentsKey = GlobalKey<_SpecializedStudentsStepState>();
   final double _tabHeight = 0.0;
   int _currentStep = 0;
 
@@ -318,6 +318,13 @@ class _EnterpriseEvaluationScreenState
 
   void _nextStep() async {
     _logger.finer('Next step called, current step: $_currentStep');
+    if (!_controller.canModify) {
+      setState(() {
+        _currentStep += 1;
+      });
+      _currentStep > 2 ? _cancel() : _scrollToCurrentTab();
+      return;
+    }
 
     bool valid = false;
     String? message;
@@ -398,11 +405,15 @@ class _EnterpriseEvaluationScreenState
   void _cancel() async {
     _logger.info('Cancel called, current step: $_currentStep');
     final navigator = Navigator.of(context);
-    final answer = await ConfirmExitDialog.show(
-      context,
-      content: const Text('Toutes les modifications seront perdues.'),
-    );
-    if (!mounted || !answer) return;
+
+    if (_controller.canModify) {
+      final answer = await ConfirmExitDialog.show(
+        context,
+        content: const Text('Toutes les modifications seront perdues.'),
+      );
+      if (!mounted || !answer) return;
+    }
+
     _logger.fine('User confirmed exit, navigating back');
     navigator.pop(null);
   }
@@ -416,6 +427,11 @@ class _EnterpriseEvaluationScreenState
     final internships = InternshipsProvider.of(context, listen: false);
     final internship =
         internships.firstWhere((e) => e.id == widget.internshipId);
+
+    if (_currentStep > 2) {
+      // We are probably waiting for the current page to close
+      return SizedBox.shrink();
+    }
 
     return SizedBox(
       width: ResponsiveService.maxBodyWidth,
@@ -456,14 +472,14 @@ class _EnterpriseEvaluationScreenState
                   state: _stepStatus[1],
                   isActive: _currentStep == 1,
                   title: const Text('Encadrement'),
-                  content: SupervisionStep(
+                  content: _SupervisionStep(
                       key: _supervisionKey, controller: _controller),
                 ),
                 Step(
                   state: _stepStatus[2],
                   isActive: _currentStep == 2,
                   title: const Text('Clientèle\nspécialisée'),
-                  content: SpecializedStudentsStep(
+                  content: _SpecializedStudentsStep(
                     key: _specializedStudentsKey,
                     controller: _controller,
                   ),
@@ -494,7 +510,7 @@ class _EnterpriseEvaluationScreenState
           TextButton(
             onPressed: details.onStepContinue,
             child: _currentStep == 2
-                ? const Text('Confirmer')
+                ? Text(_controller.canModify ? 'Confirmer' : 'Fermer')
                 : const Text('Suivant'),
           ),
         ],
@@ -708,8 +724,8 @@ class _TaskAndAbilityStepState extends State<_TaskAndAbilityStep> {
   }
 }
 
-class SupervisionStep extends StatefulWidget {
-  const SupervisionStep({
+class _SupervisionStep extends StatefulWidget {
+  const _SupervisionStep({
     super.key,
     required this.controller,
   });
@@ -717,10 +733,10 @@ class SupervisionStep extends StatefulWidget {
   final EnterpriseEvaluationFormController controller;
 
   @override
-  State<SupervisionStep> createState() => SupervisionStepState();
+  State<_SupervisionStep> createState() => _SupervisionStepState();
 }
 
-class SupervisionStepState extends State<SupervisionStep> {
+class _SupervisionStepState extends State<_SupervisionStep> {
   final _formKey = GlobalKey<FormState>();
 
   Future<String?> validate() async {
@@ -906,17 +922,17 @@ class _Comments extends StatelessWidget {
   }
 }
 
-class SpecializedStudentsStep extends StatefulWidget {
-  const SpecializedStudentsStep({super.key, required this.controller});
+class _SpecializedStudentsStep extends StatefulWidget {
+  const _SpecializedStudentsStep({super.key, required this.controller});
 
   final EnterpriseEvaluationFormController controller;
 
   @override
-  State<SpecializedStudentsStep> createState() =>
-      SpecializedStudentsStepState();
+  State<_SpecializedStudentsStep> createState() =>
+      _SpecializedStudentsStepState();
 }
 
-class SpecializedStudentsStepState extends State<SpecializedStudentsStep> {
+class _SpecializedStudentsStepState extends State<_SpecializedStudentsStep> {
   final _formKey = GlobalKey<FormState>();
 
   Future<String?> validate() async {

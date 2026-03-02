@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 /// See also:
 ///
 ///  * [WidgetBuilder], which is similar but only takes a [BuildContext].
-typedef ControlsWidgetBuilder =
-    Widget Function(BuildContext context, ControlsDetails details);
+typedef ControlsWidgetBuilder = Widget Function(
+    BuildContext context, ControlsDetails details);
 
 const TextStyle _kStepStyle = TextStyle(fontSize: 12.0, color: Colors.white);
 const Color _kErrorLight = Colors.red;
@@ -239,10 +239,9 @@ class _ScrollableStepperState extends State<ScrollableStepper>
         return Text(
           '${index + 1}',
           // coverage:ignore-start
-          style:
-              isDarkActive
-                  ? _kStepStyle.copyWith(color: Colors.black87)
-                  : _kStepStyle,
+          style: isDarkActive
+              ? _kStepStyle.copyWith(color: Colors.black87)
+              : _kStepStyle,
           // coverage:ignore-end
         );
       case StepState.editing:
@@ -342,10 +341,9 @@ class _ScrollableStepperState extends State<ScrollableStepper>
         firstCurve: const Interval(0.0, 0.6, curve: Curves.fastOutSlowIn),
         secondCurve: const Interval(0.4, 1.0, curve: Curves.fastOutSlowIn),
         sizeCurve: Curves.fastOutSlowIn,
-        crossFadeState:
-            widget.steps[index].state == StepState.error
-                ? CrossFadeState.showSecond
-                : CrossFadeState.showFirst,
+        crossFadeState: widget.steps[index].state == StepState.error
+            ? CrossFadeState.showSecond
+            : CrossFadeState.showFirst,
         duration: kThemeAnimationDuration,
       );
       // coverage:ignore-end
@@ -414,8 +412,7 @@ class _ScrollableStepperState extends State<ScrollableStepper>
                   return states.contains(WidgetState.disabled)
                       ? null
                       : (_isDark()
-                          ? colorScheme
-                              .onSurface // coverage:ignore-line
+                          ? colorScheme.onSurface // coverage:ignore-line
                           : colorScheme.onPrimary);
                 }),
                 backgroundColor: WidgetStateProperty.resolveWith<Color?>((
@@ -434,8 +431,7 @@ class _ScrollableStepperState extends State<ScrollableStepper>
               ),
               child: Text(
                 themeData.useMaterial3
-                    ? localizations
-                        .continueButtonLabel // coverage:ignore-line
+                    ? localizations.continueButtonLabel // coverage:ignore-line
                     : localizations.continueButtonLabel.toUpperCase(),
               ),
             ),
@@ -450,8 +446,7 @@ class _ScrollableStepperState extends State<ScrollableStepper>
                 ),
                 child: Text(
                   themeData.useMaterial3
-                      ? localizations
-                          .cancelButtonLabel // coverage:ignore-line
+                      ? localizations.cancelButtonLabel // coverage:ignore-line
                       : localizations.cancelButtonLabel.toUpperCase(),
                 ),
               ),
@@ -605,8 +600,7 @@ class _ScrollableStepperState extends State<ScrollableStepper>
         AnimatedCrossFade(
           firstChild: Container(height: 0.0),
           secondChild: Container(
-            margin:
-                widget.margin ??
+            margin: widget.margin ??
                 const EdgeInsetsDirectional.only(
                   start: 60.0,
                   end: 24.0,
@@ -622,10 +616,9 @@ class _ScrollableStepperState extends State<ScrollableStepper>
           firstCurve: const Interval(0.0, 0.6, curve: Curves.fastOutSlowIn),
           secondCurve: const Interval(0.4, 1.0, curve: Curves.fastOutSlowIn),
           sizeCurve: Curves.fastOutSlowIn,
-          crossFadeState:
-              _isCurrent(index)
-                  ? CrossFadeState.showSecond
-                  : CrossFadeState.showFirst,
+          crossFadeState: _isCurrent(index)
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
           duration: kThemeAnimationDuration,
         ),
       ],
@@ -643,20 +636,19 @@ class _ScrollableStepperState extends State<ScrollableStepper>
             key: _keys[i],
             children: <Widget>[
               InkWell(
-                onTap:
-                    widget.steps[i].state != StepState.disabled
-                        ? () {
-                          // In the vertical case we need to scroll to the newly tapped
-                          // step.
-                          Scrollable.ensureVisible(
-                            _keys[i].currentContext!,
-                            curve: Curves.fastOutSlowIn,
-                            duration: kThemeAnimationDuration,
-                          );
+                onTap: widget.steps[i].state != StepState.disabled
+                    ? () {
+                        // In the vertical case we need to scroll to the newly tapped
+                        // step.
+                        Scrollable.ensureVisible(
+                          _keys[i].currentContext!,
+                          curve: Curves.fastOutSlowIn,
+                          duration: kThemeAnimationDuration,
+                        );
 
-                          widget.onStepTapped?.call(i);
-                        }
-                        : null,
+                        widget.onStepTapped?.call(i);
+                      }
+                    : null,
                 canRequestFocus: widget.steps[i].state != StepState.disabled,
                 child: _buildVerticalHeader(i),
               ),
@@ -671,12 +663,11 @@ class _ScrollableStepperState extends State<ScrollableStepper>
     final List<Widget> children = <Widget>[
       for (int i = 0; i < widget.steps.length; i += 1) ...<Widget>[
         InkResponse(
-          onTap:
-              widget.steps[i].state != StepState.disabled
-                  ? () {
-                    widget.onStepTapped?.call(i);
-                  }
-                  : null,
+          onTap: widget.steps[i].state != StepState.disabled
+              ? () {
+                  widget.onStepTapped?.call(i);
+                }
+              : null,
           canRequestFocus: widget.steps[i].state != StepState.disabled,
           child: Row(
             children: <Widget>[
@@ -741,9 +732,12 @@ class _ScrollableStepperState extends State<ScrollableStepper>
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: stepPanels,
               ),
-              _buildVerticalControls(widget.currentStep),
             ],
           ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(right: 24.0),
+          child: _buildVerticalControls(widget.currentStep),
         ),
       ],
     );

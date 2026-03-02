@@ -460,38 +460,44 @@ class _SkillEvaluationMainScreenState
         body: PopScope(
           child: student == null
               ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                  child: Builder(
-                    builder: (context) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _EvaluationDate(
-                            formController: _formController,
-                            editMode: _editMode,
-                          ),
-                          _PersonAtMeeting(
-                            formController: _formController,
-                            editMode: _editMode,
-                          ),
-                          if (_editMode) _buildAutofillChooser(),
-                          _JobToEvaluate(
-                            formController: _formController,
-                            editMode: _editMode,
-                          ),
-                          _EvaluationTypeChoser(
-                            formController: _formController,
-                            editMode: _editMode,
-                          ),
-                          _StartEvaluation(
-                            rootContext: widget.rootContext,
-                            formController: _formController,
-                            editMode: _editMode,
-                          ),
-                        ],
-                      );
-                    },
-                  ),
+              : Column(
+                  children: [
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Builder(
+                          builder: (context) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _EvaluationDate(
+                                  formController: _formController,
+                                  editMode: _editMode,
+                                ),
+                                _PersonAtMeeting(
+                                  formController: _formController,
+                                  editMode: _editMode,
+                                ),
+                                if (_editMode) _buildAutofillChooser(),
+                                _JobToEvaluate(
+                                  formController: _formController,
+                                  editMode: _editMode,
+                                ),
+                                _EvaluationTypeChoser(
+                                  formController: _formController,
+                                  editMode: _editMode,
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    _StartEvaluation(
+                      rootContext: widget.rootContext,
+                      formController: _formController,
+                      editMode: _editMode,
+                    ),
+                  ],
                 ),
         ),
       ),

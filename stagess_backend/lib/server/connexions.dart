@@ -380,6 +380,8 @@ class Connexions {
         RequestType.get => 'get-requested',
         RequestType.post => 'post-requested',
         RequestType.delete => 'delete-requested',
+        RequestType.getLock => 'get-lock-requested',
+        RequestType.releaseLock => 'release-lock-requested',
         _ => 'invalid-requested',
       };
       final request = protocol.data?['id'] != null
