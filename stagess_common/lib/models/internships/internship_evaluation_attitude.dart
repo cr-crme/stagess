@@ -3,30 +3,23 @@ import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship_evaluation.dart';
 
 class AttitudeEvaluation extends ItemSerializable {
-  Inattendance inattendance;
   Ponctuality ponctuality;
-  Sociability sociability;
-  Politeness politeness;
-  Motivation motivation;
-  DressCode dressCode;
+  Inattendance inattendance;
   QualityOfWork qualityOfWork;
   Productivity productivity;
-  Autonomy autonomy;
-  Cautiousness cautiousness;
-  GeneralAppreciation generalAppreciation;
+  TeamCommunication teamCommunication;
+  RespectOfAuthority respectOfAuthority;
+  CommunicationAboutSst communicationAboutSst;
+  SelfControl selfControl;
+  TakeInitiative takeInitiative;
+  Adaptability adaptability;
 
   List<String> _fromRequirements(int min, int max) {
     List<String> out = [];
-    if (isBetween(inattendance, min, max)) out.add(Inattendance.title);
-    if (isBetween(ponctuality, min, max)) out.add(Ponctuality.title);
-    if (isBetween(sociability, min, max)) out.add(Sociability.title);
-    if (isBetween(politeness, min, max)) out.add(Politeness.title);
-    if (isBetween(motivation, min, max)) out.add(Motivation.title);
-    if (isBetween(dressCode, min, max)) out.add(DressCode.title);
-    if (isBetween(qualityOfWork, min, max)) out.add(QualityOfWork.title);
-    if (isBetween(productivity, min, max)) out.add(Productivity.title);
-    if (isBetween(autonomy, min, max)) out.add(Autonomy.title);
-    if (isBetween(cautiousness, min, max)) out.add(Cautiousness.title);
+    if (isBetween(ponctuality, min, max)) out.add(Ponctuality._(-1).title);
+    if (isBetween(inattendance, min, max)) out.add(Inattendance._(-1).title);
+    if (isBetween(qualityOfWork, min, max)) out.add(QualityOfWork._(-1).title);
+    if (isBetween(productivity, min, max)) out.add(Productivity._(-1).title);
     return out;
   }
 
@@ -35,64 +28,64 @@ class AttitudeEvaluation extends ItemSerializable {
 
   AttitudeEvaluation({
     super.id,
-    required this.inattendance,
     required this.ponctuality,
-    required this.sociability,
-    required this.politeness,
-    required this.motivation,
-    required this.dressCode,
+    required this.inattendance,
     required this.qualityOfWork,
     required this.productivity,
-    required this.autonomy,
-    required this.cautiousness,
-    required this.generalAppreciation,
+    required this.teamCommunication,
+    required this.respectOfAuthority,
+    required this.communicationAboutSst,
+    required this.selfControl,
+    required this.takeInitiative,
+    required this.adaptability,
   });
   AttitudeEvaluation.fromSerialized(super.map)
-      : inattendance = Inattendance.fromIndex(map?['inattendance'] ?? -1),
-        ponctuality = Ponctuality.fromIndex(map?['ponctuality'] ?? -1),
-        sociability = Sociability.fromIndex(map?['sociability'] ?? -1),
-        politeness = Politeness.fromIndex(map?['politeness'] ?? -1),
-        motivation = Motivation.fromIndex(map?['motivation'] ?? -1),
-        dressCode = DressCode.fromIndex(map?['dressCode'] ?? -1),
+      : ponctuality = Ponctuality.fromIndex(map?['ponctuality'] ?? -1),
+        inattendance = Inattendance.fromIndex(map?['inattendance'] ?? -1),
         qualityOfWork = QualityOfWork.fromIndex(map?['quality_of_work'] ?? -1),
         productivity = Productivity.fromIndex(map?['productivity'] ?? -1),
-        autonomy = Autonomy.fromIndex(map?['autonomy'] ?? -1),
-        cautiousness = Cautiousness.fromIndex(map?['cautiousness'] ?? -1),
-        generalAppreciation =
-            GeneralAppreciation.fromIndex(map?['general_appreciation'] ?? -1),
+        teamCommunication =
+            TeamCommunication.fromIndex(map?['team_communication'] ?? -1),
+        respectOfAuthority =
+            RespectOfAuthority.fromIndex(map?['respect_of_authority'] ?? -1),
+        communicationAboutSst = CommunicationAboutSst.fromIndex(
+            map?['communication_about_sst'] ?? -1),
+        selfControl = SelfControl.fromIndex(map?['self_control'] ?? -1),
+        takeInitiative =
+            TakeInitiative.fromIndex(map?['take_initiative'] ?? -1),
+        adaptability = Adaptability.fromIndex(map?['adaptability'] ?? -1),
         super.fromSerialized();
 
   @override
   Map<String, dynamic> serializedMap() {
+    // TODO Update database
     return {
       'id': id,
-      'inattendance': inattendance.index,
       'ponctuality': ponctuality.index,
-      'sociability': sociability.index,
-      'politeness': politeness.index,
-      'motivation': motivation.index,
-      'dressCode': dressCode.index,
+      'inattendance': inattendance.index,
       'quality_of_work': qualityOfWork.index,
       'productivity': productivity.index,
-      'autonomy': autonomy.index,
-      'cautiousness': cautiousness.index,
-      'general_appreciation': generalAppreciation.index,
+      'team_communication': teamCommunication.index,
+      'respect_of_authority': respectOfAuthority.index,
+      'communication_about_sst': communicationAboutSst.index,
+      'self_control': selfControl.index,
+      'take_initiative': takeInitiative.index,
+      'adaptability': adaptability.index,
     };
   }
 
   @override
   String toString() {
-    return 'AttitudeEvaluation{inattendance: ${inattendance.name}, '
-        'ponctuality: ${ponctuality.name}, '
-        'sociability: ${sociability.name}, '
-        'politeness: ${politeness.name}, '
-        'motivation: ${motivation.name}, '
-        'dressCode: ${dressCode.name}, '
+    return 'ponctuality: ${ponctuality.name}, '
+        'AttitudeEvaluation{inattendance: ${inattendance.name}, '
         'qualityOfWork: ${qualityOfWork.name}, '
         'productivity: ${productivity.name}, '
-        'autonomy: ${autonomy.name}, '
-        'cautiousness: ${cautiousness.name}, '
-        'generalAppreciation: ${generalAppreciation.name}}';
+        'teamCommunication: ${teamCommunication.name}, '
+        'respectOfAuthority: ${respectOfAuthority.name}, '
+        'communicationAboutSst: ${communicationAboutSst.name}, '
+        'selfControl: ${selfControl.name}, '
+        'takeInitiative: ${takeInitiative.name}, '
+        'adaptability: ${adaptability.name}';
   }
 }
 
@@ -104,7 +97,6 @@ class InternshipEvaluationAttitude extends InternshipEvaluation {
 
   List<String> presentAtEvaluation;
   AttitudeEvaluation attitude;
-  String comments;
   String
       formVersion; // The version of the evaluation form (so data can be parsed properly)
 
@@ -113,7 +105,6 @@ class InternshipEvaluationAttitude extends InternshipEvaluation {
     required this.date,
     required this.presentAtEvaluation,
     required this.attitude,
-    required this.comments,
     required this.formVersion,
   });
   InternshipEvaluationAttitude.fromSerialized(super.map)
@@ -123,7 +114,6 @@ class InternshipEvaluationAttitude extends InternshipEvaluation {
         presentAtEvaluation =
             (map?['present'] as List?)?.map((e) => e as String).toList() ?? [],
         attitude = AttitudeEvaluation.fromSerialized(map?['attitude'] ?? {}),
-        comments = map?['comments'] ?? '',
         formVersion = map?['form_version'] ?? currentVersion,
         super.fromSerialized();
 
@@ -134,7 +124,6 @@ class InternshipEvaluationAttitude extends InternshipEvaluation {
       'date': date.millisecondsSinceEpoch,
       'present': presentAtEvaluation,
       'attitude': attitude.serialize(),
-      'comments': comments,
       'form_version': formVersion,
     };
   }
@@ -144,7 +133,6 @@ class InternshipEvaluationAttitude extends InternshipEvaluation {
         'date': FetchableFields.optional,
         'present': FetchableFields.optional,
         'attitude': FetchableFields.optional,
-        'comments': FetchableFields.optional,
         'form_version': FetchableFields.mandatory,
       });
 
@@ -152,65 +140,30 @@ class InternshipEvaluationAttitude extends InternshipEvaluation {
   String toString() {
     return 'InternshipEvaluationAttitude(date: $date, '
         'presentAtEvaluation: $presentAtEvaluation, '
-        'attitude: $attitude, '
-        'comments: $comments)';
+        'attitude: $attitude, ';
   }
 }
 
 abstract class AttitudeCategoryEnum {
   String get name;
+  String get title;
+  String get definition;
   int get index;
+  String? get extraInformation;
+  List<AttitudeCategoryEnum> get validElements;
 }
 
 bool isBetween(AttitudeCategoryEnum category, int min, int max) {
   return category.index >= min && category.index <= max;
 }
 
-class Inattendance implements AttitudeCategoryEnum {
-  static String get title => 'Assiduité';
-
-  @override
-  final int index;
-
-  @override
-  String get name {
-    switch (index) {
-      case -1:
-        return 'Non évalué';
-      case 0:
-        return 'Aucune absence';
-      case 1:
-        return 'S\'absente rarement et avise';
-      case 2:
-        return 'Quelques absences injustifiées';
-      case 3:
-        return 'Absences fréquentes et injustifiées';
-      default:
-        // This should be unreachable code
-        throw 'Wrong choice of $title'; // coverage:ignore-line
-    }
-  }
-
-  const Inattendance._(this.index);
-  static Inattendance get notEvaluated => const Inattendance._(-1);
-  static Inattendance get never => const Inattendance._(0);
-  static Inattendance get rarely => const Inattendance._(1);
-  static Inattendance get sometime => const Inattendance._(2);
-  static Inattendance get frequently => const Inattendance._(3);
-
-  static Inattendance fromIndex(int index) =>
-      index < 0 ? Inattendance.notEvaluated : Inattendance.values[index];
-
-  static List<Inattendance> get values => [
-        Inattendance.never,
-        Inattendance.rarely,
-        Inattendance.sometime,
-        Inattendance.frequently,
-      ];
-}
-
 class Ponctuality implements AttitudeCategoryEnum {
-  static String get title => 'Ponctualité';
+  @override
+  String get title => 'Ponctualité';
+
+  @override
+  String get definition =>
+      'Capacité à respecter les horaires de travail et à être prêt à commencer ses tâches';
 
   @override
   final int index;
@@ -221,39 +174,52 @@ class Ponctuality implements AttitudeCategoryEnum {
       case -1:
         return 'Non évalué';
       case 0:
-        return 'Toujours à l\'heure';
+        return 'Est présent à l\'heure prévue à son poste de travail et prêt à travailler';
       case 1:
-        return 'Quelques retards justifiés';
+        return 'Est souvent présent à l\'heure prévue à son poste de travail et prêt à travailler';
       case 2:
-        return 'Quelques retards injustifiés';
+        return 'A quelques retards';
       case 3:
-        return 'Retards fréquents et injustifiés';
+        return 'A des retards fréquents';
       default:
         // This should be unreachable code
         throw 'Wrong choice of $title'; // coverage:ignore-line
     }
   }
+
+  @override
+  String? get extraInformation =>
+      'Moments observables : Heure de début, retour de pauses, \n'
+      'Retards justifiés : transport adapté, transport en commun, rendez-vous médical, ...';
 
   const Ponctuality._(this.index);
   static Ponctuality get notEvaluated => const Ponctuality._(-1);
-  static Ponctuality get highly => const Ponctuality._(0);
-  static Ponctuality get mostly => const Ponctuality._(1);
-  static Ponctuality get sometimeLate => const Ponctuality._(2);
-  static Ponctuality get frequentlyLate => const Ponctuality._(3);
+  static Ponctuality get veryHigh => const Ponctuality._(0);
+  static Ponctuality get high => const Ponctuality._(1);
+  static Ponctuality get low => const Ponctuality._(2);
+  static Ponctuality get insufficient => const Ponctuality._(3);
 
   static Ponctuality fromIndex(int index) =>
       index < 0 ? Ponctuality.notEvaluated : Ponctuality.values[index];
 
   static List<Ponctuality> get values => [
-        Ponctuality.highly,
-        Ponctuality.mostly,
-        Ponctuality.sometimeLate,
-        Ponctuality.frequentlyLate,
+        Ponctuality.veryHigh,
+        Ponctuality.high,
+        Ponctuality.low,
+        Ponctuality.insufficient,
       ];
+
+  @override
+  List<Ponctuality> get validElements => Ponctuality.values;
 }
 
-class Sociability implements AttitudeCategoryEnum {
-  static String get title => 'Sociabilité';
+class Inattendance implements AttitudeCategoryEnum {
+  @override
+  String get title => 'Assiduité';
+
+  @override
+  String get definition =>
+      'Être présent de façon régulière à son lieu de travail';
 
   @override
   final int index;
@@ -264,168 +230,52 @@ class Sociability implements AttitudeCategoryEnum {
       case -1:
         return 'Non évalué';
       case 0:
-        return 'Très sociable';
+        return 'Est présent';
       case 1:
-        return 'Sociable';
+        return 'A quelques absences';
       case 2:
-        return 'Établit très peu de contacts';
+        return 'S\'absente souvent, même avec rappels';
       case 3:
-        return 'Pas d\'intégration à l\'équipe de travail';
+        return 'Ne se présente pas ou ne respecte pas son horaire de travail';
       default:
         // This should be unreachable code
         throw 'Wrong choice of $title'; // coverage:ignore-line
     }
   }
 
-  const Sociability._(this.index);
-  static Sociability get notEvaluated => const Sociability._(-1);
-  static Sociability get veryHigh => const Sociability._(0);
-  static Sociability get high => const Sociability._(1);
-  static Sociability get low => const Sociability._(2);
-  static Sociability get veryLow => const Sociability._(3);
+  @override
+  String? get extraInformation => null;
 
-  static Sociability fromIndex(int index) =>
-      index < 0 ? Sociability.notEvaluated : Sociability.values[index];
+  const Inattendance._(this.index);
+  static Inattendance get notEvaluated => const Inattendance._(-1);
+  static Inattendance get veryHigh => const Inattendance._(0);
+  static Inattendance get high => const Inattendance._(1);
+  static Inattendance get low => const Inattendance._(2);
+  static Inattendance get insufficient => const Inattendance._(3);
 
-  static List<Sociability> get values => [
-        Sociability.veryHigh,
-        Sociability.high,
-        Sociability.low,
-        Sociability.veryLow,
+  static Inattendance fromIndex(int index) =>
+      index < 0 ? Inattendance.notEvaluated : Inattendance.values[index];
+
+  static List<Inattendance> get values => [
+        Inattendance.veryHigh,
+        Inattendance.high,
+        Inattendance.low,
+        Inattendance.insufficient,
       ];
-}
-
-class Politeness implements AttitudeCategoryEnum {
-  static String get title => 'Politesse et langage';
 
   @override
-  final int index;
-
-  @override
-  String get name {
-    switch (index) {
-      case -1:
-        return 'Non évalué';
-      case 0:
-        return 'Langage exemplaire en tout temps';
-      case 1:
-        return 'Langage convenable en tout temps';
-      case 2:
-        return 'Langage convenable la plupart du temps';
-      case 3:
-        return 'Langage inapproprié';
-      default:
-        // This should be unreachable code
-        throw 'Wrong choice of $title'; // coverage:ignore-line
-    }
-  }
-
-  const Politeness._(this.index);
-  static Politeness get notEvaluated => const Politeness._(-1);
-  static Politeness get exemplary => const Politeness._(0);
-  static Politeness get alwaysSuitable => const Politeness._(1);
-  static Politeness get mostlySuitable => const Politeness._(2);
-  static Politeness get inappropriate => const Politeness._(3);
-
-  static Politeness fromIndex(int index) =>
-      index < 0 ? Politeness.notEvaluated : Politeness.values[index];
-
-  static List<Politeness> get values => [
-        Politeness.exemplary,
-        Politeness.alwaysSuitable,
-        Politeness.mostlySuitable,
-        Politeness.inappropriate,
-      ];
-}
-
-class Motivation implements AttitudeCategoryEnum {
-  static String get title => 'Motivation';
-
-  @override
-  final int index;
-
-  @override
-  String get name {
-    switch (index) {
-      case -1:
-        return 'Non évalué';
-      case 0:
-        return 'Très grand intérêt pour son travail';
-      case 1:
-        return 'Intérêt marqué';
-      case 2:
-        return 'Peu d\'intérêt';
-      case 3:
-        return 'Aucun intérêt';
-      default:
-        // This should be unreachable code
-        throw 'Wrong choice of $title'; // coverage:ignore-line
-    }
-  }
-
-  const Motivation._(this.index);
-  static Motivation get notEvaluated => const Motivation._(-1);
-  static Motivation get veryHigh => const Motivation._(0);
-  static Motivation get high => const Motivation._(1);
-  static Motivation get low => const Motivation._(2);
-  static Motivation get none => const Motivation._(3);
-
-  static Motivation fromIndex(int index) =>
-      index < 0 ? Motivation.notEvaluated : Motivation.values[index];
-
-  static List<Motivation> get values => [
-        Motivation.veryHigh,
-        Motivation.high,
-        Motivation.low,
-        Motivation.none,
-      ];
-}
-
-class DressCode implements AttitudeCategoryEnum {
-  static String get title => 'Tenue vestimentaire';
-
-  @override
-  final int index;
-
-  @override
-  String get name {
-    switch (index) {
-      case -1:
-        return 'Non évalué';
-      case 0:
-        return 'Très soignée, très propre';
-      case 1:
-        return 'Soignée et propre';
-      case 2:
-        return 'Négligée';
-      case 3:
-        return 'Très négligée, malpropre';
-      default:
-        // This should be unreachable code
-        throw 'Wrong choice of $title'; // coverage:ignore-line
-    }
-  }
-
-  const DressCode._(this.index);
-  static DressCode get notEvaluated => const DressCode._(-1);
-  static DressCode get highlyAppropriate => const DressCode._(0);
-  static DressCode get appropriate => const DressCode._(1);
-  static DressCode get poorlyAppropriate => const DressCode._(2);
-  static DressCode get notAppropriate => const DressCode._(3);
-
-  static DressCode fromIndex(int index) =>
-      index < 0 ? DressCode.notEvaluated : DressCode.values[index];
-
-  static List<DressCode> get values => [
-        DressCode.highlyAppropriate,
-        DressCode.appropriate,
-        DressCode.poorlyAppropriate,
-        DressCode.notAppropriate,
-      ];
+  List<Inattendance> get validElements => Inattendance.values;
 }
 
 class QualityOfWork implements AttitudeCategoryEnum {
-  static String get title => 'Qualité du travail';
+  @override
+  String get title => 'Qualité du travail';
+
+  @override
+  String get definition =>
+      'L\'accomplissement des tâches requises en tenant compte des exigences associées '
+      'à la compétence spécifique, en utilisant les méthodes et les techniques '
+      'appropriées et en respectant les dispositions légales et réglementaires';
 
   @override
   final int index;
@@ -436,25 +286,29 @@ class QualityOfWork implements AttitudeCategoryEnum {
       case -1:
         return 'Non évalué';
       case 0:
-        return 'S\'applique et travail avec précision';
+        return 'Respecte les exigences en appliquant les méthodes et techniques requises';
       case 1:
-        return 'Commet quelques erreurs, mais persévère';
+        return 'Persévère malgré quelques erreurs dans l\'application des méthodes et techniques';
       case 2:
-        return 'Manque d\'application et/ou exige une supervision';
+        return 'Applique difficilement les méthodes et techniques requises avec le soutien';
       case 3:
-        return 'Comment souvent des erreurs et néglige les méthodes de travail';
+        return 'N\'applique pas les méthodes et techniques requises malgré le soutien';
+
       default:
         // This should be unreachable code
         throw 'Wrong choice of $title'; // coverage:ignore-line
     }
   }
+
+  @override
+  String? get extraInformation => null;
 
   const QualityOfWork._(this.index);
   static QualityOfWork get notEvaluated => const QualityOfWork._(-1);
   static QualityOfWork get veryHigh => const QualityOfWork._(0);
   static QualityOfWork get high => const QualityOfWork._(1);
   static QualityOfWork get low => const QualityOfWork._(2);
-  static QualityOfWork get negligent => const QualityOfWork._(3);
+  static QualityOfWork get insufficient => const QualityOfWork._(3);
 
   static QualityOfWork fromIndex(int index) =>
       index < 0 ? QualityOfWork.notEvaluated : QualityOfWork.values[index];
@@ -463,12 +317,22 @@ class QualityOfWork implements AttitudeCategoryEnum {
         QualityOfWork.veryHigh,
         QualityOfWork.high,
         QualityOfWork.low,
-        QualityOfWork.negligent,
+        QualityOfWork.insufficient,
       ];
+
+  @override
+  List<QualityOfWork> get validElements => QualityOfWork.values;
 }
 
 class Productivity implements AttitudeCategoryEnum {
-  static String get title => 'Rendement et constance';
+  @override
+  String get title => 'Rendement et constance';
+
+  @override
+  String get definition =>
+      'Capacité de l\'élève à fournir la production attendue tout en adoptant des '
+      'comportements sains et sécuritaires (ex. : organisation, sens de la priorisation, '
+      'gestion de la pression temporelle...)';
 
   @override
   final int index;
@@ -479,18 +343,21 @@ class Productivity implements AttitudeCategoryEnum {
       case -1:
         return 'Non évalué';
       case 0:
-        return 'Rendement et rythme de travail excellents';
+        return 'Offre toujours le rendement et le rythme de travail attendus';
       case 1:
-        return 'Rendement et rythme de travail bons et constants';
+        return 'Offre régulièrement le rendement et le rythme de travail attendus';
       case 2:
-        return 'Difficulté à maintenir le rythme de travail';
+        return 'Offre avec soutien le rendement et le rythme de travail attendu';
       case 3:
-        return 'Rendement insuffisant';
+        return 'N\'offre pas le rendement et le rythme de travail attendu malgré le soutien';
       default:
         // This should be unreachable code
         throw 'Wrong choice of $title'; // coverage:ignore-line
     }
   }
+
+  @override
+  String? get extraInformation => null;
 
   const Productivity._(this.index);
   static Productivity get notEvaluated => const Productivity._(-1);
@@ -508,10 +375,20 @@ class Productivity implements AttitudeCategoryEnum {
         Productivity.low,
         Productivity.insufficient,
       ];
+
+  @override
+  List<Productivity> get validElements => Productivity.values;
 }
 
-class Autonomy implements AttitudeCategoryEnum {
-  static String get title => 'Autonomie et sens de l\'initiative';
+class TeamCommunication implements AttitudeCategoryEnum {
+  @override
+  String get title => 'Communication avec l\'équipe';
+
+  @override
+  String get definition =>
+      'Capacité de l\'élève à interagir avec son entourage pour échanger des informations, '
+      'pour organiser et coordonner le travail, recevoir des instructions ou prendre '
+      'part à d\'autres activités nécessitant des échanges';
 
   @override
   final int index;
@@ -522,40 +399,52 @@ class Autonomy implements AttitudeCategoryEnum {
       case -1:
         return 'Non évalué';
       case 0:
-        return 'Prend très souvent de bonnes initiatives';
+        return 'Communique de façon claire, précise et adaptée au milieu';
       case 1:
-        return 'Prend souvent de bonnes initiatives';
+        return 'Communique généralement de façon claire, précise et adaptée au milieu';
       case 2:
-        return 'Peu d\'initiative';
+        return 'Communique difficilement ou le message est hors contexte';
       case 3:
-        return 'Aucune initiative';
+        return 'Ne communique pas ou communique de façon inadéquate';
       default:
         // This should be unreachable code
         throw 'Wrong choice of $title'; // coverage:ignore-line
     }
   }
 
-  const Autonomy._(this.index);
-  static Autonomy get notEvaluated => const Autonomy._(-1);
-  static Autonomy get veryHigh => const Autonomy._(0);
-  static Autonomy get high => const Autonomy._(1);
-  static Autonomy get low => const Autonomy._(2);
-  static Autonomy get none => const Autonomy._(3);
+  @override
+  String? get extraInformation => null;
 
-  static Autonomy fromIndex(int index) =>
-      index < 0 ? Autonomy.notEvaluated : Autonomy.values[index];
+  const TeamCommunication._(this.index);
+  static TeamCommunication get notEvaluated => const TeamCommunication._(-1);
+  static TeamCommunication get veryHigh => const TeamCommunication._(0);
+  static TeamCommunication get high => const TeamCommunication._(1);
+  static TeamCommunication get low => const TeamCommunication._(2);
+  static TeamCommunication get insufficient => const TeamCommunication._(3);
 
-  static List<Autonomy> get values => [
-        Autonomy.veryHigh,
-        Autonomy.high,
-        Autonomy.low,
-        Autonomy.none,
+  static TeamCommunication fromIndex(int index) => index < 0
+      ? TeamCommunication.notEvaluated
+      : TeamCommunication.values[index];
+
+  static List<TeamCommunication> get values => [
+        TeamCommunication.veryHigh,
+        TeamCommunication.high,
+        TeamCommunication.low,
+        TeamCommunication.insufficient,
       ];
+
+  @override
+  List<TeamCommunication> get validElements => TeamCommunication.values;
 }
 
-class Cautiousness implements AttitudeCategoryEnum {
-  static String get title =>
-      'Respect des règles de santé et de sécurité du travail (SST)';
+class RespectOfAuthority implements AttitudeCategoryEnum {
+  @override
+  String get title => 'Respect des personnes en autorité';
+
+  @override
+  String get definition =>
+      'Adoption d\'une attitude d\'écoute et d\'ouverture à l\'égard des directives '
+      'et des explications dans ses échanges avec une personne en autorité';
 
   @override
   final int index;
@@ -566,39 +455,53 @@ class Cautiousness implements AttitudeCategoryEnum {
       case -1:
         return 'Non évalué';
       case 0:
-        return 'Toujours';
+        return 'Exprime ses besoins et démontre de l\'ouverture à recevoir la rétroaction';
       case 1:
-        return 'Souvent';
+        return 'A besoin du support pour exprimer ses besoins tout en démontrant de l\'ouverture à recevoir la rétroaction';
       case 2:
-        return 'Parfois';
+        return 'A de la difficulté à exprimer ses besoins et à accepter la rétroaction';
       case 3:
-        return 'Rarement';
+        return 'N\'exprime pas ses besoins et n\'est pas à l\'écoute de la rétroaction';
       default:
         // This should be unreachable code
         throw 'Wrong choice of $title'; // coverage:ignore-line
     }
   }
 
-  const Cautiousness._(this.index);
-  static Cautiousness get notEvaluated => const Cautiousness._(-1);
-  static Cautiousness get always => const Cautiousness._(0);
-  static Cautiousness get mostly => const Cautiousness._(1);
-  static Cautiousness get sometime => const Cautiousness._(2);
-  static Cautiousness get rarely => const Cautiousness._(3);
+  @override
+  String? get extraInformation =>
+      'S\'il s\'absente ou est en retard, il informe l\'employeur et son superviseur de stage';
 
-  static Cautiousness fromIndex(int index) =>
-      index < 0 ? Cautiousness.notEvaluated : Cautiousness.values[index];
+  const RespectOfAuthority._(this.index);
+  static RespectOfAuthority get notEvaluated => const RespectOfAuthority._(-1);
+  static RespectOfAuthority get veryHigh => const RespectOfAuthority._(0);
+  static RespectOfAuthority get high => const RespectOfAuthority._(1);
+  static RespectOfAuthority get low => const RespectOfAuthority._(2);
+  static RespectOfAuthority get insufficient => const RespectOfAuthority._(3);
 
-  static List<Cautiousness> get values => [
-        Cautiousness.always,
-        Cautiousness.mostly,
-        Cautiousness.sometime,
-        Cautiousness.rarely,
+  static RespectOfAuthority fromIndex(int index) => index < 0
+      ? RespectOfAuthority.notEvaluated
+      : RespectOfAuthority.values[index];
+
+  static List<RespectOfAuthority> get values => [
+        RespectOfAuthority.veryHigh,
+        RespectOfAuthority.high,
+        RespectOfAuthority.low,
+        RespectOfAuthority.insufficient,
       ];
+
+  @override
+  List<RespectOfAuthority> get validElements => RespectOfAuthority.values;
 }
 
-class GeneralAppreciation implements AttitudeCategoryEnum {
-  static String get title => 'Appréciation générale du ou de la stagiaire';
+class CommunicationAboutSst implements AttitudeCategoryEnum {
+  @override
+  String get title =>
+      'Communication au sujet de la santé et sécurité au travail';
+
+  @override
+  String get definition =>
+      'Capacité de l\'élève à reconnaître les risques et à adopter un comportement sécuritaire';
 
   @override
   final int index;
@@ -609,35 +512,208 @@ class GeneralAppreciation implements AttitudeCategoryEnum {
       case -1:
         return 'Non évalué';
       case 0:
-        return 'Dépasse les attentes';
+        return 'Identifie toujours les risques et agit de manière préventive en adoptant un comportement sécuritaire';
       case 1:
-        return 'Répond aux attentes';
+        return 'Identifie certains risques et agit parfois de manière préventive';
       case 2:
-        return 'Répond minimalement aux attentes';
+        return 'Identifie les risques et agit avec soutien afin d\'adopter le comportement sécuritaire enseigné';
       case 3:
-        return 'Ne répond pas aux attentes';
+        return 'N\'identifie pas les risques ou n\'adopte pas le comportement sécuritaire enseigné';
       default:
         // This should be unreachable code
         throw 'Wrong choice of $title'; // coverage:ignore-line
     }
   }
 
-  const GeneralAppreciation._(this.index);
-  static GeneralAppreciation get notEvaluated =>
-      const GeneralAppreciation._(-1);
-  static GeneralAppreciation get veryHigh => const GeneralAppreciation._(0);
-  static GeneralAppreciation get good => const GeneralAppreciation._(1);
-  static GeneralAppreciation get passable => const GeneralAppreciation._(2);
-  static GeneralAppreciation get failed => const GeneralAppreciation._(3);
+  @override
+  String? get extraInformation => null;
 
-  static GeneralAppreciation fromIndex(int index) => index < 0
-      ? GeneralAppreciation.notEvaluated
-      : GeneralAppreciation.values[index];
+  const CommunicationAboutSst._(this.index);
+  static CommunicationAboutSst get notEvaluated =>
+      const CommunicationAboutSst._(-1);
+  static CommunicationAboutSst get veryHigh => const CommunicationAboutSst._(0);
+  static CommunicationAboutSst get high => const CommunicationAboutSst._(1);
+  static CommunicationAboutSst get low => const CommunicationAboutSst._(2);
+  static CommunicationAboutSst get insufficient =>
+      const CommunicationAboutSst._(3);
 
-  static List<GeneralAppreciation> get values => [
-        GeneralAppreciation.veryHigh,
-        GeneralAppreciation.good,
-        GeneralAppreciation.passable,
-        GeneralAppreciation.failed,
+  static CommunicationAboutSst fromIndex(int index) => index < 0
+      ? CommunicationAboutSst.notEvaluated
+      : CommunicationAboutSst.values[index];
+
+  static List<CommunicationAboutSst> get values => [
+        CommunicationAboutSst.veryHigh,
+        CommunicationAboutSst.high,
+        CommunicationAboutSst.low,
+        CommunicationAboutSst.insufficient,
       ];
+
+  @override
+  List<CommunicationAboutSst> get validElements => CommunicationAboutSst.values;
+}
+
+class SelfControl implements AttitudeCategoryEnum {
+  @override
+  String get title => 'Maîtrise de soi';
+
+  @override
+  String get definition =>
+      'L\'action de se contrôler dans un contexte de travail. L\'élève utilise des '
+      'stratégies efficaces pour gérer ses émotions dans des situations délicates';
+
+  @override
+  final int index;
+
+  @override
+  String get name {
+    switch (index) {
+      case -1:
+        return 'Non évalué';
+      case 0:
+        return 'Utilise toujours des stratégies efficaces pour gérer ses émotions';
+      case 1:
+        return 'Utilise régulièrement des stratégies efficaces pour gérer ses émotions';
+      case 2:
+        return 'A besoin de soutien pour gérer ses émotions';
+      case 3:
+        return 'N\'utilise pas ses stratégies malgré le soutien offert';
+      default:
+        // This should be unreachable code
+        throw 'Wrong choice of $title'; // coverage:ignore-line
+    }
+  }
+
+  @override
+  String? get extraInformation => null;
+
+  const SelfControl._(this.index);
+  static SelfControl get notEvaluated => const SelfControl._(-1);
+  static SelfControl get veryHigh => const SelfControl._(0);
+  static SelfControl get high => const SelfControl._(1);
+  static SelfControl get low => const SelfControl._(2);
+  static SelfControl get insufficient => const SelfControl._(3);
+
+  static SelfControl fromIndex(int index) =>
+      index < 0 ? SelfControl.notEvaluated : SelfControl.values[index];
+
+  static List<SelfControl> get values => [
+        SelfControl.veryHigh,
+        SelfControl.high,
+        SelfControl.low,
+        SelfControl.insufficient,
+      ];
+
+  @override
+  List<SelfControl> get validElements => SelfControl.values;
+}
+
+class TakeInitiative implements AttitudeCategoryEnum {
+  @override
+  String get title => 'Prise d\'initiative';
+
+  @override
+  String get definition =>
+      'Capacité de l\'élève à agir de façon autonome et proactive dans les tâches';
+
+  @override
+  final int index;
+
+  @override
+  String get name {
+    switch (index) {
+      case -1:
+        return 'Non évalué';
+      case 0:
+        return 'Prend très souvent des initiatives pertinentes selon les situations';
+      case 1:
+        return 'Prend des initiatives dans certaines situations';
+      case 2:
+        return 'Prend rarement des initiatives et attend souvent les directives';
+      case 3:
+        return 'Ne prend pas d\'initiative, n\'agit que sur demande';
+      default:
+        // This should be unreachable code
+        throw 'Wrong choice of $title'; // coverage:ignore-line
+    }
+  }
+
+  @override
+  String? get extraInformation => null;
+
+  const TakeInitiative._(this.index);
+  static TakeInitiative get notEvaluated => const TakeInitiative._(-1);
+  static TakeInitiative get veryHigh => const TakeInitiative._(0);
+  static TakeInitiative get high => const TakeInitiative._(1);
+  static TakeInitiative get low => const TakeInitiative._(2);
+  static TakeInitiative get insufficient => const TakeInitiative._(3);
+
+  static TakeInitiative fromIndex(int index) =>
+      index < 0 ? TakeInitiative.notEvaluated : TakeInitiative.values[index];
+
+  static List<TakeInitiative> get values => [
+        TakeInitiative.veryHigh,
+        TakeInitiative.high,
+        TakeInitiative.low,
+        TakeInitiative.insufficient,
+      ];
+
+  @override
+  List<TakeInitiative> get validElements => TakeInitiative.values;
+}
+
+class Adaptability implements AttitudeCategoryEnum {
+  @override
+  String get title => 'Adaptation aux changements';
+
+  @override
+  String get definition =>
+      'Utilisation de stratégies favorisant l\'adaptabilité au milieu de travail '
+      '(ex : s\'inspirer des bons modèles de travailleurs)';
+
+  @override
+  final int index;
+
+  @override
+  String get name {
+    switch (index) {
+      case -1:
+        return 'Non évalué';
+      case 0:
+        return 'S\'ajuste en fonction des changements qui surviennent ou qui lui sont demandés';
+      case 1:
+        return 'S\'ajuste souvent en fonction des changements qui surviennent ou qui lui sont demandés';
+      case 2:
+        return 'S\'ajuste avec un soutien ponctuel';
+      case 3:
+        return 'N\'arrive pas à s\'ajuster';
+      default:
+        // This should be unreachable code
+        throw 'Wrong choice of $title'; // coverage:ignore-line
+    }
+  }
+
+  @override
+  String? get extraInformation =>
+      'Nouvelles tâches, changement de tâches, imprévus, changement de travailleur '
+      'parrain, changement horaire';
+
+  const Adaptability._(this.index);
+  static Adaptability get notEvaluated => const Adaptability._(-1);
+  static Adaptability get veryHigh => const Adaptability._(0);
+  static Adaptability get high => const Adaptability._(1);
+  static Adaptability get low => const Adaptability._(2);
+  static Adaptability get insufficient => const Adaptability._(3);
+
+  static Adaptability fromIndex(int index) =>
+      index < 0 ? Adaptability.notEvaluated : Adaptability.values[index];
+
+  static List<Adaptability> get values => [
+        Adaptability.veryHigh,
+        Adaptability.high,
+        Adaptability.low,
+        Adaptability.insufficient,
+      ];
+
+  @override
+  List<Adaptability> get validElements => Adaptability.values;
 }

@@ -18,8 +18,26 @@ Future<Uint8List> generateAttitudeEvaluationPdf(
     {required String internshipId, required String evaluationId}) async {
   _logger.info(
       'Generating attitude evaluation PDF for internship: $internshipId, evaluationId: $evaluationId');
+
   final controller = AttitudeEvaluationFormController.fromInternshipId(context,
       internshipId: internshipId, evaluationId: evaluationId);
+
+  final workingSituations = [
+    controller.ponctuality,
+    controller.inattendance,
+    controller.qualityOfWork,
+    controller.productivity,
+  ];
+  final relationshipWithOthers = [
+    controller.teamCommunication,
+    controller.respectOfAuthority,
+    controller.communicationAboutSst,
+  ];
+  final autonomyAndAdaptability = [
+    controller.selfControl,
+    controller.takeInitiative,
+    controller.adaptability,
+  ];
 
   final document = pw.Document(pageMode: PdfPageMode.outlines);
 
@@ -36,68 +54,63 @@ Future<Uint8List> generateAttitudeEvaluationPdf(
         pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
           _buildPersonsPresent(controller: controller),
           pw.SizedBox(height: 24),
-          _buildAttitudeTile(
-              title: '1. ${Inattendance.title}',
-              controller: controller,
-              elements: Inattendance.values),
-          pw.SizedBox(height: 24),
-          _buildAttitudeTile(
-              title: '2. ${Ponctuality.title}',
-              controller: controller,
-              elements: Ponctuality.values),
-          pw.SizedBox(height: 24),
-          _buildAttitudeTile(
-              title: '3. ${Sociability.title}',
-              controller: controller,
-              elements: Sociability.values),
-          pw.SizedBox(height: 24),
-          _buildAttitudeTile(
-              title: '4. ${Politeness.title}',
-              controller: controller,
-              elements: Politeness.values),
-          pw.SizedBox(height: 24),
-          _buildAttitudeTile(
-              title: '5. ${Motivation.title}',
-              controller: controller,
-              elements: Motivation.values),
-          pw.SizedBox(height: 24),
-          _buildAttitudeTile(
-              title: '6. ${DressCode.title}',
-              controller: controller,
-              elements: DressCode.values),
-          pw.SizedBox(height: 24),
-          _buildAttitudeTile(
-              title: '7. ${QualityOfWork.title}',
-              controller: controller,
-              elements: QualityOfWork.values),
-          pw.SizedBox(height: 24),
-          _buildAttitudeTile(
-              title: '8. ${Productivity.title}',
-              controller: controller,
-              elements: Productivity.values),
-          pw.SizedBox(height: 24),
-          _buildAttitudeTile(
-              title: '9. ${Autonomy.title}',
-              controller: controller,
-              elements: Autonomy.values),
-          pw.SizedBox(height: 24),
-          _buildAttitudeTile(
-              title: '10. ${Cautiousness.title}',
-              controller: controller,
-              elements: Cautiousness.values),
-          pw.SizedBox(height: 24),
-          _buildAttitudeTile(
-              title: '11. ${GeneralAppreciation.title}',
-              controller: controller,
-              elements: GeneralAppreciation.values),
-          pw.SizedBox(height: 24),
-          _buildGeneralComments(controller: controller),
+          _subTitle('Situation de travail'),
+          ...workingSituations.asMap().keys.map(
+            (index) {
+              final element = workingSituations[index];
+              return pw.Padding(
+                  padding: pw.EdgeInsets.only(bottom: 24.0),
+                  child: _buildAttitudeTile(
+                    title: '${index + 1}. ${element.title}',
+                    definition: element.definition,
+                    groupValue: element,
+                    elements: element.validElements,
+                  ));
+            },
+          ),
+          _subTitle('Relation avec les autres'),
+          ...relationshipWithOthers.asMap().keys.map(
+            (index) {
+              final element = relationshipWithOthers[index];
+              return pw.Padding(
+                  padding: pw.EdgeInsets.only(bottom: 24.0),
+                  child: _buildAttitudeTile(
+                    title:
+                        '${index + workingSituations.length + 1}. ${element.title}',
+                    definition: element.definition,
+                    groupValue: element,
+                    elements: element.validElements,
+                  ));
+            },
+          ),
+          _subTitle('Autonomie et adaptabilité'),
+          ...autonomyAndAdaptability.asMap().keys.map(
+            (index) {
+              final element = autonomyAndAdaptability[index];
+              return pw.Padding(
+                  padding: pw.EdgeInsets.only(bottom: 24.0),
+                  child: _buildAttitudeTile(
+                    title:
+                        '${index + workingSituations.length + relationshipWithOthers.length + 1}. ${element.title}',
+                    definition: element.definition,
+                    groupValue: element,
+                    elements: element.validElements,
+                  ));
+            },
+          ),
         ])
       ],
     ),
   );
 
   return document.save();
+}
+
+pw.Widget _subTitle(String text) {
+  return pw.Padding(
+    padding: pw.EdgeInsets.only(bottom: 8),
+    child: pw.Text(text, style: _textStyleBold.copyWith(fontSize: 14)),
+  );
 }
 
 pw.Widget _buildPersonsPresent({
@@ -120,67 +133,44 @@ pw.Widget _buildPersonsPresent({
 
 pw.Widget _buildAttitudeTile({
   required String title,
+  required String definition,
+  required AttitudeCategoryEnum groupValue,
   required List<AttitudeCategoryEnum> elements,
-  required AttitudeEvaluationFormController controller,
 }) {
-  return controller.responses[elements[0].runtimeType] == null
-      ? pw.Container()
-      : pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            pw.Text('$title :', style: _textStyleBold),
-            ...elements.map((element) => pw.Padding(
-                padding: pw.EdgeInsets.only(top: 8),
-                child: pw.Row(
-                  crossAxisAlignment: pw.CrossAxisAlignment.center,
-                  mainAxisSize: pw.MainAxisSize.min,
-                  children: [
-                    pw.Container(
-                      width: 12,
-                      height: 12,
-                      decoration: pw.BoxDecoration(
-                        shape: pw.BoxShape.circle,
-                        border: pw.Border.all(color: PdfColors.black),
-                      ),
-                      child:
-                          controller.responses[element.runtimeType] == element
-                              ? pw.Center(
-                                  child: pw.Container(
-                                    width: 6,
-                                    height: 6,
-                                    decoration: pw.BoxDecoration(
-                                      shape: pw.BoxShape.circle,
-                                      color: PdfColors.black,
-                                    ),
-                                  ),
-                                )
-                              : pw.Container(),
-                    ),
-                    pw.SizedBox(width: 4),
-                    pw.Text(element.name, style: _textStyle),
-                  ],
-                ))),
-          ],
-        );
-}
-
-pw.Widget _buildGeneralComments(
-    {required AttitudeEvaluationFormController controller}) {
   return pw.Column(
     crossAxisAlignment: pw.CrossAxisAlignment.start,
     children: [
-      pw.Text('Commentaires généraux :', style: _textStyleBold),
-      pw.SizedBox(height: 8),
-      pw.Container(
-        width: double.infinity,
-        decoration: pw.BoxDecoration(
-          border: pw.Border.all(color: PdfColors.black),
-        ),
-        child: pw.Padding(
-            padding: pw.EdgeInsets.all(8),
-            child:
-                pw.Text(controller.commentsController.text, style: _textStyle)),
-      ),
+      pw.Text('$title :', style: _textStyleBold),
+      ...elements.map((element) => pw.Padding(
+          padding: pw.EdgeInsets.only(top: 8),
+          child: pw.Row(
+            crossAxisAlignment: pw.CrossAxisAlignment.center,
+            mainAxisSize: pw.MainAxisSize.min,
+            children: [
+              pw.Container(
+                width: 12,
+                height: 12,
+                decoration: pw.BoxDecoration(
+                  shape: pw.BoxShape.circle,
+                  border: pw.Border.all(color: PdfColors.black),
+                ),
+                child: groupValue == element
+                    ? pw.Center(
+                        child: pw.Container(
+                          width: 6,
+                          height: 6,
+                          decoration: pw.BoxDecoration(
+                            shape: pw.BoxShape.circle,
+                            color: PdfColors.black,
+                          ),
+                        ),
+                      )
+                    : pw.Container(),
+              ),
+              pw.SizedBox(width: 4),
+              pw.Text(element.name, style: _textStyle),
+            ],
+          ))),
     ],
   );
 }

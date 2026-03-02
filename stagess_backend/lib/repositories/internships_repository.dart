@@ -226,7 +226,21 @@ class MySqlInternshipsRepository extends InternshipsRepository {
           sqlInterface.selectSubquery(
             dataTableName: 'internship_attitude_evaluations',
             asName: 'attitude_evaluations',
-            fieldsToFetch: ['id', 'date', 'comments', 'form_version'],
+            fieldsToFetch: [
+              'id',
+              'date',
+              'ponctuality',
+              'inattendance',
+              'quality_of_work',
+              'productivity',
+              'team_communication',
+              'respect_of_authority',
+              'communication_about_sst',
+              'self_control',
+              'take_initiative',
+              'adaptability',
+              'form_version'
+            ],
             idNameToDataTable: 'internship_id',
           ),
           sqlInterface.selectSubquery(
@@ -449,7 +463,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
                 user: user,
                 tableName: 'internship_attitude_evaluations',
                 filters: {
-              'id': evaluation['id']
+              'id': evaluation['id'],
             },
                 subqueries: [
               sqlInterface.selectSubquery(
@@ -457,31 +471,22 @@ class MySqlInternshipsRepository extends InternshipsRepository {
                 asName: 'present',
                 fieldsToFetch: ['person_name'],
                 idNameToDataTable: 'evaluation_id',
-              ),
-              sqlInterface.selectSubquery(
-                dataTableName: 'internship_attitude_evaluation_items',
-                asName: 'attitude',
-                fieldsToFetch: [
-                  'id',
-                  'evaluation_id',
-                  'inattendance',
-                  'ponctuality',
-                  'sociability',
-                  'politeness',
-                  'motivation',
-                  'dressCode',
-                  'quality_of_work',
-                  'productivity',
-                  'autonomy',
-                  'cautiousness',
-                  'general_appreciation',
-                ],
-                idNameToDataTable: 'evaluation_id',
-              ),
+              )
             ]))
             .first;
 
-        evaluation['attitude'] = (evaluationSubquery['attitude'] as List).first;
+        evaluation['attitude'] = {
+          'ponctuality': evaluation['ponctuality'],
+          'inattendance': evaluation['inattendance'],
+          'quality_of_work': evaluation['quality_of_work'],
+          'productivity': evaluation['productivity'],
+          'team_communication': evaluation['team_communication'],
+          'respect_of_authority': evaluation['respect_of_authority'],
+          'communication_about_sst': evaluation['communication_about_sst'],
+          'self_control': evaluation['self_control'],
+          'take_initiative': evaluation['take_initiative'],
+          'adaptability': evaluation['adaptability'],
+        };
         evaluation['present'] = [
           for (final person in (evaluationSubquery['present'] as List? ?? []))
             person['person_name']
@@ -893,7 +898,18 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             'id': evaluation['id'],
             'internship_id': internship.id,
             'date': evaluation['date'],
-            'comments': evaluation['comments'],
+            'ponctuality': evaluation['attitude']['ponctuality'],
+            'inattendance': evaluation['attitude']['inattendance'],
+            'quality_of_work': evaluation['attitude']['quality_of_work'],
+            'productivity': evaluation['attitude']['productivity'],
+            'team_communication': evaluation['attitude']['team_communication'],
+            'respect_of_authority': evaluation['attitude']
+                ['respect_of_authority'],
+            'communication_about_sst': evaluation['attitude']
+                ['communication_about_sst'],
+            'self_control': evaluation['attitude']['self_control'],
+            'take_initiative': evaluation['attitude']['take_initiative'],
+            'adaptability': evaluation['attitude']['adaptability'],
             'form_version': evaluation['form_version'],
           });
 
@@ -906,26 +922,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
               'person_name': name,
             });
       }
-
-      // Insert the attitude
-      await sqlInterface.performInsertQuery(
-          tableName: 'internship_attitude_evaluation_items',
-          data: {
-            'id': evaluation['attitude']['id'],
-            'evaluation_id': evaluation['id'],
-            'inattendance': evaluation['attitude']['inattendance'],
-            'ponctuality': evaluation['attitude']['ponctuality'],
-            'sociability': evaluation['attitude']['sociability'],
-            'politeness': evaluation['attitude']['politeness'],
-            'motivation': evaluation['attitude']['motivation'],
-            'dressCode': evaluation['attitude']['dressCode'],
-            'quality_of_work': evaluation['attitude']['quality_of_work'],
-            'productivity': evaluation['attitude']['productivity'],
-            'autonomy': evaluation['attitude']['autonomy'],
-            'cautiousness': evaluation['attitude']['cautiousness'],
-            'general_appreciation': evaluation['attitude']
-                ['general_appreciation']
-          });
     }
   }
 

@@ -8,122 +8,65 @@ import '../utils.dart';
 void main() {
   group('InternshipEvaluation', () {
     group('Attitude', () {
-      test('"Inattendance" shows the right things', () {
-        expect(Inattendance.title, 'Assiduité');
-        expect(Inattendance.never.name, 'Aucune absence');
-        expect(Inattendance.rarely.name, 'S\'absente rarement et avise');
-        expect(Inattendance.sometime.name, 'Quelques absences injustifiées');
-        expect(Inattendance.frequently.name,
-            'Absences fréquentes et injustifiées');
-        expect(Inattendance.values.length, 4);
-
-        expect(Inattendance.never.index, 0);
-        expect(Inattendance.rarely.index, 1);
-        expect(Inattendance.sometime.index, 2);
-        expect(Inattendance.frequently.index, 3);
-      });
-
       test('"Ponctuality" shows the right things', () {
-        expect(Ponctuality.title, 'Ponctualité');
-        expect(Ponctuality.highly.name, 'Toujours à l\'heure');
-        expect(Ponctuality.mostly.name, 'Quelques retards justifiés');
-        expect(Ponctuality.sometimeLate.name, 'Quelques retards injustifiés');
-        expect(Ponctuality.frequentlyLate.name,
-            'Retards fréquents et injustifiés');
+        expect(Ponctuality.notEvaluated.title, 'Ponctualité');
+        expect(Ponctuality.veryHigh.name,
+            'Est présent à l\'heure prévue à son poste de travail et prêt à travailler');
+        expect(Ponctuality.high.name,
+            'Est souvent présent à l\'heure prévue à son poste de travail et prêt à travailler');
+        expect(Ponctuality.low.name, 'A quelques retards');
+        expect(Ponctuality.insufficient.name, 'A des retards fréquents');
         expect(Ponctuality.values.length, 4);
 
-        expect(Ponctuality.highly.index, 0);
-        expect(Ponctuality.mostly.index, 1);
-        expect(Ponctuality.sometimeLate.index, 2);
-        expect(Ponctuality.frequentlyLate.index, 3);
+        expect(Ponctuality.veryHigh.index, 0);
+        expect(Ponctuality.high.index, 1);
+        expect(Ponctuality.low.index, 2);
+        expect(Ponctuality.insufficient.index, 3);
       });
 
-      test('"Sociability" shows the right things', () {
-        expect(Sociability.title, 'Sociabilité');
-        expect(Sociability.veryHigh.name, 'Très sociable');
-        expect(Sociability.high.name, 'Sociable');
-        expect(Sociability.low.name, 'Établit très peu de contacts');
-        expect(Sociability.veryLow.name,
-            'Pas d\'intégration à l\'équipe de travail');
-        expect(Sociability.values.length, 4);
+      test('"Inattendance" shows the right things', () {
+        expect(Inattendance.notEvaluated.title, 'Assiduité');
+        expect(Inattendance.veryHigh.name, 'Est présent');
+        expect(Inattendance.high.name, 'A quelques absences');
+        expect(Inattendance.low.name, 'S\'absente souvent, même avec rappels');
+        expect(Inattendance.insufficient.name,
+            'Ne se présente pas ou ne respecte pas son horaire de travail');
+        expect(Inattendance.values.length, 4);
 
-        expect(Sociability.veryHigh.index, 0);
-        expect(Sociability.high.index, 1);
-        expect(Sociability.low.index, 2);
-        expect(Sociability.veryLow.index, 3);
-      });
-
-      test('"Politeness" shows the right things', () {
-        expect(Politeness.title, 'Politesse et langage');
-        expect(Politeness.exemplary.name, 'Langage exemplaire en tout temps');
-        expect(
-            Politeness.alwaysSuitable.name, 'Langage convenable en tout temps');
-        expect(Politeness.mostlySuitable.name,
-            'Langage convenable la plupart du temps');
-        expect(Politeness.inappropriate.name, 'Langage inapproprié');
-        expect(Politeness.values.length, 4);
-
-        expect(Politeness.exemplary.index, 0);
-        expect(Politeness.alwaysSuitable.index, 1);
-        expect(Politeness.mostlySuitable.index, 2);
-        expect(Politeness.inappropriate.index, 3);
-      });
-
-      test('"Motivation" shows the right things', () {
-        expect(Motivation.title, 'Motivation');
-        expect(Motivation.veryHigh.name, 'Très grand intérêt pour son travail');
-        expect(Motivation.high.name, 'Intérêt marqué');
-        expect(Motivation.low.name, 'Peu d\'intérêt');
-        expect(Motivation.none.name, 'Aucun intérêt');
-        expect(Motivation.values.length, 4);
-
-        expect(Motivation.veryHigh.index, 0);
-        expect(Motivation.high.index, 1);
-        expect(Motivation.low.index, 2);
-        expect(Motivation.none.index, 3);
-      });
-
-      test('"DressCode" shows the right things', () {
-        expect(DressCode.title, 'Tenue vestimentaire');
-        expect(DressCode.highlyAppropriate.name, 'Très soignée, très propre');
-        expect(DressCode.appropriate.name, 'Soignée et propre');
-        expect(DressCode.poorlyAppropriate.name, 'Négligée');
-        expect(DressCode.notAppropriate.name, 'Très négligée, malpropre');
-        expect(DressCode.values.length, 4);
-
-        expect(DressCode.highlyAppropriate.index, 0);
-        expect(DressCode.appropriate.index, 1);
-        expect(DressCode.poorlyAppropriate.index, 2);
-        expect(DressCode.notAppropriate.index, 3);
+        expect(Inattendance.veryHigh.index, 0);
+        expect(Inattendance.high.index, 1);
+        expect(Inattendance.low.index, 2);
+        expect(Inattendance.insufficient.index, 3);
       });
 
       test('"QualityOfWork" shows the right things', () {
-        expect(QualityOfWork.title, 'Qualité du travail');
+        expect(QualityOfWork.notEvaluated.title, 'Qualité du travail');
         expect(QualityOfWork.veryHigh.name,
-            'S\'applique et travail avec précision');
-        expect(
-            QualityOfWork.high.name, 'Commet quelques erreurs, mais persévère');
+            'Respecte les exigences en appliquant les méthodes et techniques requises');
+        expect(QualityOfWork.high.name,
+            'Persévère malgré quelques erreurs dans l\'application des méthodes et techniques');
         expect(QualityOfWork.low.name,
-            'Manque d\'application et/ou exige une supervision');
-        expect(QualityOfWork.negligent.name,
-            'Comment souvent des erreurs et néglige les méthodes de travail');
+            'Applique difficilement les méthodes et techniques requises avec le soutien');
+        expect(QualityOfWork.insufficient.name,
+            'N\'applique pas les méthodes et techniques requises malgré le soutien');
         expect(QualityOfWork.values.length, 4);
 
         expect(QualityOfWork.veryHigh.index, 0);
         expect(QualityOfWork.high.index, 1);
         expect(QualityOfWork.low.index, 2);
-        expect(QualityOfWork.negligent.index, 3);
+        expect(QualityOfWork.insufficient.index, 3);
       });
 
       test('"Productivity" shows the right things', () {
-        expect(Productivity.title, 'Rendement et constance');
+        expect(Productivity.notEvaluated.title, 'Productivité');
         expect(Productivity.veryHigh.name,
-            'Rendement et rythme de travail excellents');
+            'Offre toujours le rendement et le rythme de travail attendus');
         expect(Productivity.high.name,
-            'Rendement et rythme de travail bons et constants');
+            'Offre régulièrement le rendement et le rythme de travail attendus');
         expect(Productivity.low.name,
-            'Difficulté à maintenir le rythme de travail');
-        expect(Productivity.insufficient.name, 'Rendement insuffisant');
+            'Offre avec soutien le rendement et le rythme de travail attendu');
+        expect(Productivity.insufficient.name,
+            'N\'offre pas le rendement et le rythme de travail attendu malgré le soutien');
         expect(Productivity.values.length, 4);
 
         expect(Productivity.veryHigh.index, 0);
@@ -132,50 +75,113 @@ void main() {
         expect(Productivity.insufficient.index, 3);
       });
 
-      test('"Autonomy" shows the right things', () {
-        expect(Autonomy.title, 'Autonomie et sens de l\'initiative');
-        expect(
-            Autonomy.veryHigh.name, 'Prend très souvent de bonnes initiatives');
-        expect(Autonomy.high.name, 'Prend souvent de bonnes initiatives');
-        expect(Autonomy.low.name, 'Peu d\'initiative');
-        expect(Autonomy.none.name, 'Aucune initiative');
-        expect(Autonomy.values.length, 4);
+      test('"TeamCommunication" shows the right things', () {
+        expect(TeamCommunication.notEvaluated.title, 'Communication en équipe');
+        expect(TeamCommunication.veryHigh.name,
+            'Communique de façon claire, précise et adaptée au milieu');
+        expect(TeamCommunication.high.name,
+            'Communique généralement de façon claire, précise et adaptée au milieu');
+        expect(TeamCommunication.low.name,
+            'Communique difficilement ou le message est hors contexte');
+        expect(TeamCommunication.insufficient.name,
+            'Ne communique pas ou communique de façon inadéquate');
+        expect(TeamCommunication.values.length, 4);
 
-        expect(Autonomy.veryHigh.index, 0);
-        expect(Autonomy.high.index, 1);
-        expect(Autonomy.low.index, 2);
-        expect(Autonomy.none.index, 3);
+        expect(TeamCommunication.veryHigh.index, 0);
+        expect(TeamCommunication.high.index, 1);
+        expect(TeamCommunication.low.index, 2);
+        expect(TeamCommunication.insufficient.index, 3);
       });
 
-      test('"Cautiousness" shows the right things', () {
-        expect(Cautiousness.title,
+      test('"RespectOfAuthority" shows the right things', () {
+        expect(RespectOfAuthority.notEvaluated.title, 'Respect de l\'autorité');
+        expect(RespectOfAuthority.veryHigh.name,
+            'Exprime ses besoins et démontre de l\'ouverture à recevoir la rétroaction');
+        expect(RespectOfAuthority.high.name,
+            'A besoin du support pour exprimer ses besoins tout en démontrant de l\'ouverture à recevoir la rétroaction');
+        expect(RespectOfAuthority.low.name,
+            'A de la difficulté à exprimer ses besoins et à accepter la rétroaction');
+        expect(RespectOfAuthority.insufficient.name,
+            'N\'exprime pas ses besoins et n\'est pas à l\'écoute de la rétroaction');
+        expect(RespectOfAuthority.values.length, 4);
+
+        expect(RespectOfAuthority.veryHigh.index, 0);
+        expect(RespectOfAuthority.high.index, 1);
+        expect(RespectOfAuthority.low.index, 2);
+        expect(RespectOfAuthority.insufficient.index, 3);
+      });
+
+      test('"CommunicationAboutSst" shows the right things', () {
+        expect(CommunicationAboutSst.notEvaluated.title,
+            'Communication sur la SST');
+        expect(CommunicationAboutSst.veryHigh.name,
+            'Identifie toujours les risques et agit de manière préventive en adoptant un comportement sécuritaire');
+        expect(CommunicationAboutSst.high.name,
+            'Identifie certains risques et agit parfois de manière préventive');
+        expect(CommunicationAboutSst.low.name,
+            'Identifie les risques et agit avec soutien afin d\'adopter le comportement sécuritaire enseigné');
+        expect(CommunicationAboutSst.insufficient.name,
+            'N\'identifie pas les risques ou n\'adopte pas le comportement sécuritaire enseigné');
+        expect(CommunicationAboutSst.values.length, 4);
+
+        expect(CommunicationAboutSst.veryHigh.index, 0);
+        expect(CommunicationAboutSst.high.index, 1);
+        expect(CommunicationAboutSst.low.index, 2);
+        expect(CommunicationAboutSst.insufficient.index, 3);
+      });
+
+      test('"SelfControl" shows the right things', () {
+        expect(SelfControl.notEvaluated.title, 'Rendement et constance');
+        expect(SelfControl.veryHigh.name,
+            'Utilise toujours des stratégies efficaces pour gérer ses émotions');
+        expect(SelfControl.high.name,
+            'Utilise régulièrement des stratégies efficaces pour gérer ses émotions');
+        expect(SelfControl.low.name,
+            'A besoin de soutien pour gérer ses émotions');
+        expect(SelfControl.insufficient.name,
+            'N\'utilise pas ses stratégies malgré le soutien offert');
+        expect(SelfControl.values.length, 4);
+
+        expect(SelfControl.veryHigh.index, 0);
+        expect(SelfControl.high.index, 1);
+        expect(SelfControl.low.index, 2);
+        expect(SelfControl.insufficient.index, 3);
+      });
+
+      test('"TakeInitiative" shows the right things', () {
+        expect(TakeInitiative.notEvaluated.title,
+            'Autonomie et sens de l\'initiative');
+        expect(TakeInitiative.veryHigh.name,
+            'Prend très souvent des initiatives pertinentes selon les situations');
+        expect(TakeInitiative.high.name,
+            'Prend des initiatives dans certaines situations');
+        expect(TakeInitiative.low.name,
+            'Prend rarement des initiatives et attend souvent les directives');
+        expect(TakeInitiative.insufficient.name,
+            'Ne prend pas d\'initiative, n\'agit que sur demande');
+        expect(TakeInitiative.values.length, 4);
+
+        expect(TakeInitiative.veryHigh.index, 0);
+        expect(TakeInitiative.high.index, 1);
+        expect(TakeInitiative.low.index, 2);
+        expect(TakeInitiative.insufficient.index, 3);
+      });
+
+      test('"Adaptability" shows the right things', () {
+        expect(Adaptability.notEvaluated.title,
             'Respect des règles de santé et de sécurité du travail (SST)');
-        expect(Cautiousness.always.name, 'Toujours');
-        expect(Cautiousness.mostly.name, 'Souvent');
-        expect(Cautiousness.sometime.name, 'Parfois');
-        expect(Cautiousness.rarely.name, 'Rarement');
-        expect(Cautiousness.values.length, 4);
+        expect(Adaptability.veryHigh.name,
+            'S\'ajuste en fonction des changements qui surviennent ou qui lui sont demandés');
+        expect(Adaptability.high.name,
+            'S\'ajuste souvent en fonction des changements qui surviennent ou qui lui sont demandés');
+        expect(Adaptability.low.name, 'S\'ajuste avec un soutien ponctuel');
+        expect(Adaptability.insufficient.name, 'N\'arrive pas à s\'ajuster');
+        expect(Adaptability.values.length, 4);
 
-        expect(Cautiousness.always.index, 0);
-        expect(Cautiousness.mostly.index, 1);
-        expect(Cautiousness.sometime.index, 2);
-        expect(Cautiousness.rarely.index, 3);
-      });
-
-      test('"GeneralAppreciation" shows the right things', () {
-        expect(GeneralAppreciation.title,
-            'Appréciation générale du ou de la stagiaire');
-        expect(GeneralAppreciation.veryHigh.name, 'Dépasse les attentes');
-        expect(GeneralAppreciation.good.name, 'Répond aux attentes');
-        expect(GeneralAppreciation.passable.name,
-            'Répond minimalement aux attentes');
-        expect(GeneralAppreciation.failed.name, 'Ne répond pas aux attentes');
-        expect(GeneralAppreciation.values.length, 4);
-
-        expect(GeneralAppreciation.veryHigh.index, 0);
-        expect(GeneralAppreciation.good.index, 1);
-        expect(GeneralAppreciation.passable.index, 2);
-        expect(GeneralAppreciation.failed.index, 3);
+        expect(Adaptability.veryHigh.index, 0);
+        expect(Adaptability.high.index, 1);
+        expect(Adaptability.low.index, 2);
+        expect(Adaptability.insufficient.index, 3);
       });
 
       test('"meetsRequirements" behaves properly', () {
@@ -192,48 +198,48 @@ void main() {
 
         expect(serialized, {
           'id': 'attitudeEvaluationId',
-          'inattendance': 1,
-          'ponctuality': 2,
-          'sociability': 3,
-          'politeness': 1,
-          'motivation': 2,
-          'dressCode': 3,
-          'quality_of_work': 1,
-          'productivity': 2,
-          'autonomy': 3,
-          'cautiousness': 1,
-          'general_appreciation': 2,
+          'ponctuality': 1,
+          'inattendance': 2,
+          'quality_of_work': 3,
+          'productivity': 1,
+          'team_communication': 2,
+          'respect_of_authority': 3,
+          'communication_about_sst': 1,
+          'self_control': 2,
+          'take_initiative': 3,
+          'adaptability': 1,
         });
 
         expect(deserialized.id, 'attitudeEvaluationId');
-        expect(deserialized.inattendance, Inattendance.values[1]);
-        expect(deserialized.ponctuality, Ponctuality.values[2]);
-        expect(deserialized.sociability, Sociability.values[3]);
-        expect(deserialized.politeness, Politeness.values[1]);
-        expect(deserialized.motivation, Motivation.values[2]);
-        expect(deserialized.dressCode, DressCode.values[3]);
-        expect(deserialized.qualityOfWork, QualityOfWork.values[1]);
-        expect(deserialized.productivity, Productivity.values[2]);
-        expect(deserialized.autonomy, Autonomy.values[3]);
-        expect(deserialized.cautiousness, Cautiousness.values[1]);
-        expect(deserialized.generalAppreciation, GeneralAppreciation.values[2]);
+        expect(deserialized.ponctuality, Ponctuality.values[1]);
+        expect(deserialized.inattendance, Inattendance.values[2]);
+        expect(deserialized.qualityOfWork, QualityOfWork.values[3]);
+        expect(deserialized.productivity, Productivity.values[1]);
+        expect(deserialized.teamCommunication, TeamCommunication.values[2]);
+        expect(deserialized.respectOfAuthority, RespectOfAuthority.values[3]);
+        expect(deserialized.communicationAboutSst,
+            CommunicationAboutSst.values[1]);
+        expect(deserialized.selfControl, SelfControl.values[2]);
+        expect(deserialized.takeInitiative, TakeInitiative.values[3]);
+        expect(deserialized.adaptability, Adaptability.values[1]);
 
         // Test for empty deserialize to make sure it doesn't crash
         final emptyDeserialized =
             AttitudeEvaluation.fromSerialized({'id': 'emptyId'});
         expect(emptyDeserialized.id, 'emptyId');
-        expect(emptyDeserialized.inattendance, Inattendance.notEvaluated);
         expect(emptyDeserialized.ponctuality, Ponctuality.notEvaluated);
-        expect(emptyDeserialized.sociability, Sociability.notEvaluated);
-        expect(emptyDeserialized.politeness, Politeness.notEvaluated);
-        expect(emptyDeserialized.motivation, Motivation.notEvaluated);
-        expect(emptyDeserialized.dressCode, DressCode.notEvaluated);
+        expect(emptyDeserialized.inattendance, Inattendance.notEvaluated);
         expect(emptyDeserialized.qualityOfWork, QualityOfWork.notEvaluated);
         expect(emptyDeserialized.productivity, Productivity.notEvaluated);
-        expect(emptyDeserialized.autonomy, Autonomy.notEvaluated);
-        expect(emptyDeserialized.cautiousness, Cautiousness.notEvaluated);
-        expect(emptyDeserialized.generalAppreciation,
-            GeneralAppreciation.notEvaluated);
+        expect(emptyDeserialized.teamCommunication,
+            TeamCommunication.notEvaluated);
+        expect(emptyDeserialized.respectOfAuthority,
+            RespectOfAuthority.notEvaluated);
+        expect(emptyDeserialized.communicationAboutSst,
+            CommunicationAboutSst.notEvaluated);
+        expect(emptyDeserialized.selfControl, SelfControl.notEvaluated);
+        expect(emptyDeserialized.takeInitiative, TakeInitiative.notEvaluated);
+        expect(emptyDeserialized.adaptability, Adaptability.notEvaluated);
       });
 
       test(
@@ -249,7 +255,6 @@ void main() {
           'date': attitude.date.millisecondsSinceEpoch,
           'present': attitude.presentAtEvaluation,
           'attitude': attitude.attitude.serialize(),
-          'comments': attitude.comments,
           'form_version': attitude.formVersion,
         });
 
@@ -257,7 +262,6 @@ void main() {
         expect(deserialized.date.toString(), attitude.date.toString());
         expect(deserialized.presentAtEvaluation, attitude.presentAtEvaluation);
         expect(deserialized.attitude.id, attitude.attitude.id);
-        expect(deserialized.comments, attitude.comments);
         expect(deserialized.formVersion, attitude.formVersion);
 
         // Test for empty deserialize to make sure it doesn't crash
@@ -266,23 +270,25 @@ void main() {
         expect(emptyEvaluation.id, 'emptyId');
         expect(emptyEvaluation.date, DateTime(0));
         expect(emptyEvaluation.presentAtEvaluation, []);
+        expect(emptyEvaluation.attitude.ponctuality, Ponctuality.notEvaluated);
         expect(
             emptyEvaluation.attitude.inattendance, Inattendance.notEvaluated);
-        expect(emptyEvaluation.attitude.ponctuality, Ponctuality.notEvaluated);
-        expect(emptyEvaluation.attitude.sociability, Sociability.notEvaluated);
-        expect(emptyEvaluation.attitude.politeness, Politeness.notEvaluated);
-        expect(emptyEvaluation.attitude.motivation, Motivation.notEvaluated);
-        expect(emptyEvaluation.attitude.dressCode, DressCode.notEvaluated);
         expect(
             emptyEvaluation.attitude.qualityOfWork, QualityOfWork.notEvaluated);
         expect(
             emptyEvaluation.attitude.productivity, Productivity.notEvaluated);
-        expect(emptyEvaluation.attitude.autonomy, Autonomy.notEvaluated);
+        expect(emptyEvaluation.attitude.teamCommunication,
+            TeamCommunication.notEvaluated);
+        expect(emptyEvaluation.attitude.respectOfAuthority,
+            RespectOfAuthority.notEvaluated);
+        expect(emptyEvaluation.attitude.communicationAboutSst,
+            CommunicationAboutSst.notEvaluated);
+        expect(emptyEvaluation.attitude.selfControl, SelfControl.notEvaluated);
+        expect(emptyEvaluation.attitude.takeInitiative,
+            TakeInitiative.notEvaluated);
         expect(
-            emptyEvaluation.attitude.cautiousness, Cautiousness.notEvaluated);
-        expect(emptyEvaluation.attitude.generalAppreciation,
-            GeneralAppreciation.notEvaluated);
-        expect(emptyEvaluation.comments, '');
+            emptyEvaluation.attitude.adaptability, Adaptability.notEvaluated);
+
         expect(emptyEvaluation.formVersion, '1.0.0');
       });
     });

@@ -439,17 +439,16 @@ attitude.AttitudeEvaluation dummyAttitudeEvaluation({
 }) =>
     attitude.AttitudeEvaluation(
       id: id,
-      inattendance: attitude.Inattendance.rarely,
-      ponctuality: attitude.Ponctuality.sometimeLate,
-      sociability: attitude.Sociability.veryLow,
-      politeness: attitude.Politeness.alwaysSuitable,
-      motivation: attitude.Motivation.low,
-      dressCode: attitude.DressCode.notAppropriate,
+      ponctuality: attitude.Ponctuality.high,
+      inattendance: attitude.Inattendance.low,
       qualityOfWork: attitude.QualityOfWork.high,
       productivity: attitude.Productivity.low,
-      autonomy: attitude.Autonomy.none,
-      cautiousness: attitude.Cautiousness.mostly,
-      generalAppreciation: attitude.GeneralAppreciation.passable,
+      teamCommunication: attitude.TeamCommunication.low,
+      respectOfAuthority: attitude.RespectOfAuthority.veryHigh,
+      communicationAboutSst: attitude.CommunicationAboutSst.insufficient,
+      selfControl: attitude.SelfControl.high,
+      takeInitiative: attitude.TakeInitiative.low,
+      adaptability: attitude.Adaptability.veryHigh,
     );
 
 attitude.InternshipEvaluationAttitude dummyInternshipEvaluationAttitude({
@@ -460,7 +459,6 @@ attitude.InternshipEvaluationAttitude dummyInternshipEvaluationAttitude({
       date: DateTime(1980, 5, 20),
       presentAtEvaluation: ['Me', 'You'],
       attitude: dummyAttitudeEvaluation(),
-      comments: 'No comment',
       formVersion: '1.0.0',
     );
 

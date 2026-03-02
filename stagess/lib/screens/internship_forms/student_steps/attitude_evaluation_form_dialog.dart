@@ -73,6 +73,13 @@ class AttitudeEvaluationFormController {
     controller._inattendance = evaluation.attitude.inattendance;
     controller._qualityOfWork = evaluation.attitude.qualityOfWork;
     controller._productivity = evaluation.attitude.productivity;
+    controller._teamCommunication = evaluation.attitude.teamCommunication;
+    controller._respectOfAuthority = evaluation.attitude.respectOfAuthority;
+    controller._communicationAboutSst =
+        evaluation.attitude.communicationAboutSst;
+    controller._selfControl = evaluation.attitude.selfControl;
+    controller._takeInitiative = evaluation.attitude.takeInitiative;
+    controller._adaptability = evaluation.attitude.adaptability;
 
     return controller;
   }
@@ -114,16 +121,36 @@ class AttitudeEvaluationFormController {
   }
 
   Ponctuality _ponctuality = Ponctuality.notEvaluated;
+  Ponctuality get ponctuality => _ponctuality;
+
   Inattendance _inattendance = Inattendance.notEvaluated;
+  Inattendance get inattendance => _inattendance;
+
   QualityOfWork _qualityOfWork = QualityOfWork.notEvaluated;
+  QualityOfWork get qualityOfWork => _qualityOfWork;
+
   Productivity _productivity = Productivity.notEvaluated;
+  Productivity get productivity => _productivity;
+
   TeamCommunication _teamCommunication = TeamCommunication.notEvaluated;
+  TeamCommunication get teamCommunication => _teamCommunication;
+
   RespectOfAuthority _respectOfAuthority = RespectOfAuthority.notEvaluated;
+  RespectOfAuthority get respectOfAuthority => _respectOfAuthority;
+
   CommunicationAboutSst _communicationAboutSst =
       CommunicationAboutSst.notEvaluated;
+  CommunicationAboutSst get communicationAboutSst => _communicationAboutSst;
+
   SelfControl _selfControl = SelfControl.notEvaluated;
+  SelfControl get selfControl => _selfControl;
+
   TakeInitiative _takeInitiative = TakeInitiative.notEvaluated;
+  TakeInitiative get takeInitiative => _takeInitiative;
+
   Adaptability _adaptability = Adaptability.notEvaluated;
+  Adaptability get adaptability => _adaptability;
+
   void setValue(AttitudeCategoryEnum value) {
     switch (value) {
       case Ponctuality value:
@@ -254,20 +281,20 @@ class _AttitudeEvaluationScreenState extends State<_AttitudeEvaluationScreen> {
     ).firstWhereOrNull((e) => e.id == internship.studentId);
 
     final workingSituations = [
-      _formController._ponctuality,
-      _formController._inattendance,
-      _formController._qualityOfWork,
-      _formController._productivity,
+      _formController.ponctuality,
+      _formController.inattendance,
+      _formController.qualityOfWork,
+      _formController.productivity,
     ];
     final relationshipWithOthers = [
-      _formController._teamCommunication,
-      _formController._respectOfAuthority,
-      _formController._communicationAboutSst,
+      _formController.teamCommunication,
+      _formController.respectOfAuthority,
+      _formController.communicationAboutSst,
     ];
     final autonomyAndAdaptability = [
-      _formController._selfControl,
-      _formController._takeInitiative,
-      _formController._adaptability,
+      _formController.selfControl,
+      _formController.takeInitiative,
+      _formController.adaptability,
     ];
 
     return SizedBox(
@@ -321,7 +348,7 @@ class _AttitudeEvaluationScreenState extends State<_AttitudeEvaluationScreen> {
                                 final element = relationshipWithOthers[index];
                                 return _AttitudeRadioChoices(
                                   title:
-                                      '${index + workingSituations.length + 1}. *${element.title}',
+                                      '${index + workingSituations.length + 1}. ${element.title}',
                                   definition: element.definition,
                                   groupValue: element,
                                   onValueChanged: (value) => setState(
@@ -338,7 +365,7 @@ class _AttitudeEvaluationScreenState extends State<_AttitudeEvaluationScreen> {
                                 final element = autonomyAndAdaptability[index];
                                 return _AttitudeRadioChoices(
                                   title:
-                                      '${index + workingSituations.length + relationshipWithOthers.length + 1}. *${element.title}',
+                                      '${index + workingSituations.length + relationshipWithOthers.length + 1}. ${element.title}',
                                   definition: element.definition,
                                   groupValue: element,
                                   onValueChanged: (value) => setState(
@@ -474,6 +501,7 @@ class _AttitudeRadioChoicesState extends State<_AttitudeRadioChoices> {
         children: [
           Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Flexible(
