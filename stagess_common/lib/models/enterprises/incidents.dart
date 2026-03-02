@@ -35,33 +35,23 @@ class Incidents extends ItemSerializable {
   List<Incident> severeInjuries;
   List<Incident> verbalAbuses;
   List<Incident> minorInjuries;
-  List<Incident> autoReportedIncidents;
 
-  bool get isEmpty =>
-      !hasMajorIncident &&
-      minorInjuries.isEmpty &&
-      autoReportedIncidents.isEmpty;
+  bool get isEmpty => !hasMajorIncident && minorInjuries.isEmpty;
   bool get isNotEmpty => !isEmpty;
   bool get hasMajorIncident =>
       severeInjuries.isNotEmpty || verbalAbuses.isNotEmpty;
 
-  List<Incident> get all => [
-        ...severeInjuries,
-        ...verbalAbuses,
-        ...minorInjuries,
-        ...autoReportedIncidents
-      ];
+  List<Incident> get all =>
+      [...severeInjuries, ...verbalAbuses, ...minorInjuries];
 
   Incidents({
     super.id,
     List<Incident>? severeInjuries,
     List<Incident>? verbalAbuses,
     List<Incident>? minorInjuries,
-    List<Incident>? autoReportedIncidents,
   })  : severeInjuries = severeInjuries ?? [],
         verbalAbuses = verbalAbuses ?? [],
-        minorInjuries = minorInjuries ?? [],
-        autoReportedIncidents = autoReportedIncidents ?? [];
+        minorInjuries = minorInjuries ?? [];
 
   static Incidents get empty => Incidents();
 
@@ -70,15 +60,12 @@ class Incidents extends ItemSerializable {
     List<Incident>? severeInjuries,
     List<Incident>? verbalAbuses,
     List<Incident>? minorInjuries,
-    List<Incident>? autoReportedIncidents,
   }) =>
       Incidents(
         id: id ?? this.id,
         severeInjuries: severeInjuries ?? this.severeInjuries,
         verbalAbuses: verbalAbuses ?? this.verbalAbuses,
         minorInjuries: minorInjuries ?? this.minorInjuries,
-        autoReportedIncidents:
-            autoReportedIncidents ?? this.autoReportedIncidents,
       );
 
   Incidents.fromSerialized(super.map)
@@ -94,10 +81,6 @@ class Incidents extends ItemSerializable {
                 ?.map((e) => Incident.fromSerialized(e))
                 .toList() ??
             [],
-        autoReportedIncidents = (map?['auto_reported'] as List?)
-                ?.map((e) => Incident.fromSerialized(e))
-                .toList() ??
-            [],
         super.fromSerialized();
 
   @override
@@ -106,7 +89,6 @@ class Incidents extends ItemSerializable {
         'severe_injuries': severeInjuries.map((e) => e.serialize()).toList(),
         'verbal_abuses': verbalAbuses.map((e) => e.serialize()).toList(),
         'minor_injuries': minorInjuries.map((e) => e.serialize()).toList(),
-        'auto_reported':
-            autoReportedIncidents.map((e) => e.serialize()).toList(),
+        // TODO Remove auto_reported from the database
       };
 }

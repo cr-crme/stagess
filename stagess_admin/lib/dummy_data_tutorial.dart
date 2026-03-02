@@ -1300,7 +1300,7 @@ Future<void> _addDummyEnterprises(
           ActivitySectorsService.activitySectors[9].specializations[3],
       positionsOffered: {schoolAId: 3, schoolBId: 5},
       incidents: Incidents.empty.copyWith(
-        autoReportedIncidents: [
+        severeInjuries: [
           Incident(
             'L\'élève ne portait pas ses gants malgré plusieurs avertissements, '
             'et il s\'est ouvert profondément la paume en voulant couper une tige.',
@@ -1375,7 +1375,7 @@ Future<void> _addDummyEnterprises(
       specialization:
           ActivitySectorsService.activitySectors[9].specializations[3],
       positionsOffered: {schoolAId: 2, schoolBId: 5},
-      incidents: Incidents.empty.copyWith(autoReportedIncidents: [
+      incidents: Incidents.empty.copyWith(severeInjuries: [
         Incident(
           'L\'élève ne portait pas ses gants malgré plusieurs avertissements, '
           'et il s\'est ouvert profondément la paume en voulant ouvrir une boite.',

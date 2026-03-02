@@ -277,9 +277,6 @@ class JobsPageState extends State<JobsPage> {
       case SstEventType.minor:
         job.incidents.minorInjuries.add(incident);
         break;
-      case SstEventType.autoReported:
-        job.incidents.autoReportedIncidents.add(incident);
-        break;
     }
     enterprises[widget.enterprise].jobs.replace(job);
     await enterprises.replaceWithConfirmation(widget.enterprise);

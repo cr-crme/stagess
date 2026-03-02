@@ -89,11 +89,10 @@ class ResponsiveService {
                   final edgeInsets = switch (screenSize) {
                     ScreenSize.medium => EdgeInsets.only(right: 4.0),
                     ScreenSize.large => EdgeInsets.symmetric(
-                      horizontal:
-                          constraints.maxWidth < maxBodyWidth
-                              ? 0.0
-                              : (constraints.maxWidth - maxBodyWidth) / 2,
-                    ),
+                        horizontal: constraints.maxWidth < maxBodyWidth
+                            ? 0.0
+                            : (constraints.maxWidth - maxBodyWidth) / 2,
+                      ),
                     _ => EdgeInsets.zero,
                   };
                   return Padding(padding: edgeInsets, child: body);
@@ -116,14 +115,12 @@ class ResponsiveService {
     return AppBar(
       title: title,
       actions: actions,
-      leadingWidth:
-          ResponsiveService.getScreenSize(context) == ScreenSize.small
-              ? null
-              : 0,
-      leading:
-          (ResponsiveService.getScreenSize(context) == ScreenSize.small
-              ? leading
-              : SizedBox.shrink()),
+      leadingWidth: ResponsiveService.getScreenSize(context) == ScreenSize.small
+          ? null
+          : 0,
+      leading: (ResponsiveService.getScreenSize(context) == ScreenSize.small
+          ? leading
+          : SizedBox.shrink()),
       bottom: bottom,
     );
   }

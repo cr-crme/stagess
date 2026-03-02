@@ -6,8 +6,7 @@ import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 enum SstEventType {
   severe,
   verbal,
-  minor,
-  autoReported;
+  minor;
 
   String get description {
     switch (this) {
@@ -17,8 +16,6 @@ enum SstEventType {
         return 'Agression verbale ou harcèlement par des collègues ou des clients';
       case SstEventType.minor:
         return 'Blessure mineure de l\'élève\n(p. ex. brûlure légère)';
-      case SstEventType.autoReported:
-        return 'Incident auto-rapporté par l\'entreprise';
     }
   }
 }
