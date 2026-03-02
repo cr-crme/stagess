@@ -89,6 +89,5 @@ class Incidents extends ItemSerializable {
         'severe_injuries': severeInjuries.map((e) => e.serialize()).toList(),
         'verbal_abuses': verbalAbuses.map((e) => e.serialize()).toList(),
         'minor_injuries': minorInjuries.map((e) => e.serialize()).toList(),
-        // TODO Remove auto_reported from the database
       };
 }

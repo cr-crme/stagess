@@ -463,9 +463,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
                 'minor_injuries': incidents
                     .where((e) => e['incident_type'] == 'minor_injuries')
                     .toList(),
-                'auto_reported': incidents
-                    .where((e) => e['incident_type'] == 'auto_reported')
-                    .toList(),
               };
       }
       enterprise['jobs'] = jobs;
