@@ -136,8 +136,8 @@ class EnterpriseEvaluationFormController {
     _taskVariety =
         (evaluation.taskVariety == 0 ? TaskVariety.low : TaskVariety.high);
     _trainingPlan = evaluation.trainingPlanRespect == 0
-        ? TrainingPlan.notFilled
-        : TrainingPlan.filled;
+        ? TrainingPlan.notFollowed
+        : TrainingPlan.followed;
     if (!canModify || evaluation.autonomyExpected >= 0) {
       _autonomyExpected = evaluation.autonomyExpected;
     }
@@ -573,10 +573,11 @@ class _TaskAndAbilityStepState extends State<_TaskAndAbilityStep> {
                 children: [
                   const SubTitle('Informations générales', left: 0),
                   _buildEnterpriseName(enterprise),
+                  // TODO Add date
                   _buildStudentName(student),
                   const SubTitle('Tâches', left: 0),
                   _buildVariety(context),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
                   _buildTrainingPlan(context),
                   const SubTitle('Habiletés', left: 0),
                   const SizedBox(height: 16),
@@ -632,17 +633,38 @@ class _TaskAndAbilityStepState extends State<_TaskAndAbilityStep> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          '* Tâches données à l\'élève',
-          style: Theme.of(context).textTheme.titleSmall!,
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '* Tâches données à l\'élève',
+              style: Theme.of(context).textTheme.titleSmall!,
+            ),
+            IconButton(
+              icon: Icon(Icons.info_rounded,
+                  color: Theme.of(context).primaryColor),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    content: Text(
+                        'Tâches incluses dans le répertoire des métiers semi-spécialisés'),
+                  ),
+                );
+              },
+            )
+          ],
         ),
         RadioGroup(
           groupValue: widget.controller._taskVariety,
           onChanged: (value) =>
               setState(() => widget.controller._taskVariety = value!),
-          child: Row(
+          child: Column(
             children: [
-              Expanded(
+              SizedBox(
+                width: 200,
                 child: RadioListTile<TaskVariety>(
                   value: TaskVariety.low,
                   enabled: widget.controller.canModify,
@@ -654,7 +676,21 @@ class _TaskAndAbilityStepState extends State<_TaskAndAbilityStep> {
                   ),
                 ),
               ),
-              Expanded(
+              SizedBox(
+                width: 200,
+                child: RadioListTile<TaskVariety>(
+                  value: TaskVariety.mid,
+                  enabled: widget.controller.canModify,
+                  dense: true,
+                  visualDensity: VisualDensity.compact,
+                  title: Text(
+                    'Variées',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 200,
                 child: RadioListTile<TaskVariety>(
                   value: TaskVariety.high,
                   enabled: widget.controller.canModify,
@@ -682,36 +718,37 @@ class _TaskAndAbilityStepState extends State<_TaskAndAbilityStep> {
           style: Theme.of(context).textTheme.titleSmall!,
         ),
         Text(
-          'Tâches et compétences prévues dans le plan de formation ont été '
-          'faites par l\'élève\u00a0:',
-          style: Theme.of(context).textTheme.titleSmall,
+          'Possibilité d\'exercer toutes les tâches de toutes les compétences spécifiques '
+          'obligatoires d\'un métier semi-spécialisé',
         ),
         RadioGroup(
           groupValue: widget.controller._trainingPlan,
           onChanged: (value) =>
               setState(() => widget.controller._trainingPlan = value!),
-          child: Row(
+          child: Column(
             children: [
-              Expanded(
+              SizedBox(
+                width: 200,
                 child: RadioListTile<TrainingPlan>(
-                  value: TrainingPlan.notFilled,
+                  value: TrainingPlan.followed,
                   enabled: widget.controller.canModify,
                   dense: true,
                   visualDensity: VisualDensity.compact,
                   title: Text(
-                    'En partie',
+                    'Oui',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
               ),
-              Expanded(
+              SizedBox(
+                width: 200,
                 child: RadioListTile<TrainingPlan>(
-                  value: TrainingPlan.filled,
+                  value: TrainingPlan.notFollowed,
                   enabled: widget.controller.canModify,
                   dense: true,
                   visualDensity: VisualDensity.compact,
                   title: Text(
-                    'En totalité',
+                    'Non',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
@@ -763,12 +800,16 @@ class _SupervisionStepState extends State<_SupervisionStep> {
             _buildAutonomyRequired(context),
             const SizedBox(height: 8),
             _buildEfficiency(context),
+            const SizedBox(height: 8),
+            _buildSpecialNeedsAccomodation(context),
             const SubTitle('Encadrement', left: 0),
             _buildSupervisionStyle(context),
             const SizedBox(height: 8),
             _buildCommunication(context),
             const SizedBox(height: 8),
             _buildAbsenceTolerance(context),
+            const SizedBox(height: 8),
+            _buildSstManagement(context),
             const SizedBox(height: 8),
             _Comments(
               controller: widget.controller._supervisionCommentsController,
@@ -777,6 +818,77 @@ class _SupervisionStepState extends State<_SupervisionStep> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSpecialNeedsAccomodation(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '* Ouverture de l\'entreprise à accueillir des élèves avec des besoins particuliers',
+          style: Theme.of(context).textTheme.titleSmall!,
+        ),
+        Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Container()
+            // TODO This
+            // LowHighSliderFormField(
+            //   initialValue: widget.controller._specialNeedsAccommodation,
+            //   fixed: !widget.controller.canModify,
+            //   onChanged: (value) =>
+            //       widget.controller._specialNeedsAccommodation = value,
+            //   lowLabel: SpecialNeedsAccommodation.low.label,
+            //   highLabel: SpecialNeedsAccommodation.high.label,
+            // ),
+            )
+      ],
+    );
+  }
+
+  Widget _buildSstManagement(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              '* Encadrement par rapport à la SST',
+              style: Theme.of(context).textTheme.titleSmall!,
+            ),
+            IconButton(
+              icon: Icon(Icons.info_rounded,
+                  color: Theme.of(context).primaryColor),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    content: Text(
+                        'Niveau d\'encadrement des mesures de sécurité et prévention '
+                        'des risques à la SST (formations, modélisation, accompagnement, etc.)'),
+                  ),
+                );
+              },
+            )
+          ],
+        ),
+        Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Container()
+            // TODO This
+            // LowHighSliderFormField(
+            //   initialValue: widget.controller._specialNeedsAccommodation,
+            //   fixed: !widget.controller.canModify,
+            //   onChanged: (value) =>
+            //       widget.controller._specialNeedsAccommodation = value,
+            //   lowLabel: SpecialNeedsAccommodation.low.label,
+            //   highLabel: SpecialNeedsAccommodation.high.label,
+            // ),
+            )
+      ],
     );
   }
 

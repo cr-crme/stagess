@@ -1,6 +1,7 @@
 enum TaskVariety {
   none,
   low,
+  mid,
   high;
 
   double toDouble() {
@@ -9,6 +10,8 @@ enum TaskVariety {
         return -1.0;
       case TaskVariety.low:
         return 0.0;
+      case TaskVariety.mid:
+        return 0.5;
       case TaskVariety.high:
         return 1.0;
     }
@@ -17,16 +20,16 @@ enum TaskVariety {
 
 enum TrainingPlan {
   none,
-  notFilled,
-  filled;
+  notFollowed,
+  followed;
 
   double toDouble() {
     switch (this) {
       case TrainingPlan.none:
         return -1.0;
-      case TrainingPlan.notFilled:
+      case TrainingPlan.notFollowed:
         return 0.0;
-      case TrainingPlan.filled:
+      case TrainingPlan.followed:
         return 1.0;
     }
   }
