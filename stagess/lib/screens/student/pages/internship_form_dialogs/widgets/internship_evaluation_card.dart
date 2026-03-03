@@ -202,6 +202,7 @@ Future<void> showInternshipEvaluationFormDialog(BuildContext context,
     return;
   }
 
+  // TODO: Find why all the InternshipContracts returned by the backend are the same
   final newInternship = await showEvaluationDialog(context,
       internshipId: internshipId, evaluationId: evaluationId);
   if (!editMode) return;

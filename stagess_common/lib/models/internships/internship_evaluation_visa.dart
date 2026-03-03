@@ -131,7 +131,7 @@ class InternshipEvaluationVisa extends ItemSerializable {
         'id': FetchableFields.mandatory,
         'date': FetchableFields.optional,
         'form': FetchableFields.optional,
-        'form_version': FetchableFields.optional,
+        'form_version': FetchableFields.mandatory,
       });
 
   @override

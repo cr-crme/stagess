@@ -708,6 +708,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
       {Internship? previous, required DatabaseUser user}) async {
     final previousContracts = previous?.contracts ?? [];
     bool supervisorIsUpdated = false;
+    // TODO Remove the supervisor from the persons table as we need to keep track of previous one without updating
     for (final contract in internship.contracts) {
       if (previousContracts.any((prev) => prev.id == contract.id)) {
         // Skip if the contract already exists
@@ -763,7 +764,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
           .performInsertQuery(tableName: 'internship_contracts', data: {
         'id': contract.id,
         'internship_id': internship.id,
-        'creation_date': contract.date.serialize(),
+        'date': contract.date.serialize(),
         'supervisor_id': contract.supervisor.id,
         'starting_date': contract.dates.start.serialize(),
         'ending_date': contract.dates.end.serialize(),
@@ -793,7 +794,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
                 data: {
                   'id': schedule.id,
                   'weekly_schedule_id': weeklySchedule.id,
-                  'day': day,
+                  'day': day.index,
                   'block_index': blockIndex,
                   'starting_hour': schedule.blocks[blockIndex].start.hour,
                   'starting_minute': schedule.blocks[blockIndex].start.minute,

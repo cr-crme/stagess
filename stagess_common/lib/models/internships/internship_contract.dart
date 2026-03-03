@@ -32,7 +32,7 @@ class InternshipContract extends InternshipEvaluation {
     _finalizeInitialization();
   }
   InternshipContract.fromSerialized(super.map)
-      : date = DateTimeExt.from(map?['creation_date']) ?? DateTime.now(),
+      : date = DateTimeExt.from(map?['date']) ?? DateTime.now(),
         supervisor = Person.fromSerialized(map?['supervisor']),
         dates = DateTimeRange(
             start: DateTimeExt.from(map?['starting_date']) ?? DateTime(0),
@@ -99,7 +99,7 @@ class InternshipContract extends InternshipEvaluation {
 
     return InternshipContract(
       id: id,
-      date: DateTimeExt.from(serialized['creation_date']) ?? date,
+      date: DateTimeExt.from(serialized['date']) ?? date,
       supervisor: supervisor.copyWithData(serialized['supervisor']),
       dates: DateTimeRange(
         start: DateTimeExt.from(serialized['starting_date']) ?? dates.start,
@@ -121,9 +121,10 @@ class InternshipContract extends InternshipEvaluation {
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
         'date': FetchableFields.optional,
-        'supervisor': Person.fetchableFields,
-        'starting_date': FetchableFields.mandatory,
-        'ending_date': FetchableFields.mandatory,
+        'supervisor': FetchableFields
+            .optional, // TODO change this (see internships_repository.dart)
+        'starting_date': FetchableFields.optional,
+        'ending_date': FetchableFields.optional,
         'schedules': WeeklySchedule.fetchableFields,
         'transportations': FetchableFields.optional,
         'visit_frequencies': FetchableFields.optional,

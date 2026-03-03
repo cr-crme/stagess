@@ -22,9 +22,8 @@ class InternshipManagingContract extends StatelessWidget {
         internshipId: internshipId,
         evaluateButtonText: 'Évaluer l\'entreprise',
         reevaluateButtonText: 'Évaluer de nouveau',
-        evaluations: InternshipsProvider.of(context)
-            .fromId(internshipId)
-            .enterpriseEvaluations,
+        evaluations:
+            InternshipsProvider.of(context).fromId(internshipId).contracts,
         onClickedNewEvaluation: () => showInternshipEvaluationFormDialog(
             context,
             internshipId: internshipId,

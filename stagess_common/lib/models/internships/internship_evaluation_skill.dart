@@ -149,7 +149,7 @@ class InternshipEvaluationSkill extends InternshipEvaluation {
         'skill_granularity': FetchableFields.optional,
         'skills': FetchableFields.optional,
         'comments': FetchableFields.optional,
-        'form_version': FetchableFields.optional,
+        'form_version': FetchableFields.mandatory,
       });
 
   @override
