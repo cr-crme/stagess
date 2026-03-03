@@ -39,7 +39,7 @@ String _title(student_model.Program program) {
 
 Future<Uint8List> generateInternshipContractPdf(
     BuildContext mainContext, PdfPageFormat format,
-    {required String internshipId}) async {
+    {required String internshipId, required String contractId}) async {
   _logger
       .info('Generating internship contract PDF for internship: $internshipId');
 

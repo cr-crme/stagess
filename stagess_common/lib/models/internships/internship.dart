@@ -3,6 +3,7 @@ import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/generic/extended_item_serializable.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
+import 'package:stagess_common/models/internships/internship_contract.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_visa.dart';
@@ -14,115 +15,6 @@ import 'package:stagess_common/models/internships/transportation.dart';
 import 'package:stagess_common/models/persons/person.dart';
 
 export 'package:stagess_common/models/generic/serializable_elements.dart';
-
-class InternshipMutableElements extends ItemSerializable {
-  InternshipMutableElements({
-    super.id,
-    required this.creationDate,
-    required this.supervisor,
-    required this.dates,
-    required this.weeklySchedules,
-    required this.transportations,
-    required this.visitFrequencies,
-  });
-  final DateTime creationDate;
-  final Person supervisor;
-  final DateTimeRange dates;
-  final List<WeeklySchedule> weeklySchedules;
-  final List<Transportation> transportations;
-  final String visitFrequencies;
-
-  InternshipMutableElements.fromSerialized(super.map)
-      : creationDate =
-            DateTimeExt.from(map?['creation_date']) ?? DateTime.now(),
-        supervisor = Person.fromSerialized(map?['supervisor']),
-        dates = DateTimeRange(
-            start: DateTimeExt.from(map?['starting_date']) ?? DateTime(0),
-            end: DateTimeExt.from(map?['ending_date']) ?? DateTime(0)),
-        weeklySchedules = (map?['schedules'] as List?)
-                ?.map((e) => WeeklySchedule.fromSerialized(e))
-                .toList() ??
-            [],
-        transportations = ListExt.from(map?['transportations'],
-                deserializer: (e) => Transportation.deserialize(e)) ??
-            [],
-        visitFrequencies = StringExt.from(map?['visit_frequencies']) ?? 'N/A',
-        super.fromSerialized();
-
-  @override
-  Map<String, dynamic> serializedMap() => {
-        'id': id,
-        'creation_date': creationDate.serialize(),
-        'supervisor': supervisor.serialize(),
-        'starting_date': dates.start.serialize(),
-        'ending_date': dates.end.serialize(),
-        'schedules': weeklySchedules.map((e) => e.serialize()).toList(),
-        'transportations': transportations.map((e) => e.serialize()).toList(),
-        'visit_frequencies': visitFrequencies.serialize(),
-      };
-
-  InternshipMutableElements copyWith({
-    DateTime? creationDate,
-    Person? supervisor,
-    DateTimeRange? dates,
-    List<WeeklySchedule>? weeklySchedules,
-    List<Transportation>? transportations,
-    String? visitFrequencies,
-  }) {
-    return InternshipMutableElements(
-      id: id,
-      creationDate: creationDate ?? this.creationDate,
-      supervisor: supervisor ?? this.supervisor,
-      dates: dates ?? this.dates,
-      weeklySchedules: weeklySchedules ?? this.weeklySchedules,
-      transportations: transportations ?? this.transportations,
-      visitFrequencies: visitFrequencies ?? this.visitFrequencies,
-    );
-  }
-
-  InternshipMutableElements copyWithData(Map? serialized) {
-    if (serialized == null || serialized.isEmpty) return copyWith();
-
-    return InternshipMutableElements(
-      id: id,
-      creationDate:
-          DateTimeExt.from(serialized['creation_date']) ?? creationDate,
-      supervisor: supervisor.copyWithData(serialized['supervisor']),
-      dates: DateTimeRange(
-        start: DateTimeExt.from(serialized['starting_date']) ?? dates.start,
-        end: DateTimeExt.from(serialized['ending_date']) ?? dates.end,
-      ),
-      weeklySchedules: (serialized['schedules'] as List?)
-              ?.map((e) => WeeklySchedule.fromSerialized(e))
-              .toList() ??
-          weeklySchedules,
-      transportations: ListExt.from(serialized['transportations'],
-              deserializer: (e) => Transportation.deserialize(e)) ??
-          transportations,
-      visitFrequencies:
-          StringExt.from(serialized['visit_frequencies']) ?? visitFrequencies,
-    );
-  }
-
-  static FetchableFields get fetchableFields => FetchableFields.reference({
-        'id': FetchableFields.mandatory,
-        'creation_date': FetchableFields.mandatory,
-        'supervisor': Person.fetchableFields,
-        'starting_date': FetchableFields.mandatory,
-        'ending_date': FetchableFields.mandatory,
-        'schedules': WeeklySchedule.fetchableFields,
-        'transportations': FetchableFields.optional,
-        'visit_frequencies': FetchableFields.optional,
-      });
-
-  @override
-  String toString() {
-    return 'MutableElements{creationDate: $creationDate, '
-        'supervisor_id: $supervisor, '
-        'dates: $dates, '
-        'weeklySchedules: $weeklySchedules}';
-  }
-}
 
 class Internship extends ExtendedItemSerializable {
   static final String _currentVersion = '1.0.0';
@@ -172,6 +64,7 @@ class Internship extends ExtendedItemSerializable {
   final String teacherNotes;
   final DateTime endDate;
 
+  final List<InternshipContract> contracts;
   final List<InternshipEvaluationSkill> skillEvaluations;
   final List<InternshipEvaluationAttitude> attitudeEvaluations;
   final List<InternshipEvaluationVisa> visaEvaluations;

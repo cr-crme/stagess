@@ -180,7 +180,13 @@ class AttitudeEvaluationFormController {
       _ponctuality != Ponctuality.notEvaluated &&
       _inattendance != Inattendance.notEvaluated &&
       _qualityOfWork != QualityOfWork.notEvaluated &&
-      _productivity != Productivity.notEvaluated;
+      _productivity != Productivity.notEvaluated &&
+      _teamCommunication != TeamCommunication.notEvaluated &&
+      _respectOfAuthority != RespectOfAuthority.notEvaluated &&
+      _communicationAboutSst != CommunicationAboutSst.notEvaluated &&
+      _selfControl != SelfControl.notEvaluated &&
+      _takeInitiative != TakeInitiative.notEvaluated &&
+      _adaptability != Adaptability.notEvaluated;
 }
 
 class _AttitudeEvaluationScreen extends StatefulWidget {

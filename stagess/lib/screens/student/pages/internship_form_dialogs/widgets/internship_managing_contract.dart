@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:stagess/common/widgets/dialogs/show_pdf_dialog.dart';
+import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/internship_managing_contract_form_dialog.dart';
+import 'package:stagess/screens/student/pages/internship_form_dialogs/pdf/internship_contract_pdf_template.dart';
 import 'package:stagess/screens/student/pages/internship_form_dialogs/widgets/internship_evaluation_card.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 
-final _logger = Logger('InternshipDetails');
+final _logger = Logger('InternshipManagingContract');
 
-class InternshipDetails extends StatelessWidget {
-  const InternshipDetails({super.key, required this.internshipId});
+class InternshipManagingContract extends StatelessWidget {
+  const InternshipManagingContract({super.key, required this.internshipId});
 
   final String internshipId;
 
   @override
   Widget build(BuildContext context) {
-    _logger.finer('Building InternshipDetails for job: $internshipId');
+    _logger.finer('Building InternshipManagingContract for job: $internshipId');
 
     return InternshipEvaluationCard(
         title: 'Détails du stage',
@@ -22,19 +25,20 @@ class InternshipDetails extends StatelessWidget {
         evaluations: InternshipsProvider.of(context)
             .fromId(internshipId)
             .enterpriseEvaluations,
-        onClickedNewEvaluation: () => showInternshipDetailsFormDialog(context,
+        onClickedNewEvaluation: () => showInternshipEvaluationFormDialog(
+            context,
             internshipId: internshipId,
-            showEvaluationDialog: showInternshipDetailsFormDialog),
-        onClickedShowEvaluation: (evaluationId) =>
-            showInternshipDetailsFormDialog(context,
+            showEvaluationDialog: showManagingContractFormDialog),
+        onClickedShowEvaluation: (contractId) =>
+            showInternshipEvaluationFormDialog(context,
                 internshipId: internshipId,
-                evaluationId: evaluationId,
-                showEvaluationDialog: showInternshipDetailsFormDialog),
-        onClickedShowEvaluationPdf: (evaluationId) => showPdfDialog(
+                evaluationId: contractId,
+                showEvaluationDialog: showManagingContractFormDialog),
+        onClickedShowEvaluationPdf: (contractId) => showPdfDialog(
               context,
               pdfGeneratorCallback: (context, format) =>
-                  generateInternshipDetailsPdf(context, format,
-                      internshipId: internshipId, evaluationId: evaluationId),
+                  generateInternshipContractPdf(context, format,
+                      internshipId: internshipId, contractId: contractId),
             ));
   }
 }

@@ -26,9 +26,7 @@ class StudentScreen extends StatelessWidget {
     final internships = InternshipsProvider.of(context, listen: false);
     await Future.wait([
       students.fetchData(id: id, fields: FetchableFields.all),
-      ...internships
-          .where((e) => e.studentId == id)
-          .map(
+      ...internships.where((e) => e.studentId == id).map(
             (e) => internships.fetchData(id: e.id, fields: FetchableFields.all),
           ),
     ]);
@@ -87,33 +85,11 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
   final _internshipPageKey = GlobalKey<InternshipsPageState>();
   final _skillsPageKey = GlobalKey<SkillsPageState>();
 
-  Future<bool> _preventIfEditing(int tabIndex) async {
-    if (tabIndex != 1) return false;
-    if (_internshipPageKey.currentState?.activeKey.currentState == null) {
-      return false;
-    }
-
-    // For each internships
-    final keys =
-        _internshipPageKey.currentState!.activeKey.currentState!.detailKeys;
-    for (final key in keys.keys) {
-      if (keys[key]!.currentState?.editMode ?? false) {
-        if (keys[key]!.currentState?.editMode ?? false) {
-          return await keys[key]!.currentState?.preventClosingIfEditing() ??
-              false;
-        }
-      }
-    }
-    return false;
-  }
-
   void _onTapBack() async {
     _logger.finer(
       'Back button tapped, current tab index: ${_tabController.index}',
     );
-    if (await _preventIfEditing(_tabController.index)) return;
 
-    _logger.finer('Navigating back from StudentScreen');
     if (!mounted) return;
     Navigator.of(context).pop();
   }
@@ -129,44 +105,33 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
     return student == null
         ? Container()
         : ResponsiveService.scaffoldOf(
-          context,
-          appBar: ResponsiveService.appBarOf(
             context,
-            title: Row(
-              children: [
-                student.avatar,
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(student.fullName),
-                    Text(
-                      '${student.program} - groupe ${student.group}',
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            leading: IconButton(
-              onPressed: _onTapBack,
-              icon: const Icon(Icons.arrow_back),
-            ),
-            bottom:
-                widget.hasFullData
-                    ? TabBar(
+            appBar: ResponsiveService.appBarOf(
+              context,
+              title: Row(
+                children: [
+                  student.avatar,
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(student.fullName),
+                      Text(
+                        '${student.program} - groupe ${student.group}',
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              leading: IconButton(
+                onPressed: _onTapBack,
+                icon: const Icon(Icons.arrow_back),
+              ),
+              bottom: widget.hasFullData
+                  ? TabBar(
                       controller: _tabController,
-                      onTap: (value) {
-                        // Prevent from changing for now
-                        int previousIndex = _tabController.previousIndex;
-                        _tabController.index = previousIndex;
-                        Future.microtask(() async {
-                          if (!(await _preventIfEditing(previousIndex))) {
-                            // If it is allowed to change, then do it
-                            _tabController.index = value;
-                          }
-                        });
-                      },
+                      onTap: (value) => _tabController.index = value,
                       tabs: const [
                         Tab(icon: Icon(Icons.info_outlined), text: 'À propos'),
                         Tab(icon: Icon(Icons.assignment), text: 'Stages'),
@@ -176,14 +141,13 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
                         ),
                       ],
                     )
-                    : null,
-          ),
-          smallDrawer: null,
-          mediumDrawer: MainDrawer.medium,
-          largeDrawer: MainDrawer.large,
-          body:
-              widget.hasFullData
-                  ? TabBarView(
+                  : null,
+            ),
+            smallDrawer: null,
+            mediumDrawer: MainDrawer.medium,
+            largeDrawer: MainDrawer.large,
+            body: widget.hasFullData
+                ? TabBarView(
                     controller: _tabController,
                     children: [
                       AboutPage(key: _aboutPageKey, student: student),
@@ -194,11 +158,11 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
                       SkillsPage(key: _skillsPageKey, student: student),
                     ],
                   )
-                  : Center(
+                : Center(
                     child: CircularProgressIndicator(
                       color: Theme.of(context).primaryColor,
                     ),
                   ),
-        );
+          );
   }
 }

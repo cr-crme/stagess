@@ -6,7 +6,7 @@ import 'package:stagess/common/widgets/dialogs/finalize_internship_dialog.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/enterprise_evaluation_form_dialog.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/widgets/internship_details.dart';
+import 'package:stagess/screens/student/pages/internship_form_dialogs/widgets/internship_managing_contract.dart';
 import 'package:stagess/screens/student/pages/internship_form_dialogs/widgets/internship_evaluation_attitude.dart';
 import 'package:stagess/screens/student/pages/internship_form_dialogs/widgets/internship_evaluation_post.dart';
 import 'package:stagess/screens/student/pages/internship_form_dialogs/widgets/internship_evaluation_skill.dart';
@@ -143,20 +143,12 @@ class _StudentInternshipListView extends StatefulWidget {
 class _StudentInternshipListViewState
     extends State<_StudentInternshipListView> {
   final Map<String, bool> _expanded = {};
-  final Map<String, GlobalKey<InternshipDetailsState>> detailKeys = {};
 
   void _prepareExpander(List<Internship> internships) {
     if (_expanded.length != internships.length) {
       for (final internship in internships) {
         _expanded[internship.id] =
             internship.isActive || internship.isEnterpriseEvaluationPending;
-      }
-    }
-
-    if (detailKeys.length != internships.length) {
-      detailKeys.clear();
-      for (final internship in internships) {
-        detailKeys[internship.id] = GlobalKey<InternshipDetailsState>();
       }
     }
   }
@@ -298,8 +290,7 @@ class _StudentInternshipListViewState
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(bottom: 4.0),
-                        child: InternshipDetails(
-                            key: detailKeys[internship.id],
+                        child: InternshipManagingContract(
                             internshipId: internship.id),
                       ),
                       Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
