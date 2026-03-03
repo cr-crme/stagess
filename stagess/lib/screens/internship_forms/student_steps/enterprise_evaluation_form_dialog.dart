@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
@@ -18,6 +19,7 @@ import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
+import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('EnterpriseEvaluationScreen');
@@ -79,7 +81,7 @@ class EnterpriseEvaluationFormController {
     return controller;
   }
 
-  DateTime evaluationDate = DateTime.now();
+  DateTime _evaluationDate = DateTime.now();
 
   final _skillController = CheckboxWithOtherController<RequiredSkills>(
       elements: RequiredSkills.values);
@@ -126,7 +128,7 @@ class EnterpriseEvaluationFormController {
     final evaluation = _previousEvaluation(context);
     if (evaluation == null) return;
 
-    if (!canModify) evaluationDate = evaluation.date;
+    if (!canModify) _evaluationDate = evaluation.date;
 
     _skillController.forceSetIfDifferent(
         comparator: CheckboxWithOtherController(
@@ -203,7 +205,7 @@ class EnterpriseEvaluationFormController {
 
   PostInternshipEnterpriseEvaluation toInternshipEvaluation() {
     return PostInternshipEnterpriseEvaluation(
-      date: evaluationDate,
+      date: _evaluationDate,
       internshipId: internshipId,
       skillsRequired: _skillController.values,
       taskVariety: _taskVariety.toDouble(),
@@ -230,7 +232,7 @@ class EnterpriseEvaluationFormController {
   }
 
   void _resetForm(BuildContext context) {
-    evaluationDate = DateTime.now();
+    _evaluationDate = DateTime.now();
     _previousEvaluationId = null;
 
     _skillController.forceSetIfDifferent(
@@ -519,6 +521,60 @@ class _EnterpriseEvaluationScreenState
   }
 }
 
+class _EvaluationDate extends StatefulWidget {
+  const _EvaluationDate({required this.controller});
+
+  final EnterpriseEvaluationFormController controller;
+
+  @override
+  State<_EvaluationDate> createState() => _EvaluationDateState();
+}
+
+class _EvaluationDateState extends State<_EvaluationDate> {
+  void _promptDate(BuildContext context) async {
+    final newDate = await showCustomDatePicker(
+      helpText: 'Sélectionner la date',
+      cancelText: 'Annuler',
+      confirmText: 'Confirmer',
+      context: context,
+      initialDate: widget.controller._evaluationDate,
+      firstDate: DateTime(DateTime.now().year),
+      lastDate: DateTime(DateTime.now().year + 2),
+    );
+    if (newDate == null) return;
+
+    widget.controller._evaluationDate = newDate;
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(height: 4),
+        const Text('Date de l\'évaluation', style: TextStyle(fontSize: 12)),
+        Row(
+          children: [
+            Text(
+              DateFormat('dd MMMM yyyy', 'fr_CA')
+                  .format(widget.controller._evaluationDate),
+            ),
+            if (widget.controller.canModify)
+              IconButton(
+                icon: const Icon(
+                  Icons.calendar_month_outlined,
+                  color: Colors.blue,
+                ),
+                onPressed: () => _promptDate(context),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 class _TaskAndAbilityStep extends StatefulWidget {
   const _TaskAndAbilityStep({super.key, required this.controller});
 
@@ -573,8 +629,8 @@ class _TaskAndAbilityStepState extends State<_TaskAndAbilityStep> {
                 children: [
                   const SubTitle('Informations générales', left: 0),
                   _buildEnterpriseName(enterprise),
-                  // TODO Add date
                   _buildStudentName(student),
+                  _EvaluationDate(controller: widget.controller),
                   const SubTitle('Tâches', left: 0),
                   _buildVariety(context),
                   const SizedBox(height: 12),

@@ -58,7 +58,6 @@ class AttitudeEvaluation extends ItemSerializable {
 
   @override
   Map<String, dynamic> serializedMap() {
-    // TODO Update database
     return {
       'id': id,
       'ponctuality': ponctuality.index,
