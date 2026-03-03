@@ -539,16 +539,11 @@ CREATE TABLE post_internship_enterprise_evaluations (
     training_plan_respect FLOAT NOT NULL,
     autonomy_expected FLOAT NOT NULL,
     efficiency_expected FLOAT NOT NULL,
+    special_needs_accommodation FLOAT NOT NULL,
     supervision_style FLOAT NOT NULL,
     ease_of_communication FLOAT NOT NULL,
     absence_acceptance FLOAT NOT NULL,
-    supervision_comments VARCHAR(2000) NOT NULL,
-    acceptance_tsa FLOAT NOT NULL,
-    acceptance_language_disorder FLOAT NOT NULL,
-    acceptance_intellectual_disability FLOAT NOT NULL,
-    acceptance_physical_disability FLOAT NOT NULL,
-    acceptance_mental_health_disorder FLOAT NOT NULL,
-    acceptance_behavior_difficulties FLOAT NOT NULL,
+    sst_management FLOAT NOT NULL,
     FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE
 );
 

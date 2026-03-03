@@ -385,16 +385,6 @@ void main() {
   });
 
   group('PostInternshipEnterpriseEvaluation', () {
-    test('"hasDisorder" behaves properly', () {
-      final evaluation =
-          dummyPostInternshipEnterpriseEvaluation(hasDisorder: false);
-      expect(evaluation.hasDisorder, isFalse);
-      expect(
-          dummyPostInternshipEnterpriseEvaluation(hasDisorder: true)
-              .hasDisorder,
-          isTrue);
-    });
-
     test('serialization and deserialization works', () {
       final evaluation = dummyPostInternshipEnterpriseEvaluation();
       final serialized = evaluation.serialize();
@@ -409,20 +399,11 @@ void main() {
         'training_plan_respect': evaluation.trainingPlanRespect,
         'autonomy_expected': evaluation.autonomyExpected,
         'efficiency_expected': evaluation.efficiencyExpected,
+        'special_needs_accommodation': evaluation.specialNeedsAccommodation,
         'supervision_style': evaluation.supervisionStyle,
         'ease_of_communication': evaluation.easeOfCommunication,
         'absence_acceptance': evaluation.absenceAcceptance,
-        'supervision_comments': evaluation.supervisionComments,
-        'acceptance_tsa': evaluation.acceptanceTsa,
-        'acceptance_language_disorder': evaluation.acceptanceLanguageDisorder,
-        'acceptance_intellectual_disability':
-            evaluation.acceptanceIntellectualDisability,
-        'acceptance_physical_disability':
-            evaluation.acceptancePhysicalDisability,
-        'acceptance_mental_health_disorder':
-            evaluation.acceptanceMentalHealthDisorder,
-        'acceptance_behavior_difficulties':
-            evaluation.acceptanceBehaviorDifficulties,
+        'sst_management': evaluation.sstManagement,
       });
 
       expect(deserialized.id, evaluation.id);
@@ -432,21 +413,12 @@ void main() {
       expect(deserialized.trainingPlanRespect, evaluation.trainingPlanRespect);
       expect(deserialized.autonomyExpected, evaluation.autonomyExpected);
       expect(deserialized.efficiencyExpected, evaluation.efficiencyExpected);
+      expect(deserialized.specialNeedsAccommodation,
+          evaluation.specialNeedsAccommodation);
       expect(deserialized.supervisionStyle, evaluation.supervisionStyle);
       expect(deserialized.easeOfCommunication, evaluation.easeOfCommunication);
       expect(deserialized.absenceAcceptance, evaluation.absenceAcceptance);
-      expect(deserialized.supervisionComments, evaluation.supervisionComments);
-      expect(deserialized.acceptanceTsa, evaluation.acceptanceTsa);
-      expect(deserialized.acceptanceLanguageDisorder,
-          evaluation.acceptanceLanguageDisorder);
-      expect(deserialized.acceptanceIntellectualDisability,
-          evaluation.acceptanceIntellectualDisability);
-      expect(deserialized.acceptancePhysicalDisability,
-          evaluation.acceptancePhysicalDisability);
-      expect(deserialized.acceptanceMentalHealthDisorder,
-          evaluation.acceptanceMentalHealthDisorder);
-      expect(deserialized.acceptanceBehaviorDifficulties,
-          evaluation.acceptanceBehaviorDifficulties);
+      expect(deserialized.sstManagement, evaluation.sstManagement);
 
       // Test for empty deserialize to make sure it doesn't crash
       final emptyDeserialized =
@@ -458,16 +430,11 @@ void main() {
       expect(emptyDeserialized.trainingPlanRespect, 0);
       expect(emptyDeserialized.autonomyExpected, 0);
       expect(emptyDeserialized.efficiencyExpected, 0);
+      expect(emptyDeserialized.specialNeedsAccommodation, 0);
       expect(emptyDeserialized.supervisionStyle, 0);
       expect(emptyDeserialized.easeOfCommunication, 0);
       expect(emptyDeserialized.absenceAcceptance, 0);
-      expect(emptyDeserialized.supervisionComments, '');
-      expect(emptyDeserialized.acceptanceTsa, 0);
-      expect(emptyDeserialized.acceptanceLanguageDisorder, 0);
-      expect(emptyDeserialized.acceptanceIntellectualDisability, 0);
-      expect(emptyDeserialized.acceptancePhysicalDisability, 0);
-      expect(emptyDeserialized.acceptanceMentalHealthDisorder, 0);
-      expect(emptyDeserialized.acceptanceBehaviorDifficulties, 0);
+      expect(emptyDeserialized.sstManagement, 0);
     });
   });
 }

@@ -267,28 +267,24 @@ Enterprise dummyEnterprise({bool addJob = false}) {
 PostInternshipEnterpriseEvaluation dummyPostInternshipEnterpriseEvaluation({
   String id = 'postInternshipEnterpriseEvaluationId',
   String internshipId = 'internshipId',
-  bool hasDisorder = true,
 }) =>
     PostInternshipEnterpriseEvaluation(
-      id: id,
-      date: DateTime(2005, 11, 25),
-      internshipId: internshipId,
-      skillsRequired: ['Communiquer à l\'écrit', 'Interagir avec des clients'],
-      taskVariety: 0,
-      trainingPlanRespect: 1,
-      autonomyExpected: 4,
-      efficiencyExpected: 2,
-      supervisionStyle: 1,
-      easeOfCommunication: 5,
-      absenceAcceptance: 4,
-      supervisionComments: 'Milieu peu aidant, mais ouvert',
-      acceptanceTsa: -1,
-      acceptanceLanguageDisorder: hasDisorder ? 4 : -1,
-      acceptanceIntellectualDisability: hasDisorder ? 4 : -1,
-      acceptancePhysicalDisability: hasDisorder ? 4 : -1,
-      acceptanceMentalHealthDisorder: hasDisorder ? 2 : -1,
-      acceptanceBehaviorDifficulties: hasDisorder ? 2 : -1,
-    );
+        id: id,
+        date: DateTime(2005, 11, 25),
+        internshipId: internshipId,
+        skillsRequired: [
+          'Communiquer à l\'écrit',
+          'Interagir avec des clients'
+        ],
+        taskVariety: 0,
+        trainingPlanRespect: 1,
+        autonomyExpected: 4,
+        efficiencyExpected: 2,
+        specialNeedsAccommodation: 3,
+        supervisionStyle: 1,
+        easeOfCommunication: 5,
+        absenceAcceptance: 4,
+        sstManagement: 1);
 
 visa.InternshipEvaluationVisa dummyInternshipVisaEvaluation({
   String id = 'internshipVisaEvaluationId',

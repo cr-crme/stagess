@@ -115,6 +115,34 @@ enum EfficiencyExpected {
   }
 }
 
+enum SpecialNeedsAccommodation {
+  low,
+  high;
+
+  String get label {
+    switch (this) {
+      case SpecialNeedsAccommodation.low:
+        return 'Aucune\nouverture';
+      case SpecialNeedsAccommodation.high:
+        return 'Grande\nouverture';
+    }
+  }
+}
+
+enum SstManagement {
+  low,
+  high;
+
+  String get label {
+    switch (this) {
+      case SstManagement.low:
+        return 'Insuffisant';
+      case SstManagement.high:
+        return 'Rigoureux';
+    }
+  }
+}
+
 enum AutonomyExpected {
   low,
   high;

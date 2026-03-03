@@ -5,7 +5,6 @@ import 'package:stagess/common/extensions/job_extension.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/common/widgets/form_fields/low_high_slider_form_field.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
-import 'package:stagess/common/widgets/rating_bar_tile.dart';
 import 'package:stagess/screens/internship_forms/student_steps/enterprise_evaluation_form_enums.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
@@ -142,6 +141,7 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
                     _buildAutonomy(evaluations),
                     const SizedBox(height: 12),
                     _buildEfficiency(evaluations),
+                    // TODO update with new info
                     const SizedBox(height: 12),
                     _buildSupervisionStyle(evaluations),
                     const SizedBox(height: 12),
@@ -149,23 +149,13 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
                     const SizedBox(height: 12),
                     _buildAbsenceAcceptance(evaluations),
                     const SizedBox(height: 12),
-                    Visibility(
-                      visible: evaluations.any((e) => e.hasDisorder),
-                      child: Text(
-                        'Évaluation de l\'accueil de stagiaires avec',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleSmall!
-                            .copyWith(fontWeight: FontWeight.bold),
-                      ),
+                    Text(
+                      'Évaluation de l\'accueil de stagiaires avec',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleSmall!
+                          .copyWith(fontWeight: FontWeight.bold),
                     ),
-                    _buildAcceptanceTsa(evaluations),
-                    _buildAcceptanceLanguageDeficiency(evaluations),
-                    _buildAcceptanceMentalDeficiency(evaluations),
-                    _buildAcceptancePhysicalDeficiency(evaluations),
-                    _buildAcceptanceMentalHealtyIssue(evaluations),
-                    _buildAcceptanceBehaviorIssue(evaluations),
-                    _buildComments(context, evaluations),
                     const SizedBox(height: 12),
                   ],
                 ),
@@ -193,74 +183,6 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
         ),
       ],
     );
-  }
-
-  Widget _buildAcceptanceTsa(
-      List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return RatingBarTile(
-      title: 'Un trouble du spectre de l\'autisme (TSA)',
-      rating: _meanOf(evaluations, (e) => e.acceptanceTsa),
-    );
-  }
-
-  Widget _buildAcceptanceLanguageDeficiency(
-      List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return RatingBarTile(
-      title: 'Un trouble du langage',
-      rating: _meanOf(evaluations, (e) => e.acceptanceLanguageDisorder),
-    );
-  }
-
-  Widget _buildAcceptanceMentalDeficiency(
-      List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return RatingBarTile(
-      title: 'Une déficience intellectuelle',
-      rating: _meanOf(evaluations, (e) => e.acceptanceIntellectualDisability),
-    );
-  }
-
-  Widget _buildAcceptancePhysicalDeficiency(
-      List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return RatingBarTile(
-      title: 'Une déficience physique',
-      rating: _meanOf(evaluations, (e) => e.acceptancePhysicalDisability),
-    );
-  }
-
-  Widget _buildAcceptanceMentalHealtyIssue(
-      List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return RatingBarTile(
-      title: 'Un trouble de santé mentale',
-      rating: _meanOf(evaluations, (e) => e.acceptanceMentalHealthDisorder),
-    );
-  }
-
-  Widget _buildAcceptanceBehaviorIssue(
-      List<PostInternshipEnterpriseEvaluation> evaluations) {
-    return RatingBarTile(
-      title: 'Des difficultés comportementales',
-      rating: _meanOf(evaluations, (e) => e.acceptanceBehaviorDifficulties),
-    );
-  }
-
-  Widget _buildComments(BuildContext context,
-      List<PostInternshipEnterpriseEvaluation> evaluations) {
-    final comments = evaluations
-        .map((e) => e.supervisionComments)
-        .where((e) => e != '')
-        .toList();
-    return comments.isEmpty
-        ? Container()
-        : Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Autres commentaires sur l\'encadrement',
-                style: Theme.of(context).textTheme.titleSmall,
-              ),
-              ItemizedText(comments),
-            ],
-          );
   }
 
   Widget _buildTaskVariety(

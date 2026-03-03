@@ -15,7 +15,14 @@ class LowHighSliderFormField extends FormField<double> {
     this.lowLabel = 'Faible',
     this.highLabel = 'Élevé',
   })  : factor = pow(10, decimal).toDouble(),
-        super(builder: _builder, enabled: true, initialValue: initialValue);
+        super(
+            builder: _builder,
+            enabled: true,
+            initialValue: fixed
+                ? initialValue
+                : (initialValue < min || initialValue > max
+                    ? 3
+                    : initialValue));
 
   final double factor;
   final String lowLabel;
@@ -34,7 +41,7 @@ class LowHighSliderFormField extends FormField<double> {
     final max = (state.widget as LowHighSliderFormField).max;
     final onChanged = (state.widget as LowHighSliderFormField).onChanged;
 
-    if (state.value! < min || state.value! > max) {
+    if (fixed && (state.value! < min || state.value! > max)) {
       return const Text('Aucune donnée pour l\'instant.');
     }
 

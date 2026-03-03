@@ -17,16 +17,11 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
     required this.trainingPlanRespect,
     required this.autonomyExpected,
     required this.efficiencyExpected,
+    required this.specialNeedsAccommodation,
     required this.supervisionStyle,
     required this.easeOfCommunication,
     required this.absenceAcceptance,
-    required this.supervisionComments,
-    required this.acceptanceTsa,
-    required this.acceptanceLanguageDisorder,
-    required this.acceptanceIntellectualDisability,
-    required this.acceptancePhysicalDisability,
-    required this.acceptanceMentalHealthDisorder,
-    required this.acceptanceBehaviorDifficulties,
+    required this.sstManagement,
   });
 
   PostInternshipEnterpriseEvaluation.fromSerialized(super.map)
@@ -40,22 +35,13 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
             _doubleFromSerialized(map?['training_plan_respect']),
         autonomyExpected = _doubleFromSerialized(map?['autonomy_expected']),
         efficiencyExpected = _doubleFromSerialized(map?['efficiency_expected']),
+        specialNeedsAccommodation =
+            _doubleFromSerialized(map?['special_needs_accommodation']),
         supervisionStyle = _doubleFromSerialized(map?['supervision_style']),
         easeOfCommunication =
             _doubleFromSerialized(map?['ease_of_communication']),
         absenceAcceptance = _doubleFromSerialized(map?['absence_acceptance']),
-        supervisionComments = map?['supervision_comments'] ?? '',
-        acceptanceTsa = _doubleFromSerialized(map?['acceptance_tsa']),
-        acceptanceLanguageDisorder =
-            _doubleFromSerialized(map?['acceptance_language_disorder']),
-        acceptanceIntellectualDisability =
-            _doubleFromSerialized(map?['acceptance_intellectual_disability']),
-        acceptancePhysicalDisability =
-            _doubleFromSerialized(map?['acceptance_physical_disability']),
-        acceptanceMentalHealthDisorder =
-            _doubleFromSerialized(map?['acceptance_mental_health_disorder']),
-        acceptanceBehaviorDifficulties =
-            _doubleFromSerialized(map?['acceptance_behavior_difficulties']),
+        sstManagement = _doubleFromSerialized(map?['sst_management']),
         super.fromSerialized();
 
   PostInternshipEnterpriseEvaluation copyWith({
@@ -67,41 +53,28 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
     double? trainingPlanRespect,
     double? autonomyExpected,
     double? efficiencyExpected,
+    double? specialNeedsAccommodation,
     double? supervisionStyle,
     double? easeOfCommunication,
     double? absenceAcceptance,
-    String? supervisionComments,
-    double? acceptanceTsa,
-    double? acceptanceLanguageDisorder,
-    double? acceptanceIntellectualDisability,
-    double? acceptancePhysicalDisability,
-    double? acceptanceMentalHealthDisorder,
-    double? acceptanceBehaviorDifficulties,
+    double? sstManagement,
   }) {
     return PostInternshipEnterpriseEvaluation(
-        id: id ?? this.id,
-        date: date ?? this.date,
-        internshipId: internshipId ?? this.internshipId,
-        skillsRequired: skillsRequired ?? this.skillsRequired,
-        taskVariety: taskVariety ?? this.taskVariety,
-        trainingPlanRespect: trainingPlanRespect ?? this.trainingPlanRespect,
-        autonomyExpected: autonomyExpected ?? this.autonomyExpected,
-        efficiencyExpected: efficiencyExpected ?? this.efficiencyExpected,
-        supervisionStyle: supervisionStyle ?? this.supervisionStyle,
-        easeOfCommunication: easeOfCommunication ?? this.easeOfCommunication,
-        absenceAcceptance: absenceAcceptance ?? this.absenceAcceptance,
-        supervisionComments: supervisionComments ?? this.supervisionComments,
-        acceptanceTsa: acceptanceTsa ?? this.acceptanceTsa,
-        acceptanceLanguageDisorder:
-            acceptanceLanguageDisorder ?? this.acceptanceLanguageDisorder,
-        acceptanceIntellectualDisability: acceptanceIntellectualDisability ??
-            this.acceptanceIntellectualDisability,
-        acceptancePhysicalDisability:
-            acceptancePhysicalDisability ?? this.acceptancePhysicalDisability,
-        acceptanceMentalHealthDisorder: acceptanceMentalHealthDisorder ??
-            this.acceptanceMentalHealthDisorder,
-        acceptanceBehaviorDifficulties: acceptanceBehaviorDifficulties ??
-            this.acceptanceBehaviorDifficulties);
+      id: id ?? this.id,
+      date: date ?? this.date,
+      internshipId: internshipId ?? this.internshipId,
+      skillsRequired: skillsRequired ?? this.skillsRequired,
+      taskVariety: taskVariety ?? this.taskVariety,
+      trainingPlanRespect: trainingPlanRespect ?? this.trainingPlanRespect,
+      autonomyExpected: autonomyExpected ?? this.autonomyExpected,
+      efficiencyExpected: efficiencyExpected ?? this.efficiencyExpected,
+      specialNeedsAccommodation:
+          specialNeedsAccommodation ?? this.specialNeedsAccommodation,
+      supervisionStyle: supervisionStyle ?? this.supervisionStyle,
+      easeOfCommunication: easeOfCommunication ?? this.easeOfCommunication,
+      absenceAcceptance: absenceAcceptance ?? this.absenceAcceptance,
+      sstManagement: sstManagement ?? this.sstManagement,
+    );
   }
 
   PostInternshipEnterpriseEvaluation copyWithData(
@@ -109,38 +82,35 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
     if (serialized == null || serialized.isEmpty) return copyWith();
 
     return PostInternshipEnterpriseEvaluation(
-        id: serialized['id'] ?? id,
-        date: DateTimeExt.from(serialized['date']) ?? date,
-        internshipId: serialized['internship_id'] ?? internshipId,
-        skillsRequired: ListExt.from(serialized['skills_required'], deserializer: (e) => StringExt.from(e)!) ??
-            skillsRequired,
-        taskVariety: _doubleFromSerialized(serialized['task_variety'],
-            defaultValue: taskVariety),
-        trainingPlanRespect: _doubleFromSerialized(serialized['training_plan_respect'],
-            defaultValue: trainingPlanRespect),
-        autonomyExpected: _doubleFromSerialized(serialized['autonomy_expected'],
-            defaultValue: autonomyExpected),
-        efficiencyExpected: _doubleFromSerialized(serialized['efficiency_expected'],
-            defaultValue: efficiencyExpected),
-        supervisionStyle: _doubleFromSerialized(serialized['supervision_style'],
-            defaultValue: supervisionStyle),
-        easeOfCommunication: _doubleFromSerialized(serialized['ease_of_communication'],
-            defaultValue: easeOfCommunication),
-        absenceAcceptance: _doubleFromSerialized(serialized['absence_acceptance'],
-            defaultValue: absenceAcceptance),
-        supervisionComments:
-            serialized['supervision_comments'] ?? supervisionComments,
-        acceptanceTsa: _doubleFromSerialized(serialized['acceptance_tsa'],
-            defaultValue: acceptanceTsa),
-        acceptanceLanguageDisorder: _doubleFromSerialized(
-            serialized['acceptance_language_disorder'],
-            defaultValue: acceptanceLanguageDisorder),
-        acceptanceIntellectualDisability: _doubleFromSerialized(
-            serialized['acceptance_intellectual_disability'],
-            defaultValue: acceptanceIntellectualDisability),
-        acceptancePhysicalDisability: _doubleFromSerialized(serialized['acceptance_physical_disability'], defaultValue: acceptancePhysicalDisability),
-        acceptanceMentalHealthDisorder: _doubleFromSerialized(serialized['acceptance_mental_health_disorder'], defaultValue: acceptanceMentalHealthDisorder),
-        acceptanceBehaviorDifficulties: _doubleFromSerialized(serialized['acceptance_behavior_difficulties'], defaultValue: acceptanceBehaviorDifficulties));
+      id: serialized['id'] ?? id,
+      date: DateTimeExt.from(serialized['date']) ?? date,
+      internshipId: serialized['internship_id'] ?? internshipId,
+      skillsRequired: ListExt.from(serialized['skills_required'],
+              deserializer: (e) => StringExt.from(e)!) ??
+          skillsRequired,
+      taskVariety: _doubleFromSerialized(serialized['task_variety'],
+          defaultValue: taskVariety),
+      trainingPlanRespect: _doubleFromSerialized(
+          serialized['training_plan_respect'],
+          defaultValue: trainingPlanRespect),
+      autonomyExpected: _doubleFromSerialized(serialized['autonomy_expected'],
+          defaultValue: autonomyExpected),
+      efficiencyExpected: _doubleFromSerialized(
+          serialized['efficiency_expected'],
+          defaultValue: efficiencyExpected),
+      specialNeedsAccommodation: _doubleFromSerialized(
+          serialized['special_needs_accommodation'],
+          defaultValue: specialNeedsAccommodation),
+      supervisionStyle: _doubleFromSerialized(serialized['supervision_style'],
+          defaultValue: supervisionStyle),
+      easeOfCommunication: _doubleFromSerialized(
+          serialized['ease_of_communication'],
+          defaultValue: easeOfCommunication),
+      absenceAcceptance: _doubleFromSerialized(serialized['absence_acceptance'],
+          defaultValue: absenceAcceptance),
+      sstManagement: _doubleFromSerialized(serialized['sst_management'],
+          defaultValue: sstManagement),
+    );
   }
 
   String internshipId;
@@ -155,27 +125,15 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
   final double trainingPlanRespect;
   final double autonomyExpected;
   final double efficiencyExpected;
+  final double specialNeedsAccommodation;
 
   // Management
   final double supervisionStyle;
   final double easeOfCommunication;
   final double absenceAcceptance;
-  final String supervisionComments;
+  final double sstManagement;
 
   // Supervision
-  final double acceptanceTsa;
-  final double acceptanceLanguageDisorder;
-  final double acceptanceIntellectualDisability;
-  final double acceptancePhysicalDisability;
-  final double acceptanceMentalHealthDisorder;
-  final double acceptanceBehaviorDifficulties;
-  bool get hasDisorder =>
-      acceptanceTsa >= 0 ||
-      acceptanceLanguageDisorder >= 0 ||
-      acceptanceIntellectualDisability >= 0 ||
-      acceptancePhysicalDisability >= 0 ||
-      acceptanceMentalHealthDisorder >= 0 ||
-      acceptanceBehaviorDifficulties >= 0;
 
   @override
   Map<String, dynamic> serializedMap() => {
@@ -187,16 +145,11 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
         'training_plan_respect': trainingPlanRespect,
         'autonomy_expected': autonomyExpected,
         'efficiency_expected': efficiencyExpected,
+        'special_needs_accommodation': specialNeedsAccommodation,
         'supervision_style': supervisionStyle,
         'ease_of_communication': easeOfCommunication,
         'absence_acceptance': absenceAcceptance,
-        'supervision_comments': supervisionComments,
-        'acceptance_tsa': acceptanceTsa,
-        'acceptance_language_disorder': acceptanceLanguageDisorder,
-        'acceptance_intellectual_disability': acceptanceIntellectualDisability,
-        'acceptance_physical_disability': acceptancePhysicalDisability,
-        'acceptance_mental_health_disorder': acceptanceMentalHealthDisorder,
-        'acceptance_behavior_difficulties': acceptanceBehaviorDifficulties,
+        'sst_management': sstManagement,
       };
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
@@ -208,16 +161,11 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
         'training_plan_respect': FetchableFields.optional,
         'autonomy_expected': FetchableFields.optional,
         'efficiency_expected': FetchableFields.optional,
+        'special_needs_accommodation': FetchableFields.optional,
         'supervision_style': FetchableFields.optional,
         'ease_of_communication': FetchableFields.optional,
         'absence_acceptance': FetchableFields.optional,
-        'supervision_comments': FetchableFields.optional,
-        'acceptance_tsa': FetchableFields.optional,
-        'acceptance_language_disorder': FetchableFields.optional,
-        'acceptance_intellectual_disability': FetchableFields.optional,
-        'acceptance_physical_disability': FetchableFields.optional,
-        'acceptance_mental_health_disorder': FetchableFields.optional,
-        'acceptance_behavior_difficulties': FetchableFields.optional,
+        'sst_management': FetchableFields.optional,
       });
 
   @override
@@ -229,15 +177,11 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
         'trainingPlanRespect: $trainingPlanRespect, '
         'autonomyExpected: $autonomyExpected, '
         'efficiencyExpected: $efficiencyExpected, '
+        'specialNeedsAccommodation: $specialNeedsAccommodation, '
         'supervisionStyle: $supervisionStyle, '
         'easeOfCommunication: $easeOfCommunication, '
         'absenceAcceptance: $absenceAcceptance, '
-        'supervisionComments: $supervisionComments, '
-        'acceptanceTsa: $acceptanceTsa, '
-        'acceptanceLanguageDisorder: $acceptanceLanguageDisorder, '
-        'acceptanceIntellectualDisability: $acceptanceIntellectualDisability, '
-        'acceptancePhysicalDisability: $acceptancePhysicalDisability, '
-        'acceptanceMentalHealthDisorder: $acceptanceMentalHealthDisorder, '
-        'acceptanceBehaviorDifficulties: $acceptanceBehaviorDifficulties}';
+        'sstManagement: $sstManagement, '
+        '}';
   }
 }

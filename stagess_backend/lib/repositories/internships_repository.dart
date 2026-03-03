@@ -260,16 +260,11 @@ class MySqlInternshipsRepository extends InternshipsRepository {
               'training_plan_respect',
               'autonomy_expected',
               'efficiency_expected',
+              'special_needs_accommodation',
               'supervision_style',
               'ease_of_communication',
               'absence_acceptance',
-              'supervision_comments',
-              'acceptance_tsa',
-              'acceptance_language_disorder',
-              'acceptance_intellectual_disability',
-              'acceptance_physical_disability',
-              'acceptance_mental_health_disorder',
-              'acceptance_behavior_difficulties'
+              'sst_management',
             ],
             idNameToDataTable: 'internship_id',
           ),
@@ -1037,21 +1032,12 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             'training_plan_respect': serialized['training_plan_respect'],
             'autonomy_expected': serialized['autonomy_expected'],
             'efficiency_expected': serialized['efficiency_expected'],
+            'special_needs_accommodation':
+                serialized['special_needs_accommodation'],
             'supervision_style': serialized['supervision_style'],
             'ease_of_communication': serialized['ease_of_communication'],
             'absence_acceptance': serialized['absence_acceptance'],
-            'supervision_comments': serialized['supervision_comments'],
-            'acceptance_tsa': serialized['acceptance_tsa'],
-            'acceptance_language_disorder':
-                serialized['acceptance_language_disorder'],
-            'acceptance_intellectual_disability':
-                serialized['acceptance_intellectual_disability'],
-            'acceptance_physical_disability':
-                serialized['acceptance_physical_disability'],
-            'acceptance_mental_health_disorder':
-                serialized['acceptance_mental_health_disorder'],
-            'acceptance_behavior_difficulties':
-                serialized['acceptance_behavior_difficulties'],
+            'sst_management': serialized['sst_management'],
           });
 
       for (final skill in (serialized['skills_required'] as List?) ?? []) {

@@ -2207,16 +2207,11 @@ Future<void> _addDummyInternships(
     trainingPlanRespect: 1,
     autonomyExpected: 4,
     efficiencyExpected: 2,
+    specialNeedsAccommodation: 3,
     supervisionStyle: 1,
     easeOfCommunication: 5,
     absenceAcceptance: 4,
-    supervisionComments: 'Milieu peu aidant, mais ouvert',
-    acceptanceTsa: -1,
-    acceptanceLanguageDisorder: 4,
-    acceptanceIntellectualDisability: 4,
-    acceptancePhysicalDisability: 4,
-    acceptanceMentalHealthDisorder: 2,
-    acceptanceBehaviorDifficulties: 2,
+    sstManagement: 1,
   ));
   internships.add(internship);
 
