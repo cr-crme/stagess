@@ -10,6 +10,7 @@ import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common/models/internships/internship_contract.dart';
 import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/sst_evaluation.dart';
@@ -1878,7 +1879,6 @@ Future<void> _addDummyInternships(
   internships.add(
     Internship(
       schoolBoardId: schoolBoardId,
-      creationDate: DateTime.now(),
       studentId: students.firstWhere((e) => e.fullName == 'Cedric Masson').id,
       signatoryTeacherId: teacherA1Id,
       extraSupervisingTeacherIds: [],
@@ -1888,88 +1888,99 @@ Future<void> _addDummyInternships(
         ActivitySectorsService.activitySectors[2].specializations[1].id,
         ActivitySectorsService.activitySectors[1].specializations[0].id,
       ],
-      supervisor: Person(
-        firstName: 'Robert',
-        middleName: null,
-        lastName: 'Marceau',
-        dateBirth: null,
-        phone: PhoneNumber.fromString('514-555-1234'),
-        address: null,
-        email: 'r.marceau@mon_entreprise.com',
-      ),
-      dates: period,
       expectedDuration: 135,
       achievedDuration: -1,
       endDate: DateTime(0),
-      teacherNotes: 'Sonner à l\'interphone à l\'arrière du garage pour entrer',
-      weeklySchedules: [
-        WeeklySchedule(
-          schedule: {
-            Day.monday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+      contracts: [
+        InternshipContract(
+          date: DateTime.now(),
+          supervisor: Person(
+            firstName: 'Robert',
+            middleName: null,
+            lastName: 'Marceau',
+            dateBirth: null,
+            phone: PhoneNumber.fromString('514-555-1234'),
+            address: null,
+            email: 'r.marceau@mon_entreprise.com',
+          ),
+          dates: period,
+          weeklySchedules: [
+            WeeklySchedule(
+              schedule: {
+                Day.monday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
                 ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                Day.tuesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
                 ),
-              ],
+                Day.wednesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.thursday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.friday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+              },
+              period: period,
             ),
-            Day.tuesday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.wednesday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.thursday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.friday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-          },
-          period: period,
+          ],
+          transportations: [Transportation.yes, Transportation.pass],
+          visitFrequencies: 'Une visite par semaine',
+          formVersion: InternshipContract.currentVersion,
         ),
       ],
-      transportations: [Transportation.yes, Transportation.pass],
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      visaEvaluations: [],
+      teacherNotes: 'Sonner à l\'interphone à l\'arrière du garage pour entrer',
       sstEvaluations: [
         SstEvaluation(
           presentAtEvaluation: [
@@ -1989,7 +2000,6 @@ Future<void> _addDummyInternships(
           date: DateTime.now(),
         )
       ],
-      visitFrequencies: 'Une visite par semaine',
     ),
   );
 
@@ -2001,7 +2011,6 @@ Future<void> _addDummyInternships(
   internships.add(
     Internship(
         schoolBoardId: schoolBoardId,
-        creationDate: DateTime.now(),
         studentId: students.firstWhere((e) => e.fullName == 'Thomas Caron').id,
         signatoryTeacherId: teacherA1Id,
         extraSupervisingTeacherIds: [],
@@ -2012,19 +2021,148 @@ Future<void> _addDummyInternships(
             .jobs[0]
             .id,
         extraSpecializationIds: [],
+        expectedDuration: 135,
+        achievedDuration: -1,
+        endDate: DateTime(0),
+        contracts: [
+          InternshipContract(
+            date: DateTime.now(),
+            supervisor: Person(
+              firstName: 'Claude',
+              middleName: null,
+              lastName: 'Simard',
+              dateBirth: null,
+              phone: null,
+              address: null,
+              email: '',
+            ),
+            dates: period,
+            weeklySchedules: [
+              WeeklySchedule(
+                schedule: {
+                  Day.monday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                  Day.tuesday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                  Day.wednesday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                  Day.thursday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                  Day.friday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                },
+                period: period,
+              ),
+            ],
+            transportations: [Transportation.pass],
+            visitFrequencies: 'Une visite par semaine',
+            formVersion: InternshipContract.currentVersion,
+          ),
+        ],
+        skillEvaluations: [],
+        attitudeEvaluations: [],
+        enterpriseEvaluations: [],
+        visaEvaluations: [],
+        teacherNotes: '',
+        sstEvaluations: [
+          SstEvaluation(
+            presentAtEvaluation: ['Responsable en milieu de stage'],
+            questions: {
+              'Q1': ['Oui'],
+              'Q1+t': [
+                'En début et en fin de journée, surtout des pots de fleurs.',
+              ],
+              'Q3': ['Un diable'],
+              'Q5': ['Un couteau', 'Des ciseaux'],
+              'Q7': ['Des pesticides', 'Engrais'],
+              'Q12': ['__NOT_APPLICABLE_INTERNAL__'],
+              'Q15': ['Oui'],
+              'Q15+t': ['Aucun'],
+              'Q16': ['Ranger le local avant de quitter'],
+            },
+          )
+        ]),
+  );
+
+  startingPeriod = DateTime.now();
+  period = time_utils.DateTimeRange(
+    start: startingPeriod,
+    end: startingPeriod.add(Duration(days: 180)),
+  );
+  var internship = Internship(
+    schoolBoardId: schoolBoardId,
+    studentId: students.firstWhere((e) => e.fullName == 'Melissa Poulain').id,
+    signatoryTeacherId: teacherA1Id,
+    extraSupervisingTeacherIds: [],
+    enterpriseId: enterprises.firstWhere((e) => e.name == 'Subway').id,
+    jobId: enterprises.firstWhere((e) => e.name == 'Subway').jobs[0].id,
+    extraSpecializationIds: [],
+    endDate: DateTime.now().add(const Duration(days: 10)),
+    expectedDuration: 135,
+    achievedDuration: 125,
+    contracts: [
+      InternshipContract(
+        date: DateTime.now(),
         supervisor: Person(
-          firstName: 'Claude',
+          firstName: 'Carole',
           middleName: null,
-          lastName: 'Simard',
+          lastName: 'Moisan',
           dateBirth: null,
           phone: null,
           address: null,
           email: '',
         ),
         dates: period,
-        expectedDuration: 135,
-        achievedDuration: -1,
-        endDate: DateTime(0),
         weeklySchedules: [
           WeeklySchedule(
             schedule: {
@@ -2076,128 +2214,21 @@ Future<void> _addDummyInternships(
                   ),
                 ],
               ),
-              Day.friday: DailySchedule(
-                blocks: [
-                  TimeBlock(
-                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                  ),
-                  TimeBlock(
-                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                  ),
-                ],
-              ),
             },
             period: period,
           ),
         ],
-        transportations: [Transportation.pass],
-        visitFrequencies: 'Une visite par semaine',
-        sstEvaluations: [
-          SstEvaluation(
-            presentAtEvaluation: ['Responsable en milieu de stage'],
-            questions: {
-              'Q1': ['Oui'],
-              'Q1+t': [
-                'En début et en fin de journée, surtout des pots de fleurs.',
-              ],
-              'Q3': ['Un diable'],
-              'Q5': ['Un couteau', 'Des ciseaux'],
-              'Q7': ['Des pesticides', 'Engrais'],
-              'Q12': ['__NOT_APPLICABLE_INTERNAL__'],
-              'Q15': ['Oui'],
-              'Q15+t': ['Aucun'],
-              'Q16': ['Ranger le local avant de quitter'],
-            },
-          )
-        ]),
-  );
-
-  startingPeriod = DateTime.now();
-  period = time_utils.DateTimeRange(
-    start: startingPeriod,
-    end: startingPeriod.add(Duration(days: 180)),
-  );
-  var internship = Internship(
-    schoolBoardId: schoolBoardId,
-    creationDate: DateTime.now(),
-    studentId: students.firstWhere((e) => e.fullName == 'Melissa Poulain').id,
-    signatoryTeacherId: teacherA1Id,
-    extraSupervisingTeacherIds: [],
-    enterpriseId: enterprises.firstWhere((e) => e.name == 'Subway').id,
-    jobId: enterprises.firstWhere((e) => e.name == 'Subway').jobs[0].id,
-    extraSpecializationIds: [],
-    supervisor: Person(
-      firstName: 'Carole',
-      middleName: null,
-      lastName: 'Moisan',
-      dateBirth: null,
-      phone: null,
-      address: null,
-      email: '',
-    ),
-    dates: period,
-    endDate: DateTime.now().add(const Duration(days: 10)),
-    expectedDuration: 135,
-    achievedDuration: 125,
-    weeklySchedules: [
-      WeeklySchedule(
-        schedule: {
-          Day.monday: DailySchedule(
-            blocks: [
-              TimeBlock(
-                start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-              ),
-              TimeBlock(
-                start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-              ),
-            ],
-          ),
-          Day.tuesday: DailySchedule(
-            blocks: [
-              TimeBlock(
-                start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-              ),
-              TimeBlock(
-                start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-              ),
-            ],
-          ),
-          Day.wednesday: DailySchedule(
-            blocks: [
-              TimeBlock(
-                start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-              ),
-              TimeBlock(
-                start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-              ),
-            ],
-          ),
-          Day.thursday: DailySchedule(
-            blocks: [
-              TimeBlock(
-                start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-              ),
-              TimeBlock(
-                start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-              ),
-            ],
-          ),
-        },
-        period: period,
+        transportations: [Transportation.none],
+        visitFrequencies: 'Une visite par mois',
+        formVersion: InternshipContract.currentVersion,
       ),
     ],
-    transportations: [Transportation.none],
-    visitFrequencies: 'Une visite par mois',
+    skillEvaluations: [],
+    attitudeEvaluations: [],
+    enterpriseEvaluations: [],
+    visaEvaluations: [],
+    sstEvaluations: [],
+    teacherNotes: '',
   );
   internship.enterpriseEvaluations.add(PostInternshipEnterpriseEvaluation(
     internshipId: internship.id,
@@ -2223,71 +2254,82 @@ Future<void> _addDummyInternships(
   internships.add(
     Internship(
       schoolBoardId: schoolBoardId,
-      creationDate: DateTime.now(),
       studentId: students.firstWhere((e) => e.fullName == 'Vincent Picard').id,
       signatoryTeacherId: teacherA2Id,
       extraSupervisingTeacherIds: [],
       enterpriseId: enterprises.firstWhere((e) => e.name == 'IGA').id,
       jobId: enterprises.firstWhere((e) => e.name == 'IGA').jobs[0].id,
       extraSpecializationIds: [],
-      supervisor: Person(
-        firstName: 'Charles',
-        middleName: null,
-        lastName: 'Villeneuve',
-        dateBirth: null,
-        phone: null,
-        address: null,
-        email: '',
-      ),
-      dates: period,
       expectedDuration: 135,
       achievedDuration: -1,
       endDate: DateTime(0),
-      weeklySchedules: [
-        WeeklySchedule(
-          schedule: {
-            Day.monday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+      contracts: [
+        InternshipContract(
+          date: DateTime.now(),
+          supervisor: Person(
+            firstName: 'Charles',
+            middleName: null,
+            lastName: 'Villeneuve',
+            dateBirth: null,
+            phone: null,
+            address: null,
+            email: '',
+          ),
+          dates: period,
+          weeklySchedules: [
+            WeeklySchedule(
+              schedule: {
+                Day.monday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
                 ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                Day.tuesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
                 ),
-              ],
+                Day.wednesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+              },
+              period: period,
             ),
-            Day.tuesday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.wednesday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-          },
-          period: period,
+          ],
+          transportations: [Transportation.yes],
+          visitFrequencies: 'Une visite par semaine',
+          formVersion: InternshipContract.currentVersion,
         ),
       ],
-      transportations: [Transportation.yes],
-      visitFrequencies: 'Une visite par semaine',
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      visaEvaluations: [],
+      sstEvaluations: [],
+      teacherNotes: '',
     ),
   );
 
@@ -2298,88 +2340,99 @@ Future<void> _addDummyInternships(
   );
   internships.add(
     Internship(
-        schoolBoardId: schoolBoardId,
-        creationDate: DateTime.now(),
-        studentId: students.firstWhere((e) => e.fullName == 'Simon Gingras').id,
-        // This is a Roméo Montaigu's student
-        signatoryTeacherId: teacherB1Id,
-        extraSupervisingTeacherIds: [],
-        enterpriseId: enterprises.firstWhere((e) => e.name == 'Auto Care').id,
-        jobId: enterprises.firstWhere((e) => e.name == 'Auto Care').jobs[0].id,
-        extraSpecializationIds: [],
-        supervisor: Person(
-          firstName: 'Thomas',
-          middleName: null,
-          lastName: 'Giroud',
-          dateBirth: null,
-          phone: null,
-          address: null,
-          email: '',
-        ),
-        dates: period,
-        endDate: DateTime.now().add(const Duration(days: 10)),
-        expectedDuration: 135,
-        achievedDuration: -1,
-        weeklySchedules: [
-          WeeklySchedule(
-            schedule: {
-              Day.monday: DailySchedule(
-                blocks: [
-                  TimeBlock(
-                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                  ),
-                  TimeBlock(
-                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                  ),
-                ],
-              ),
-              Day.wednesday: DailySchedule(
-                blocks: [
-                  TimeBlock(
-                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                  ),
-                  TimeBlock(
-                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                  ),
-                ],
-              ),
-              Day.friday: DailySchedule(
-                blocks: [
-                  TimeBlock(
-                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                  ),
-                  TimeBlock(
-                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                  ),
-                ],
-              ),
-            },
-            period: period,
+      schoolBoardId: schoolBoardId,
+      studentId: students.firstWhere((e) => e.fullName == 'Simon Gingras').id,
+      // This is a Roméo Montaigu's student
+      signatoryTeacherId: teacherB1Id,
+      extraSupervisingTeacherIds: [],
+      enterpriseId: enterprises.firstWhere((e) => e.name == 'Auto Care').id,
+      jobId: enterprises.firstWhere((e) => e.name == 'Auto Care').jobs[0].id,
+      extraSpecializationIds: [],
+      endDate: DateTime.now().add(const Duration(days: 10)),
+      expectedDuration: 135,
+      achievedDuration: -1,
+      contracts: [
+        InternshipContract(
+          date: DateTime.now(),
+          supervisor: Person(
+            firstName: 'Thomas',
+            middleName: null,
+            lastName: 'Giroud',
+            dateBirth: null,
+            phone: null,
+            address: null,
+            email: '',
           ),
-        ],
-        transportations: [Transportation.ticket],
-        visitFrequencies: 'Une visite par semaine',
-        sstEvaluations: [
-          SstEvaluation(
-            presentAtEvaluation: ['Responsable en milieu de stage'],
-            questions: {
-              'Q1': ['Non'],
-              'Q5': ['Des couteaux'],
-              'Q9': ['Des solvants', 'Des produits ménagers'],
-              'Q12': ['__NOT_APPLICABLE_INTERNAL__'],
-              'Q12+t': ['Bouchons a oreilles'],
-              'Q15': ['Oui'],
-              'Q15+t': ['Travail quotidien avec les clients'],
-            },
-            date: DateTime.now(),
-          )
-        ]),
+          dates: period,
+          weeklySchedules: [
+            WeeklySchedule(
+              schedule: {
+                Day.monday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.wednesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.friday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+              },
+              period: period,
+            ),
+          ],
+          transportations: [Transportation.ticket],
+          visitFrequencies: 'Une visite par semaine',
+          formVersion: InternshipContract.currentVersion,
+        ),
+      ],
+      sstEvaluations: [
+        SstEvaluation(
+          presentAtEvaluation: ['Responsable en milieu de stage'],
+          questions: {
+            'Q1': ['Non'],
+            'Q5': ['Des couteaux'],
+            'Q9': ['Des solvants', 'Des produits ménagers'],
+            'Q12': ['__NOT_APPLICABLE_INTERNAL__'],
+            'Q12+t': ['Bouchons a oreilles'],
+            'Q15': ['Oui'],
+            'Q15+t': ['Travail quotidien avec les clients'],
+          },
+          date: DateTime.now(),
+        )
+      ],
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      visaEvaluations: [],
+      teacherNotes: '',
+    ),
   );
 
   startingPeriod = DateTime.now().subtract(const Duration(days: 100));
@@ -2390,95 +2443,106 @@ Future<void> _addDummyInternships(
   internships.add(
     Internship(
       schoolBoardId: schoolBoardId,
-      creationDate: DateTime.now(),
       studentId: students.firstWhere((e) => e.fullName == 'Jeanne Tremblay').id,
       signatoryTeacherId: teacherA1Id,
       extraSupervisingTeacherIds: [],
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').id,
       jobId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').jobs[0].id,
       extraSpecializationIds: [],
-      supervisor: Person(
-        firstName: 'Maxime',
-        middleName: null,
-        lastName: 'Lefrançois',
-        dateBirth: null,
-        phone: PhoneNumber.fromString('123-456-7890'),
-        address: null,
-        email: '',
-      ),
-      dates: period,
       expectedDuration: 135,
       achievedDuration: -1,
       endDate: DateTime(0),
-      weeklySchedules: [
-        WeeklySchedule(
-          schedule: {
-            Day.monday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+      contracts: [
+        InternshipContract(
+          date: DateTime.now(),
+          supervisor: Person(
+            firstName: 'Maxime',
+            middleName: null,
+            lastName: 'Lefrançois',
+            dateBirth: null,
+            phone: PhoneNumber.fromString('123-456-7890'),
+            address: null,
+            email: '',
+          ),
+          dates: period,
+          weeklySchedules: [
+            WeeklySchedule(
+              schedule: {
+                Day.monday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
                 ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                Day.tuesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
                 ),
-              ],
+                Day.wednesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.thursday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.friday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+              },
+              period: period,
             ),
-            Day.tuesday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.wednesday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.thursday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.friday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-          },
-          period: period,
-        ),
+          ],
+          transportations: [Transportation.none],
+          visitFrequencies: 'Jamais',
+          formVersion: InternshipContract.currentVersion,
+        )
       ],
-      transportations: [Transportation.none],
-      visitFrequencies: 'Jamais',
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      visaEvaluations: [],
+      sstEvaluations: [],
+      teacherNotes: '',
     ),
   );
 
@@ -2490,95 +2554,106 @@ Future<void> _addDummyInternships(
   internships.add(
     Internship(
       schoolBoardId: schoolBoardId,
-      creationDate: DateTime.now(),
       studentId: students.firstWhere((e) => e.fullName == 'Diego Vargas').id,
       signatoryTeacherId: teacherB1Id,
       extraSupervisingTeacherIds: [teacherB1Id],
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').id,
       jobId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').jobs[1].id,
       extraSpecializationIds: [],
-      supervisor: Person(
-        firstName: 'Mathilde',
-        middleName: null,
-        lastName: 'Delaume',
-        dateBirth: null,
-        phone: null,
-        address: null,
-        email: '',
-      ),
-      dates: period,
       expectedDuration: 135,
       achievedDuration: -1,
       endDate: DateTime(0),
-      weeklySchedules: [
-        WeeklySchedule(
-          schedule: {
-            Day.monday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+      contracts: [
+        InternshipContract(
+          date: DateTime.now(),
+          supervisor: Person(
+            firstName: 'Mathilde',
+            middleName: null,
+            lastName: 'Delaume',
+            dateBirth: null,
+            phone: null,
+            address: null,
+            email: '',
+          ),
+          dates: period,
+          weeklySchedules: [
+            WeeklySchedule(
+              schedule: {
+                Day.monday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
                 ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                Day.tuesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
                 ),
-              ],
+                Day.wednesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.thursday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.friday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+              },
+              period: period,
             ),
-            Day.tuesday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.wednesday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.thursday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-            Day.friday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-          },
-          period: period,
+          ],
+          transportations: [Transportation.none],
+          visitFrequencies: 'Une visite par semaine',
+          formVersion: InternshipContract.currentVersion,
         ),
       ],
-      transportations: [Transportation.none],
-      visitFrequencies: 'Une visite par semaine',
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      visaEvaluations: [],
+      sstEvaluations: [],
+      teacherNotes: '',
     ),
   );
 
@@ -2589,75 +2664,84 @@ Future<void> _addDummyInternships(
   );
   internships.add(
     Internship(
-        schoolBoardId: schoolBoardId,
-        creationDate: DateTime.now(),
-        studentId:
-            students.firstWhere((e) => e.fullName == 'Vanessa Monette').id,
-        signatoryTeacherId: teacherA1Id,
-        extraSupervisingTeacherIds: [],
-        enterpriseId: enterprises.firstWhere((e) => e.name == 'Jean Coutu').id,
-        jobId: enterprises.firstWhere((e) => e.name == 'Jean Coutu').jobs[0].id,
-        extraSpecializationIds: [],
-        supervisor: Person(
-          firstName: 'Francis',
-          middleName: null,
-          lastName: 'Beaudet',
-          dateBirth: null,
-          phone: null,
-          address: null,
-          email: '',
-        ),
-        dates: period,
-        endDate: period.end,
-        expectedDuration: 135,
-        achievedDuration: 100,
-        weeklySchedules: [
-          WeeklySchedule(
-            schedule: {
-              Day.monday: DailySchedule(
-                blocks: [
-                  TimeBlock(
-                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+      schoolBoardId: schoolBoardId,
+      studentId: students.firstWhere((e) => e.fullName == 'Vanessa Monette').id,
+      signatoryTeacherId: teacherA1Id,
+      extraSupervisingTeacherIds: [],
+      enterpriseId: enterprises.firstWhere((e) => e.name == 'Jean Coutu').id,
+      jobId: enterprises.firstWhere((e) => e.name == 'Jean Coutu').jobs[0].id,
+      extraSpecializationIds: [],
+      endDate: period.end,
+      expectedDuration: 135,
+      achievedDuration: 100,
+      contracts: [
+        InternshipContract(
+            date: DateTime.now(),
+            supervisor: Person(
+              firstName: 'Francis',
+              middleName: null,
+              lastName: 'Beaudet',
+              dateBirth: null,
+              phone: null,
+              address: null,
+              email: '',
+            ),
+            dates: period,
+            weeklySchedules: [
+              WeeklySchedule(
+                schedule: {
+                  Day.monday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
                   ),
-                  TimeBlock(
-                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                  Day.tuesday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
                   ),
-                ],
+                },
+                period: period,
               ),
-              Day.tuesday: DailySchedule(
-                blocks: [
-                  TimeBlock(
-                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                  ),
-                  TimeBlock(
-                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                  ),
-                ],
-              ),
-            },
-            period: period,
-          ),
-        ],
-        transportations: [Transportation.none],
-        visitFrequencies: 'Une visite par semaine',
-        sstEvaluations: [
-          SstEvaluation(
-            presentAtEvaluation: ['Responsable en milieu de stage'],
-            questions: {
-              'Q1': ['Oui'],
-              'Q1+t': ['Plusieurs fois par jour, surtout des pots de fleurs.'],
-              'Q3': ['Un diable'],
-              'Q5': ['Un couteau', 'Des ciseaux', 'Un sécateur'],
-              'Q7': ['Des pesticides', 'Engrais'],
-              'Q12': ['Bruyant'],
-              'Q15': ['Non'],
-            },
-          )
-        ]),
+            ],
+            transportations: [Transportation.none],
+            visitFrequencies: 'Une visite par semaine',
+            formVersion: InternshipContract.currentVersion),
+      ],
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      visaEvaluations: [],
+      sstEvaluations: [
+        SstEvaluation(
+          presentAtEvaluation: ['Responsable en milieu de stage'],
+          questions: {
+            'Q1': ['Oui'],
+            'Q1+t': ['Plusieurs fois par jour, surtout des pots de fleurs.'],
+            'Q3': ['Un diable'],
+            'Q5': ['Un couteau', 'Des ciseaux', 'Un sécateur'],
+            'Q7': ['Des pesticides', 'Engrais'],
+            'Q12': ['Bruyant'],
+            'Q15': ['Non'],
+          },
+        )
+      ],
+      teacherNotes: '',
+    ),
   );
 
   startingPeriod = DateTime.now().subtract(Duration(days: 30));
@@ -2668,59 +2752,70 @@ Future<void> _addDummyInternships(
   internships.add(
     Internship(
       schoolBoardId: schoolBoardId,
-      creationDate: DateTime.now(),
       studentId: students.firstWhere((e) => e.fullName == 'Vanessa Monette').id,
       signatoryTeacherId: teacherA1Id,
       extraSupervisingTeacherIds: [],
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Pharmaprix').id,
       jobId: enterprises.firstWhere((e) => e.name == 'Pharmaprix').jobs[0].id,
       extraSpecializationIds: [],
-      supervisor: Person(
-        firstName: 'Thierry',
-        middleName: null,
-        lastName: 'Joly',
-        dateBirth: null,
-        phone: null,
-        address: null,
-        email: '',
-      ),
-      dates: period,
       endDate: period.end,
       expectedDuration: 135,
       achievedDuration: 100,
-      weeklySchedules: [
-        WeeklySchedule(
-          schedule: {
-            Day.monday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+      contracts: [
+        InternshipContract(
+          date: DateTime.now(),
+          supervisor: Person(
+            firstName: 'Thierry',
+            middleName: null,
+            lastName: 'Joly',
+            dateBirth: null,
+            phone: null,
+            address: null,
+            email: '',
+          ),
+          dates: period,
+          weeklySchedules: [
+            WeeklySchedule(
+              schedule: {
+                Day.monday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
                 ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                Day.tuesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
                 ),
-              ],
+              },
+              period: period,
             ),
-            Day.tuesday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-          },
-          period: period,
+          ],
+          transportations: [Transportation.none],
+          visitFrequencies: 'Tous les jours',
+          formVersion: InternshipContract.currentVersion,
         ),
       ],
-      transportations: [Transportation.none],
-      visitFrequencies: 'Tous les jours',
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      visaEvaluations: [],
+      sstEvaluations: [],
+      teacherNotes: '',
     ),
   );
 
@@ -2732,7 +2827,6 @@ Future<void> _addDummyInternships(
   internships.add(
     Internship(
       schoolBoardId: schoolBoardId,
-      creationDate: DateTime.now(),
       studentId:
           students.firstWhere((e) => e.fullName == 'Sébastien Desmarais').id,
       signatoryTeacherId: teacherC1Id,
@@ -2740,52 +2834,63 @@ Future<void> _addDummyInternships(
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Subway').id,
       jobId: enterprises.firstWhere((e) => e.name == 'Subway').jobs[0].id,
       extraSpecializationIds: [],
-      supervisor: Person(
-        firstName: 'Carlos',
-        middleName: null,
-        lastName: 'Rodriguez',
-        dateBirth: null,
-        phone: PhoneNumber.fromString('514 555 3333'),
-        address: null,
-        email: 'c.rodriguez@email.com',
-      ),
-      dates: period,
       endDate: period.end,
       expectedDuration: 135,
       achievedDuration: 100,
-      weeklySchedules: [
-        WeeklySchedule(
-          schedule: {
-            Day.monday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
+      contracts: [
+        InternshipContract(
+            date: DateTime.now(),
+            supervisor: Person(
+              firstName: 'Carlos',
+              middleName: null,
+              lastName: 'Rodriguez',
+              dateBirth: null,
+              phone: PhoneNumber.fromString('514 555 3333'),
+              address: null,
+              email: 'c.rodriguez@email.com',
             ),
-            Day.tuesday: DailySchedule(
-              blocks: [
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-                ),
-                TimeBlock(
-                  start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-                  end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-                ),
-              ],
-            ),
-          },
-          period: period,
-        ),
+            dates: period,
+            weeklySchedules: [
+              WeeklySchedule(
+                schedule: {
+                  Day.monday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                  Day.tuesday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                },
+                period: period,
+              ),
+            ],
+            transportations: [Transportation.none],
+            visitFrequencies: 'Tous les jours',
+            formVersion: InternshipContract.currentVersion),
       ],
-      transportations: [Transportation.none],
-      visitFrequencies: 'Tous les jours',
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      visaEvaluations: [],
+      sstEvaluations: [],
+      teacherNotes: '',
     ),
   );
   await _waitForDatabaseUpdate(internships, 10);

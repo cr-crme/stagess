@@ -8,6 +8,7 @@ import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common/models/internships/internship_contract.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/time_utils.dart';
 import 'package:stagess_common/models/internships/transportation.dart';
@@ -199,11 +200,11 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             idNameToDataTable: 'internship_id',
           ),
           sqlInterface.selectSubquery(
-            dataTableName: 'internship_mutable_data',
-            asName: 'mutables',
+            dataTableName: 'internship_contracts',
+            asName: 'contracts',
             fieldsToFetch: [
               'id',
-              'creation_date',
+              'date',
               'supervisor_id',
               'starting_date',
               'ending_date',
@@ -297,12 +298,13 @@ class MySqlInternshipsRepository extends InternshipsRepository {
                   .toList() ??
               [];
 
-      for (final mutable in (internship['mutables'] as List? ?? [])) {
-        mutable['supervisor'] = (await sqlInterface.performSelectQuery(
+      final contracts = [];
+      for (final contract in (internship['contracts'] as List? ?? [])) {
+        contract['supervisor'] = (await sqlInterface.performSelectQuery(
                     user: user,
                     tableName: 'persons',
                     filters: {
-                  'id': mutable['supervisor_id']
+                  'id': contract['supervisor_id']
                 },
                     subqueries: [
                   sqlInterface.selectSubquery(
@@ -325,16 +327,16 @@ class MySqlInternshipsRepository extends InternshipsRepository {
                 ]) as List?)
                 ?.first ??
             {};
-        mutable['supervisor']['phone'] =
-            (mutable['supervisor']['phone_numbers'] as List?)?.firstOrNull;
-        mutable['supervisor']['address'] =
-            (mutable['supervisor']['addresses'] as List?)?.firstOrNull;
+        contract['supervisor']['phone'] =
+            (contract['supervisor']['phone_numbers'] as List?)?.firstOrNull;
+        contract['supervisor']['address'] =
+            (contract['supervisor']['addresses'] as List?)?.firstOrNull;
 
         final schedules = await sqlInterface.performSelectQuery(
             user: user,
             tableName: 'internship_weekly_schedules',
             filters: {
-              'mutable_data_id': mutable['id']
+              'contract_id': contract['id']
             },
             subqueries: [
               sqlInterface.selectSubquery(
@@ -380,13 +382,15 @@ class MySqlInternshipsRepository extends InternshipsRepository {
         final transportations = await sqlInterface.performSelectQuery(
             user: user,
             tableName: 'internship_transportations',
-            filters: {'id': mutable['id']});
-        mutable['transportations'] = (transportations as List? ?? [])
+            filters: {'id': contract['id']});
+        contract['transportations'] = (transportations as List? ?? [])
             .map((e) => e['transportation'])
             .toList();
 
-        mutable['schedules'] = schedules;
+        contract['schedules'] = schedules;
+        contracts.add(contract);
       }
+      internship['contracts'] = contracts;
 
       final skillEvaluations = [];
       for (final Map<String, dynamic> evaluation
@@ -700,13 +704,13 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     }
   }
 
-  Future<void> _insertToMutables(Internship internship,
+  Future<void> _insertToContracts(Internship internship,
       {Internship? previous, required DatabaseUser user}) async {
-    final previousSerialized = previous?.serializedMutables ?? [];
+    final previousContracts = previous?.contracts ?? [];
     bool supervisorIsUpdated = false;
-    for (final mutable in internship.serializedMutables) {
-      if (previousSerialized.any((e) => e['id'] == mutable['id'])) {
-        // Skip if the mutable already exists
+    for (final contract in internship.contracts) {
+      if (previousContracts.any((prev) => prev.id == contract.id)) {
+        // Skip if the contract already exists
         continue;
       }
       if (!supervisorIsUpdated) {
@@ -714,7 +718,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
                     user: user,
                     tableName: 'persons',
                     filters: {
-                  'id': mutable['supervisor']['id']
+                  'id': contract.supervisor.id
                 },
                     subqueries: [
                   sqlInterface.selectSubquery(
@@ -745,74 +749,76 @@ class MySqlInternshipsRepository extends InternshipsRepository {
         }
 
         if (previousSupervisor.isEmpty) {
-          await sqlInterface.performInsertPerson(person: internship.supervisor);
+          await sqlInterface.performInsertPerson(person: contract.supervisor);
         } else {
           // Update the person (without the phone numbers and addresses of previous as they were removed)
           await sqlInterface.performUpdatePerson(
-              person: internship.supervisor,
+              person: contract.supervisor,
               previous: Person.fromSerialized(previousSupervisor));
         }
         supervisorIsUpdated = true;
       }
 
       await sqlInterface
-          .performInsertQuery(tableName: 'internship_mutable_data', data: {
-        'id': mutable['id'],
+          .performInsertQuery(tableName: 'internship_contracts', data: {
+        'id': contract.id,
         'internship_id': internship.id,
-        'creation_date': mutable['creation_date'],
-        'supervisor_id': internship.supervisor.id,
-        'starting_date': mutable['starting_date'],
-        'ending_date': mutable['ending_date'],
-        'visit_frequencies': mutable['visit_frequencies'],
+        'creation_date': contract.date.serialize(),
+        'supervisor_id': contract.supervisor.id,
+        'starting_date': contract.dates.start.serialize(),
+        'ending_date': contract.dates.end.serialize(),
+        'visit_frequencies': contract.visitFrequencies.serialize(),
       });
 
       // Insert the weekly schedules
-      for (final schedule in mutable['schedules'] as List) {
+      for (final weeklySchedule in contract.weeklySchedules) {
         await sqlInterface.performInsertQuery(
             tableName: 'internship_weekly_schedules',
             data: {
-              'id': schedule['id'],
-              'mutable_data_id': mutable['id'],
-              'starting_date': schedule['start'],
-              'ending_date': schedule['end'],
+              'id': weeklySchedule.id,
+              'contract_id': contract.id,
+              'starting_date': weeklySchedule.period.start.serialize(),
+              'ending_date': weeklySchedule.period.end.serialize(),
             });
 
         // Insert the daily schedules
-        for (final pair in (schedule['days'] as Map? ?? {}).entries) {
-          final day = int.parse(pair.key);
-          final entry = pair.value;
+        for (final key in weeklySchedule.schedule.keys) {
+          final day = key;
+          final schedule = weeklySchedule.schedule[key]!;
           for (int blockIndex = 0;
-              blockIndex < (entry['blocks'] as List).length;
+              blockIndex < schedule.blocks.length;
               blockIndex++) {
             await sqlInterface.performInsertQuery(
                 tableName: 'internship_daily_schedules',
                 data: {
-                  'id': entry['id'],
-                  'weekly_schedule_id': schedule['id'],
+                  'id': schedule.id,
+                  'weekly_schedule_id': weeklySchedule.id,
                   'day': day,
                   'block_index': blockIndex,
-                  'starting_hour': entry['blocks'][blockIndex]['start'][0],
-                  'starting_minute': entry['blocks'][blockIndex]['start'][1],
-                  'ending_hour': entry['blocks'][blockIndex]['end'][0],
-                  'ending_minute': entry['blocks'][blockIndex]['end'][1],
+                  'starting_hour': schedule.blocks[blockIndex].start.hour,
+                  'starting_minute': schedule.blocks[blockIndex].start.minute,
+                  'ending_hour': schedule.blocks[blockIndex].end.hour,
+                  'ending_minute': schedule.blocks[blockIndex].end.minute,
                 });
           }
         }
       }
 
       // Insert the transportations
-      for (final transportation in mutable['transportations'] as List) {
-        await sqlInterface.performInsertQuery(
-            tableName: 'internship_transportations',
-            data: {'id': mutable['id'], 'transportation': transportation});
+      for (final transportation in contract.transportations) {
+        await sqlInterface
+            .performInsertQuery(tableName: 'internship_transportations', data: {
+          'id': contract.id,
+          'transportation': transportation.serialize(),
+        });
       }
     }
   }
 
-  Future<void> _updateToMutables(
+  Future<void> _updateToContracts(
       Internship internship, Internship previous, DatabaseUser user) async {
-    // We don't update the mutable data, but stack them
-    await _insertToMutables(internship, previous: previous, user: user);
+    // We don't update the contracts data, but stack them
+    await _insertToContracts(internship, previous: previous, user: user);
   }
 
   Future<void> _insertToSkillEvaluations(Internship internship,
@@ -1090,7 +1096,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     if (previous == null) {
       toWait.add(_insertToSupervisingTeachers(internship));
       toWait.add(_insertExtraSpecializations(internship));
-      toWait.add(_insertToMutables(internship, user: user));
+      toWait.add(_insertToContracts(internship, user: user));
       toWait.add(_insertToSkillEvaluations(internship));
       toWait.add(_insertToAttitudeEvaluations(internship));
       toWait.add(_insertToVisaEvaluations(internship));
@@ -1099,7 +1105,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     } else {
       toWait.add(_updateToSupervisingTeachers(internship, previous));
       toWait.add(_updateToExtraSpecializations(internship, previous));
-      toWait.add(_updateToMutables(internship, previous, user));
+      toWait.add(_updateToContracts(internship, previous, user));
       toWait.add(_updateToSkillEvaluations(internship, previous));
       toWait.add(_updateToAttitudeEvaluations(internship, previous));
       toWait.add(_updateToVisaEvaluations(internship, previous));
@@ -1115,21 +1121,20 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     required DatabaseUser user,
   }) async {
     try {
-      final mutable = (await sqlInterface.performSelectQuery(
+      final contracts = (await sqlInterface.performSelectQuery(
         user: user,
-        tableName: 'internship_mutable_data',
+        tableName: 'internship_contracts',
         filters: {'internship_id': id},
-      ))
-          .lastOrNull;
+      ));
 
       await sqlInterface.performDeleteQuery(
         tableName: 'entities',
         filters: {'shared_id': id},
       );
-      if (mutable != null) {
+      for (final contract in contracts) {
         await sqlInterface.performDeleteQuery(
           tableName: 'entities',
-          filters: {'shared_id': mutable['supervisor_id']},
+          filters: {'shared_id': contract['supervisor_id']},
         );
       }
 
@@ -1152,54 +1157,64 @@ class InternshipsRepositoryMock extends InternshipsRepository {
       enterpriseId: '12345',
       jobId: '67890',
       extraSpecializationIds: ['12345'],
-      dates: DateTimeRange(
-          start: DateTime(1990, 1, 1), end: DateTime(1990, 1, 31)),
-      supervisor: Person(
-          firstName: 'Mine',
-          middleName: null,
-          lastName: 'Yours',
-          dateBirth: null,
-          address: Address.empty,
-          phone: PhoneNumber.empty,
-          email: null),
-      creationDate: DateTime(2000, 1, 1),
-      weeklySchedules: [
-        WeeklySchedule(
-            schedule: {
-              Day.monday: DailySchedule(blocks: [
-                TimeBlock(
-                    start: TimeOfDay(hour: 8, minute: 0),
-                    end: TimeOfDay(hour: 12, minute: 0)),
-                TimeBlock(
-                    start: TimeOfDay(hour: 13, minute: 0),
-                    end: TimeOfDay(hour: 16, minute: 0))
-              ]),
-              Day.wednesday: DailySchedule(blocks: [
-                TimeBlock(
-                    start: TimeOfDay(hour: 8, minute: 0),
-                    end: TimeOfDay(hour: 12, minute: 0)),
-                TimeBlock(
-                    start: TimeOfDay(hour: 13, minute: 0),
-                    end: TimeOfDay(hour: 16, minute: 0))
-              ]),
-              Day.friday: DailySchedule(blocks: [
-                TimeBlock(
-                    start: TimeOfDay(hour: 8, minute: 0),
-                    end: TimeOfDay(hour: 12, minute: 0)),
-                TimeBlock(
-                    start: TimeOfDay(hour: 13, minute: 0),
-                    end: TimeOfDay(hour: 16, minute: 0))
-              ]),
-            },
-            period: DateTimeRange(
-                start: DateTime(1990, 1, 1), end: DateTime(1990, 1, 31)))
-      ],
       expectedDuration: 30,
       achievedDuration: -1,
       endDate: DateTime(0),
+      contracts: [
+        InternshipContract(
+          date: DateTime(2000, 1, 1),
+          dates: DateTimeRange(
+              start: DateTime(1990, 1, 1), end: DateTime(1990, 1, 31)),
+          supervisor: Person(
+              firstName: 'Mine',
+              middleName: null,
+              lastName: 'Yours',
+              dateBirth: null,
+              address: Address.empty,
+              phone: PhoneNumber.empty,
+              email: null),
+          weeklySchedules: [
+            WeeklySchedule(
+                schedule: {
+                  Day.monday: DailySchedule(blocks: [
+                    TimeBlock(
+                        start: TimeOfDay(hour: 8, minute: 0),
+                        end: TimeOfDay(hour: 12, minute: 0)),
+                    TimeBlock(
+                        start: TimeOfDay(hour: 13, minute: 0),
+                        end: TimeOfDay(hour: 16, minute: 0))
+                  ]),
+                  Day.wednesday: DailySchedule(blocks: [
+                    TimeBlock(
+                        start: TimeOfDay(hour: 8, minute: 0),
+                        end: TimeOfDay(hour: 12, minute: 0)),
+                    TimeBlock(
+                        start: TimeOfDay(hour: 13, minute: 0),
+                        end: TimeOfDay(hour: 16, minute: 0))
+                  ]),
+                  Day.friday: DailySchedule(blocks: [
+                    TimeBlock(
+                        start: TimeOfDay(hour: 8, minute: 0),
+                        end: TimeOfDay(hour: 12, minute: 0)),
+                    TimeBlock(
+                        start: TimeOfDay(hour: 13, minute: 0),
+                        end: TimeOfDay(hour: 16, minute: 0))
+                  ]),
+                },
+                period: DateTimeRange(
+                    start: DateTime(1990, 1, 1), end: DateTime(1990, 1, 31)))
+          ],
+          transportations: [Transportation.pass],
+          visitFrequencies: 'Toutes les semaines',
+          formVersion: InternshipContract.currentVersion,
+        )
+      ],
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      visaEvaluations: [],
+      sstEvaluations: [],
+      enterpriseEvaluations: [],
       teacherNotes: 'Nope',
-      transportations: [Transportation.pass],
-      visitFrequencies: 'Toutes les semaines',
     ),
     '1': Internship(
       id: '1',
@@ -1210,48 +1225,58 @@ class InternshipsRepositoryMock extends InternshipsRepository {
       enterpriseId: '54321',
       jobId: '09876',
       extraSpecializationIds: ['54321', '09876'],
-      dates: DateTimeRange(
-          start: DateTime(1990, 2, 1), end: DateTime(1990, 2, 28)),
-      supervisor: Person(
-          firstName: 'Mine',
-          middleName: null,
-          lastName: 'Yours',
-          dateBirth: null,
-          address: Address.empty,
-          phone: PhoneNumber.empty,
-          email: null),
-      creationDate: DateTime(2000, 2, 1),
-      weeklySchedules: [
-        WeeklySchedule(
-            schedule: {
-              Day.tuesday: DailySchedule(
-                blocks: [
-                  TimeBlock(
-                      start: TimeOfDay(hour: 9, minute: 0),
-                      end: TimeOfDay(hour: 12, minute: 0)),
-                  TimeBlock(
-                      start: TimeOfDay(hour: 13, minute: 0),
-                      end: TimeOfDay(hour: 17, minute: 0))
-                ],
-              ),
-              Day.thursday: DailySchedule(blocks: [
-                TimeBlock(
-                    start: TimeOfDay(hour: 9, minute: 0),
-                    end: TimeOfDay(hour: 12, minute: 0)),
-                TimeBlock(
-                    start: TimeOfDay(hour: 13, minute: 0),
-                    end: TimeOfDay(hour: 17, minute: 0))
-              ]),
-            },
-            period: DateTimeRange(
-                start: DateTime(1990, 2, 1), end: DateTime(1990, 2, 28)))
-      ],
       expectedDuration: 20,
       achievedDuration: -1,
       endDate: DateTime(0),
+      contracts: [
+        InternshipContract(
+          date: DateTime(2000, 2, 1),
+          dates: DateTimeRange(
+              start: DateTime(1990, 2, 1), end: DateTime(1990, 2, 28)),
+          supervisor: Person(
+              firstName: 'Mine',
+              middleName: null,
+              lastName: 'Yours',
+              dateBirth: null,
+              address: Address.empty,
+              phone: PhoneNumber.empty,
+              email: null),
+          weeklySchedules: [
+            WeeklySchedule(
+                schedule: {
+                  Day.tuesday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                          start: TimeOfDay(hour: 9, minute: 0),
+                          end: TimeOfDay(hour: 12, minute: 0)),
+                      TimeBlock(
+                          start: TimeOfDay(hour: 13, minute: 0),
+                          end: TimeOfDay(hour: 17, minute: 0))
+                    ],
+                  ),
+                  Day.thursday: DailySchedule(blocks: [
+                    TimeBlock(
+                        start: TimeOfDay(hour: 9, minute: 0),
+                        end: TimeOfDay(hour: 12, minute: 0)),
+                    TimeBlock(
+                        start: TimeOfDay(hour: 13, minute: 0),
+                        end: TimeOfDay(hour: 17, minute: 0))
+                  ]),
+                },
+                period: DateTimeRange(
+                    start: DateTime(1990, 2, 1), end: DateTime(1990, 2, 28)))
+          ],
+          transportations: [Transportation.yes, Transportation.ticket],
+          visitFrequencies: 'Toutes les deux semaines',
+          formVersion: InternshipContract.currentVersion,
+        ),
+      ],
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      visaEvaluations: [],
+      sstEvaluations: [],
+      enterpriseEvaluations: [],
       teacherNotes: 'Yes',
-      transportations: [Transportation.yes, Transportation.ticket],
-      visitFrequencies: 'Toutes les deux semaines',
     ),
   };
 

@@ -79,7 +79,10 @@ class InternshipsPageState extends State<InternshipsPage> {
     _logger.finer(
       'Sorting internships by start date for student: ${widget.student.id}',
     );
-    internships.sort((a, b) => a.dates.start.compareTo(b.dates.start));
+    internships.sort((a, b) =>
+        a.currentContract?.dates.start
+            .compareTo(b.currentContract?.dates.start ?? DateTime.now()) ??
+        0);
   }
 
   @override
@@ -213,7 +216,9 @@ class _StudentInternshipListViewState
                   EnterprisesProvider.of(context)[internship.enterpriseId];
 
               final endDate = internship.isActive
-                  ? DateFormat.yMMMd('fr_CA').format(internship.dates.end)
+                  ? DateFormat.yMMMd('fr_CA').format(
+                      internship.currentContract?.dates.end ??
+                          DateTime.now()) // TODO Check this
                   : DateFormat.yMMMd('fr_CA').format(internship.endDate);
 
               final String specializationIdWithName =
@@ -249,7 +254,7 @@ class _StudentInternshipListViewState
                         ),
                         Text(enterprise.address?.toString() ?? ''),
                         Text(
-                          '${DateFormat.yMMMd('fr_CA').format(internship.dates.start)} - $endDate',
+                          '${DateFormat.yMMMd('fr_CA').format(internship.currentContract?.dates.start ?? DateTime.now())} - $endDate', // TODO Check this
                         ),
                         if (internship.isActive &&
                             internship.supervisingTeacherIds.contains(

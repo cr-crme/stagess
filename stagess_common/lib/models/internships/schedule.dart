@@ -119,10 +119,30 @@ class WeeklySchedule extends ItemSerializable {
     super.id,
     required this.schedule,
     required this.period,
-  });
+  }) {
+    _finalizeInitialization();
+  }
 
   final Map<Day, DailySchedule?> schedule;
   final DateTimeRange period;
+
+  void _finalizeInitialization() {
+    schedule.entries.toList().sort((pairA, pairB) {
+      final dayA = pairA.key;
+      final dayB = pairB.key;
+      final a = pairA.value;
+      final b = pairB.value;
+
+      if (a == null && b == null) return 0;
+      if (a == null) return 1;
+      if (b == null) return -1;
+
+      if (dayA.index < dayB.index) return -1;
+      if (dayA.index > dayB.index) return 1;
+
+      return 0;
+    });
+  }
 
   WeeklySchedule.fromSerialized(super.map)
       : schedule = (map?['days'] as Map?)?.map((day, e) => MapEntry(

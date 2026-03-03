@@ -204,7 +204,8 @@ class _SstRisk extends StatelessWidget {
     final data = _sstToEvaluate(context);
 
     data.sort(
-      (a, b) => a.internship!.dates.start.compareTo(b.internship!.dates.start),
+      (a, b) => a.internship!.currentContract!.dates.start
+          .compareTo(b.internship!.currentContract!.dates.start),
     );
 
     return Column(
@@ -234,7 +235,7 @@ class _SstRisk extends StatelessWidget {
                   subtitle: '${enterprise.name} (${job.specialization.name})',
                   icon: Icons.warning,
                   iconColor: Theme.of(context).colorScheme.secondary,
-                  date: internship.dates.start,
+                  date: internship.currentContract!.dates.start,
                   buttonTitle: 'Remplir le\nquestionnaire SST',
                   onTap: () => showInternshipEvaluationFormDialog(context,
                       internshipId: internship.id,
@@ -254,7 +255,8 @@ class _EndingInternship extends StatelessWidget {
     final internships = _internshipsToTerminate(context);
 
     internships.sort(
-      (a, b) => a.internship!.dates.end.compareTo(b.internship!.dates.end),
+      (a, b) => a.internship!.currentContract!.dates.end
+          .compareTo(b.internship!.currentContract!.dates.end),
     );
 
     return Column(
@@ -273,7 +275,7 @@ class _EndingInternship extends StatelessWidget {
                   subtitle: enterprise.name,
                   icon: Icons.flag,
                   iconColor: Colors.yellow.shade700,
-                  date: internship.dates.end,
+                  date: internship.currentContract!.dates.end,
                   buttonTitle: 'Aller au stage',
                   onTap: () => GoRouter.of(context).pushNamed(
                     Screens.student,

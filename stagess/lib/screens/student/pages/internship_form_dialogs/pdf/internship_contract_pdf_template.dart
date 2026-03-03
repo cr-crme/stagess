@@ -6,15 +6,15 @@ import 'package:logging/logging.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:stagess_common/models/enterprises/enterprise.dart';
-import 'package:stagess_common/models/enterprises/job.dart';
-import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common/models/internships/internship_contract.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/transportation.dart';
-import 'package:stagess_common/models/persons/student.dart' as student_model;
+import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/models/school_boards/school.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/services/image_helpers.dart';
+import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
@@ -26,13 +26,13 @@ final _logger = Logger('GenerateInternshipContractPdf');
 final _textStyle = pw.TextStyle(font: pw.Font.times());
 final _textStyleBold = pw.TextStyle(font: pw.Font.timesBold());
 
-String _title(student_model.Program program) {
+String _title(Program program) {
   switch (program) {
-    case student_model.Program.fpt:
+    case Program.fpt:
       return 'Formation préparatoire au travail';
-    case student_model.Program.fms:
+    case Program.fms:
       return 'Formation menant à l\'exercice d\'un métier semi-spécialisé';
-    case student_model.Program.undefined:
+    case Program.undefined:
       throw ArgumentError('Program must be defined');
   }
 }
@@ -46,12 +46,30 @@ Future<Uint8List> generateInternshipContractPdf(
   final document = pw.Document(pageMode: PdfPageMode.outlines);
   final headerHeight = 300;
 
+  final internship =
+      InternshipsProvider.of(mainContext, listen: false).fromId(internshipId);
+  final schoolBoard = SchoolBoardsProvider.of(mainContext, listen: false)
+      .fromId(internship.schoolBoardId);
+  final student = StudentsProvider.of(mainContext, listen: false)
+      .fromId(internship.studentId);
+  final school =
+      schoolBoard.schools.firstWhere((school) => school.id == student.schoolId);
+  final teacher = TeachersProvider.of(mainContext, listen: false)
+      .fromId(internship.signatoryTeacherId);
+  final enterprise = EnterprisesProvider.of(mainContext, listen: false)
+      .fromId(internship.enterpriseId);
+  final contract = internship.contracts.firstWhere((c) => c.id == contractId);
+  final specialization = enterprise.jobs
+      .firstWhere((job) => job.id == internship.jobId)
+      .specialization;
+
   document.addPage(pw.MultiPage(
       pageFormat: PdfPageFormat.letter,
       header: (context) => pw.Container(
-          child: _logo(mainContext,
-              internshipId: internshipId,
-              sizeFactor: context.pageNumber == 1 ? 1.0 : 0.7),
+          child: _logo(
+            schoolBoard: schoolBoard,
+            sizeFactor: context.pageNumber == 1 ? 1.0 : 0.7,
+          ),
           padding: const pw.EdgeInsets.only(bottom: 12.0)),
       footer: (pw.Context context) {
         return pw.Stack(children: [
@@ -74,25 +92,40 @@ Future<Uint8List> generateInternshipContractPdf(
       },
       build: (context) => [
             pw.SizedBox(
-                height: PdfPageFormat.letter.height - headerHeight,
-                child: _coverPage(mainContext, internshipId: internshipId)),
+              height: PdfPageFormat.letter.height - headerHeight,
+              child: _coverPage(schoolBoard: schoolBoard, student: student),
+            ),
             pw.NewPage(),
-            _studentObligations(mainContext, internshipId: internshipId),
+            _studentObligations(
+              schoolBoard: schoolBoard,
+              school: school,
+              student: student,
+            ),
             pw.NewPage(),
-            _contract(mainContext, internshipId: internshipId),
+            _contract(
+              schoolBoard: schoolBoard,
+              school: school,
+              student: student,
+              enterprise: enterprise,
+            ),
             pw.NewPage(),
-            _studentInformations(mainContext, internshipId: internshipId),
+            _studentInformations(
+              school: school,
+              teacher: teacher,
+              student: student,
+              contract: contract,
+              enterprise: enterprise,
+              specialization: specialization,
+            ),
           ]));
 
   return document.save();
 }
 
-pw.Widget _logo(BuildContext context,
-    {required String internshipId, double sizeFactor = 1.0}) {
-  final internship = _internship(context, internshipId: internshipId);
-  final schoolBoard =
-      _schoolBoard(context, schoolBoardId: internship.schoolBoardId);
-
+pw.Widget _logo({
+  required SchoolBoard schoolBoard,
+  double sizeFactor = 1.0,
+}) {
   return schoolBoard.logo.isEmpty
       ? pw.Container()
       : pw.Image(
@@ -102,11 +135,11 @@ pw.Widget _logo(BuildContext context,
         );
 }
 
-pw.Widget _coverPage(BuildContext context, {required String internshipId}) {
-  final internship = _internship(context, internshipId: internshipId);
-  final schoolBoard =
-      _schoolBoard(context, schoolBoardId: internship.schoolBoardId);
-  final program = _student(context, studentId: internship.studentId).program;
+pw.Widget _coverPage({
+  required SchoolBoard schoolBoard,
+  required Student student,
+}) {
+  final program = student.program;
   final dash = '-';
 
   return pw.Center(
@@ -148,14 +181,11 @@ pw.Widget _coverPage(BuildContext context, {required String internshipId}) {
   ));
 }
 
-pw.Widget _studentObligations(BuildContext context,
-    {required String internshipId}) {
-  final internship = _internship(context, internshipId: internshipId);
-  final schoolBoard =
-      _schoolBoard(context, schoolBoardId: internship.schoolBoardId);
-  final student = _student(context, studentId: internship.studentId);
-  final school = _school(context,
-      schoolBoardId: student.schoolBoardId, schoolId: student.schoolId);
+pw.Widget _studentObligations({
+  required SchoolBoard schoolBoard,
+  required School school,
+  required Student student,
+}) {
   final mid = '\u00b7';
 
   return pw.Column(
@@ -331,16 +361,12 @@ pw.Widget _studentObligations(BuildContext context,
   );
 }
 
-pw.Widget _contract(BuildContext context, {required String internshipId}) {
-  final internship = _internship(context, internshipId: internshipId);
-  final schoolBoard =
-      _schoolBoard(context, schoolBoardId: internship.schoolBoardId);
-  final student = _student(context, studentId: internship.studentId);
-  final school = _school(context,
-      schoolBoardId: student.schoolBoardId, schoolId: student.schoolId);
-  final enterprise =
-      _enterprise(context, enterpriseId: internship.enterpriseId);
-
+pw.Widget _contract({
+  required SchoolBoard schoolBoard,
+  required School school,
+  required Student student,
+  required Enterprise enterprise,
+}) {
   return pw.Column(
     crossAxisAlignment: pw.CrossAxisAlignment.start,
     mainAxisSize: pw.MainAxisSize.max,
@@ -606,19 +632,14 @@ pw.Widget _signature(String person) {
       ]);
 }
 
-pw.Widget _studentInformations(BuildContext context,
-    {required String internshipId}) {
-  final internship = _internship(context, internshipId: internshipId);
-  final student = _student(context, studentId: internship.studentId);
-  final school = _school(context,
-      schoolBoardId: student.schoolBoardId, schoolId: student.schoolId);
-  final teacher = _teacher(context, teacherId: internship.signatoryTeacherId);
-  final enterprise =
-      _enterprise(context, enterpriseId: internship.enterpriseId);
-  final specialization =
-      _job(context, enterpriseId: enterprise.id, jobId: internship.jobId)
-          .specialization;
-
+pw.Widget _studentInformations({
+  required School school,
+  required Teacher teacher,
+  required Student student,
+  required Enterprise enterprise,
+  required Specialization specialization,
+  required InternshipContract contract,
+}) {
   return pw.Column(
     mainAxisSize: pw.MainAxisSize.max,
     children: [
@@ -660,7 +681,7 @@ pw.Widget _studentInformations(BuildContext context,
       pw.SizedBox(height: 12),
       _textCell(
         title: 'Date de début du stage',
-        content: DateFormat('yyyy-MM-dd').format(internship.dates.start),
+        content: DateFormat('yyyy-MM-dd').format(contract.dates.start),
       ),
       _textCell(
         title: 'Code et nom du métier semi-spécialisé',
@@ -672,16 +693,16 @@ pw.Widget _studentInformations(BuildContext context,
           content: Transportation.values.asMap().map((key, value) {
             final transportation = Transportation.deserialize(key);
             return MapEntry(transportation.toString(),
-                internship.transportations.contains(transportation));
+                contract.transportations.contains(transportation));
           })),
       _textCell(
         title: 'Fréquence de visites du superviseur',
-        content: internship.visitFrequencies,
+        content: contract.visitFrequencies,
         sameLine: false,
       ),
       _textCell(
         title: 'Nom du parrain dans l\'entreprise',
-        content: internship.supervisor.fullName.toUpperCase(),
+        content: contract.supervisor.fullName.toUpperCase(),
         sameLine: false,
       ),
       _textCell(
@@ -693,7 +714,7 @@ pw.Widget _studentInformations(BuildContext context,
       ),
       _schedulesCell(
         title: 'Horaire de travail (et heure de la pause)',
-        content: internship.weeklySchedules,
+        content: contract.weeklySchedules,
       ),
     ],
   );
@@ -832,30 +853,3 @@ pw.Widget _schedulesCell(
         ],
       ));
 }
-
-Internship _internship(BuildContext context, {required String internshipId}) =>
-    InternshipsProvider.of(context, listen: false).fromId(internshipId);
-
-Job _job(BuildContext context,
-        {required String enterpriseId, required String jobId}) =>
-    _enterprise(context, enterpriseId: enterpriseId).jobs[jobId];
-
-SchoolBoard _schoolBoard(BuildContext context,
-        {required String schoolBoardId}) =>
-    SchoolBoardsProvider.of(context, listen: false).fromId(schoolBoardId);
-
-School _school(BuildContext context,
-        {required String schoolBoardId, required String schoolId}) =>
-    _schoolBoard(context, schoolBoardId: schoolBoardId)
-        .schools
-        .firstWhere((school) => school.id == schoolId);
-
-Enterprise _enterprise(BuildContext context, {required String enterpriseId}) =>
-    EnterprisesProvider.of(context, listen: false).fromId(enterpriseId);
-
-Teacher _teacher(BuildContext context, {required String teacherId}) =>
-    TeachersProvider.of(context, listen: false).fromId(teacherId);
-
-student_model.Student _student(BuildContext context,
-        {required String studentId}) =>
-    StudentsProvider.of(context, listen: false).fromId(studentId);

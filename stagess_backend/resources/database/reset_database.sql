@@ -37,9 +37,9 @@ DROP TABLE IF EXISTS enterprises;
 
 DROP TABLE IF EXISTS internship_supervising_teachers;
 DROP TABLE IF EXISTS internship_extra_specializations;
-DROP TABLE IF EXISTS internship_mutable_data;
 DROP TABLE IF EXISTS internship_weekly_schedules;
 DROP TABLE IF EXISTS internship_daily_schedules;
+DROP TABLE IF EXISTS internship_contracts;
 DROP TABLE IF EXISTS internship_transportations;
 DROP TABLE IF EXISTS internship_skill_evaluations;
 DROP TABLE IF EXISTS internship_skill_evaluation_persons;
@@ -65,6 +65,7 @@ DROP TABLE IF EXISTS school_boards;
 DROP TABLE IF EXISTS enterprise_job_sst_evaluation_questions;
 DROP TABLE IF EXISTS internship_sst_evaluation_info;
 DROP TABLE IF EXISTS internship_attitude_evaluation_items;
+DROP TABLE IF EXISTS internship_mutable_data;
 /**************/
 
 SET FOREIGN_KEY_CHECKS = 1;
@@ -390,10 +391,10 @@ CREATE TABLE internship_extra_specializations (
     FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE
 );
 
-CREATE TABLE internship_mutable_data (
+CREATE TABLE internship_contracts (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     internship_id VARCHAR(36) NOT NULL,
-    creation_date BIGINT NOT NULL,
+    date BIGINT NOT NULL,
     supervisor_id VARCHAR(36) NOT NULL,
     starting_date BIGINT NOT NULL,
     ending_date BIGINT NOT NULL,
@@ -404,10 +405,10 @@ CREATE TABLE internship_mutable_data (
 
 CREATE TABLE internship_weekly_schedules (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
-    mutable_data_id VARCHAR(36) NOT NULL,
+    contract_id VARCHAR(36) NOT NULL,
     starting_date BIGINT NOT NULL,
     ending_date BIGINT NOT NULL,
-    FOREIGN KEY (mutable_data_id) REFERENCES internship_mutable_data(id) ON DELETE CASCADE
+    FOREIGN KEY (contract_id) REFERENCES internship_contracts(id) ON DELETE CASCADE
 );
 
 CREATE TABLE internship_daily_schedules (
@@ -425,7 +426,7 @@ CREATE TABLE internship_daily_schedules (
 CREATE TABLE internship_transportations (
     id VARCHAR(36) NOT NULL,
     transportation INT NOT NULL, 
-    FOREIGN KEY (id) REFERENCES internship_mutable_data(id) ON DELETE CASCADE
+    FOREIGN KEY (id) REFERENCES internship_contracts(id) ON DELETE CASCADE
 );
 
 CREATE TABLE internship_skill_evaluations (

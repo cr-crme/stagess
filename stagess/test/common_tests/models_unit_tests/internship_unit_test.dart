@@ -1,12 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stagess/common/extensions/internship_extension.dart';
 import 'package:stagess/program_helpers.dart';
-import 'package:stagess_common/models/generic/address.dart';
-import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
-import 'package:stagess_common/models/internships/time_utils.dart';
-import 'package:stagess_common/models/internships/transportation.dart';
-import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
@@ -32,76 +27,6 @@ void main() {
 
       expect(internshipClosed.isActive, isFalse);
       expect(internshipClosed.isClosed, isTrue);
-    });
-
-    test('can add new version', () {
-      final internship = dummyInternship();
-
-      expect(internship.nbVersions, 1);
-      expect(
-        internship.creationDate.millisecondsSinceEpoch,
-        DateTime(2005, 10, 31).millisecondsSinceEpoch,
-      );
-      expect(internship.creationDateFrom(0), internship.creationDate);
-      expect(internship.supervisor.toString(), 'Nobody Forever');
-      expect(internship.supervisorFrom(0), internship.supervisor);
-      expect(
-        internship.dates.start.millisecondsSinceEpoch,
-        DateTime(2005, 10, 31).millisecondsSinceEpoch,
-      );
-      expect(
-        internship.dates.end.millisecondsSinceEpoch,
-        DateTime(
-          2005,
-          10,
-          31,
-        ).add(const Duration(days: 20)).millisecondsSinceEpoch,
-      );
-      expect(internship.dateFrom(0), internship.dates);
-      expect(internship.weeklySchedules.length, 1);
-      expect(internship.weeklySchedules[0].id, 'weeklyScheduleId');
-      expect(internship.weeklySchedulesFrom(0), internship.weeklySchedules);
-
-      internship.addVersion(
-        creationDate: DateTime(2020, 2, 4),
-        weeklySchedules: [dummyWeeklySchedule(id: 'newWeeklyScheduleId')],
-        dates: DateTimeRange(
-          start: DateTime(2000, 1, 1),
-          end: DateTime(2001, 1, 1),
-        ),
-        supervisor: Person(
-          firstName: 'New',
-          middleName: null,
-          lastName: 'Supervisor',
-          dateBirth: null,
-          phone: PhoneNumber.empty,
-          address: Address.empty,
-          email: null,
-        ),
-        transportations: [Transportation.none],
-        visitFrequencies: 'Toutes les semaines',
-      );
-
-      expect(internship.nbVersions, 2);
-      expect(
-        internship.creationDate.millisecondsSinceEpoch,
-        DateTime(2020, 2, 4).millisecondsSinceEpoch,
-      );
-      expect(internship.creationDateFrom(1), internship.creationDate);
-      expect(internship.supervisor.toString(), 'New Supervisor');
-      expect(internship.supervisorFrom(1), internship.supervisor);
-      expect(
-        internship.dates.start.millisecondsSinceEpoch,
-        DateTime(2000, 1, 1).millisecondsSinceEpoch,
-      );
-      expect(
-        internship.dates.end.millisecondsSinceEpoch,
-        DateTime(2001, 1, 1).millisecondsSinceEpoch,
-      );
-      expect(internship.dateFrom(1), internship.dates);
-      expect(internship.weeklySchedules.length, 1);
-      expect(internship.weeklySchedules[0].id, 'newWeeklyScheduleId');
-      expect(internship.weeklySchedulesFrom(1), internship.weeklySchedules);
     });
 
     testWidgets('can add and remove supervisors', (tester) async {
@@ -166,19 +91,19 @@ void main() {
       );
       expect(internshipSame.enterpriseId, internship.enterpriseId);
       expect(internshipSame.jobId, internship.jobId);
-      expect(internshipSame.nbVersions, internship.nbVersions);
       expect(
-        internshipSame.creationDate.toString(),
-        internship.creationDate.toString(),
+        internshipSame.currentContract!.date.toString(),
+        internship.currentContract!.date.toString(),
       );
       expect(
-        internshipSame.supervisor.toString(),
-        internship.supervisor.toString(),
+        internshipSame.currentContract!.supervisor.toString(),
+        internship.currentContract!.supervisor.toString(),
       );
-      expect(internshipSame.dates.toString(), internship.dates.toString());
+      expect(internshipSame.currentContract!.dates.toString(),
+          internship.currentContract!.dates.toString());
       expect(
-        internshipSame.weeklySchedules.length,
-        internship.weeklySchedules.length,
+        internshipSame.currentContract!.weeklySchedules.length,
+        internship.currentContract!.weeklySchedules.length,
       );
       expect(internshipSame.expectedDuration, internship.expectedDuration);
       expect(internshipSame.achievedDuration, internship.achievedDuration);
@@ -275,11 +200,6 @@ void main() {
       final serialized = internship.serialize();
       final deserialized = Internship.fromSerialized(serialized);
 
-      final period = DateTimeRange(
-        start: DateTime(2005, 10, 31),
-        end: DateTime(2005, 10, 31).add(const Duration(days: 20)),
-      );
-
       final expected = {
         'id': 'internshipId',
         'version': Internship.currentVersion,
@@ -290,18 +210,7 @@ void main() {
         'enterprise_id': 'enterpriseId',
         'job_id': 'jobId',
         'extra_specialization_ids': ['8168', '8134'],
-        'mutables': [
-          {
-            'id': serialized['mutables'][0]['id'],
-            'creation_date': internship.creationDate.millisecondsSinceEpoch,
-            'supervisor': internship.supervisor.serialize(),
-            'starting_date': internship.dates.start.millisecondsSinceEpoch,
-            'ending_date': internship.dates.end.millisecondsSinceEpoch,
-            'schedules': [dummyWeeklySchedule(period: period).serialize()],
-            'transportations': [Transportation.none.serialize()],
-            'visit_frequencies': 'Tous les jours',
-          },
-        ],
+        'contracts': [dummyInternshipContract().serialize()],
         'expected_duration': 135,
         'achieved_duration': 130,
         'teacher_notes': '',
@@ -324,20 +233,20 @@ void main() {
       expect(deserialized.supervisingTeacherIds, ['teacherId']);
       expect(deserialized.enterpriseId, 'enterpriseId');
       expect(deserialized.jobId, 'jobId');
-      expect(deserialized.nbVersions, 1);
       expect(
-        deserialized.creationDate.toString(),
-        internship.creationDate.toString(),
+        deserialized.currentContract!.date.toString(),
+        internship.currentContract!.date.toString(),
       );
       expect(
-        deserialized.supervisor.toString(),
-        internship.supervisor.toString(),
+        deserialized.currentContract!.supervisor.toString(),
+        internship.currentContract!.supervisor.toString(),
       );
-      expect(deserialized.dates.toString(), internship.dates.toString());
-      expect(deserialized.weeklySchedules.length, 1);
+      expect(deserialized.currentContract!.dates.toString(),
+          internship.currentContract!.dates.toString());
+      expect(deserialized.currentContract!.weeklySchedules.length, 1);
       expect(
-        deserialized.weeklySchedules[0].id,
-        internship.weeklySchedules[0].id,
+        deserialized.currentContract!.weeklySchedules[0].id,
+        internship.currentContract!.weeklySchedules[0].id,
       );
       expect(deserialized.expectedDuration, 135);
       expect(deserialized.achievedDuration, 130);
@@ -375,7 +284,6 @@ void main() {
       expect(emptyDeserialized.supervisingTeacherIds, ['']);
       expect(emptyDeserialized.enterpriseId, '');
       expect(emptyDeserialized.jobId, '');
-      expect(emptyDeserialized.nbVersions, 0);
       expect(emptyDeserialized.expectedDuration, -1);
       expect(emptyDeserialized.achievedDuration, -1);
       expect(emptyDeserialized.teacherNotes, '');
@@ -386,9 +294,11 @@ void main() {
       expect(emptyDeserialized.enterpriseEvaluations.length, 0);
       expect(emptyDeserialized.visaEvaluations.length, 0);
 
-      expect(() => emptyDeserialized.dates, throwsStateError);
-      expect(() => emptyDeserialized.weeklySchedules, throwsStateError);
-      expect(() => emptyDeserialized.supervisor, throwsStateError);
+      expect(() => emptyDeserialized.currentContract!.dates, throwsStateError);
+      expect(() => emptyDeserialized.currentContract!.weeklySchedules,
+          throwsStateError);
+      expect(() => emptyDeserialized.currentContract!.supervisor,
+          throwsStateError);
     });
   });
 }

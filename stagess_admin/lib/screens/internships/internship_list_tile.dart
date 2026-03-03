@@ -11,6 +11,7 @@ import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common/models/internships/internship_contract.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/transportation.dart';
 import 'package:stagess_common/models/persons/person.dart';
@@ -99,93 +100,56 @@ class InternshipListTileState extends State<InternshipListTile> {
     ),
   );
   late final _contactFirstNameController = TextEditingController(
-    text:
-        widget.internship.hasVersions
-            ? widget.internship.supervisor.firstName
-            : '',
+    text: widget.internship.currentContract?.supervisor.firstName ?? '',
   );
   late final _contactLastNameController = TextEditingController(
-    text:
-        widget.internship.hasVersions
-            ? widget.internship.supervisor.lastName
-            : '',
+    text: widget.internship.currentContract?.supervisor.lastName ?? '',
   );
   late final _contactPhoneController = TextEditingController(
-    text:
-        widget.internship.hasVersions
-            ? widget.internship.supervisor.phone?.toString()
-            : '',
+    text: widget.internship.currentContract?.supervisor.phone?.toString() ?? '',
   );
   late final _contactEmailController = TextEditingController(
-    text:
-        widget.internship.hasVersions ? widget.internship.supervisor.email : '',
+    text: widget.internship.currentContract?.supervisor.email ?? '',
   );
   late final _weeklySchedulesController = WeeklySchedulesController(
-    dateRange: widget.internship.hasVersions ? widget.internship.dates : null,
-    weeklySchedules:
-        widget.internship.hasVersions
-            ? widget.internship.weeklySchedules
-            : null,
+    dateRange: widget.internship.currentContract?.dates,
+    weeklySchedules: widget.internship.currentContract?.weeklySchedules,
   );
   late final _expectedDurationController = TextEditingController(
-    text:
-        widget.internship.expectedDuration > 0
-            ? widget.internship.expectedDuration.toString()
-            : '',
+    text: widget.internship.expectedDuration > 0
+        ? widget.internship.expectedDuration.toString()
+        : '',
   );
   late final _transportations =
-      widget.internship.hasVersions
-          ? [...widget.internship.transportations]
-          : <Transportation>[];
+      widget.internship.currentContract?.transportations ?? <Transportation>[];
   late final _visitFrequenciesController = TextEditingController(
-    text:
-        widget.internship.hasVersions ? widget.internship.visitFrequencies : '',
+    text: widget.internship.currentContract?.visitFrequencies ?? '',
   );
   late DateTime _endDate = widget.internship.endDate;
   bool get _isActive => _endDate == DateTime(0);
   late final _achievedDurationController = TextEditingController(
-    text:
-        widget.internship.achievedDuration > 0
-            ? widget.internship.achievedDuration.toString()
-            : '',
+    text: widget.internship.achievedDuration > 0
+        ? widget.internship.achievedDuration.toString()
+        : '',
   );
   late final _teacherNotesController = TextEditingController(
     text: widget.internship.teacherNotes,
   );
 
   Internship get editedInternship {
-    var internship = widget.internship.copyWith(
-      studentId: _studentPickerController.student?.id,
-      signatoryTeacherId: _teacherPickerController.teacher?.id ?? '',
-      enterpriseId:
-          widget.forceEditingMode
-              ? _enterprisePickerController.enterprise.id
-              : null,
-      jobId:
-          widget.forceEditingMode ? _enterprisePickerController.job.id : null,
-      teacherNotes: _teacherNotesController.text,
-      expectedDuration: int.tryParse(_expectedDurationController.text) ?? 0,
-      achievedDuration: int.tryParse(_achievedDurationController.text) ?? -1,
-      endDate: _endDate,
-    );
-
     final schedulesHasChanged =
-        !widget.internship.hasVersions || _weeklySchedulesController.hasChanged;
+        !widget.internship.hasContract || _weeklySchedulesController.hasChanged;
 
     final transportationsChanged = areListsNotEqual(
-      widget.internship.hasVersions ? widget.internship.transportations : [],
+      widget.internship.currentContract?.transportations ?? [],
       _transportations,
     );
     final visitFrequenciesChanged =
-        (widget.internship.hasVersions
-            ? widget.internship.visitFrequencies
-            : '') !=
-        _visitFrequenciesController.text;
+        (widget.internship.currentContract?.visitFrequencies ?? '') !=
+            _visitFrequenciesController.text;
 
     final previousSupervisor =
-        widget.internship.hasVersions
-            ? widget.internship.supervisor
-            : Person.empty;
+        widget.internship.currentContract?.supervisor ?? Person.empty;
     final supervisor = previousSupervisor.copyWith(
       firstName: _contactFirstNameController.text,
       lastName: _contactLastNameController.text,
@@ -197,29 +161,25 @@ class InternshipListTileState extends State<InternshipListTile> {
     );
 
     if (schedulesHasChanged ||
-        visitFrequenciesChanged ||
         transportationsChanged ||
+        visitFrequenciesChanged ||
         previousSupervisor.getDifference(supervisor).isNotEmpty) {
-      // If a mutable has changed, we cannot edit it from here. We have to
-      // create a deep copy of the internship and modify this new instance.
-      // The easiest way to do this is to serialize, modify and then deserialize.
-      final serialized = internship.serialize();
-      final newVersion = InternshipMutableElements(
-        creationDate: DateTime.now(),
-        supervisor: supervisor,
-        dates: _weeklySchedulesController.dateRange!,
-        weeklySchedules: InternshipHelpers.copySchedules(
-          _weeklySchedulesController.weeklySchedules,
-          keepId: false,
-        ),
-        transportations: _transportations,
-        visitFrequencies: _visitFrequenciesController.text,
-      );
-      (serialized['mutables'] as List).add(newVersion.serialize());
-      internship = Internship.fromSerialized(serialized);
+      return Internship.fromSerialized(widget.internship.serialize())
+        ..contracts.add(InternshipContract(
+          date: DateTime.now(),
+          supervisor: supervisor,
+          dates: _weeklySchedulesController.dateRange!,
+          weeklySchedules: InternshipHelpers.copySchedules(
+            _weeklySchedulesController.weeklySchedules,
+            keepId: false,
+          ),
+          transportations: _transportations,
+          visitFrequencies: _visitFrequenciesController.text,
+          formVersion: InternshipContract.currentVersion,
+        ));
+    } else {
+      return widget.internship;
     }
-
-    return internship;
   }
 
   @override
@@ -256,9 +216,8 @@ class InternshipListTileState extends State<InternshipListTile> {
     // Show confirmation dialog
     final answer = await showDialog(
       context: context,
-      builder:
-          (context) =>
-              ConfirmDeleteInternshipDialog(internship: widget.internship),
+      builder: (context) =>
+          ConfirmDeleteInternshipDialog(internship: widget.internship),
     );
     if (answer == null || !answer || !mounted) {
       await internships.releaseLockForItem(widget.internship);
@@ -274,10 +233,9 @@ class InternshipListTileState extends State<InternshipListTile> {
     if (mounted) {
       showSnackBar(
         context,
-        message:
-            isSuccess
-                ? 'Stage supprimé avec succès.'
-                : 'Échec de la suppression du stage.',
+        message: isSuccess
+            ? 'Stage supprimé avec succès.'
+            : 'Échec de la suppression du stage.',
       );
     }
     await internships.releaseLockForItem(widget.internship);
@@ -305,34 +263,15 @@ class InternshipListTileState extends State<InternshipListTile> {
 
       // Finish editing
       final newInternship = editedInternship;
-
-      // Mutable will always be different here, since a new version is created
-      // Therefore we need to manually check if the last version is different
-      // from the previous one to avoid creating trial new versions.
-      final differences = newInternship.getDifference(widget.internship);
-      bool areDifferent = differences.length > 1;
-      if (!areDifferent) {
-        areDifferent = areMapsNotEqual(
-          newInternship.hasVersions
-              ? newInternship.serializedMutables.last
-              : null,
-          widget.internship.hasVersions
-              ? widget.internship.serializedMutables.last
-              : null,
-          ignoreKeys: ['id', 'creation_date'],
-        );
-      }
-      if (areDifferent) {
-        final isSuccess = await internships.replaceWithConfirmation(
-          newInternship,
-        );
+      if (newInternship.getDifference(widget.internship).isNotEmpty) {
+        final isSuccess =
+            await internships.replaceWithConfirmation(newInternship);
         if (mounted) {
           showSnackBar(
             context,
-            message:
-                isSuccess
-                    ? 'Stage modifié avec succès.'
-                    : 'Échec de la modification du stage.',
+            message: isSuccess
+                ? 'Stage modifié avec succès.'
+                : 'Échec de la modification du stage.',
           );
         }
       }
@@ -373,20 +312,18 @@ class InternshipListTileState extends State<InternshipListTile> {
     ).fromIdOrNull(widget.internship.signatoryTeacherId);
 
     final supervisor =
-        widget.internship.hasVersions
-            ? widget.internship.supervisor
-            : Person.empty;
+        widget.internship.currentContract?.supervisor ?? Person.empty;
     _contactFirstNameController.text = supervisor.firstName;
     _contactLastNameController.text = supervisor.lastName;
     _contactPhoneController.text = supervisor.phone?.toString() ?? '';
     _contactEmailController.text = supervisor.email ?? '';
 
     _weeklySchedulesController.dateRange =
-        widget.internship.hasVersions ? widget.internship.dates : null;
+        widget.internship.currentContract?.dates;
 
-    _weeklySchedulesController
-        .weeklySchedules = InternshipHelpers.copySchedules(
-      widget.internship.hasVersions ? widget.internship.weeklySchedules : [],
+    _weeklySchedulesController.weeklySchedules =
+        InternshipHelpers.copySchedules(
+      widget.internship.currentContract?.weeklySchedules ?? [],
       keepId: true,
     );
 
@@ -396,17 +333,15 @@ class InternshipListTileState extends State<InternshipListTile> {
     _transportations
       ..clear()
       ..addAll(
-        widget.internship.hasVersions ? widget.internship.transportations : [],
+        widget.internship.currentContract?.transportations ?? [],
       );
 
     _visitFrequenciesController.text =
-        widget.internship.hasVersions ? widget.internship.visitFrequencies : '';
-
+        widget.internship.currentContract?.visitFrequencies ?? '';
     _endDate = widget.internship.endDate;
-    _achievedDurationController.text =
-        widget.internship.achievedDuration < 0
-            ? ''
-            : widget.internship.achievedDuration.toString();
+    _achievedDurationController.text = widget.internship.achievedDuration < 0
+        ? ''
+        : widget.internship.achievedDuration.toString();
 
     _teacherNotesController.text = widget.internship.teacherNotes;
   }
@@ -435,75 +370,67 @@ class InternshipListTileState extends State<InternshipListTile> {
     return widget.forceEditingMode
         ? _buildEditingForm()
         : AnimatedExpandingCard(
-          expandingDuration: ConfigurationService.expandingTileDuration,
-          initialExpandedState: _isExpanded,
-          onTapHeader: (isExpanded) {
-            setState(() => _isExpanded = isExpanded);
-            _fetchData();
-          },
-          header:
-              (ctx, isExpanded) => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 12.0,
-                      top: 8,
-                      bottom: 8,
-                    ),
-                    child: Text(
-                      '${student?.fullName} - ${enterprise.name}',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+            expandingDuration: ConfigurationService.expandingTileDuration,
+            initialExpandedState: _isExpanded,
+            onTapHeader: (isExpanded) {
+              setState(() => _isExpanded = isExpanded);
+              _fetchData();
+            },
+            header: (ctx, isExpanded) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 12.0,
+                    top: 8,
+                    bottom: 8,
                   ),
-                  if (_isExpanded)
-                    FutureBuilder(
-                      future: _fetchFullDataCompleter.future,
-                      builder:
-                          (context, snapshot) =>
-                              snapshot.connectionState == ConnectionState.done
-                                  ? Row(
-                                    children: [
-                                      if (widget.canDelete)
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.delete,
-                                            color:
-                                                _forceDisabled
-                                                    ? Colors.grey
-                                                    : Colors.red,
-                                          ),
-                                          onPressed:
-                                              _forceDisabled
-                                                  ? null
-                                                  : _onClickedDeleting,
-                                        ),
-                                      if (widget.canEdit)
-                                        IconButton(
-                                          icon: Icon(
-                                            _isEditing
-                                                ? Icons.save
-                                                : Icons.edit,
-                                            color:
-                                                _forceDisabled
-                                                    ? Colors.grey
-                                                    : Theme.of(
-                                                      context,
-                                                    ).primaryColor,
-                                          ),
-                                          onPressed:
-                                              _forceDisabled
-                                                  ? null
-                                                  : _onClickedEditing,
-                                        ),
-                                    ],
-                                  )
-                                  : SizedBox.shrink(),
-                    ),
-                ],
-              ),
-          child: _buildEditingForm(),
-        );
+                  child: Text(
+                    '${student?.fullName} - ${enterprise.name}',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                if (_isExpanded)
+                  FutureBuilder(
+                    future: _fetchFullDataCompleter.future,
+                    builder: (context, snapshot) =>
+                        snapshot.connectionState == ConnectionState.done
+                            ? Row(
+                                children: [
+                                  if (widget.canDelete)
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: _forceDisabled
+                                            ? Colors.grey
+                                            : Colors.red,
+                                      ),
+                                      onPressed: _forceDisabled
+                                          ? null
+                                          : _onClickedDeleting,
+                                    ),
+                                  if (widget.canEdit)
+                                    IconButton(
+                                      icon: Icon(
+                                        _isEditing ? Icons.save : Icons.edit,
+                                        color: _forceDisabled
+                                            ? Colors.grey
+                                            : Theme.of(
+                                                context,
+                                              ).primaryColor,
+                                      ),
+                                      onPressed: _forceDisabled
+                                          ? null
+                                          : _onClickedEditing,
+                                    ),
+                                ],
+                              )
+                            : SizedBox.shrink(),
+                  ),
+              ],
+            ),
+            child: _buildEditingForm(),
+          );
   }
 
   Widget _buildEditingForm() {
@@ -569,9 +496,9 @@ class InternshipListTileState extends State<InternshipListTile> {
   Widget _buildStudent() {
     _studentPickerController.student =
         StudentsProvider.of(context, listen: true).firstWhereOrNull(
-          (student) => student.id == widget.internship.studentId,
-        ) ??
-        Student.empty;
+              (student) => student.id == widget.internship.studentId,
+            ) ??
+            Student.empty;
 
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
@@ -586,9 +513,9 @@ class InternshipListTileState extends State<InternshipListTile> {
   Widget _buildEnterprise() {
     _enterprisePickerController.enterprise =
         EnterprisesProvider.of(context, listen: true).firstWhereOrNull(
-          (enterprise) => enterprise.id == widget.internship.enterpriseId,
-        ) ??
-        Enterprise.empty;
+              (enterprise) => enterprise.id == widget.internship.enterpriseId,
+            ) ??
+            Enterprise.empty;
 
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
@@ -604,9 +531,9 @@ class InternshipListTileState extends State<InternshipListTile> {
   Widget _buildSupervisingTeacher() {
     _teacherPickerController.teacher =
         TeachersProvider.of(context, listen: true).firstWhereOrNull(
-          (teacher) => teacher.id == widget.internship.signatoryTeacherId,
-        ) ??
-        Teacher.empty;
+              (teacher) => teacher.id == widget.internship.signatoryTeacherId,
+            ) ??
+            Teacher.empty;
 
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
@@ -627,8 +554,8 @@ class InternshipListTileState extends State<InternshipListTile> {
         _isEditing && _isActive
             ? Text('Contact')
             : Text(
-              'Contact : ${widget.internship.hasVersions ? widget.internship.supervisor.toString() : ''}',
-            ),
+                'Contact : ${widget.internship.currentContract?.supervisor.toString() ?? ''}',
+              ),
         Padding(
           padding: const EdgeInsets.only(left: 16.0),
           child: Column(
@@ -705,9 +632,8 @@ class InternshipListTileState extends State<InternshipListTile> {
               labelText: '* Nombre total d\'heures de stage à faire',
               labelStyle: TextStyle(color: Colors.black),
             ),
-            validator:
-                (text) =>
-                    text!.isEmpty ? 'Indiquer un nombre d\'heures.' : null,
+            validator: (text) =>
+                text!.isEmpty ? 'Indiquer un nombre d\'heures.' : null,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             style: const TextStyle(color: Colors.black),
             enabled: _isEditing,
@@ -726,8 +652,10 @@ class InternshipListTileState extends State<InternshipListTile> {
       context: context,
       initialDate: _isActive ? DateTime.now() : _endDate,
       initialEntryMode: DatePickerEntryMode.calendar,
-      firstDate: DateTime(widget.internship.dates.start.year - 1),
-      lastDate: DateTime(widget.internship.dates.start.year + 2),
+      firstDate: DateTime(widget.internship.currentContract?.dates.start.year ??
+          DateTime.now().year - 1),
+      lastDate: DateTime(widget.internship.currentContract?.dates.start.year ??
+          DateTime.now().year + 2),
     );
     if (date == null) return;
     _endDate = date;
@@ -887,39 +815,35 @@ class _TransportationsState extends State<_Transportations> {
       padding: const EdgeInsets.only(left: 12.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children:
-            Transportation.values.map((e) {
-              return MouseRegion(
-                cursor:
-                    widget.isEditing
-                        ? SystemMouseCursors.click
-                        : SystemMouseCursors.basic,
-                child: GestureDetector(
-                  onTap:
-                      widget.isEditing ? () => _updateTransportations(e) : null,
-                  child: Row(
-                    children: [
-                      Text(e.toString()),
-                      Checkbox(
-                        value: widget.transportations.contains(e),
-                        side: WidgetStateBorderSide.resolveWith(
-                          (states) => BorderSide(
-                            color: Theme.of(context).primaryColor,
-                            width: 2.0,
-                          ),
-                        ),
-                        fillColor: WidgetStatePropertyAll(Colors.transparent),
-                        checkColor: Colors.black,
-                        onChanged:
-                            widget.isEditing
-                                ? (value) => _updateTransportations(e)
-                                : null,
+        children: Transportation.values.map((e) {
+          return MouseRegion(
+            cursor: widget.isEditing
+                ? SystemMouseCursors.click
+                : SystemMouseCursors.basic,
+            child: GestureDetector(
+              onTap: widget.isEditing ? () => _updateTransportations(e) : null,
+              child: Row(
+                children: [
+                  Text(e.toString()),
+                  Checkbox(
+                    value: widget.transportations.contains(e),
+                    side: WidgetStateBorderSide.resolveWith(
+                      (states) => BorderSide(
+                        color: Theme.of(context).primaryColor,
+                        width: 2.0,
                       ),
-                    ],
+                    ),
+                    fillColor: WidgetStatePropertyAll(Colors.transparent),
+                    checkColor: Colors.black,
+                    onChanged: widget.isEditing
+                        ? (value) => _updateTransportations(e)
+                        : null,
                   ),
-                ),
-              );
-            }).toList(),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
       ),
     );
   }

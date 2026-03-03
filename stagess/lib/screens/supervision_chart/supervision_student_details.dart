@@ -83,7 +83,7 @@ class SupervisionStudentDetailsScreen extends StatelessWidget {
       internships.fetchData(
         id: internship?.id ?? '-1',
         fields: FetchableFields({
-          'mutables': FetchableFields.all,
+          'contracts': FetchableFields.all,
           'teacher_notes': FetchableFields.all,
         }),
       ),
@@ -136,83 +136,81 @@ class _SupervisionStudentDetailsScreenInternal extends StatelessWidget {
       context,
       appBar: ResponsiveService.appBarOf(
         context,
-        title:
-            student == null || !hasFullData
-                ? Text(
-                  hasFullData
-                      ? 'Aucun élève trouvé'
-                      : 'Chargement des informations',
-                )
-                : Row(
-                  children: [
-                    student.avatar,
-                    const SizedBox(width: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(student.fullName),
-                        Text(
-                          enterprise?.name ?? 'Aucun stage',
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+        title: student == null || !hasFullData
+            ? Text(
+                hasFullData
+                    ? 'Aucun élève trouvé'
+                    : 'Chargement des informations',
+              )
+            : Row(
+                children: [
+                  student.avatar,
+                  const SizedBox(width: 12),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(student.fullName),
+                      Text(
+                        enterprise?.name ?? 'Aucun stage',
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
       ),
       smallDrawer: null,
       mediumDrawer: MainDrawer.medium,
       largeDrawer: MainDrawer.large,
-      body:
-          hasFullData
-              ? SingleChildScrollView(
-                child: Builder(
-                  builder: (context) {
-                    if (student == null) {
-                      return const Center(child: Text('Aucun élève trouvé'));
-                    }
-                    if (internship == null) {
-                      return const Center(child: Text('Aucun stage trouvé'));
-                    }
-                    if (enterprise == null) {
-                      return const Center(
-                        child: Text('Aucune entreprise trouvée'),
-                      );
-                    }
-                    if (job == null) {
-                      return const Center(child: Text('Aucun emploi trouvé'));
-                    }
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _IsOver(
-                          studentId: studentId,
-                          onTapGoToInternship:
-                              () => _navigateToStudentInternship(context),
-                        ),
-                        _Contact(
-                          student: student,
-                          enterprise: enterprise,
-                          internship: internship,
-                        ),
-                        _PersonalNotes(internship: internship),
-                        _Schedule(internship: internship),
-                        _buildUniformAndEpi(context, job),
-                        _MoreInfoButton(
-                          studentId: studentId,
-                          onTap: () => _navigateToStudentInternship(context),
-                        ),
-                      ],
+      body: hasFullData
+          ? SingleChildScrollView(
+              child: Builder(
+                builder: (context) {
+                  if (student == null) {
+                    return const Center(child: Text('Aucun élève trouvé'));
+                  }
+                  if (internship == null) {
+                    return const Center(child: Text('Aucun stage trouvé'));
+                  }
+                  if (enterprise == null) {
+                    return const Center(
+                      child: Text('Aucune entreprise trouvée'),
                     );
-                  },
-                ),
-              )
-              : Center(
-                child: CircularProgressIndicator(
-                  color: Theme.of(context).primaryColor,
-                ),
+                  }
+                  if (job == null) {
+                    return const Center(child: Text('Aucun emploi trouvé'));
+                  }
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _IsOver(
+                        studentId: studentId,
+                        onTapGoToInternship: () =>
+                            _navigateToStudentInternship(context),
+                      ),
+                      _Contact(
+                        student: student,
+                        enterprise: enterprise,
+                        internship: internship,
+                      ),
+                      _PersonalNotes(internship: internship),
+                      _Schedule(internship: internship),
+                      _buildUniformAndEpi(context, job),
+                      _MoreInfoButton(
+                        studentId: studentId,
+                        onTap: () => _navigateToStudentInternship(context),
+                      ),
+                    ],
+                  );
+                },
               ),
+            )
+          : Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
     );
   }
 
@@ -281,41 +279,44 @@ class _IsOver extends StatelessWidget {
     if (internships.isEmpty) return Container();
 
     final internship = internships.last;
-    final isOver = internship.dates.end.compareTo(DateTime.now()) < 1;
+    final isOver =
+        (internship.currentContract?.dates.end.compareTo(DateTime.now()) ??
+                -1) <
+            1;
 
     return isOver
         ? Center(
-          child: Column(
-            children: [
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.priority_high,
-                    color: Theme.of(context).primaryColor,
-                    size: 35,
-                  ),
-                  Text(
-                    'La date de fin du stage est dépassée.',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: onTapGoToInternship,
-                child: Text(
-                  'Aller au stage',
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleMedium!.copyWith(color: Colors.white),
+            child: Column(
+              children: [
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.priority_high,
+                      color: Theme.of(context).primaryColor,
+                      size: 35,
+                    ),
+                    Text(
+                      'La date de fin du stage est dépassée.',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-        )
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: onTapGoToInternship,
+                  child: Text(
+                    'Aller au stage',
+                    style: Theme.of(
+                      context,
+                    ).textTheme.titleMedium!.copyWith(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          )
         : SizedBox.shrink();
   }
 }
@@ -330,8 +331,8 @@ class _PersonalNotes extends StatefulWidget {
 }
 
 class _PersonalNotesState extends State<_PersonalNotes> {
-  late final _textController =
-      TextEditingController()..text = widget.internship.teacherNotes;
+  late final _textController = TextEditingController()
+    ..text = widget.internship.teacherNotes;
 
   void _sendComments() {
     final internships = InternshipsProvider.of(context, listen: false);
@@ -367,11 +368,10 @@ class _PersonalNotesState extends State<_PersonalNotes> {
               ),
             ),
             IconButton(
-              onPressed:
-                  () => setState(() {
-                    _editMode = !_editMode;
-                    if (!_editMode) _sendComments();
-                  }),
+              onPressed: () => setState(() {
+                _editMode = !_editMode;
+                if (!_editMode) _sendComments();
+              }),
               icon: Icon(
                 _editMode ? Icons.save : Icons.edit,
                 color: Theme.of(context).primaryColor,
@@ -383,28 +383,26 @@ class _PersonalNotesState extends State<_PersonalNotes> {
           padding: const EdgeInsets.only(left: 32.0),
           child: Container(
             width: MediaQuery.of(context).size.width * 5 / 6,
-            decoration:
-                _editMode
-                    ? BoxDecoration(border: Border.all(color: Colors.grey))
-                    : null,
-            child:
-                _editMode
-                    ? TextField(
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                      ),
-                      keyboardType: TextInputType.multiline,
-                      minLines: 4,
-                      maxLines: null,
-                      controller: _textController,
-                    )
-                    : Text(
-                      _textController.text.isEmpty
-                          ? 'Aucun commentaire'
-                          : _textController.text,
-                      style: const TextStyle(fontStyle: FontStyle.italic),
+            decoration: _editMode
+                ? BoxDecoration(border: Border.all(color: Colors.grey))
+                : null,
+            child: _editMode
+                ? TextField(
+                    decoration: const InputDecoration(
+                      border: InputBorder.none,
+                      focusedBorder: InputBorder.none,
                     ),
+                    keyboardType: TextInputType.multiline,
+                    minLines: 4,
+                    maxLines: null,
+                    controller: _textController,
+                  )
+                : Text(
+                    _textController.text.isEmpty
+                        ? 'Aucun commentaire'
+                        : _textController.text,
+                    style: const TextStyle(fontStyle: FontStyle.italic),
+                  ),
           ),
         ),
       ],
@@ -490,10 +488,10 @@ class _Contact extends StatelessWidget {
           child: Row(
             children: [
               InkWell(
-                onTap:
-                    () => launchUrl(
-                      Uri.parse('tel:${internship.supervisor.phone}'),
-                    ),
+                onTap: () => launchUrl(
+                  Uri.parse(
+                      'tel:${internship.currentContract?.supervisor.phone}'),
+                ),
                 child: Icon(Icons.phone, color: Theme.of(context).primaryColor),
               ),
               Padding(
@@ -506,8 +504,8 @@ class _Contact extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      '${internship.supervisor.fullName}\n'
-                      '${internship.supervisor.phone.toString() == '' ? 'Aucun téléphone enregistré' : internship.supervisor.phone}',
+                      '${internship.currentContract?.supervisor.fullName}\n'
+                      '${internship.currentContract?.supervisor.phone.toString() == '' ? 'Aucun téléphone enregistré' : internship.currentContract?.supervisor.phone}',
                     ),
                   ],
                 ),
@@ -532,8 +530,8 @@ class _Schedule extends StatelessWidget {
     return ScheduleSelector(
       editMode: false,
       scheduleController: WeeklySchedulesController(
-        weeklySchedules: internship.weeklySchedules,
-        dateRange: internship.dates,
+        weeklySchedules: internship.currentContract?.weeklySchedules,
+        dateRange: internship.currentContract?.dates,
       ),
       leftPadding: 0,
       periodTextSize: 14,
@@ -548,7 +546,8 @@ class _Schedule extends StatelessWidget {
         const SubTitle('Horaire de stage'),
         Padding(
           padding: const EdgeInsets.only(left: 32),
-          child: _scheduleBuilder(context, internship.weeklySchedules),
+          child: _scheduleBuilder(
+              context, internship.currentContract?.weeklySchedules ?? []),
         ),
       ],
     );

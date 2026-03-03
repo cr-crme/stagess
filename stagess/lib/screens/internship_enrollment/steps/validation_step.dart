@@ -64,20 +64,22 @@ class ValidationStep extends StatelessWidget {
         SubTitle('Responsable en milieu de stage', left: 0),
         Text('Nom du responsable:',
             style: Theme.of(context).textTheme.titleSmall),
-        Text(
-            internship?.supervisor.fullName ?? 'Aucun responsable sélectionné'),
+        Text(internship?.currentContract?.supervisor.fullName ??
+            'Aucun responsable sélectionné'),
         const SizedBox(height: 8),
         Text('Téléphone du responsable:',
             style: Theme.of(context).textTheme.titleSmall),
-        Text(internship?.supervisor.phone.toString().isEmpty ?? true
+        Text(internship?.currentContract?.supervisor.phone.toString().isEmpty ??
+                true
             ? 'Non spécifié'
-            : internship!.supervisor.phone.toString()),
+            : internship!.currentContract!.supervisor.phone.toString()),
         const SizedBox(height: 8),
         Text('Courriel du responsable:',
             style: Theme.of(context).textTheme.titleSmall),
-        Text(internship?.supervisor.email.toString().isEmpty ?? true
+        Text(internship?.currentContract?.supervisor.email.toString().isEmpty ??
+                true
             ? 'Non spécifié'
-            : internship!.supervisor.email.toString()),
+            : internship!.currentContract!.supervisor.email.toString()),
         const SizedBox(height: 8),
         const SubTitle('Horaire du stage', left: 0),
         if (weeklySchedulesController == null ||
@@ -140,13 +142,13 @@ class ValidationStep extends StatelessWidget {
         TransportationsCheckBoxes(
           withTitle: true,
           editMode: false,
-          transportations: internship?.transportations ?? [],
+          transportations: internship?.currentContract?.transportations ?? [],
         ),
         SubTitle('Fréquence des visites de l\'enseignant·e', left: 0),
-        Text(internship?.visitFrequencies == null ||
-                (internship?.visitFrequencies.isEmpty == true)
+        Text(internship?.currentContract?.visitFrequencies == null ||
+                (internship?.currentContract?.visitFrequencies.isEmpty == true)
             ? 'Non spécifié'
-            : internship!.visitFrequencies),
+            : internship!.currentContract!.visitFrequencies),
       ],
     );
   }

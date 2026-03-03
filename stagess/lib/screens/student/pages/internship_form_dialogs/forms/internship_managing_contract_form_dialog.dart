@@ -6,10 +6,15 @@ import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_contract.dart';
+import 'package:stagess_common/models/internships/schedule.dart';
+import 'package:stagess_common/models/internships/transportation.dart';
+import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
+import 'package:stagess_common/models/internships/time_utils.dart'
+    as time_utils;
 
 final _logger = Logger('InternshipManagingContractFormDialog');
 
@@ -43,6 +48,13 @@ Future<Internship?> showManagingContractFormDialog(
 
 class InternshipContractFormController {
   DateTime creationDate = DateTime.now();
+  Person supervisor = Person.empty;
+  time_utils.DateTimeRange dates =
+      time_utils.DateTimeRange(start: DateTime.now(), end: DateTime.now());
+  List<WeeklySchedule> weeklySchedules = [];
+  List<Transportation> transportations = [];
+  String visitFrequencies = '';
+
   InternshipContractFormController({required this.internshipId});
   final String internshipId;
   Internship internship(BuildContext context, {bool listen = true}) =>
@@ -72,6 +84,11 @@ class InternshipContractFormController {
   InternshipContract toInternshipEvaluation() {
     return InternshipContract(
       date: creationDate,
+      supervisor: supervisor,
+      dates: dates,
+      weeklySchedules: weeklySchedules,
+      transportations: transportations,
+      visitFrequencies: visitFrequencies,
       formVersion: InternshipContract.currentVersion,
     );
   }

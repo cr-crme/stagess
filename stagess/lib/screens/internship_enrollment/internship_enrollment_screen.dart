@@ -12,6 +12,7 @@ import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common/models/internships/internship_contract.dart';
 import 'package:stagess_common/models/internships/time_utils.dart'
     as time_utils;
 import 'package:stagess_common/models/persons/person.dart';
@@ -204,7 +205,6 @@ class _InternshipEnrollmentScreenState
 
     return Internship(
       schoolBoardId: schoolBoard.id,
-      creationDate: DateTime.now(),
       studentId: _caracteristicsKey.currentState!.student!.id,
       signatoryTeacherId: signatoryTeacher.id,
       extraSupervisingTeacherIds: [],
@@ -222,32 +222,47 @@ class _InternshipEnrollmentScreenState
           .map<String>((e) => e.job.specializationOrNull?.id ?? '')
           .where((e) => e.isNotEmpty)
           .toList(),
-      supervisor: Person(
-        firstName: _caracteristicsKey.currentState!.supervisorFirstName ?? '',
-        middleName: null,
-        lastName: _caracteristicsKey.currentState!.supervisorLastName ?? '',
-        dateBirth: null,
-        email: _caracteristicsKey.currentState!.supervisorEmail ?? '',
-        address: Address.empty,
-        phone: _caracteristicsKey.currentState?.supervisorPhone == null
-            ? null
-            : PhoneNumber.fromString(
-                _caracteristicsKey.currentState!.supervisorPhone!,
-              ),
-      ),
-      dates: _scheduleKey.currentState?.weeklyScheduleController.dateRange ??
-          time_utils.DateTimeRange(
-            start: DateTime.now(),
-            end: DateTime.now().add(const Duration(days: 30)),
-          ),
       expectedDuration: _scheduleKey.currentState?.internshipDuration ?? -1,
       achievedDuration: -1,
       endDate: DateTime(0),
-      weeklySchedules:
-          _scheduleKey.currentState?.weeklyScheduleController.weeklySchedules ??
+      contracts: [
+        InternshipContract(
+          date: DateTime.now(),
+          supervisor: Person(
+            firstName:
+                _caracteristicsKey.currentState!.supervisorFirstName ?? '',
+            middleName: null,
+            lastName: _caracteristicsKey.currentState!.supervisorLastName ?? '',
+            dateBirth: null,
+            email: _caracteristicsKey.currentState!.supervisorEmail ?? '',
+            address: Address.empty,
+            phone: _caracteristicsKey.currentState?.supervisorPhone == null
+                ? null
+                : PhoneNumber.fromString(
+                    _caracteristicsKey.currentState!.supervisorPhone!,
+                  ),
+          ),
+          dates:
+              _scheduleKey.currentState?.weeklyScheduleController.dateRange ??
+                  time_utils.DateTimeRange(
+                    start: DateTime.now(),
+                    end: DateTime.now().add(const Duration(days: 30)),
+                  ),
+          weeklySchedules: _scheduleKey
+                  .currentState?.weeklyScheduleController.weeklySchedules ??
               [],
-      transportations: _caracteristicsKey.currentState?.transportations ?? [],
-      visitFrequencies: _scheduleKey.currentState?.visitFrequencies ?? '',
+          transportations:
+              _caracteristicsKey.currentState?.transportations ?? [],
+          visitFrequencies: _scheduleKey.currentState?.visitFrequencies ?? '',
+          formVersion: InternshipContract.currentVersion,
+        ),
+      ],
+      teacherNotes: '',
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      sstEvaluations: [],
+      visaEvaluations: [],
     );
   }
 

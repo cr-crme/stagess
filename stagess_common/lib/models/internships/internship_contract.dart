@@ -28,7 +28,9 @@ class InternshipContract extends InternshipEvaluation {
     required this.transportations,
     required this.visitFrequencies,
     required this.formVersion,
-  });
+  }) {
+    _finalizeInitialization();
+  }
   InternshipContract.fromSerialized(super.map)
       : date = DateTimeExt.from(map?['creation_date']) ?? DateTime.now(),
         supervisor = Person.fromSerialized(map?['supervisor']),
@@ -44,7 +46,17 @@ class InternshipContract extends InternshipEvaluation {
             [],
         visitFrequencies = StringExt.from(map?['visit_frequencies']) ?? 'N/A',
         formVersion = map?['form_version'] ?? currentVersion,
-        super.fromSerialized();
+        super.fromSerialized() {
+    _finalizeInitialization();
+  }
+
+  void _finalizeInitialization() {
+    weeklySchedules.sort((a, b) {
+      if (a.period.start.isBefore(b.period.start)) return -1;
+      if (a.period.start.isAfter(b.period.start)) return 1;
+      return 0;
+    });
+  }
 
   @override
   Map<String, dynamic> serializedMap() {

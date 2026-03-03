@@ -154,8 +154,11 @@ class _InternshipListState extends State<_InternshipList> {
   }
 
   Widget _dateBuild(Internship internship) {
-    final endDate =
-        internship.isActive ? internship.dates.end : internship.endDate;
+    final dates =
+        internship.hasContract ? internship.currentContract?.dates : null;
+    if (dates == null) return Container();
+
+    final endDate = internship.isActive ? dates.end : internship.endDate;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -164,9 +167,9 @@ class _InternshipListState extends State<_InternshipList> {
           children: [
             const Text('Début\u00a0:'),
             Text(
-              '${internship.dates.start.year.toString().padLeft(4, '0')}-'
-              '${internship.dates.start.month.toString().padLeft(2, '0')}-'
-              '${internship.dates.start.day.toString().padLeft(2, '0')}',
+              '${dates.start.year.toString().padLeft(4, '0')}-'
+              '${dates.start.month.toString().padLeft(2, '0')}-'
+              '${dates.start.day.toString().padLeft(2, '0')}',
             ),
           ],
         ),
@@ -221,6 +224,9 @@ class _InternshipListState extends State<_InternshipList> {
         Column(
           children: [
             ...widget.internships.map((internship) {
+              final contract = internship.currentContract;
+              if (contract == null) return Container();
+
               final specialization =
                   widget.enterprise.jobs[internship.jobId].specialization;
               final student = StudentsProvider.of(
@@ -250,8 +256,8 @@ class _InternshipListState extends State<_InternshipList> {
                             SizedBox(
                               width: 120,
                               child: Text(
-                                '${internship.dates.start.year.toString()}'
-                                '${internship.dates.end.year == internship.dates.start.year ? '' : ' \u2014 ${internship.dates.end.year.toString()}'}',
+                                '${contract.dates.start.year.toString()}'
+                                '${contract.dates.end.year == contract.dates.start.year ? '' : ' \u2014 ${contract.dates.end.year.toString()}'}',
                                 style: Theme.of(context).textTheme.titleMedium,
                               ),
                             ),
@@ -312,7 +318,7 @@ class _InternshipListState extends State<_InternshipList> {
                       Padding(
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
-                          'Responsable en milieu de stage\u00a0: ${widget.internships.last.supervisor.fullName}',
+                          'Responsable en milieu de stage\u00a0: ${contract.supervisor.fullName}',
                         ),
                       ),
                       Padding(

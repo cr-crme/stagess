@@ -8,6 +8,7 @@ import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/photo.dart';
 import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common/models/internships/internship_contract.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart'
     as attitude;
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
@@ -320,14 +321,9 @@ Internship dummyInternship({
   bool hasEndDate = false,
   int achievedLength = 130,
 }) {
-  final period = DateTimeRange(
-    start: DateTime(2005, 10, 31),
-    end: DateTime(2005, 10, 31).add(const Duration(days: 20)),
-  );
   return Internship(
     id: id,
     schoolBoardId: schoolBoardId,
-    creationDate: versionDate ?? DateTime(2005, 10, 31),
     studentId: studentId,
     signatoryTeacherId: teacherId,
     extraSupervisingTeacherIds: [],
@@ -337,29 +333,20 @@ Internship dummyInternship({
       ActivitySectorsService.activitySectors[2].specializations[1].id,
       ActivitySectorsService.activitySectors[1].specializations[0].id,
     ],
-    supervisor: Person(
-      firstName: 'Nobody',
-      middleName: null,
-      lastName: 'Forever',
-      dateBirth: null,
-      phone: PhoneNumber.fromString('514-555-1234'),
-      address: Address.empty,
-      email: null,
-    ),
-    dates: period,
     endDate: hasEndDate ? DateTime(2034, 10, 28) : DateTime(0),
     expectedDuration: 135,
     achievedDuration: achievedLength,
+    contracts: [
+      dummyInternshipContract(date: versionDate),
+    ],
     enterpriseEvaluations: [
       dummyPostInternshipEnterpriseEvaluation(internshipId: id)
     ],
     sstEvaluations: [dummySstEvaluation(id: id)],
-    weeklySchedules: [dummyWeeklySchedule(period: period)],
     skillEvaluations: [dummyInternshipEvaluationSkill()],
     attitudeEvaluations: [dummyInternshipEvaluationAttitude()],
     visaEvaluations: [dummyInternshipVisaEvaluation()],
-    transportations: [Transportation.none],
-    visitFrequencies: 'Tous les jours',
+    teacherNotes: '',
   );
 }
 
@@ -485,4 +472,20 @@ InternshipEvaluationSkill dummyInternshipEvaluationSkill({
       skills: [dummySkillEvaluation()],
       comments: 'No comment',
       formVersion: '1.0.0',
+    );
+
+InternshipContract dummyInternshipContract(
+        {String id = 'internshipContractId', DateTime? date}) =>
+    InternshipContract(
+      id: id,
+      date: date ?? DateTime(1980, 5, 20),
+      supervisor: dummyPerson(),
+      dates: DateTimeRange(
+        start: DateTime(2000, 1, 1),
+        end: DateTime(2000, 1, 31),
+      ),
+      weeklySchedules: [dummyWeeklySchedule()],
+      transportations: [Transportation.none],
+      visitFrequencies: 'Tous les jours',
+      formVersion: InternshipContract.currentVersion,
     );

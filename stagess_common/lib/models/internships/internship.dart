@@ -1,4 +1,3 @@
-import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
 import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/generic/extended_item_serializable.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
@@ -8,11 +7,7 @@ import 'package:stagess_common/models/internships/internship_evaluation_attitude
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_visa.dart';
 import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
-import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/sst_evaluation.dart';
-import 'package:stagess_common/models/internships/time_utils.dart';
-import 'package:stagess_common/models/internships/transportation.dart';
-import 'package:stagess_common/models/persons/person.dart';
 
 export 'package:stagess_common/models/generic/serializable_elements.dart';
 
@@ -35,35 +30,15 @@ class Internship extends ExtendedItemSerializable {
       extraSpecializationIds; // Any extra jobs added to the internship
   final int expectedDuration;
 
-  // Elements that can be modified (which increase the version number, but
-  // do not require a completely new internship contract)
-  final List<InternshipMutableElements> _mutables;
-  bool get hasVersions => _mutables.isNotEmpty;
-  int get nbVersions => _mutables.length;
-  DateTime get creationDate => _mutables.last.creationDate;
-  DateTime creationDateFrom(int version) => _mutables[version].creationDate;
-  Person get supervisor => _mutables.last.supervisor;
-  Person supervisorFrom(int version) => _mutables[version].supervisor;
-  DateTimeRange get dates => _mutables.last.dates;
-  DateTimeRange dateFrom(int version) => _mutables[version].dates;
-  List<WeeklySchedule> get weeklySchedules => _mutables.last.weeklySchedules;
-  List<WeeklySchedule> weeklySchedulesFrom(int version) =>
-      _mutables[version].weeklySchedules;
-  List<Transportation> get transportations => _mutables.last.transportations;
-  List<Transportation> transportationsFrom(int version) =>
-      _mutables[version].transportations;
-  String get visitFrequencies => _mutables.last.visitFrequencies;
-  String visitFrequenciesFrom(int version) =>
-      _mutables[version].visitFrequencies;
-  List<Map<String, dynamic>> get serializedMutables =>
-      _mutables.map((e) => e.serialize()).toList();
-
   // Elements that are parts of the inner working of the internship (can be
   // modify, but won't generate a new version)
   final int achievedDuration;
   final String teacherNotes;
   final DateTime endDate;
 
+  bool get hasContract => contracts.isNotEmpty;
+  InternshipContract? get currentContract =>
+      hasContract ? contracts.last : null;
   final List<InternshipContract> contracts;
   final List<InternshipEvaluationSkill> skillEvaluations;
   final List<InternshipEvaluationAttitude> attitudeEvaluations;
@@ -74,89 +49,21 @@ class Internship extends ExtendedItemSerializable {
   bool get isClosed => isNotActive && !isEnterpriseEvaluationPending;
   bool get isEnterpriseEvaluationPending =>
       isNotActive && enterpriseEvaluations.isEmpty;
-  bool get isActive => endDate == DateTime(0);
+  bool get isActive => hasContract && endDate == DateTime(0);
   bool get isNotActive => !isActive;
   bool get shouldTerminate =>
-      isActive && dates.end.difference(DateTime.now()).inDays <= -1;
+      isActive &&
+      currentContract!.dates.end.difference(DateTime.now()).inDays <= -1;
 
   void _finalizeInitialization() {
     extraSupervisingTeacherIds.remove(signatoryTeacherId);
 
-    _mutables.sort((a, b) => a.creationDate.compareTo(b.creationDate));
-    for (final mutable in _mutables) {
-      mutable.weeklySchedules.sort((a, b) {
-        if (a.period.start.isBefore(b.period.start)) return -1;
-        if (a.period.start.isAfter(b.period.start)) return 1;
-        return 0;
-      });
-
-      for (final schedule in mutable.weeklySchedules) {
-        schedule.schedule.entries.toList().sort((pairA, pairB) {
-          final dayA = pairA.key;
-          final dayB = pairB.key;
-          final a = pairA.value;
-          final b = pairB.value;
-
-          if (a == null && b == null) return 0;
-          if (a == null) return 1;
-          if (b == null) return -1;
-
-          if (dayA.index < dayB.index) return -1;
-          if (dayA.index > dayB.index) return 1;
-
-          return 0;
-        });
-      }
-    }
-
-    skillEvaluations.sort((a, b) {
-      if (a.date.isBefore(b.date)) return -1;
-      if (a.date.isAfter(b.date)) return 1;
-      return 0;
-    });
-    attitudeEvaluations.sort((a, b) {
-      if (a.date.isBefore(b.date)) return -1;
-      if (a.date.isAfter(b.date)) return 1;
-      return 0;
-    });
-    visaEvaluations.sort((a, b) {
-      if (a.date.isBefore(b.date)) return -1;
-      if (a.date.isAfter(b.date)) return 1;
-      return 0;
-    });
-    sstEvaluations.sort((a, b) {
-      if (a.date.isBefore(b.date)) return -1;
-      if (a.date.isAfter(b.date)) return 1;
-      return 0;
-    });
-    enterpriseEvaluations.sort((a, b) {
-      if (a.date.isBefore(b.date)) return -1;
-      if (a.date.isAfter(b.date)) return 1;
-      return 0;
-    });
-  }
-
-  Internship._({
-    super.id,
-    required this.schoolBoardId,
-    required this.studentId,
-    required this.signatoryTeacherId,
-    required this.extraSupervisingTeacherIds,
-    required this.enterpriseId,
-    required this.jobId,
-    required this.extraSpecializationIds,
-    required List<InternshipMutableElements> mutables,
-    required this.expectedDuration,
-    required this.achievedDuration,
-    required this.teacherNotes,
-    required this.endDate,
-    required this.skillEvaluations,
-    required this.attitudeEvaluations,
-    required this.visaEvaluations,
-    required this.sstEvaluations,
-    required this.enterpriseEvaluations,
-  }) : _mutables = mutables {
-    _finalizeInitialization();
+    contracts.sort((a, b) => a.date.compareTo(b.date));
+    skillEvaluations.sort((a, b) => a.date.compareTo(b.date));
+    attitudeEvaluations.sort((a, b) => a.date.compareTo(b.date));
+    visaEvaluations.sort((a, b) => a.date.compareTo(b.date));
+    sstEvaluations.sort((a, b) => a.date.compareTo(b.date));
+    enterpriseEvaluations.sort((a, b) => a.date.compareTo(b.date));
   }
 
   Internship({
@@ -168,40 +75,21 @@ class Internship extends ExtendedItemSerializable {
     required this.enterpriseId,
     required this.jobId,
     required this.extraSpecializationIds,
-    required DateTime creationDate,
-    required Person supervisor,
-    required DateTimeRange dates,
-    required List<WeeklySchedule> weeklySchedules,
-    required List<Transportation> transportations,
-    required String visitFrequencies,
     required this.expectedDuration,
     required this.achievedDuration,
-    this.teacherNotes = '',
+    required this.teacherNotes,
     required this.endDate,
-    List<InternshipEvaluationSkill>? skillEvaluations,
-    List<InternshipEvaluationAttitude>? attitudeEvaluations,
-    List<InternshipEvaluationVisa>? visaEvaluations,
-    List<SstEvaluation>? sstEvaluations,
-    List<PostInternshipEnterpriseEvaluation>? enterpriseEvaluations,
-  })  : _mutables = [
-          InternshipMutableElements(
-            creationDate: creationDate,
-            supervisor: supervisor,
-            dates: dates,
-            weeklySchedules: weeklySchedules,
-            transportations: transportations,
-            visitFrequencies: visitFrequencies,
-          )
-        ],
-        skillEvaluations = skillEvaluations ?? [],
-        attitudeEvaluations = attitudeEvaluations ?? [],
-        visaEvaluations = visaEvaluations ?? [],
-        sstEvaluations = sstEvaluations ?? [],
-        enterpriseEvaluations = enterpriseEvaluations ?? [] {
+    required this.contracts,
+    required this.skillEvaluations,
+    required this.attitudeEvaluations,
+    required this.visaEvaluations,
+    required this.sstEvaluations,
+    required this.enterpriseEvaluations,
+  }) {
     _finalizeInitialization();
   }
 
-  static Internship get empty => Internship._(
+  static Internship get empty => Internship(
         schoolBoardId: '-1',
         studentId: '',
         signatoryTeacherId: '',
@@ -209,11 +97,11 @@ class Internship extends ExtendedItemSerializable {
         enterpriseId: '',
         jobId: '',
         extraSpecializationIds: [],
-        mutables: [],
         expectedDuration: -1,
         achievedDuration: -1,
         teacherNotes: '',
         endDate: DateTime(0),
+        contracts: [],
         skillEvaluations: [],
         attitudeEvaluations: [],
         visaEvaluations: [],
@@ -234,14 +122,13 @@ class Internship extends ExtendedItemSerializable {
         extraSpecializationIds = ListExt.from(map?['extra_specialization_ids'],
                 deserializer: (e) => StringExt.from(e)!) ??
             [],
-        _mutables = (map?['mutables'] as List?)
-                ?.map(((e) => InternshipMutableElements.fromSerialized(e)))
-                .toList() ??
-            [],
         expectedDuration = IntExt.from(map?['expected_duration']) ?? -1,
         achievedDuration = IntExt.from(map?['achieved_duration']) ?? -1,
         teacherNotes = StringExt.from(map?['teacher_notes']) ?? '',
         endDate = DateTimeExt.from(map?['end_date']) ?? DateTime(0),
+        contracts = ListExt.from(map?['contracts'] as List?,
+                deserializer: (e) => InternshipContract.fromSerialized(e)) ??
+            [],
         skillEvaluations = ListExt.from(map?['skill_evaluations'],
                 deserializer: (map) =>
                     InternshipEvaluationSkill.fromSerialized(map)) ??
@@ -275,11 +162,11 @@ class Internship extends ExtendedItemSerializable {
         'enterprise_id': enterpriseId.serialize(),
         'job_id': jobId.serialize(),
         'extra_specialization_ids': extraSpecializationIds.serialize(),
-        'mutables': serializedMutables,
         'expected_duration': expectedDuration.serialize(),
         'achieved_duration': achievedDuration.serialize(),
         'teacher_notes': teacherNotes.serialize(),
         'end_date': endDate.serialize(),
+        'contracts': contracts.serialize(),
         'skill_evaluations': skillEvaluations.serialize(),
         'attitude_evaluations': attitudeEvaluations.serialize(),
         'visa_evaluations': visaEvaluations.serialize(),
@@ -296,7 +183,7 @@ class Internship extends ExtendedItemSerializable {
         'enterprise_id': FetchableFields.mandatory,
         'job_id': FetchableFields.mandatory,
         'extra_supervising_teacher_ids': FetchableFields.mandatory,
-        'mutables': InternshipMutableElements.fetchableFields,
+        'contracts': InternshipContract.fetchableFields,
         'expected_duration': FetchableFields.optional,
         'achieved_duration': FetchableFields.optional,
         'teacher_notes': FetchableFields.optional,
@@ -308,24 +195,6 @@ class Internship extends ExtendedItemSerializable {
         'enterprise_evaluations':
             PostInternshipEnterpriseEvaluation.fetchableFields,
       });
-
-  void addVersion({
-    required DateTime creationDate,
-    required Person supervisor,
-    required DateTimeRange dates,
-    required List<WeeklySchedule> weeklySchedules,
-    required List<Transportation> transportations,
-    required String visitFrequencies,
-  }) {
-    _mutables.add(InternshipMutableElements(
-      creationDate: creationDate,
-      supervisor: supervisor,
-      dates: dates,
-      weeklySchedules: weeklySchedules,
-      transportations: transportations,
-      visitFrequencies: visitFrequencies,
-    ));
-  }
 
   Internship copyWith({
     String? id,
@@ -340,13 +209,14 @@ class Internship extends ExtendedItemSerializable {
     int? achievedDuration,
     String? teacherNotes,
     DateTime? endDate,
+    List<InternshipContract>? contracts,
     List<InternshipEvaluationSkill>? skillEvaluations,
     List<InternshipEvaluationAttitude>? attitudeEvaluations,
     List<InternshipEvaluationVisa>? visaEvaluations,
     List<SstEvaluation>? sstEvaluations,
     List<PostInternshipEnterpriseEvaluation>? enterpriseEvaluations,
   }) {
-    return Internship._(
+    return Internship(
       id: id ?? this.id,
       schoolBoardId: schoolBoardId ?? this.schoolBoardId,
       studentId: studentId ?? this.studentId,
@@ -357,11 +227,11 @@ class Internship extends ExtendedItemSerializable {
       jobId: jobId ?? this.jobId,
       extraSpecializationIds:
           extraSpecializationIds ?? this.extraSpecializationIds,
-      mutables: _mutables,
       expectedDuration: expectedDuration ?? this.expectedDuration,
       achievedDuration: achievedDuration ?? this.achievedDuration,
       teacherNotes: teacherNotes ?? this.teacherNotes,
       endDate: endDate ?? this.endDate,
+      contracts: contracts?.toList() ?? this.contracts,
       skillEvaluations: skillEvaluations?.toList() ?? this.skillEvaluations,
       attitudeEvaluations:
           attitudeEvaluations?.toList() ?? this.attitudeEvaluations,
@@ -386,11 +256,11 @@ class Internship extends ExtendedItemSerializable {
       'enterprise_id',
       'job_id',
       'extra_specialization_ids',
-      'mutables',
       'expected_duration',
       'achieved_duration',
       'teacher_notes',
       'end_date',
+      'contracts',
       'skill_evaluations',
       'attitude_evaluations',
       'visa_evaluations',
@@ -409,7 +279,7 @@ class Internship extends ExtendedItemSerializable {
       throw WrongVersionException(version, _currentVersion);
     }
 
-    return Internship._(
+    return Internship(
       id: StringExt.from(data['id']) ?? id,
       schoolBoardId: StringExt.from(data['school_board_id']) ?? schoolBoardId,
       studentId: StringExt.from(data['student_id']) ?? studentId,
@@ -424,16 +294,15 @@ class Internship extends ExtendedItemSerializable {
       extraSpecializationIds: ListExt.from(data['extra_specialization_ids'],
               deserializer: (e) => StringExt.from(e)!) ??
           extraSpecializationIds,
-      mutables: ListExt.mergeWithData(_mutables, data['mutables'] as List?,
-          copyWithData: (original, serialized) =>
-              original.copyWithData(serialized),
-          deserializer: (e) => InternshipMutableElements.fromSerialized(e)),
       expectedDuration:
           IntExt.from(data['expected_duration']) ?? expectedDuration,
       achievedDuration:
           IntExt.from(data['achieved_duration']) ?? achievedDuration,
       teacherNotes: StringExt.from(data['teacher_notes']) ?? teacherNotes,
       endDate: DateTimeExt.from(data['end_date']) ?? endDate,
+      contracts: ListExt.from(data['contracts'],
+              deserializer: (map) => InternshipContract.fromSerialized(map)) ??
+          contracts,
       skillEvaluations: ListExt.from(data['skill_evaluations'],
               deserializer: (map) =>
                   InternshipEvaluationSkill.fromSerialized(map)) ??
@@ -464,11 +333,11 @@ class Internship extends ExtendedItemSerializable {
         'enterpriseId: $enterpriseId, '
         'jobId: $jobId, '
         'extraSpecializationIds: $extraSpecializationIds, '
-        'mutables: $_mutables, '
         'expectedDuration: $expectedDuration days, '
         'achievedDuration: $achievedDuration, '
         'teacherNotes: $teacherNotes, '
         'endDate: $endDate, '
+        'contracts: $contracts, '
         'skillEvaluations: $skillEvaluations, '
         'attitudeEvaluations: $attitudeEvaluations, '
         'visaEvaluations: $visaEvaluations, '
