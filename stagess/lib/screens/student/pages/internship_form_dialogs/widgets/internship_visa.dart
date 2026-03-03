@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
-import 'package:stagess/screens/internship_forms/student_steps/visa_evaluation_screen.dart';
+import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/visa_evaluation_form_dialog.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_visa.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';

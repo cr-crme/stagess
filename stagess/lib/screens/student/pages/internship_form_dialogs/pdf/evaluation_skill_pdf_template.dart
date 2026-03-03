@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:stagess/screens/internship_forms/student_steps/skill_evaluation_form_dialog.dart';
+import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/skill_evaluation_form_dialog.dart';
 import 'package:stagess_common/models/internships/task_appreciation.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 

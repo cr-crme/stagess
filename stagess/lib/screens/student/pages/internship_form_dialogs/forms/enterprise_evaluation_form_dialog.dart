@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/common/widgets/form_fields/low_high_slider_form_field.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
-import 'package:stagess/screens/internship_forms/student_steps/enterprise_evaluation_form_enums.dart';
+import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/enterprise_evaluation_form_enums.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/internships/internship.dart';

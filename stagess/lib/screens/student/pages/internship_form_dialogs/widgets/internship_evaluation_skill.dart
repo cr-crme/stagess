@@ -1,44 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/dialogs/show_pdf_dialog.dart';
-import 'package:stagess/screens/internship_forms/student_steps/sst_evaluation_form_screen.dart';
-import 'package:stagess/screens/student/pages/pdf/evaluation_sst_pdf_template.dart';
-import 'package:stagess/screens/student/pages/widgets/internship_evaluation_card.dart';
+import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/skill_evaluation_form_dialog.dart';
+import 'package:stagess/screens/student/pages/internship_form_dialogs/pdf/evaluation_skill_pdf_template.dart';
+import 'package:stagess/screens/student/pages/internship_form_dialogs/widgets/internship_evaluation_card.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 
-final _logger = Logger('InternshipEvaluationSst');
+final _logger = Logger('InternshipEvaluationSkill');
 
-// TODO Card is opened if they need to do something
-class EvaluationSst extends StatelessWidget {
-  const EvaluationSst({super.key, required this.internshipId});
+class EvaluationSkill extends StatelessWidget {
+  const EvaluationSkill({
+    super.key,
+    required this.internshipId,
+  });
 
   final String internshipId;
 
   @override
   Widget build(BuildContext context) {
-    _logger.finer('Building EvaluationSst for job: $internshipId');
+    _logger.finer('Building EvaluationSkill for internship: $internshipId');
 
     return InternshipEvaluationCard(
-        title: 'SST en entreprise',
+        title: 'C1. Compétences spécifiques du métier',
         internshipId: internshipId,
-        evaluateButtonText: 'Évaluer l\'entreprise',
+        evaluateButtonText: 'Évaluer l\'élève',
         reevaluateButtonText: 'Évaluer de nouveau',
         evaluations: InternshipsProvider.of(context, listen: true)
             .fromId(internshipId)
-            .sstEvaluations,
+            .skillEvaluations,
         onClickedNewEvaluation: () => showInternshipEvaluationFormDialog(
             context,
             internshipId: internshipId,
-            showEvaluationDialog: showSstEvaluationFormDialog),
+            showEvaluationDialog: showSkillEvaluationFormDialog),
         onClickedShowEvaluation: (evaluationId) =>
             showInternshipEvaluationFormDialog(context,
                 internshipId: internshipId,
                 evaluationId: evaluationId,
-                showEvaluationDialog: showSstEvaluationFormDialog),
+                showEvaluationDialog: showSkillEvaluationFormDialog),
         onClickedShowEvaluationPdf: (evaluationId) => showPdfDialog(
               context,
               pdfGeneratorCallback: (context, format) =>
-                  generateSstEvaluationPdf(context, format,
+                  generateSkillEvaluationPdf(context, format,
                       internshipId: internshipId, evaluationId: evaluationId),
             ));
   }
