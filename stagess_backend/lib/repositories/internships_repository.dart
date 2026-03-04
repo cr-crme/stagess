@@ -353,7 +353,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
         final transportations = await sqlInterface.performSelectQuery(
             user: user,
             tableName: 'internship_transportations',
-            filters: {'id': contract['id']});
+            filters: {'contract_id': contract['id']});
         contract['transportations'] = (transportations as List? ?? [])
             .map((e) => e['transportation'])
             .toList();
@@ -783,7 +783,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
       for (final transportation in contract.transportations) {
         await sqlInterface
             .performInsertQuery(tableName: 'internship_transportations', data: {
-          'id': contract.id,
+          'contract_id': contract.id,
           'transportation': transportation.serialize(),
         });
       }

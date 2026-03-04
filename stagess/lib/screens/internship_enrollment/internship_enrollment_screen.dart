@@ -5,9 +5,6 @@ import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/common/widgets/scrollable_stepper.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/router.dart';
-import 'package:stagess/screens/internship_enrollment/steps/caracteristics_step.dart';
-import 'package:stagess/screens/internship_enrollment/steps/schedule_step.dart';
-import 'package:stagess/screens/internship_enrollment/steps/validation_step.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
@@ -47,10 +44,6 @@ class InternshipEnrollmentScreen extends StatefulWidget {
 class _InternshipEnrollmentScreenState
     extends State<InternshipEnrollmentScreen> {
   final _scrollController = ScrollController();
-
-  final _caracteristicsKey = GlobalKey<CaracteristicsStepState>();
-  final _scheduleKey = GlobalKey<ScheduleStepState>();
-
   int _currentStep = 0;
   final List<StepState> _stepStatus = [
     StepState.indexed,
@@ -75,48 +68,9 @@ class _InternshipEnrollmentScreenState
     setState(() {});
   }
 
-  void _nextStep() async {
-    _logger.finer('Going to next step: $_currentStep');
-
-    bool areAllValid = true;
-    if (_currentStep >= 0) {
-      final isValid = FormService.validateForm(
-        _caracteristicsKey.currentState!.formKey,
-      );
-      areAllValid = areAllValid && isValid;
-      _stepStatus[0] = isValid ? StepState.complete : StepState.error;
-    }
-    if (_currentStep >= 1) {
-      final isValid = FormService.validateForm(
-        _scheduleKey.currentState!.formKey,
-      );
-      areAllValid = areAllValid && isValid;
-      _stepStatus[1] = isValid ? StepState.complete : StepState.error;
-    }
-    setState(() {});
-
-    if (!areAllValid) {
-      _showInvalidFieldsSnakBar();
-      return;
-    }
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).clearSnackBars();
-
-    if (_currentStep == 2) {
-      return await _submit();
-    } else {
-      _currentStep += 1;
-      _scrollController.jumpTo(0);
-      setState(() {});
-      return;
-    }
-  }
-
   Future<void> _submit() async {
     // Submit
     _logger.info('Submitting internship enrollment form');
-    _caracteristicsKey.currentState!.formKey.currentState!.save();
-    _scheduleKey.currentState!.formKey.currentState!.save();
 
     final internship = _newInternship;
     if (internship == null) {
@@ -134,7 +88,7 @@ class _InternshipEnrollmentScreenState
     final student = StudentsHelpers.studentsInMyGroups(
       context,
       listen: false,
-    ).firstWhere((e) => e.id == _caracteristicsKey.currentState!.student!.id);
+    ).firstWhere((e) => e.id == 'COUCOU');
     await showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -180,12 +134,10 @@ class _InternshipEnrollmentScreenState
   }
 
   Internship? get _newInternship {
-    final enterprise = _caracteristicsKey.currentState == null
-        ? null
-        : EnterprisesProvider.of(
-            context,
-            listen: false,
-          ).fromIdOrNull(_caracteristicsKey.currentState!.enterprise.id);
+    final enterprise = EnterprisesProvider.of(
+      context,
+      listen: false,
+    ).fromIdOrNull('COUCOU');
     if (enterprise == null) return null;
 
     final signatoryTeacher =
@@ -205,24 +157,27 @@ class _InternshipEnrollmentScreenState
 
     return Internship(
       schoolBoardId: schoolBoard.id,
-      studentId: _caracteristicsKey.currentState!.student!.id,
+      studentId: 'COUCOU',
       signatoryTeacherId: signatoryTeacher.id,
       extraSupervisingTeacherIds: [],
-      enterpriseId: _caracteristicsKey.currentState!.enterprise.id,
-      jobId: enterprise.jobs
-          .firstWhere(
-            (job) =>
-                job.specialization ==
-                _caracteristicsKey
-                    .currentState!.primaryJobController.job.specialization,
-          )
-          .id,
-      extraSpecializationIds: _caracteristicsKey
-          .currentState!.extraJobControllers
-          .map<String>((e) => e.job.specializationOrNull?.id ?? '')
-          .where((e) => e.isNotEmpty)
-          .toList(),
-      expectedDuration: _scheduleKey.currentState?.internshipDuration ?? -1,
+      enterpriseId: 'COUCOU',
+      jobId: 'COUCOU',
+      // enterprise.jobs
+      //     .firstWhere(
+      //       (job) =>
+      //           job.specialization ==
+      //           _caracteristicsKey
+      //               .currentState!.primaryJobController.job.specialization,
+      //     )
+      //     .id,
+      extraSpecializationIds: ['COUCOU'],
+      // _caracteristicsKey
+      //     .currentState!.extraJobControllers
+      //     .map<String>((e) => e.job.specializationOrNull?.id ?? '')
+      //     .where((e) => e.isNotEmpty)
+      //     .toList(),
+      expectedDuration: // _scheduleKey.currentState?.internshipDuration ??
+          -1,
       achievedDuration: -1,
       endDate: DateTime(0),
       contracts: [
@@ -230,30 +185,33 @@ class _InternshipEnrollmentScreenState
           date: DateTime.now(),
           supervisor: Person(
             firstName:
-                _caracteristicsKey.currentState!.supervisorFirstName ?? '',
+                'COUCOU', //_caracteristicsKey.currentState!.supervisorFirstName ?? '',
             middleName: null,
-            lastName: _caracteristicsKey.currentState!.supervisorLastName ?? '',
+            lastName:
+                'COUCOU', //_caracteristicsKey.currentState!.supervisorLastName ?? '',
             dateBirth: null,
-            email: _caracteristicsKey.currentState!.supervisorEmail ?? '',
+            email:
+                'COUCOU', //_caracteristicsKey.currentState!.supervisorEmail ?? '',
             address: Address.empty,
-            phone: _caracteristicsKey.currentState?.supervisorPhone == null
+            phone: null == null
                 ? null
                 : PhoneNumber.fromString(
-                    _caracteristicsKey.currentState!.supervisorPhone!,
+                    'COUCOU', //_caracteristicsKey.currentState!.supervisorPhone!,
                   ),
           ),
           dates:
-              _scheduleKey.currentState?.weeklyScheduleController.dateRange ??
-                  time_utils.DateTimeRange(
-                    start: DateTime.now(),
-                    end: DateTime.now().add(const Duration(days: 30)),
-                  ),
-          weeklySchedules: _scheduleKey
-                  .currentState?.weeklyScheduleController.weeklySchedules ??
+              //_scheduleKey.currentState?.weeklyScheduleController.dateRange ??
+              time_utils.DateTimeRange(
+            start: DateTime.now(),
+            end: DateTime.now().add(const Duration(days: 30)),
+          ),
+          weeklySchedules:
+              // _scheduleKey
+              //         .currentState?.weeklyScheduleController.weeklySchedules ??
               [],
-          transportations:
-              _caracteristicsKey.currentState?.transportations ?? [],
-          visitFrequencies: _scheduleKey.currentState?.visitFrequencies ?? '',
+          transportations: [], //_caracteristicsKey.currentState?.transportations ?? [],
+          visitFrequencies: // _scheduleKey.currentState?.visitFrequencies ??
+              '',
           formVersion: InternshipContract.currentVersion,
         ),
       ],
@@ -303,7 +261,7 @@ class _InternshipEnrollmentScreenState
             type: StepperType.horizontal,
             scrollController: _scrollController,
             currentStep: _currentStep,
-            onTapContinue: _nextStep,
+            onTapContinue: null,
             onStepTapped: (int tapped) {
               setState(() {
                 _currentStep = tapped;
@@ -312,35 +270,19 @@ class _InternshipEnrollmentScreenState
             },
             onTapCancel: _cancel,
             steps: [
-              Step(
-                state: _stepStatus[0],
-                isActive: _currentStep == 0,
-                title: const Text('Caractéristiques'),
-                content: CaracteristicsStep(
-                  key: _caracteristicsKey,
-                  enterprise: widget.enterprise,
-                  specifiedSpecialization:
-                      widget.specifiedSpecialization == null
-                          ? null
-                          : [widget.specifiedSpecialization!],
-                ),
-              ),
-              Step(
-                state: _stepStatus[1],
-                isActive: _currentStep == 1,
-                title: const Text('Horaire'),
-                content: ScheduleStep(key: _scheduleKey),
-              ),
-              Step(
-                state: _stepStatus[2],
-                isActive: _currentStep == 2,
-                title: const Text('Validation des\ninformations'),
-                content: ValidationStep(
-                  internship: _newInternship,
-                  weeklySchedulesController:
-                      _scheduleKey.currentState?.weeklyScheduleController,
-                ),
-              ),
+              // Step(
+              //   state: _stepStatus[0],
+              //   isActive: _currentStep == 0,
+              //   title: const Text('Caractéristiques'),
+              //   content: CaracteristicsStep(
+              //     key: _caracteristicsKey,
+              //     enterprise: widget.enterprise,
+              //     specifiedSpecialization:
+              //         widget.specifiedSpecialization == null
+              //             ? null
+              //             : [widget.specifiedSpecialization!],
+              //   ),
+              // ),
             ],
             controlsBuilder: _controlBuilder,
           ),

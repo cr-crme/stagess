@@ -49,11 +49,10 @@ class WeeklySchedulesController {
   WeeklySchedulesController({
     List<WeeklySchedule>? weeklySchedules,
     time_utils.DateTimeRange? dateRange,
-  }) : _dateRange = dateRange?.copy(),
-       _weeklySchedules = InternshipHelpers.copySchedules(
-         weeklySchedules,
-         keepId: true,
-       ) {
+    bool keepId = true,
+  })  : _dateRange = dateRange?.copy(),
+        _weeklySchedules =
+            InternshipHelpers.copySchedules(weeklySchedules, keepId: keepId) {
     for (var _ in weeklySchedules ?? []) {
       _useSameScheduleForAllDays.add(false);
     }
@@ -100,9 +99,9 @@ class WeeklySchedulesController {
     );
     _weeklySchedules[weeklyIndex].schedule[day] =
         _weeklySchedules[weeklyIndex].schedule[day]?.copyWith(
-          blocks: schedule.blocks,
-        ) ??
-        schedule;
+                  blocks: schedule.blocks,
+                ) ??
+            schedule;
 
     if (_useSameScheduleForAllDays[weeklyIndex]) {
       applySameScheduleForAllDays(weeklyIndex);
@@ -222,48 +221,43 @@ class _ScheduleSelectorState extends State<ScheduleSelector> {
       children: [
         if (widget.title != null) widget.title!,
         ...widget.scheduleController._weeklySchedules.asMap().keys.map<Widget>(
-          (weekIndex) => _ScheduleSelector(
-            key: ValueKey(
-              widget.scheduleController._weeklySchedules[weekIndex].hashCode,
+              (weekIndex) => _ScheduleSelector(
+                key: ValueKey(
+                  widget
+                      .scheduleController._weeklySchedules[weekIndex].hashCode,
+                ),
+                controller: widget.scheduleController,
+                weekIndex: weekIndex,
+                periodName:
+                    widget.scheduleController._weeklySchedules.length > 1
+                        ? 'Période ${weekIndex + 1}'
+                        : null,
+                periodTextSize: widget.periodTextSize,
+                onShouldRefresh: () => setState(() {}),
+                editMode: widget.editMode,
+                leftPadding: widget.leftPadding,
+              ),
             ),
-            controller: widget.scheduleController,
-            weekIndex: weekIndex,
-            periodName:
-                widget.scheduleController._weeklySchedules.length > 1
-                    ? 'Période ${weekIndex + 1}'
-                    : null,
-            periodTextSize: widget.periodTextSize,
-            onShouldRefresh: () => setState(() {}),
-            editMode: widget.editMode,
-            leftPadding: widget.leftPadding,
-          ),
-        ),
         if (widget.editMode)
           Padding(
             padding: const EdgeInsets.only(top: 20.0),
             child: TextButton(
-              onPressed:
-                  () => setState(() {
-                    widget.scheduleController.addWeeklySchedule(
-                      WeeklySchedulesController.fillNewScheduleList(
-                        schedule:
-                            widget.scheduleController._weeklySchedules.isEmpty
-                                ? {}
-                                : widget
-                                    .scheduleController
-                                    ._weeklySchedules
-                                    .last
-                                    .schedule,
-                        periode: widget.scheduleController.dateRange!,
-                      ),
-                    );
-                  }),
+              onPressed: () => setState(() {
+                widget.scheduleController.addWeeklySchedule(
+                  WeeklySchedulesController.fillNewScheduleList(
+                    schedule: widget.scheduleController._weeklySchedules.isEmpty
+                        ? {}
+                        : widget
+                            .scheduleController._weeklySchedules.last.schedule,
+                    periode: widget.scheduleController.dateRange!,
+                  ),
+                );
+              }),
               style: Theme.of(context).textButtonTheme.style?.copyWith(
-                backgroundColor:
-                    Theme.of(
+                    backgroundColor: Theme.of(
                       context,
                     ).elevatedButtonTheme.style!.backgroundColor,
-              ),
+                  ),
               child: const Text('Ajouter une période'),
             ),
           ),
@@ -315,9 +309,9 @@ class _ScheduleSelector extends StatelessWidget {
                 child: Text(
                   periodName!,
                   style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: periodTextSize,
-                  ),
+                        fontWeight: FontWeight.bold,
+                        fontSize: periodTextSize,
+                      ),
                 ),
               ),
               if (editMode)
@@ -441,56 +435,55 @@ class _ScheduleSelector extends StatelessWidget {
                     child: Column(
                       children: [
                         ...Day.values.asMap().keys.map(
-                          (dayIndex) => FormField(
-                            validator: (value) {
-                              final day = Day.values[dayIndex];
-                              final schedule = weeklySchedule.schedule[day];
-                              for (final block
-                                  in schedule?.blocks ?? <TimeBlock>[]) {
-                                if (block.end.isBefore(block.start)) {
-                                  return 'La fin du bloc horaire ne peut pas être avant le début.';
-                                }
-                              }
-                              return null;
-                            },
-                            builder: (state) {
-                              final day = Day.values[dayIndex];
+                              (dayIndex) => FormField(
+                                validator: (value) {
+                                  final day = Day.values[dayIndex];
+                                  final schedule = weeklySchedule.schedule[day];
+                                  for (final block
+                                      in schedule?.blocks ?? <TimeBlock>[]) {
+                                    if (block.end.isBefore(block.start)) {
+                                      return 'La fin du bloc horaire ne peut pas être avant le début.';
+                                    }
+                                  }
+                                  return null;
+                                },
+                                builder: (state) {
+                                  final day = Day.values[dayIndex];
 
-                              bool isEnabled = true;
-                              if (useSameScheduleForAllDays &&
-                                  weeklySchedule.schedule[day] != null) {
-                                if (referenceDayIndex == null) {
-                                  referenceDayIndex = dayIndex;
-                                } else {
-                                  isEnabled = false;
-                                }
-                              }
+                                  bool isEnabled = true;
+                                  if (useSameScheduleForAllDays &&
+                                      weeklySchedule.schedule[day] != null) {
+                                    if (referenceDayIndex == null) {
+                                      referenceDayIndex = dayIndex;
+                                    } else {
+                                      isEnabled = false;
+                                    }
+                                  }
 
-                              return Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  _buildDailyScheduleTile(
-                                    context,
-                                    day: day,
-                                    canChangeTime: isEnabled,
-                                  ),
-                                  if (state.hasError && isEnabled)
-                                    Center(
-                                      child: Text(
-                                        state.errorText ?? '',
-                                        style: TextStyle(
-                                          color:
-                                              Theme.of(
+                                  return Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      _buildDailyScheduleTile(
+                                        context,
+                                        day: day,
+                                        canChangeTime: isEnabled,
+                                      ),
+                                      if (state.hasError && isEnabled)
+                                        Center(
+                                          child: Text(
+                                            state.errorText ?? '',
+                                            style: TextStyle(
+                                              color: Theme.of(
                                                 context,
                                               ).colorScheme.error,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                ],
-                              );
-                            },
-                          ),
-                        ),
+                                    ],
+                                  );
+                                },
+                              ),
+                            ),
                       ],
                     ),
                   ),
@@ -545,11 +538,10 @@ class _ScheduleSelector extends StatelessWidget {
         hour: initial?.hour ?? 12,
         minute: initial?.minute ?? 0,
       ),
-      builder:
-          (context, child) => MediaQuery(
-            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
-            child: child ?? Container(),
-          ),
+      builder: (context, child) => MediaQuery(
+        data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+        child: child ?? Container(),
+      ),
     );
 
     if (time == null) return null;
@@ -604,21 +596,20 @@ class _ScheduleSelector extends StatelessWidget {
     required bool canChangeTime,
   }) {
     final schedule = controller._weeklySchedules[weekIndex].schedule[day];
-    final checkboxCallback =
-        editMode
-            ? () {
-              if (schedule == null) {
-                controller.updateDailyScheduleTime(
-                  weekIndex,
-                  day,
-                  schedule: controller._currentDefaultDaily.duplicate(),
-                );
-              } else {
-                controller.removeDailyScheduleTime(weekIndex, day);
-              }
-              onShouldRefresh();
+    final checkboxCallback = editMode
+        ? () {
+            if (schedule == null) {
+              controller.updateDailyScheduleTime(
+                weekIndex,
+                day,
+                schedule: controller._currentDefaultDaily.duplicate(),
+              );
+            } else {
+              controller.removeDailyScheduleTime(weekIndex, day);
             }
-            : null;
+            onShouldRefresh();
+          }
+        : null;
     if (!editMode && schedule == null) {
       return SizedBox.shrink();
     }
@@ -655,123 +646,109 @@ class _ScheduleSelector extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(bottom: 4.0, top: 8.0),
             child: Column(
-              children:
-                  (schedule?.blocks ?? []).asMap().keys.map((i) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 4.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _ClickableTextField(
-                            enabled: editMode,
-                            schedule!.blocks[i].start.format(context),
-                            onTap:
-                                canChangeTime
-                                    ? () => _updateBlockStart(
-                                      context,
-                                      schedule: schedule,
-                                      blockIndex: i,
-                                      day: day,
-                                    )
-                                    : null,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                            ),
-                            child: Text('à'),
-                          ),
-                          _ClickableTextField(
-                            enabled: editMode,
-                            schedule.blocks[i].end.format(context),
-                            onTap:
-                                canChangeTime
-                                    ? () => _updateBlockEnd(
-                                      context,
-                                      schedule: schedule,
-                                      blockIndex: i,
-                                      day: day,
-                                    )
-                                    : null,
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 4.0),
-                            child:
-                                editMode
-                                    ? (i == 0
-                                        ? Visibility(
-                                          visible: schedule.blocks.length == 1,
-                                          maintainAnimation: true,
-                                          maintainState: true,
-                                          maintainSize: true,
-                                          child: _TimeBlockIconButton(
-                                            onTap:
-                                                canChangeTime
-                                                    ? () {
-                                                      schedule.blocks.add(
-                                                        controller
-                                                                    ._currentDefaultDaily
-                                                                    .blocks
-                                                                    .length >
-                                                                1
-                                                            ? controller
-                                                                ._currentDefaultDaily
-                                                                .blocks[1]
-                                                            : _defaultDaily
-                                                                .blocks[1],
-                                                      );
-                                                      controller
-                                                              ._currentDefaultDaily =
-                                                          schedule.duplicate();
-                                                      controller
-                                                          .updateDailyScheduleTime(
-                                                            weekIndex,
-                                                            day,
-                                                            schedule: schedule,
-                                                          );
-                                                      onShouldRefresh();
-                                                    }
-                                                    : null,
-                                            icon: Icon(
-                                              Icons.add,
-                                              color:
-                                                  canChangeTime
-                                                      ? Colors.green
-                                                      : Colors.grey,
-                                            ),
-                                          ),
-                                        )
-                                        : _TimeBlockIconButton(
-                                          onTap:
-                                              canChangeTime
-                                                  ? () {
-                                                    schedule.blocks.removeAt(i);
-                                                    controller
-                                                            ._currentDefaultDaily =
-                                                        schedule.duplicate();
-                                                    controller
-                                                        .updateDailyScheduleTime(
-                                                          weekIndex,
-                                                          day,
-                                                          schedule: schedule,
-                                                        );
-                                                    onShouldRefresh();
-                                                  }
-                                                  : null,
-                                          icon: Icon(
-                                            Icons.remove,
-                                            color:
-                                                canChangeTime
-                                                    ? Colors.red
-                                                    : Colors.grey,
-                                          ),
-                                        ))
-                                    : Container(),
-                          ),
-                        ],
+              children: (schedule?.blocks ?? []).asMap().keys.map((i) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 4.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _ClickableTextField(
+                        enabled: editMode,
+                        schedule!.blocks[i].start.format(context),
+                        onTap: canChangeTime
+                            ? () => _updateBlockStart(
+                                  context,
+                                  schedule: schedule,
+                                  blockIndex: i,
+                                  day: day,
+                                )
+                            : null,
                       ),
-                    );
-                  }).toList(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                        ),
+                        child: Text('à'),
+                      ),
+                      _ClickableTextField(
+                        enabled: editMode,
+                        schedule.blocks[i].end.format(context),
+                        onTap: canChangeTime
+                            ? () => _updateBlockEnd(
+                                  context,
+                                  schedule: schedule,
+                                  blockIndex: i,
+                                  day: day,
+                                )
+                            : null,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4.0),
+                        child: editMode
+                            ? (i == 0
+                                ? Visibility(
+                                    visible: schedule.blocks.length == 1,
+                                    maintainAnimation: true,
+                                    maintainState: true,
+                                    maintainSize: true,
+                                    child: _TimeBlockIconButton(
+                                      onTap: canChangeTime
+                                          ? () {
+                                              schedule.blocks.add(
+                                                controller._currentDefaultDaily
+                                                            .blocks.length >
+                                                        1
+                                                    ? controller
+                                                        ._currentDefaultDaily
+                                                        .blocks[1]
+                                                    : _defaultDaily.blocks[1],
+                                              );
+                                              controller._currentDefaultDaily =
+                                                  schedule.duplicate();
+                                              controller
+                                                  .updateDailyScheduleTime(
+                                                weekIndex,
+                                                day,
+                                                schedule: schedule,
+                                              );
+                                              onShouldRefresh();
+                                            }
+                                          : null,
+                                      icon: Icon(
+                                        Icons.add,
+                                        color: canChangeTime
+                                            ? Colors.green
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                  )
+                                : _TimeBlockIconButton(
+                                    onTap: canChangeTime
+                                        ? () {
+                                            schedule.blocks.removeAt(i);
+                                            controller._currentDefaultDaily =
+                                                schedule.duplicate();
+                                            controller.updateDailyScheduleTime(
+                                              weekIndex,
+                                              day,
+                                              schedule: schedule,
+                                            );
+                                            onShouldRefresh();
+                                          }
+                                        : null,
+                                    icon: Icon(
+                                      Icons.remove,
+                                      color: canChangeTime
+                                          ? Colors.red
+                                          : Colors.grey,
+                                    ),
+                                  ))
+                            : Container(),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
             ),
           ),
         ),
@@ -825,28 +802,25 @@ class _ClickableTextFieldState extends State<_ClickableTextField> {
   Widget build(BuildContext context) {
     return widget.enabled
         ? InkWell(
-          onTap: widget.onTap,
-          onHover: (hovering) {
-            setState(() {
-              _isHovering = hovering;
-            });
-          },
-          child: Container(
-            width: 66,
-            height: 28,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.black),
-              borderRadius: BorderRadius.circular(4.0),
-              color:
-                  _isHovering
-                      ? Colors.grey[200]
-                      : (widget.onTap == null
-                          ? Colors.grey[200]
-                          : Colors.white),
+            onTap: widget.onTap,
+            onHover: (hovering) {
+              setState(() {
+                _isHovering = hovering;
+              });
+            },
+            child: Container(
+              width: 66,
+              height: 28,
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.black),
+                borderRadius: BorderRadius.circular(4.0),
+                color: _isHovering
+                    ? Colors.grey[200]
+                    : (widget.onTap == null ? Colors.grey[200] : Colors.white),
+              ),
+              child: Center(child: Text(widget.text)),
             ),
-            child: Center(child: Text(widget.text)),
-          ),
-        )
+          )
         : SizedBox(width: 50, child: Center(child: Text(widget.text)));
   }
 }

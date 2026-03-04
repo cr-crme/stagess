@@ -107,6 +107,7 @@ class _InternshipEvaluationCardState extends State<InternshipEvaluationCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
+              // TODO Allow for changing the text here
               widget.evaluations.length > 1
                   ? 'Afficher les évaluations du\u00a0: '
                   : 'Afficher l\'évaluation du\u00a0: ',

@@ -426,9 +426,9 @@ CREATE TABLE internship_daily_schedules (
 );
 
 CREATE TABLE internship_transportations (
-    id VARCHAR(36) NOT NULL,
+    contract_id VARCHAR(36) NOT NULL,
     transportation INT NOT NULL, 
-    FOREIGN KEY (id) REFERENCES internship_contracts(id) ON DELETE CASCADE
+    FOREIGN KEY (contract_id) REFERENCES internship_contracts(id) ON DELETE CASCADE
 );
 
 CREATE TABLE internship_skill_evaluations (

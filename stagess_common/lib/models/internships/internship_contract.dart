@@ -54,6 +54,15 @@ class InternshipContract extends InternshipEvaluation {
         super.fromSerialized() {
     _finalizeInitialization();
   }
+  static InternshipContract get empty => InternshipContract(
+        date: DateTime.now(),
+        supervisor: Person.empty,
+        dates: DateTimeRange(start: DateTime.now(), end: DateTime.now()),
+        weeklySchedules: [],
+        transportations: [],
+        visitFrequencies: '',
+        formVersion: currentVersion,
+      );
 
   void _finalizeInitialization() {
     weeklySchedules.sort((a, b) {

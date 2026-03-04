@@ -21,18 +21,26 @@ class InternshipManagingContract extends StatelessWidget {
         title: 'Détails du stage',
         internshipId: internshipId,
         evaluateButtonText: 'Évaluer l\'entreprise',
-        reevaluateButtonText: 'Évaluer de nouveau',
+        reevaluateButtonText: 'Modifier le contrat',
         evaluations:
             InternshipsProvider.of(context).fromId(internshipId).contracts,
-        onClickedNewEvaluation: () => showInternshipEvaluationFormDialog(
-            context,
+        onClickedNewEvaluation: () => showInternshipEvaluationFormDialog(context,
             internshipId: internshipId,
-            showEvaluationDialog: showManagingContractFormDialog),
-        onClickedShowEvaluation: (contractId) =>
-            showInternshipEvaluationFormDialog(context,
-                internshipId: internshipId,
-                evaluationId: contractId,
-                showEvaluationDialog: showManagingContractFormDialog),
+            showEvaluationDialog: (BuildContext context,
+                    {required String internshipId, String? evaluationId}) =>
+                showManagingContractFormDialog(context,
+                    internship: InternshipsProvider.of(context, listen: false)
+                        .fromId(internshipId),
+                    isNewContract: false)),
+        onClickedShowEvaluation: (contractId) => showInternshipEvaluationFormDialog(context,
+            internshipId: internshipId,
+            evaluationId: contractId,
+            showEvaluationDialog: (BuildContext context,
+                    {required String internshipId, String? evaluationId}) =>
+                showManagingContractFormDialog(context,
+                    internship: InternshipsProvider.of(context, listen: false).fromId(internshipId),
+                    evaluationId: evaluationId,
+                    isNewContract: false)),
         onClickedShowEvaluationPdf: (contractId) => showPdfDialog(
               context,
               pdfGeneratorCallback: (context, format) =>

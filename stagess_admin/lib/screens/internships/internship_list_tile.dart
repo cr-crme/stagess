@@ -114,6 +114,7 @@ class InternshipListTileState extends State<InternshipListTile> {
   late final _weeklySchedulesController = WeeklySchedulesController(
     dateRange: widget.internship.currentContract?.dates,
     weeklySchedules: widget.internship.currentContract?.weeklySchedules,
+    keepId: false, // TODO Check this
   );
   late final _expectedDurationController = TextEditingController(
     text: widget.internship.expectedDuration > 0

@@ -104,7 +104,8 @@ extension IterableExtensions<T> on Iterable<T> {
 extension ItemSerializableExtension on ItemSerializable {
   /// Returns all the fields that contains a difference between the two objects.
   /// If the two objects are equal, an empty list is returned.
-  List<String> getDifference([ItemSerializable? other]) {
+  List<String> getDifference(ItemSerializable? other,
+      {List<String> ignoreKeys = const []}) {
     final keys = serializedMap().keys;
 
     // If there is no other object, all the keys are necessarily different
@@ -115,12 +116,16 @@ extension ItemSerializableExtension on ItemSerializable {
 
     final diff = <String>[];
     for (var key in serializedThis.keys) {
+      if (ignoreKeys.contains(key)) continue;
+
       if (serializedThis[key] is List) {
-        if (areListsNotEqual(serializedThis[key], serializedOther[key])) {
+        if (areListsNotEqual(serializedThis[key], serializedOther[key],
+            ignoreKeys: ignoreKeys)) {
           diff.add(key);
         }
       } else if (serializedThis[key] is Map) {
-        if (areMapsNotEqual(serializedThis[key], serializedOther[key])) {
+        if (areMapsNotEqual(serializedThis[key], serializedOther[key],
+            ignoreKeys: ignoreKeys)) {
           diff.add(key);
         }
       } else {
