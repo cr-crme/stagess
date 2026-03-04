@@ -395,11 +395,13 @@ CREATE TABLE internship_contracts (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     internship_id VARCHAR(36) NOT NULL,
     date BIGINT NOT NULL,
-    supervisor_id VARCHAR(36) NOT NULL,
+    supervisor_first_name VARCHAR(50) NOT NULL,
+    supervisor_last_name VARCHAR(50) NOT NULL,
+    supervisor_phone_number VARCHAR(50),
+    supervisor_email VARCHAR(100),
     starting_date BIGINT NOT NULL,
     ending_date BIGINT NOT NULL,
     visit_frequencies VARCHAR(255) NOT NULL,
-    FOREIGN KEY (supervisor_id) REFERENCES persons(id),
     FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE
 );
 

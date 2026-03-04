@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
-import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
@@ -156,64 +155,35 @@ Future<void> showInternshipEvaluationFormDialog(BuildContext context,
   final editMode = evaluationId == null;
   _logger.info(
       'Showing InternshipEvaluationFormDialog for internship: $internshipId, editMode: $editMode');
-
   final internships = InternshipsProvider.of(context, listen: false);
-  if (!context.mounted) return;
+  final internship = internships.fromId(internshipId);
 
-  final hasLock = await showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) => FutureBuilder(
-      future: Future.wait([
-        internships.getLockForItem(internships.fromId(internshipId)),
-        internships.fetchData(id: internshipId, fields: FetchableFields.all),
-      ]),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          final hasLock = (snapshot.data as List).first as bool;
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.of(context).pop(hasLock);
-          });
-        }
-        return Dialog(
-          child: SizedBox(
-            width: 100,
-            height: 100,
-            child: Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
-          ),
+  if (editMode) {
+    final hasLock = await internships.getLockForItem(internship);
+    if (!hasLock || !context.mounted) {
+      if (context.mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible de modifier ce stage, car il est en cours de modification par un autre utilisateur.',
         );
-      },
-    ),
-  );
-
-  if (!hasLock || !context.mounted) {
-    _logger.warning('Could not get lock for internshipId: $internshipId');
-    if (context.mounted) {
-      showSnackBar(
-        context,
-        message:
-            'Impossible de modifier le formulaire, car il est en cours de modification par un autre utilisateur.',
-      );
+      }
+      return;
     }
-    return;
   }
 
-  // TODO: Find why all the InternshipContracts returned by the backend are the same
   final newInternship = await showEvaluationDialog(context,
       internshipId: internshipId, evaluationId: evaluationId);
   if (!editMode) return;
 
-  final internship = internships.fromId(internshipId);
-  final isSuccess = newInternship != null &&
-      await internships.replaceWithConfirmation(newInternship);
-  await internships.releaseLockForItem(internship);
-
-  if (isSuccess && context.mounted) {
-    showSnackBar(context, message: 'L\'évaluation SST a bien été enregistrée.');
+  if (newInternship == null) {
+    await internships.releaseLockForItem(internship);
+    return;
   }
-  return;
+
+  await internships.replaceWithConfirmation(newInternship);
+  if (context.mounted) {
+    showSnackBar(context, message: 'Le stage a été mis à jour');
+  }
+  await internships.releaseLockForItem(internship);
 }

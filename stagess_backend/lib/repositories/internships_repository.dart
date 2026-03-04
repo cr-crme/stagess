@@ -205,7 +205,10 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             fieldsToFetch: [
               'id',
               'date',
-              'supervisor_id',
+              'supervisor_first_name',
+              'supervisor_last_name',
+              'supervisor_phone_number',
+              'supervisor_email',
               'starting_date',
               'ending_date',
               'visit_frequencies',
@@ -300,38 +303,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
 
       final contracts = [];
       for (final contract in (internship['contracts'] as List? ?? [])) {
-        contract['supervisor'] = (await sqlInterface.performSelectQuery(
-                    user: user,
-                    tableName: 'persons',
-                    filters: {
-                  'id': contract['supervisor_id']
-                },
-                    subqueries: [
-                  sqlInterface.selectSubquery(
-                      dataTableName: 'phone_numbers',
-                      idNameToDataTable: 'entity_id',
-                      fieldsToFetch: ['id', 'phone_number']),
-                  sqlInterface.selectSubquery(
-                      dataTableName: 'addresses',
-                      idNameToDataTable: 'entity_id',
-                      fieldsToFetch: [
-                        'id',
-                        'civic',
-                        'street',
-                        'apartment',
-                        'city',
-                        'postal_code',
-                        'latitude',
-                        'longitude',
-                      ]),
-                ]) as List?)
-                ?.first ??
-            {};
-        contract['supervisor']['phone'] =
-            (contract['supervisor']['phone_numbers'] as List?)?.firstOrNull;
-        contract['supervisor']['address'] =
-            (contract['supervisor']['addresses'] as List?)?.firstOrNull;
-
         final schedules = await sqlInterface.performSelectQuery(
             user: user,
             tableName: 'internship_weekly_schedules',
@@ -708,7 +679,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
       {Internship? previous, required DatabaseUser user}) async {
     final previousContracts = previous?.contracts ?? [];
     bool supervisorIsUpdated = false;
-    // TODO Remove the supervisor from the persons table as we need to keep track of previous one without updating
     for (final contract in internship.contracts) {
       if (previousContracts.any((prev) => prev.id == contract.id)) {
         // Skip if the contract already exists
@@ -765,7 +735,11 @@ class MySqlInternshipsRepository extends InternshipsRepository {
         'id': contract.id,
         'internship_id': internship.id,
         'date': contract.date.serialize(),
-        'supervisor_id': contract.supervisor.id,
+        'supervisor_first_name': contract.supervisor.firstName.serialize(),
+        'supervisor_last_name': contract.supervisor.lastName.serialize(),
+        'supervisor_phone_number':
+            contract.supervisor.phone?.serialize()['phone_number'],
+        'supervisor_email': contract.supervisor.email?.serialize(),
         'starting_date': contract.dates.start.serialize(),
         'ending_date': contract.dates.end.serialize(),
         'visit_frequencies': contract.visitFrequencies.serialize(),
@@ -1122,23 +1096,10 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     required DatabaseUser user,
   }) async {
     try {
-      final contracts = (await sqlInterface.performSelectQuery(
-        user: user,
-        tableName: 'internship_contracts',
-        filters: {'internship_id': id},
-      ));
-
       await sqlInterface.performDeleteQuery(
         tableName: 'entities',
         filters: {'shared_id': id},
       );
-      for (final contract in contracts) {
-        await sqlInterface.performDeleteQuery(
-          tableName: 'entities',
-          filters: {'shared_id': contract['supervisor_id']},
-        );
-      }
-
       return id;
     } catch (e) {
       return null;

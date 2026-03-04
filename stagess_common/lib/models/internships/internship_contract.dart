@@ -33,7 +33,12 @@ class InternshipContract extends InternshipEvaluation {
   }
   InternshipContract.fromSerialized(super.map)
       : date = DateTimeExt.from(map?['date']) ?? DateTime.now(),
-        supervisor = Person.fromSerialized(map?['supervisor']),
+        supervisor = Person.fromSerialized({
+          'first_name': map?['supervisor_first_name'],
+          'last_name': map?['supervisor_last_name'],
+          'phone': {'phone_number': map?['supervisor_phone_number']},
+          'email': map?['supervisor_email'],
+        }),
         dates = DateTimeRange(
             start: DateTimeExt.from(map?['starting_date']) ?? DateTime(0),
             end: DateTimeExt.from(map?['ending_date']) ?? DateTime(0)),
@@ -63,7 +68,10 @@ class InternshipContract extends InternshipEvaluation {
     return {
       'id': id,
       'date': date.millisecondsSinceEpoch,
-      'supervisor': supervisor.serialize(),
+      'supervisor_first_name': supervisor.firstName.serialize(),
+      'supervisor_last_name': supervisor.lastName.serialize(),
+      'supervisor_phone_number': supervisor.phone?.serialize()['phone_number'],
+      'supervisor_email': supervisor.email?.serialize(),
       'starting_date': dates.start.serialize(),
       'ending_date': dates.end.serialize(),
       'schedules': weeklySchedules.map((e) => e.serialize()).toList(),
@@ -100,7 +108,12 @@ class InternshipContract extends InternshipEvaluation {
     return InternshipContract(
       id: id,
       date: DateTimeExt.from(serialized['date']) ?? date,
-      supervisor: supervisor.copyWithData(serialized['supervisor']),
+      supervisor: supervisor.copyWithData({
+        'first_name': serialized['supervisor_first_name'],
+        'last_name': serialized['supervisor_last_name'],
+        'phone': serialized['supervisor_phone_number'],
+        'email': serialized['supervisor_email'],
+      }),
       dates: DateTimeRange(
         start: DateTimeExt.from(serialized['starting_date']) ?? dates.start,
         end: DateTimeExt.from(serialized['ending_date']) ?? dates.end,
@@ -121,14 +134,16 @@ class InternshipContract extends InternshipEvaluation {
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
         'date': FetchableFields.optional,
-        'supervisor': FetchableFields
-            .optional, // TODO change this (see internships_repository.dart)
+        'supervisor_first_name': FetchableFields.optional,
+        'supervisor_last_name': FetchableFields.optional,
+        'supervisor_phone_number': FetchableFields.optional,
+        'supervisor_email': FetchableFields.optional,
         'starting_date': FetchableFields.optional,
         'ending_date': FetchableFields.optional,
         'schedules': WeeklySchedule.fetchableFields,
         'transportations': FetchableFields.optional,
         'visit_frequencies': FetchableFields.optional,
-        'form_version': FetchableFields.optional,
+        'form_version': FetchableFields.mandatory,
       });
 
   @override

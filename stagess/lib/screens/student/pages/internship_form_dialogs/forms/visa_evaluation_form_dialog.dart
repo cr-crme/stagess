@@ -11,7 +11,6 @@ import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
-import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('VisaEvaluationScreen');
 
@@ -20,26 +19,7 @@ Future<Internship?> showVisaEvaluationFormDialog({
   required VisaEvaluationFormController formController,
   required bool editMode,
 }) async {
-  _logger.info('Showing VisaEvaluationDialog with editMode: $editMode');
-
-  final internships = InternshipsProvider.of(context, listen: false);
-  final internship = internships[formController.internshipId];
-
-  if (editMode) {
-    final hasLock = await internships.getLockForItem(internship);
-    if (!hasLock || !context.mounted) {
-      if (context.mounted) {
-        showSnackBar(
-          context,
-          message:
-              'Impossible de modifier ce stage, car il est en cours de modification par un autre utilisateur.',
-        );
-      }
-      return null;
-    }
-  }
-
-  final editedInternship = await showDialog<Internship?>(
+  final newEvaluation = await showDialog<InternshipEvaluationVisa?>(
     context: context,
     barrierDismissible: false,
     builder: (context) => Navigator(
@@ -54,19 +34,12 @@ Future<Internship?> showVisaEvaluationFormDialog({
       ),
     ),
   );
-  if (!editMode) return editedInternship;
+  if (newEvaluation == null || !context.mounted) return null;
 
-  if (editedInternship == null) {
-    await internships.releaseLockForItem(internship);
-    return null;
-  }
-
-  await internships.replaceWithConfirmation(editedInternship);
-  if (context.mounted) {
-    showSnackBar(context, message: 'Le stage a été mis à jour');
-  }
-  await internships.releaseLockForItem(internship);
-  return editedInternship;
+  final internship = InternshipsProvider.of(context, listen: false)
+      .fromId(formController.internshipId);
+  return Internship.fromSerialized(internship.serialize())
+    ..visaEvaluations.add(newEvaluation);
 }
 
 class VisaEvaluationFormController {

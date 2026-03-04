@@ -199,7 +199,7 @@ class Enterprise extends ExtendedItemSerializable {
         'status': FetchableFields.mandatory,
         'activity_types': FetchableFields.optional,
         'recruiter_id': FetchableFields.optional,
-        'jobs': FetchableFields.optional
+        'jobs': FetchableFields.mandatory
           ..addAll(FetchableFields.reference({'*': Job.fetchableFields})),
         'contact': Person.fetchableFields,
         'contact_function': FetchableFields.optional,

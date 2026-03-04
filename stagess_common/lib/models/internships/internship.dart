@@ -183,17 +183,28 @@ class Internship extends ExtendedItemSerializable {
         'enterprise_id': FetchableFields.mandatory,
         'job_id': FetchableFields.mandatory,
         'extra_supervising_teacher_ids': FetchableFields.mandatory,
-        'contracts': InternshipContract.fetchableFields,
+        'contracts': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference(
+              {'*': InternshipContract.fetchableFields})),
         'expected_duration': FetchableFields.optional,
         'achieved_duration': FetchableFields.optional,
         'teacher_notes': FetchableFields.optional,
         'end_date': FetchableFields.mandatory,
-        'skill_evaluations': InternshipEvaluationSkill.fetchableFields,
-        'attitude_evaluations': InternshipEvaluationAttitude.fetchableFields,
-        'visa_evaluations': InternshipEvaluationVisa.fetchableFields,
-        'sst_evaluations': SstEvaluation.fetchableFields,
-        'enterprise_evaluations':
-            PostInternshipEnterpriseEvaluation.fetchableFields,
+        'skill_evaluations': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference(
+              {'*': InternshipEvaluationSkill.fetchableFields})),
+        'attitude_evaluations': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference(
+              {'*': InternshipEvaluationAttitude.fetchableFields})),
+        'visa_evaluations': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference(
+              {'*': InternshipEvaluationVisa.fetchableFields})),
+        'sst_evaluations': FetchableFields.mandatory
+          ..addAll(
+              FetchableFields.reference({'*': SstEvaluation.fetchableFields})),
+        'enterprise_evaluations': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference(
+              {'*': PostInternshipEnterpriseEvaluation.fetchableFields})),
       });
 
   Internship copyWith({
