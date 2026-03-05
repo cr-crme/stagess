@@ -1096,7 +1096,8 @@ class InternshipsRepositoryMock extends InternshipsRepository {
                 period: DateTimeRange(
                     start: DateTime(1990, 1, 1), end: DateTime(1990, 1, 31)))
           ],
-          transportations: [Transportation.pass],
+          transportations:
+              [Transportation.walk].map((e) => e.toString()).toList(),
           visitFrequencies: 'Toutes les semaines',
           expectedDuration: 30,
           formVersion: InternshipContract.currentVersion,
@@ -1158,7 +1159,9 @@ class InternshipsRepositoryMock extends InternshipsRepository {
                 period: DateTimeRange(
                     start: DateTime(1990, 2, 1), end: DateTime(1990, 2, 28)))
           ],
-          transportations: [Transportation.yes, Transportation.ticket],
+          transportations: [Transportation.walk, Transportation.publicTransport]
+              .map((e) => e.toString())
+              .toList(),
           visitFrequencies: 'Toutes les deux semaines',
           expectedDuration: 20,
           formVersion: InternshipContract.currentVersion,

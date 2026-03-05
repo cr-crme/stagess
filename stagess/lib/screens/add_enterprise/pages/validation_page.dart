@@ -102,7 +102,6 @@ class ValidationPage extends StatelessWidget {
             ...jobControllers!.map(
               (controller) => EnterpriseJobListTile(
                 key: UniqueKey(),
-                // TODO Fix visual (editMode false)
                 schools: SchoolBoardsProvider.of(
                           context,
                           listen: false,

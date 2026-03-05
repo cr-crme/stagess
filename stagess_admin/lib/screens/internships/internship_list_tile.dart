@@ -24,6 +24,7 @@ import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
+import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
@@ -121,8 +122,11 @@ class InternshipListTileState extends State<InternshipListTile> {
         ? widget.internship.currentContract?.expectedDuration.toString()
         : '',
   );
-  late final _transportations =
-      widget.internship.currentContract?.transportations ?? <Transportation>[];
+  late final _transportations = CheckboxWithOtherController<Transportation>(
+      elements: Transportation.values,
+      initialValues: [
+        ...widget.internship.currentContract?.transportations ?? []
+      ]);
   late final _visitFrequenciesController = TextEditingController(
     text: widget.internship.currentContract?.visitFrequencies ?? '',
   );
@@ -143,7 +147,7 @@ class InternshipListTileState extends State<InternshipListTile> {
 
     final transportationsChanged = areListsNotEqual(
       widget.internship.currentContract?.transportations ?? [],
-      _transportations,
+      _transportations.values,
     );
     final visitFrequenciesChanged =
         (widget.internship.currentContract?.visitFrequencies ?? '') !=
@@ -178,17 +182,16 @@ class InternshipListTileState extends State<InternshipListTile> {
           ...widget.internship.contracts,
           InternshipContract(
             date: DateTime.now(),
-            jobId: widget.forceEditingMode
-                ? _enterprisePickerController.job.id
-                : '',
-            extraSpecializationIds: [], // TODO: handle extra job ids??
+            jobId: widget.internship.currentContract?.jobId ?? '',
+            extraSpecializationIds:
+                widget.internship.currentContract?.extraSpecializationIds ?? [],
             supervisor: supervisor,
             dates: _weeklySchedulesController.dateRange!,
             weeklySchedules: InternshipHelpers.copySchedules(
               _weeklySchedulesController.weeklySchedules,
               keepId: false,
             ),
-            transportations: _transportations,
+            transportations: _transportations.values,
             visitFrequencies: _visitFrequenciesController.text,
             expectedDuration:
                 int.tryParse(_expectedDurationController.text) ?? 0,
@@ -349,11 +352,11 @@ class InternshipListTileState extends State<InternshipListTile> {
     _expectedDurationController.text =
         widget.internship.currentContract?.expectedDuration.toString() ?? '';
 
-    _transportations
-      ..clear()
-      ..addAll(
-        widget.internship.currentContract?.transportations ?? [],
-      );
+    _transportations.forceSetIfDifferent(
+        comparator: CheckboxWithOtherController(
+            elements: Transportation.values,
+            initialValues:
+                widget.internship.currentContract?.transportations ?? []));
 
     _visitFrequenciesController.text =
         widget.internship.currentContract?.visitFrequencies ?? '';
@@ -688,9 +691,9 @@ class InternshipListTileState extends State<InternshipListTile> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Transport vers l\'entreprise'),
-          _Transportations(
-            isEditing: _isEditing,
-            transportations: _transportations,
+          CheckboxWithOther(
+            controller: _transportations,
+            enabled: _isEditing && _isActive,
           ),
         ],
       ),
@@ -794,75 +797,6 @@ class InternshipListTileState extends State<InternshipListTile> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _Transportations extends StatefulWidget {
-  const _Transportations({
-    required this.isEditing,
-    required this.transportations,
-  });
-
-  final bool isEditing;
-  final List<Transportation> transportations;
-
-  @override
-  State<_Transportations> createState() => _TransportationsState();
-}
-
-class _TransportationsState extends State<_Transportations> {
-  @override
-  void didUpdateWidget(covariant _Transportations oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.isEditing != widget.isEditing) setState(() {});
-  }
-
-  void _updateTransportations(Transportation transportation) {
-    if (!widget.transportations.contains(transportation)) {
-      widget.transportations.add(transportation);
-    } else {
-      widget.transportations.remove(transportation);
-    }
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(left: 12.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: Transportation.values.map((e) {
-          return MouseRegion(
-            cursor: widget.isEditing
-                ? SystemMouseCursors.click
-                : SystemMouseCursors.basic,
-            child: GestureDetector(
-              onTap: widget.isEditing ? () => _updateTransportations(e) : null,
-              child: Row(
-                children: [
-                  Text(e.toString()),
-                  Checkbox(
-                    value: widget.transportations.contains(e),
-                    side: WidgetStateBorderSide.resolveWith(
-                      (states) => BorderSide(
-                        color: Theme.of(context).primaryColor,
-                        width: 2.0,
-                      ),
-                    ),
-                    fillColor: WidgetStatePropertyAll(Colors.transparent),
-                    checkColor: Colors.black,
-                    onChanged: widget.isEditing
-                        ? (value) => _updateTransportations(e)
-                        : null,
-                  ),
-                ],
-              ),
-            ),
-          );
-        }).toList(),
       ),
     );
   }

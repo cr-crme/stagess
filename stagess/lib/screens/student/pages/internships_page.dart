@@ -217,8 +217,7 @@ class _StudentInternshipListViewState
 
               final endDate = internship.isActive
                   ? DateFormat.yMMMd('fr_CA').format(
-                      internship.currentContract?.dates.end ??
-                          DateTime.now()) // TODO Check this
+                      internship.currentContract?.dates.end ?? DateTime.now())
                   : DateFormat.yMMMd('fr_CA').format(internship.endDate);
 
               final String specializationIdWithName = EnterprisesProvider.of(
@@ -254,8 +253,7 @@ class _StudentInternshipListViewState
                         ),
                         Text(enterprise.address?.toString() ?? ''),
                         Text(
-                          '${DateFormat.yMMMd('fr_CA').format(internship.currentContract?.dates.start ?? DateTime.now())} - $endDate', // TODO Check this
-                        ),
+                            '${DateFormat.yMMMd('fr_CA').format(internship.currentContract?.dates.start ?? DateTime.now())} - $endDate'),
                         if (internship.isActive &&
                             internship.supervisingTeacherIds.contains(
                               teacherId,

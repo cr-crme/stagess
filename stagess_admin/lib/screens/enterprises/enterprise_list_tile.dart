@@ -653,8 +653,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                       key: ValueKey(jobId),
                       controller: _jobControllers[jobId]!,
                       schools: _currentSchoolBoard?.schools ?? [],
-                      // TODO Fix visual (editMode false)
-                      editMode: _isEditing,
+                      editMode: false,
                       onRequestDelete:
                           hasInternship ? null : () => _deleteJob(jobId),
                       initialExpandedState:

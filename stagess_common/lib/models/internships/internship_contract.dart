@@ -3,7 +3,6 @@ import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/internships/internship_evaluation.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/time_utils.dart';
-import 'package:stagess_common/models/internships/transportation.dart';
 import 'package:stagess_common/models/persons/person.dart';
 
 class InternshipContract extends InternshipEvaluation {
@@ -18,7 +17,7 @@ class InternshipContract extends InternshipEvaluation {
   final List<String> extraSpecializationIds; // Any extra specialization
   final Person supervisor;
   final List<WeeklySchedule> weeklySchedules;
-  final List<Transportation> transportations;
+  final List<String> transportations;
   final String visitFrequencies;
   final int expectedDuration;
 
@@ -57,7 +56,7 @@ class InternshipContract extends InternshipEvaluation {
                 .toList() ??
             [],
         transportations = ListExt.from(map?['transportations'],
-                deserializer: (e) => Transportation.deserialize(e)) ??
+                deserializer: (e) => StringExt.from(e)!) ??
             [],
         visitFrequencies = StringExt.from(map?['visit_frequencies']) ?? 'N/A',
         expectedDuration = map?['expected_duration'] ?? -1,
@@ -100,7 +99,7 @@ class InternshipContract extends InternshipEvaluation {
       'starting_date': dates.start.serialize(),
       'ending_date': dates.end.serialize(),
       'schedules': weeklySchedules.map((e) => e.serialize()).toList(),
-      'transportations': transportations.map((e) => e.serialize()).toList(),
+      'transportations': transportations.serialize(),
       'visit_frequencies': visitFrequencies.serialize(),
       'expected_duration': expectedDuration,
       'form_version': formVersion,
@@ -114,7 +113,7 @@ class InternshipContract extends InternshipEvaluation {
     Person? supervisor,
     DateTimeRange? dates,
     List<WeeklySchedule>? weeklySchedules,
-    List<Transportation>? transportations,
+    List<String>? transportations,
     String? visitFrequencies,
     int? expectedDuration,
     String? formVersion,
@@ -161,7 +160,7 @@ class InternshipContract extends InternshipEvaluation {
               .toList() ??
           weeklySchedules,
       transportations: ListExt.from(serialized['transportations'],
-              deserializer: (e) => Transportation.deserialize(e)) ??
+              deserializer: (e) => StringExt.from(e)!) ??
           transportations,
       visitFrequencies:
           StringExt.from(serialized['visit_frequencies']) ?? visitFrequencies,

@@ -23,6 +23,7 @@ import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
+import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
@@ -76,9 +77,12 @@ class InternshipContractFormController {
     dateRange: _previousContract?.dates,
     keepId: false,
   );
-  late final List<Transportation> _transportations = [
-    ...?_previousContract?.transportations
-  ];
+  late final _transportationsController =
+      CheckboxWithOtherController<Transportation>(
+          elements: Transportation.values,
+          initialValues: [
+        ...?_previousContract?.transportations.map((e) => e.toString()),
+      ]);
 
   final EnterpriseJobListController _primaryJobController;
   final List<EnterpriseJobListController> _extraJobControllers;
@@ -166,7 +170,7 @@ class InternshipContractFormController {
           _extraJobControllers.map((e) => e.job.specialization.id).toList(),
       dates: _weeklySchedulesController.dateRange!,
       weeklySchedules: _weeklySchedulesController.weeklySchedules,
-      transportations: _transportations,
+      transportations: _transportationsController.values,
       visitFrequencies: _visitFrequenciesController.text,
       expectedDuration: internshipDuration,
       formVersion: InternshipContract.currentVersion,
@@ -752,26 +756,10 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
   }
 }
 
-class _TransportationsCheckBoxes extends StatefulWidget {
+class _TransportationsCheckBoxes extends StatelessWidget {
   const _TransportationsCheckBoxes({required this.controller});
 
   final InternshipContractFormController controller;
-
-  @override
-  State<_TransportationsCheckBoxes> createState() =>
-      _TransportationsCheckBoxesState();
-}
-
-class _TransportationsCheckBoxesState
-    extends State<_TransportationsCheckBoxes> {
-  void _updateTransportations(Transportation transportation) {
-    if (!widget.controller._transportations.contains(transportation)) {
-      widget.controller._transportations.add(transportation);
-    } else {
-      widget.controller._transportations.remove(transportation);
-    }
-    setState(() {});
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -779,37 +767,9 @@ class _TransportationsCheckBoxesState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SubTitle('Transport de l\'élève vers l\'entreprise', left: 0),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: Transportation.values.map((e) {
-            return InkWell(
-              onTap: widget.controller.canModify
-                  ? () => _updateTransportations(e)
-                  : null,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 12.0, right: 8.0),
-                child: Row(
-                  children: [
-                    Text(e.toString()),
-                    Checkbox(
-                      value: widget.controller._transportations.contains(e),
-                      side: WidgetStateBorderSide.resolveWith(
-                        (states) => BorderSide(
-                          color: Theme.of(context).primaryColor,
-                          width: 2.0,
-                        ),
-                      ),
-                      fillColor: WidgetStatePropertyAll(Colors.transparent),
-                      checkColor: Colors.black,
-                      onChanged: widget.controller.canModify
-                          ? (value) => _updateTransportations(e)
-                          : null,
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }).toList(),
+        CheckboxWithOther(
+          controller: controller._transportationsController,
+          enabled: controller.canModify,
         ),
       ],
     );

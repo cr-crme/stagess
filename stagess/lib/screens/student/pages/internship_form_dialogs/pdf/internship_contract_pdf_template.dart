@@ -689,12 +689,20 @@ pw.Widget _studentInformations({
         sameLine: false,
       ),
       _checkBoxCell(
-          title: 'Transport',
-          content: Transportation.values.asMap().map((key, value) {
-            final transportation = Transportation.deserialize(key);
-            return MapEntry(transportation.toString(),
-                contract.transportations.contains(transportation));
-          })),
+        title: 'Transport',
+        content: Transportation.values.asMap().map((key, value) {
+          final name = value.toString();
+          return MapEntry(name, contract.transportations.contains(name));
+        }),
+        includeOther: true,
+        otherValue: contract.transportations
+            .map((e) =>
+                Transportation.values.map((e) => e.toString()).contains(e)
+                    ? null
+                    : e)
+            .where((e) => e != null)
+            .join('\n'),
+      ),
       _textCell(
         title: 'Fréquence de visites du superviseur',
         content: contract.visitFrequencies,
@@ -741,36 +749,64 @@ pw.Widget _textCell({String? title, String? content, bool sameLine = true}) {
       ));
 }
 
-pw.Widget _checkBoxCell({String? title, required Map<String, bool> content}) {
+pw.Widget _checkBoxCell(
+    {String? title,
+    required Map<String, bool> content,
+    bool includeOther = false,
+    String otherValue = ''}) {
+  if (includeOther) {
+    content['__OTHER__'] = otherValue.isNotEmpty;
+  }
+
   return pw.Container(
-      width: double.infinity,
-      padding: const pw.EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
-      decoration:
-          pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
-      child: pw.Row(children: [
+    width: double.infinity,
+    padding: const pw.EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
+    decoration: pw.BoxDecoration(border: pw.Border.all(color: PdfColors.black)),
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
         pw.Text('$title : ', style: _textStyleBold.copyWith(fontSize: 14)),
-        pw.Expanded(
-            child: pw.Row(
-          mainAxisAlignment: pw.MainAxisAlignment.spaceAround,
-          children: content.entries.map((entry) {
-            return pw.Row(mainAxisSize: pw.MainAxisSize.min, children: [
-              pw.Text(entry.key, style: _textStyle.copyWith(fontSize: 14)),
-              pw.SizedBox(width: 6.0),
-              pw.Container(
-                  decoration: entry.value
-                      ? pw.BoxDecoration(
-                          border: pw.Border.all(color: PdfColors.black))
-                      : null,
-                  child: pw.Checkbox(
-                    value: entry.value,
-                    name: entry.key,
-                    checkColor: PdfColors.black,
-                    activeColor: PdfColors.white,
-                  )),
-            ]);
-          }).toList(),
-        ))
-      ]));
+        ...content.entries.map(
+          (entry) {
+            return pw.Row(
+              mainAxisSize: pw.MainAxisSize.min,
+              children: [
+                pw.Container(
+                    decoration: entry.value
+                        ? pw.BoxDecoration(
+                            border: pw.Border.all(color: PdfColors.black))
+                        : null,
+                    child: pw.Checkbox(
+                      value: entry.value,
+                      name: entry.key,
+                      checkColor: PdfColors.black,
+                      activeColor: PdfColors.white,
+                    )),
+                pw.SizedBox(width: 6.0),
+                pw.Text(entry.key == '__OTHER__' ? 'Autre : ' : entry.key,
+                    style: _textStyle.copyWith(fontSize: 14)),
+                if (includeOther && entry.key == '__OTHER__')
+                  pw.Padding(
+                    padding: const pw.EdgeInsets.only(left: 12.0),
+                    child: pw.Container(
+                      width: 200,
+                      padding: const pw.EdgeInsets.only(
+                          left: 4.0, bottom: 4.0, top: 4.0),
+                      decoration: pw.BoxDecoration(
+                          border: pw.Border.all(color: PdfColors.black)),
+                      child: pw.Text(
+                        'Précisez: $otherValue',
+                        style: _textStyle.copyWith(fontSize: 14),
+                      ),
+                    ),
+                  ),
+              ],
+            );
+          },
+        ),
+      ],
+    ),
+  );
 }
 
 pw.Widget _schedulesCell(

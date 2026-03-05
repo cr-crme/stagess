@@ -486,7 +486,7 @@ InternshipContract dummyInternshipContract(
         end: DateTime(2000, 1, 31),
       ),
       weeklySchedules: [dummyWeeklySchedule()],
-      transportations: [Transportation.none],
+      transportations: [Transportation.walk].map((e) => e.toString()).toList(),
       visitFrequencies: 'Tous les jours',
       expectedDuration: 135,
       formVersion: InternshipContract.currentVersion,

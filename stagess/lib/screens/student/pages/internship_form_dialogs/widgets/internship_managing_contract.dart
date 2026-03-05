@@ -27,6 +27,9 @@ class InternshipManagingContract extends StatelessWidget {
             : 'Un contrat de stage a été créé pour ce stage le\u00a0: '
                 '${DateFormat.yMMMEd('fr_CA').format(contracts.first.date)}'
                 '${contracts.length > 1 ? '\nDernière modification le\u00a0: ${DateFormat.yMMMEd('fr_CA').format(contracts.last.date)}' : ''}',
+        showEvaluationsTitle: contracts.length > 1
+            ? 'Afficher les contrats du\u00a0: '
+            : 'Afficher le contrat du\u00a0: ',
         internshipId: internshipId,
         evaluateButtonText: 'Évaluer l\'entreprise',
         reevaluateButtonText: 'Modifier le contrat',
@@ -39,8 +42,7 @@ class InternshipManagingContract extends StatelessWidget {
                     internship: InternshipsProvider.of(context, listen: false)
                         .fromId(internshipId),
                     isNewContract: false)),
-        onClickedShowEvaluation: (contractId) => showInternshipEvaluationFormDialog(
-            context,
+        onClickedShowEvaluation: (contractId) => showInternshipEvaluationFormDialog(context,
             internshipId: internshipId,
             evaluationId: contractId,
             showEvaluationDialog: (BuildContext context,

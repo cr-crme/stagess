@@ -1971,7 +1971,13 @@ Future<void> _addDummyInternships(
               period: period,
             ),
           ],
-          transportations: [Transportation.yes, Transportation.pass],
+          transportations: [
+            ...[
+              Transportation.walk,
+              Transportation.adaptedTransport,
+            ].map((e) => e.toString()),
+            'Vélo'
+          ],
           visitFrequencies: 'Une visite par semaine',
           expectedDuration: 135,
           formVersion: InternshipContract.currentVersion,
@@ -2104,7 +2110,10 @@ Future<void> _addDummyInternships(
                 period: period,
               ),
             ],
-            transportations: [Transportation.pass],
+            transportations: [
+              Transportation.walk,
+              Transportation.adaptedTransport
+            ].map((e) => e.toString()).toList(),
             visitFrequencies: 'Une visite par semaine',
             expectedDuration: 135,
             formVersion: InternshipContract.currentVersion,
@@ -2218,7 +2227,8 @@ Future<void> _addDummyInternships(
             period: period,
           ),
         ],
-        transportations: [Transportation.none],
+        transportations:
+            [Transportation.publicTransport].map((e) => e.toString()).toList(),
         visitFrequencies: 'Une visite par mois',
         expectedDuration: 135,
         formVersion: InternshipContract.currentVersion,
@@ -2319,7 +2329,9 @@ Future<void> _addDummyInternships(
               period: period,
             ),
           ],
-          transportations: [Transportation.yes],
+          transportations: [Transportation.publicTransport]
+              .map((e) => e.toString())
+              .toList(),
           visitFrequencies: 'Une visite par semaine',
           expectedDuration: 135,
           formVersion: InternshipContract.currentVersion,
@@ -2408,7 +2420,8 @@ Future<void> _addDummyInternships(
               period: period,
             ),
           ],
-          transportations: [Transportation.ticket],
+          transportations:
+              [Transportation.walk].map((e) => e.toString()).toList(),
           visitFrequencies: 'Une visite par semaine',
           expectedDuration: 135,
           formVersion: InternshipContract.currentVersion,
@@ -2536,7 +2549,8 @@ Future<void> _addDummyInternships(
               period: period,
             ),
           ],
-          transportations: [Transportation.none],
+          transportations:
+              [Transportation.walk].map((e) => e.toString()).toList(),
           visitFrequencies: 'Jamais',
           expectedDuration: 135,
           formVersion: InternshipContract.currentVersion,
@@ -2650,7 +2664,7 @@ Future<void> _addDummyInternships(
               period: period,
             ),
           ],
-          transportations: [Transportation.none],
+          transportations: [],
           visitFrequencies: 'Une visite par semaine',
           expectedDuration: 135,
           formVersion: InternshipContract.currentVersion,
@@ -2728,7 +2742,8 @@ Future<void> _addDummyInternships(
                 period: period,
               ),
             ],
-            transportations: [Transportation.none],
+            transportations:
+                [Transportation.walk].map((e) => e.toString()).toList(),
             visitFrequencies: 'Une visite par semaine',
             expectedDuration: 135,
             formVersion: InternshipContract.currentVersion),
@@ -2816,7 +2831,7 @@ Future<void> _addDummyInternships(
               period: period,
             ),
           ],
-          transportations: [Transportation.none],
+          transportations: ['Vélo'].map((e) => e.toString()).toList(),
           visitFrequencies: 'Tous les jours',
           expectedDuration: 135,
           formVersion: InternshipContract.currentVersion,
@@ -2892,7 +2907,8 @@ Future<void> _addDummyInternships(
                 period: period,
               ),
             ],
-            transportations: [Transportation.none],
+            transportations:
+                [Transportation.walk].map((e) => e.toString()).toList(),
             visitFrequencies: 'Tous les jours',
             expectedDuration: 135,
             formVersion: InternshipContract.currentVersion),

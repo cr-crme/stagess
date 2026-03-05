@@ -15,6 +15,7 @@ class InternshipEvaluationCard extends StatefulWidget {
     super.key,
     required this.title,
     this.header,
+    this.showEvaluationsTitle,
     required this.internshipId,
     required this.evaluateButtonText,
     required this.reevaluateButtonText,
@@ -26,6 +27,7 @@ class InternshipEvaluationCard extends StatefulWidget {
 
   final String title;
   final String? header;
+  final String? showEvaluationsTitle;
   final String internshipId;
   final String evaluateButtonText;
   final String reevaluateButtonText;
@@ -110,10 +112,10 @@ class _InternshipEvaluationCardState extends State<InternshipEvaluationCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-              // TODO Allow for changing the text here
-              widget.evaluations.length > 1
-                  ? 'Afficher les évaluations du\u00a0: '
-                  : 'Afficher l\'évaluation du\u00a0: ',
+              widget.showEvaluationsTitle ??
+                  (widget.evaluations.length > 1
+                      ? 'Afficher les évaluations du\u00a0: '
+                      : 'Afficher l\'évaluation du\u00a0: '),
               style: TextStyle(fontWeight: FontWeight.bold)),
           Column(
             mainAxisSize: MainAxisSize.min,
