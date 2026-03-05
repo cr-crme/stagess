@@ -1081,18 +1081,19 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     required DatabaseUser user,
     required InternshipsRepository internshipsRepository,
   }) async {
-    final internships = await sqlInterface.performSelectQuery(
+    final internshipIds = (await sqlInterface.performSelectQuery(
         user: user,
-        tableName: 'internships',
+        tableName: 'internship_contracts',
+        fieldsToFetch: ['internship_id'],
         filters: {'job_id': jobId.serialize()}..addAll(
             user.accessLevel == AccessLevel.superAdmin
                 ? {}
-                : {'school_board_id': user.schoolBoardId ?? ''}));
+                : {'school_board_id': user.schoolBoardId ?? ''})));
 
     final toWait = <Future>[];
-    for (final internship in internships) {
-      toWait.add(
-          internshipsRepository.deleteById(id: internship['id'], user: user));
+    for (final internshipId in internshipIds) {
+      toWait.add(internshipsRepository.deleteById(
+          id: internshipId['internship_id'], user: user));
     }
     await Future.wait(toWait);
   }

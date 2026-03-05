@@ -90,11 +90,14 @@ void main() {
         internship.supervisingTeacherIds,
       );
       expect(internshipSame.enterpriseId, internship.enterpriseId);
-      expect(internshipSame.jobId, internship.jobId);
       expect(
         internshipSame.currentContract!.date.toString(),
         internship.currentContract!.date.toString(),
       );
+      expect(internshipSame.currentContract!.jobId,
+          internship.currentContract!.jobId);
+      expect(internshipSame.currentContract!.extraSpecializationIds,
+          internship.currentContract!.extraSpecializationIds);
       expect(
         internshipSame.currentContract!.supervisor.toString(),
         internship.currentContract!.supervisor.toString(),
@@ -105,7 +108,6 @@ void main() {
         internshipSame.currentContract!.weeklySchedules.length,
         internship.currentContract!.weeklySchedules.length,
       );
-      expect(internshipSame.expectedDuration, internship.expectedDuration);
       expect(internshipSame.achievedDuration, internship.achievedDuration);
       expect(internshipSame.teacherNotes, internship.teacherNotes);
       expect(internshipSame.endDate, internship.endDate);
@@ -130,9 +132,6 @@ void main() {
         signatoryTeacherId: 'newTeacherId',
         extraSupervisingTeacherIds: ['newExtraTeacherId'],
         enterpriseId: 'newEnterpriseId',
-        jobId: 'newJobId',
-        extraSpecializationIds: ['newSpecializationId'],
-        expectedDuration: 135,
         achievedDuration: 130,
         teacherNotes: 'newTeacherNotes',
         endDate: DateTime(2020, 2, 4),
@@ -164,8 +163,6 @@ void main() {
         'newExtraTeacherId',
       ]);
       expect(internshipDifferent.enterpriseId, 'newEnterpriseId');
-      expect(internshipDifferent.jobId, 'newJobId');
-      expect(internshipDifferent.expectedDuration, 135);
       expect(internshipDifferent.achievedDuration, 130);
       expect(internshipDifferent.teacherNotes, 'newTeacherNotes');
       expect(internshipDifferent.endDate, DateTime(2020, 2, 4));
@@ -208,8 +205,6 @@ void main() {
         'signatory_teacher_id': 'teacherId',
         'extra_supervising_teacher_ids': [],
         'enterprise_id': 'enterpriseId',
-        'job_id': 'jobId',
-        'extra_specialization_ids': ['8168', '8134'],
         'contracts': [dummyInternshipContract().serialize()],
         'expected_duration': 135,
         'achieved_duration': 130,
@@ -232,7 +227,6 @@ void main() {
       expect(deserialized.signatoryTeacherId, 'teacherId');
       expect(deserialized.supervisingTeacherIds, ['teacherId']);
       expect(deserialized.enterpriseId, 'enterpriseId');
-      expect(deserialized.jobId, 'jobId');
       expect(
         deserialized.currentContract!.date.toString(),
         internship.currentContract!.date.toString(),
@@ -248,7 +242,7 @@ void main() {
         deserialized.currentContract!.weeklySchedules[0].id,
         internship.currentContract!.weeklySchedules[0].id,
       );
-      expect(deserialized.expectedDuration, 135);
+      expect(deserialized.currentContract!.expectedDuration, 135);
       expect(deserialized.achievedDuration, 130);
       expect(deserialized.teacherNotes, '');
       expect(
@@ -283,8 +277,6 @@ void main() {
       expect(emptyDeserialized.signatoryTeacherId, '');
       expect(emptyDeserialized.supervisingTeacherIds, ['']);
       expect(emptyDeserialized.enterpriseId, '');
-      expect(emptyDeserialized.jobId, '');
-      expect(emptyDeserialized.expectedDuration, -1);
       expect(emptyDeserialized.achievedDuration, -1);
       expect(emptyDeserialized.teacherNotes, '');
       expect(emptyDeserialized.endDate, DateTime(0));
@@ -299,6 +291,7 @@ void main() {
           throwsStateError);
       expect(() => emptyDeserialized.currentContract!.supervisor,
           throwsStateError);
+      expect(emptyDeserialized.currentContract!.expectedDuration, -1);
     });
   });
 }

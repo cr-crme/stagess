@@ -25,10 +25,6 @@ class Internship extends ExtendedItemSerializable {
       [signatoryTeacherId, ...extraSupervisingTeacherIds];
 
   final String enterpriseId;
-  final String jobId; // Main job attached to the enterprise
-  final List<String>
-      extraSpecializationIds; // Any extra jobs added to the internship
-  final int expectedDuration;
 
   // Elements that are parts of the inner working of the internship (can be
   // modify, but won't generate a new version)
@@ -73,9 +69,6 @@ class Internship extends ExtendedItemSerializable {
     required this.signatoryTeacherId,
     required this.extraSupervisingTeacherIds,
     required this.enterpriseId,
-    required this.jobId,
-    required this.extraSpecializationIds,
-    required this.expectedDuration,
     required this.achievedDuration,
     required this.teacherNotes,
     required this.endDate,
@@ -95,9 +88,6 @@ class Internship extends ExtendedItemSerializable {
         signatoryTeacherId: '',
         extraSupervisingTeacherIds: [],
         enterpriseId: '',
-        jobId: '',
-        extraSpecializationIds: [],
-        expectedDuration: -1,
         achievedDuration: -1,
         teacherNotes: '',
         endDate: DateTime(0),
@@ -118,11 +108,6 @@ class Internship extends ExtendedItemSerializable {
                 deserializer: (e) => StringExt.from(e)!) ??
             [],
         enterpriseId = StringExt.from(map?['enterprise_id']) ?? '',
-        jobId = StringExt.from(map?['job_id']) ?? '',
-        extraSpecializationIds = ListExt.from(map?['extra_specialization_ids'],
-                deserializer: (e) => StringExt.from(e)!) ??
-            [],
-        expectedDuration = IntExt.from(map?['expected_duration']) ?? -1,
         achievedDuration = IntExt.from(map?['achieved_duration']) ?? -1,
         teacherNotes = StringExt.from(map?['teacher_notes']) ?? '',
         endDate = DateTimeExt.from(map?['end_date']) ?? DateTime(0),
@@ -160,9 +145,6 @@ class Internship extends ExtendedItemSerializable {
         'signatory_teacher_id': signatoryTeacherId.serialize(),
         'extra_supervising_teacher_ids': extraSupervisingTeacherIds.serialize(),
         'enterprise_id': enterpriseId.serialize(),
-        'job_id': jobId.serialize(),
-        'extra_specialization_ids': extraSpecializationIds.serialize(),
-        'expected_duration': expectedDuration.serialize(),
         'achieved_duration': achievedDuration.serialize(),
         'teacher_notes': teacherNotes.serialize(),
         'end_date': endDate.serialize(),
@@ -179,14 +161,11 @@ class Internship extends ExtendedItemSerializable {
         'school_board_id': FetchableFields.mandatory,
         'student_id': FetchableFields.mandatory,
         'signatory_teacher_id': FetchableFields.mandatory,
-        'extra_specialization_ids': FetchableFields.mandatory,
         'enterprise_id': FetchableFields.mandatory,
-        'job_id': FetchableFields.mandatory,
         'extra_supervising_teacher_ids': FetchableFields.mandatory,
         'contracts': FetchableFields.mandatory
           ..addAll(FetchableFields.reference(
               {'*': InternshipContract.fetchableFields})),
-        'expected_duration': FetchableFields.optional,
         'achieved_duration': FetchableFields.optional,
         'teacher_notes': FetchableFields.optional,
         'end_date': FetchableFields.mandatory,
@@ -214,9 +193,6 @@ class Internship extends ExtendedItemSerializable {
     String? signatoryTeacherId,
     List<String>? extraSupervisingTeacherIds,
     String? enterpriseId,
-    String? jobId,
-    List<String>? extraSpecializationIds,
-    int? expectedDuration,
     int? achievedDuration,
     String? teacherNotes,
     DateTime? endDate,
@@ -235,10 +211,6 @@ class Internship extends ExtendedItemSerializable {
       extraSupervisingTeacherIds:
           extraSupervisingTeacherIds ?? this.extraSupervisingTeacherIds,
       enterpriseId: enterpriseId ?? this.enterpriseId,
-      jobId: jobId ?? this.jobId,
-      extraSpecializationIds:
-          extraSpecializationIds ?? this.extraSpecializationIds,
-      expectedDuration: expectedDuration ?? this.expectedDuration,
       achievedDuration: achievedDuration ?? this.achievedDuration,
       teacherNotes: teacherNotes ?? this.teacherNotes,
       endDate: endDate ?? this.endDate,
@@ -265,9 +237,6 @@ class Internship extends ExtendedItemSerializable {
       'signatory_teacher_id',
       'extra_supervising_teacher_ids',
       'enterprise_id',
-      'job_id',
-      'extra_specialization_ids',
-      'expected_duration',
       'achieved_duration',
       'teacher_notes',
       'end_date',
@@ -301,12 +270,6 @@ class Internship extends ExtendedItemSerializable {
               deserializer: (e) => StringExt.from(e)!) ??
           extraSupervisingTeacherIds,
       enterpriseId: StringExt.from(data['enterprise_id']) ?? enterpriseId,
-      jobId: StringExt.from(data['job_id']) ?? jobId,
-      extraSpecializationIds: ListExt.from(data['extra_specialization_ids'],
-              deserializer: (e) => StringExt.from(e)!) ??
-          extraSpecializationIds,
-      expectedDuration:
-          IntExt.from(data['expected_duration']) ?? expectedDuration,
       achievedDuration:
           IntExt.from(data['achieved_duration']) ?? achievedDuration,
       teacherNotes: StringExt.from(data['teacher_notes']) ?? teacherNotes,
@@ -342,9 +305,6 @@ class Internship extends ExtendedItemSerializable {
         'signatoryTeacherId: $signatoryTeacherId, '
         'extraSupervisingTeacherIds: $extraSupervisingTeacherIds, '
         'enterpriseId: $enterpriseId, '
-        'jobId: $jobId, '
-        'extraSpecializationIds: $extraSpecializationIds, '
-        'expectedDuration: $expectedDuration days, '
         'achievedDuration: $achievedDuration, '
         'teacherNotes: $teacherNotes, '
         'endDate: $endDate, '

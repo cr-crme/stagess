@@ -13,26 +13,36 @@ class InternshipContract extends InternshipEvaluation {
   DateTime date;
   String formVersion;
 
-  final Person supervisor;
   final DateTimeRange dates;
+  final String jobId; // Main job attached to the enterprise
+  final List<String> extraSpecializationIds; // Any extra specialization
+  final Person supervisor;
   final List<WeeklySchedule> weeklySchedules;
   final List<Transportation> transportations;
   final String visitFrequencies;
+  final int expectedDuration;
 
   InternshipContract({
     super.id,
     required this.date,
+    required this.jobId,
+    required this.extraSpecializationIds,
     required this.supervisor,
     required this.dates,
     required this.weeklySchedules,
     required this.transportations,
     required this.visitFrequencies,
+    required this.expectedDuration,
     required this.formVersion,
   }) {
     _finalizeInitialization();
   }
   InternshipContract.fromSerialized(super.map)
       : date = DateTimeExt.from(map?['date']) ?? DateTime.now(),
+        jobId = StringExt.from(map?['job_id']) ?? '',
+        extraSpecializationIds = ListExt.from(map?['extra_specialization_ids'],
+                deserializer: (e) => StringExt.from(e)!) ??
+            [],
         supervisor = Person.fromSerialized({
           'first_name': map?['supervisor_first_name'],
           'last_name': map?['supervisor_last_name'],
@@ -50,17 +60,21 @@ class InternshipContract extends InternshipEvaluation {
                 deserializer: (e) => Transportation.deserialize(e)) ??
             [],
         visitFrequencies = StringExt.from(map?['visit_frequencies']) ?? 'N/A',
+        expectedDuration = map?['expected_duration'] ?? -1,
         formVersion = map?['form_version'] ?? currentVersion,
         super.fromSerialized() {
     _finalizeInitialization();
   }
   static InternshipContract get empty => InternshipContract(
         date: DateTime.now(),
+        jobId: '',
+        extraSpecializationIds: [],
         supervisor: Person.empty,
         dates: DateTimeRange(start: DateTime.now(), end: DateTime.now()),
         weeklySchedules: [],
         transportations: [],
         visitFrequencies: '',
+        expectedDuration: -1,
         formVersion: currentVersion,
       );
 
@@ -77,6 +91,8 @@ class InternshipContract extends InternshipEvaluation {
     return {
       'id': id,
       'date': date.millisecondsSinceEpoch,
+      'job_id': jobId.serialize(),
+      'extra_specialization_ids': extraSpecializationIds.serialize(),
       'supervisor_first_name': supervisor.firstName.serialize(),
       'supervisor_last_name': supervisor.lastName.serialize(),
       'supervisor_phone_number': supervisor.phone?.serialize()['phone_number'],
@@ -86,27 +102,35 @@ class InternshipContract extends InternshipEvaluation {
       'schedules': weeklySchedules.map((e) => e.serialize()).toList(),
       'transportations': transportations.map((e) => e.serialize()).toList(),
       'visit_frequencies': visitFrequencies.serialize(),
+      'expected_duration': expectedDuration,
       'form_version': formVersion,
     };
   }
 
   InternshipContract copyWith({
     DateTime? date,
+    String? jobId,
+    List<String>? extraSpecializationIds,
     Person? supervisor,
     DateTimeRange? dates,
     List<WeeklySchedule>? weeklySchedules,
     List<Transportation>? transportations,
     String? visitFrequencies,
+    int? expectedDuration,
     String? formVersion,
   }) {
     return InternshipContract(
       id: id,
       date: date ?? this.date,
+      jobId: jobId ?? this.jobId,
+      extraSpecializationIds:
+          extraSpecializationIds ?? this.extraSpecializationIds,
       supervisor: supervisor ?? this.supervisor,
       dates: dates ?? this.dates,
       weeklySchedules: weeklySchedules ?? this.weeklySchedules,
       transportations: transportations ?? this.transportations,
       visitFrequencies: visitFrequencies ?? this.visitFrequencies,
+      expectedDuration: expectedDuration ?? this.expectedDuration,
       formVersion: formVersion ?? this.formVersion,
     );
   }
@@ -117,6 +141,11 @@ class InternshipContract extends InternshipEvaluation {
     return InternshipContract(
       id: id,
       date: DateTimeExt.from(serialized['date']) ?? date,
+      jobId: StringExt.from(serialized['job_id']) ?? jobId,
+      extraSpecializationIds: ListExt.from(
+              serialized['extra_specialization_ids'],
+              deserializer: (e) => StringExt.from(e)!) ??
+          extraSpecializationIds,
       supervisor: supervisor.copyWithData({
         'first_name': serialized['supervisor_first_name'],
         'last_name': serialized['supervisor_last_name'],
@@ -136,6 +165,8 @@ class InternshipContract extends InternshipEvaluation {
           transportations,
       visitFrequencies:
           StringExt.from(serialized['visit_frequencies']) ?? visitFrequencies,
+      expectedDuration:
+          IntExt.from(serialized['expected_duration']) ?? expectedDuration,
       formVersion: serialized['form_version'] ?? formVersion,
     );
   }
@@ -143,6 +174,8 @@ class InternshipContract extends InternshipEvaluation {
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
         'date': FetchableFields.optional,
+        'job_id': FetchableFields.mandatory,
+        'extra_specialization_ids': FetchableFields.mandatory,
         'supervisor_first_name': FetchableFields.optional,
         'supervisor_last_name': FetchableFields.optional,
         'supervisor_phone_number': FetchableFields.optional,
@@ -152,17 +185,21 @@ class InternshipContract extends InternshipEvaluation {
         'schedules': WeeklySchedule.fetchableFields,
         'transportations': FetchableFields.optional,
         'visit_frequencies': FetchableFields.optional,
+        'expected_duration': FetchableFields.optional,
         'form_version': FetchableFields.mandatory,
       });
 
   @override
   String toString() {
     return 'InternshipManagingContract(date: $date, '
+        'jobId: $jobId, '
+        'extraSpecializationIds: $extraSpecializationIds, '
         'supervisor: ${supervisor.fullName}, '
         'dates: ${dates.start} - ${dates.end}, '
         'weeklySchedules: $weeklySchedules, '
         'transportations: $transportations, '
         'visitFrequencies: $visitFrequencies, '
+        'expectedDuration: $expectedDuration, '
         'form_version: $formVersion)';
   }
 }

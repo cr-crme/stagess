@@ -133,7 +133,8 @@ class SkillEvaluationFormController {
     final internshipTp = internship(context, listen: false);
     final enterprise = EnterprisesProvider.of(context,
         listen: false)[internshipTp.enterpriseId];
-    final specialization = enterprise.jobs[internshipTp.jobId].specialization;
+    final specialization =
+        enterprise.jobs[internshipTp.currentContract?.jobId].specialization;
 
     for (final skill in specialization.skills) {
       addSkill(skill.id);
@@ -282,14 +283,16 @@ class SkillEvaluationFormController {
     final enterprise = EnterprisesProvider.of(context,
         listen: false)[internshipTp.enterpriseId];
 
-    final specialization = enterprise.jobs[internshipTp.jobId].specialization;
+    final specialization =
+        enterprise.jobs[internshipTp.currentContract?.jobId].specialization;
     for (final skill in specialization.skills) {
       _idToSkill[skill.id] = skill;
       _evaluatedSkills[skill.id] = 0;
       _skillsAreFromSpecializationId[skill.id] = specialization.id;
     }
 
-    for (final extraSpecializationId in internshipTp.extraSpecializationIds) {
+    for (final extraSpecializationId
+        in (internshipTp.currentContract?.extraSpecializationIds ?? [])) {
       for (final skill in ActivitySectorsService.specialization(
         extraSpecializationId,
       ).skills) {
@@ -710,12 +713,12 @@ class _JobToEvaluateState extends State<_JobToEvaluate> {
     final internship = widget.formController.internship(context, listen: false);
     final enterprise =
         EnterprisesProvider.of(context, listen: false)[internship.enterpriseId];
-    return enterprise.jobs[internship.jobId].specialization;
+    return enterprise.jobs[internship.currentContract?.jobId].specialization;
   }
 
   List<Specialization> get extraSpecializations {
     final internship = widget.formController.internship(context, listen: false);
-    return internship.extraSpecializationIds
+    return (internship.currentContract?.extraSpecializationIds ?? [])
         .map(
           (specializationId) =>
               ActivitySectorsService.specialization(specializationId),
@@ -870,7 +873,8 @@ class _JobToEvaluateState extends State<_JobToEvaluate> {
     final internship = widget.formController.internship(context, listen: false);
     final enterprise =
         EnterprisesProvider.of(context, listen: false)[internship.enterpriseId];
-    final mainSkills = enterprise.jobs[internship.jobId].specialization.skills;
+    final mainSkills = enterprise
+        .jobs[internship.currentContract?.jobId].specialization.skills;
 
     for (final extra in extraSpecializations) {
       for (final skill in extra.skills) {

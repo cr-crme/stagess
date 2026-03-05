@@ -313,11 +313,11 @@ visa.InternshipEvaluationVisa dummyInternshipVisaEvaluation({
 Internship dummyInternship({
   String id = 'internshipId',
   String schoolBoardId = 'schoolBoardId',
+  String jobId = 'jobId',
   DateTime? versionDate,
   String studentId = 'studentId',
   String teacherId = 'teacherId',
   String enterpriseId = 'enterpriseId',
-  String jobId = 'jobId',
   bool hasEndDate = false,
   int achievedLength = 130,
 }) {
@@ -328,16 +328,10 @@ Internship dummyInternship({
     signatoryTeacherId: teacherId,
     extraSupervisingTeacherIds: [],
     enterpriseId: enterpriseId,
-    jobId: jobId,
-    extraSpecializationIds: [
-      ActivitySectorsService.activitySectors[2].specializations[1].id,
-      ActivitySectorsService.activitySectors[1].specializations[0].id,
-    ],
     endDate: hasEndDate ? DateTime(2034, 10, 28) : DateTime(0),
-    expectedDuration: 135,
     achievedDuration: achievedLength,
     contracts: [
-      dummyInternshipContract(date: versionDate),
+      dummyInternshipContract(date: versionDate, jobId: jobId),
     ],
     enterpriseEvaluations: [
       dummyPostInternshipEnterpriseEvaluation(internshipId: id)
@@ -475,10 +469,17 @@ InternshipEvaluationSkill dummyInternshipEvaluationSkill({
     );
 
 InternshipContract dummyInternshipContract(
-        {String id = 'internshipContractId', DateTime? date}) =>
+        {String id = 'internshipContractId',
+        String jobId = 'jobId',
+        DateTime? date}) =>
     InternshipContract(
       id: id,
       date: date ?? DateTime(1980, 5, 20),
+      jobId: jobId,
+      extraSpecializationIds: [
+        ActivitySectorsService.activitySectors[2].specializations[1].id,
+        ActivitySectorsService.activitySectors[1].specializations[0].id,
+      ],
       supervisor: dummyPerson(),
       dates: DateTimeRange(
         start: DateTime(2000, 1, 1),
@@ -487,5 +488,6 @@ InternshipContract dummyInternshipContract(
       weeklySchedules: [dummyWeeklySchedule()],
       transportations: [Transportation.none],
       visitFrequencies: 'Tous les jours',
+      expectedDuration: 135,
       formVersion: InternshipContract.currentVersion,
     );

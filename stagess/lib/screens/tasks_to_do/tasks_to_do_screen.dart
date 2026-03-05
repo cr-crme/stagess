@@ -217,8 +217,8 @@ class _SstRisk extends StatelessWidget {
             : data.map((e) {
                 final internship = e.internship;
                 final enterprise = e.enterprise;
-                final job = enterprise?.jobs
-                    .firstWhere((j) => j.id == internship?.jobId);
+                final job = enterprise?.jobs.firstWhere(
+                    (j) => j.id == internship?.currentContract?.jobId);
                 final student = e.student;
                 if (internship == null ||
                     enterprise == null ||

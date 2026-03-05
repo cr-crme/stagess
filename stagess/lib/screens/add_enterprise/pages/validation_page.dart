@@ -90,31 +90,31 @@ class ValidationPage extends StatelessWidget {
           enterprise.activityTypes.isEmpty || activityTypeController == null
               ? const Text('Non spécifiés')
               : EnterpriseActivityTypeListTile(
-                hideTitle: true,
-                subtitle:
-                    '* Sélectionner les mots clefs illustrant les activités de l’entreprise',
-                controller: activityTypeController!,
-                editMode: false,
-                activityTabAtTop: false,
-              ),
+                  hideTitle: true,
+                  subtitle:
+                      '* Sélectionner les mots clefs illustrant les activités de l’entreprise',
+                  controller: activityTypeController!,
+                  editMode: false,
+                  activityTabAtTop: false,
+                ),
           const SizedBox(height: 16),
           if (jobControllers != null)
             ...jobControllers!.map(
               (controller) => EnterpriseJobListTile(
                 key: UniqueKey(),
-                schools:
-                    SchoolBoardsProvider.of(
-                              context,
-                              listen: false,
-                            ).currentSchool ==
-                            null
-                        ? []
-                        : [
-                          SchoolBoardsProvider.of(
-                            context,
-                            listen: false,
-                          ).currentSchool!,
-                        ],
+                // TODO Fix visual (editMode false)
+                schools: SchoolBoardsProvider.of(
+                          context,
+                          listen: false,
+                        ).currentSchool ==
+                        null
+                    ? []
+                    : [
+                        SchoolBoardsProvider.of(
+                          context,
+                          listen: false,
+                        ).currentSchool!,
+                      ],
                 elevation: 0,
                 initialExpandedState: true,
                 canChangeExpandedState: false,

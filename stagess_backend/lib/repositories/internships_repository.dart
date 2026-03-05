@@ -194,17 +194,12 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             idNameToDataTable: 'internship_id',
           ),
           sqlInterface.selectSubquery(
-            dataTableName: 'internship_extra_specializations',
-            asName: 'extra_specializations',
-            fieldsToFetch: ['specialization_id'],
-            idNameToDataTable: 'internship_id',
-          ),
-          sqlInterface.selectSubquery(
             dataTableName: 'internship_contracts',
             asName: 'contracts',
             fieldsToFetch: [
               'id',
               'date',
+              'job_id',
               'supervisor_first_name',
               'supervisor_last_name',
               'supervisor_phone_number',
@@ -212,6 +207,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
               'starting_date',
               'ending_date',
               'visit_frequencies',
+              'expected_duration',
             ],
             idNameToDataTable: 'internship_id',
           ),
@@ -295,14 +291,12 @@ class MySqlInternshipsRepository extends InternshipsRepository {
                   .toList() ??
               [];
 
-      internship['extra_specialization_ids'] =
-          (internship['extra_specializations'] as List?)
-                  ?.map((e) => e['specialization_id'].toString())
-                  .toList() ??
-              [];
-
       final contracts = [];
       for (final contract in (internship['contracts'] as List? ?? [])) {
+        final extraSpecializationIds = await sqlInterface.performSelectQuery(
+            user: user,
+            tableName: 'internship_extra_specializations',
+            filters: {'contract_id': contract['id']});
         final schedules = await sqlInterface.performSelectQuery(
             user: user,
             tableName: 'internship_weekly_schedules',
@@ -358,6 +352,10 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             .map((e) => e['transportation'])
             .toList();
 
+        contract['extra_specialization_ids'] =
+            (extraSpecializationIds as List? ?? [])
+                .map((e) => e['specialization_id'].toString())
+                .toList();
         contract['schedules'] = schedules;
         contracts.add(contract);
       }
@@ -577,8 +575,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
       'school_board_id': internship.schoolBoardId.serialize(),
       'student_id': internship.studentId.serialize(),
       'enterprise_id': internship.enterpriseId.serialize(),
-      'job_id': internship.jobId.serialize(),
-      'expected_duration': internship.expectedDuration.serialize(),
       'achieved_duration': internship.achievedDuration.serialize(),
       'teacher_notes': internship.teacherNotes.serialize(),
       'end_date': internship.endDate.serialize(),
@@ -598,14 +594,8 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     if (differences.contains('enterprise_id')) {
       throw InvalidRequestException('Enterprise id cannot be changed');
     }
-    if (differences.contains('job_id')) {
-      throw InvalidRequestException('Job id cannot be changed');
-    }
 
     final toUpdate = <String, dynamic>{};
-    if (differences.contains('expected_duration')) {
-      toUpdate['expected_duration'] = internship.expectedDuration.serialize();
-    }
     if (differences.contains('achieved_duration')) {
       toUpdate['achieved_duration'] = internship.achievedDuration.serialize();
     }
@@ -651,90 +641,20 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     }
   }
 
-  Future<void> _insertExtraSpecializations(Internship internship) async {
-    for (final specializationId in internship.extraSpecializationIds) {
-      await sqlInterface.performInsertQuery(
-          tableName: 'internship_extra_specializations',
-          data: {
-            'internship_id': internship.id,
-            'specialization_id': specializationId
-          });
-    }
-  }
-
-  Future<void> _updateToExtraSpecializations(
-      Internship internship, Internship previous) async {
-    final toUpdate = internship.getDifference(previous);
-    if (toUpdate.contains('extra_specialization_ids')) {
-      // This is a bit tricky to simply update, so we delete and reinsert
-      await sqlInterface.performDeleteQuery(
-          tableName: 'internship_extra_specializations',
-          filters: {'internship_id': internship.id});
-
-      await _insertExtraSpecializations(internship);
-    }
-  }
-
   Future<void> _insertToContracts(Internship internship,
       {Internship? previous, required DatabaseUser user}) async {
     final previousContracts = previous?.contracts ?? [];
-    bool supervisorIsUpdated = false;
     for (final contract in internship.contracts) {
       if (previousContracts.any((prev) => prev.id == contract.id)) {
         // Skip if the contract already exists
         continue;
       }
-      if (!supervisorIsUpdated) {
-        final previousSupervisor = (await sqlInterface.performSelectQuery(
-                    user: user,
-                    tableName: 'persons',
-                    filters: {
-                  'id': contract.supervisor.id
-                },
-                    subqueries: [
-                  sqlInterface.selectSubquery(
-                      dataTableName: 'phone_numbers',
-                      idNameToDataTable: 'entity_id',
-                      fieldsToFetch: ['id', 'phone_number']),
-                  sqlInterface.selectSubquery(
-                      dataTableName: 'addresses',
-                      idNameToDataTable: 'entity_id',
-                      fieldsToFetch: [
-                        'id',
-                        'civic',
-                        'street',
-                        'apartment',
-                        'city',
-                        'postal_code',
-                        'latitude',
-                        'longitude',
-                      ]),
-                ]) as List?)
-                ?.firstOrNull as Map<String, dynamic>? ??
-            {};
-        if (previousSupervisor.isNotEmpty) {
-          previousSupervisor['phone'] =
-              (previousSupervisor['phone_numbers'] as List?)?[0] ?? [];
-          previousSupervisor['address'] =
-              (previousSupervisor['addresses'] as List?)?[0] ?? [];
-        }
-
-        if (previousSupervisor.isEmpty) {
-          await sqlInterface.performInsertPerson(person: contract.supervisor);
-        } else {
-          // Update the person (without the phone numbers and addresses of previous as they were removed)
-          await sqlInterface.performUpdatePerson(
-              person: contract.supervisor,
-              previous: Person.fromSerialized(previousSupervisor));
-        }
-        supervisorIsUpdated = true;
-      }
-
       await sqlInterface
           .performInsertQuery(tableName: 'internship_contracts', data: {
         'id': contract.id,
         'internship_id': internship.id,
         'date': contract.date.serialize(),
+        'job_id': contract.jobId.serialize(),
         'supervisor_first_name': contract.supervisor.firstName.serialize(),
         'supervisor_last_name': contract.supervisor.lastName.serialize(),
         'supervisor_phone_number':
@@ -743,18 +663,29 @@ class MySqlInternshipsRepository extends InternshipsRepository {
         'starting_date': contract.dates.start.serialize(),
         'ending_date': contract.dates.end.serialize(),
         'visit_frequencies': contract.visitFrequencies.serialize(),
+        'expected_duration': contract.expectedDuration.serialize(),
       });
+
+      final toWait = <Future>[];
+      for (final specializationId in contract.extraSpecializationIds) {
+        toWait.add(sqlInterface.performInsertQuery(
+            tableName: 'internship_extra_specializations',
+            data: {
+              'contract_id': contract.id,
+              'specialization_id': specializationId
+            }));
+      }
 
       // Insert the weekly schedules
       for (final weeklySchedule in contract.weeklySchedules) {
-        await sqlInterface.performInsertQuery(
+        toWait.add(sqlInterface.performInsertQuery(
             tableName: 'internship_weekly_schedules',
             data: {
               'id': weeklySchedule.id,
               'contract_id': contract.id,
               'starting_date': weeklySchedule.period.start.serialize(),
               'ending_date': weeklySchedule.period.end.serialize(),
-            });
+            }));
 
         // Insert the daily schedules
         for (final key in weeklySchedule.schedule.keys) {
@@ -763,7 +694,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
           for (int blockIndex = 0;
               blockIndex < schedule.blocks.length;
               blockIndex++) {
-            await sqlInterface.performInsertQuery(
+            toWait.add(sqlInterface.performInsertQuery(
                 tableName: 'internship_daily_schedules',
                 data: {
                   'id': schedule.id,
@@ -774,19 +705,21 @@ class MySqlInternshipsRepository extends InternshipsRepository {
                   'starting_minute': schedule.blocks[blockIndex].start.minute,
                   'ending_hour': schedule.blocks[blockIndex].end.hour,
                   'ending_minute': schedule.blocks[blockIndex].end.minute,
-                });
+                }));
           }
         }
       }
 
       // Insert the transportations
       for (final transportation in contract.transportations) {
-        await sqlInterface
+        toWait.add(sqlInterface
             .performInsertQuery(tableName: 'internship_transportations', data: {
           'contract_id': contract.id,
           'transportation': transportation.serialize(),
-        });
+        }));
       }
+
+      await Future.wait(toWait);
     }
   }
 
@@ -1070,7 +1003,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     final toWait = <Future>[];
     if (previous == null) {
       toWait.add(_insertToSupervisingTeachers(internship));
-      toWait.add(_insertExtraSpecializations(internship));
       toWait.add(_insertToContracts(internship, user: user));
       toWait.add(_insertToSkillEvaluations(internship));
       toWait.add(_insertToAttitudeEvaluations(internship));
@@ -1079,7 +1011,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
       toWait.add(_insertJobSstEvaluation(internship));
     } else {
       toWait.add(_updateToSupervisingTeachers(internship, previous));
-      toWait.add(_updateToExtraSpecializations(internship, previous));
       toWait.add(_updateToContracts(internship, previous, user));
       toWait.add(_updateToSkillEvaluations(internship, previous));
       toWait.add(_updateToAttitudeEvaluations(internship, previous));
@@ -1117,14 +1048,13 @@ class InternshipsRepositoryMock extends InternshipsRepository {
       signatoryTeacherId: '67890',
       extraSupervisingTeacherIds: [],
       enterpriseId: '12345',
-      jobId: '67890',
-      extraSpecializationIds: ['12345'],
-      expectedDuration: 30,
       achievedDuration: -1,
       endDate: DateTime(0),
       contracts: [
         InternshipContract(
           date: DateTime(2000, 1, 1),
+          jobId: '67890',
+          extraSpecializationIds: ['12345'],
           dates: DateTimeRange(
               start: DateTime(1990, 1, 1), end: DateTime(1990, 1, 31)),
           supervisor: Person(
@@ -1168,6 +1098,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
           ],
           transportations: [Transportation.pass],
           visitFrequencies: 'Toutes les semaines',
+          expectedDuration: 30,
           formVersion: InternshipContract.currentVersion,
         )
       ],
@@ -1185,14 +1116,13 @@ class InternshipsRepositoryMock extends InternshipsRepository {
       signatoryTeacherId: '09876',
       extraSupervisingTeacherIds: ['54321'],
       enterpriseId: '54321',
-      jobId: '09876',
-      extraSpecializationIds: ['54321', '09876'],
-      expectedDuration: 20,
       achievedDuration: -1,
       endDate: DateTime(0),
       contracts: [
         InternshipContract(
           date: DateTime(2000, 2, 1),
+          jobId: '09876',
+          extraSpecializationIds: ['54321', '09876'],
           dates: DateTimeRange(
               start: DateTime(1990, 2, 1), end: DateTime(1990, 2, 28)),
           supervisor: Person(
@@ -1230,6 +1160,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
           ],
           transportations: [Transportation.yes, Transportation.ticket],
           visitFrequencies: 'Toutes les deux semaines',
+          expectedDuration: 20,
           formVersion: InternshipContract.currentVersion,
         ),
       ],

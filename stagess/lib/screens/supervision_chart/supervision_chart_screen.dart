@@ -105,11 +105,10 @@ extension _InternshipMetaDataList on List<_InternshipMetaData> {
           isSupervised: internship.supervisingTeacherIds.contains(
             currentTeacher.id,
           ),
-          visitingPriority:
-              currentTeacher.visitingPriority(internship.id) ==
-                      VisitingPriority.notApplicable
-                  ? VisitingPriority.low
-                  : currentTeacher.visitingPriority(internship.id),
+          visitingPriority: currentTeacher.visitingPriority(internship.id) ==
+                  VisitingPriority.notApplicable
+              ? VisitingPriority.low
+              : currentTeacher.visitingPriority(internship.id),
           isTeacherSignatory:
               internship.signatoryTeacherId == currentTeacher.id,
         ),
@@ -119,15 +118,14 @@ extension _InternshipMetaDataList on List<_InternshipMetaData> {
     // Sort the internships by student names
     out.sort(
       (a, b) => a.student.lastName.toLowerCase().compareTo(
-        b.student.lastName.toLowerCase(),
-      ),
+            b.student.lastName.toLowerCase(),
+          ),
     );
 
     // Apply the filters
-    out =
-        visibilityFilters == null
-            ? out
-            : out.filterPriorities(visibilityFilters);
+    out = visibilityFilters == null
+        ? out
+        : out.filterPriorities(visibilityFilters);
     out = (filterText?.isEmpty ?? true) ? out : out.filterByText(filterText!);
 
     // Return the internships
@@ -362,10 +360,9 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
         final internship = internshipsProvided.fromIdOrNull(meta.internship.id);
         if (internship == null) continue;
 
-        final newInternship =
-            meta.isSupervised
-                ? internship.copyWithTeacher(context, teacherId: teacherId)
-                : internship.copyWithoutTeacher(context, teacherId: teacherId);
+        final newInternship = meta.isSupervised
+            ? internship.copyWithTeacher(context, teacherId: teacherId)
+            : internship.copyWithoutTeacher(context, teacherId: teacherId);
         if (internship.getDifference(newInternship).isNotEmpty) {
           // Update the internship with the new values
           toWait.add(
@@ -406,10 +403,9 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
 
     final internships = _InternshipMetaDataList._internshipsOf(
       context,
-      visibilityFilters:
-          _visibilityFilters.keys
-              .where((priority) => _visibilityFilters[priority] ?? false)
-              .toList(),
+      visibilityFilters: _visibilityFilters.keys
+          .where((priority) => _visibilityFilters[priority] ?? false)
+          .toList(),
       filterText: _searchTextController.text.toLowerCase(),
     );
 
@@ -423,100 +419,92 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
         actions: [
           if (_tabController.index == 0)
             IconButton(
-              onPressed:
-                  _forcePrioritiesDisabled || _editSignatoriesMode
-                      ? null
-                      : () => _toggleEditPrioritiesMode(
+              onPressed: _forcePrioritiesDisabled || _editSignatoriesMode
+                  ? null
+                  : () => _toggleEditPrioritiesMode(
                         context,
                         internships: internships,
                       ),
               icon: Icon(
                 _editPrioritiesMode ? Icons.save : Icons.flag,
-                color:
-                    _forcePrioritiesDisabled || _editSignatoriesMode
-                        ? Colors.grey
-                        : Colors.white,
+                color: _forcePrioritiesDisabled || _editSignatoriesMode
+                    ? Colors.grey
+                    : Colors.white,
               ),
             ),
           if (_tabController.index == 0)
             IconButton(
-              onPressed:
-                  _forceSignatoriesDisabled || _editPrioritiesMode
-                      ? null
-                      : () => _toggleEditSignatoriesMode(
+              onPressed: _forceSignatoriesDisabled || _editPrioritiesMode
+                  ? null
+                  : () => _toggleEditSignatoriesMode(
                         context,
                         internships: internships,
                       ),
               icon: Icon(
                 _editSignatoriesMode ? Icons.save : Icons.edit_document,
-                color:
-                    _forceSignatoriesDisabled || _editPrioritiesMode
-                        ? Colors.grey
-                        : Colors.white,
+                color: _forceSignatoriesDisabled || _editPrioritiesMode
+                    ? Colors.grey
+                    : Colors.white,
               ),
             ),
         ],
         bottom: _buildBottomTabBar(context),
       ),
-      body:
-          widget.hasFullData
-              ? TabBarView(
-                controller: _tabController,
-                children: [
-                  Column(
-                    children: [
-                      _buildFilters(context),
-                      if (internships.isEmpty)
-                        Center(
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                              top: 12.0,
-                              left: 36,
-                              right: 36,
-                            ),
-                            child: Text(
-                              'Aucun élève en stage',
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
+      body: widget.hasFullData
+          ? TabBarView(
+              controller: _tabController,
+              children: [
+                Column(
+                  children: [
+                    _buildFilters(context),
+                    if (internships.isEmpty)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                            top: 12.0,
+                            left: 36,
+                            right: 36,
+                          ),
+                          child: Text(
+                            'Aucun élève en stage',
+                            textAlign: TextAlign.center,
+                            style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
-                      if (internships.isNotEmpty)
-                        Expanded(
-                          child: ListView.builder(
-                            shrinkWrap: true,
-                            itemCount:
-                                _editSignatoriesMode
-                                    ? internships.length
-                                    : internships.supervizedCount,
-                            itemBuilder: ((ctx, i) {
-                              final meta =
-                                  _editSignatoriesMode
-                                      ? internships[i]
-                                      : internships.getSupervized(i);
-                              if (meta == null) return Container();
+                      ),
+                    if (internships.isNotEmpty)
+                      Expanded(
+                        child: ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: _editSignatoriesMode
+                              ? internships.length
+                              : internships.supervizedCount,
+                          itemBuilder: ((ctx, i) {
+                            final meta = _editSignatoriesMode
+                                ? internships[i]
+                                : internships.getSupervized(i);
+                            if (meta == null) return Container();
 
-                              return _StudentTile(
-                                key: Key(meta.student.id),
-                                meta: meta,
-                                onTap:
-                                    () => _navigateToStudentInfo(meta.student),
-                                editPrioritiesMode: _editPrioritiesMode,
-                                editSignatoriesMode: _editSignatoriesMode,
-                              );
-                            }),
-                          ),
+                            return _StudentTile(
+                              key: Key(meta.student.id),
+                              meta: meta,
+                              onTap: () => _navigateToStudentInfo(meta.student),
+                              editPrioritiesMode: _editPrioritiesMode,
+                              editSignatoriesMode: _editSignatoriesMode,
+                            );
+                          }),
                         ),
-                    ],
-                  ),
-                  const ItineraryMainScreen(),
-                ],
-              )
-              : Center(
-                child: CircularProgressIndicator(
-                  color: Theme.of(context).primaryColor,
+                      ),
+                  ],
                 ),
+                const ItineraryMainScreen(),
+              ],
+            )
+          : Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
               ),
+            ),
     );
   }
 
@@ -576,33 +564,29 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children:
-              _visibilityFilters.keys.map<Widget>((priority) {
-                return InkWell(
-                  onTap:
-                      () => setState(
-                        () =>
-                            _visibilityFilters[priority] =
-                                !_visibilityFilters[priority]!,
-                      ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Checkbox(
-                        value: _visibilityFilters[priority],
-                        onChanged:
-                            (value) => setState(
-                              () => _visibilityFilters[priority] = value!,
-                            ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 15),
-                        child: Icon(priority.icon, color: priority.color),
-                      ),
-                    ],
+          children: _visibilityFilters.keys.map<Widget>((priority) {
+            return InkWell(
+              onTap: () => setState(
+                () => _visibilityFilters[priority] =
+                    !_visibilityFilters[priority]!,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Checkbox(
+                    value: _visibilityFilters[priority],
+                    onChanged: (value) => setState(
+                      () => _visibilityFilters[priority] = value!,
+                    ),
                   ),
-                );
-              }).toList(),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 15),
+                    child: Icon(priority.icon, color: priority.color),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
         ),
       ],
     );
@@ -612,11 +596,11 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
     return ResponsiveService.getScreenSize(context) == ScreenSize.small
         ? Column(children: [_buildSearchBar(), _buildFlagFilter()])
         : Row(
-          children: [
-            Expanded(child: _buildSearchBar()),
-            Expanded(child: _buildFlagFilter()),
-          ],
-        );
+            children: [
+              Expanded(child: _buildSearchBar()),
+              Expanded(child: _buildFlagFilter()),
+            ],
+          );
   }
 }
 
@@ -635,19 +619,19 @@ class _TabIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return isColumn
         ? Column(
-          children: [
-            Icon(icon),
-            Text(title, style: const TextStyle(color: Colors.white)),
-          ],
-        )
+            children: [
+              Icon(icon),
+              Text(title, style: const TextStyle(color: Colors.white)),
+            ],
+          )
         : Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon),
-            SizedBox(width: 8),
-            Text(title, style: const TextStyle(color: Colors.white)),
-          ],
-        );
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon),
+              SizedBox(width: 8),
+              Text(title, style: const TextStyle(color: Colors.white)),
+            ],
+          );
   }
 }
 
@@ -697,7 +681,7 @@ class _StudentTileState extends State<_StudentTile> {
   Specialization? _getSpecialization(BuildContext context) {
     if (_enterprise == null) return null;
     return _enterprise!.jobs
-        .fromIdOrNull(widget.meta.internship.jobId)
+        .fromIdOrNull(widget.meta.internship.currentContract?.jobId ?? '-1')
         ?.specialization;
   }
 
@@ -715,10 +699,9 @@ class _StudentTileState extends State<_StudentTile> {
     return Card(
       elevation: 10,
       child: ListTile(
-        onTap:
-            widget.editPrioritiesMode || widget.editSignatoriesMode
-                ? null
-                : widget.onTap,
+        onTap: widget.editPrioritiesMode || widget.editSignatoriesMode
+            ? null
+            : widget.onTap,
         leading: SizedBox(
           height: double.infinity, // This centers the avatar
           child: widget.meta.student.avatar,
@@ -780,17 +763,15 @@ class _StudentTileState extends State<_StudentTile> {
             ),
             if (widget.editSignatoriesMode)
               Checkbox(
-                value:
-                    widget.meta.isTeacherSignatory
-                        ? true
-                        : widget.meta.isSupervised,
-                onChanged:
-                    widget.editSignatoriesMode &&
-                            !widget.meta.isTeacherSignatory
-                        ? (value) => setState(
+                value: widget.meta.isTeacherSignatory
+                    ? true
+                    : widget.meta.isSupervised,
+                onChanged: widget.editSignatoriesMode &&
+                        !widget.meta.isTeacherSignatory
+                    ? (value) => setState(
                           () => widget.meta.isSupervised = value ?? false,
                         )
-                        : null,
+                    : null,
               ),
           ],
         ),

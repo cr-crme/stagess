@@ -1883,17 +1883,17 @@ Future<void> _addDummyInternships(
       signatoryTeacherId: teacherA1Id,
       extraSupervisingTeacherIds: [],
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Auto Care').id,
-      jobId: enterprises.firstWhere((e) => e.name == 'Auto Care').jobs[0].id,
-      extraSpecializationIds: [
-        ActivitySectorsService.activitySectors[2].specializations[1].id,
-        ActivitySectorsService.activitySectors[1].specializations[0].id,
-      ],
-      expectedDuration: 135,
       achievedDuration: -1,
       endDate: DateTime(0),
       contracts: [
         InternshipContract(
           date: DateTime.now(),
+          jobId:
+              enterprises.firstWhere((e) => e.name == 'Auto Care').jobs[0].id,
+          extraSpecializationIds: [
+            ActivitySectorsService.activitySectors[2].specializations[1].id,
+            ActivitySectorsService.activitySectors[1].specializations[0].id,
+          ],
           supervisor: Person(
             firstName: 'Robert',
             middleName: null,
@@ -1973,6 +1973,7 @@ Future<void> _addDummyInternships(
           ],
           transportations: [Transportation.yes, Transportation.pass],
           visitFrequencies: 'Une visite par semaine',
+          expectedDuration: 135,
           formVersion: InternshipContract.currentVersion,
         ),
       ],
@@ -2016,17 +2017,16 @@ Future<void> _addDummyInternships(
         extraSupervisingTeacherIds: [],
         enterpriseId:
             enterprises.firstWhere((e) => e.name == 'Boucherie Marien').id,
-        jobId: enterprises
-            .firstWhere((e) => e.name == 'Boucherie Marien')
-            .jobs[0]
-            .id,
-        extraSpecializationIds: [],
-        expectedDuration: 135,
         achievedDuration: -1,
         endDate: DateTime(0),
         contracts: [
           InternshipContract(
             date: DateTime.now(),
+            jobId: enterprises
+                .firstWhere((e) => e.name == 'Boucherie Marien')
+                .jobs[0]
+                .id,
+            extraSpecializationIds: [],
             supervisor: Person(
               firstName: 'Claude',
               middleName: null,
@@ -2106,6 +2106,7 @@ Future<void> _addDummyInternships(
             ],
             transportations: [Transportation.pass],
             visitFrequencies: 'Une visite par semaine',
+            expectedDuration: 135,
             formVersion: InternshipContract.currentVersion,
           ),
         ],
@@ -2145,14 +2146,13 @@ Future<void> _addDummyInternships(
     signatoryTeacherId: teacherA1Id,
     extraSupervisingTeacherIds: [],
     enterpriseId: enterprises.firstWhere((e) => e.name == 'Subway').id,
-    jobId: enterprises.firstWhere((e) => e.name == 'Subway').jobs[0].id,
-    extraSpecializationIds: [],
     endDate: DateTime.now().add(const Duration(days: 10)),
-    expectedDuration: 135,
     achievedDuration: 125,
     contracts: [
       InternshipContract(
         date: DateTime.now(),
+        jobId: enterprises.firstWhere((e) => e.name == 'Subway').jobs[0].id,
+        extraSpecializationIds: [],
         supervisor: Person(
           firstName: 'Carole',
           middleName: null,
@@ -2220,6 +2220,7 @@ Future<void> _addDummyInternships(
         ],
         transportations: [Transportation.none],
         visitFrequencies: 'Une visite par mois',
+        expectedDuration: 135,
         formVersion: InternshipContract.currentVersion,
       ),
     ],
@@ -2258,14 +2259,13 @@ Future<void> _addDummyInternships(
       signatoryTeacherId: teacherA2Id,
       extraSupervisingTeacherIds: [],
       enterpriseId: enterprises.firstWhere((e) => e.name == 'IGA').id,
-      jobId: enterprises.firstWhere((e) => e.name == 'IGA').jobs[0].id,
-      extraSpecializationIds: [],
-      expectedDuration: 135,
       achievedDuration: -1,
       endDate: DateTime(0),
       contracts: [
         InternshipContract(
           date: DateTime.now(),
+          jobId: enterprises.firstWhere((e) => e.name == 'IGA').jobs[0].id,
+          extraSpecializationIds: [],
           supervisor: Person(
             firstName: 'Charles',
             middleName: null,
@@ -2321,6 +2321,7 @@ Future<void> _addDummyInternships(
           ],
           transportations: [Transportation.yes],
           visitFrequencies: 'Une visite par semaine',
+          expectedDuration: 135,
           formVersion: InternshipContract.currentVersion,
         ),
       ],
@@ -2346,14 +2347,14 @@ Future<void> _addDummyInternships(
       signatoryTeacherId: teacherB1Id,
       extraSupervisingTeacherIds: [],
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Auto Care').id,
-      jobId: enterprises.firstWhere((e) => e.name == 'Auto Care').jobs[0].id,
-      extraSpecializationIds: [],
       endDate: DateTime.now().add(const Duration(days: 10)),
-      expectedDuration: 135,
       achievedDuration: -1,
       contracts: [
         InternshipContract(
           date: DateTime.now(),
+          jobId:
+              enterprises.firstWhere((e) => e.name == 'Auto Care').jobs[0].id,
+          extraSpecializationIds: [],
           supervisor: Person(
             firstName: 'Thomas',
             middleName: null,
@@ -2409,6 +2410,7 @@ Future<void> _addDummyInternships(
           ],
           transportations: [Transportation.ticket],
           visitFrequencies: 'Une visite par semaine',
+          expectedDuration: 135,
           formVersion: InternshipContract.currentVersion,
         ),
       ],
@@ -2447,14 +2449,16 @@ Future<void> _addDummyInternships(
       signatoryTeacherId: teacherA1Id,
       extraSupervisingTeacherIds: [],
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').id,
-      jobId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').jobs[0].id,
-      extraSpecializationIds: [],
-      expectedDuration: 135,
       achievedDuration: -1,
       endDate: DateTime(0),
       contracts: [
         InternshipContract(
           date: DateTime.now(),
+          jobId: enterprises
+              .firstWhere((e) => e.name == 'Metro Gagnon')
+              .jobs[0]
+              .id,
+          extraSpecializationIds: [],
           supervisor: Person(
             firstName: 'Maxime',
             middleName: null,
@@ -2534,6 +2538,7 @@ Future<void> _addDummyInternships(
           ],
           transportations: [Transportation.none],
           visitFrequencies: 'Jamais',
+          expectedDuration: 135,
           formVersion: InternshipContract.currentVersion,
         )
       ],
@@ -2558,14 +2563,16 @@ Future<void> _addDummyInternships(
       signatoryTeacherId: teacherB1Id,
       extraSupervisingTeacherIds: [teacherB1Id],
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').id,
-      jobId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').jobs[1].id,
-      extraSpecializationIds: [],
-      expectedDuration: 135,
       achievedDuration: -1,
       endDate: DateTime(0),
       contracts: [
         InternshipContract(
           date: DateTime.now(),
+          jobId: enterprises
+              .firstWhere((e) => e.name == 'Metro Gagnon')
+              .jobs[1]
+              .id,
+          extraSpecializationIds: [],
           supervisor: Person(
             firstName: 'Mathilde',
             middleName: null,
@@ -2645,6 +2652,7 @@ Future<void> _addDummyInternships(
           ],
           transportations: [Transportation.none],
           visitFrequencies: 'Une visite par semaine',
+          expectedDuration: 135,
           formVersion: InternshipContract.currentVersion,
         ),
       ],
@@ -2669,14 +2677,16 @@ Future<void> _addDummyInternships(
       signatoryTeacherId: teacherA1Id,
       extraSupervisingTeacherIds: [],
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Jean Coutu').id,
-      jobId: enterprises.firstWhere((e) => e.name == 'Jean Coutu').jobs[0].id,
-      extraSpecializationIds: [],
       endDate: period.end,
-      expectedDuration: 135,
       achievedDuration: 100,
       contracts: [
         InternshipContract(
             date: DateTime.now(),
+            jobId: enterprises
+                .firstWhere((e) => e.name == 'Jean Coutu')
+                .jobs[0]
+                .id,
+            extraSpecializationIds: [],
             supervisor: Person(
               firstName: 'Francis',
               middleName: null,
@@ -2720,6 +2730,7 @@ Future<void> _addDummyInternships(
             ],
             transportations: [Transportation.none],
             visitFrequencies: 'Une visite par semaine',
+            expectedDuration: 135,
             formVersion: InternshipContract.currentVersion),
       ],
       skillEvaluations: [],
@@ -2756,14 +2767,14 @@ Future<void> _addDummyInternships(
       signatoryTeacherId: teacherA1Id,
       extraSupervisingTeacherIds: [],
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Pharmaprix').id,
-      jobId: enterprises.firstWhere((e) => e.name == 'Pharmaprix').jobs[0].id,
-      extraSpecializationIds: [],
       endDate: period.end,
-      expectedDuration: 135,
       achievedDuration: 100,
       contracts: [
         InternshipContract(
           date: DateTime.now(),
+          jobId:
+              enterprises.firstWhere((e) => e.name == 'Pharmaprix').jobs[0].id,
+          extraSpecializationIds: [],
           supervisor: Person(
             firstName: 'Thierry',
             middleName: null,
@@ -2807,6 +2818,7 @@ Future<void> _addDummyInternships(
           ],
           transportations: [Transportation.none],
           visitFrequencies: 'Tous les jours',
+          expectedDuration: 135,
           formVersion: InternshipContract.currentVersion,
         ),
       ],
@@ -2832,14 +2844,13 @@ Future<void> _addDummyInternships(
       signatoryTeacherId: teacherC1Id,
       extraSupervisingTeacherIds: [],
       enterpriseId: enterprises.firstWhere((e) => e.name == 'Subway').id,
-      jobId: enterprises.firstWhere((e) => e.name == 'Subway').jobs[0].id,
-      extraSpecializationIds: [],
       endDate: period.end,
-      expectedDuration: 135,
       achievedDuration: 100,
       contracts: [
         InternshipContract(
             date: DateTime.now(),
+            jobId: enterprises.firstWhere((e) => e.name == 'Subway').jobs[0].id,
+            extraSpecializationIds: [],
             supervisor: Person(
               firstName: 'Carlos',
               middleName: null,
@@ -2883,6 +2894,7 @@ Future<void> _addDummyInternships(
             ],
             transportations: [Transportation.none],
             visitFrequencies: 'Tous les jours',
+            expectedDuration: 135,
             formVersion: InternshipContract.currentVersion),
       ],
       skillEvaluations: [],

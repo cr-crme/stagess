@@ -221,14 +221,14 @@ class _StudentInternshipListViewState
                           DateTime.now()) // TODO Check this
                   : DateFormat.yMMMd('fr_CA').format(internship.endDate);
 
-              final String specializationIdWithName =
-                  EnterprisesProvider.of(context)
-                          .fromIdOrNull(internship.enterpriseId)
-                          ?.jobs
-                          .fromIdOrNull(internship.jobId)
-                          ?.specialization
-                          .idWithName ??
-                      '';
+              final String specializationIdWithName = EnterprisesProvider.of(
+                          context)
+                      .fromIdOrNull(internship.enterpriseId)
+                      ?.jobs
+                      .fromIdOrNull(internship.currentContract?.jobId ?? '-1')
+                      ?.specialization
+                      .idWithName ??
+                  '';
 
               return AnimatedExpandingCard(
                 initialExpandedState: _expanded[internship.id]!,

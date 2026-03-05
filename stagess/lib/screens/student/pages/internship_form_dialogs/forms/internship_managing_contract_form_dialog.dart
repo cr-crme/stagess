@@ -16,6 +16,7 @@ import 'package:stagess_common/models/internships/time_utils.dart'
 import 'package:stagess_common/models/internships/transportation.dart';
 import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
@@ -68,23 +69,19 @@ class InternshipContractFormController {
 
   DateTime creationDate = DateTime.now();
 
-  StudentPickerController studentController;
+  StudentPickerController _studentController;
 
-  late time_utils.DateTimeRange _dates = _previousContract?.dates ??
-      time_utils.DateTimeRange(start: DateTime.now(), end: DateTime.now());
   late final _weeklySchedulesController = WeeklySchedulesController(
     weeklySchedules: _previousContract?.weeklySchedules,
-    dateRange: _previousContract?.dates ??
-        time_utils.DateTimeRange(
-          start: DateTime.now(),
-          end: DateTime.now().add(const Duration(days: 30)),
-        ),
+    dateRange: _previousContract?.dates,
     keepId: false,
   );
-  final List<Transportation> _transportations;
+  late final List<Transportation> _transportations = [
+    ...?_previousContract?.transportations
+  ];
 
   final EnterpriseJobListController _primaryJobController;
-  final _extraJobControllers = <EnterpriseJobListController>[];
+  final List<EnterpriseJobListController> _extraJobControllers;
 
   late final _superviserFirstNameController = TextEditingController(
       text: _previousContract?.supervisor.firstName ?? '');
@@ -106,15 +103,15 @@ class InternshipContractFormController {
         dateBirth: null,
       );
 
-  late final _internshipDurationController = TextEditingController(
-      text: internship.expectedDuration < 0
-          ? ''
-          : internship.expectedDuration.toString());
-  int get internshipDuration =>
-      int.tryParse(_internshipDurationController.text) ?? 0;
-
   late final _visitFrequenciesController =
       TextEditingController(text: _previousContract?.visitFrequencies ?? '');
+
+  late final _internshipDurationController = TextEditingController(
+      text: (_previousContract?.expectedDuration ?? -1) >= 0
+          ? _previousContract?.expectedDuration.toString()
+          : '');
+  int get internshipDuration =>
+      int.tryParse(_internshipDurationController.text) ?? 0;
 
   InternshipContractFormController(
     BuildContext context, {
@@ -122,12 +119,19 @@ class InternshipContractFormController {
     required this.canModify,
     required this.internship,
     required this.contractId,
-    required List<Transportation> transportations,
-  })  : _transportations = transportations,
-        studentController =
+  })  : _studentController =
             _studentPickerControllerOf(context, internship: internship),
         _primaryJobController =
-            _jobListControllerOf(context, internship: internship);
+            _jobListControllerOf(context, internship: internship),
+        _extraJobControllers = (contractId == null
+                    ? (internship.currentContract)
+                    : internship.contracts
+                        .firstWhereOrNull((e) => e.id == contractId))
+                ?.extraSpecializationIds
+                .map((id) => _jobListControllerOfSpecialization(context,
+                    specializationId: id))
+                .toList() ??
+            [];
 
   factory InternshipContractFormController.fromInternshipId(
     BuildContext context, {
@@ -145,7 +149,6 @@ class InternshipContractFormController {
       isNewContract: isNewContract,
       canModify: canModify,
       internship: internship,
-      transportations: [...contract.transportations],
       contractId: contractId,
     );
 
@@ -154,22 +157,24 @@ class InternshipContractFormController {
     return controller;
   }
 
-  bool get isCompleted => true; // TODO Implement real validation logic
-
   InternshipContract toContract() {
     return InternshipContract(
       date: creationDate,
       supervisor: _supervisor,
-      dates: _dates,
+      jobId: _primaryJobController.job.id,
+      extraSpecializationIds:
+          _extraJobControllers.map((e) => e.job.specialization.id).toList(),
+      dates: _weeklySchedulesController.dateRange!,
       weeklySchedules: _weeklySchedulesController.weeklySchedules,
       transportations: _transportations,
       visitFrequencies: _visitFrequenciesController.text,
+      expectedDuration: internshipDuration,
       formVersion: InternshipContract.currentVersion,
     );
   }
 
   void dispose() {
-    studentController.dispose();
+    _studentController.dispose();
     _primaryJobController.dispose();
     for (final controller in _extraJobControllers) {
       controller.dispose();
@@ -205,24 +210,24 @@ class _InternshipDetailsScreen extends StatefulWidget {
 }
 
 class _InternshipDetailsScreenState extends State<_InternshipDetailsScreen> {
+  final _formKey = GlobalKey<FormState>();
   bool get _editMode => widget.contractId == null;
 
   late final _controller = _editMode
       ? InternshipContractFormController(
-          isNewContract: widget.isNewContract,
           context,
+          isNewContract: widget.isNewContract,
           canModify: true,
           internship: widget.internship,
           contractId: widget.contractId,
-          transportations: widget.isNewContract
-              ? []
-              : widget.internship.contracts.last.transportations,
         )
-      : InternshipContractFormController.fromInternshipId(context,
+      : InternshipContractFormController.fromInternshipId(
+          context,
           isNewContract: widget.isNewContract,
           canModify: false,
           internship: widget.internship,
-          contractId: widget.contractId!);
+          contractId: widget.contractId!,
+        );
 
   void _cancel() async {
     _logger.info('Cancelling InternshipDetailsDialog');
@@ -245,16 +250,7 @@ class _InternshipDetailsScreenState extends State<_InternshipDetailsScreen> {
       return;
     }
 
-    if (!_controller.isCompleted) {
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) => const AlertDialog(
-          title: Text('Formulaire incomplet'),
-          content: Text('Répondre à toutes les questions avec un *.'),
-        ),
-      );
-      return;
-    }
+    if (!(_formKey.currentState?.validate() ?? false)) return;
 
     _logger.fine('Internship contract form submitted successfully');
     if (!widget.rootContext.mounted) return;
@@ -265,18 +261,49 @@ class _InternshipDetailsScreenState extends State<_InternshipDetailsScreen> {
 
     final newContract = _controller.toContract();
     final previousContract = widget.internship.contracts.lastOrNull;
-    final differences =
-        newContract.getDifference(previousContract, ignoreKeys: ['id']);
-    differences.removeWhere(
-        (element) => element == 'date'); // Date is always different
-    if (differences.isEmpty) {
+    final contractDifferences = newContract
+        .getDifference(previousContract, ignoreKeys: ['id'])
+      ..removeWhere((element) => element == 'date'); // Date is always different
+
+    // Prepare the new internship
+    if (contractDifferences.isEmpty) {
+      _logger.fine(
+          'No changes detected in internship, not returning updated internship');
       Navigator.of(widget.rootContext).pop(null);
       return;
     }
 
-    final internship = (Internship.fromSerialized(widget.internship.serialize())
-      ..contracts.add(newContract));
-    Navigator.of(widget.rootContext).pop(internship);
+    Internship newInternship =
+        Internship.fromSerialized(widget.internship.serialize())
+          ..contracts.add(newContract);
+
+    if (widget.isNewContract) {
+      final student = _controller._studentController.student;
+      final schoolBoard =
+          SchoolBoardsProvider.of(context, listen: false).currentSchoolBoard;
+      final school = schoolBoard?.schools
+          .firstWhereOrNull((s) => s.id == student?.schoolId);
+      final teacherId = AuthProvider.of(context).teacherId;
+      final enterprise = EnterprisesProvider.of(context, listen: false)
+          .fromIdOrNull(_controller.internship.enterpriseId);
+      if (student == null ||
+          teacherId == null ||
+          schoolBoard == null ||
+          school == null ||
+          enterprise == null) {
+        _logger.severe(
+            'Cannot create internship with missing student, teacher, or school information');
+        Navigator.of(widget.rootContext).pop(null);
+        return;
+      }
+      newInternship = newInternship.copyWith(
+        schoolBoardId: schoolBoard.id,
+        studentId: student.id,
+        signatoryTeacherId: teacherId,
+        enterpriseId: enterprise.id,
+      );
+    }
+    Navigator.of(widget.rootContext).pop(newInternship);
   }
 
   Widget _controlBuilder() {
@@ -312,7 +339,7 @@ class _InternshipDetailsScreenState extends State<_InternshipDetailsScreen> {
     );
     final enterprise = EnterprisesProvider.of(context, listen: false)
         .fromId(_controller.internship.enterpriseId);
-    final studentName = _controller.studentController.student?.fullName;
+    final studentName = _controller._studentController.student?.fullName;
     final linebreak =
         ResponsiveService.getScreenSize(context) == ScreenSize.small
             ? '\n'
@@ -332,36 +359,39 @@ class _InternshipDetailsScreenState extends State<_InternshipDetailsScreen> {
             icon: const Icon(Icons.arrow_back),
           ),
         ),
-        body: Padding(
-          padding: const EdgeInsets.only(left: 24.0, right: 24.0),
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _CreationDate(
-                          controller: _controller, editMode: _editMode),
-                      _GeneralInformations(
-                          controller: _controller, setState: setState),
-                      _MainJob(controller: _controller),
-                      if (_controller.studentController.student != null &&
-                          _controller.studentController.student!.program ==
-                              Program.fpt)
-                        _ExtraSpecialization(
-                          controller: _controller,
-                          setState: setState,
-                        ),
-                      _SupervisonInformation(controller: _controller),
-                      _TransportationsCheckBoxes(controller: _controller),
-                      _SchedulePicker(controller: _controller),
-                    ],
+        body: Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+            child: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _CreationDate(
+                            controller: _controller, editMode: _editMode),
+                        _GeneralInformations(
+                            controller: _controller, setState: setState),
+                        _MainJob(controller: _controller),
+                        if (_controller._studentController.student != null &&
+                            _controller._studentController.student!.program ==
+                                Program.fpt)
+                          _ExtraSpecialization(
+                            controller: _controller,
+                            setState: setState,
+                          ),
+                        _SupervisonInformation(controller: _controller),
+                        _TransportationsCheckBoxes(controller: _controller),
+                        _SchedulePicker(controller: _controller),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              _controlBuilder(),
-            ],
+                _controlBuilder(),
+              ],
+            ),
           ),
         ),
       ),
@@ -439,7 +469,7 @@ class _GeneralInformations extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-      'Building _GeneralInformations with selected student: ${controller.studentController.student?.id}',
+      'Building _GeneralInformations with selected student: ${controller._studentController.student?.id}',
     );
 
     return Column(
@@ -452,7 +482,7 @@ class _GeneralInformations extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               StudentPickerTile(
-                controller: controller.studentController,
+                controller: controller._studentController,
                 editMode: controller.isNewContract,
                 onSelected: (_) => setState(() {}),
               ),
@@ -492,7 +522,7 @@ class _MainJob extends StatelessWidget {
               schools: [
                 SchoolBoardsProvider.of(context, listen: false).currentSchool!,
               ],
-              editMode: true,
+              editMode: controller.isNewContract,
               specializationOnly: true,
               canChangeExpandedState: false,
               initialExpandedState: true,
@@ -532,16 +562,17 @@ class _ExtraSpecialization extends StatelessWidget {
               'Métier supplémentaire ${index + 1}',
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            SizedBox(
-              width: 35,
-              height: 35,
-              child: InkWell(
-                borderRadius: BorderRadius.circular(25),
-                onTap: () => setState(
-                    () => controller._extraJobControllers.removeAt(index)),
-                child: const Icon(Icons.delete, color: Colors.red),
+            if (controller.canModify)
+              SizedBox(
+                width: 35,
+                height: 35,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(25),
+                  onTap: () => setState(
+                      () => controller._extraJobControllers.removeAt(index)),
+                  child: const Icon(Icons.delete, color: Colors.red),
+                ),
               ),
-            ),
           ],
         ),
         EnterpriseJobListTile(
@@ -549,7 +580,7 @@ class _ExtraSpecialization extends StatelessWidget {
           schools: [
             SchoolBoardsProvider.of(context, listen: false).currentSchool!,
           ],
-          editMode: true,
+          editMode: controller.isNewContract || controller.canModify,
           specializationOnly: true,
           canChangeExpandedState: false,
           initialExpandedState: true,
@@ -613,11 +644,11 @@ class _SupervisonInformation extends StatefulWidget {
 }
 
 class _SupervisonInformationState extends State<_SupervisonInformation> {
-  late bool _useContactInfo = widget.controller._supervisor
-      .getDifference(EnterprisesProvider.of(context, listen: false)
+  late bool _useContactInfo = widget.controller._supervisor.getDifference(
+      EnterprisesProvider.of(context, listen: false)
           .fromId(widget.controller.internship.enterpriseId)
-          .contact)
-      .isEmpty;
+          .contact,
+      ignoreKeys: ['id', 'address']).isEmpty;
 
   void _toggleUseContactInfo() {
     final enterprise = EnterprisesProvider.of(context, listen: false)
@@ -633,11 +664,6 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
           enterprise.contact.phone.toString();
       widget.controller._supervisorEmailController.text =
           enterprise.contact.email ?? '';
-    } else {
-      widget.controller._superviserFirstNameController.text = '';
-      widget.controller._supervisorLastNameController.text = '';
-      widget.controller._supervisorPhoneController.text = '';
-      widget.controller._supervisorEmailController.text = '';
     }
     setState(() {});
   }
@@ -656,24 +682,23 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SubTitle('Responsable en milieu de stage', left: 0),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Flexible(
-              child: Text(
-                'Même personne que le contact de l\'entreprise',
-                style: Theme.of(context).textTheme.titleMedium,
+        if (widget.controller.canModify)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Text(
+                  'Même personne que le contact de l\'entreprise',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
-            ),
-            Switch(
-              onChanged: widget.controller.canModify
-                  ? (newValue) => _toggleUseContactInfo()
-                  : null,
-              value: _useContactInfo,
-            ),
-          ],
-        ),
+              Switch(
+                onChanged: (newValue) => _toggleUseContactInfo(),
+                value: _useContactInfo,
+              ),
+            ],
+          ),
         Padding(
           padding: const EdgeInsets.only(left: 12.0),
           child: Column(
@@ -692,7 +717,7 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
                     style: TextStyle(color: Colors.black),
                     validator: (text) =>
                         text!.isEmpty ? 'Ajouter un prénom.' : null,
-                    enabled: !_useContactInfo,
+                    enabled: !_useContactInfo && widget.controller.canModify,
                   ),
                   TextFormField(
                     controller: widget.controller._supervisorLastNameController,
@@ -703,7 +728,7 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
                     style: TextStyle(color: Colors.black),
                     validator: (text) =>
                         text!.isEmpty ? 'Ajouter un nom de famille.' : null,
-                    enabled: !_useContactInfo,
+                    enabled: !_useContactInfo && widget.controller.canModify,
                   ),
                 ],
               ),
@@ -711,12 +736,12 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
                 controller: widget.controller._supervisorPhoneController,
                 isMandatory: true,
                 canCall: false,
-                enabled: !_useContactInfo,
+                enabled: !_useContactInfo && widget.controller.canModify,
               ),
               EmailListTile(
                 controller: widget.controller._supervisorEmailController,
                 isMandatory: true,
-                enabled: !_useContactInfo,
+                enabled: !_useContactInfo && widget.controller.canModify,
                 canMail: false,
               ),
             ],
@@ -726,8 +751,6 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
     );
   }
 }
-
-// TODO : Check "Ajouter un métier"
 
 class _TransportationsCheckBoxes extends StatefulWidget {
   const _TransportationsCheckBoxes({required this.controller});
@@ -803,11 +826,8 @@ class _SchedulePicker extends StatefulWidget {
 }
 
 class _SchedulePickerState extends State<_SchedulePicker> {
-  final formKey = GlobalKey<FormState>();
-
   void onScheduleChanged() {
-    if (widget.controller._weeklySchedulesController.dateRange != null &&
-        widget.controller._weeklySchedulesController.weeklySchedules.isEmpty) {
+    if (widget.controller._weeklySchedulesController.dateRange != null) {
       widget.controller._weeklySchedulesController.addWeeklySchedule(
           WeeklySchedulesController.fillNewScheduleList(
               schedule: widget.controller._weeklySchedulesController
@@ -825,39 +845,33 @@ class _SchedulePickerState extends State<_SchedulePicker> {
   Widget build(BuildContext context) {
     _logger.finer('Building ScheduleStep widget');
 
-    return FocusScope(
-      child: Form(
-        key: formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _DateRange(
-              controller: widget.controller,
-              onScheduleChanged: onScheduleChanged,
-            ),
-            Visibility(
-                visible:
-                    widget.controller._weeklySchedulesController.dateRange !=
-                        null,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SubTitle('Horaire du stage', left: 0),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 12.0),
-                      child: ScheduleSelector(
-                        scheduleController:
-                            widget.controller._weeklySchedulesController,
-                        editMode: widget.controller.canModify,
-                      ),
-                    ),
-                    _Hours(controller: widget.controller),
-                    _VisitFrequencies(controller: widget.controller),
-                  ],
-                )),
-          ],
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _DateRange(
+          controller: widget.controller,
+          onScheduleChanged: onScheduleChanged,
         ),
-      ),
+        Visibility(
+            visible:
+                widget.controller._weeklySchedulesController.dateRange != null,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SubTitle('Horaire du stage', left: 0),
+                Padding(
+                  padding: const EdgeInsets.only(left: 12.0),
+                  child: ScheduleSelector(
+                    scheduleController:
+                        widget.controller._weeklySchedulesController,
+                    editMode: widget.controller.canModify,
+                  ),
+                ),
+                _Hours(controller: widget.controller),
+                _VisitFrequencies(controller: widget.controller),
+              ],
+            )),
+      ],
     );
   }
 }
@@ -883,14 +897,19 @@ class _DateRangeState extends State<_DateRange> {
       confirmText: 'Confirmer',
       context: context,
       initialEntryMode: DatePickerEntryMode.calendar,
-      initialDateRange: widget.controller._dates,
+      initialDateRange:
+          widget.controller._weeklySchedulesController.dateRange ??
+              time_utils.DateTimeRange(
+                start: DateTime.now(),
+                end: DateTime.now().add(const Duration(days: 90)),
+              ),
       firstDate: DateTime(DateTime.now().year),
       lastDate: DateTime(DateTime.now().year + 2),
     );
     if (range == null) return;
 
     _isValid = true;
-    widget.controller._dates = range;
+    widget.controller._weeklySchedulesController.dateRange = range;
 
     widget.onScheduleChanged();
     setState(() {});
@@ -1012,7 +1031,6 @@ class _Hours extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // TODO Verify why this does not update
         const SubTitle('Nombre d\'heures', left: 0, bottom: 0),
         Padding(
           padding: const EdgeInsets.only(left: 12.0),
@@ -1097,17 +1115,32 @@ EnterpriseJobListController _jobListControllerOf(BuildContext context,
   return EnterpriseJobListController(
     context: context,
     enterpriseStatus: EnterpriseStatus.active,
-    job: enterprise?.availablejobs(context).length == 1
-        ? enterprise!.availablejobs(context).first
-        : Job.empty,
-    specializationWhiteList: //specifiedSpecialization ??
-        enterprise
-            ?.jobsWithRemainingPositions(
-              context,
-              schoolId: AuthProvider.of(context, listen: false).schoolId!,
-              listen: false,
-            )
-            .map((job) => job.specialization)
-            .toList(),
+    job: internship.currentContract == null
+        ? (enterprise?.availablejobs(context).length == 1
+            ? enterprise!.availablejobs(context).first
+            : Job.empty)
+        : (enterprise?.jobs.firstWhereOrNull(
+                (job) => job.id == internship.currentContract!.jobId) ??
+            Job.empty),
+    specializationWhiteList: enterprise
+        ?.jobsWithRemainingPositions(
+          context,
+          schoolId: AuthProvider.of(context, listen: false).schoolId!,
+          listen: false,
+        )
+        .map((job) => job.specialization)
+        .toList(),
+  );
+}
+
+EnterpriseJobListController _jobListControllerOfSpecialization(
+    BuildContext context,
+    {required String specializationId}) {
+  final specialization =
+      ActivitySectorsService.specializationOrNull(specializationId)!;
+  return EnterpriseJobListController(
+    context: context,
+    enterpriseStatus: EnterpriseStatus.active,
+    job: Job.empty.copyWith(specialization: specialization),
   );
 }

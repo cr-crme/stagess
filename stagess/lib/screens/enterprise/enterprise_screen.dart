@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
+import 'package:stagess/common/widgets/sub_title.dart';
+import 'package:stagess/router.dart';
 import 'package:stagess/screens/enterprise/pages/about_page.dart';
 import 'package:stagess/screens/enterprise/pages/internships_page.dart';
 import 'package:stagess/screens/enterprise/pages/jobs_page.dart';
-import 'package:stagess/screens/internship_enrollment/internship_enrollment_screen.dart';
+import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/internship_managing_contract_form_dialog.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
+import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
@@ -187,17 +192,64 @@ class _EnterpriseScreenInternalState extends State<_EnterpriseScreenInternal>
       return;
     }
 
+    final internship = await showManagingContractFormDialog(
+      context,
+      isNewContract: true,
+      internship: Internship.empty.copyWith(enterpriseId: enterprise.id),
+    );
+    if (internship == null || !mounted) return;
+
+    final isSuccess = await InternshipsProvider.of(context, listen: false)
+        .replaceWithConfirmation(internship);
+    if (!mounted) return;
+    if (!isSuccess) {
+      showSnackBar(context, message: 'Erreur lors de la création du stage');
+      return;
+    }
+
+    final student = StudentsProvider.of(context, listen: false)
+        .fromId(internship.studentId);
     await showDialog(
-      barrierDismissible: false,
       context: context,
-      builder: (context) => Dialog(
-        child: InternshipEnrollmentScreen(
-          enterprise: enterprise,
-          specifiedSpecialization: specialization,
+      builder: (ctx) => AlertDialog(
+        title: const SubTitle('Inscription réussie', left: 0, bottom: 0),
+        content: RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: '${student.fullName} ',
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(
+                text: ' a bien été inscrit comme stagiaire chez ',
+              ),
+              TextSpan(
+                text: enterprise.name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const TextSpan(
+                text:
+                    '.\n\nVous pouvez maintenant accéder au contrat de stage dans la section "Documents".',
+              ),
+            ],
+          ),
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Ok'),
+          ),
+        ],
       ),
     );
     _logger.fine('Internship added for enterprise: ${enterprise.name}');
+    if (!mounted) return;
+    Navigator.pop(context);
+    GoRouter.of(context).pushNamed(
+      Screens.student,
+      pathParameters: Screens.params(internship.studentId),
+      queryParameters: Screens.queryParams(pageIndex: '1'),
+    );
   }
 
   @override

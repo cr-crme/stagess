@@ -114,11 +114,11 @@ class InternshipListTileState extends State<InternshipListTile> {
   late final _weeklySchedulesController = WeeklySchedulesController(
     dateRange: widget.internship.currentContract?.dates,
     weeklySchedules: widget.internship.currentContract?.weeklySchedules,
-    keepId: false, // TODO Check this
+    keepId: false,
   );
   late final _expectedDurationController = TextEditingController(
-    text: widget.internship.expectedDuration > 0
-        ? widget.internship.expectedDuration.toString()
+    text: (widget.internship.currentContract?.expectedDuration ?? -1) > 0
+        ? widget.internship.currentContract?.expectedDuration.toString()
         : '',
   );
   late final _transportations =
@@ -171,16 +171,17 @@ class InternshipListTileState extends State<InternshipListTile> {
         enterpriseId: widget.forceEditingMode
             ? _enterprisePickerController.enterprise.id
             : null,
-        jobId:
-            widget.forceEditingMode ? _enterprisePickerController.job.id : null,
         teacherNotes: _teacherNotesController.text,
-        expectedDuration: int.tryParse(_expectedDurationController.text) ?? 0,
         achievedDuration: int.tryParse(_achievedDurationController.text) ?? -1,
         endDate: _endDate,
         contracts: [
           ...widget.internship.contracts,
           InternshipContract(
             date: DateTime.now(),
+            jobId: widget.forceEditingMode
+                ? _enterprisePickerController.job.id
+                : '',
+            extraSpecializationIds: [], // TODO: handle extra job ids??
             supervisor: supervisor,
             dates: _weeklySchedulesController.dateRange!,
             weeklySchedules: InternshipHelpers.copySchedules(
@@ -189,6 +190,8 @@ class InternshipListTileState extends State<InternshipListTile> {
             ),
             transportations: _transportations,
             visitFrequencies: _visitFrequenciesController.text,
+            expectedDuration:
+                int.tryParse(_expectedDurationController.text) ?? 0,
             formVersion: InternshipContract.currentVersion,
           )
         ],
@@ -344,7 +347,7 @@ class InternshipListTileState extends State<InternshipListTile> {
     );
 
     _expectedDurationController.text =
-        widget.internship.expectedDuration.toString();
+        widget.internship.currentContract?.expectedDuration.toString() ?? '';
 
     _transportations
       ..clear()

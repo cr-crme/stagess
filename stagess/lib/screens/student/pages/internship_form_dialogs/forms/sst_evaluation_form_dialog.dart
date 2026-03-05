@@ -268,7 +268,7 @@ class _SstEvaluationFormScreenState extends State<_SstEvaluationFormScreen> {
                             internship.sstEvaluations.lastOrNull,
                         wereAtMeetingController: wereAtMeetingController,
                         enterpriseId: internship.enterpriseId,
-                        jobId: internship.jobId),
+                        jobId: internship.currentContract?.jobId ?? '-1'),
                   ),
                 ),
                 _controlBuilder(),

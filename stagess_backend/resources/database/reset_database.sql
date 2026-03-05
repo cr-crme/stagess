@@ -365,14 +365,11 @@ CREATE TABLE internships (
     school_board_id VARCHAR(36) NOT NULL,
     student_id VARCHAR(36) NOT NULL,
     enterprise_id VARCHAR(36) NOT NULL,
-    job_id VARCHAR(36) NOT NULL,
-    expected_duration BIGINT NOT NULL,
     achieved_duration BIGINT NOT NULL,
     teacher_notes VARCHAR(2000) NOT NULL,
     end_date BIGINT,
     FOREIGN KEY (student_id) REFERENCES students(id), 
     FOREIGN KEY (enterprise_id) REFERENCES enterprises(id),
-    FOREIGN KEY (job_id) REFERENCES enterprise_jobs(id),
     FOREIGN KEY (id) REFERENCES entities(shared_id) ON DELETE CASCADE, 
     FOREIGN KEY (school_board_id) REFERENCES school_boards(id) ON DELETE CASCADE
 );
@@ -385,16 +382,11 @@ CREATE TABLE internship_supervising_teachers (
     FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE
 );
 
-CREATE TABLE internship_extra_specializations (
-    internship_id VARCHAR(36) NOT NULL,
-    specialization_id VARCHAR(36) NOT NULL,
-    FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE
-);
-
 CREATE TABLE internship_contracts (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     internship_id VARCHAR(36) NOT NULL,
     date BIGINT NOT NULL,
+    job_id VARCHAR(36) NOT NULL,
     supervisor_first_name VARCHAR(50) NOT NULL,
     supervisor_last_name VARCHAR(50) NOT NULL,
     supervisor_phone_number VARCHAR(50),
@@ -402,7 +394,15 @@ CREATE TABLE internship_contracts (
     starting_date BIGINT NOT NULL,
     ending_date BIGINT NOT NULL,
     visit_frequencies VARCHAR(255) NOT NULL,
-    FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE
+    expected_duration INT NOT NULL,
+    FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE,
+    FOREIGN KEY (job_id) REFERENCES enterprise_jobs(id)
+);
+
+CREATE TABLE internship_extra_specializations (
+    contract_id VARCHAR(36) NOT NULL,
+    specialization_id VARCHAR(36) NOT NULL,
+    FOREIGN KEY (contract_id) REFERENCES internship_contracts(id) ON DELETE CASCADE
 );
 
 CREATE TABLE internship_weekly_schedules (

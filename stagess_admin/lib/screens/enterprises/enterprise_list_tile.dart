@@ -95,8 +95,8 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   );
   late final _enterpriseStatusController =
       RadioWithFollowUpController<EnterpriseStatus>(
-        initialValue: widget.enterprise.status,
-      );
+    initialValue: widget.enterprise.status,
+  );
   late final _activityTypeController = EnterpriseActivityTypeListController(
     initial: widget.enterprise.activityTypes,
   );
@@ -164,37 +164,37 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   );
 
   Enterprise get editedEnterprise => widget.enterprise.copyWith(
-    name: _nameController.text,
-    status: _enterpriseStatusController.value,
-    activityTypes: _activityTypeController.activityTypes,
-    recruiterId: _teacherPickerController.teacher?.id ?? '',
-    phone: PhoneNumber.fromString(
-      _phoneController.text,
-      id: widget.enterprise.phone?.id,
-    ),
-    fax: PhoneNumber.fromString(
-      _faxController.text,
-      id: widget.enterprise.fax?.id,
-    ),
-    jobs:
-        JobList()..addAll(
-          _jobControllers.values.map((jobController) => jobController.job),
+        name: _nameController.text,
+        status: _enterpriseStatusController.value,
+        activityTypes: _activityTypeController.activityTypes,
+        recruiterId: _teacherPickerController.teacher?.id ?? '',
+        phone: PhoneNumber.fromString(
+          _phoneController.text,
+          id: widget.enterprise.phone?.id,
         ),
-    website: _websiteController.text,
-    address: _addressController.address,
-    headquartersAddress: _headquartersAddressController.address,
-    contact: widget.enterprise.contact.copyWith(
-      firstName: _contactFirstNameController.text,
-      lastName: _contactLastNameController.text,
-      phone: PhoneNumber.fromString(
-        _contactPhoneController.text,
-        id: widget.enterprise.contact.phone?.id,
-      ),
-      email: _contactEmailController.text,
-    ),
-    contactFunction: _contactFunctionController.text,
-    neq: _neqController.text,
-  );
+        fax: PhoneNumber.fromString(
+          _faxController.text,
+          id: widget.enterprise.fax?.id,
+        ),
+        jobs: JobList()
+          ..addAll(
+            _jobControllers.values.map((jobController) => jobController.job),
+          ),
+        website: _websiteController.text,
+        address: _addressController.address,
+        headquartersAddress: _headquartersAddressController.address,
+        contact: widget.enterprise.contact.copyWith(
+          firstName: _contactFirstNameController.text,
+          lastName: _contactLastNameController.text,
+          phone: PhoneNumber.fromString(
+            _contactPhoneController.text,
+            id: widget.enterprise.contact.phone?.id,
+          ),
+          email: _contactEmailController.text,
+        ),
+        contactFunction: _contactFunctionController.text,
+        neq: _neqController.text,
+      );
 
   @override
   void initState() {
@@ -230,9 +230,8 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     // Show confirmation dialog
     final answer = await showDialog(
       context: context,
-      builder:
-          (context) =>
-              ConfirmDeleteEnterpriseDialog(enterprise: widget.enterprise),
+      builder: (context) =>
+          ConfirmDeleteEnterpriseDialog(enterprise: widget.enterprise),
     );
     if (answer == null || !answer || !mounted) {
       await enterprises.releaseLockForItem(widget.enterprise);
@@ -248,10 +247,9 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     if (mounted) {
       showSnackBar(
         context,
-        message:
-            isSuccess
-                ? 'Entreprise supprimée avec succès'
-                : 'Échec de la suppression de l\'entreprise',
+        message: isSuccess
+            ? 'Entreprise supprimée avec succès'
+            : 'Échec de la suppression de l\'entreprise',
       );
     }
     await enterprises.releaseLockForItem(widget.enterprise);
@@ -286,10 +284,9 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
         if (mounted) {
           showSnackBar(
             context,
-            message:
-                isSuccess
-                    ? 'Entreprise mise à jour avec succès'
-                    : 'Échec de la mise à jour de l\'entreprise',
+            message: isSuccess
+                ? 'Entreprise mise à jour avec succès'
+                : 'Échec de la mise à jour de l\'entreprise',
           );
         }
       }
@@ -411,72 +408,66 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     return widget.forceEditingMode
         ? _buildEditingForm()
         : AnimatedExpandingCard(
-          expandingDuration: ConfigurationService.expandingTileDuration,
-          initialExpandedState: _isExpanded,
-          onTapHeader: (isExpanded) {
-            setState(() => _isExpanded = isExpanded);
-            _fetchData();
-          },
-          header:
-              (ctx, isExpanded) => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 12.0,
-                      top: 8,
-                      bottom: 8,
-                    ),
-                    child: Text(
-                      widget.enterprise.name,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+            expandingDuration: ConfigurationService.expandingTileDuration,
+            initialExpandedState: _isExpanded,
+            onTapHeader: (isExpanded) {
+              setState(() => _isExpanded = isExpanded);
+              _fetchData();
+            },
+            header: (ctx, isExpanded) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 12.0,
+                    top: 8,
+                    bottom: 8,
                   ),
-                  if (_isExpanded)
-                    FutureBuilder(
-                      future: _fetchFullDataCompleter.future,
-                      builder:
-                          (context, snapshot) =>
-                              snapshot.connectionState == ConnectionState.done
-                                  ? Row(
-                                    children: [
-                                      if (!hasInternship)
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.delete,
-                                            color:
-                                                _forceDisabled
-                                                    ? Colors.grey
-                                                    : Colors.red,
-                                          ),
-                                          onPressed:
-                                              _forceDisabled
-                                                  ? null
-                                                  : _onClickedDeleting,
-                                        ),
-                                      IconButton(
-                                        icon: Icon(
-                                          _isEditing ? Icons.save : Icons.edit,
-                                          color:
-                                              _forceDisabled
-                                                  ? Colors.grey
-                                                  : Theme.of(
-                                                    context,
-                                                  ).primaryColor,
-                                        ),
-                                        onPressed:
-                                            _forceDisabled
-                                                ? null
-                                                : _onClickedEditing,
+                  child: Text(
+                    widget.enterprise.name,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                if (_isExpanded)
+                  FutureBuilder(
+                    future: _fetchFullDataCompleter.future,
+                    builder: (context, snapshot) =>
+                        snapshot.connectionState == ConnectionState.done
+                            ? Row(
+                                children: [
+                                  if (!hasInternship)
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: _forceDisabled
+                                            ? Colors.grey
+                                            : Colors.red,
                                       ),
-                                    ],
-                                  )
-                                  : const SizedBox.shrink(),
-                    ),
-                ],
-              ),
-          child: _buildEditingForm(),
-        );
+                                      onPressed: _forceDisabled
+                                          ? null
+                                          : _onClickedDeleting,
+                                    ),
+                                  IconButton(
+                                    icon: Icon(
+                                      _isEditing ? Icons.save : Icons.edit,
+                                      color: _forceDisabled
+                                          ? Colors.grey
+                                          : Theme.of(
+                                              context,
+                                            ).primaryColor,
+                                    ),
+                                    onPressed: _forceDisabled
+                                        ? null
+                                        : _onClickedEditing,
+                                  ),
+                                ],
+                              )
+                            : const SizedBox.shrink(),
+                  ),
+              ],
+            ),
+            child: _buildEditingForm(),
+          );
   }
 
   Widget _buildEditingForm() {
@@ -515,16 +506,15 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                 AnimatedExpandingCard(
                   elevation: 0.0,
                   onTapHeader: (newState) => _wasDetailsExpanded = true,
-                  header:
-                      (ctx, isExpanded) => Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Text(
-                          isExpanded
-                              ? 'Détails de l\'entreprise'
-                              : 'Plus de détails sur l\'entreprise...',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ),
+                  header: (ctx, isExpanded) => Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Text(
+                      isExpanded
+                          ? 'Détails de l\'entreprise'
+                          : 'Plus de détails sur l\'entreprise...',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Column(
@@ -564,24 +554,22 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   Widget _buildName() {
     return _isEditing
         ? Padding(
-          padding: const EdgeInsets.only(right: 12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                controller: _nameController,
-                validator:
-                    (value) =>
-                        value?.isEmpty == true
-                            ? 'Le nom de l\'entreprise est requis'
-                            : null,
-                decoration: const InputDecoration(
-                  labelText: 'Nom de l\'entreprise',
+            padding: const EdgeInsets.only(right: 12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: _nameController,
+                  validator: (value) => value?.isEmpty == true
+                      ? 'Le nom de l\'entreprise est requis'
+                      : null,
+                  decoration: const InputDecoration(
+                    labelText: 'Nom de l\'entreprise',
+                  ),
                 ),
-              ),
-            ],
-          ),
-        )
+              ],
+            ),
+          )
         : Container();
   }
 
@@ -592,13 +580,11 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
         elements: EnterpriseStatus.values,
         controller: _enterpriseStatusController,
         enabled: _isEditing,
-        onChanged:
-            (value) => setState(() {
-              _jobControllers.forEach((_, controller) {
-                controller.enterpriseStatus =
-                    _enterpriseStatusController.value!;
-              });
-            }),
+        onChanged: (value) => setState(() {
+          _jobControllers.forEach((_, controller) {
+            controller.enterpriseStatus = _enterpriseStatusController.value!;
+          });
+        }),
       ),
     );
   }
@@ -613,18 +599,17 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   void _addJob() {
     final job = Job.empty;
     setState(
-      () =>
-          _jobControllers[job.id] = EnterpriseJobListController(
-            context: context,
-            enterpriseStatus: _enterpriseStatusController.value!,
-            job: job,
-            reservedForPickerController: EntityPickerController(
-              allElementsTitle: 'Tous les enseignant\u00b7e\u00b7s',
-              schools: _currentSchoolBoard?.schools ?? [],
-              teachers: [...TeachersProvider.of(context, listen: false)],
-              initialId: job.reservedForId,
-            ),
-          ),
+      () => _jobControllers[job.id] = EnterpriseJobListController(
+        context: context,
+        enterpriseStatus: _enterpriseStatusController.value!,
+        job: job,
+        reservedForPickerController: EntityPickerController(
+          allElementsTitle: 'Tous les enseignant\u00b7e\u00b7s',
+          schools: _currentSchoolBoard?.schools ?? [],
+          teachers: [...TeachersProvider.of(context, listen: false)],
+          initialId: job.reservedForId,
+        ),
+      ),
     );
   }
 
@@ -648,35 +633,37 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
           ),
         _jobControllers.isEmpty
             ? Padding(
-              padding: const EdgeInsets.only(left: 12.0, top: 8.0, bottom: 4.0),
-              child: Text('Aucun métier proposé pour le moment.'),
-            )
+                padding:
+                    const EdgeInsets.only(left: 12.0, top: 8.0, bottom: 4.0),
+                child: Text('Aucun métier proposé pour le moment.'),
+              )
             : Column(
-              children: [
-                ..._jobControllers.keys.map((jobId) {
-                  final hasInternship = InternshipsProvider.of(
-                    context,
-                    listen: true,
-                  ).any(
-                    (internship) =>
-                        internship.enterpriseId == widget.enterprise.id &&
-                        internship.jobId == jobId,
-                  );
+                children: [
+                  ..._jobControllers.keys.map((jobId) {
+                    final hasInternship = InternshipsProvider.of(
+                      context,
+                      listen: true,
+                    ).any(
+                      (internship) =>
+                          internship.enterpriseId == widget.enterprise.id &&
+                          internship.currentContract?.jobId == jobId,
+                    );
 
-                  return EnterpriseJobListTile(
-                    key: ValueKey(jobId),
-                    controller: _jobControllers[jobId]!,
-                    schools: _currentSchoolBoard?.schools ?? [],
-                    editMode: _isEditing,
-                    onRequestDelete:
-                        hasInternship ? null : () => _deleteJob(jobId),
-                    initialExpandedState:
-                        _jobControllers[jobId]!.specialization?.idWithName ==
-                        null,
-                  );
-                }),
-              ],
-            ),
+                    return EnterpriseJobListTile(
+                      key: ValueKey(jobId),
+                      controller: _jobControllers[jobId]!,
+                      schools: _currentSchoolBoard?.schools ?? [],
+                      // TODO Fix visual (editMode false)
+                      editMode: _isEditing,
+                      onRequestDelete:
+                          hasInternship ? null : () => _deleteJob(jobId),
+                      initialExpandedState:
+                          _jobControllers[jobId]!.specialization?.idWithName ==
+                              null,
+                    );
+                  }),
+                ],
+              ),
       ],
     );
   }
@@ -684,9 +671,9 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   Widget _buildRecruiter() {
     _teacherPickerController.teacher =
         TeachersProvider.of(context, listen: false).firstWhereOrNull(
-          (teacher) => teacher.id == widget.enterprise.recruiterId,
-        ) ??
-        Teacher.empty;
+              (teacher) => teacher.id == widget.enterprise.recruiterId,
+            ) ??
+            Teacher.empty;
 
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
@@ -765,8 +752,8 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
         _isEditing
             ? Text('Contact')
             : Text(
-              'Contact : ${widget.enterprise.contact.toString()} (${widget.enterprise.contactFunction})',
-            ),
+                'Contact : ${widget.enterprise.contact.toString()} (${widget.enterprise.contactFunction})',
+              ),
         Padding(
           padding: const EdgeInsets.only(left: 16.0),
           child: Column(

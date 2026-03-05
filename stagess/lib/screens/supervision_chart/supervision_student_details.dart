@@ -40,7 +40,7 @@ Job? _getJob(BuildContext context, {required String studentId}) {
   final internship = _getInternship(context, studentId: studentId);
   final enterprise = _getEnterprise(context, studentId: studentId);
   if (internship == null || enterprise == null) return null;
-  return enterprise.jobs[internship.jobId];
+  return enterprise.jobs[internship.currentContract?.jobId];
 }
 
 Student? _getStudent(BuildContext context, {required String studentId}) {

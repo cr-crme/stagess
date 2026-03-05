@@ -83,7 +83,7 @@ pw.Widget _buildQuestions(BuildContext context,
     {required Internship internship, required SstEvaluation evaluation}) {
   final enterprise = EnterprisesProvider.of(context, listen: false)
       .fromId(internship.enterpriseId);
-  final job = enterprise.jobs.fromId(internship.jobId);
+  final job = enterprise.jobs.fromId(internship.currentContract?.jobId ?? '-1');
   // Sort the question by "id"
   final questionIds = [...job.specialization.questions]
     ..sort((a, b) => int.parse(a) - int.parse(b));

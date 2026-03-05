@@ -83,12 +83,12 @@ class EnterpriseJobListController {
         _specializationsWhiteList = specializationWhiteList,
         _specializationBlacklist = specializationBlackList,
         _reservedForPickerController = reservedForPickerController {
-    final students = StudentsProvider.of(context, listen: true);
-    final internships = InternshipsProvider.of(context, listen: true);
+    final students = StudentsProvider.of(context, listen: false);
+    final internships = InternshipsProvider.of(context, listen: false);
 
     _positionsOccupied.clear();
     for (final intership in internships) {
-      if (intership.jobId == job.id && intership.isActive) {
+      if (intership.currentContract?.jobId == job.id && intership.isActive) {
         final schoolId = students
             .firstWhereOrNull(
               (student) => student.id == intership.studentId,
@@ -283,11 +283,10 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (widget.editMode)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: _buildJobPicker(),
-              ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: _buildJobPicker(),
+            ),
             if (!widget.specializationOnly)
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,7 +377,7 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
             return null;
           },
           style: const TextStyle(color: Colors.black),
-          enabled: _availableSpecialization.length != 1,
+          enabled: widget.editMode && _availableSpecialization.length != 1,
           decoration: InputDecoration(
             labelText: '* Métier semi-spécialisé',
             labelStyle: TextStyle(color: Colors.black),

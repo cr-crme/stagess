@@ -453,7 +453,8 @@ class _ScheduleSelector extends StatelessWidget {
                                   bool isEnabled = true;
                                   if (useSameScheduleForAllDays &&
                                       weeklySchedule.schedule[day] != null) {
-                                    if (referenceDayIndex == null) {
+                                    if (referenceDayIndex == null ||
+                                        referenceDayIndex == dayIndex) {
                                       referenceDayIndex = dayIndex;
                                     } else {
                                       isEnabled = false;

@@ -147,12 +147,14 @@ class _InternshipEvaluationCardState extends State<InternshipEvaluationCard> {
   }
 }
 
-Future<void> showInternshipEvaluationFormDialog(BuildContext context,
-    {required String internshipId,
-    String? evaluationId,
-    required Future<Internship?> Function(BuildContext,
-            {required String internshipId, String? evaluationId})
-        showEvaluationDialog}) async {
+Future<void> showInternshipEvaluationFormDialog(
+  BuildContext context, {
+  required String internshipId,
+  String? evaluationId,
+  required Future<Internship?> Function(BuildContext,
+          {required String internshipId, String? evaluationId})
+      showEvaluationDialog,
+}) async {
   final editMode = evaluationId == null;
   _logger.info(
       'Showing InternshipEvaluationFormDialog for internship: $internshipId, editMode: $editMode');

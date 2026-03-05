@@ -228,7 +228,7 @@ class _InternshipListState extends State<_InternshipList> {
               if (contract == null) return Container();
 
               final specialization =
-                  widget.enterprise.jobs[internship.jobId].specialization;
+                  widget.enterprise.jobs[contract.jobId].specialization;
               final student = StudentsProvider.of(
                 context,
               ).firstWhereOrNull((e) => e.id == internship.studentId);

@@ -75,10 +75,11 @@ class SkillsPageState extends State<SkillsPage> {
       // Fetch all the specialization of the current internship
       specializations.add(enterprises
           .fromIdOrNull(internship.enterpriseId)
-          ?.jobs[internship.jobId]
+          ?.jobs[internship.currentContract?.jobId]
           .specialization);
-      specializations.addAll(internship.extraSpecializationIds
-          .map((id) => ActivitySectorsService.specialization(id)));
+      specializations.addAll(
+          (internship.currentContract?.extraSpecializationIds ?? [])
+              .map((id) => ActivitySectorsService.specialization(id)));
 
       specializations.removeWhere((specialization) => specialization == null);
 

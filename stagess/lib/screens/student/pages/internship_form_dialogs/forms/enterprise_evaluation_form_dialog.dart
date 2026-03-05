@@ -367,7 +367,8 @@ class _EnterpriseEvaluationScreenState
                   ),
                 ),
                 selector: (context, enterprises) =>
-                    enterprises[internship.enterpriseId].jobs[internship.jobId],
+                    enterprises[internship.enterpriseId]
+                        .jobs[internship.currentContract?.jobId],
               ),
       ),
     );

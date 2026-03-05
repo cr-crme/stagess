@@ -60,7 +60,7 @@ Future<Uint8List> generateInternshipContractPdf(
       .fromId(internship.enterpriseId);
   final contract = internship.contracts.firstWhere((c) => c.id == contractId);
   final specialization = enterprise.jobs
-      .firstWhere((job) => job.id == internship.jobId)
+      .firstWhere((job) => job.id == internship.currentContract?.jobId)
       .specialization;
 
   document.addPage(pw.MultiPage(
