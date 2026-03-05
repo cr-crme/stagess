@@ -14,6 +14,7 @@ class InternshipEvaluationCard extends StatefulWidget {
   const InternshipEvaluationCard({
     super.key,
     required this.title,
+    this.header,
     required this.internshipId,
     required this.evaluateButtonText,
     required this.reevaluateButtonText,
@@ -24,6 +25,7 @@ class InternshipEvaluationCard extends StatefulWidget {
   });
 
   final String title;
+  final String? header;
   final String internshipId;
   final String evaluateButtonText;
   final String reevaluateButtonText;
@@ -65,10 +67,11 @@ class _InternshipEvaluationCardState extends State<InternshipEvaluationCard> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(widget.evaluations.isEmpty
-                ? 'Aucune évaluation réalisée pour ce stage.'
-                : 'Dernière évaluation réalisée le\u00a0: '
-                    '${DateFormat.yMMMEd('fr_CA').format(widget.evaluations.last.date)}'),
+            Text(widget.header ??
+                (widget.evaluations.isEmpty
+                    ? 'Aucune évaluation réalisée pour ce stage.'
+                    : 'Dernière évaluation réalisée le\u00a0: '
+                        '${DateFormat.yMMMEd('fr_CA').format(widget.evaluations.last.date)}')),
             Visibility(
               visible: internship.supervisingTeacherIds.contains(teacherId),
               child: Align(
