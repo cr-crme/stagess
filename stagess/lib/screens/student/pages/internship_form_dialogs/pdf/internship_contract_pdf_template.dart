@@ -772,34 +772,40 @@ pw.Widget _checkBoxCell(
               mainAxisSize: pw.MainAxisSize.min,
               children: [
                 pw.Container(
-                    decoration: entry.value
-                        ? pw.BoxDecoration(
-                            border: pw.Border.all(color: PdfColors.black))
-                        : null,
+                    decoration: pw.BoxDecoration(
+                        border: pw.Border.all(color: PdfColors.black)),
                     child: pw.Checkbox(
-                      value: entry.value,
+                      value: true,
                       name: entry.key,
-                      checkColor: PdfColors.black,
+                      checkColor: entry.value
+                          ? PdfColors.black
+                          : PdfColorsExtension.transparent,
                       activeColor: PdfColors.white,
                     )),
                 pw.SizedBox(width: 6.0),
                 pw.Text(entry.key == '__OTHER__' ? 'Autre : ' : entry.key,
                     style: _textStyle.copyWith(fontSize: 14)),
-                if (includeOther && entry.key == '__OTHER__')
-                  pw.Padding(
-                    padding: const pw.EdgeInsets.only(left: 12.0),
-                    child: pw.Container(
-                      width: 200,
-                      padding: const pw.EdgeInsets.only(
-                          left: 4.0, bottom: 4.0, top: 4.0),
-                      decoration: pw.BoxDecoration(
-                          border: pw.Border.all(color: PdfColors.black)),
-                      child: pw.Text(
-                        'Précisez: $otherValue',
-                        style: _textStyle.copyWith(fontSize: 14),
-                      ),
+                pw.Padding(
+                  padding: const pw.EdgeInsets.only(left: 12.0),
+                  child: pw.Container(
+                    width: 200,
+                    padding: const pw.EdgeInsets.only(
+                        left: 4.0, bottom: 4.0, top: 4.0),
+                    decoration: pw.BoxDecoration(
+                        border: pw.Border.all(
+                            color: includeOther && entry.key == '__OTHER__'
+                                ? PdfColors.black
+                                : PdfColorsExtension.transparent)),
+                    child: pw.Text(
+                      'Précisez: $otherValue',
+                      style: _textStyle.copyWith(
+                          fontSize: 14,
+                          color: includeOther && entry.key == '__OTHER__'
+                              ? null
+                              : PdfColorsExtension.transparent),
                     ),
                   ),
+                ),
               ],
             );
           },
@@ -888,4 +894,8 @@ pw.Widget _schedulesCell(
           ),
         ],
       ));
+}
+
+extension PdfColorsExtension on PdfColor {
+  static PdfColor transparent = PdfColor(1.0, 1.0, 1.0, 1.0);
 }
