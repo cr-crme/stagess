@@ -356,28 +356,31 @@ class _PersonalNotesState extends State<_PersonalNotes> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SubTitle('Particularités du stage à connaitre'),
         Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const Padding(
-              padding: EdgeInsets.only(left: 32.0, bottom: 8),
-              child: Text(
-                '(ex. entrer par la porte 5 réservée au personnel, ...)',
-              ),
-            ),
-            IconButton(
-              onPressed: () => setState(() {
-                _editMode = !_editMode;
-                if (!_editMode) _sendComments();
-              }),
-              icon: Icon(
-                _editMode ? Icons.save : Icons.edit,
-                color: Theme.of(context).primaryColor,
+            const SubTitle('Particularités du stage à connaitre'),
+            Padding(
+              padding: const EdgeInsets.only(left: 24.0),
+              child: IconButton(
+                onPressed: () => setState(() {
+                  _editMode = !_editMode;
+                  if (!_editMode) _sendComments();
+                }),
+                icon: Icon(
+                  _editMode ? Icons.save : Icons.edit,
+                  color: Theme.of(context).primaryColor,
+                ),
               ),
             ),
           ],
+        ),
+        const Padding(
+          padding: EdgeInsets.only(left: 32.0, bottom: 8),
+          child: Text(
+            '(ex. entrer par la porte 5 réservée au personnel, ...)',
+          ),
         ),
         Padding(
           padding: const EdgeInsets.only(left: 32.0),
@@ -527,14 +530,17 @@ class _Schedule extends StatelessWidget {
     BuildContext context,
     List<WeeklySchedule> schedules,
   ) {
-    return ScheduleSelector(
-      editMode: false,
-      scheduleController: WeeklySchedulesController(
-        weeklySchedules: internship.currentContract?.weeklySchedules,
-        dateRange: internship.currentContract?.dates,
+    return SizedBox(
+      width: 350,
+      child: ScheduleSelector(
+        editMode: false,
+        scheduleController: WeeklySchedulesController(
+          weeklySchedules: internship.currentContract?.weeklySchedules,
+          dateRange: internship.currentContract?.dates,
+        ),
+        leftPadding: 0,
+        periodTextSize: 14,
       ),
-      leftPadding: 0,
-      periodTextSize: 14,
     );
   }
 
@@ -565,7 +571,7 @@ class _MoreInfoButton extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(top: 50.0, bottom: 40),
       child: Center(
-        child: ElevatedButton(
+        child: TextButton(
           onPressed: onTap,
           child: const Text(
             'Plus de détails\nsur le stage',
