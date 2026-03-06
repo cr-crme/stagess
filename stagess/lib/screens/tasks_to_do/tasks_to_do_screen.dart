@@ -233,6 +233,7 @@ class _SstRisk extends StatelessWidget {
                 return _TaskTile(
                   title: student.fullName,
                   subtitle: '${enterprise.name} (${job.specialization.name})',
+                  student: student,
                   icon: Icons.warning,
                   iconColor: Theme.of(context).colorScheme.secondary,
                   date: internship.currentContract!.dates.start,
@@ -273,6 +274,7 @@ class _EndingInternship extends StatelessWidget {
                 return _TaskTile(
                   title: student.fullName,
                   subtitle: enterprise.name,
+                  student: student,
                   icon: Icons.flag,
                   iconColor: Colors.yellow.shade700,
                   date: internship.currentContract!.dates.end,
@@ -314,6 +316,7 @@ class _PostInternshipEvaluation extends StatelessWidget {
                 return _TaskTile(
                   title: student.fullName,
                   subtitle: enterprise.name,
+                  student: student,
                   icon: Icons.rate_review,
                   iconColor: Colors.blueGrey,
                   date: internship.endDate,
@@ -333,6 +336,7 @@ class _TaskTile extends StatelessWidget {
   const _TaskTile({
     required this.title,
     required this.subtitle,
+    required this.student,
     required this.icon,
     required this.iconColor,
     required this.date,
@@ -342,6 +346,7 @@ class _TaskTile extends StatelessWidget {
 
   final String title;
   final String subtitle;
+  final Student student;
   final IconData icon;
   final Color iconColor;
   final DateTime date;
@@ -371,35 +376,42 @@ class _TaskTile extends StatelessWidget {
         ],
       ),
     );
-    return Card(
-      elevation: 10,
-      child: Column(
-        children: [
-          const SizedBox(height: 8),
-          Row(
-            children: [
-              SizedBox(width: 60, child: Icon(icon, color: iconColor)),
-              Expanded(
-                //width: MediaQuery.of(context).size.width - 72,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: Theme.of(context).textTheme.titleSmall),
-                    Text(
-                      subtitle,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                  ],
+    return InkWell(
+      onTap: () => GoRouter.of(context).goNamed(
+        Screens.student,
+        pathParameters: Screens.params(student),
+        queryParameters: Screens.queryParams(pageIndex: '1'),
+      ),
+      child: Card(
+        elevation: 10,
+        child: Column(
+          children: [
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                SizedBox(width: 60, child: Icon(icon, color: iconColor)),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title,
+                          style: Theme.of(context).textTheme.titleSmall),
+                      Text(
+                        subtitle,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 8),
+                    ],
+                  ),
                 ),
-              ),
-              if (screenSize == ScreenSize.large) button,
-            ],
-          ),
-          if (screenSize != ScreenSize.large) button,
-          const SizedBox(height: 8),
-        ],
+                if (screenSize == ScreenSize.large) button,
+              ],
+            ),
+            if (screenSize != ScreenSize.large) button,
+            const SizedBox(height: 8),
+          ],
+        ),
       ),
     );
   }

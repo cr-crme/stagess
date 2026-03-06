@@ -2,76 +2,39 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
+import 'package:stagess/screens/enterprise/pages/jobs_page.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/enterprise_job_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/radio_with_follow_up.dart';
 
 final _logger = Logger('PrerequisitesExpansionPanel');
 
-class PrerequisitesExpansionPanel extends ExpansionPanel {
-  PrerequisitesExpansionPanel({
-    required GlobalKey<PrerequisitesBodyState> key,
-    required super.isExpanded,
-    required bool isEditing,
-    required Enterprise enterprise,
-    required Function() onClickEdit,
-    required Job job,
-  }) : super(
-          canTapOnHeader: true,
-          body: _PrerequisitesBody(
-            key: key,
-            job: job,
-            enterprise: enterprise,
-            isEditing: isEditing,
-            onClickSave: onClickEdit,
-          ),
-          headerBuilder: (context, isExpanded) => ListTile(
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Prérequis et équipements'),
-                if (isExpanded)
-                  SizedBox(
-                    width: 50,
-                    height: 50,
-                    child: InkWell(
-                      onTap: onClickEdit,
-                      borderRadius: BorderRadius.circular(25),
-                      child: Icon(
-                        isEditing ? Icons.save : Icons.edit,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        );
-}
-
-class _PrerequisitesBody extends StatefulWidget {
-  const _PrerequisitesBody({
+class PrerequisitesExpansionPanel extends StatefulWidget {
+  const PrerequisitesExpansionPanel({
     required super.key,
     required this.job,
     required this.enterprise,
     required this.isEditing,
     required this.onClickSave,
+    required this.onClickCancel,
   });
 
   final Job job;
   final Enterprise enterprise;
   final bool isEditing;
   final Function() onClickSave;
+  final Function() onClickCancel;
 
   @override
-  State<_PrerequisitesBody> createState() => PrerequisitesBodyState();
+  State<PrerequisitesExpansionPanel> createState() =>
+      PrerequisitesExpansionPanelState();
 }
 
-class PrerequisitesBodyState extends State<_PrerequisitesBody> {
-  final formKey = GlobalKey<FormState>();
-
+class PrerequisitesExpansionPanelState
+    extends State<PrerequisitesExpansionPanel> {
   late final _ageController = TextEditingController(
     text: widget.job.minimumAge.toString(),
   );
@@ -172,33 +135,59 @@ class PrerequisitesBodyState extends State<_PrerequisitesBody> {
       'Building PrerequisitesExpansionPanel for job: ${widget.job.specialization.name}',
     );
 
-    return FocusScope(
-      child: Form(
-        key: formKey,
-        child: SizedBox(
-          width: Size.infinite.width,
-          child: Padding(
-            padding: const EdgeInsets.only(left: 24, right: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildMinimumAge(),
-                const SizedBox(height: 12),
-                _buildEntepriseRequests(),
-                const SizedBox(height: 12),
-                _buildUniform(),
-                const SizedBox(height: 12),
-                _buildProtections(),
-                const SizedBox(height: 12),
-                if (widget.isEditing)
-                  Center(
-                      child: TextButton(
-                          onPressed: widget.onClickSave,
-                          child: const Text('Enregistrer'))),
-                const SizedBox(height: 12),
-              ],
+    return AnimatedExpandingCard(
+      elevation: 0.0,
+      onTapHeader: (nextState) {
+        final previousState = !nextState;
+        if (widget.isEditing && previousState) widget.onClickCancel();
+      },
+      tappingPermitted: (isExpanded) => tappingIsPermitted(context,
+          isExpanded: isExpanded, isEditing: widget.isEditing),
+      header: (context, isExpanded) => ListTile(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Prérequis et équipements'),
+            Visibility(
+              visible: isExpanded,
+              maintainSize: true,
+              maintainAnimation: true,
+              maintainState: true,
+              child: InkWell(
+                onTap: widget.onClickSave,
+                borderRadius: BorderRadius.circular(25),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Icon(
+                    widget.isEditing ? Icons.save : Icons.edit,
+                    color: Theme.of(context).primaryColor,
+                  ),
+                ),
+              ),
             ),
-          ),
+          ],
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildMinimumAge(),
+            const SizedBox(height: 12),
+            _buildEntepriseRequests(),
+            const SizedBox(height: 12),
+            _buildUniform(),
+            const SizedBox(height: 12),
+            _buildProtections(),
+            const SizedBox(height: 12),
+            if (widget.isEditing)
+              Center(
+                  child: TextButton(
+                      onPressed: widget.onClickSave,
+                      child: const Text('Enregistrer'))),
+            const SizedBox(height: 12),
+          ],
         ),
       ),
     );

@@ -54,10 +54,10 @@ class JobsPage extends StatefulWidget {
 }
 
 class JobsPageState extends State<JobsPage> {
+  final _formKey = GlobalKey<FormState>();
   final Map<String, UniqueKey> _cardKey = {};
-  final Map<String, List> _expandedSections = {};
-  final Map<String, GlobalKey<PrerequisitesBodyState>> _prerequisitesFormKeys =
-      {};
+  final Map<String, GlobalKey<PrerequisitesExpansionPanelState>>
+      _prerequisitesFormKeys = {};
   final Map<String, bool> _isEditingPrerequisites = {};
 
   bool _forceDisabled = false;
@@ -381,13 +381,9 @@ class JobsPageState extends State<JobsPage> {
   void _updateSectionsIfNeeded() {
     for (Job job in widget.enterprise.jobs) {
       _cardKey.putIfAbsent(job.id, () => UniqueKey());
-      _expandedSections.putIfAbsent(
-        job.id,
-        () => [false, false, false, false, false],
-      );
       _prerequisitesFormKeys.putIfAbsent(
         job.id,
-        () => GlobalKey<PrerequisitesBodyState>(),
+        () => GlobalKey<PrerequisitesExpansionPanelState>(),
       );
       _isEditingPrerequisites.putIfAbsent(job.id, () => false);
     }
@@ -402,9 +398,7 @@ class JobsPageState extends State<JobsPage> {
     // If we have to validate something before switching
     final enterprises = EnterprisesProvider.of(context, listen: false);
     if (_isEditingPrerequisites[job.id]!) {
-      final formKey =
-          _prerequisitesFormKeys[job.id]!.currentState!.formKey.currentState!;
-      if (!formKey.validate()) {
+      if (!(_formKey.currentState?.validate() ?? false)) {
         setState(() {
           _forceDisabled = false;
         });
@@ -490,155 +484,139 @@ class JobsPageState extends State<JobsPage> {
                 availableJobs: availableJobs,
               );
 
-              return AnimatedExpandingCard(
-                key: _cardKey[job.id],
-                header: (ctx, isExpanded) => Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SubTitle(job.specialization.name, top: 12, bottom: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _AvailablePlace(
-                                positionsOffered: offered,
-                                positionsOccupied: occupied,
-                                status: status,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  if (widget.enterprise.status ==
-                                      EnterpriseStatus.active)
-                                    Expanded(
-                                      child: _RecrutedBy(
-                                        enterprise: widget.enterprise,
-                                      ),
-                                    ),
-                                  if (status ==
-                                          AvailabilityStatus.isAvailable ||
-                                      status == AvailabilityStatus.isFull)
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 8.0,
-                                        top: 4.0,
-                                        bottom: 4.0,
-                                      ),
-                                      child: TextButton(
-                                        onPressed: status ==
-                                                AvailabilityStatus.isAvailable
-                                            ? () =>
-                                                widget.onAddInternshipRequest(
-                                                  widget.enterprise,
-                                                  job.specialization,
-                                                )
-                                            : null,
-                                        style: Theme.of(
-                                          context,
-                                        ).textButtonTheme.style!.copyWith(
-                                              backgroundColor:
-                                                  WidgetStateProperty
-                                                      .resolveWith<Color>(
-                                                (states) => states.contains(
-                                                  WidgetState.disabled,
-                                                )
-                                                    ? Theme.of(
-                                                        context,
-                                                      ).disabledColor
-                                                    : Theme.of(
-                                                        context,
-                                                      ).primaryColor,
-                                              ),
-                                            ),
-                                        child: const Text(
-                                          'Inscrire un\nstagiaire',
-                                          textAlign: TextAlign.center,
+              return Form(
+                key: _formKey,
+                child: AnimatedExpandingCard(
+                  key: _cardKey[job.id],
+                  header: (ctx, isExpanded) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SubTitle(job.specialization.name, top: 12, bottom: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _AvailablePlace(
+                                  positionsOffered: offered,
+                                  positionsOccupied: occupied,
+                                  status: status,
+                                ),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    if (widget.enterprise.status ==
+                                        EnterpriseStatus.active)
+                                      Expanded(
+                                        child: _RecrutedBy(
+                                          enterprise: widget.enterprise,
                                         ),
                                       ),
-                                    )
-                                  else
-                                    (SizedBox(height: 100)),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                initialExpandedState: jobs.length == 1,
-                child: ExpansionPanelList(
-                  expansionCallback: (panelIndex, isExpanded) async {
-                    if (isEditing) {
-                      if (!await ConfirmExitDialog.show(
-                        context,
-                        content: Text.rich(
-                          TextSpan(
-                            children: [
-                              const TextSpan(
-                                text: '** Vous quittez la page sans avoir '
-                                    'cliqué sur Enregistrer ',
-                              ),
-                              WidgetSpan(
-                                child: SizedBox(
-                                  height: 22,
-                                  width: 22,
-                                  child: Icon(
-                                    Icons.save,
-                                    color: Theme.of(context).primaryColor,
-                                  ),
+                                    if (status ==
+                                            AvailabilityStatus.isAvailable ||
+                                        status == AvailabilityStatus.isFull)
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 8.0,
+                                          top: 4.0,
+                                          bottom: 4.0,
+                                        ),
+                                        child: TextButton(
+                                          onPressed: status ==
+                                                  AvailabilityStatus.isAvailable
+                                              ? () =>
+                                                  widget.onAddInternshipRequest(
+                                                    widget.enterprise,
+                                                    job.specialization,
+                                                  )
+                                              : null,
+                                          style: Theme.of(
+                                            context,
+                                          ).textButtonTheme.style!.copyWith(
+                                                backgroundColor:
+                                                    WidgetStateProperty
+                                                        .resolveWith<Color>(
+                                                  (states) => states.contains(
+                                                    WidgetState.disabled,
+                                                  )
+                                                      ? Theme.of(
+                                                          context,
+                                                        ).disabledColor
+                                                      : Theme.of(
+                                                          context,
+                                                        ).primaryColor,
+                                                ),
+                                              ),
+                                          child: const Text(
+                                            'Inscrire un\nstagiaire',
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      )
+                                    else
+                                      (SizedBox(height: 100)),
+                                  ],
                                 ),
-                              ),
-                              const TextSpan(
-                                text:
-                                    '. **\n\nToutes vos modifications seront perdues.',
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      )) {
-                        return;
-                      }
-                      cancelEditing();
-                    }
-                    _expandedSections[job.id]![panelIndex] = isExpanded;
-                    setState(() {});
+                        ],
+                      ),
+                    ],
+                  ),
+                  initialExpandedState: jobs.length == 1,
+                  onTapHeader: (nextState) {
+                    final previousState = !nextState;
+                    if (isEditing && previousState) cancelEditing();
                   },
-                  children: [
-                    PrerequisitesExpansionPanel(
-                      key: _prerequisitesFormKeys[job.id]!,
-                      isExpanded: _expandedSections[job.id]![0],
-                      isEditing: _isEditingPrerequisites[job.id]!,
-                      enterprise: widget.enterprise,
-                      job: job,
-                      onClickEdit: () => _onClickPrerequisiteEdit(job),
+                  tappingPermitted: (isExpanded) => tappingIsPermitted(context,
+                      isExpanded: isExpanded, isEditing: isEditing),
+                  child: Column(children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4.0),
+                      child: PrerequisitesExpansionPanel(
+                        key: _prerequisitesFormKeys[job.id]!,
+                        isEditing: _isEditingPrerequisites[job.id]!,
+                        enterprise: widget.enterprise,
+                        job: job,
+                        onClickSave: () => _onClickPrerequisiteEdit(job),
+                        onClickCancel: cancelEditing,
+                      ),
                     ),
-                    IncidentsExpansionPanel(
-                      isExpanded: _expandedSections[job.id]![1],
-                      enterprise: widget.enterprise,
-                      job: job,
-                      addSstEvent: _addSstEvent,
+                    Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4.0),
+                      child: IncidentsExpansionPanel(
+                        enterprise: widget.enterprise,
+                        job: job,
+                        addSstEvent: _addSstEvent,
+                      ),
                     ),
-                    SupervisionExpansionPanel(
-                      isExpanded: _expandedSections[job.id]![2],
-                      job: job,
+                    Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4.0),
+                      child: SupervisionExpansionPanel(job: job),
                     ),
-                    PhotoExpansionPanel(
-                      isExpanded: _expandedSections[job.id]![3],
-                      job: job,
-                      addImage: _addImage,
-                      removeImage: _removeImage,
+                    Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4.0),
+                      child: PhotoExpansionPanel(
+                        job: job,
+                        addImage: _addImage,
+                        removeImage: _removeImage,
+                      ),
                     ),
-                    CommentsExpansionPanel(
-                      isExpanded: _expandedSections[job.id]![4],
-                      job: job,
-                      addComment: _addComment,
+                    Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 4.0),
+                      child: CommentsExpansionPanel(
+                        job: job,
+                        addComment: _addComment,
+                      ),
                     ),
-                  ],
+                  ]),
                 ),
               );
             },
@@ -766,4 +744,36 @@ class _RecrutedBy extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<bool> tappingIsPermitted(BuildContext context,
+    {required bool isExpanded, required bool isEditing}) async {
+  if (!isEditing) return true;
+
+  return await ConfirmExitDialog.show(
+    context,
+    content: Text.rich(
+      TextSpan(
+        children: [
+          const TextSpan(
+            text: '** Vous quittez la page sans avoir '
+                'cliqué sur Enregistrer ',
+          ),
+          WidgetSpan(
+            child: SizedBox(
+              height: 22,
+              width: 22,
+              child: Icon(
+                Icons.save,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          ),
+          const TextSpan(
+            text: '. **\n\nToutes vos modifications seront perdues.',
+          ),
+        ],
+      ),
+    ),
+  );
 }

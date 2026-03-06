@@ -10,86 +10,22 @@ import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('SupervisionExpansionPanel');
 
-double _meanOf(
-    List list, double Function(PostInternshipEnterpriseEvaluation) value) {
-  var runningSum = 0.0;
-  var nElements = 0;
-  for (final e in list) {
-    final valueTp = value(e);
-    if (valueTp < 0) continue;
-    runningSum += valueTp;
-    nElements++;
-  }
-  return nElements == 0 ? -1 : runningSum / nElements;
-}
-
-class SupervisionExpansionPanel extends ExpansionPanel {
-  SupervisionExpansionPanel({
-    required super.isExpanded,
-    required Job job,
-  }) : super(
-          canTapOnHeader: true,
-          body: _SupervisionBody(job: job),
-          headerBuilder: (context, isExpanded) => ListTile(
-            title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const Text('Encadrement des stagiaires'),
-                  if (isExpanded) _buildInfoButton(context),
-                ]),
-          ),
-        );
-
-  static Widget _buildInfoButton(BuildContext context) {
-    return Align(
-      alignment: Alignment.topRight,
-      child: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(25)),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(25),
-          onTap: () => showSnackBar(context,
-              message: 'Les résultats sont le cumul des '
-                  'évaluations des personnes ayant '
-                  'supervisé des stagiaires dans cette entreprise. '
-                  '\nIls sont différenciés entre stages '
-                  'FMS et FPT.'),
-          child: Icon(
-            Icons.info,
-            color: Theme.of(context).primaryColor,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-Widget _printCountedList<T>(Iterable<T> iterable, String Function(T) toString) {
-  var out = iterable.map<String>((e) => toString(e)).toList();
-
-  out = out
-      .toSet()
-      .map((e) =>
-          '$e (${out.fold<int>(0, (prev, e2) => prev + (e == e2 ? 1 : 0))})')
-      .toList();
-  return ItemizedText(out);
-}
-
-class _SupervisionBody extends StatefulWidget {
-  const _SupervisionBody({required this.job});
+class SupervisionExpansionPanel extends StatefulWidget {
+  const SupervisionExpansionPanel({super.key, required this.job});
 
   final Job job;
 
   @override
-  State<_SupervisionBody> createState() => _SupervisionBodyState();
+  State<SupervisionExpansionPanel> createState() =>
+      _SupervisionExpansionPanelState();
 }
 
-class _SupervisionBodyState extends State<_SupervisionBody> {
+class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
   var _currentProgramToShow = Program.fms;
 
   List<PostInternshipEnterpriseEvaluation> _getFilteredEvaluations() {
@@ -115,52 +51,65 @@ class _SupervisionBodyState extends State<_SupervisionBody> {
 
     final evaluations = _getFilteredEvaluations();
 
-    return Column(
-      children: [
-        _buildStudentSelector(),
-        Padding(
-          padding: const EdgeInsets.only(left: 24.0, right: 24, top: 8),
-          child: evaluations.isEmpty
-              ? Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(bottom: 12.0),
-                    child: Text(
-                        'L\'entreprise n\'a pas encore été évaluée pour des '
-                        'élèves de $_currentProgramToShow.'),
-                  ),
-                )
-              : Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildTaskVariety(evaluations),
-                    const SizedBox(height: 12),
-                    _buildTrainingPlanRespect(evaluations),
-                    const SizedBox(height: 12),
-                    _buildSkillsRequired(evaluations),
-                    const SizedBox(height: 12),
-                    _buildAutonomy(evaluations),
-                    const SizedBox(height: 12),
-                    _buildEfficiency(evaluations),
-                    // TODO update with new info
-                    const SizedBox(height: 12),
-                    _buildSupervisionStyle(evaluations),
-                    const SizedBox(height: 12),
-                    _buildEaseOfCommunication(evaluations),
-                    const SizedBox(height: 12),
-                    _buildAbsenceAcceptance(evaluations),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Évaluation de l\'accueil de stagiaires avec',
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleSmall!
-                          .copyWith(fontWeight: FontWeight.bold),
+    return AnimatedExpandingCard(
+      elevation: 0.0,
+      header: (context, isExpanded) => ListTile(
+        title:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          const Text('Encadrement des stagiaires'),
+          _buildInfoButton(context, isExpanded: isExpanded),
+        ]),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 24.0, right: 24.0),
+        child: Column(
+          children: [
+            _buildStudentSelector(),
+            Padding(
+              padding: const EdgeInsets.only(left: 24.0, right: 24, top: 8),
+              child: evaluations.isEmpty
+                  ? Center(
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 12.0),
+                        child: Text(
+                            'L\'entreprise n\'a pas encore été évaluée pour des '
+                            'élèves de $_currentProgramToShow.'),
+                      ),
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildTaskVariety(evaluations),
+                        const SizedBox(height: 12),
+                        _buildTrainingPlanRespect(evaluations),
+                        const SizedBox(height: 12),
+                        _buildSkillsRequired(evaluations),
+                        const SizedBox(height: 12),
+                        _buildAutonomy(evaluations),
+                        const SizedBox(height: 12),
+                        _buildEfficiency(evaluations),
+                        // TODO update with new info
+                        const SizedBox(height: 12),
+                        _buildSupervisionStyle(evaluations),
+                        const SizedBox(height: 12),
+                        _buildEaseOfCommunication(evaluations),
+                        const SizedBox(height: 12),
+                        _buildAbsenceAcceptance(evaluations),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Évaluation de l\'accueil de stagiaires avec',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall!
+                              .copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
                     ),
-                    const SizedBox(height: 12),
-                  ],
-                ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
@@ -348,4 +297,56 @@ class _FilterTile extends StatelessWidget {
       ),
     );
   }
+}
+
+Widget _buildInfoButton(BuildContext context, {required bool isExpanded}) {
+  return Visibility(
+    visible: isExpanded,
+    maintainSize: true,
+    maintainAnimation: true,
+    maintainState: true,
+    child: Align(
+      alignment: Alignment.topRight,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(25),
+        onTap: () => showSnackBar(context,
+            message: 'Les résultats sont le cumul des '
+                'évaluations des personnes ayant '
+                'supervisé des stagiaires dans cette entreprise. '
+                '\nIls sont différenciés entre stages '
+                'FMS et FPT.'),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Icon(
+            Icons.info,
+            color: Theme.of(context).primaryColor,
+          ),
+        ),
+      ),
+    ),
+  );
+}
+
+double _meanOf(
+    List list, double Function(PostInternshipEnterpriseEvaluation) value) {
+  var runningSum = 0.0;
+  var nElements = 0;
+  for (final e in list) {
+    final valueTp = value(e);
+    if (valueTp < 0) continue;
+    runningSum += valueTp;
+    nElements++;
+  }
+  return nElements == 0 ? -1 : runningSum / nElements;
+}
+
+Widget _printCountedList<T>(Iterable<T> iterable, String Function(T) toString) {
+  var out = iterable.map<String>((e) => toString(e)).toList();
+
+  out = out
+      .toSet()
+      .map((e) =>
+          '$e (${out.fold<int>(0, (prev, e2) => prev + (e == e2 ? 1 : 0))})')
+      .toList();
+  return ItemizedText(out);
 }
