@@ -73,11 +73,7 @@ extension _InternshipMetaDataList on List<_InternshipMetaData> {
     return null;
   }
 
-  static List<_InternshipMetaData> _internshipsOf(
-    BuildContext context, {
-    List<VisitingPriority>? visibilityFilters,
-    String? filterText,
-  }) {
+  static List<_InternshipMetaData> _internshipsOf(BuildContext context) {
     final currentTeacher =
         TeachersProvider.of(context, listen: true).currentTeacher;
     if (currentTeacher == null) return [];
@@ -121,12 +117,6 @@ extension _InternshipMetaDataList on List<_InternshipMetaData> {
             b.student.lastName.toLowerCase(),
           ),
     );
-
-    // Apply the filters
-    out = visibilityFilters == null
-        ? out
-        : out.filterPriorities(visibilityFilters);
-    out = (filterText?.isEmpty ?? true) ? out : out.filterByText(filterText!);
 
     // Return the internships
     return out;
@@ -239,6 +229,13 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
     VisitingPriority.low: true,
   };
 
+  late final _teachersProvided = TeachersProvider.of(context, listen: false);
+  late final _internshipsProvided =
+      InternshipsProvider.of(context, listen: false);
+
+  late final _internshipsMetaData =
+      _InternshipMetaDataList._internshipsOf(context);
+
   void _navigateToStudentInfo(Student student) {
     if (_editPrioritiesMode || _editSignatoriesMode) return;
     GoRouter.of(context).goNamed(
@@ -250,10 +247,9 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
   Future<bool> _getAllInternshipLocks(
     List<_InternshipMetaData> internships,
   ) async {
-    final internshipsProvided = InternshipsProvider.of(context, listen: false);
     final hasLocks = await Future.wait([
       for (final meta in internships)
-        internshipsProvided.getLockForItem(meta.internship),
+        _internshipsProvided.getLockForItem(meta.internship),
     ]);
     final hasLock = hasLocks.every((e) => e);
     if (hasLock) return true;
@@ -266,10 +262,9 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
   Future<void> _releaseAllInternshipLocks(
     Iterable<_InternshipMetaData> internships,
   ) async {
-    final internshipsProvided = InternshipsProvider.of(context, listen: false);
     await Future.wait([
       for (final meta in internships)
-        internshipsProvided.releaseLockForItem(meta.internship),
+        _internshipsProvided.releaseLockForItem(meta.internship),
     ]);
   }
 
@@ -278,8 +273,7 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
     required List<_InternshipMetaData> internships,
   }) async {
     if (_forcePrioritiesDisabled) return;
-    final teachersProvided = TeachersProvider.of(context, listen: false);
-    final currentTeacher = teachersProvided.currentTeacher;
+    final currentTeacher = _teachersProvided.currentTeacher;
     if (currentTeacher == null) {
       setState(() {
         _editPrioritiesMode = false;
@@ -299,23 +293,21 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
         if (meta.visitingPriority !=
             currentTeacher.visitingPriority(meta.internship.id)) {
           currentTeacher.setVisitingPriority(
-            meta.internship.id,
-            meta.visitingPriority,
-          );
+              meta.internship.id, meta.visitingPriority);
           hasChanged = true;
         }
       }
       if (hasChanged) {
-        await teachersProvided.replaceWithConfirmation(currentTeacher);
+        await _teachersProvided.replaceWithConfirmation(currentTeacher);
       }
-      await teachersProvided.releaseLockForItem(currentTeacher);
+      await _teachersProvided.releaseLockForItem(currentTeacher);
 
       if (context.mounted) {
         showSnackBar(context, message: 'Modifications enregistrées');
       }
       _editPrioritiesMode = false;
     } else {
-      final hasLock = await teachersProvided.getLockForItem(currentTeacher);
+      final hasLock = await _teachersProvided.getLockForItem(currentTeacher);
       if (!hasLock && context.mounted) {
         showSnackBar(
           context,
@@ -337,8 +329,7 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
     required List<_InternshipMetaData> internships,
   }) async {
     if (_forceSignatoriesDisabled) return;
-    final teacherId =
-        TeachersProvider.of(context, listen: false).currentTeacher?.id;
+    final teacherId = _teachersProvided.currentTeacher?.id;
     if (teacherId == null) {
       setState(() {
         _editSignatoriesMode = false;
@@ -350,14 +341,14 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
     setState(() {
       _forceSignatoriesDisabled = true;
     });
-    final internshipsProvided = InternshipsProvider.of(context, listen: false);
 
     if (_editSignatoriesMode) {
       _logger.info('Saving changes in edit are signatories mode');
 
       final toWait = <Future>[];
       for (final meta in internships) {
-        final internship = internshipsProvided.fromIdOrNull(meta.internship.id);
+        final internship =
+            _internshipsProvided.fromIdOrNull(meta.internship.id);
         if (internship == null) continue;
 
         final newInternship = meta.isSupervised
@@ -366,7 +357,7 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
         if (internship.getDifference(newInternship).isNotEmpty) {
           // Update the internship with the new values
           toWait.add(
-            internshipsProvided.replaceWithConfirmation(newInternship),
+            _internshipsProvided.replaceWithConfirmation(newInternship),
           );
         }
       }
@@ -396,18 +387,43 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    _searchTextController.dispose();
+    _unlockAll();
+
+    super.dispose();
+  }
+
+  void _unlockAll() async {
+    final currentTeacher = _teachersProvided.currentTeacher;
+    if (_editPrioritiesMode) {
+      if (currentTeacher != null) {
+        await _teachersProvided.releaseLockForItem(currentTeacher);
+      }
+    }
+
+    if (_editSignatoriesMode) {
+      await _releaseAllInternshipLocks(_internshipsMetaData);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     _logger.finer(
       'Building SupervisionChart with tab index: ${_tabController.index}',
     );
 
-    final internships = _InternshipMetaDataList._internshipsOf(
-      context,
-      visibilityFilters: _visibilityFilters.keys
-          .where((priority) => _visibilityFilters[priority] ?? false)
-          .toList(),
-      filterText: _searchTextController.text.toLowerCase(),
-    );
+    // Apply the filters
+    var filteredInternshipsMetaData = [..._internshipsMetaData];
+    final visibilityFilters = _visibilityFilters.keys
+        .where((priority) => _visibilityFilters[priority] ?? false)
+        .toList();
+    final textFilter = _searchTextController.text.toLowerCase();
+    filteredInternshipsMetaData =
+        filteredInternshipsMetaData.filterPriorities(visibilityFilters);
+    filteredInternshipsMetaData =
+        filteredInternshipsMetaData.filterByText(textFilter);
 
     return ResponsiveService.scaffoldOf(
       context,
@@ -419,26 +435,11 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
         actions: [
           if (_tabController.index == 0)
             IconButton(
-              onPressed: _forcePrioritiesDisabled || _editSignatoriesMode
-                  ? null
-                  : () => _toggleEditPrioritiesMode(
-                        context,
-                        internships: internships,
-                      ),
-              icon: Icon(
-                _editPrioritiesMode ? Icons.save : Icons.flag,
-                color: _forcePrioritiesDisabled || _editSignatoriesMode
-                    ? Colors.grey
-                    : Colors.white,
-              ),
-            ),
-          if (_tabController.index == 0)
-            IconButton(
               onPressed: _forceSignatoriesDisabled || _editPrioritiesMode
                   ? null
                   : () => _toggleEditSignatoriesMode(
                         context,
-                        internships: internships,
+                        internships: _internshipsMetaData,
                       ),
               icon: Icon(
                 _editSignatoriesMode ? Icons.save : Icons.edit_document,
@@ -457,7 +458,15 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
                 Column(
                   children: [
                     _buildFilters(context),
-                    if (internships.isEmpty)
+                    if (_editSignatoriesMode)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(
+                          'Sélectionner les élèves à superviser',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
+                    if (filteredInternshipsMetaData.isEmpty)
                       Center(
                         child: Padding(
                           padding: const EdgeInsets.only(
@@ -471,18 +480,18 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
                             style: Theme.of(context).textTheme.titleMedium,
                           ),
                         ),
-                      ),
-                    if (internships.isNotEmpty)
+                      )
+                    else
                       Expanded(
                         child: ListView.builder(
                           shrinkWrap: true,
                           itemCount: _editSignatoriesMode
-                              ? internships.length
-                              : internships.supervizedCount,
+                              ? filteredInternshipsMetaData.length
+                              : filteredInternshipsMetaData.supervizedCount,
                           itemBuilder: ((ctx, i) {
                             final meta = _editSignatoriesMode
-                                ? internships[i]
-                                : internships.getSupervized(i);
+                                ? filteredInternshipsMetaData[i]
+                                : filteredInternshipsMetaData.getSupervized(i);
                             if (meta == null) return Container();
 
                             return _StudentTile(
@@ -564,29 +573,50 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: _visibilityFilters.keys.map<Widget>((priority) {
-            return InkWell(
-              onTap: () => setState(
-                () => _visibilityFilters[priority] =
-                    !_visibilityFilters[priority]!,
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Checkbox(
-                    value: _visibilityFilters[priority],
-                    onChanged: (value) => setState(
-                      () => _visibilityFilters[priority] = value!,
+          children: [
+            ..._visibilityFilters.keys.map<Widget>((priority) {
+              return InkWell(
+                onTap: () => setState(
+                  () => _visibilityFilters[priority] =
+                      !_visibilityFilters[priority]!,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Checkbox(
+                      value: _visibilityFilters[priority],
+                      onChanged: (value) => setState(
+                        () => _visibilityFilters[priority] = value!,
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(right: 15),
-                    child: Icon(priority.icon, color: priority.color),
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.only(right: 15),
+                      child: Icon(priority.icon, color: priority.color),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            InkWell(
+              borderRadius: BorderRadius.circular(25),
+              onTap: _forcePrioritiesDisabled || _editSignatoriesMode
+                  ? null
+                  : () => _toggleEditPrioritiesMode(context,
+                      internships: _internshipsMetaData),
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25),
+                    border: Border.all(color: Theme.of(context).primaryColor)),
+                child: Icon(
+                  _editPrioritiesMode ? Icons.save : Icons.edit,
+                  color: _forcePrioritiesDisabled || _editSignatoriesMode
+                      ? Colors.grey
+                      : Theme.of(context).primaryColor,
+                ),
               ),
-            );
-          }).toList(),
+            ),
+          ],
         ),
       ],
     );
@@ -723,46 +753,8 @@ class _StudentTileState extends State<_StudentTile> {
             ),
           ],
         ),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Ink(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                boxShadow: [
-                  if (widget.editPrioritiesMode)
-                    BoxShadow(
-                      color: Colors.grey,
-                      blurRadius: 5.0,
-                      spreadRadius: 0.0,
-                      offset: Offset(2.0, 2.0),
-                    ),
-                ],
-                border: Border.all(
-                  color: Theme.of(context).primaryColor.withAlpha(100),
-                  width: widget.editPrioritiesMode ? 2.5 : 1,
-                ),
-                shape: BoxShape.circle,
-              ),
-              child: Tooltip(
-                message: 'Niveau de priorité pour les visites de supervision',
-                child: InkWell(
-                  onTap: widget.editPrioritiesMode ? _cyclePriority : null,
-                  borderRadius: BorderRadius.circular(25),
-                  child: SizedBox(
-                    width: 45,
-                    height: 45,
-                    child: Icon(
-                      widget.meta.visitingPriority.icon,
-                      color: widget.meta.visitingPriority.color,
-                      size: 30,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            if (widget.editSignatoriesMode)
-              Checkbox(
+        trailing: widget.editSignatoriesMode
+            ? Checkbox(
                 value: widget.meta.isTeacherSignatory
                     ? true
                     : widget.meta.isSupervised,
@@ -772,9 +764,42 @@ class _StudentTileState extends State<_StudentTile> {
                           () => widget.meta.isSupervised = value ?? false,
                         )
                     : null,
+              )
+            : Ink(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    if (widget.editPrioritiesMode)
+                      BoxShadow(
+                        color: Colors.grey,
+                        blurRadius: 5.0,
+                        spreadRadius: 0.0,
+                        offset: Offset(2.0, 2.0),
+                      ),
+                  ],
+                  border: Border.all(
+                    color: Theme.of(context).primaryColor.withAlpha(100),
+                    width: widget.editPrioritiesMode ? 2.5 : 1,
+                  ),
+                  shape: BoxShape.circle,
+                ),
+                child: Tooltip(
+                  message: 'Niveau de priorité pour les visites de supervision',
+                  child: InkWell(
+                    onTap: widget.editPrioritiesMode ? _cyclePriority : null,
+                    borderRadius: BorderRadius.circular(25),
+                    child: SizedBox(
+                      width: 45,
+                      height: 45,
+                      child: Icon(
+                        widget.meta.visitingPriority.icon,
+                        color: widget.meta.visitingPriority.color,
+                        size: 30,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-          ],
-        ),
       ),
     );
   }
