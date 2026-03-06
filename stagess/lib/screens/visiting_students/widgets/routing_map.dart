@@ -264,7 +264,7 @@ class _RoutingMapState extends State<RoutingMap> {
       Polyline(
         points: route.polyline!.map((e) => LatLng(e.lat, e.lng)).toList(),
         strokeWidth: 4,
-        color: Theme.of(context).primaryColor,
+        color: Colors.blue,
       ),
     ];
   }

@@ -10,7 +10,9 @@ class CachedFlutterMap extends StatelessWidget {
   const CachedFlutterMap({
     super.key,
     this.options = const fm.MapOptions(
-        initialCenter: LatLng(45.508888, -73.561668), initialZoom: 12),
+      initialCenter: LatLng(45.508888, -73.561668),
+      initialZoom: 12,
+    ),
     this.routeOverlayBuilder,
     this.markersOverlayBuilder,
   });
