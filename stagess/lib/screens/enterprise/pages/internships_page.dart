@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/extensions/enterprise_extension.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
@@ -9,6 +10,7 @@ import 'package:stagess/router.dart';
 import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/enterprise_evaluation_form_dialog.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
@@ -153,40 +155,6 @@ class _InternshipListState extends State<_InternshipList> {
     }
   }
 
-  Widget _dateBuild(Internship internship) {
-    final dates =
-        internship.hasContract ? internship.currentContract?.dates : null;
-    if (dates == null) return Container();
-
-    final endDate = internship.isActive ? dates.end : internship.endDate;
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Column(
-          children: [
-            const Text('Début\u00a0:'),
-            Text(
-              '${dates.start.year.toString().padLeft(4, '0')}-'
-              '${dates.start.month.toString().padLeft(2, '0')}-'
-              '${dates.start.day.toString().padLeft(2, '0')}',
-            ),
-          ],
-        ),
-        Column(
-          children: [
-            Text('${internship.isActive ? 'Fin prévue' : 'Fin'}\u00a0:'),
-            Text(
-              '${endDate.year.toString().padLeft(4, '0')}-'
-              '${endDate.month.toString().padLeft(2, '0')}-'
-              '${endDate.day.toString().padLeft(2, '0')}',
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
   void _sendEmail(Teacher teacher) {
     final Uri emailLaunchUri = Uri(scheme: 'mailto', path: teacher.email!);
     launchUrl(emailLaunchUri);
@@ -239,35 +207,33 @@ class _InternshipListState extends State<_InternshipList> {
 
               if (student == null) return Container();
 
+              var internshipDays = <Day>{};
+              for (final weeklySchedule in contract.weeklySchedules) {
+                internshipDays.addAll(weeklySchedule.schedule.keys);
+              }
+              internshipDays = internshipDays
+                  .sorted((e, f) => e.index.compareTo(f.index))
+                  .toSet();
+
               return AnimatedExpandingCard(
                 initialExpandedState: _expanded[internship.id] ?? false,
                 onTapHeader: (newState) =>
                     setState(() => _expanded[internship.id] = newState),
                 header: (ctx, isExpanded) => Padding(
-                  padding: const EdgeInsets.only(left: 12.0),
+                  padding: const EdgeInsets.only(
+                      left: 18.0, top: 12.0, bottom: 12.0),
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Row(
-                          children: [
-                            SizedBox(
-                              width: 120,
-                              child: Text(
-                                '${contract.dates.start.year.toString()}'
-                                '${contract.dates.end.year == contract.dates.start.year ? '' : ' \u2014 ${contract.dates.end.year.toString()}'}',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                            ),
-                            Text(
-                              student.fullName,
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                          ],
-                        ),
+                      Text(
+                        student.fullName,
+                        style: Theme.of(context).textTheme.titleMedium,
                       ),
+                      Text(
+                          '${DateFormat.yMMMd('fr_CA').format(contract.dates.start)} - '
+                          '${DateFormat.yMMMd('fr_CA').format(contract.dates.end)}',
+                          style: Theme.of(context).textTheme.titleSmall),
                       Text(
                         'Stagiaire ${student.program}',
                         style: Theme.of(context).textTheme.bodyMedium,
@@ -279,8 +245,7 @@ class _InternshipListState extends State<_InternshipList> {
                           maxLines: null,
                         ),
                       ),
-                      if (!(_expanded[internship.id] ?? false))
-                        SizedBox(height: 8.0),
+                      Flexible(child: Text(internshipDays.join(' - '))),
                     ],
                   ),
                 ),
@@ -294,22 +259,26 @@ class _InternshipListState extends State<_InternshipList> {
                         child: Row(
                           children: [
                             const Text(
-                              'Enseignant\u00b7e\u00b7s superviseur\u00b7e\u00b7s de stage\u00a0: ',
+                              'Enseignant\u00b7e superviseur\u00b7e de stage\u00a0: ',
                             ),
-                            GestureDetector(
-                              onTap: signatoryTeacher.email == null
-                                  ? null
-                                  : () => _sendEmail(signatoryTeacher),
-                              child: Text(
-                                signatoryTeacher.fullName,
-                                style: signatoryTeacher.email == null
+                            MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: GestureDetector(
+                                onTap: signatoryTeacher.email == null
                                     ? null
-                                    : Theme.of(
-                                        context,
-                                      ).textTheme.titleSmall!.copyWith(
-                                          decoration: TextDecoration.underline,
-                                          color: Colors.blue,
-                                        ),
+                                    : () => _sendEmail(signatoryTeacher),
+                                child: Text(
+                                  signatoryTeacher.fullName,
+                                  style: signatoryTeacher.email == null
+                                      ? null
+                                      : Theme.of(
+                                          context,
+                                        ).textTheme.titleSmall!.copyWith(
+                                            decoration:
+                                                TextDecoration.underline,
+                                            color: Colors.blue,
+                                          ),
+                                ),
                               ),
                             ),
                           ],
@@ -320,10 +289,6 @@ class _InternshipListState extends State<_InternshipList> {
                         child: Text(
                           'Responsable en milieu de stage\u00a0: ${contract.supervisor.fullName}',
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 10.0, bottom: 15),
-                        child: _dateBuild(internship),
                       ),
                       if (canSeeDetails)
                         Align(

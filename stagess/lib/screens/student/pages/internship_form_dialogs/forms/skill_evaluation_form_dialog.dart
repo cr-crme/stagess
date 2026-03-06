@@ -516,19 +516,19 @@ class _SkillEvaluationMainScreenState
         : Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SubTitle('Options de remplissage'),
+              const SubTitle('Options d\'évaluation'),
               Padding(
                 padding: const EdgeInsets.only(left: 24.0),
                 child: Column(
                   children: [
-                    const Text('Préremplir avec les résultats de\u00a0: '),
+                    const Text('Recommencer à partir de\u00a0: '),
                     DropdownButton<String?>(
                       value: _currentEvaluationId,
                       onChanged: (value) {
                         _currentEvaluationId = evaluations
                             .firstWhereOrNull((e) => e.id == value)
                             ?.id;
-                        value == null || value == 'Vide'
+                        value == null || value == 'Nouveau formulaire vide'
                             ? _formController.clearForm(context)
                             : _formController.fillFromPreviousEvaluation(
                                 context,
@@ -541,17 +541,18 @@ class _SkillEvaluationMainScreenState
                             (evaluation) => DropdownMenuItem(
                               value: evaluation.id,
                               child: Text(
-                                DateFormat(
+                                'Évaluation du ${DateFormat(
                                   'dd MMMM yyyy',
                                   'fr_CA',
-                                ).format(evaluation.date),
+                                ).format(evaluation.date)}',
                               ),
                             ),
                           )
                           .toList()
                         ..add(
                           DropdownMenuItem(
-                              value: null, child: const Text('Vide')),
+                              value: null,
+                              child: const Text('Nouveau formulaire vide')),
                         ),
                     ),
                   ],
