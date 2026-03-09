@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:stagess/common/pdf_widgets/pdf_bullet_points.dart';
+import 'package:stagess/common/pdf_widgets/pdf_check_boxes.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/internships/internship_contract.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
@@ -212,7 +214,7 @@ pw.Widget _studentObligations({
         ])),
         pw.SizedBox(height: 16),
       ])),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -231,7 +233,7 @@ pw.Widget _studentObligations({
           ),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -254,7 +256,7 @@ pw.Widget _studentObligations({
           ),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -263,7 +265,7 @@ pw.Widget _studentObligations({
               style: _textStyle),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -273,7 +275,7 @@ pw.Widget _studentObligations({
               style: _textStyle.copyWith(color: PdfColors.red)),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -292,7 +294,7 @@ pw.Widget _studentObligations({
           ),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -302,7 +304,7 @@ pw.Widget _studentObligations({
               style: _textStyle),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -312,7 +314,7 @@ pw.Widget _studentObligations({
               style: _textStyle),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -324,7 +326,7 @@ pw.Widget _studentObligations({
               style: _textStyle),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -334,7 +336,7 @@ pw.Widget _studentObligations({
               style: _textStyle),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -345,7 +347,7 @@ pw.Widget _studentObligations({
               style: _textStyle),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -420,7 +422,7 @@ pw.Widget _contract({
       pw.RichText(
           text: pw.TextSpan(text: 'Il est entendu :', style: _textStyle)),
       pw.SizedBox(height: 16),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -431,7 +433,7 @@ pw.Widget _contract({
               style: _textStyle),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -442,7 +444,7 @@ pw.Widget _contract({
               style: _textStyle),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -459,7 +461,7 @@ pw.Widget _contract({
           ),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -469,7 +471,7 @@ pw.Widget _contract({
               style: _textStyle),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -480,7 +482,7 @@ pw.Widget _contract({
               style: _textStyle),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -500,7 +502,7 @@ pw.Widget _contract({
           ),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -510,7 +512,7 @@ pw.Widget _contract({
               style: _textStyle),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -521,7 +523,7 @@ pw.Widget _contract({
               style: _textStyle),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -552,7 +554,7 @@ pw.Widget _contract({
           ),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -571,7 +573,7 @@ pw.Widget _contract({
           ),
         ),
       ),
-      _BulletPoint(
+      PdfBulletPoint(
         child: pw.RichText(
           textAlign: pw.TextAlign.justify,
           text: pw.TextSpan(
@@ -592,27 +594,6 @@ pw.Widget _contract({
       _signature('Signature du stagiaire'),
     ],
   );
-}
-
-class _BulletPoint extends pw.StatelessWidget {
-  _BulletPoint({required this.child});
-
-  final pw.Widget child;
-
-  @override
-  pw.Widget build(pw.Context context) {
-    return pw.Container(
-      child: pw.Row(
-        crossAxisAlignment: pw.CrossAxisAlignment.start,
-        children: [
-          pw.Text('\u0097', style: _textStyle),
-          pw.SizedBox(width: 6.0),
-          pw.Expanded(child: child),
-        ],
-      ),
-      padding: const pw.EdgeInsets.only(bottom: 12.0),
-    );
-  }
 }
 
 pw.Widget _signature(String person) {
@@ -690,11 +671,11 @@ pw.Widget _studentInformations({
       ),
       _checkBoxCell(
         title: 'Transport',
-        content: Transportation.values.asMap().map((key, value) {
+        options: Transportation.values.asMap().map((key, value) {
           final name = value.toString();
           return MapEntry(name, contract.transportations.contains(name));
         }),
-        includeOther: true,
+        includeOthers: true,
         otherValue: contract.transportations
             .map((e) =>
                 Transportation.values.map((e) => e.toString()).contains(e)
@@ -749,15 +730,12 @@ pw.Widget _textCell({String? title, String? content, bool sameLine = true}) {
       ));
 }
 
-pw.Widget _checkBoxCell(
-    {String? title,
-    required Map<String, bool> content,
-    bool includeOther = false,
-    String otherValue = ''}) {
-  if (includeOther) {
-    content['__OTHER__'] = otherValue.isNotEmpty;
-  }
-
+pw.Widget _checkBoxCell({
+  String? title,
+  required Map<String, bool> options,
+  bool includeOthers = false,
+  String otherValue = '',
+}) {
   return pw.Container(
     width: double.infinity,
     padding: const pw.EdgeInsets.symmetric(horizontal: 4.0, vertical: 6.0),
@@ -766,49 +744,14 @@ pw.Widget _checkBoxCell(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         pw.Text('$title : ', style: _textStyleBold.copyWith(fontSize: 14)),
-        ...content.entries.map(
-          (entry) {
-            return pw.Row(
-              mainAxisSize: pw.MainAxisSize.min,
-              children: [
-                pw.Container(
-                    decoration: pw.BoxDecoration(
-                        border: pw.Border.all(color: PdfColors.black)),
-                    child: pw.Checkbox(
-                      value: true,
-                      name: entry.key,
-                      checkColor: entry.value
-                          ? PdfColors.black
-                          : PdfColorsExtension.transparent,
-                      activeColor: PdfColors.white,
-                    )),
-                pw.SizedBox(width: 6.0),
-                pw.Text(entry.key == '__OTHER__' ? 'Autre : ' : entry.key,
-                    style: _textStyle.copyWith(fontSize: 14)),
-                pw.Padding(
-                  padding: const pw.EdgeInsets.only(left: 12.0),
-                  child: pw.Container(
-                    width: 200,
-                    padding: const pw.EdgeInsets.only(
-                        left: 4.0, bottom: 4.0, top: 4.0),
-                    decoration: pw.BoxDecoration(
-                        border: pw.Border.all(
-                            color: includeOther && entry.key == '__OTHER__'
-                                ? PdfColors.black
-                                : PdfColorsExtension.transparent)),
-                    child: pw.Text(
-                      'Précisez: $otherValue',
-                      style: _textStyle.copyWith(
-                          fontSize: 14,
-                          color: includeOther && entry.key == '__OTHER__'
-                              ? null
-                              : PdfColorsExtension.transparent),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
+        pw.Padding(
+          padding: const pw.EdgeInsets.only(left: 12.0),
+          child: PdfCheckBoxes(
+            options: options,
+            includeOthers: includeOthers,
+            otherValue: otherValue,
+            textStyle: _textStyle.copyWith(fontSize: 14),
+          ),
         ),
       ],
     ),
@@ -894,8 +837,4 @@ pw.Widget _schedulesCell(
           ),
         ],
       ));
-}
-
-extension PdfColorsExtension on PdfColor {
-  static PdfColor transparent = PdfColor(1.0, 1.0, 1.0, 1.0);
 }

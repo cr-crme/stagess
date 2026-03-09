@@ -5,9 +5,14 @@ import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:stagess/common/pdf_widgets/pdf_bullet_points.dart';
+import 'package:stagess/common/pdf_widgets/pdf_text_box.dart';
+import 'package:stagess/common/pdf_widgets/pdf_were_present.dart';
 import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/skill_evaluation_form_dialog.dart';
 import 'package:stagess_common/models/internships/task_appreciation.dart';
+import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
+import 'package:stagess_common_flutter/providers/students_provider.dart';
 
 final _logger = Logger('GenerateSkillEvaluationPdf');
 
@@ -26,6 +31,9 @@ Future<Uint8List> generateSkillEvaluationPdf(
     evaluationId: evaluationId,
     canModify: false,
   );
+  final internship = controller.internship(context, listen: false);
+  final student =
+      StudentsProvider.of(context, listen: false).fromId(internship.studentId);
 
   final document = pw.Document(pageMode: PdfPageMode.outlines);
 
@@ -40,7 +48,7 @@ Future<Uint8List> generateSkillEvaluationPdf(
     pw.MultiPage(
       build: (pw.Context context) => [
         pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-          _buildPersonsPresent(controller: controller),
+          _buildPersonsPresent(controller: controller, student: student),
           ...controller.skillResults().map((e) => pw.Padding(
               padding: pw.EdgeInsets.only(top: 24),
               child: _buildSkillTile(skill: e, controller: controller))),
@@ -56,6 +64,7 @@ Future<Uint8List> generateSkillEvaluationPdf(
 
 pw.Widget _buildPersonsPresent({
   required SkillEvaluationFormController controller,
+  required Student student,
 }) {
   return pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
     pw.Text(
@@ -64,11 +73,8 @@ pw.Widget _buildPersonsPresent({
           'fr_CA',
         ).format(controller.evaluationDate)} :',
         style: _textStyleBold),
-    ...controller.wereAtMeeting.map(
-      (e) => pw.Padding(
-          padding: pw.EdgeInsets.only(top: 8),
-          child: pw.Text('- $e', style: _textStyle)),
-    ),
+    PdfWerePresentAtMeeting(
+        werePresent: controller.wereAtMeeting, studentName: student.fullName),
   ]);
 }
 
@@ -92,7 +98,10 @@ pw.Widget _buildSkillTile({
       ...(controller.taskCompleted[skill.id]?.keys.map((task) =>
               controller.taskCompleted[skill.id]?[task] ==
                       TaskAppreciationLevel.evaluated
-                  ? pw.Text('- $task', style: _textStyle)
+                  ? PdfBulletPoint(
+                      textStyle: _textStyle,
+                      child: pw.Text(task, style: _textStyle),
+                    )
                   : pw.Container()) ??
           []),
       if (controller.skillCommentsControllers[skill.id]?.text != null)
@@ -115,16 +124,9 @@ pw.Widget _buildGeneralComments(
     children: [
       pw.Text('Commentaires généraux :', style: _textStyleBold),
       pw.SizedBox(height: 8),
-      pw.Container(
-        width: double.infinity,
-        decoration: pw.BoxDecoration(
-          border: pw.Border.all(color: PdfColors.black),
-        ),
-        child: pw.Padding(
-            padding: pw.EdgeInsets.all(8),
-            child:
-                pw.Text(controller.commentsController.text, style: _textStyle)),
-      ),
+      PdfTextBox(
+          child:
+              pw.Text(controller.commentsController.text, style: _textStyle)),
     ],
   );
 }

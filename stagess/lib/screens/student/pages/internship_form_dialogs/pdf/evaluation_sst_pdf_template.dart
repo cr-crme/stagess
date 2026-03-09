@@ -5,12 +5,15 @@ import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:stagess/common/pdf_widgets/pdf_were_present.dart';
 import 'package:stagess/misc/question_file_service.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/sst_evaluation.dart';
+import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess_common_flutter/providers/students_provider.dart';
 
 final _logger = Logger('GenerateSstEvaluationPdf');
 
@@ -33,6 +36,8 @@ Future<Uint8List> generateSstEvaluationPdf(
         'No SST evaluation found for internship ${internship.id} with evaluation id $evaluationId');
     return Uint8List(0);
   }
+  final student =
+      StudentsProvider.of(context, listen: false).fromId(internship.studentId);
 
   final document = pw.Document(pageMode: PdfPageMode.outlines);
 
@@ -46,13 +51,20 @@ Future<Uint8List> generateSstEvaluationPdf(
   document.addPage(
     pw.MultiPage(
       build: (pw.Context ctx) => [
-        pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-          _buildPersonsPresent(internship: internship, evaluation: evaluation),
-          pw.Text('Questions', style: _textStyleBold),
-          _buildQuestions(context,
-              internship: internship, evaluation: evaluation),
-          pw.SizedBox(height: 24),
-        ])
+        pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            _buildPersonsPresent(
+                internship: internship,
+                evaluation: evaluation,
+                student: student),
+            pw.SizedBox(height: 24),
+            pw.Text('Questions', style: _textStyleBold),
+            _buildQuestions(context,
+                internship: internship, evaluation: evaluation),
+            pw.SizedBox(height: 24),
+          ],
+        )
       ],
     ),
   );
@@ -63,20 +75,22 @@ Future<Uint8List> generateSstEvaluationPdf(
 pw.Widget _buildPersonsPresent({
   required Internship internship,
   required SstEvaluation evaluation,
+  required Student student,
 }) {
-  return pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-    pw.Text(
-        'Personnes présentes à l\'évaluation du ${DateFormat(
-          'dd MMMM yyyy',
-          'fr_CA',
-        ).format(evaluation.date)} :',
-        style: _textStyleBold),
-    ...evaluation.presentAtEvaluation.map(
-      (e) => pw.Padding(
-          padding: pw.EdgeInsets.only(top: 8),
-          child: pw.Text('- $e', style: _textStyle)),
-    ),
-  ]);
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.start,
+    children: [
+      pw.Text(
+          'Personnes présentes à l\'évaluation du ${DateFormat(
+            'dd MMMM yyyy',
+            'fr_CA',
+          ).format(evaluation.date)} :',
+          style: _textStyleBold),
+      PdfWerePresentAtMeeting(
+          werePresent: evaluation.presentAtEvaluation,
+          studentName: student.fullName),
+    ],
+  );
 }
 
 pw.Widget _buildQuestions(BuildContext context,
@@ -90,23 +104,30 @@ pw.Widget _buildQuestions(BuildContext context,
   final questions =
       questionIds.map((e) => QuestionFileService.fromId(e)).toList();
 
-  return pw.ListView.builder(
-      itemCount: questions.length,
-      itemBuilder: (ctx, index) {
-        final question = questions[index];
+  return pw.Column(
+    crossAxisAlignment: pw.CrossAxisAlignment.start,
+    children: questions.asMap().entries.map((entry) {
+      final index = entry.key;
+      final question = entry.value;
 
-        // Fill the initial answer
-        final baseAnswer = evaluation.questions['Q${question.id}'];
-        final followUpAnswer = evaluation.questions['Q${question.id}+t'];
+      // Fill the initial answer
+      final baseAnswer = evaluation.questions['Q${question.id}'];
+      final followUpAnswer = evaluation.questions['Q${question.id}+t'];
 
-        switch (question.type) {
-          case QuestionType.radio:
-          case QuestionType.checkbox:
-          case QuestionType.text:
-            return pw.Padding(
-              padding: const pw.EdgeInsets.only(bottom: 36.0),
-              child: pw.Text('${index + 1}. ${question.question}'),
-            );
-        }
-      });
+      return pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text('${index + 1}. ${question.question}'),
+            switch (question.type) {
+              QuestionType.radio =>
+                pw.Text(baseAnswer?.join(', ') ?? 'Aucune réponse'),
+              QuestionType.checkbox =>
+                pw.Text(baseAnswer?.join(', ') ?? 'Aucune réponse'),
+              QuestionType.text =>
+                pw.Text(baseAnswer?.join(', ') ?? 'Aucune réponse'),
+            },
+            pw.SizedBox(height: 12),
+          ]);
+    }).toList(),
+  );
 }

@@ -5,8 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:stagess/common/pdf_widgets/pdf_radio_buttons.dart';
+import 'package:stagess/common/pdf_widgets/pdf_were_present.dart';
 import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/attitude_evaluation_form_dialog.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart';
+import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common_flutter/providers/students_provider.dart';
 
 final _logger = Logger('GenerateAttitudePdf');
 
@@ -21,6 +25,9 @@ Future<Uint8List> generateAttitudeEvaluationPdf(
 
   final controller = AttitudeEvaluationFormController.fromInternshipId(context,
       internshipId: internshipId, evaluationId: evaluationId);
+  final internship = controller.internship(context, listen: false);
+  final student =
+      StudentsProvider.of(context, listen: false).fromId(internship.studentId);
 
   final workingSituations = [
     controller.ponctuality,
@@ -52,7 +59,7 @@ Future<Uint8List> generateAttitudeEvaluationPdf(
     pw.MultiPage(
       build: (pw.Context context) => [
         pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-          _buildPersonsPresent(controller: controller),
+          _buildPersonsPresent(controller: controller, student: student),
           pw.SizedBox(height: 24),
           _subTitle('Situation de travail'),
           ...workingSituations.asMap().keys.map(
@@ -68,6 +75,8 @@ Future<Uint8List> generateAttitudeEvaluationPdf(
                   ));
             },
           ),
+          pw.NewPage(),
+          // TODO Check why newpage does not work
           _subTitle('Relation avec les autres'),
           ...relationshipWithOthers.asMap().keys.map(
             (index) {
@@ -83,6 +92,7 @@ Future<Uint8List> generateAttitudeEvaluationPdf(
                   ));
             },
           ),
+          pw.NewPage(),
           _subTitle('Autonomie et adaptabilité'),
           ...autonomyAndAdaptability.asMap().keys.map(
             (index) {
@@ -109,12 +119,13 @@ Future<Uint8List> generateAttitudeEvaluationPdf(
 pw.Widget _subTitle(String text) {
   return pw.Padding(
     padding: pw.EdgeInsets.only(bottom: 8),
-    child: pw.Text(text, style: _textStyleBold.copyWith(fontSize: 14)),
+    child: pw.Text(text, style: _textStyleBold.copyWith(fontSize: 18)),
   );
 }
 
 pw.Widget _buildPersonsPresent({
   required AttitudeEvaluationFormController controller,
+  required Student student,
 }) {
   return pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
     pw.Text(
@@ -123,11 +134,10 @@ pw.Widget _buildPersonsPresent({
           'fr_CA',
         ).format(controller.evaluationDate)} :',
         style: _textStyleBold),
-    ...controller.wereAtMeeting.map(
-      (e) => pw.Padding(
-          padding: pw.EdgeInsets.only(top: 8),
-          child: pw.Text('- $e', style: _textStyle)),
-    ),
+    PdfWerePresentAtMeeting(
+        werePresent: controller.wereAtMeeting,
+        textStyle: _textStyle,
+        studentName: student.fullName),
   ]);
 }
 
@@ -141,36 +151,14 @@ pw.Widget _buildAttitudeTile({
     crossAxisAlignment: pw.CrossAxisAlignment.start,
     children: [
       pw.Text('$title :', style: _textStyleBold),
-      ...elements.map((element) => pw.Padding(
+      pw.Padding(
           padding: pw.EdgeInsets.only(top: 8),
-          child: pw.Row(
-            crossAxisAlignment: pw.CrossAxisAlignment.center,
-            mainAxisSize: pw.MainAxisSize.min,
-            children: [
-              pw.Container(
-                width: 12,
-                height: 12,
-                decoration: pw.BoxDecoration(
-                  shape: pw.BoxShape.circle,
-                  border: pw.Border.all(color: PdfColors.black),
-                ),
-                child: groupValue == element
-                    ? pw.Center(
-                        child: pw.Container(
-                          width: 6,
-                          height: 6,
-                          decoration: pw.BoxDecoration(
-                            shape: pw.BoxShape.circle,
-                            color: PdfColors.black,
-                          ),
-                        ),
-                      )
-                    : pw.Container(),
-              ),
-              pw.SizedBox(width: 4),
-              pw.Text(element.name, style: _textStyle),
-            ],
-          ))),
+          child: PdfRadioButtons(
+            options: {
+              for (var element in elements) element.name: element == groupValue,
+            },
+            textStyle: _textStyle.copyWith(fontSize: 14),
+          ))
     ],
   );
 }
