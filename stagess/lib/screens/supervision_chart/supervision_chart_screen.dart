@@ -458,6 +458,14 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
                 Column(
                   children: [
                     _buildFilters(context),
+                    if (_editPrioritiesMode)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Text(
+                          'Modifier les niveaux de priorité',
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                      ),
                     if (_editSignatoriesMode)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0),

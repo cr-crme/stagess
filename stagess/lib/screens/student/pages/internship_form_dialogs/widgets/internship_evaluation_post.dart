@@ -18,7 +18,7 @@ class EvaluationPost extends StatelessWidget {
     _logger.finer('Building EvaluationPost for job: $internshipId');
 
     return InternshipEvaluationCard(
-        title: 'Évaluation de l\'entreprise',
+        title: 'Évaluation de l\'encadrement de l\'entreprise',
         internshipId: internshipId,
         evaluateButtonText: 'Évaluer l\'entreprise',
         reevaluateButtonText: 'Évaluer de nouveau',

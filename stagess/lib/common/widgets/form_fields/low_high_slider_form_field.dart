@@ -49,7 +49,8 @@ class LowHighSliderFormField extends FormField<double> {
       width: Size.infinite.width,
       child: Row(
         children: [
-          Text(lowLabel, textAlign: TextAlign.center),
+          SizedBox(
+              width: 80, child: Text(lowLabel, textAlign: TextAlign.center)),
           Expanded(
             child: Slider(
               value: state.value! * factor,
@@ -64,7 +65,8 @@ class LowHighSliderFormField extends FormField<double> {
               label: '${factor == 1 ? state.value!.toInt() : state.value!}',
             ),
           ),
-          Text(highLabel, textAlign: TextAlign.center),
+          SizedBox(
+              width: 80, child: Text(highLabel, textAlign: TextAlign.center)),
         ],
       ),
     );

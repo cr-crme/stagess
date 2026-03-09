@@ -182,6 +182,7 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
     );
   }
 
+// TODO Update the slider when changing type
   Widget _buildAutonomy(List<PostInternshipEnterpriseEvaluation> evaluations) {
     return _TitledFixSlider(
       title: 'Niveau d\'autonomie souhaité',

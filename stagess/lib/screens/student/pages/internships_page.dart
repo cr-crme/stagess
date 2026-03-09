@@ -299,17 +299,17 @@ class _StudentInternshipListViewState
                       Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
-                        child: EvaluationSst(internshipId: internship.id),
-                      ),
-                      Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: EvaluationSkill(internshipId: internship.id),
                       ),
                       Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: EvaluationAttitude(internshipId: internship.id),
+                      ),
+                      Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                        child: EvaluationSst(internshipId: internship.id),
                       ),
                       Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
                       Padding(

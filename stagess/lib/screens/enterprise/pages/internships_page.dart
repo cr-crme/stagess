@@ -227,17 +227,16 @@ class _InternshipListState extends State<_InternshipList> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        student.fullName,
+                        '${student.fullName} (${student.program})',
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Text(
                           '${DateFormat.yMMMd('fr_CA').format(contract.dates.start)} - '
                           '${DateFormat.yMMMd('fr_CA').format(contract.dates.end)}',
                           style: Theme.of(context).textTheme.titleSmall),
-                      Text(
-                        'Stagiaire ${student.program}',
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
+                      Flexible(
+                          child: Text(
+                              '${internshipDays.join(' - ')}${contract.weeklySchedules.length > 1 ? ' (sur ${contract.weeklySchedules.length} périodes)' : ''}')),
                       Flexible(
                         child: Text(
                           specialization.idWithName,
@@ -245,7 +244,6 @@ class _InternshipListState extends State<_InternshipList> {
                           maxLines: null,
                         ),
                       ),
-                      Flexible(child: Text(internshipDays.join(' - '))),
                     ],
                   ),
                 ),
@@ -331,7 +329,9 @@ class _InternshipListState extends State<_InternshipList> {
                               ],
                             ),
                           ),
-                        ),
+                        )
+                      else
+                        SizedBox(height: 12.0),
                     ],
                   ),
                 ),
