@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation.dart';
@@ -58,7 +60,8 @@ class SstEvaluation extends InternshipEvaluation {
                 deserializer: (e) => e as String)?.toList() ??
             [],
         questions = {
-          for (final entry in (map?['questions'] as Map? ?? {}).entries)
+          for (final entry
+              in (jsonDecode(map?['questions'] ?? '{}') as Map).entries)
             entry.key: (entry.value as List?)?.map((e) => e as String).toList()
         },
         super.fromSerialized();
@@ -68,7 +71,7 @@ class SstEvaluation extends InternshipEvaluation {
         'id': id.serialize(),
         'date': date.serialize(),
         'present_at_evaluation': presentAtEvaluation.serialize(),
-        'questions': questions,
+        'questions': jsonEncode(questions),
       };
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,

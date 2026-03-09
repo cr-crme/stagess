@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/utils/database_user.dart';
@@ -529,12 +531,12 @@ class MySqlInternshipsRepository extends InternshipsRepository {
           for (final person in (evaluationSubquery['present'] as List? ?? []))
             person['person_name']
         ];
-        evaluation['questions'] = {
+        evaluation['questions'] = jsonEncode({
           for (final Map question
               in (evaluationSubquery['questions'] as List?) ?? [])
             question['question']:
                 (question['answers'] as String?)?.split('\n') ?? []
-        };
+        });
 
         sstEvaluations.add(evaluation);
       }
@@ -909,7 +911,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             data: {'evaluation_id': evaluation['id'], 'person_name': person}));
       }
 
-      final questions = evaluation['questions'] as Map?;
+      final questions = jsonDecode(evaluation['questions']) as Map?;
       for (final question in (questions?.keys.toList() ?? [])) {
         final answers = (questions![question] as List?)?.join('\n');
         if (answers == null) continue;
