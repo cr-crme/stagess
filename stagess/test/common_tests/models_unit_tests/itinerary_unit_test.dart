@@ -11,14 +11,14 @@ void main() {
 
       final itinerarySame = itinerary.copyWith();
       expect(itinerarySame.id, itinerary.id);
-      expect(itinerarySame.date.toString(), itinerary.date.toString());
+      expect(itinerarySame.name, itinerary.name);
       expect(itinerarySame.length, itinerary.length);
       expect(itinerarySame[0].id, itinerary[0].id);
       expect(itinerarySame[1].id, itinerary[1].id);
 
       final itineraryDifferent = itinerary.copyWith(
         id: 'newId',
-        date: DateTime(2020, 2, 4),
+        name: 'New Name',
         waypoints: [
           dummyWaypoint(id: 'newWaypointId'),
           dummyWaypoint(id: 'newWaypointId2'),
@@ -27,7 +27,7 @@ void main() {
       );
 
       expect(itineraryDifferent.id, 'newId');
-      expect(itineraryDifferent.date, DateTime(2020, 2, 4));
+      expect(itineraryDifferent.name, 'New Name');
       expect(itineraryDifferent.length, 3);
       expect(itineraryDifferent[0].id, 'newWaypointId');
       expect(itineraryDifferent[1].id, 'newWaypointId2');
@@ -60,7 +60,7 @@ void main() {
     });
 
     test('"deserializeItem" behaves properly', () {
-      final itinerary = Itinerary(date: DateTime(0));
+      final itinerary = Itinerary(name: 'New Name');
       final waypoint = itinerary.deserializeItem(dummyWaypoint().serialize());
 
       expect(waypoint.id, 'waypointId');
@@ -93,12 +93,12 @@ void main() {
       ];
       expect(serialized, {
         'id': 'itineraryId',
-        'date': itinerary.date.millisecondsSinceEpoch,
+        'name': 'TestItinerary',
         'waypoints': serializedWaypoints,
       });
 
       expect(deserialized.id, 'itineraryId');
-      expect(deserialized.date.toString(), itinerary.date.toString());
+      expect(deserialized.name, itinerary.name);
       expect(deserialized.length, 2);
       expect(deserialized[0].id, 'waypointId');
       expect(deserialized[1].id, 'waypointId2');
@@ -106,7 +106,7 @@ void main() {
       // Test for empty deserialize to make sure it doesn't crash
       final emptyDeserialized = Itinerary.fromSerialized({'id': 'emptyId'});
       expect(emptyDeserialized.id, 'emptyId');
-      expect(emptyDeserialized.date, DateTime(0));
+      expect(emptyDeserialized.name, 'empty');
       expect(emptyDeserialized.length, 0);
     });
   });

@@ -220,7 +220,7 @@ class MySqlTeachersRepository extends TeachersRepository {
             dataTableName: 'teacher_itineraries',
             asName: 'itineraries',
             idNameToDataTable: 'teacher_id',
-            fieldsToFetch: ['id', 'date'],
+            fieldsToFetch: ['id', 'name'],
           ),
           sqlInterface.selectSubquery(
             dataTableName: 'teachers_visiting_priorities',
@@ -511,7 +511,7 @@ Future<void> _sendItineraries(
       .performInsertQuery(tableName: 'teacher_itineraries', data: {
     'id': serialized['id'],
     'teacher_id': teacher.id,
-    'date': serialized['date'],
+    'name': serialized['name'],
   });
 
   for (int i = 0; i < serialized['waypoints'].length; i++) {

@@ -240,7 +240,7 @@ class _AttitudeEvaluationScreenState extends State<_AttitudeEvaluationScreen> {
         context: context,
         builder: (BuildContext context) => const AlertDialog(
           title: Text('Formulaire incomplet'),
-          content: Text('Répondre à toutes les questions avec un *.'),
+          content: Text('Répondre à toutes les questions.'),
         ),
       );
       return;

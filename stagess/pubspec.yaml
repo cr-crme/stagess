@@ -32,7 +32,7 @@ dependencies:
     firebase_storage_mocks: ^0.8.0+1
     path: ^1.8.1
     nanoid: ^1.0.0
-    collection: ^1.16.0
+    collection: ^1.19.1
     mockito: ^5.3.2
     build_runner: ^2.3.0
     latlong2: ^0.9.1

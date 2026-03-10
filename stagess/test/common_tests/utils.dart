@@ -402,13 +402,13 @@ Waypoint dummyWaypoint({
 
 Itinerary dummyItinerary({
   String id = 'itineraryId',
+  String name = 'TestItinerary',
   String studentId = 'studentId',
   String teacherId = 'teacherId',
   String enterpriseId = 'enterpriseId',
   String jobId = 'jobId',
-  DateTime? date,
 }) =>
-    Itinerary(id: id, date: date ?? DateTime(2000, 1, 1))
+    Itinerary(id: id, name: name)
       ..add(dummyWaypoint())
       ..add(dummyWaypoint(id: 'waypointId2', latitude: 30.0, longitude: 30.5));
 

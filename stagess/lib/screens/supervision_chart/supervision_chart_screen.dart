@@ -230,6 +230,8 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
   };
 
   late final _teachersProvided = TeachersProvider.of(context, listen: false);
+  late final _currentTeacher = _teachersProvided.currentTeacher;
+
   late final _internshipsProvided =
       InternshipsProvider.of(context, listen: false);
 
@@ -273,8 +275,7 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
     required List<_InternshipMetaData> internships,
   }) async {
     if (_forcePrioritiesDisabled) return;
-    final currentTeacher = _teachersProvided.currentTeacher;
-    if (currentTeacher == null) {
+    if (_currentTeacher == null) {
       setState(() {
         _editPrioritiesMode = false;
         _forcePrioritiesDisabled = false;
@@ -291,23 +292,23 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
       bool hasChanged = false;
       for (final meta in internships) {
         if (meta.visitingPriority !=
-            currentTeacher.visitingPriority(meta.internship.id)) {
-          currentTeacher.setVisitingPriority(
-              meta.internship.id, meta.visitingPriority);
+            _currentTeacher!.visitingPriority(meta.internship.id)) {
+          _currentTeacher!
+              .setVisitingPriority(meta.internship.id, meta.visitingPriority);
           hasChanged = true;
         }
       }
       if (hasChanged) {
-        await _teachersProvided.replaceWithConfirmation(currentTeacher);
+        await _teachersProvided.replaceWithConfirmation(_currentTeacher!);
       }
-      await _teachersProvided.releaseLockForItem(currentTeacher);
+      await _teachersProvided.releaseLockForItem(_currentTeacher!);
 
       if (context.mounted) {
         showSnackBar(context, message: 'Modifications enregistrées');
       }
       _editPrioritiesMode = false;
     } else {
-      final hasLock = await _teachersProvided.getLockForItem(currentTeacher);
+      final hasLock = await _teachersProvided.getLockForItem(_currentTeacher!);
       if (!hasLock && context.mounted) {
         showSnackBar(
           context,
@@ -329,7 +330,7 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
     required List<_InternshipMetaData> internships,
   }) async {
     if (_forceSignatoriesDisabled) return;
-    final teacherId = _teachersProvided.currentTeacher?.id;
+    final teacherId = _currentTeacher?.id;
     if (teacherId == null) {
       setState(() {
         _editSignatoriesMode = false;
@@ -396,10 +397,9 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
   }
 
   void _unlockAll() async {
-    final currentTeacher = _teachersProvided.currentTeacher;
     if (_editPrioritiesMode) {
-      if (currentTeacher != null) {
-        await _teachersProvided.releaseLockForItem(currentTeacher);
+      if (_currentTeacher != null) {
+        await _teachersProvided.releaseLockForItem(_currentTeacher!);
       }
     }
 

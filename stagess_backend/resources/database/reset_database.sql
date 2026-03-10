@@ -203,7 +203,7 @@ CREATE TABLE teaching_groups (
 CREATE TABLE teacher_itineraries (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     teacher_id VARCHAR(36) NOT NULL,
-    date BIGINT NOT NULL,
+    name VARCHAR(50) NOT NULL,
     FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE
 );
 

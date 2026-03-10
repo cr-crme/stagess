@@ -7,6 +7,7 @@ import 'package:stagess/screens/login/login_screen.dart';
 import 'package:stagess/screens/my_account/my_account_screen.dart';
 import 'package:stagess/screens/ref_sst/home_sst/home_sst_screen.dart';
 import 'package:stagess/screens/ref_sst/incident_history/incident_history_screen.dart';
+import 'package:stagess/screens/ref_sst/risks_list/risks_info_screen.dart';
 import 'package:stagess/screens/ref_sst/risks_list/risks_list_screen.dart';
 import 'package:stagess/screens/ref_sst/specialization_list_risks_and_skills/specialization_list_screen.dart';
 import 'package:stagess/screens/student/student_screen.dart';
@@ -36,6 +37,7 @@ abstract class Screens {
 
   static const homeSst = HomeSstScreen.route;
   static const cardsSst = SstCardsScreen.route;
+  static const infoCardsSst = SstInfoCardsScreen.route;
   static const incidentHistorySst = IncidentHistoryScreen.route;
   static const jobSst = SpecializationListScreen.route;
 
@@ -150,10 +152,21 @@ final router = GoRouter(
       builder: (context, state) => const HomeSstScreen(),
       routes: [
         GoRoute(
-          path: Screens.cardsSst,
-          name: Screens.cardsSst,
-          builder: (context, state) => const SstCardsScreen(),
-        ),
+            path: Screens.cardsSst,
+            name: Screens.cardsSst,
+            builder: (context, state) => const SstCardsScreen(),
+            routes: [
+              GoRoute(
+                path: Screens.infoCardsSst,
+                name: Screens.infoCardsSst,
+                builder: (context, state) {
+                  final tabIndex = int.tryParse(
+                          state.uri.queryParameters['tabIndex'] ?? '0') ??
+                      0;
+                  return SstInfoCardsScreen(initialTabIndex: tabIndex);
+                },
+              )
+            ]),
         GoRoute(
           path: Screens.incidentHistorySst,
           name: Screens.incidentHistorySst,

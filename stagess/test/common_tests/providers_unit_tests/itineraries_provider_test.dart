@@ -18,17 +18,17 @@ void main() {
       teachers.initializeAuth(AuthProvider(mockMe: true));
       final itineraries = [...(teachers.currentTeacher?.itineraries ?? [])];
 
-      itineraries.add(dummyItinerary(date: DateTime(2021, 1, 1)));
-      itineraries.add(dummyItinerary(date: DateTime(2021, 1, 2)));
-      itineraries.add(dummyItinerary(date: DateTime(2021, 1, 3)));
+      itineraries.add(dummyItinerary(name: 'TestItinerary 1'));
+      itineraries.add(dummyItinerary(name: 'TestItinerary 2'));
+      itineraries.add(dummyItinerary(name: 'TestItinerary 3'));
 
       final teacherItineraries = teachers.currentTeacher?.itineraries ?? [];
       expect(teacherItineraries.length, 0);
 
       expect(itineraries.length, 3);
-      expect(itineraries[0].date, DateTime(2021, 1, 1));
-      expect(itineraries[1].date, DateTime(2021, 1, 2));
-      expect(itineraries[2].date, DateTime(2021, 1, 3));
+      expect(itineraries[0].name, 'TestItinerary 1');
+      expect(itineraries[1].name, 'TestItinerary 2');
+      expect(itineraries[2].name, 'TestItinerary 3');
     });
   });
 }

@@ -122,24 +122,24 @@ class RoutingController {
   bool _hasChanged = false;
   bool get hasChanged => _hasChanged;
 
-  Future<bool> saveItinerary({required TeachersProvider teachers}) async {
-    if (_hasChanged) {
+  Future<bool> saveItinerary(
+      {required TeachersProvider teachers, bool force = false}) async {
+    if (_hasChanged || force) {
       return ItinerariesHelpers.add(_itinerary, teachers: teachers);
     }
+    _hasChanged = false;
     return true;
   }
 
-  Future<bool> setItinerary(
-    Itinerary itinerary, {
-    required TeachersProvider teachers,
-  }) async {
-    final isSuccess = await saveItinerary(teachers: teachers);
+  void setItineraryName(String name) {
+    _itinerary = _itinerary.copyWith(name: name);
+    _hasChanged = true;
+  }
 
+  void setItinerary(Itinerary itinerary) async {
     _itinerary = itinerary;
     _hasChanged = false;
-    _updateInternal();
-
-    return isSuccess;
+    await _updateInternal();
   }
 
   final _routingManager = routing_client.RoutingManager();

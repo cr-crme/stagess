@@ -939,6 +939,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     await _insertJobSstEvaluation(internship, previous);
   }
 
+  // TODO FOR ALL INSERTS IN THE APP: LIMIT THE STRING TO WHAT THE DATABASE CAN TAKE TO AVOID ERRORS
   Future<void> _insertToEnterpriseEvaluation(Internship internship) async {
     final toWait = <Future>[];
     for (final evaluation in internship.enterpriseEvaluations) {

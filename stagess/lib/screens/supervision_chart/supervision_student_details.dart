@@ -399,6 +399,7 @@ class _PersonalNotesState extends State<_PersonalNotes> {
                     minLines: 4,
                     maxLines: null,
                     controller: _textController,
+                    maxLength: 2000,
                   )
                 : Text(
                     _textController.text.isEmpty

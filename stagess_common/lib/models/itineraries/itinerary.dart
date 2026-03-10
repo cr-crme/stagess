@@ -14,6 +14,7 @@ class Itinerary extends ListSerializable<Waypoint>
   final String _id;
   @override
   late final String id = _id;
+  final String name;
 
   // Iterator implementation
   int _currentIndex = 0;
@@ -21,10 +22,11 @@ class Itinerary extends ListSerializable<Waypoint>
   @override
   Waypoint get current => this[_currentIndex];
 
-  final DateTime date;
-
-  Itinerary({String? id, required this.date, List<Waypoint>? waypoints})
-      : _id = id ?? _uuid.v4() {
+  Itinerary({
+    String? id,
+    required this.name,
+    List<Waypoint>? waypoints,
+  }) : _id = id ?? _uuid.v4() {
     if (waypoints != null) {
       for (final waypoint in waypoints) {
         add(waypoint);
@@ -48,10 +50,10 @@ class Itinerary extends ListSerializable<Waypoint>
 
   Itinerary copyWith({
     String? id,
-    DateTime? date,
+    String? name,
     List<Waypoint>? waypoints,
   }) {
-    final itinerary = Itinerary(id: id ?? this.id, date: date ?? this.date);
+    final itinerary = Itinerary(id: id ?? this.id, name: name ?? this.name);
     for (final waypoint in waypoints ?? this) {
       itinerary.add(waypoint.copyWith());
     }
@@ -62,9 +64,7 @@ class Itinerary extends ListSerializable<Waypoint>
     if (data == null || data.isEmpty) return copyWith();
     return Itinerary(
       id: data['id'] ?? id,
-      date: data['date'] == null
-          ? date
-          : DateTime.fromMillisecondsSinceEpoch(data['date']),
+      name: data['name'] ?? name,
       waypoints: ListExt.from(data['waypoints'],
               deserializer: Waypoint.fromSerialized) ??
           toList(),
@@ -72,12 +72,7 @@ class Itinerary extends ListSerializable<Waypoint>
   }
 
   static Itinerary fromSerialized(dynamic map) {
-    final out = Itinerary(
-      id: map?['id'],
-      date: map?['date'] == null
-          ? DateTime(0)
-          : DateTime.fromMillisecondsSinceEpoch(map!['date']),
-    );
+    final out = Itinerary(id: map?['id'], name: map?['name'] ?? 'empty');
     for (final waypoint in map?['waypoints'] ?? []) {
       out.add(Waypoint.fromSerialized(waypoint));
     }
@@ -90,13 +85,13 @@ class Itinerary extends ListSerializable<Waypoint>
   @override
   Map<String, dynamic> serializedMap() => {
         'id': id,
-        'date': date.millisecondsSinceEpoch,
+        'name': name,
         'waypoints': super.map((e) => e.serialize()).toList()
       };
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
-        'date': FetchableFields.mandatory,
+        'name': FetchableFields.optional,
         'waypoints': Waypoint.fetchableFields,
       });
 
@@ -105,17 +100,17 @@ class Itinerary extends ListSerializable<Waypoint>
     if (identical(this, other)) return true;
     if (other is! Itinerary) return false;
     return id == other.id &&
-        date == other.date &&
+        name == other.name &&
         areListsEqual(toList(), other.toList());
   }
 
   @override
   String toString() {
-    return 'Itinerary{id: $id, date: $date, waypoints: ${[
+    return 'Itinerary{id: $id, name: $name, waypoints: ${[
       for (final e in this) e
     ]}}';
   }
 
   @override
-  int get hashCode => id.hashCode ^ date.hashCode;
+  int get hashCode => id.hashCode ^ name.hashCode ^ toList().hashCode;
 }

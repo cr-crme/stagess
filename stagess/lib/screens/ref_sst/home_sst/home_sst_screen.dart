@@ -57,7 +57,6 @@ class _HomeSstScreenState extends State<HomeSstScreen> {
       ],
     );
     // To refresh the scaffold body after the data are fetched
-    WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
     return ResponsiveService.scaffoldOf(context,
         appBar: ResponsiveService.appBarOf(
           context,

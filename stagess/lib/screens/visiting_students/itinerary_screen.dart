@@ -1,8 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
-import 'package:stagess/common/provider_helpers/itineraries_helpers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/screens/visiting_students/widgets/routing_map.dart';
 import 'package:stagess/screens/visiting_students/widgets/waypoint_card.dart';
@@ -15,10 +14,16 @@ import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
-import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('ItineraryMainScreen');
+
+TextStyle _subtitleStyleOf(BuildContext context) => TextStyle(
+      color: Theme.of(context).colorScheme.primary,
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+    );
+String _newItineraryName = 'Nouvel itinéraire';
 
 class ItineraryMainScreen extends StatefulWidget {
   const ItineraryMainScreen({super.key});
@@ -127,7 +132,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
   bool _hasLock = false;
   late final _routingController = RoutingController(
     destinations: widget.waypoints,
-    itinerary: currentItinerary,
+    itinerary: _currentItinerary,
     onItineraryChanged: _onItineraryChanged,
   );
 
@@ -150,37 +155,137 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
   // We need to access TeachersProvider when dispose is called so we save it
   // and update it each time we would have used it
   late var _teachersProvider = TeachersProvider.of(context, listen: false);
-  final _itineraries = <DateTime, Itinerary>{};
-  Future<bool> _selectItinerary(DateTime date) async {
-    _teachersProvider = TeachersProvider.of(context, listen: false);
+  late Itinerary _currentItinerary =
+      _teachersProvider.currentTeacher?.itineraries.firstOrNull ??
+          Itinerary(name: _newItineraryName);
 
-    if (_itineraries[date] == null) {
-      _itineraries[date] = ItinerariesHelpers.fromDate(
-            date,
-            teachers: _teachersProvider,
-          )?.copyWith() ??
-          Itinerary(date: date);
-    }
-    return await _routingController.setItinerary(
-      _itineraries[date]!,
-      teachers: _teachersProvider,
-    );
+  set currentItinerary(String name) {
+    _teachersProvider = TeachersProvider.of(context, listen: false);
+    if (_teachersProvider.currentTeacher?.itineraries == null) return;
+
+    _currentItinerary = _teachersProvider.currentTeacher!.itineraries
+        .firstWhere((e) => e.name == name, orElse: () => Itinerary(name: name));
   }
 
-  late DateTime _currentDate;
-  Itinerary get currentItinerary {
-    if (_itineraries[_currentDate] == null) _selectItinerary(_currentDate);
-    return _itineraries[_currentDate]!;
+  Future<void> _onSelectedItinerary(String? itineraryName) async {
+    itineraryName ??= _currentItinerary.name;
+
+    bool isNew = false;
+    if (itineraryName == _newItineraryName) {
+      final formKey = GlobalKey<FormState>();
+
+      final isSuccess = await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: const Text(
+                  'Nom de l\'itinéraire',
+                ),
+                content: Form(
+                  key: formKey,
+                  child: TextFormField(
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      labelText: 'Nom de l\'itinéraire',
+                    ),
+                    initialValue: '',
+                    onChanged: (newValue) => itineraryName = newValue,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Le nom de l\'itinéraire ne peut pas être vide.';
+                      } else if (value == _newItineraryName) {
+                        return 'Veuillez choisir un nom différent de "$_newItineraryName".';
+                      } else if (_teachersProvider.currentTeacher?.itineraries
+                              .any((itinerary) => itinerary.name == value) ==
+                          true) {
+                        return 'Vous avez déjà un itinéraire avec ce nom.';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                actions: [
+                  OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(false),
+                    child: const Text('Annuler'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      if (!(formKey.currentState?.validate() ?? false)) {
+                        return;
+                      }
+                      Navigator.of(context).pop(true);
+                    },
+                    child: const Text('Confirmer'),
+                  ),
+                ],
+              ));
+      if (isSuccess != true) return;
+
+      // If it is the very first we recorded, save on the new name
+      if (_teachersProvider.currentTeacher!.itineraries.isEmpty) {
+        _routingController.setItineraryName(itineraryName!);
+        isNew = true;
+      }
+    } else if (itineraryName == _currentItinerary.name) {
+      return;
+    }
+    await _sendItineraryToBackend(itineraryName!, isNew: isNew);
+  }
+
+  Future<void> _sendItineraryToBackend(String itineraryName,
+      {required bool isNew}) async {
+    if (itineraryName.isEmpty) {
+      showSnackBar(context,
+          message: 'Le nom de l\'itinéraire ne peut pas être vide.');
+      return;
+    }
+
+    bool isSuccess =
+        await _routingController.saveItinerary(teachers: _teachersProvider);
+    if (!isSuccess) {
+      if (!mounted) return;
+      showSnackBar(
+        context,
+        message:
+            'Une erreur est survenue lors de l\'enregistrement de l\'itinéraire.',
+      );
+    }
+
+    currentItinerary = itineraryName;
+    _routingController.setItinerary(_currentItinerary);
+    isSuccess = await _routingController.saveItinerary(
+        teachers: _teachersProvider, force: true);
+
+    if (!mounted) return;
+    showSnackBar(
+      context,
+      message: isSuccess
+          ? 'Itinéraire enregistré avec succès.'
+          : 'Une erreur est survenue lors de l\'enregistrement de l\'itinéraire.',
+    );
+
+    final preferences = await SharedPreferences.getInstance();
+    preferences.setString('last_itinerary_name', _currentItinerary.name);
+    setState(() {});
   }
 
   @override
   void initState() {
     super.initState();
 
-    final date = DateTime.now();
-    _currentDate = DateTime(date.year, date.month, date.day);
+    // Select the last itinerary used if exists, otherwise select the first one
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final preferences = await SharedPreferences.getInstance();
+      final itineraryName = preferences.getString('last_itinerary_name');
+
+      _currentItinerary = _teachersProvider.currentTeacher!.itineraries
+          .firstWhere((e) => e.name == itineraryName,
+              orElse: () => _currentItinerary);
+      _routingController.setItinerary(_currentItinerary);
+      setState(() {});
+    });
+
     _acquireLock();
-    _selectItinerary(_currentDate);
   }
 
   @override
@@ -195,12 +300,16 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    _logger.finer('Building ItineraryMainScreen for date: $_currentDate');
+    _logger.finer(
+        'Building ItineraryMainScreen for itinerary ${_currentItinerary.name}');
 
     // We need to define small 200px over actual small screen width because of the
     // row nature of the page.
     final isSmall = MediaQuery.of(context).size.width <
         ResponsiveService.smallScreenWidth + 200;
+
+    final itineraries = [...?_teachersProvider.currentTeacher?.itineraries]
+      ..sort((a, b) => a.name.compareTo(b.name));
 
     return Column(
       children: [
@@ -213,10 +322,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
             children: [
               Flexible(
                 flex: 3,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [_showDate(), _map()],
-                ),
+                child: _map(),
               ),
               Flexible(
                 flex: 2,
@@ -224,11 +330,43 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     if (!isSmall) SizedBox(height: 60),
+                    Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 32.0),
+                              child: DropdownButton<String?>(
+                                value:
+                                    _currentItinerary.name == _newItineraryName
+                                        ? null
+                                        : _currentItinerary.name,
+                                items: [
+                                  ...itineraries.map((e) => e.name),
+                                  _newItineraryName
+                                ]
+                                    .map((itineraryName) => DropdownMenuItem(
+                                          value: itineraryName,
+                                          child: Text(itineraryName),
+                                        ))
+                                    .toList(),
+                                onChanged: _onSelectedItinerary,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 18.0),
+                              child: _saveItineraryButton(),
+                            ),
+                          ],
+                        ),
+                        _studentsToVisitWidget(context),
+                      ],
+                    ),
                     _Distance(
                       _routingController.distances,
-                      itinerary: currentItinerary,
+                      itinerary: _currentItinerary,
                     ),
-                    _studentsToVisitWidget(context),
                   ],
                 ),
               ),
@@ -255,81 +393,23 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     );
   }
 
-  Widget _showDate() {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Faire l\'itinéraire du\n${DateFormat('d MMMM yyyy', 'fr_CA').format(_currentDate)}',
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 20),
-            ),
-            const SizedBox(width: 12),
-            InkWell(
-              onTap: _showDatePicker,
-              borderRadius: BorderRadius.circular(30.0),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).primaryColor,
-                  shape: BoxShape.circle,
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(6.0),
-                  child: Icon(Icons.calendar_month, size: 24),
-                ),
-              ),
-            ),
-          ],
-        ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: Padding(
-            padding: const EdgeInsets.only(right: 12.0),
-            child: IconButton(
-              onPressed: _routingController.hasChanged
-                  ? () async {
-                      final isSuccess = await _selectItinerary(_currentDate);
-                      if (mounted) {
-                        showSnackBar(
-                          context,
-                          message: isSuccess
-                              ? 'Itinéraire enregistré avec succès.'
-                              : 'Une erreur est survenue lors du l\'enregistrement de l\'itinéraire.',
-                        );
-                      }
-                    }
-                  : null,
-              icon: Icon(
-                Icons.save,
-                color: _routingController.hasChanged
-                    ? Theme.of(context).primaryColor
-                    : Colors.grey,
-              ),
-            ),
-          ),
-        ),
-      ],
+  Widget _saveItineraryButton() {
+    return IconButton(
+      onPressed: _currentItinerary.name == _newItineraryName
+          ? () async => await _onSelectedItinerary(_currentItinerary.name)
+          : (_routingController.hasChanged
+              ? () async => await _sendItineraryToBackend(
+                  _currentItinerary.name,
+                  isNew: false)
+              : null),
+      icon: Icon(
+        Icons.save,
+        color: _currentItinerary.name == _newItineraryName ||
+                _routingController.hasChanged
+            ? Theme.of(context).primaryColor
+            : Colors.grey,
+      ),
     );
-  }
-
-  void _showDatePicker() async {
-    final newDate = await showCustomDatePicker(
-      context: context,
-      initialDate: _currentDate,
-      firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now().add(const Duration(days: 365)),
-    );
-
-    if (newDate == null || !mounted) return;
-
-    // Keep only granularity of days
-    _currentDate = DateTime(newDate.year, newDate.month, newDate.day);
-    _selectItinerary(_currentDate);
-
-    setState(() {});
   }
 
   Widget _map() {
@@ -347,7 +427,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                       waypoints:
                           widget.waypoints.length == 1 ? [] : widget.waypoints,
                       centerWaypoint: widget.waypoints.first,
-                      itinerary: currentItinerary,
+                      itinerary: _currentItinerary,
                       onItineraryChanged: (_) => setState(() {}),
                     ),
                     if (widget.waypoints.length == 1)
@@ -367,27 +447,26 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
       mainAxisSize: MainAxisSize.min,
       children: [
         const SizedBox(height: 8),
-        if (currentItinerary.isNotEmpty)
-          ReorderableListView.builder(
-            onReorder: (oldIndex, newIndex) {
-              _routingController.move(oldIndex, newIndex);
-              setState(() {});
-            },
-            buildDefaultDragHandles: !kIsWeb,
-            physics: const NeverScrollableScrollPhysics(),
-            shrinkWrap: true,
-            itemBuilder: (context, index) {
-              final way = currentItinerary[index];
-              return WaypointCard(
-                key: ValueKey(way.id),
-                index: index,
-                name: way.title,
-                waypoint: way,
-                onDelete: () => _routingController.removeFromItinerary(index),
-              );
-            },
-            itemCount: currentItinerary.length,
-          ),
+        ReorderableListView.builder(
+          onReorder: (oldIndex, newIndex) {
+            _routingController.move(oldIndex, newIndex);
+            setState(() {});
+          },
+          buildDefaultDragHandles: !kIsWeb,
+          physics: const NeverScrollableScrollPhysics(),
+          shrinkWrap: true,
+          itemBuilder: (context, index) {
+            final way = _currentItinerary[index];
+            return WaypointCard(
+              key: ValueKey(way.id),
+              index: index,
+              name: way.title,
+              waypoint: way,
+              onDelete: () => _routingController.removeFromItinerary(index),
+            );
+          },
+          itemCount: _currentItinerary.length,
+        ),
       ],
     );
   }
@@ -417,7 +496,7 @@ class __DistanceState extends State<_Distance> {
       },
       behavior: HitTestBehavior.opaque, // Make the full box clickable
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 25),
+        padding: const EdgeInsets.symmetric(horizontal: 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -432,11 +511,7 @@ class __DistanceState extends State<_Distance> {
                   child: Text(
                     'Kilométrage\u00a0: '
                     '${(widget.distances!.isEmpty ? 0 : widget.distances!.reduce((a, b) => a + b).toDouble() / 1000).toStringAsFixed(1)}km',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: _subtitleStyleOf(context),
                   ),
                 ),
                 Container(
