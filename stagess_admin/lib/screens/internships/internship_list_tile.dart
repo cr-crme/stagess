@@ -185,6 +185,8 @@ class InternshipListTileState extends State<InternshipListTile> {
             jobId: widget.internship.currentContract?.jobId ?? '',
             extraSpecializationIds:
                 widget.internship.currentContract?.extraSpecializationIds ?? [],
+            program:
+                widget.internship.currentContract?.program ?? Program.undefined,
             supervisor: supervisor,
             dates: _weeklySchedulesController.dateRange!,
             weeklySchedules: InternshipHelpers.copySchedules(

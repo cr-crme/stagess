@@ -15,12 +15,14 @@ import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('EnterpriseEvaluationScreen');
+const double _defaultValue = 3.0;
 
 Future<Internship?> showEnterpriseEvaluationFormDialog(
   BuildContext context, {
@@ -48,7 +50,18 @@ class EnterpriseEvaluationFormController {
     required this.internshipId,
     String? evaluationId,
     required this.canModify,
-  }) {
+  }) : program = canModify
+            ? (StudentsProvider.of(context, listen: false)
+                .fromId(InternshipsProvider.of(context, listen: false)
+                    .fromId(internshipId)
+                    .studentId)
+                .program)
+            : (InternshipsProvider.of(context, listen: false)
+                    .fromId(internshipId)
+                    .enterpriseEvaluations
+                    .firstWhereOrNull((e) => e.id == evaluationId)
+                    ?.program ??
+                Program.undefined) {
     clearForm(context);
     if (evaluationId != null) {
       fillFromPreviousEvaluation(context, previousEvaluationId: evaluationId);
@@ -62,6 +75,7 @@ class EnterpriseEvaluationFormController {
   final String internshipId;
   Internship internship(BuildContext context, {bool listen = true}) =>
       InternshipsProvider.of(context, listen: listen)[internshipId];
+  final Program program;
 
   factory EnterpriseEvaluationFormController.fromInternshipId(
     BuildContext context, {
@@ -85,13 +99,14 @@ class EnterpriseEvaluationFormController {
       elements: RequiredSkills.values);
   TaskVariety _taskVariety = TaskVariety.none;
   TrainingPlan _trainingPlan = TrainingPlan.none;
-  double _autonomyExpected = -1.0;
-  double _supervisionStyle = -1.0;
-  double _efficiencyExpected = -1.0;
-  double _specialNeedsAccommodation = -1.0;
-  double _easeOfCommunication = -1.0;
-  double _absenceAcceptance = -1.0;
-  double _sstManagement = -1.0;
+
+  double _autonomyExpected = _defaultValue;
+  double _supervisionStyle = _defaultValue;
+  double _efficiencyExpected = _defaultValue;
+  double _specialNeedsAccommodation = _defaultValue;
+  double _easeOfCommunication = _defaultValue;
+  double _absenceAcceptance = _defaultValue;
+  double _sstManagement = _defaultValue;
 
   void dispose() {
     try {
@@ -165,6 +180,7 @@ class EnterpriseEvaluationFormController {
     return PostInternshipEnterpriseEvaluation(
       date: _evaluationDate,
       internshipId: internshipId,
+      program: program,
       skillsRequired: _skillController.values,
       taskVariety: _taskVariety.toDouble(),
       trainingPlanRespect: _trainingPlan.toDouble(),
@@ -187,13 +203,13 @@ class EnterpriseEvaluationFormController {
             elements: RequiredSkills.values, initialValues: []));
     _taskVariety = TaskVariety.none;
     _trainingPlan = TrainingPlan.none;
-    _autonomyExpected = -1.0;
-    _supervisionStyle = -1.0;
-    _efficiencyExpected = -1.0;
-    _specialNeedsAccommodation = -1.0;
-    _easeOfCommunication = -1.0;
-    _absenceAcceptance = -1.0;
-    _sstManagement = -1.0;
+    _autonomyExpected = _defaultValue;
+    _supervisionStyle = _defaultValue;
+    _efficiencyExpected = _defaultValue;
+    _specialNeedsAccommodation = _defaultValue;
+    _easeOfCommunication = _defaultValue;
+    _absenceAcceptance = _defaultValue;
+    _sstManagement = _defaultValue;
   }
 }
 

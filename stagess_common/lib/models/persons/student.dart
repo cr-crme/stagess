@@ -16,14 +16,14 @@ enum Program {
       (element) => element == Program.undefined,
     );
 
-  int _toInt(String version) {
+  int serialize(String version) {
     if (version == '1.0.0') {
       return index;
     }
     throw WrongVersionException(version, '1.0.0');
   }
 
-  static Program _fromInt(int index, String version) {
+  static Program fromSerialized(int index, String version) {
     if (version == '1.0.0') {
       return Program.values[index];
     }
@@ -53,7 +53,7 @@ class Student extends Person {
   final String photo;
 
   final Program program;
-  int get programSerialized => program._toInt(_currentVersion);
+  int get programSerialized => program.serialize(_currentVersion);
   final String group;
 
   final Person contact;
@@ -99,7 +99,7 @@ class Student extends Person {
             Random().nextInt(0xFFFFFF).toString(),
         program = map?['program'] == null
             ? Program.undefined
-            : Program._fromInt(map?['program'] as int, map?['version']),
+            : Program.fromSerialized(map?['program'] as int, map?['version']),
         group = StringExt.from(map?['group']) ?? '-1',
         contact = Person.fromSerialized(map?['contact'] ?? {}),
         contactLink = StringExt.from(map?['contact_link']) ?? '',
@@ -223,7 +223,7 @@ class Student extends Person {
       photo: StringExt.from(data['photo']) ?? photo,
       program: data['program'] == null
           ? program
-          : Program._fromInt(data['program'] as int, _currentVersion),
+          : Program.fromSerialized(data['program'] as int, _currentVersion),
       group: StringExt.from(data['group']) ?? group,
       contact: contact.copyWithData(data['contact']),
       contactLink: StringExt.from(data['contact_link']) ?? contactLink,

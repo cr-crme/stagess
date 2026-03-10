@@ -64,6 +64,9 @@ class InternshipContractFormController {
 
   final Internship internship;
   final String? contractId;
+  late final Program program = canModify
+      ? (_studentController.student!.program)
+      : _previousContract?.program ?? Program.undefined;
   InternshipContract? get _previousContract => contractId == null
       ? (internship.currentContract)
       : internship.contracts.firstWhereOrNull((e) => e.id == contractId);
@@ -135,7 +138,9 @@ class InternshipContractFormController {
                 .map((id) => _jobListControllerOfSpecialization(context,
                     specializationId: id))
                 .toList() ??
-            [];
+            [] {
+    if (program != Program.fpt) _extraJobControllers.clear();
+  }
 
   factory InternshipContractFormController.fromInternshipId(
     BuildContext context, {
@@ -168,6 +173,7 @@ class InternshipContractFormController {
       jobId: _primaryJobController.job.id,
       extraSpecializationIds:
           _extraJobControllers.map((e) => e.job.specialization.id).toList(),
+      program: program,
       dates: _weeklySchedulesController.dateRange!,
       weeklySchedules: _weeklySchedulesController.weeklySchedules,
       transportations: _transportationsController.values,
@@ -379,9 +385,7 @@ class _InternshipDetailsScreenState extends State<_InternshipDetailsScreen> {
                         _GeneralInformations(
                             controller: _controller, setState: setState),
                         _MainJob(controller: _controller),
-                        if (_controller._studentController.student != null &&
-                            _controller._studentController.student!.program ==
-                                Program.fpt)
+                        if (_controller.program == Program.fpt)
                           _ExtraSpecialization(
                             controller: _controller,
                             setState: setState,

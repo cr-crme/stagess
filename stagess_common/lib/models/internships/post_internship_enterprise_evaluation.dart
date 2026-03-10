@@ -1,6 +1,7 @@
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation.dart';
+import 'package:stagess_common/models/persons/student.dart';
 
 double _doubleFromSerialized(num? number, {double defaultValue = 0}) {
   if (number is int) return number.toDouble();
@@ -12,6 +13,7 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
     super.id,
     required this.date,
     required this.internshipId,
+    required this.program,
     required this.skillsRequired,
     required this.taskVariety,
     required this.trainingPlanRespect,
@@ -25,8 +27,11 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
   });
 
   PostInternshipEnterpriseEvaluation.fromSerialized(super.map)
-      : internshipId = map?['internship_id'] ?? '',
-        date = DateTimeExt.from(map?['date']) ?? DateTime(0),
+      : date = DateTimeExt.from(map?['date']) ?? DateTime(0),
+        internshipId = map?['internship_id'] ?? '',
+        program = map?['program'] == null
+            ? Program.undefined
+            : Program.fromSerialized(map?['program']!, '1.0.0'),
         skillsRequired = ListExt.from(map?['skills_required'],
                 deserializer: (e) => StringExt.from(e)!) ??
             [],
@@ -48,6 +53,7 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
     String? id,
     DateTime? date,
     String? internshipId,
+    Program? program,
     List<String>? skillsRequired,
     double? taskVariety,
     double? trainingPlanRespect,
@@ -63,6 +69,7 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
       id: id ?? this.id,
       date: date ?? this.date,
       internshipId: internshipId ?? this.internshipId,
+      program: program ?? this.program,
       skillsRequired: skillsRequired ?? this.skillsRequired,
       taskVariety: taskVariety ?? this.taskVariety,
       trainingPlanRespect: trainingPlanRespect ?? this.trainingPlanRespect,
@@ -85,6 +92,9 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
       id: serialized['id'] ?? id,
       date: DateTimeExt.from(serialized['date']) ?? date,
       internshipId: serialized['internship_id'] ?? internshipId,
+      program: serialized['program'] == null
+          ? program
+          : Program.fromSerialized(serialized['program']!, '1.0.0'),
       skillsRequired: ListExt.from(serialized['skills_required'],
               deserializer: (e) => StringExt.from(e)!) ??
           skillsRequired,
@@ -114,6 +124,7 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
   }
 
   String internshipId;
+  Program program;
   @override
   DateTime date;
 
@@ -140,6 +151,7 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
         'id': id,
         'date': date.serialize(),
         'internship_id': internshipId,
+        'program': program.serialize('1.0.0'),
         'skills_required': skillsRequired,
         'task_variety': taskVariety,
         'training_plan_respect': trainingPlanRespect,
@@ -172,6 +184,7 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
   String toString() {
     return 'PostInternshipEnterpriseEvaluation{'
         'internshipId: $internshipId, '
+        'program: $program, '
         'skillsRequired: $skillsRequired, '
         'taskVariety: $taskVariety, '
         'trainingPlanRespect: $trainingPlanRespect, '

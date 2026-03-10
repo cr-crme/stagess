@@ -273,6 +273,7 @@ PostInternshipEnterpriseEvaluation dummyPostInternshipEnterpriseEvaluation({
         id: id,
         date: DateTime(2005, 11, 25),
         internshipId: internshipId,
+        program: Program.fpt,
         skillsRequired: [
           'Communiquer à l\'écrit',
           'Interagir avec des clients'
@@ -480,6 +481,7 @@ InternshipContract dummyInternshipContract(
         ActivitySectorsService.activitySectors[2].specializations[1].id,
         ActivitySectorsService.activitySectors[1].specializations[0].id,
       ],
+      program: Program.fpt,
       supervisor: dummyPerson(),
       dates: DateTimeRange(
         start: DateTime(2000, 1, 1),

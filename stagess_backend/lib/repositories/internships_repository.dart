@@ -15,6 +15,7 @@ import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/time_utils.dart';
 import 'package:stagess_common/models/internships/transportation.dart';
 import 'package:stagess_common/models/persons/person.dart';
+import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/utils.dart';
 
 // AccessLevel in this repository is discarded as all operations are currently
@@ -202,6 +203,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
               'id',
               'date',
               'job_id',
+              'program',
               'supervisor_first_name',
               'supervisor_last_name',
               'supervisor_phone_number',
@@ -256,8 +258,9 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             asName: 'enterprise_evaluations',
             fieldsToFetch: [
               'id',
-              'internship_id',
               'date',
+              'internship_id',
+              'program',
               'task_variety',
               'training_plan_respect',
               'autonomy_expected',
@@ -657,6 +660,8 @@ class MySqlInternshipsRepository extends InternshipsRepository {
         'internship_id': internship.id,
         'date': contract.date.serialize(),
         'job_id': contract.jobId.serialize(),
+        'program':
+            contract.program.serialize(InternshipContract.currentVersion),
         'supervisor_first_name': contract.supervisor.firstName.serialize(),
         'supervisor_last_name': contract.supervisor.lastName.serialize(),
         'supervisor_phone_number':
@@ -944,6 +949,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             'id': serialized['id'],
             'date': serialized['date'],
             'internship_id': internship.id,
+            'program': serialized['program'],
             'task_variety': serialized['task_variety'],
             'training_plan_respect': serialized['training_plan_respect'],
             'autonomy_expected': serialized['autonomy_expected'],
@@ -1057,6 +1063,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
           date: DateTime(2000, 1, 1),
           jobId: '67890',
           extraSpecializationIds: ['12345'],
+          program: Program.fpt,
           dates: DateTimeRange(
               start: DateTime(1990, 1, 1), end: DateTime(1990, 1, 31)),
           supervisor: Person(
@@ -1126,6 +1133,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
           date: DateTime(2000, 2, 1),
           jobId: '09876',
           extraSpecializationIds: ['54321', '09876'],
+          program: Program.fpt,
           dates: DateTimeRange(
               start: DateTime(1990, 2, 1), end: DateTime(1990, 2, 28)),
           supervisor: Person(

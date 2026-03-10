@@ -1894,6 +1894,8 @@ Future<void> _addDummyInternships(
             ActivitySectorsService.activitySectors[2].specializations[1].id,
             ActivitySectorsService.activitySectors[1].specializations[0].id,
           ],
+          program:
+              students.firstWhere((e) => e.fullName == 'Cedric Masson').program,
           supervisor: Person(
             firstName: 'Robert',
             middleName: null,
@@ -2033,6 +2035,9 @@ Future<void> _addDummyInternships(
                 .jobs[0]
                 .id,
             extraSpecializationIds: [],
+            program: students
+                .firstWhere((e) => e.fullName == 'Thomas Caron')
+                .program,
             supervisor: Person(
               firstName: 'Claude',
               middleName: null,
@@ -2162,6 +2167,8 @@ Future<void> _addDummyInternships(
         date: DateTime.now(),
         jobId: enterprises.firstWhere((e) => e.name == 'Subway').jobs[0].id,
         extraSpecializationIds: [],
+        program:
+            students.firstWhere((e) => e.fullName == 'Melissa Poulain').program,
         supervisor: Person(
           firstName: 'Carole',
           middleName: null,
@@ -2242,8 +2249,10 @@ Future<void> _addDummyInternships(
     teacherNotes: '',
   );
   internship.enterpriseEvaluations.add(PostInternshipEnterpriseEvaluation(
-    internshipId: internship.id,
     date: period.end.add(Duration(days: 5)),
+    internshipId: internship.id,
+    program:
+        students.firstWhere((e) => e.fullName == 'Melissa Poulain').program,
     skillsRequired: ['Communiquer à l\'écrit', 'Interagir avec des clients'],
     taskVariety: 0,
     trainingPlanRespect: 1,
@@ -2276,6 +2285,9 @@ Future<void> _addDummyInternships(
           date: DateTime.now(),
           jobId: enterprises.firstWhere((e) => e.name == 'IGA').jobs[0].id,
           extraSpecializationIds: [],
+          program: students
+              .firstWhere((e) => e.fullName == 'Vincent Picard')
+              .program,
           supervisor: Person(
             firstName: 'Charles',
             middleName: null,
@@ -2367,6 +2379,8 @@ Future<void> _addDummyInternships(
           jobId:
               enterprises.firstWhere((e) => e.name == 'Auto Care').jobs[0].id,
           extraSpecializationIds: [],
+          program:
+              students.firstWhere((e) => e.fullName == 'Simon Gingras').program,
           supervisor: Person(
             firstName: 'Thomas',
             middleName: null,
@@ -2472,6 +2486,9 @@ Future<void> _addDummyInternships(
               .jobs[0]
               .id,
           extraSpecializationIds: [],
+          program: students
+              .firstWhere((e) => e.fullName == 'Jeanne Tremblay')
+              .program,
           supervisor: Person(
             firstName: 'Maxime',
             middleName: null,
@@ -2587,6 +2604,8 @@ Future<void> _addDummyInternships(
               .jobs[1]
               .id,
           extraSpecializationIds: [],
+          program:
+              students.firstWhere((e) => e.fullName == 'Diego Vargas').program,
           supervisor: Person(
             firstName: 'Mathilde',
             middleName: null,
@@ -2701,6 +2720,9 @@ Future<void> _addDummyInternships(
                 .jobs[0]
                 .id,
             extraSpecializationIds: [],
+            program: students
+                .firstWhere((e) => e.fullName == 'Vanessa Monette')
+                .program,
             supervisor: Person(
               firstName: 'Francis',
               middleName: null,
@@ -2790,6 +2812,9 @@ Future<void> _addDummyInternships(
           jobId:
               enterprises.firstWhere((e) => e.name == 'Pharmaprix').jobs[0].id,
           extraSpecializationIds: [],
+          program: students
+              .firstWhere((e) => e.fullName == 'Vanessa Monette')
+              .program,
           supervisor: Person(
             firstName: 'Thierry',
             middleName: null,
@@ -2866,6 +2891,9 @@ Future<void> _addDummyInternships(
             date: DateTime.now(),
             jobId: enterprises.firstWhere((e) => e.name == 'Subway').jobs[0].id,
             extraSpecializationIds: [],
+            program: students
+                .firstWhere((e) => e.fullName == 'Sébastien Desmarais')
+                .program,
             supervisor: Person(
               firstName: 'Carlos',
               middleName: null,

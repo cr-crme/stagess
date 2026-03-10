@@ -4,6 +4,7 @@ import 'package:stagess_common/models/internships/internship_evaluation.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/time_utils.dart';
 import 'package:stagess_common/models/persons/person.dart';
+import 'package:stagess_common/models/persons/student.dart';
 
 class InternshipContract extends InternshipEvaluation {
   static const String currentVersion = '1.0.0';
@@ -15,6 +16,7 @@ class InternshipContract extends InternshipEvaluation {
   final DateTimeRange dates;
   final String jobId; // Main job attached to the enterprise
   final List<String> extraSpecializationIds; // Any extra specialization
+  final Program program;
   final Person supervisor;
   final List<WeeklySchedule> weeklySchedules;
   final List<String> transportations;
@@ -26,6 +28,7 @@ class InternshipContract extends InternshipEvaluation {
     required this.date,
     required this.jobId,
     required this.extraSpecializationIds,
+    required this.program,
     required this.supervisor,
     required this.dates,
     required this.weeklySchedules,
@@ -42,6 +45,7 @@ class InternshipContract extends InternshipEvaluation {
         extraSpecializationIds = ListExt.from(map?['extra_specialization_ids'],
                 deserializer: (e) => StringExt.from(e)!) ??
             [],
+        program = Program.fromSerialized(map?['program'] ?? {}, currentVersion),
         supervisor = Person.fromSerialized({
           'first_name': map?['supervisor_first_name'],
           'last_name': map?['supervisor_last_name'],
@@ -68,6 +72,7 @@ class InternshipContract extends InternshipEvaluation {
         date: DateTime.now(),
         jobId: '',
         extraSpecializationIds: [],
+        program: Program.undefined,
         supervisor: Person.empty,
         dates: DateTimeRange(start: DateTime.now(), end: DateTime.now()),
         weeklySchedules: [],
@@ -92,6 +97,7 @@ class InternshipContract extends InternshipEvaluation {
       'date': date.millisecondsSinceEpoch,
       'job_id': jobId.serialize(),
       'extra_specialization_ids': extraSpecializationIds.serialize(),
+      'program': program.serialize(currentVersion),
       'supervisor_first_name': supervisor.firstName.serialize(),
       'supervisor_last_name': supervisor.lastName.serialize(),
       'supervisor_phone_number': supervisor.phone?.serialize()['phone_number'],
@@ -110,6 +116,7 @@ class InternshipContract extends InternshipEvaluation {
     DateTime? date,
     String? jobId,
     List<String>? extraSpecializationIds,
+    Program? program,
     Person? supervisor,
     DateTimeRange? dates,
     List<WeeklySchedule>? weeklySchedules,
@@ -124,6 +131,7 @@ class InternshipContract extends InternshipEvaluation {
       jobId: jobId ?? this.jobId,
       extraSpecializationIds:
           extraSpecializationIds ?? this.extraSpecializationIds,
+      program: program ?? this.program,
       supervisor: supervisor ?? this.supervisor,
       dates: dates ?? this.dates,
       weeklySchedules: weeklySchedules ?? this.weeklySchedules,
@@ -145,6 +153,9 @@ class InternshipContract extends InternshipEvaluation {
               serialized['extra_specialization_ids'],
               deserializer: (e) => StringExt.from(e)!) ??
           extraSpecializationIds,
+      program: serialized['program'] == null
+          ? Program.fromSerialized(serialized['program'] ?? {}, currentVersion)
+          : program,
       supervisor: supervisor.copyWithData({
         'first_name': serialized['supervisor_first_name'],
         'last_name': serialized['supervisor_last_name'],
@@ -175,6 +186,7 @@ class InternshipContract extends InternshipEvaluation {
         'date': FetchableFields.optional,
         'job_id': FetchableFields.mandatory,
         'extra_specialization_ids': FetchableFields.mandatory,
+        'program': FetchableFields.optional,
         'supervisor_first_name': FetchableFields.optional,
         'supervisor_last_name': FetchableFields.optional,
         'supervisor_phone_number': FetchableFields.optional,
@@ -193,6 +205,7 @@ class InternshipContract extends InternshipEvaluation {
     return 'InternshipManagingContract(date: $date, '
         'jobId: $jobId, '
         'extraSpecializationIds: $extraSpecializationIds, '
+        'program: ${program.name}, '
         'supervisor: ${supervisor.fullName}, '
         'dates: ${dates.start} - ${dates.end}, '
         'weeklySchedules: $weeklySchedules, '

@@ -1,15 +1,12 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/extensions/job_extension.dart';
-import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/common/widgets/form_fields/low_high_slider_form_field.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
 import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/enterprise_evaluation_form_enums.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common/models/persons/student.dart';
-import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
@@ -29,19 +26,13 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
   var _currentProgramToShow = Program.fms;
 
   List<PostInternshipEnterpriseEvaluation> _getFilteredEvaluations() {
-    final internships = InternshipsProvider.of(context);
-    final students = StudentsHelpers.studentsInMyGroups(context);
-    var evaluations =
+    final evaluations =
         widget.job.mostRecentPostInternshipEnterpriseEvaluations(context);
 
     // Only keep evaluations from the requested students
-    return evaluations.where((eval) {
-      final internship = internships.fromIdOrNull(eval.internshipId);
-      if (internship == null) return false;
-      final student = students
-          .firstWhereOrNull((student) => student.id == internship.studentId);
-      return student?.program == _currentProgramToShow;
-    }).toList();
+    return evaluations
+        .where((eval) => eval.program == _currentProgramToShow)
+        .toList();
   }
 
   @override
