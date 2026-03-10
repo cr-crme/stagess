@@ -22,8 +22,8 @@ class StudentPickerController {
     required this.schoolBoardId,
     Student? initial,
     List<Student>? studentWhiteList,
-  }) : _studentWhiteList = studentWhiteList,
-       _selection = initial ?? Student.empty;
+  })  : _studentWhiteList = studentWhiteList,
+        _selection = initial ?? Student.empty;
 
   final _formKey = GlobalKey<FormFieldState<String>>();
 
@@ -98,19 +98,22 @@ class StudentPickerTile extends StatelessWidget {
         return students.where(
           (student) =>
               student.fullName.toLowerCase().contains(
-                textEditingValue.text.toLowerCase(),
-              ) &&
+                    textEditingValue.text.toLowerCase(),
+                  ) &&
               student.fullName.toLowerCase() !=
                   textEditingValue.text.toLowerCase(),
         );
       },
-      optionsViewBuilder:
-          (context, onSelected, options) => OptionsBuilderForAutocomplete(
-            onSelected: onSelected,
-            options: options,
-            optionToString: (Student e) => e.fullName,
-          ),
-      onSelected: (item) => controller.student = item,
+      optionsViewBuilder: (context, onSelected, options) =>
+          OptionsBuilderForAutocomplete(
+        onSelected: onSelected,
+        options: options,
+        optionToString: (Student e) => e.fullName,
+      ),
+      onSelected: (item) {
+        controller.student = item;
+        if (onSelected != null) onSelected!(item);
+      },
       fieldViewBuilder: (_, textController, focusNode, onSubmitted) {
         controller._textController = textController;
 
@@ -120,11 +123,9 @@ class StudentPickerTile extends StatelessWidget {
           readOnly: false,
           enabled: editMode,
           style: const TextStyle(color: Colors.black),
-          validator:
-              (value) =>
-                  isMandatory && (value?.isEmpty ?? true)
-                      ? 'Sélectionner un·e élève'
-                      : null,
+          validator: (value) => isMandatory && (value?.isEmpty ?? true)
+              ? 'Sélectionner un·e élève'
+              : null,
           decoration: InputDecoration(
             labelText:
                 title ?? '${isMandatory ? '* ' : ''}Sélectionner un·e élève',

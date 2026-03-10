@@ -64,7 +64,7 @@ class InternshipContractFormController {
 
   final Internship internship;
   final String? contractId;
-  late final Program program = canModify
+  Program get program => canModify
       ? (_studentController.student!.program)
       : _previousContract?.program ?? Program.undefined;
   InternshipContract? get _previousContract => contractId == null

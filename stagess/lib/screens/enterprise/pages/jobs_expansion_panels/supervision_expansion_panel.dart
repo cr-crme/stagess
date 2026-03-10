@@ -79,7 +79,8 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
                         _buildAutonomy(evaluations),
                         const SizedBox(height: 12),
                         _buildEfficiency(evaluations),
-                        // TODO update with new info
+                        const SizedBox(height: 12),
+                        _buildSpecialNeedsAccomodation(evaluations),
                         const SizedBox(height: 12),
                         _buildSupervisionStyle(evaluations),
                         const SizedBox(height: 12),
@@ -87,13 +88,7 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
                         const SizedBox(height: 12),
                         _buildAbsenceAcceptance(evaluations),
                         const SizedBox(height: 12),
-                        Text(
-                          'Évaluation de l\'accueil de stagiaires avec',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleSmall!
-                              .copyWith(fontWeight: FontWeight.bold),
-                        ),
+                        _buildSstManagement(evaluations),
                         const SizedBox(height: 12),
                       ],
                     ),
@@ -146,12 +141,14 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Plan de formation\n'
-          'Tâches et compétences prévues dans le plan ont été faites par l\'élève',
+          'Respect du plan de formation',
           style: Theme.of(context).textTheme.titleSmall,
         ),
-        _printCountedList<PostInternshipEnterpriseEvaluation>(evaluations,
-            (e) => e.trainingPlanRespect == 0 ? 'En partie' : 'En totalité'),
+        ItemizedText([
+          'L\'élève a pu exercer toutes les tâches de toutes les compétences spécifiques obligatoires d\'un métier semi-spécialisé ('
+              '${evaluations.fold<int>(0, (prev, e) => prev + e.trainingPlanRespect.toInt()).toString()} / ${evaluations.length}'
+              ')'
+        ]),
       ],
     );
   }
@@ -173,9 +170,9 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
     );
   }
 
-// TODO Update the slider when changing type
   Widget _buildAutonomy(List<PostInternshipEnterpriseEvaluation> evaluations) {
     return _TitledFixSlider(
+      sliderKey: ValueKey('autonomy_$_currentProgramToShow'),
       title: 'Niveau d\'autonomie souhaité',
       value: _meanOf(evaluations, (e) => e.autonomyExpected),
       lowLabel: AutonomyExpected.low.label,
@@ -186,6 +183,7 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
   Widget _buildEfficiency(
       List<PostInternshipEnterpriseEvaluation> evaluations) {
     return _TitledFixSlider(
+      sliderKey: ValueKey('efficiency_$_currentProgramToShow'),
       title: 'Rendement de l\'élève attendu',
       value: _meanOf(evaluations, (e) => e.efficiencyExpected),
       lowLabel: EfficiencyExpected.low.label,
@@ -193,9 +191,22 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
     );
   }
 
+  Widget _buildSpecialNeedsAccomodation(
+      List<PostInternshipEnterpriseEvaluation> evaluations) {
+    return _TitledFixSlider(
+      sliderKey: ValueKey('special_needs_accomodation_$_currentProgramToShow'),
+      title:
+          'Ouverture de l\'entreprise à accueillir des élèves ayant des besoins particuliers',
+      value: _meanOf(evaluations, (e) => e.specialNeedsAccommodation),
+      lowLabel: SpecialNeedsAccommodation.low.label,
+      highLabel: SpecialNeedsAccommodation.high.label,
+    );
+  }
+
   Widget _buildSupervisionStyle(
       List<PostInternshipEnterpriseEvaluation> evaluations) {
     return _TitledFixSlider(
+      sliderKey: ValueKey('supervision_style_$_currentProgramToShow'),
       title: 'Type d\'encadrement',
       value: _meanOf(evaluations, (e) => e.supervisionStyle),
       lowLabel: SupervisionStyle.low.label,
@@ -206,6 +217,7 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
   Widget _buildEaseOfCommunication(
       List<PostInternshipEnterpriseEvaluation> evaluations) {
     return _TitledFixSlider(
+      sliderKey: ValueKey('ease_of_communication_$_currentProgramToShow'),
       title: 'Communication avec l\'entreprise',
       value: _meanOf(evaluations, (e) => e.easeOfCommunication),
       lowLabel: EaseOfCommunication.low.label,
@@ -216,6 +228,7 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
   Widget _buildAbsenceAcceptance(
       List<PostInternshipEnterpriseEvaluation> evaluations) {
     return _TitledFixSlider(
+      sliderKey: ValueKey('absence_acceptance_$_currentProgramToShow'),
       title:
           'Tolérance du milieu à l\'égard des retards et absences de l\'élève',
       value: _meanOf(evaluations, (e) => e.absenceAcceptance),
@@ -223,16 +236,29 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
       highLabel: AbsenceAcceptance.high.label,
     );
   }
+
+  Widget _buildSstManagement(
+      List<PostInternshipEnterpriseEvaluation> evaluations) {
+    return _TitledFixSlider(
+      sliderKey: ValueKey('sst_management_$_currentProgramToShow'),
+      title: 'Encadrement par rapport à la SST',
+      value: _meanOf(evaluations, (e) => e.sstManagement),
+      lowLabel: SstManagement.low.label,
+      highLabel: SstManagement.high.label,
+    );
+  }
 }
 
 class _TitledFixSlider extends StatelessWidget {
   const _TitledFixSlider({
+    required this.sliderKey,
     required this.title,
     required this.value,
     required this.lowLabel,
     required this.highLabel,
   });
 
+  final Key sliderKey;
   final String title;
   final double value;
   final String lowLabel;
@@ -245,6 +271,7 @@ class _TitledFixSlider extends StatelessWidget {
       children: [
         Text(title, style: Theme.of(context).textTheme.titleSmall),
         LowHighSliderFormField(
+          key: sliderKey,
           initialValue: value,
           decimal: 1,
           fixed: true,
