@@ -21,75 +21,97 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
   static const _interline = 12.0;
 
   List<StudentVisa> get _evaluations =>
-      StudentsProvider.of(context).fromId(widget.studentId).allVisa;
-  // It is currently not possible to have more than one evaluation
-  final int _currentEvaluationIndex = 0;
+      StudentsProvider.of(context, listen: false)
+          .fromId(widget.studentId)
+          .allVisa;
+  final int _currentFormIndex = 0;
+  StudentVisa? get _currentEvaluation =>
+      _evaluations.isEmpty ? null : _evaluations[_currentFormIndex];
 
-  Widget _buildAttitudeIsGood() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: _interline),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Conformes aux exigences',
-            style: TextStyle(fontWeight: FontWeight.bold),
+  @override
+  Widget build(BuildContext context) {
+    _logger.finer(
+      'Building StudentVisaForm for ${widget.studentId}',
+    );
+
+    return AnimatedExpandingCard(
+      header: (ctx, isExpanded) => ListTile(
+        title: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          child: Text(
+            'VISA et certifications',
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge!
+                .copyWith(color: Colors.black),
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 12.0),
-            child: ItemizedText(
-              _evaluations[_currentEvaluationIndex].form.meetsRequirements,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(left: 24.0, top: 8.0),
+        child: Column(
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildSummary(
+                  title:
+                      'Expériences et aptitudes personnelles et scolaires complémentaires au profil d’employabilité',
+                  elements: [],
+                  emptyMessage: 'Aucune expérience renseignée.',
+                ),
+                _buildSummary(
+                  title: 'Attestations et mentions',
+                  elements: [
+                    'Attestation de stage 1',
+                    'Attestation de stage 2'
+                  ],
+                  emptyMessage: 'Aucune attestation renseignée.',
+                ),
+                _buildSummary(
+                  title: 'Formations relatives à la SST',
+                  elements: [],
+                  emptyMessage: 'Aucune formation à la SST renseignée.',
+                ),
+                _buildSummary(
+                  title: 'Certification CFMS / CFPT',
+                  elements: [],
+                  emptyMessage: 'Aucune certification renseignée.',
+                ),
+                SizedBox(height: 16.0),
+                _buildShowOtherForms(),
+                // TODO: Add previous evaluations when multiple evaluations are supported
+              ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildAttitudeIsBad() {
+  Widget _buildSummary({
+    required String title,
+    String? subtitle,
+    required List<String> elements,
+    required String emptyMessage,
+  }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: _interline),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'À améliorer',
-            style: TextStyle(fontWeight: FontWeight.bold),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium,
           ),
-          Padding(
-            padding: const EdgeInsets.only(left: 12.0),
-            child: ItemizedText(
-              _evaluations[_currentEvaluationIndex]
-                  .form
-                  .doesNotMeetRequirements,
+          if (subtitle != null)
+            Text(
+              subtitle,
+              style: Theme.of(context).textTheme.bodyMedium,
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildGeneralAppreciation() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: _interline),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Appréciation générale',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(left: 12.0),
-            child: Text(
-              GeneralAppreciation
-                  .values[_evaluations[_currentEvaluationIndex]
-                      .form
-                      .generalAppreciation
-                      .index]
-                  .name,
-            ),
-          ),
+          const SizedBox(height: 8.0),
+          if (elements.isEmpty) Text(emptyMessage) else ItemizedText(elements),
+          const SizedBox(height: 12.0),
         ],
       ),
     );
@@ -97,54 +119,17 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
 
   Widget _buildShowOtherForms() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: _interline),
-      child: Center(
-        child: OutlinedButton(
-          onPressed: () => showVisaEvaluationFormDialog(
-            context: context,
-            formController: VisaFormController.fromStudentId(context,
-                studentId: widget.studentId),
-            editMode: false,
+      padding: const EdgeInsets.only(bottom: _interline, right: _interline),
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: TextButton(
+          onPressed: () async => await showVisaEvaluationFormDialog(
+            context,
+            studentId: widget.studentId,
+            evaluationId: _currentEvaluation?.id,
           ),
-          child: const Text('Voir l\'évaluation détaillée'),
+          child: const Text('Modifier'),
         ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    _logger.finer(
-      'Building InternshipVisa for ${widget.studentId}',
-    );
-
-    return AnimatedExpandingCard(
-      elevation: 0.0,
-      header: (ctx, isExpanded) => Text(
-        'VISA',
-        style: Theme.of(context)
-            .textTheme
-            .titleMedium!
-            .copyWith(color: Colors.black),
-      ),
-      child: Column(
-        children: [
-          if (_evaluations.isEmpty)
-            const Padding(
-              padding: EdgeInsets.only(top: 8.0, bottom: 4.0),
-              child: Text('Aucune évaluation disponible pour ce stage.'),
-            ),
-          if (_evaluations.isNotEmpty)
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildAttitudeIsGood(),
-                _buildAttitudeIsBad(),
-                _buildGeneralAppreciation(),
-                _buildShowOtherForms(),
-              ],
-            ),
-        ],
       ),
     );
   }

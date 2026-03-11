@@ -135,8 +135,8 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
                         Tab(icon: Icon(Icons.info_outlined), text: 'À propos'),
                         Tab(icon: Icon(Icons.assignment), text: 'Stages'),
                         Tab(
-                          icon: Icon(Icons.card_membership),
-                          text: 'Plan formation',
+                          icon: Icon(Icons.trending_up),
+                          text: 'Progression',
                         ),
                       ],
                     )

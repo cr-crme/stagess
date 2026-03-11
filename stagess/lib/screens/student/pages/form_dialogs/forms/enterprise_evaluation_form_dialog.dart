@@ -19,7 +19,6 @@ import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
-import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('EnterpriseEvaluationScreen');
 const double _defaultValue = 3.0;
@@ -67,7 +66,7 @@ class EnterpriseEvaluationFormController {
       fillFromPreviousEvaluation(context, previousEvaluationId: evaluationId);
     }
   }
-  String? _previousEvaluationId; // -1 is the last, null is not from evaluation
+  String? _previousEvaluationId;
   bool get isFilledUsingPreviousEvaluation => _previousEvaluationId != null;
 
   final bool canModify;
@@ -76,22 +75,6 @@ class EnterpriseEvaluationFormController {
   Internship internship(BuildContext context, {bool listen = true}) =>
       InternshipsProvider.of(context, listen: listen)[internshipId];
   final Program program;
-
-  factory EnterpriseEvaluationFormController.fromInternshipId(
-    BuildContext context, {
-    required String internshipId,
-    required String evaluationId,
-    required bool canModify,
-  }) {
-    final controller = EnterpriseEvaluationFormController(
-      context,
-      internshipId: internshipId,
-      canModify: canModify,
-    );
-    controller.fillFromPreviousEvaluation(context,
-        previousEvaluationId: evaluationId);
-    return controller;
-  }
 
   DateTime _evaluationDate = DateTime.now();
 
@@ -229,75 +212,26 @@ class _EnterpriseEvaluationScreenState
     extends State<_EnterpriseEvaluationScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  late final EnterpriseEvaluationFormController _controller =
-      widget.evaluationId == null
-          ? EnterpriseEvaluationFormController(context,
-              internshipId: widget.internshipId,
-              evaluationId: InternshipsProvider.of(context, listen: false)
+  late final _controller = widget.evaluationId == null
+      ? EnterpriseEvaluationFormController(context,
+          internshipId: widget.internshipId,
+          evaluationId: InternshipsProvider.of(context, listen: false)
+              .fromId(widget.internshipId)
+              .enterpriseEvaluations
+              .lastOrNull
+              ?.id,
+          canModify: true)
+      : (InternshipsProvider.of(context, listen: false)
                   .fromId(widget.internshipId)
                   .enterpriseEvaluations
-                  .lastOrNull
-                  ?.id,
-              canModify: true)
-          : (InternshipsProvider.of(context, listen: false)
-                      .fromId(widget.internshipId)
-                      .enterpriseEvaluations
-                      .firstWhereOrNull((e) => e.id == widget.evaluationId) ==
-                  null
-              ? EnterpriseEvaluationFormController(context,
-                  internshipId: widget.internshipId, canModify: false)
-              : EnterpriseEvaluationFormController.fromInternshipId(context,
-                  internshipId: widget.internshipId,
-                  evaluationId: widget.evaluationId!,
-                  canModify: false));
-
-  void _showInvalidFieldsSnakBar([String? message]) {
-    ScaffoldMessenger.of(context).clearSnackBars();
-    showSnackBar(
-      context,
-      message: message ?? 'Remplir tous les champs avec un *.',
-    );
-  }
-
-  void _submit() async {
-    _logger
-        .info('Submitting evaluation for internship: ${widget.internshipId}');
-
-    if (!_controller.canModify) {
-      Navigator.of(context).pop();
-      return;
-    }
-
-    bool valid = _formKey.currentState?.validate() ?? true;
-    String? message;
-
-    setState(() {});
-
-    if (!valid) {
-      _showInvalidFieldsSnakBar(message);
-      return;
-    }
-    if (!mounted) return;
-
-    ScaffoldMessenger.of(context).clearSnackBars();
-    Navigator.of(context).pop(_controller.toInternshipEvaluation());
-  }
-
-  void _cancel() async {
-    _logger.info('Cancel called');
-    final navigator = Navigator.of(context);
-
-    if (_controller.canModify) {
-      final answer = await ConfirmExitDialog.show(
-        context,
-        content: const Text('Toutes les modifications seront perdues.'),
-      );
-      if (!mounted || !answer) return;
-    }
-
-    _logger.fine('User confirmed exit, navigating back');
-    navigator.pop(null);
-  }
+                  .firstWhereOrNull((e) => e.id == widget.evaluationId) ==
+              null
+          ? EnterpriseEvaluationFormController(context,
+              internshipId: widget.internshipId, canModify: false)
+          : EnterpriseEvaluationFormController(context,
+              internshipId: widget.internshipId,
+              evaluationId: widget.evaluationId!,
+              canModify: false));
 
   @override
   Widget build(BuildContext context) {
@@ -388,6 +322,45 @@ class _EnterpriseEvaluationScreenState
               ),
       ),
     );
+  }
+
+  void _submit() async {
+    _logger
+        .info('Submitting evaluation for internship: ${widget.internshipId}');
+
+    if (!_controller.canModify) {
+      Navigator.of(context).pop();
+      return;
+    }
+
+    if (!(_formKey.currentState?.validate() ?? true)) {
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) => const AlertDialog(
+          title: Text('Formulaire incomplet'),
+          content: Text('Répondre à toutes les questions.'),
+        ),
+      );
+      return;
+    }
+
+    _logger.fine('Enterprise evaluation form submitted successfully');
+    Navigator.of(context).pop(_controller.toInternshipEvaluation());
+  }
+
+  void _cancel() async {
+    _logger.info('Cancel called');
+
+    if (_controller.canModify) {
+      final answer = await ConfirmExitDialog.show(
+        context,
+        content: const Text('Toutes les modifications seront perdues.'),
+      );
+      if (!mounted || !answer) return;
+    }
+
+    _logger.fine('User confirmed exit, navigating back');
+    Navigator.of(context).pop(null);
   }
 
   Widget _buildSkillsRequired() {

@@ -24,6 +24,7 @@ class SkillsPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _SkillCard(studentId: studentId),
+          StudentVisaForm(studentId: studentId),
         ],
       ),
     );
@@ -62,7 +63,6 @@ class _SkillCard extends StatelessWidget {
                 title: 'Compétences à poursuivre',
                 skills: _getToPursuitSkills(skills)),
             SizedBox(height: 16.0),
-            StudentVisaForm(studentId: studentId)
           ],
         ));
   }
@@ -168,12 +168,12 @@ class _SkillTile extends StatelessWidget {
           Text(title,
               style: Theme.of(context)
                   .textTheme
-                  .titleLarge
+                  .titleMedium
                   ?.copyWith(color: Colors.black)),
           Text('Nombre total = ${_countNumberOfSkills()}',
               style: Theme.of(context)
                   .textTheme
-                  .titleLarge
+                  .titleMedium
                   ?.copyWith(color: Colors.black)),
           Padding(
             padding: const EdgeInsets.only(left: 12.0),
