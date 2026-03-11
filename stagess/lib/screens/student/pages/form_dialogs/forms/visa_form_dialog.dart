@@ -2,8 +2,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
-import 'package:stagess/common/widgets/itemized_text.dart';
 import 'package:stagess/common/widgets/numbered_text.dart';
+import 'package:stagess/common/widgets/selectable_text_boxes.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/models/persons/student_visa.dart';
@@ -44,7 +44,7 @@ class VisaFormController {
   final String studentId;
   final String? evaluationId;
   final bool canModify;
-  final Map<Type, VisaCategoryEnum?> responses = {};
+  final experiencesAndAptitudesController = SelectableTextBoxesController();
 
   VisaFormController(
     BuildContext context, {
@@ -60,7 +60,7 @@ class VisaFormController {
   void _fillFromPreviousEvaluation(BuildContext context,
       {required String previousEvaluationId}) {
     // Clear previous responses before filling from previous evaluation
-    responses.clear();
+    experiencesAndAptitudesController.clear();
 
     final student =
         StudentsProvider.of(context, listen: false).fromId(studentId);
@@ -72,34 +72,22 @@ class VisaFormController {
       return;
     }
 
-    responses[Inattendance] = visa.form.inattendance;
-    responses[Ponctuality] = visa.form.ponctuality;
-    responses[Sociability] = visa.form.sociability;
-    responses[Politeness] = visa.form.politeness;
-    responses[Motivation] = visa.form.motivation;
-    responses[DressCode] = visa.form.dressCode;
-    responses[QualityOfWork] = visa.form.qualityOfWork;
-    responses[Productivity] = visa.form.productivity;
-    responses[Autonomy] = visa.form.autonomy;
-    responses[Cautiousness] = visa.form.cautiousness;
-    responses[GeneralAppreciation] = visa.form.generalAppreciation;
+    for (final exp in visa.form.experiencesAndAptitudes) {
+      experiencesAndAptitudesController.insert(
+        experiencesAndAptitudesController.options.length,
+        value: exp.text,
+        isSelected: exp.isSelected,
+      );
+    }
   }
 
   StudentVisa toVisa() {
     return StudentVisa(
       form: VisaEvaluation(
-        inattendance: responses[Inattendance]! as Inattendance,
-        ponctuality: responses[Ponctuality]! as Ponctuality,
-        sociability: responses[Sociability]! as Sociability,
-        politeness: responses[Politeness]! as Politeness,
-        motivation: responses[Motivation]! as Motivation,
-        dressCode: responses[DressCode]! as DressCode,
-        qualityOfWork: responses[QualityOfWork]! as QualityOfWork,
-        productivity: responses[Productivity]! as Productivity,
-        autonomy: responses[Autonomy]! as Autonomy,
-        cautiousness: responses[Cautiousness]! as Cautiousness,
-        generalAppreciation:
-            responses[GeneralAppreciation]! as GeneralAppreciation,
+        experiencesAndAptitudes: experiencesAndAptitudesController.options
+            .map((entry) => ExperiencesAndAptitudes(
+                text: entry.key, isSelected: entry.value))
+            .toList(),
       ),
       formVersion: _formVersion,
     );
@@ -266,6 +254,9 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
               'le nom de l’organisme ou l’entreprise concernée et l’année.',
           'Cocher celles à afficher dans le VISA en PDF (maximum de 8 items).'
         ]),
+        SizedBox(height: 8.0),
+        SelectableTextBoxes(
+            controller: _controller.experiencesAndAptitudesController),
       ],
     );
   }
