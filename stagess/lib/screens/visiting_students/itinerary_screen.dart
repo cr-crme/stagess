@@ -179,9 +179,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
       final isSuccess = await showDialog(
           context: context,
           builder: (context) => AlertDialog(
-                title: const Text(
-                  'Nom de l\'itinéraire',
-                ),
+                title: const Text('Créer un nouvel itinéraire'),
                 content: Form(
                   key: formKey,
                   child: TextFormField(
@@ -189,6 +187,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                     decoration: InputDecoration(
                       labelText: 'Nom de l\'itinéraire',
                     ),
+                    maxLength: 25,
                     initialValue: '',
                     onChanged: (newValue) => itineraryName = newValue,
                     validator: (value) {
@@ -223,6 +222,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
               ));
       if (isSuccess != true) return;
 
+      // TODO: isnew is no longer need
       // If it is the very first we recorded, save on the new name
       if (_teachersProvider.currentTeacher!.itineraries.isEmpty) {
         _routingController.setItineraryName(itineraryName!);
@@ -277,6 +277,10 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
 
     // Select the last itinerary used if exists, otherwise select the first one
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (_teachersProvider.currentTeacher!.itineraries.isEmpty) {
+        await _onSelectedItinerary(_newItineraryName);
+      }
+
       final preferences = await SharedPreferences.getInstance();
       final itineraryName = preferences.getString('last_itinerary_name');
 
@@ -310,9 +314,6 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     final isSmall = MediaQuery.of(context).size.width <
         ResponsiveService.smallScreenWidth + 200;
 
-    final itineraries = [...?_teachersProvider.currentTeacher?.itineraries]
-      ..sort((a, b) => a.name.compareTo(b.name));
-
     return Column(
       children: [
         if (_hasLock)
@@ -328,53 +329,33 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
               ),
               Flexible(
                 flex: 2,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (!isSmall) SizedBox(height: 60),
-                    Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8.0),
+                    color: Colors.blueGrey.withAlpha(20),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.all(4.0),
+                        child: Column(
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 32.0),
-                              child: DropdownButton<String?>(
-                                value:
-                                    _currentItinerary.name == _newItineraryName
-                                        ? null
-                                        : _currentItinerary.name,
-                                items: [
-                                  ...itineraries.map((e) => e.name),
-                                  _newItineraryName
-                                ]
-                                    .map((itineraryName) => DropdownMenuItem(
-                                          value: itineraryName,
-                                          child: Text(itineraryName),
-                                        ))
-                                    .toList(),
-                                onChanged: _onSelectedItinerary,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(right: 4.0),
-                              child: Row(
-                                children: [
-                                  _saveItineraryButton(),
-                                  _exportToPdfButton(),
-                                ],
-                              ),
-                            ),
+                            _buildDropdownMenu(
+                                itineraries: [
+                              ...?_teachersProvider.currentTeacher?.itineraries
+                            ]..sort((a, b) => a.name.compareTo(b.name))),
+                            _studentsToVisitWidget(context),
                           ],
                         ),
-                        _studentsToVisitWidget(context),
-                      ],
-                    ),
-                    _Distance(
-                      _routingController.distances,
-                      itinerary: _currentItinerary,
-                    ),
-                  ],
+                      ),
+                      _Distance(
+                        _routingController.distances,
+                        itinerary: _currentItinerary,
+                      ),
+                      SizedBox(height: 12.0),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -400,39 +381,54 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     );
   }
 
-  Widget _saveItineraryButton() {
-    return IconButton(
-      onPressed: _currentItinerary.name == _newItineraryName
-          ? () async => await _onSelectedItinerary(_currentItinerary.name)
-          : (_routingController.hasChanged
-              ? () async => await _sendItineraryToBackend(
-                  _currentItinerary.name,
-                  isNew: false)
-              : null),
-      icon: Icon(
-        Icons.save,
-        color: _currentItinerary.name == _newItineraryName ||
-                _routingController.hasChanged
-            ? Theme.of(context).primaryColor
-            : Colors.grey,
-      ),
-    );
-  }
+  Widget _buildDropdownMenu({required List<Itinerary> itineraries}) =>
+      LayoutBuilder(
+        builder: (context, constraints) => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.grey.withAlpha(40),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: DropdownButton<String?>(
+                icon: Icon(Icons.arrow_drop_down_outlined, size: 36),
+                value: _currentItinerary.name == _newItineraryName
+                    ? _currentItinerary.name
+                    : _currentItinerary.name,
+                items: [
+                  ...itineraries.map((e) => _buildDropdownItem(
+                      itineraryName: e.name, constraints: constraints)),
+                  _buildDropdownItem(
+                      itineraryName: _newItineraryName,
+                      constraints: constraints),
+                ],
+                onChanged: _onSelectedItinerary,
+              ),
+            ),
+          ],
+        ),
+      );
 
-  Widget _exportToPdfButton() {
-    final hasItinerary = _currentItinerary.length >= 2;
-
-    return IconButton(
-      onPressed: hasItinerary
-          ? () => showPdfDialog(context,
-              pdfGeneratorCallback: (context, format) => generateItineraryPdf(
-                  context, format,
-                  itineraryName: _currentItinerary.name))
-          : null,
-      icon: Icon(Icons.picture_as_pdf,
-          color: hasItinerary ? Theme.of(context).primaryColor : Colors.grey),
-    );
-  }
+  DropdownMenuItem<String> _buildDropdownItem(
+          {required String itineraryName,
+          required BoxConstraints constraints}) =>
+      DropdownMenuItem(
+        value: itineraryName,
+        child: SizedBox(
+            width: constraints.maxWidth - 36,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 12.0),
+                  child: Text(itineraryName),
+                ),
+                if (itineraryName == _newItineraryName)
+                  Icon(Icons.add, size: 30, color: Colors.green),
+              ],
+            )),
+      );
 
   Widget _map() {
     return LayoutBuilder(
@@ -450,7 +446,10 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                           widget.waypoints.length == 1 ? [] : widget.waypoints,
                       centerWaypoint: widget.waypoints.first,
                       itinerary: _currentItinerary,
-                      onItineraryChanged: (_) => setState(() {}),
+                      onItineraryChanged: (_) {
+                        _sendItineraryToBackend(_currentItinerary.name);
+                        setState(() {});
+                      },
                     ),
                     if (widget.waypoints.length == 1)
                       Container(
@@ -494,75 +493,49 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
   }
 }
 
-class _Distance extends StatefulWidget {
+class _Distance extends StatelessWidget {
   const _Distance(this.distances, {required this.itinerary});
 
   final List<double>? distances;
   final Itinerary itinerary;
 
   @override
-  State<_Distance> createState() => __DistanceState();
-}
-
-class __DistanceState extends State<_Distance> {
-  bool _isExpanded = false;
-
-  @override
   Widget build(BuildContext context) {
-    if (widget.distances == null) return Container();
+    if (distances == null) return Container();
 
-    return GestureDetector(
-      onTap: () {
-        _isExpanded = !_isExpanded;
-        setState(() {});
-      },
-      behavior: HitTestBehavior.opaque, // Make the full box clickable
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 5,
-                  ),
-                  child: Text(
-                    'Kilométrage\u00a0: '
-                    '${(widget.distances!.isEmpty ? 0 : widget.distances!.reduce((a, b) => a + b).toDouble() / 1000).toStringAsFixed(1)}km',
-                    style: _subtitleStyleOf(context),
-                  ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: Text(
+                  'Kilométrage\u00a0: '
+                  '${(distances!.isEmpty ? 0 : distances!.reduce((a, b) => a + b).toDouble() / 1000).toStringAsFixed(1)}km',
+                  style: _subtitleStyleOf(context),
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Theme.of(context).disabledColor),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: Icon(
-                    _isExpanded ? Icons.expand_less : Icons.expand_more,
-                    color: Theme.of(context).disabledColor,
-                  ),
-                ),
-              ],
-            ),
-            if (_isExpanded) ..._distancesTo(widget.distances!),
-          ],
-        ),
+              ),
+              _exportToPdfButton(context),
+            ],
+          ),
+          ..._distancesTo(distances!),
+        ],
       ),
     );
   }
 
   List<Widget> _distancesTo(List<double?> distances) {
     List<Widget> out = [];
-    if (distances.length + 1 != widget.itinerary.length) return out;
+    if (distances.length + 1 != itinerary.length) return out;
 
     for (int i = 0; i < distances.length; i++) {
       final distance = distances[i];
-      final startingPoint = widget.itinerary[i];
-      final endingPoint = widget.itinerary[i + 1];
+      final startingPoint = itinerary[i];
+      final endingPoint = itinerary[i + 1];
 
       out.add(
         Padding(
@@ -575,5 +548,20 @@ class __DistanceState extends State<_Distance> {
     }
 
     return out;
+  }
+
+  Widget _exportToPdfButton(BuildContext context) {
+    final hasItinerary = itinerary.length >= 2;
+
+    return IconButton(
+      onPressed: hasItinerary
+          ? () => showPdfDialog(context,
+              pdfGeneratorCallback: (context, format) => generateItineraryPdf(
+                  context, format,
+                  itineraryName: itinerary.name))
+          : null,
+      icon: Icon(Icons.picture_as_pdf,
+          color: hasItinerary ? Theme.of(context).primaryColor : Colors.grey),
+    );
   }
 }
