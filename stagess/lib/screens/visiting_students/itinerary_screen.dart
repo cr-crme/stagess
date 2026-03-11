@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stagess/common/provider_helpers/itineraries_helpers.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/common/widgets/dialogs/show_pdf_dialog.dart';
 import 'package:stagess/screens/visiting_students/itinerary_pdf_template.dart';
@@ -138,7 +139,8 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     onItineraryChanged: _onItineraryChanged,
   );
 
-  void _onItineraryChanged() {
+  Future<void> _onItineraryChanged() async {
+    await _saveItinerary();
     setState(() {});
   }
 
@@ -161,23 +163,20 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
       _teachersProvider.currentTeacher?.itineraries.firstOrNull ??
           Itinerary(name: _newItineraryName);
 
-  set currentItinerary(String name) {
-    _teachersProvider = TeachersProvider.of(context, listen: false);
-    if (_teachersProvider.currentTeacher?.itineraries == null) return;
-
-    _currentItinerary = _teachersProvider.currentTeacher!.itineraries
-        .firstWhere((e) => e.name == name, orElse: () => Itinerary(name: name));
-  }
-
   Future<void> _onSelectedItinerary(String? itineraryName) async {
     itineraryName ??= _currentItinerary.name;
 
-    bool isNew = false;
-    if (itineraryName == _newItineraryName) {
+    // Update the provider in case it has changed since the last time we used it
+    _teachersProvider = TeachersProvider.of(context, listen: false);
+    if (_teachersProvider.currentTeacher?.itineraries == null) return;
+
+    final isNew = itineraryName == _newItineraryName;
+    if (isNew) {
       final formKey = GlobalKey<FormState>();
 
       final isSuccess = await showDialog(
           context: context,
+          barrierDismissible: false,
           builder: (context) => AlertDialog(
                 title: const Text('Créer un nouvel itinéraire'),
                 content: Form(
@@ -195,7 +194,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                         return 'Le nom de l\'itinéraire ne peut pas être vide.';
                       } else if (value == _newItineraryName) {
                         return 'Veuillez choisir un nom différent de "$_newItineraryName".';
-                      } else if (_teachersProvider.currentTeacher?.itineraries
+                      } else if (_teachersProvider.currentTeacher!.itineraries
                               .any((itinerary) => itinerary.name == value) ==
                           true) {
                         return 'Vous avez déjà un itinéraire avec ce nom.';
@@ -205,10 +204,13 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                   ),
                 ),
                 actions: [
-                  OutlinedButton(
-                    onPressed: () => Navigator.of(context).pop(false),
-                    child: const Text('Annuler'),
-                  ),
+                  if (_teachersProvider.currentTeacher!.itineraries.isNotEmpty)
+                    OutlinedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(false);
+                      },
+                      child: const Text('Annuler'),
+                    ),
                   TextButton(
                     onPressed: () {
                       if (!(formKey.currentState?.validate() ?? false)) {
@@ -220,28 +222,31 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                   ),
                 ],
               ));
-      if (isSuccess != true) return;
+      if (isSuccess != true || !mounted) return;
 
-      // TODO: isnew is no longer need
-      // If it is the very first we recorded, save on the new name
-      if (_teachersProvider.currentTeacher!.itineraries.isEmpty) {
-        _routingController.setItineraryName(itineraryName!);
-        isNew = true;
+      if (_currentItinerary.name.isEmpty) {
+        showSnackBar(context,
+            message: 'Le nom de l\'itinéraire ne peut pas être vide.');
+        return;
       }
     } else if (itineraryName == _currentItinerary.name) {
       return;
     }
-    await _sendItineraryToBackend(itineraryName!, isNew: isNew);
+
+    _currentItinerary = _teachersProvider.currentTeacher!.itineraries
+        .firstWhere((e) => e.name == itineraryName!,
+            orElse: () => Itinerary(name: itineraryName!));
+    if (isNew) {
+      await ItinerariesHelpers.add(_currentItinerary,
+          teachers: _teachersProvider);
+    }
+    _routingController.setItinerary(_currentItinerary);
+
+    final preferences = await SharedPreferences.getInstance();
+    preferences.setString('last_itinerary_name', _currentItinerary.name);
   }
 
-  Future<void> _sendItineraryToBackend(String itineraryName,
-      {required bool isNew}) async {
-    if (itineraryName.isEmpty) {
-      showSnackBar(context,
-          message: 'Le nom de l\'itinéraire ne peut pas être vide.');
-      return;
-    }
-
+  Future<void> _saveItinerary() async {
     bool isSuccess =
         await _routingController.saveItinerary(teachers: _teachersProvider);
     if (!isSuccess) {
@@ -252,23 +257,6 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
             'Une erreur est survenue lors de l\'enregistrement de l\'itinéraire.',
       );
     }
-
-    currentItinerary = itineraryName;
-    _routingController.setItinerary(_currentItinerary);
-    isSuccess = await _routingController.saveItinerary(
-        teachers: _teachersProvider, force: true);
-
-    if (!mounted) return;
-    showSnackBar(
-      context,
-      message: isSuccess
-          ? 'Itinéraire enregistré avec succès.'
-          : 'Une erreur est survenue lors de l\'enregistrement de l\'itinéraire.',
-    );
-
-    final preferences = await SharedPreferences.getInstance();
-    preferences.setString('last_itinerary_name', _currentItinerary.name);
-    setState(() {});
   }
 
   @override
@@ -279,6 +267,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if (_teachersProvider.currentTeacher!.itineraries.isEmpty) {
         await _onSelectedItinerary(_newItineraryName);
+        await _saveItinerary();
       }
 
       final preferences = await SharedPreferences.getInstance();
@@ -296,10 +285,8 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
 
   @override
   void dispose() {
-    if (_routingController.hasChanged) {
-      _routingController.saveItinerary(teachers: _teachersProvider);
-    }
     _teachersProvider.releaseLockForItem(_teachersProvider.currentTeacher!);
+    _routingController.dispose();
 
     super.dispose();
   }
@@ -446,10 +433,6 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                           widget.waypoints.length == 1 ? [] : widget.waypoints,
                       centerWaypoint: widget.waypoints.first,
                       itinerary: _currentItinerary,
-                      onItineraryChanged: (_) {
-                        _sendItineraryToBackend(_currentItinerary.name);
-                        setState(() {});
-                      },
                     ),
                     if (widget.waypoints.length == 1)
                       Container(

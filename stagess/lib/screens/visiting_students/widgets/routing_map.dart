@@ -122,21 +122,16 @@ class RoutingController {
   bool _hasChanged = false;
   bool get hasChanged => _hasChanged;
 
-  Future<bool> saveItinerary(
-      {required TeachersProvider teachers, bool force = false}) async {
-    if (_hasChanged || force) {
-      return ItinerariesHelpers.add(_itinerary, teachers: teachers);
+  Future<bool> saveItinerary({required TeachersProvider teachers}) async {
+    bool isSuccess = true;
+    if (_hasChanged) {
+      isSuccess = await ItinerariesHelpers.add(_itinerary, teachers: teachers);
     }
     _hasChanged = false;
-    return true;
+    return isSuccess;
   }
 
-  void setItineraryName(String name) {
-    _itinerary = _itinerary.copyWith(name: name);
-    _hasChanged = true;
-  }
-
-  void setItinerary(Itinerary itinerary) async {
+  void setItinerary(Itinerary itinerary, {bool saveNow = false}) async {
     _itinerary = itinerary;
     _hasChanged = false;
     await _updateInternal();
@@ -153,6 +148,8 @@ class RoutingController {
     _hasChanged = true;
     _updateInternal();
   }
+
+  void dispose() {}
 
   void move(int oldIndex, int newIndex) {
     _itinerary.move(oldIndex, newIndex);
@@ -179,7 +176,7 @@ class RoutingController {
       _triggerSetState!();
     }
     if (onItineraryChanged != null) {
-      onItineraryChanged!();
+      await onItineraryChanged!();
     }
   }
 
@@ -232,14 +229,12 @@ class RoutingMap extends StatefulWidget {
     required this.waypoints,
     required this.centerWaypoint,
     required this.itinerary,
-    this.onItineraryChanged,
     this.onComputedDistancesCallback,
   });
 
   final RoutingController controller;
   final List<Waypoint> waypoints;
   final Waypoint centerWaypoint;
-  final Function(int index)? onItineraryChanged;
   final Function(List<double>?)? onComputedDistancesCallback;
   final Itinerary itinerary;
 
