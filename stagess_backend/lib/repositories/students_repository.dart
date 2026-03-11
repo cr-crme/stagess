@@ -178,48 +178,55 @@ class MySqlStudentsRepository extends StudentsRepository {
     required DatabaseUser user,
   }) async {
     final students = await sqlInterface.performSelectQuery(
-        user: user,
-        tableName: 'students',
-        filters: (studentId == null ? {} : {'id': studentId})
-          ..addAll(user.accessLevel == AccessLevel.superAdmin
-              ? {}
-              : {'school_board_id': user.schoolBoardId ?? ''}),
-        subqueries: [
-          sqlInterface.selectSubquery(
-            dataTableName: 'persons',
+      user: user,
+      tableName: 'students',
+      filters: (studentId == null ? {} : {'id': studentId})
+        ..addAll(user.accessLevel == AccessLevel.superAdmin
+            ? {}
+            : {'school_board_id': user.schoolBoardId ?? ''}),
+      subqueries: [
+        sqlInterface.selectSubquery(
+          dataTableName: 'persons',
+          fieldsToFetch: [
+            'first_name',
+            'middle_name',
+            'last_name',
+            'date_birthday',
+            'email'
+          ],
+        ),
+        sqlInterface.selectSubquery(
+            dataTableName: 'phone_numbers',
+            idNameToDataTable: 'entity_id',
+            fieldsToFetch: ['id', 'phone_number']),
+        sqlInterface.selectSubquery(
+            dataTableName: 'addresses',
+            idNameToDataTable: 'entity_id',
             fieldsToFetch: [
-              'first_name',
-              'middle_name',
-              'last_name',
-              'date_birthday',
-              'email'
-            ],
-          ),
-          sqlInterface.selectSubquery(
-              dataTableName: 'phone_numbers',
-              idNameToDataTable: 'entity_id',
-              fieldsToFetch: ['id', 'phone_number']),
-          sqlInterface.selectSubquery(
-              dataTableName: 'addresses',
-              idNameToDataTable: 'entity_id',
-              fieldsToFetch: [
-                'id',
-                'civic',
-                'street',
-                'apartment',
-                'city',
-                'postal_code',
-                'latitude',
-                'longitude',
-              ]),
-          sqlInterface.joinSubquery(
-              dataTableName: 'persons',
-              asName: 'contact',
-              idNameToDataTable: 'contact_id',
-              idNameToMainTable: 'student_id',
-              relationTableName: 'student_contacts',
-              fieldsToFetch: ['id']),
-        ]);
+              'id',
+              'civic',
+              'street',
+              'apartment',
+              'city',
+              'postal_code',
+              'latitude',
+              'longitude',
+            ]),
+        sqlInterface.joinSubquery(
+            dataTableName: 'persons',
+            asName: 'contact',
+            idNameToDataTable: 'contact_id',
+            idNameToMainTable: 'student_id',
+            relationTableName: 'student_contacts',
+            fieldsToFetch: ['id']),
+        sqlInterface.selectSubquery(
+          dataTableName: 'student_visa',
+          asName: 'all_visa',
+          fieldsToFetch: ['id', 'form_version'],
+          idNameToDataTable: 'student_id',
+        ),
+      ],
+    );
 
     final map = <String, Student>{};
     for (final student in students) {
@@ -272,6 +279,44 @@ class MySqlStudentsRepository extends StudentsRepository {
           (student['phone_numbers'] as List?)?.firstOrNull as Map? ?? {};
       student['address'] =
           (student['addresses'] as List?)?.firstOrNull as Map? ?? {};
+
+      final allVisa = [];
+      for (final Map<String, dynamic> visa
+          in (student['all_visa'] as List? ?? [])) {
+        final evaluationSubquery = (await sqlInterface.performSelectQuery(
+                user: user,
+                tableName: 'student_visa',
+                filters: {
+              'id': visa['id']
+            },
+                subqueries: [
+              sqlInterface.selectSubquery(
+                dataTableName: 'student_visa_items',
+                asName: 'visa',
+                fieldsToFetch: [
+                  'id',
+                  'evaluation_id',
+                  'inattendance',
+                  'ponctuality',
+                  'sociability',
+                  'politeness',
+                  'motivation',
+                  'dressCode',
+                  'quality_of_work',
+                  'productivity',
+                  'autonomy',
+                  'cautiousness',
+                  'general_appreciation',
+                ],
+                idNameToDataTable: 'visa_id',
+              ),
+            ]))
+            .first;
+
+        visa['visa'] = (evaluationSubquery['visa'] as List).first;
+        allVisa.add(visa);
+      }
+      student['all_visa'] = allVisa;
 
       map[id] = Student.fromSerialized(student);
     }
@@ -361,6 +406,44 @@ class MySqlStudentsRepository extends StudentsRepository {
     }
   }
 
+  Future<void> _insertToVisa(Student student, [Student? previous]) async {
+    for (final evaluation in student.allVisa.serialize()) {
+      if (previous?.allVisa.any((e) => e.id == evaluation['id']) ?? false) {
+        // Skip if the evaluation already exists
+        continue;
+      }
+
+      await sqlInterface.performInsertQuery(tableName: 'student_visa', data: {
+        'id': evaluation['id'],
+        'student_id': student.id,
+        'form_version': evaluation['form_version'],
+      });
+
+      // Insert the attitude
+      await sqlInterface
+          .performInsertQuery(tableName: 'student_visa_items', data: {
+        'id': evaluation['attitude']['id'],
+        'evaluation_id': evaluation['id'],
+        'inattendance': evaluation['attitude']['inattendance'],
+        'ponctuality': evaluation['attitude']['ponctuality'],
+        'sociability': evaluation['attitude']['sociability'],
+        'politeness': evaluation['attitude']['politeness'],
+        'motivation': evaluation['attitude']['motivation'],
+        'dressCode': evaluation['attitude']['dressCode'],
+        'quality_of_work': evaluation['attitude']['quality_of_work'],
+        'productivity': evaluation['attitude']['productivity'],
+        'autonomy': evaluation['attitude']['autonomy'],
+        'cautiousness': evaluation['attitude']['cautiousness'],
+        'general_appreciation': evaluation['attitude']['general_appreciation']
+      });
+    }
+  }
+
+  Future<void> _updateToVisa(Student student, Student previous) async {
+    // Attitude evaluations are not updated, but stacked
+    _insertToVisa(student, previous);
+  }
+
   @override
   Future<void> _putStudent({
     required Student student,
@@ -370,9 +453,11 @@ class MySqlStudentsRepository extends StudentsRepository {
     if (previous == null) {
       await _insertToStudents(student);
       await _insertToContacts(student);
+      await _insertToVisa(student);
     } else {
       await _updateToStudents(student, previous, user);
       await _updateToContacts(student: student, previous: previous, user: user);
+      await _updateToVisa(student, previous);
     }
   }
 
@@ -418,51 +503,55 @@ class StudentsRepositoryMock extends StudentsRepository {
   // Simulate a database with a map
   final _dummyDatabase = {
     '0': Student(
-        id: '0',
-        schoolBoardId: '0',
-        schoolId: '0',
-        firstName: 'John',
-        middleName: null,
-        lastName: 'Doe',
-        phone: PhoneNumber.fromString('098-765-4321'),
-        email: 'john.doe@email.com',
-        dateBirth: null,
-        address: Address.empty,
-        program: Program.fms,
-        group: 'A',
-        contact: Person(
-            id: '1',
-            firstName: 'Jane',
-            middleName: null,
-            lastName: 'Doe',
-            dateBirth: null,
-            address: Address.empty,
-            phone: PhoneNumber.fromString('123-456-7890'),
-            email: 'jane.doe@quebec.qc'),
-        contactLink: 'Mother'),
+      id: '0',
+      schoolBoardId: '0',
+      schoolId: '0',
+      firstName: 'John',
+      middleName: null,
+      lastName: 'Doe',
+      phone: PhoneNumber.fromString('098-765-4321'),
+      email: 'john.doe@email.com',
+      dateBirth: null,
+      address: Address.empty,
+      program: Program.fms,
+      group: 'A',
+      contact: Person(
+          id: '1',
+          firstName: 'Jane',
+          middleName: null,
+          lastName: 'Doe',
+          dateBirth: null,
+          address: Address.empty,
+          phone: PhoneNumber.fromString('123-456-7890'),
+          email: 'jane.doe@quebec.qc'),
+      contactLink: 'Mother',
+      allVisa: [],
+    ),
     '1': Student(
-        id: '1',
-        schoolBoardId: '0',
-        schoolId: '0',
-        firstName: 'Jane',
-        middleName: null,
-        lastName: 'Doe',
-        phone: PhoneNumber.fromString('123-456-7890'),
-        email: 'jane.doe@email.com',
-        dateBirth: null,
-        address: Address.empty,
-        program: Program.fms,
-        group: 'A',
-        contact: Person(
-            id: '0',
-            firstName: 'John',
-            middleName: null,
-            lastName: 'Doe',
-            dateBirth: null,
-            address: Address.empty,
-            phone: PhoneNumber.fromString('098-765-4321'),
-            email: 'john.doe@quebec.qc'),
-        contactLink: 'Father'),
+      id: '1',
+      schoolBoardId: '0',
+      schoolId: '0',
+      firstName: 'Jane',
+      middleName: null,
+      lastName: 'Doe',
+      phone: PhoneNumber.fromString('123-456-7890'),
+      email: 'jane.doe@email.com',
+      dateBirth: null,
+      address: Address.empty,
+      program: Program.fms,
+      group: 'A',
+      contact: Person(
+          id: '0',
+          firstName: 'John',
+          middleName: null,
+          lastName: 'Doe',
+          dateBirth: null,
+          address: Address.empty,
+          phone: PhoneNumber.fromString('098-765-4321'),
+          email: 'john.doe@quebec.qc'),
+      contactLink: 'Father',
+      allVisa: [],
+    ),
   };
 
   @override

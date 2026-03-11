@@ -248,12 +248,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             idNameToDataTable: 'internship_id',
           ),
           sqlInterface.selectSubquery(
-            dataTableName: 'internship_visa_evaluations',
-            asName: 'visa_evaluations',
-            fieldsToFetch: ['id', 'date', 'form_version'],
-            idNameToDataTable: 'internship_id',
-          ),
-          sqlInterface.selectSubquery(
             dataTableName: 'post_internship_enterprise_evaluations',
             asName: 'enterprise_evaluations',
             fieldsToFetch: [
@@ -467,44 +461,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
         attitudeEvaluations.add(evaluation);
       }
       internship['attitude_evaluations'] = attitudeEvaluations;
-
-      final visaEvaluations = [];
-      for (final Map<String, dynamic> evaluation
-          in (internship['visa_evaluations'] as List? ?? [])) {
-        final evaluationSubquery = (await sqlInterface.performSelectQuery(
-                user: user,
-                tableName: 'internship_visa_evaluations',
-                filters: {
-              'id': evaluation['id']
-            },
-                subqueries: [
-              sqlInterface.selectSubquery(
-                dataTableName: 'internship_visa_evaluation_items',
-                asName: 'visa',
-                fieldsToFetch: [
-                  'id',
-                  'evaluation_id',
-                  'inattendance',
-                  'ponctuality',
-                  'sociability',
-                  'politeness',
-                  'motivation',
-                  'dressCode',
-                  'quality_of_work',
-                  'productivity',
-                  'autonomy',
-                  'cautiousness',
-                  'general_appreciation',
-                ],
-                idNameToDataTable: 'evaluation_id',
-              ),
-            ]))
-            .first;
-
-        evaluation['attitude'] = (evaluationSubquery['visa'] as List).first;
-        visaEvaluations.add(evaluation);
-      }
-      internship['visa_evaluations'] = visaEvaluations;
 
       final sstEvaluations = [];
       for (final Map<String, dynamic> evaluation
@@ -847,51 +803,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     await _insertToAttitudeEvaluations(internship, previous);
   }
 
-  Future<void> _insertToVisaEvaluations(Internship internship,
-      [Internship? previous]) async {
-    for (final evaluation in internship.visaEvaluations.serialize()) {
-      if (previous?.visaEvaluations.any((e) => e.id == evaluation['id']) ??
-          false) {
-        // Skip if the evaluation already exists
-        continue;
-      }
-
-      await sqlInterface
-          .performInsertQuery(tableName: 'internship_visa_evaluations', data: {
-        'id': evaluation['id'],
-        'internship_id': internship.id,
-        'date': evaluation['date'],
-        'form_version': evaluation['form_version'],
-      });
-
-      // Insert the attitude
-      await sqlInterface.performInsertQuery(
-          tableName: 'internship_visa_evaluation_items',
-          data: {
-            'id': evaluation['attitude']['id'],
-            'evaluation_id': evaluation['id'],
-            'inattendance': evaluation['attitude']['inattendance'],
-            'ponctuality': evaluation['attitude']['ponctuality'],
-            'sociability': evaluation['attitude']['sociability'],
-            'politeness': evaluation['attitude']['politeness'],
-            'motivation': evaluation['attitude']['motivation'],
-            'dressCode': evaluation['attitude']['dressCode'],
-            'quality_of_work': evaluation['attitude']['quality_of_work'],
-            'productivity': evaluation['attitude']['productivity'],
-            'autonomy': evaluation['attitude']['autonomy'],
-            'cautiousness': evaluation['attitude']['cautiousness'],
-            'general_appreciation': evaluation['attitude']
-                ['general_appreciation']
-          });
-    }
-  }
-
-  Future<void> _updateToVisaEvaluations(
-      Internship internship, Internship previous) async {
-    // Attitude evaluations are not updated, but stacked
-    _insertToVisaEvaluations(internship, previous);
-  }
-
   Future<void> _insertJobSstEvaluation(Internship internship,
       [Internship? previous]) async {
     for (final evaluation in internship.sstEvaluations.serialize()) {
@@ -1015,7 +926,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
       toWait.add(_insertToContracts(internship, user: user));
       toWait.add(_insertToSkillEvaluations(internship));
       toWait.add(_insertToAttitudeEvaluations(internship));
-      toWait.add(_insertToVisaEvaluations(internship));
       toWait.add(_insertToEnterpriseEvaluation(internship));
       toWait.add(_insertJobSstEvaluation(internship));
     } else {
@@ -1023,7 +933,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
       toWait.add(_updateToContracts(internship, previous, user));
       toWait.add(_updateToSkillEvaluations(internship, previous));
       toWait.add(_updateToAttitudeEvaluations(internship, previous));
-      toWait.add(_updateToVisaEvaluations(internship, previous));
       toWait.add(_updateToEnterpriseEvaluation(internship, previous));
       toWait.add(_updateJobSstEvaluation(internship, previous));
     }
@@ -1115,7 +1024,6 @@ class InternshipsRepositoryMock extends InternshipsRepository {
       ],
       skillEvaluations: [],
       attitudeEvaluations: [],
-      visaEvaluations: [],
       sstEvaluations: [],
       enterpriseEvaluations: [],
       teacherNotes: 'Nope',
@@ -1180,7 +1088,6 @@ class InternshipsRepositoryMock extends InternshipsRepository {
       ],
       skillEvaluations: [],
       attitudeEvaluations: [],
-      visaEvaluations: [],
       sstEvaluations: [],
       enterpriseEvaluations: [],
       teacherNotes: 'Yes',

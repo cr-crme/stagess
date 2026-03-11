@@ -12,6 +12,8 @@ DROP TABLE IF EXISTS admins;
 
 DROP TABLE IF EXISTS student_contacts;
 DROP TABLE IF EXISTS students;
+DROP TABLE IF EXISTS student_visa;
+DROP TABLE IF EXISTS student_visaitems;
 
 DROP TABLE IF EXISTS teaching_groups;
 DROP TABLE IF EXISTS teacher_itineraries;
@@ -47,8 +49,6 @@ DROP TABLE IF EXISTS internship_skill_evaluation_items;
 DROP TABLE IF EXISTS internship_skill_evaluation_item_tasks;
 DROP TABLE IF EXISTS internship_attitude_evaluations;
 DROP TABLE IF EXISTS internship_attitude_evaluation_persons;
-DROP TABLE IF EXISTS internship_visa_evaluations;
-DROP TABLE IF EXISTS internship_visa_evaluation_items;
 DROP TABLE IF EXISTS internship_sst_evaluations;
 DROP TABLE IF EXISTS internship_sst_evaluation_questions;
 DROP TABLE IF EXISTS internship_sst_evaluation_persons;
@@ -62,6 +62,8 @@ DROP TABLE IF EXISTS schools;
 DROP TABLE IF EXISTS school_boards;
 
 /* OLD TABLES */
+DROP TABLE IF EXISTS internship_visa_evaluations;
+DROP TABLE IF EXISTS internship_visa_evaluation_items;
 DROP TABLE IF EXISTS enterprise_job_sst_evaluation_questions;
 DROP TABLE IF EXISTS internship_sst_evaluation_info;
 DROP TABLE IF EXISTS internship_attitude_evaluation_items;
@@ -181,6 +183,29 @@ CREATE TABLE student_contacts (
     FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 );
 
+CREATE TABLE student_visa (
+    id VARCHAR(36) NOT NULL PRIMARY KEY,
+    student_id VARCHAR(36) NOT NULL,
+    form_version VARCHAR(36) NOT NULL,
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+);
+
+CREATE TABLE student_visa_items (
+    id VARCHAR(36) NOT NULL PRIMARY KEY,
+    visa_id VARCHAR(36) NOT NULL,
+    inattendance INT NOT NULL,
+    ponctuality INT NOT NULL,
+    sociability INT NOT NULL,
+    politeness INT NOT NULL,
+    motivation INT NOT NULL,
+    dressCode INT NOT NULL,
+    quality_of_work INT NOT NULL,
+    productivity INT NOT NULL,
+    autonomy INT NOT NULL,
+    cautiousness INT NOT NULL,
+    general_appreciation INT NOT NULL,
+    FOREIGN KEY (visa_id) REFERENCES student_visa(id) ON DELETE CASCADE
+);
 
 /**** Teachers ****/
 
@@ -488,31 +513,6 @@ CREATE TABLE internship_attitude_evaluation_persons (
     evaluation_id VARCHAR(36) NOT NULL,
     person_name VARCHAR(100) NOT NULL,
     FOREIGN KEY (evaluation_id) REFERENCES internship_attitude_evaluations(id) ON DELETE CASCADE
-);
-
-CREATE TABLE internship_visa_evaluations (
-    id VARCHAR(36) NOT NULL PRIMARY KEY,
-    internship_id VARCHAR(36) NOT NULL,
-    date BIGINT NOT NULL,
-    form_version VARCHAR(36) NOT NULL,
-    FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE
-);
-
-CREATE TABLE internship_visa_evaluation_items (
-    id VARCHAR(36) NOT NULL PRIMARY KEY,
-    evaluation_id VARCHAR(36) NOT NULL,
-    inattendance INT NOT NULL,
-    ponctuality INT NOT NULL,
-    sociability INT NOT NULL,
-    politeness INT NOT NULL,
-    motivation INT NOT NULL,
-    dressCode INT NOT NULL,
-    quality_of_work INT NOT NULL,
-    productivity INT NOT NULL,
-    autonomy INT NOT NULL,
-    cautiousness INT NOT NULL,
-    general_appreciation INT NOT NULL,
-    FOREIGN KEY (evaluation_id) REFERENCES internship_visa_evaluations(id) ON DELETE CASCADE
 );
 
 CREATE TABLE internship_sst_evaluations(

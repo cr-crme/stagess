@@ -3,7 +3,7 @@ import 'package:logging/logging.dart';
 import 'package:stagess/common/extensions/job_extension.dart';
 import 'package:stagess/common/widgets/form_fields/low_high_slider_form_field.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/enterprise_evaluation_form_enums.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/forms/enterprise_evaluation_form_enums.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common/models/persons/student.dart';

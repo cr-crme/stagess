@@ -134,6 +134,7 @@ void main() {
         'group': student.group,
         'contact': student.contact.serialize(),
         'contact_link': student.contactLink,
+        'all_visa': [dummyStudentVisa().serialize()],
       });
 
       expect(deserialized.id, student.id);
@@ -151,6 +152,8 @@ void main() {
       expect(deserialized.group, student.group);
       expect(deserialized.contact.id, student.contact.id);
       expect(deserialized.contactLink, student.contactLink);
+      expect(deserialized.allVisa.length, student.allVisa.length);
+      expect(deserialized.allVisa[0].id, student.allVisa[0].id);
 
       // Test for empty deserialize to make sure it doesn't crash
       final emptyDeserialized = Student.fromSerialized({'id': 'emptyId'});
@@ -168,6 +171,7 @@ void main() {
       expect(emptyDeserialized.group, '-1');
       expect(emptyDeserialized.contact.toString(), Person.empty.toString());
       expect(emptyDeserialized.contactLink, '');
+      expect(emptyDeserialized.allVisa.length, 0);
     });
   });
 }

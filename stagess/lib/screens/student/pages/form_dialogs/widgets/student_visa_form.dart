@@ -1,70 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/visa_evaluation_form_dialog.dart';
-import 'package:stagess_common/models/internships/internship_evaluation_visa.dart';
-import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/forms/visa_form_dialog.dart';
+import 'package:stagess_common/models/persons/student_visa.dart';
+import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 
-final _logger = Logger('InternshipVisa');
+final _logger = Logger('StudentVisaForm');
 
-class InternshipVisa extends StatefulWidget {
-  const InternshipVisa({super.key, required this.internshipId});
+class StudentVisaForm extends StatefulWidget {
+  const StudentVisaForm({super.key, required this.studentId});
 
-  final String internshipId;
+  final String studentId;
 
   @override
-  State<InternshipVisa> createState() => _InternshipVisaState();
+  State<StudentVisaForm> createState() => _StudentVisaFormState();
 }
 
-class _InternshipVisaState extends State<InternshipVisa> {
+class _StudentVisaFormState extends State<StudentVisaForm> {
   static const _interline = 12.0;
-  int _currentEvaluationIndex = -1;
-  int _nbPreviousEvaluations = -1;
 
-  List<InternshipEvaluationVisa> get _evaluations =>
-      InternshipsProvider.of(context)
-          .fromId(widget.internshipId)
-          .visaEvaluations;
-
-  void _resetIndex() {
-    if (_nbPreviousEvaluations != _evaluations.length) {
-      _currentEvaluationIndex = _evaluations.length - 1;
-      _nbPreviousEvaluations = _evaluations.length;
-    }
-  }
-
-  Widget _buildLastEvaluation() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: _interline),
-      child: Row(
-        children: [
-          const Text('Évaluation du\u00a0: '),
-          DropdownButton<int>(
-            value: _currentEvaluationIndex,
-            onChanged: (value) =>
-                setState(() => _currentEvaluationIndex = value!),
-            items: _evaluations
-                .asMap()
-                .keys
-                .map(
-                  (index) => DropdownMenuItem(
-                    value: index,
-                    child: Text(
-                      DateFormat(
-                        'dd MMMM yyyy',
-                        'fr_CA',
-                      ).format(_evaluations[index].date),
-                    ),
-                  ),
-                )
-                .toList(),
-          ),
-        ],
-      ),
-    );
-  }
+  List<StudentVisa> get _evaluations =>
+      StudentsProvider.of(context).fromId(widget.studentId).allVisa;
+  // It is currently not possible to have more than one evaluation
+  final int _currentEvaluationIndex = 0;
 
   Widget _buildAttitudeIsGood() {
     return Padding(
@@ -143,11 +102,8 @@ class _InternshipVisaState extends State<InternshipVisa> {
         child: OutlinedButton(
           onPressed: () => showVisaEvaluationFormDialog(
             context: context,
-            formController: VisaEvaluationFormController.fromInternshipId(
-              context,
-              internshipId: widget.internshipId,
-              evaluationIndex: _currentEvaluationIndex,
-            ),
+            formController: VisaFormController.fromStudentId(context,
+                studentId: widget.studentId),
             editMode: false,
           ),
           child: const Text('Voir l\'évaluation détaillée'),
@@ -159,10 +115,8 @@ class _InternshipVisaState extends State<InternshipVisa> {
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-      'Building InternshipVisa for internship: ${widget.internshipId}',
+      'Building InternshipVisa for ${widget.studentId}',
     );
-
-    _resetIndex();
 
     return AnimatedExpandingCard(
       elevation: 0.0,
@@ -184,7 +138,6 @@ class _InternshipVisaState extends State<InternshipVisa> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildLastEvaluation(),
                 _buildAttitudeIsGood(),
                 _buildAttitudeIsBad(),
                 _buildGeneralAppreciation(),

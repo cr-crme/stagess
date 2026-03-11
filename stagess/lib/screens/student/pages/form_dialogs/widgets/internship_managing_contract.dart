@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/dialogs/show_pdf_dialog.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/internship_managing_contract_form_dialog.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/pdf/internship_contract_pdf_template.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/widgets/internship_evaluation_card.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/forms/internship_managing_contract_form_dialog.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/pdf/internship_contract_pdf_template.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/widgets/internship_evaluation_card.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 
 final _logger = Logger('InternshipManagingContract');

@@ -95,25 +95,20 @@ class VisaEvaluation extends ItemSerializable {
   }
 }
 
-class InternshipEvaluationVisa extends ItemSerializable {
+class StudentVisa extends ItemSerializable {
   static const String currentVersion = '1.0.0';
 
-  DateTime date;
   VisaEvaluation form;
   String
       formVersion; // The version of the evaluation form (so data can be parsed properly)
 
-  InternshipEvaluationVisa({
+  StudentVisa({
     super.id,
-    required this.date,
     required this.form,
     required this.formVersion,
   });
-  InternshipEvaluationVisa.fromSerialized(super.map)
-      : date = map?['date'] == null
-            ? DateTime(0)
-            : DateTime.fromMillisecondsSinceEpoch(map!['date']),
-        form = VisaEvaluation.fromSerialized(map?['form'] ?? {}),
+  StudentVisa.fromSerialized(super.map)
+      : form = VisaEvaluation.fromSerialized(map?['form'] ?? {}),
         formVersion = map?['form_version'] ?? currentVersion,
         super.fromSerialized();
 
@@ -121,7 +116,6 @@ class InternshipEvaluationVisa extends ItemSerializable {
   Map<String, dynamic> serializedMap() {
     return {
       'id': id,
-      'date': date.millisecondsSinceEpoch,
       'form': form.serialize(),
       'form_version': formVersion,
     };
@@ -129,15 +123,13 @@ class InternshipEvaluationVisa extends ItemSerializable {
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
-        'date': FetchableFields.optional,
         'form': FetchableFields.optional,
         'form_version': FetchableFields.mandatory,
       });
 
   @override
   String toString() {
-    return 'InternshipEvaluationVisa(date: $date, '
-        'form: $form.toString(), ';
+    return 'StudentEvaluationVisa(form: $form.toString(), ';
   }
 }
 

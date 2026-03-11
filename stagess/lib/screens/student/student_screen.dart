@@ -6,7 +6,7 @@ import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
 import 'package:stagess/screens/student/pages/about_page.dart';
 import 'package:stagess/screens/student/pages/internships_page.dart';
-import 'package:stagess/screens/student/pages/skills_page.dart';
+import 'package:stagess/screens/student/pages/progression_page.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
@@ -83,7 +83,6 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
 
   final _aboutPageKey = GlobalKey<AboutPageState>();
   final _internshipPageKey = GlobalKey<InternshipsPageState>();
-  final _skillsPageKey = GlobalKey<SkillsPageState>();
 
   void _onTapBack() async {
     _logger.finer(
@@ -155,7 +154,7 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
                         key: _internshipPageKey,
                         student: student,
                       ),
-                      SkillsPage(key: _skillsPageKey, student: student),
+                      SkillsPage(studentId: student.id),
                     ],
                   )
                 : Center(

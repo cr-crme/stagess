@@ -6,6 +6,7 @@ import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/persons/person.dart';
+import 'package:stagess_common/models/persons/student_visa.dart';
 
 enum Program {
   fpt,
@@ -59,6 +60,8 @@ class Student extends Person {
   final Person contact;
   final String contactLink;
 
+  final List<StudentVisa> allVisa;
+
   static Student get empty => Student(
         schoolBoardId: '-1',
         schoolId: '-1',
@@ -72,6 +75,7 @@ class Student extends Person {
         group: '-1',
         contact: Person.empty,
         contactLink: '',
+        allVisa: [],
       );
 
   Student({
@@ -90,6 +94,7 @@ class Student extends Person {
     required this.group,
     required this.contact,
     required this.contactLink,
+    required this.allVisa,
   }) : photo = photo ?? Random().nextInt(0xFFFFFF).toString();
 
   Student.fromSerialized(super.map)
@@ -103,6 +108,9 @@ class Student extends Person {
         group = StringExt.from(map?['group']) ?? '-1',
         contact = Person.fromSerialized(map?['contact'] ?? {}),
         contactLink = StringExt.from(map?['contact_link']) ?? '',
+        allVisa = ListExt.from(map?['all_visa'],
+                deserializer: (map) => StudentVisa.fromSerialized(map)) ??
+            [],
         super.fromSerialized();
 
   @override
@@ -117,6 +125,7 @@ class Student extends Person {
         'group': group.serialize(),
         'contact': contact.serialize(),
         'contact_link': contactLink.serialize(),
+        'all_visa': allVisa.serialize(),
       });
   }
 
@@ -129,6 +138,8 @@ class Student extends Person {
       'group': FetchableFields.mandatory,
       'contact': Person.fetchableFields,
       'contact_link': FetchableFields.optional,
+      'all_visa': FetchableFields.mandatory
+        ..addAll(FetchableFields.reference({'*': StudentVisa.fetchableFields})),
     }));
 
   Student get limitedInfo => Student(
@@ -144,6 +155,7 @@ class Student extends Person {
         contact: Person.empty,
         phone: PhoneNumber.empty,
         contactLink: '',
+        allVisa: [],
         dateBirth: null,
         email: null,
       );
@@ -165,6 +177,7 @@ class Student extends Person {
     String? group,
     Person? contact,
     String? contactLink,
+    List<StudentVisa>? allVisa,
   }) =>
       Student(
         id: id ?? this.id,
@@ -181,6 +194,7 @@ class Student extends Person {
         group: group ?? this.group,
         contact: contact ?? this.contact,
         contactLink: contactLink ?? this.contactLink,
+        allVisa: allVisa?.toList() ?? this.allVisa,
         photo: photo ?? this.photo,
       );
 
@@ -206,6 +220,7 @@ class Student extends Person {
           'group',
           'contact',
           'contact_link',
+          'all_visa',
         ].contains(key))) {
       throw InvalidFieldException('Invalid field data detected');
     }
@@ -227,11 +242,20 @@ class Student extends Person {
       group: StringExt.from(data['group']) ?? group,
       contact: contact.copyWithData(data['contact']),
       contactLink: StringExt.from(data['contact_link']) ?? contactLink,
+      allVisa: ListExt.from(data['all_visa'],
+              deserializer: (map) => StudentVisa.fromSerialized(map)) ??
+          allVisa,
     );
   }
 
   @override
   String toString() {
-    return 'Student{${super.toString()}, photo: $photo, program: $program, group: $group, contact: $contact, contactLink: $contactLink}';
+    return 'Student{${super.toString()}, '
+        'photo: $photo, '
+        'program: $program, '
+        'group: $group, '
+        'contact: $contact, '
+        'contactLink: $contactLink}'
+        'allVisa: $allVisa}';
   }
 }

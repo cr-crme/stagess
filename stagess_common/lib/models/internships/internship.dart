@@ -5,7 +5,6 @@ import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/internships/internship_contract.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
-import 'package:stagess_common/models/internships/internship_evaluation_visa.dart';
 import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common/models/internships/sst_evaluation.dart';
 
@@ -38,7 +37,6 @@ class Internship extends ExtendedItemSerializable {
   final List<InternshipContract> contracts;
   final List<InternshipEvaluationSkill> skillEvaluations;
   final List<InternshipEvaluationAttitude> attitudeEvaluations;
-  final List<InternshipEvaluationVisa> visaEvaluations;
   final List<SstEvaluation> sstEvaluations;
   final List<PostInternshipEnterpriseEvaluation> enterpriseEvaluations;
 
@@ -57,7 +55,6 @@ class Internship extends ExtendedItemSerializable {
     contracts.sort((a, b) => a.date.compareTo(b.date));
     skillEvaluations.sort((a, b) => a.date.compareTo(b.date));
     attitudeEvaluations.sort((a, b) => a.date.compareTo(b.date));
-    visaEvaluations.sort((a, b) => a.date.compareTo(b.date));
     sstEvaluations.sort((a, b) => a.date.compareTo(b.date));
     enterpriseEvaluations.sort((a, b) => a.date.compareTo(b.date));
   }
@@ -75,7 +72,6 @@ class Internship extends ExtendedItemSerializable {
     required this.contracts,
     required this.skillEvaluations,
     required this.attitudeEvaluations,
-    required this.visaEvaluations,
     required this.sstEvaluations,
     required this.enterpriseEvaluations,
   }) {
@@ -94,7 +90,6 @@ class Internship extends ExtendedItemSerializable {
         contracts: [],
         skillEvaluations: [],
         attitudeEvaluations: [],
-        visaEvaluations: [],
         sstEvaluations: [],
         enterpriseEvaluations: [],
       );
@@ -122,10 +117,6 @@ class Internship extends ExtendedItemSerializable {
                 deserializer: (map) =>
                     InternshipEvaluationAttitude.fromSerialized(map)) ??
             [],
-        visaEvaluations = ListExt.from(map?['visa_evaluations'],
-                deserializer: (map) =>
-                    InternshipEvaluationVisa.fromSerialized(map)) ??
-            [],
         sstEvaluations = ListExt.from(map?['sst_evaluations'],
                 deserializer: (map) => SstEvaluation.fromSerialized(map)) ??
             [],
@@ -151,7 +142,6 @@ class Internship extends ExtendedItemSerializable {
         'contracts': contracts.serialize(),
         'skill_evaluations': skillEvaluations.serialize(),
         'attitude_evaluations': attitudeEvaluations.serialize(),
-        'visa_evaluations': visaEvaluations.serialize(),
         'sst_evaluations': sstEvaluations.serialize(),
         'enterprise_evaluations': enterpriseEvaluations.serialize(),
       };
@@ -175,9 +165,6 @@ class Internship extends ExtendedItemSerializable {
         'attitude_evaluations': FetchableFields.mandatory
           ..addAll(FetchableFields.reference(
               {'*': InternshipEvaluationAttitude.fetchableFields})),
-        'visa_evaluations': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference(
-              {'*': InternshipEvaluationVisa.fetchableFields})),
         'sst_evaluations': FetchableFields.mandatory
           ..addAll(
               FetchableFields.reference({'*': SstEvaluation.fetchableFields})),
@@ -199,7 +186,6 @@ class Internship extends ExtendedItemSerializable {
     List<InternshipContract>? contracts,
     List<InternshipEvaluationSkill>? skillEvaluations,
     List<InternshipEvaluationAttitude>? attitudeEvaluations,
-    List<InternshipEvaluationVisa>? visaEvaluations,
     List<SstEvaluation>? sstEvaluations,
     List<PostInternshipEnterpriseEvaluation>? enterpriseEvaluations,
   }) {
@@ -218,7 +204,6 @@ class Internship extends ExtendedItemSerializable {
       skillEvaluations: skillEvaluations?.toList() ?? this.skillEvaluations,
       attitudeEvaluations:
           attitudeEvaluations?.toList() ?? this.attitudeEvaluations,
-      visaEvaluations: visaEvaluations?.toList() ?? this.visaEvaluations,
       sstEvaluations: sstEvaluations ?? this.sstEvaluations,
       enterpriseEvaluations:
           enterpriseEvaluations ?? this.enterpriseEvaluations,
@@ -243,7 +228,6 @@ class Internship extends ExtendedItemSerializable {
       'contracts',
       'skill_evaluations',
       'attitude_evaluations',
-      'visa_evaluations',
       'sst_evaluations',
       'enterprise_evaluations',
     ];
@@ -285,10 +269,6 @@ class Internship extends ExtendedItemSerializable {
               deserializer: (map) =>
                   InternshipEvaluationAttitude.fromSerialized(map)) ??
           attitudeEvaluations,
-      visaEvaluations: ListExt.from(data['visa_evaluations'],
-              deserializer: (map) =>
-                  InternshipEvaluationVisa.fromSerialized(map)) ??
-          visaEvaluations,
       sstEvaluations: ListExt.from(data['sst_evaluations'],
               deserializer: (map) => SstEvaluation.fromSerialized(map)) ??
           sstEvaluations,
@@ -311,7 +291,6 @@ class Internship extends ExtendedItemSerializable {
         'contracts: $contracts, '
         'skillEvaluations: $skillEvaluations, '
         'attitudeEvaluations: $attitudeEvaluations, '
-        'visaEvaluations: $visaEvaluations, '
         'sstEvaluations: $sstEvaluations, '
         'enterpriseEvaluations: $enterpriseEvaluations'
         '}';

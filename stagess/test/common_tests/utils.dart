@@ -12,8 +12,7 @@ import 'package:stagess_common/models/internships/internship_contract.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart'
     as attitude;
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
-import 'package:stagess_common/models/internships/internship_evaluation_visa.dart'
-    as visa;
+import 'package:stagess_common/models/persons/student_visa.dart' as visa;
 import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/sst_evaluation.dart';
@@ -101,6 +100,7 @@ Student dummyStudent({
     contactLink: 'Mère',
     group: group,
     program: program,
+    allVisa: [dummyStudentVisa()],
   );
 }
 
@@ -288,13 +288,12 @@ PostInternshipEnterpriseEvaluation dummyPostInternshipEnterpriseEvaluation({
         absenceAcceptance: 4,
         sstManagement: 1);
 
-visa.InternshipEvaluationVisa dummyInternshipVisaEvaluation({
+visa.StudentVisa dummyStudentVisa({
   String id = 'internshipVisaEvaluationId',
 }) =>
-    visa.InternshipEvaluationVisa(
+    visa.StudentVisa(
       id: id,
-      date: DateTime(1980, 5, 20),
-      formVersion: visa.InternshipEvaluationVisa.currentVersion,
+      formVersion: visa.StudentVisa.currentVersion,
       form: visa.VisaEvaluation(
         id: 'visaEvaluationId',
         inattendance: visa.Inattendance.rarely,
@@ -340,7 +339,6 @@ Internship dummyInternship({
     sstEvaluations: [dummySstEvaluation(id: id)],
     skillEvaluations: [dummyInternshipEvaluationSkill()],
     attitudeEvaluations: [dummyInternshipEvaluationAttitude()],
-    visaEvaluations: [dummyInternshipVisaEvaluation()],
     teacherNotes: '',
   );
 }

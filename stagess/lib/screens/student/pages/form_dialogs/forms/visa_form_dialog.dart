@@ -1,25 +1,23 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/common/widgets/scrollable_stepper.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
-import 'package:stagess_common/models/internships/internship.dart';
-import 'package:stagess_common/models/internships/internship_evaluation_visa.dart';
+import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common/models/persons/student_visa.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
-import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
-import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 
-final _logger = Logger('VisaEvaluationScreen');
+final _logger = Logger('VisaFormDialog');
 
-Future<Internship?> showVisaEvaluationFormDialog({
+Future<Student?> showVisaEvaluationFormDialog({
   required BuildContext context,
-  required VisaEvaluationFormController formController,
+  required VisaFormController formController,
   required bool editMode,
 }) async {
-  final newEvaluation = await showDialog<InternshipEvaluationVisa?>(
+  final newEvaluation = await showDialog<StudentVisa?>(
     context: context,
     barrierDismissible: false,
     builder: (context) => Navigator(
@@ -36,33 +34,36 @@ Future<Internship?> showVisaEvaluationFormDialog({
   );
   if (newEvaluation == null || !context.mounted) return null;
 
-  final internship = InternshipsProvider.of(context, listen: false)
-      .fromId(formController.internshipId);
-  return Internship.fromSerialized(internship.serialize())
-    ..visaEvaluations.add(newEvaluation);
+  final student = StudentsProvider.of(context, listen: false)
+      .fromId(formController.studentId);
+
+  // Erase the previous visa and replace it by the new one
+  return Student.fromSerialized(student.serialize())
+    ..allVisa.clear()
+    ..allVisa.add(newEvaluation);
 }
 
-class VisaEvaluationFormController {
+class VisaFormController {
   static const _formVersion = '1.0.0';
 
-  VisaEvaluationFormController({required this.internshipId});
-  final String internshipId;
-  Internship internship(BuildContext context, {bool listen = true}) =>
-      InternshipsProvider.of(context, listen: listen)[internshipId];
+  VisaFormController({required this.studentId});
 
-  factory VisaEvaluationFormController.fromInternshipId(
+  final String studentId;
+  Student student(BuildContext context, {bool listen = true}) =>
+      StudentsProvider.of(context, listen: listen).fromId(studentId);
+
+  factory VisaFormController.fromStudentId(
     BuildContext context, {
-    required String internshipId,
-    required int evaluationIndex,
+    required String studentId,
   }) {
-    Internship internship =
-        InternshipsProvider.of(context, listen: false)[internshipId];
-    InternshipEvaluationVisa visaForm =
-        internship.visaEvaluations[evaluationIndex];
+    Student student =
+        StudentsProvider.of(context, listen: false).fromId(studentId);
 
-    final controller = VisaEvaluationFormController(internshipId: internshipId);
+    // It is currently not possible to have more than one evaluation
+    final evaluationIndex = 0;
+    StudentVisa visaForm = student.allVisa[evaluationIndex];
 
-    controller.evaluationDate = visaForm.date;
+    final controller = VisaFormController(studentId: studentId);
 
     controller.responses[Inattendance] = visaForm.form.inattendance;
     controller.responses[Ponctuality] = visaForm.form.ponctuality;
@@ -80,9 +81,8 @@ class VisaEvaluationFormController {
     return controller;
   }
 
-  InternshipEvaluationVisa toInternshipEvaluation() {
-    return InternshipEvaluationVisa(
-      date: evaluationDate,
+  StudentVisa toVisa() {
+    return StudentVisa(
       form: VisaEvaluation(
         inattendance: responses[Inattendance]! as Inattendance,
         ponctuality: responses[Ponctuality]! as Ponctuality,
@@ -101,7 +101,6 @@ class VisaEvaluationFormController {
     );
   }
 
-  DateTime evaluationDate = DateTime.now();
   Map<Type, VisaCategoryEnum?> responses = {};
 
   bool get isAttitudeCompleted =>
@@ -133,7 +132,7 @@ class _VisaEvaluationScreen extends StatefulWidget {
   });
 
   final BuildContext rootContext;
-  final VisaEvaluationFormController formController;
+  final VisaFormController formController;
   final bool editMode;
 
   @override
@@ -219,16 +218,9 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
       return;
     }
 
-    final internships = InternshipsProvider.of(context, listen: false);
-    final internship = internships.fromId(widget.formController.internshipId);
-
-    internship.visaEvaluations.add(
-      widget.formController.toInternshipEvaluation(),
-    );
-
     _logger.fine('Visa evaluation form submitted successfully');
     if (!widget.rootContext.mounted) return;
-    Navigator.of(widget.rootContext).pop(internship);
+    Navigator.of(widget.rootContext).pop(widget.formController.toVisa());
   }
 
   Widget _controlBuilder(BuildContext context, ControlsDetails details) {
@@ -262,21 +254,20 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
   @override
   Widget build(BuildContext context) {
     _logger.finer(
-      'Building AttitudeEvaluationScreen for internship: ${widget.formController.internshipId}',
+      'Building AttitudeEvaluationScreen for student: ${widget.formController.studentId}',
     );
 
-    final internship =
-        InternshipsProvider.of(context)[widget.formController.internshipId];
-    final student = StudentsHelpers.studentsInMyGroups(
-      context,
-    ).firstWhereOrNull((e) => e.id == internship.studentId);
+    final student = StudentsHelpers.studentsInMyGroups(context)
+        .firstWhereOrNull((e) => e.id == widget.formController.studentId);
 
     return SizedBox(
       width: ResponsiveService.maxBodyWidth,
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            '${student == null ? 'En attente des informations' : 'Évaluation de ${student.fullName}'}\nC2. Attitudes - Comportements',
+            student == null
+                ? 'En attente des informations'
+                : 'Génération du visa pour ${student.firstName} ${student.lastName}',
           ),
           leading: IconButton(
             onPressed: _cancel,
@@ -421,7 +412,7 @@ class _AttitudeGeneralDetailsStep extends StatelessWidget {
     required this.editMode,
   });
 
-  final VisaEvaluationFormController formController;
+  final VisaFormController formController;
   final bool editMode;
 
   @override
@@ -429,66 +420,7 @@ class _AttitudeGeneralDetailsStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _EvaluationDate(formController: formController, editMode: editMode),
-      ],
-    );
-  }
-}
-
-class _EvaluationDate extends StatefulWidget {
-  const _EvaluationDate({required this.formController, required this.editMode});
-
-  final VisaEvaluationFormController formController;
-  final bool editMode;
-
-  @override
-  State<_EvaluationDate> createState() => _EvaluationDateState();
-}
-
-class _EvaluationDateState extends State<_EvaluationDate> {
-  void _promptDate(BuildContext context) async {
-    final newDate = await showCustomDatePicker(
-      helpText: 'Sélectionner la date',
-      cancelText: 'Annuler',
-      confirmText: 'Confirmer',
-      context: context,
-      initialDate: widget.formController.evaluationDate,
-      firstDate: DateTime(DateTime.now().year),
-      lastDate: DateTime(DateTime.now().year + 2),
-    );
-    if (newDate == null) return;
-
-    widget.formController.evaluationDate = newDate;
-    setState(() {});
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SubTitle('Date de l\'évaluation'),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Row(
-            children: [
-              Text(
-                DateFormat(
-                  'dd MMMM yyyy',
-                  'fr_CA',
-                ).format(widget.formController.evaluationDate),
-              ),
-              if (widget.editMode)
-                IconButton(
-                  icon: const Icon(
-                    Icons.calendar_month_outlined,
-                    color: Colors.blue,
-                  ),
-                  onPressed: () => _promptDate(context),
-                ),
-            ],
-          ),
-        ),
+        Text('TODO'),
       ],
     );
   }
@@ -503,7 +435,7 @@ class _AttitudeRadioChoices extends StatefulWidget {
   });
 
   final String title;
-  final VisaEvaluationFormController formController;
+  final VisaFormController formController;
   final List<VisaCategoryEnum> elements;
   final bool editMode;
 

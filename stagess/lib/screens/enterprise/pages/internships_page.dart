@@ -7,7 +7,7 @@ import 'package:stagess/common/extensions/enterprise_extension.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/router.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/enterprise_evaluation_form_dialog.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/forms/enterprise_evaluation_form_dialog.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/schedule.dart';

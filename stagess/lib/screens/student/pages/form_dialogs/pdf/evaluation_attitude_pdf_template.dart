@@ -7,7 +7,7 @@ import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:stagess/common/pdf_widgets/pdf_radio_buttons.dart';
 import 'package:stagess/common/pdf_widgets/pdf_were_present.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/attitude_evaluation_form_dialog.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/forms/attitude_evaluation_form_dialog.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';

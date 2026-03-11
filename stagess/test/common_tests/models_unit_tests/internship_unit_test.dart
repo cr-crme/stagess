@@ -218,7 +218,6 @@ void main() {
         'enterprise_evaluations': [
           dummyPostInternshipEnterpriseEvaluation().serialize()
         ],
-        'visa_evaluations': [dummyInternshipVisaEvaluation().serialize()],
       };
       expect(serialized, expected);
 
@@ -265,10 +264,6 @@ void main() {
         deserialized.enterpriseEvaluations[0].id,
         internship.enterpriseEvaluations[0].id,
       );
-      expect(
-        deserialized.visaEvaluations[0].id,
-        internship.visaEvaluations[0].id,
-      );
 
       // Test for empty deserialize to make sure it doesn't crash
       final emptyDeserialized = Internship.fromSerialized({'id': 'emptyId'});
@@ -284,7 +279,6 @@ void main() {
       expect(emptyDeserialized.attitudeEvaluations.length, 0);
       expect(emptyDeserialized.sstEvaluations[0].id, isNotNull);
       expect(emptyDeserialized.enterpriseEvaluations.length, 0);
-      expect(emptyDeserialized.visaEvaluations.length, 0);
 
       expect(() => emptyDeserialized.currentContract!.dates, throwsStateError);
       expect(() => emptyDeserialized.currentContract!.weeklySchedules,

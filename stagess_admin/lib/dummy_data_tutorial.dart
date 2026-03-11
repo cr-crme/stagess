@@ -443,6 +443,7 @@ Future<void> _addDummyStudents(
         email: 'p.masson@email.com',
       ),
       contactLink: 'Père',
+      allVisa: [],
     ),
   );
 
@@ -475,6 +476,7 @@ Future<void> _addDummyStudents(
         longitude: -73.5892134,
       ),
       phone: PhoneNumber.fromString('514 222 3344'),
+      allVisa: [],
     ),
   );
 
@@ -507,6 +509,7 @@ Future<void> _addDummyStudents(
         longitude: -73.582566,
       ),
       phone: PhoneNumber.fromString('514 333 4455'),
+      allVisa: [],
     ),
   );
 
@@ -539,6 +542,7 @@ Future<void> _addDummyStudents(
         longitude: -73.6525667,
       ),
       phone: PhoneNumber.fromString('514 999 8877'),
+      allVisa: [],
     ),
   );
 
@@ -571,6 +575,7 @@ Future<void> _addDummyStudents(
         longitude: -73.6008457,
       ),
       phone: PhoneNumber.fromString('514 888 7766'),
+      allVisa: [],
     ),
   );
 
@@ -610,6 +615,7 @@ Future<void> _addDummyStudents(
         longitude: -73.6011,
       ),
       phone: PhoneNumber.fromString('514 444 5566'),
+      allVisa: [],
     ),
   );
 
@@ -642,6 +648,7 @@ Future<void> _addDummyStudents(
         longitude: -73.5993743,
       ),
       phone: PhoneNumber.fromString('514 555 9988'),
+      allVisa: [],
     ),
   );
 
@@ -674,6 +681,7 @@ Future<void> _addDummyStudents(
         longitude: -73.5986346,
       ),
       phone: PhoneNumber.fromString('514 778 8899'),
+      allVisa: [],
     ),
   );
 
@@ -706,6 +714,7 @@ Future<void> _addDummyStudents(
         longitude: -73.5676913,
       ),
       phone: PhoneNumber.fromString('514 321 6655'),
+      allVisa: [],
     ),
   );
 
@@ -738,6 +747,7 @@ Future<void> _addDummyStudents(
         longitude: -73.5687893,
       ),
       phone: PhoneNumber.fromString('514 567 9999'),
+      allVisa: [],
     ),
   );
 
@@ -770,6 +780,7 @@ Future<void> _addDummyStudents(
         longitude: -73.471654,
       ),
       phone: PhoneNumber.fromString('514 567 9999'),
+      allVisa: [],
     ),
   );
 
@@ -802,6 +813,7 @@ Future<void> _addDummyStudents(
         longitude: -73.4590631,
       ),
       phone: PhoneNumber.fromString('514 567 1111'),
+      allVisa: [],
     ),
   );
 
@@ -834,6 +846,7 @@ Future<void> _addDummyStudents(
         longitude: -73.43585,
       ),
       phone: PhoneNumber.fromString('514 567 1111'),
+      allVisa: [],
     ),
   );
 
@@ -866,6 +879,7 @@ Future<void> _addDummyStudents(
         longitude: -73.4712249,
       ),
       phone: PhoneNumber.fromString('514 567 2222'),
+      allVisa: [],
     ),
   );
 
@@ -898,6 +912,7 @@ Future<void> _addDummyStudents(
         longitude: -73.4719261,
       ),
       phone: PhoneNumber.fromString('514 567 2222'),
+      allVisa: [],
     ),
   );
 
@@ -930,6 +945,7 @@ Future<void> _addDummyStudents(
         longitude: -73.6298599,
       ),
       phone: PhoneNumber.fromString('514 567 9988'),
+      allVisa: [],
     ),
   );
 
@@ -962,6 +978,7 @@ Future<void> _addDummyStudents(
         longitude: -73.6632507,
       ),
       phone: PhoneNumber.fromString('514 567 9988'),
+      allVisa: [],
     ),
   );
 
@@ -994,6 +1011,7 @@ Future<void> _addDummyStudents(
         longitude: -73.659025,
       ),
       phone: PhoneNumber.fromString('514 567 9988'),
+      allVisa: [],
     ),
   );
 
@@ -1026,6 +1044,7 @@ Future<void> _addDummyStudents(
         longitude: -73.6764422,
       ),
       phone: PhoneNumber.fromString('514 567 9988'),
+      allVisa: [],
     ),
   );
 
@@ -1058,6 +1077,7 @@ Future<void> _addDummyStudents(
         longitude: -73.6709275,
       ),
       phone: PhoneNumber.fromString('514 567 9988'),
+      allVisa: [],
     ),
   );
   students.add(
@@ -1089,6 +1109,7 @@ Future<void> _addDummyStudents(
         longitude: -73.608841,
       ),
       phone: PhoneNumber.fromString('514 567 9988'),
+      allVisa: [],
     ),
   );
   await _waitForDatabaseUpdate(students, 21);
@@ -1988,7 +2009,6 @@ Future<void> _addDummyInternships(
       skillEvaluations: [],
       attitudeEvaluations: [],
       enterpriseEvaluations: [],
-      visaEvaluations: [],
       teacherNotes: 'Sonner à l\'interphone à l\'arrière du garage pour entrer',
       sstEvaluations: [
         SstEvaluation(
@@ -2127,7 +2147,6 @@ Future<void> _addDummyInternships(
         skillEvaluations: [],
         attitudeEvaluations: [],
         enterpriseEvaluations: [],
-        visaEvaluations: [],
         teacherNotes: '',
         sstEvaluations: [
           SstEvaluation(
@@ -2244,7 +2263,6 @@ Future<void> _addDummyInternships(
     skillEvaluations: [],
     attitudeEvaluations: [],
     enterpriseEvaluations: [],
-    visaEvaluations: [],
     sstEvaluations: [],
     teacherNotes: '',
   );
@@ -2352,7 +2370,6 @@ Future<void> _addDummyInternships(
       skillEvaluations: [],
       attitudeEvaluations: [],
       enterpriseEvaluations: [],
-      visaEvaluations: [],
       sstEvaluations: [],
       teacherNotes: '',
     ),
@@ -2459,7 +2476,6 @@ Future<void> _addDummyInternships(
       skillEvaluations: [],
       attitudeEvaluations: [],
       enterpriseEvaluations: [],
-      visaEvaluations: [],
       teacherNotes: '',
     ),
   );
@@ -2576,7 +2592,6 @@ Future<void> _addDummyInternships(
       skillEvaluations: [],
       attitudeEvaluations: [],
       enterpriseEvaluations: [],
-      visaEvaluations: [],
       sstEvaluations: [],
       teacherNotes: '',
     ),
@@ -2692,7 +2707,6 @@ Future<void> _addDummyInternships(
       skillEvaluations: [],
       attitudeEvaluations: [],
       enterpriseEvaluations: [],
-      visaEvaluations: [],
       sstEvaluations: [],
       teacherNotes: '',
     ),
@@ -2773,7 +2787,6 @@ Future<void> _addDummyInternships(
       skillEvaluations: [],
       attitudeEvaluations: [],
       enterpriseEvaluations: [],
-      visaEvaluations: [],
       sstEvaluations: [
         SstEvaluation(
           presentAtEvaluation: ['Responsable en milieu de stage'],
@@ -2865,7 +2878,6 @@ Future<void> _addDummyInternships(
       skillEvaluations: [],
       attitudeEvaluations: [],
       enterpriseEvaluations: [],
-      visaEvaluations: [],
       sstEvaluations: [],
       teacherNotes: '',
     ),
@@ -2944,7 +2956,6 @@ Future<void> _addDummyInternships(
       skillEvaluations: [],
       attitudeEvaluations: [],
       enterpriseEvaluations: [],
-      visaEvaluations: [],
       sstEvaluations: [],
       teacherNotes: '',
     ),

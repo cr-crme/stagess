@@ -5,13 +5,12 @@ import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/dialogs/finalize_internship_dialog.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/router.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/enterprise_evaluation_form_dialog.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/widgets/internship_managing_contract.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/widgets/internship_evaluation_attitude.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/widgets/internship_evaluation_post.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/widgets/internship_evaluation_skill.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/widgets/internship_evaluation_sst.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/widgets/internship_visa.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/forms/enterprise_evaluation_form_dialog.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/widgets/internship_evaluation_attitude.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/widgets/internship_evaluation_post.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/widgets/internship_evaluation_skill.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/widgets/internship_evaluation_sst.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/widgets/internship_managing_contract.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/student.dart';
@@ -315,11 +314,6 @@ class _StudentInternshipListViewState
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4.0),
                         child: EvaluationPost(internshipId: internship.id),
-                      ),
-                      Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4.0),
-                        child: InternshipVisa(internshipId: internship.id),
                       ),
                     ],
                   ),

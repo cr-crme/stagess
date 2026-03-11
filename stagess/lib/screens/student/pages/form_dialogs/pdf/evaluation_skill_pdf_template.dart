@@ -8,7 +8,7 @@ import 'package:pdf/widgets.dart' as pw;
 import 'package:stagess/common/pdf_widgets/pdf_bullet_points.dart';
 import 'package:stagess/common/pdf_widgets/pdf_text_box.dart';
 import 'package:stagess/common/pdf_widgets/pdf_were_present.dart';
-import 'package:stagess/screens/student/pages/internship_form_dialogs/forms/skill_evaluation_form_dialog.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/forms/skill_evaluation_form_dialog.dart';
 import 'package:stagess_common/models/internships/task_appreciation.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
