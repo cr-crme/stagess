@@ -483,7 +483,7 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
                             right: 36,
                           ),
                           child: Text(
-                            'Aucun élève en stage',
+                            'Aucun élève trouvé',
                             textAlign: TextAlign.center,
                             style: Theme.of(context).textTheme.titleMedium,
                           ),

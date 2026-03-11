@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
+import 'package:stagess/common/widgets/dialogs/show_pdf_dialog.dart';
+import 'package:stagess/screens/visiting_students/itinerary_pdf_template.dart';
 import 'package:stagess/screens/visiting_students/widgets/routing_map.dart';
 import 'package:stagess/screens/visiting_students/widgets/waypoint_card.dart';
 import 'package:stagess_common/models/generic/address.dart';
@@ -355,8 +357,13 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(right: 18.0),
-                              child: _saveItineraryButton(),
+                              padding: const EdgeInsets.only(right: 4.0),
+                              child: Row(
+                                children: [
+                                  _saveItineraryButton(),
+                                  _exportToPdfButton(),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -409,6 +416,21 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
             ? Theme.of(context).primaryColor
             : Colors.grey,
       ),
+    );
+  }
+
+  Widget _exportToPdfButton() {
+    final hasItinerary = _currentItinerary.length >= 2;
+
+    return IconButton(
+      onPressed: hasItinerary
+          ? () => showPdfDialog(context,
+              pdfGeneratorCallback: (context, format) => generateItineraryPdf(
+                  context, format,
+                  itineraryName: _currentItinerary.name))
+          : null,
+      icon: Icon(Icons.picture_as_pdf,
+          color: hasItinerary ? Theme.of(context).primaryColor : Colors.grey),
     );
   }
 
