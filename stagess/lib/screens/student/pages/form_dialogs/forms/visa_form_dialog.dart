@@ -303,6 +303,9 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
                                 controller: _controller),
                             _EmployabilityProfileSection(
                                 controller: _controller),
+                            SizedBox(
+                                height:
+                                    MediaQuery.of(context).size.height * 0.75),
                           ],
                         ),
                       ),
@@ -584,6 +587,10 @@ class _EmployabilityProfileSection extends StatelessWidget {
       children: [
         SubTitle('Profil d\'employabilité', left: 0.0),
         _buildCertification(context),
+        SizedBox(height: 16.0),
+        _buildSpecificSkills(context),
+        SizedBox(height: 16.0),
+        _buildReference(context),
       ],
     );
   }
@@ -607,10 +614,6 @@ class _EmployabilityProfileSection extends StatelessWidget {
             _buildGatewayToFms(context),
             SizedBox(height: 16.0),
             _buildCertificatesToShow(context),
-            SizedBox(height: 16.0),
-            _buildSpecificSkills(context),
-            SizedBox(height: 16.0),
-            _buildReference(context),
           ],
         ),
       ),
@@ -752,55 +755,72 @@ class _EmployabilityProfileSection extends StatelessWidget {
   }
 
   Widget _buildSpecificSkills(BuildContext context) {
-    return StatefulBuilder(
-        builder: (context, setState) => Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Compétences spécifiques',
-                    style: Theme.of(context).textTheme.titleSmall),
-                Text(
-                    'Cocher les compétences à afficher dans le VISA en PDF dans la liste des compétences réussies.'),
-                ...controller._specificSkillsController.options.map(
-                  (item) {
-                    return CheckboxListTile(
-                      value: item.isSelected,
-                      onChanged: (value) {
-                        controller._specificSkillsController.updateOption(
-                            controller._specificSkillsController.options
-                                .indexOf(item),
-                            item.copyWith(isSelected: value));
-                        setState(() {});
-                      },
-                      controlAffinity: ListTileControlAffinity.leading,
-                      title: Text(item.text,
-                          style: Theme.of(context).textTheme.bodyMedium),
-                    );
-                  },
-                ),
-              ],
-            ));
+    return AnimatedExpandingCard(
+        elevation: 0.0,
+        header: (context, isExpanded) => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('Compétences spécifiques',
+                  style: Theme.of(context).textTheme.titleMedium),
+            ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: StatefulBuilder(
+              builder: (context, setState) => Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                          'Cocher les compétences à afficher dans le VISA en PDF dans la liste des compétences réussies.'),
+                      ...controller._specificSkillsController.options.map(
+                        (item) {
+                          return CheckboxListTile(
+                            value: item.isSelected,
+                            onChanged: (value) {
+                              controller._specificSkillsController.updateOption(
+                                  controller._specificSkillsController.options
+                                      .indexOf(item),
+                                  item.copyWith(isSelected: value));
+                              setState(() {});
+                            },
+                            controlAffinity: ListTileControlAffinity.leading,
+                            title: Text(item.text,
+                                style: Theme.of(context).textTheme.bodyMedium),
+                          );
+                        },
+                      ),
+                    ],
+                  )),
+        ));
   }
 
   Widget _buildReference(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Référence', style: Theme.of(context).textTheme.titleSmall),
-        Text(
-            'Inscrire la référence, le nom de l\'entreprise si c\'est le milieu '
-            'de stage ou un employeur ainsi que le numéro de téléphone, à afficher dans le VISA en PDF.'),
-        SizedBox(height: 8.0),
-        TextFormField(
-          controller: controller._referenceController,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(),
+    return AnimatedExpandingCard(
+        elevation: 0.0,
+        header: (context, isExpanded) => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('Référence',
+                  style: Theme.of(context).textTheme.titleMedium),
+            ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                  'Inscrire la référence, le nom de l\'entreprise si c\'est le milieu '
+                  'de stage ou un employeur ainsi que le numéro de téléphone, à afficher dans le VISA en PDF.'),
+              SizedBox(height: 8.0),
+              TextFormField(
+                controller: controller._referenceController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
+                maxLength: 300,
+                maxLines: 5,
+              ),
+            ],
           ),
-          maxLength: 300,
-          maxLines: 5,
-        ),
-      ],
-    );
+        ));
   }
 }
