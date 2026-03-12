@@ -165,6 +165,34 @@ class Skill extends SelectableTextItem {
       SelectableTextItem.fetchableFields;
 }
 
+class Attitude extends SelectableTextItem {
+  Attitude({
+    super.id,
+    super.text,
+    super.isSelected,
+  });
+  Attitude.fromSerialized(super.map) : super.fromSerialized();
+
+  Attitude.fromItem(SelectableTextItem item)
+      : super(id: item.id, text: item.text, isSelected: item.isSelected);
+
+  static FetchableFields get fetchableFields =>
+      SelectableTextItem.fetchableFields;
+
+  static List<String> get availableItems => [
+        'Ponctualité',
+        'Assuiduité',
+        'Qualité du travail',
+        'Rendement et constance',
+        'Communication avec l\'équipe',
+        'Respect des personnes en autorité',
+        'Communication au sujet de la SST',
+        'Matrise de soi',
+        'Prise d\'initiative',
+        'Adaptation aux changements',
+      ];
+}
+
 class VisaEvaluation extends ItemSerializable {
   final List<ExperiencesAndAptitudes> experiencesAndAptitudes;
   final List<AttestationsAndMentions> attestationsAndMentions;
@@ -175,6 +203,9 @@ class VisaEvaluation extends ItemSerializable {
   final List<Skill> skills;
   final String reference;
 
+  final List<Attitude> forces;
+  final List<Attitude> challenges;
+
   VisaEvaluation({
     super.id,
     required this.experiencesAndAptitudes,
@@ -184,6 +215,8 @@ class VisaEvaluation extends ItemSerializable {
     required this.certificates,
     required this.skills,
     required this.reference,
+    required this.forces,
+    required this.challenges,
   });
   VisaEvaluation.fromSerialized(super.map)
       : experiencesAndAptitudes = (map?['experiences_and_aptitudes'] as List?)
@@ -208,6 +241,14 @@ class VisaEvaluation extends ItemSerializable {
                 .toList() ??
             [],
         reference = StringExt.from(map?['reference']) ?? '',
+        forces = (map?['forces'] as List?)
+                ?.map((e) => Attitude.fromSerialized(e))
+                .toList() ??
+            [],
+        challenges = (map?['challenges'] as List?)
+                ?.map((e) => Attitude.fromSerialized(e))
+                .toList() ??
+            [],
         super.fromSerialized();
 
   @override
@@ -221,6 +262,8 @@ class VisaEvaluation extends ItemSerializable {
       'certificates': certificates.serialize(),
       'skills': skills.serialize(),
       'reference': reference.serialize(),
+      'forces': forces.serialize(),
+      'challenges': challenges.serialize(),
     };
   }
 
@@ -232,6 +275,8 @@ class VisaEvaluation extends ItemSerializable {
     List<Certificate>? certificates,
     List<Skill>? skills,
     String? reference,
+    List<Attitude>? forces,
+    List<Attitude>? challenges,
   }) {
     return VisaEvaluation(
       id: id,
@@ -245,6 +290,8 @@ class VisaEvaluation extends ItemSerializable {
       certificates: certificates ?? this.certificates,
       skills: skills ?? this.skills,
       reference: reference ?? this.reference,
+      forces: forces ?? this.forces,
+      challenges: challenges ?? this.challenges,
     );
   }
 
@@ -258,6 +305,8 @@ class VisaEvaluation extends ItemSerializable {
         ', certificates: ${certificates.toString()}'
         ', skills: ${skills.toString()}'
         ', reference: $reference'
+        ', forces: ${forces.toString()}'
+        ', challenges: ${challenges.toString()}'
         '}';
   }
 
@@ -285,6 +334,14 @@ class VisaEvaluation extends ItemSerializable {
             '*': Skill.fetchableFields,
           })),
         'reference': FetchableFields.optional,
+        'forces': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference({
+            '*': Attitude.fetchableFields,
+          })),
+        'challenges': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference({
+            '*': Attitude.fetchableFields,
+          })),
       });
 }
 

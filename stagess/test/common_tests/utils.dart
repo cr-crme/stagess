@@ -328,6 +328,14 @@ visa.StudentVisa dummyStudentVisa({
           visa.Skill(text: 'Skill2', isSelected: false),
         ],
         reference: 'VisaReference123',
+        forces: [
+          visa.Attitude(text: 'Force1', isSelected: true),
+          visa.Attitude(text: 'Force2', isSelected: false),
+        ],
+        challenges: [
+          visa.Attitude(text: 'Challenge1', isSelected: true),
+          visa.Attitude(text: 'Challenge2', isSelected: false),
+        ],
       ),
     );
 

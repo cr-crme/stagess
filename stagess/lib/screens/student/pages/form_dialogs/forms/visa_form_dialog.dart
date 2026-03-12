@@ -66,6 +66,9 @@ class VisaFormController {
   final _specificSkillsController = SelectableTextItemsController();
   final _referenceController = TextEditingController();
 
+  final _forcesController = SelectableTextItemsController();
+  final _challengesController = SelectableTextItemsController();
+
   VisaFormController(
     BuildContext context, {
     required String studentId,
@@ -98,6 +101,8 @@ class VisaFormController {
     _sstCertificateController.dispose();
     _specificSkillsController.dispose();
     _referenceController.dispose();
+    _forcesController.dispose();
+    _challengesController.dispose();
   }
 
   void clear() {
@@ -133,6 +138,13 @@ class VisaFormController {
           .add(Skill(text: skill.skillName, isSelected: false));
     }
     _referenceController.text = '';
+
+    _forcesController.clear();
+    _challengesController.clear();
+    for (final attitude in Attitude.availableItems) {
+      _forcesController.add(Attitude(text: attitude, isSelected: false));
+      _challengesController.add(Attitude(text: attitude, isSelected: false));
+    }
   }
 
   void _fillFromPreviousEvaluation(BuildContext context,
@@ -198,6 +210,23 @@ class VisaFormController {
           index, item.copyWith(isSelected: item.isSelected));
     }
     _referenceController.text = visa.form.reference;
+
+    for (final item in visa.form.forces) {
+      final index =
+          _forcesController.options.indexWhere((e) => e.text == item.text);
+      if (index < 0) continue;
+
+      _forcesController.updateOption(
+          index, item.copyWith(isSelected: item.isSelected));
+    }
+    for (final item in visa.form.challenges) {
+      final index =
+          _challengesController.options.indexWhere((e) => e.text == item.text);
+      if (index < 0) continue;
+
+      _challengesController.updateOption(
+          index, item.copyWith(isSelected: item.isSelected));
+    }
   }
 
   StudentVisa toVisa() {
@@ -216,6 +245,8 @@ class VisaFormController {
             _sstCertificateController.options.cast<Certificate>().toList(),
         skills: _specificSkillsController.options.cast<Skill>().toList(),
         reference: _referenceController.text,
+        forces: _forcesController.options.cast<Attitude>().toList(),
+        challenges: _challengesController.options.cast<Attitude>().toList(),
       ),
       formVersion: _formVersion,
     );
@@ -302,6 +333,8 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
                             _ExpereinceAndAptitudeSection(
                                 controller: _controller),
                             _EmployabilityProfileSection(
+                                controller: _controller),
+                            _ForcesAndChallengesSection(
                                 controller: _controller),
                             SizedBox(
                                 height:
@@ -822,5 +855,82 @@ class _EmployabilityProfileSection extends StatelessWidget {
             ],
           ),
         ));
+  }
+}
+
+class _ForcesAndChallengesSection extends StatelessWidget {
+  const _ForcesAndChallengesSection({required this.controller});
+
+  final VisaFormController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SubTitle('Forces et défis', left: 0.0),
+        _buildElements(
+          context,
+          title: 'Forces',
+          definition:
+              'Cocher les cinq rubriques, correspondant aux cinq résultats '
+              'les plus forts dans les évaluations, à afficher dans le VISA en PDF.',
+          controller: controller._forcesController,
+          maxSelectedOptions: 5,
+        ),
+        SizedBox(height: 16.0),
+        _buildElements(
+          context,
+          title: 'Défis à relever',
+          definition:
+              'Cocher le ou les deux rubriques, correspondant aux résultats les '
+              'plus faibles dans les évaluations (maximum de 2 rubriques), à afficher '
+              'dans le VISA en PDF.',
+          controller: controller._challengesController,
+          maxSelectedOptions: 2,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildElements(
+    BuildContext context, {
+    required String title,
+    required String definition,
+    required SelectableTextItemsController controller,
+    required int maxSelectedOptions,
+  }) {
+    return AnimatedExpandingCard(
+      elevation: 0.0,
+      header: (context, isExpanded) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+      ),
+      child: StatefulBuilder(
+          builder: (context, setState) => Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(definition),
+                  ...controller.options.map((item) => CheckboxListTile(
+                        value: item.isSelected,
+                        onChanged: (value) {
+                          controller.updateOption(
+                              controller.options.indexOf(item),
+                              item.copyWith(isSelected: value));
+                          setState(() {});
+                        },
+                        enabled: item.isSelected ||
+                            controller.selectedCount < maxSelectedOptions,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        title: Text(item.text,
+                            style: Theme.of(context).textTheme.bodyMedium),
+                      )),
+                ],
+              )),
+    );
   }
 }
