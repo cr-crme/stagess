@@ -34,7 +34,7 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = SelectableTextBoxesController();
+    final controller = SelectableTextItemsController();
     return Scaffold(
       appBar: AppBar(title: const Text('Stagess - Main Page')),
       body: SingleChildScrollView(

@@ -50,12 +50,12 @@ class VisaFormController {
   final String? evaluationId;
   final bool canModify;
 
-  final _experiencesAndAptitudesController = SelectableTextBoxesController();
-  final _attestationsAndMentionsController = SelectableTextBoxesController();
-  final _sstTrainingsController = SelectableTextBoxesController();
+  final _experiencesAndAptitudesController = SelectableTextItemsController();
+  final _attestationsAndMentionsController = SelectableTextItemsController();
+  final _sstTrainingsController = SelectableTextItemsController();
 
   bool _isGatewayToFmsAvailable = false;
-  final _sstCertificateController = SelectableTextBoxesController();
+  final _sstCertificateController = SelectableTextItemsController();
 
   VisaFormController(
     BuildContext context, {

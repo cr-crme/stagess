@@ -3,11 +3,11 @@ import 'package:stagess_common/models/generic/selectable_text_items.dart';
 
 export 'package:stagess_common/models/generic/selectable_text_items.dart';
 
-class SelectableTextBoxesController {
+class SelectableTextItemsController {
   final List<SelectableTextItem> _options;
   final List<TextEditingController> _optionControllers;
 
-  SelectableTextBoxesController({
+  SelectableTextItemsController({
     List<SelectableTextItem>? options,
   })  : _options = options ?? [],
         _optionControllers = (options ?? [])
@@ -85,7 +85,7 @@ class SelectableTextBoxes extends StatefulWidget {
     required this.newItemBuilder,
   });
 
-  final SelectableTextBoxesController? controller;
+  final SelectableTextItemsController? controller;
   final bool enabled;
   final int? maxOptions;
   final int? maxSelectedOptions;
@@ -97,8 +97,8 @@ class SelectableTextBoxes extends StatefulWidget {
 
 class _SelectableTextBoxesState extends State<SelectableTextBoxes> {
   late final _shouldDisposeController = widget.controller == null;
-  late final SelectableTextBoxesController _controller =
-      widget.controller ?? SelectableTextBoxesController();
+  late final SelectableTextItemsController _controller =
+      widget.controller ?? SelectableTextItemsController();
 
   @override
   void initState() {
