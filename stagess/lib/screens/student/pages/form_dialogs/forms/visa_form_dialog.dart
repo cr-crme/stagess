@@ -69,6 +69,8 @@ class VisaFormController {
   final _forcesController = SelectableTextItemsController();
   final _challengesController = SelectableTextItemsController();
 
+  final _successConditionsController = TextEditingController();
+
   VisaFormController(
     BuildContext context, {
     required String studentId,
@@ -103,6 +105,7 @@ class VisaFormController {
     _referenceController.dispose();
     _forcesController.dispose();
     _challengesController.dispose();
+    _successConditionsController.dispose();
   }
 
   void clear() {
@@ -145,6 +148,8 @@ class VisaFormController {
       _forcesController.add(Attitude(text: attitude, isSelected: false));
       _challengesController.add(Attitude(text: attitude, isSelected: false));
     }
+
+    _successConditionsController.text = '';
   }
 
   void _fillFromPreviousEvaluation(BuildContext context,
@@ -227,6 +232,8 @@ class VisaFormController {
       _challengesController.updateOption(
           index, item.copyWith(isSelected: item.isSelected));
     }
+
+    _successConditionsController.text = visa.form.successConditions;
   }
 
   StudentVisa toVisa() {
@@ -247,6 +254,7 @@ class VisaFormController {
         reference: _referenceController.text,
         forces: _forcesController.options.cast<Attitude>().toList(),
         challenges: _challengesController.options.cast<Attitude>().toList(),
+        successConditions: _successConditionsController.text,
       ),
       formVersion: _formVersion,
     );
@@ -267,8 +275,6 @@ class _VisaEvaluationScreen extends StatefulWidget {
 }
 
 class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
-  final _formKey = GlobalKey<FormState>();
-
   late final _controller = widget.evaluationId == null
       ? VisaFormController(context,
           studentId: widget.studentId,
@@ -359,17 +365,6 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
       return;
     }
 
-    if (!(_formKey.currentState?.validate() ?? true)) {
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) => const AlertDialog(
-          title: Text('Formulaire incomplet'),
-          content: Text('Répondre à toutes les questions.'),
-        ),
-      );
-      return;
-    }
-
     _logger.fine('Visa evaluation form submitted successfully');
     Navigator.of(context).pop(_controller.toVisa());
   }
@@ -402,7 +397,7 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
             ),
           const SizedBox(width: 20),
           TextButton(
-            onPressed: _submit,
+            onPressed: () async => await _submit(),
             child: Text(_controller.canModify ? 'Enregistrer' : 'Fermer'),
           ),
         ],
@@ -889,6 +884,7 @@ class _ForcesAndChallengesSection extends StatelessWidget {
           controller: controller._challengesController,
           maxSelectedOptions: 2,
         ),
+        _buildSuccessConditions(context),
       ],
     );
   }
@@ -931,6 +927,40 @@ class _ForcesAndChallengesSection extends StatelessWidget {
                       )),
                 ],
               )),
+    );
+  }
+
+  Widget _buildSuccessConditions(BuildContext context) {
+    return AnimatedExpandingCard(
+      elevation: 0.0,
+      header: (context, isExpanded) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          'Conditions de succès',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+                'Lister toutes les adaptations, requises pour aider l\'élève à réussir, '
+                'à afficher dans le VISA en PDF.'),
+            SizedBox(height: 8.0),
+            TextFormField(
+              controller: controller._successConditionsController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+              ),
+              maxLength: 300,
+              maxLines: 5,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

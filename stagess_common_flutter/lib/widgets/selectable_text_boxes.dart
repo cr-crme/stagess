@@ -14,7 +14,12 @@ class SelectableTextItemsController {
             .map((option) => TextEditingController(text: option.text))
             .toList();
 
-  List<SelectableTextItem> get options => List.unmodifiable(_options);
+  List<SelectableTextItem> get options =>
+      List.unmodifiable(_options.asMap().entries.map((entry) {
+        final index = entry.key;
+        final option = entry.value;
+        return option.copyWith(text: _optionControllers[index].text);
+      }));
 
   int get length => _options.length;
   int get selectedCount =>

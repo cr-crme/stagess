@@ -336,6 +336,7 @@ visa.StudentVisa dummyStudentVisa({
           visa.Attitude(text: 'Challenge1', isSelected: true),
           visa.Attitude(text: 'Challenge2', isSelected: false),
         ],
+        successConditions: 'Well supported',
       ),
     );
 

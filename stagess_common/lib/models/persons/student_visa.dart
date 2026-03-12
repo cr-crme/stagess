@@ -13,11 +13,19 @@ class ExperiencesAndAptitudes extends SelectableTextItem {
   });
   ExperiencesAndAptitudes.fromSerialized(super.map) : super.fromSerialized();
 
-  ExperiencesAndAptitudes.fromItem(SelectableTextItem item)
-      : super(id: item.id, text: item.text, isSelected: item.isSelected);
-
   static FetchableFields get fetchableFields =>
       SelectableTextItem.fetchableFields;
+
+  @override
+  ExperiencesAndAptitudes copyWith({
+    String? text,
+    bool? isSelected,
+  }) =>
+      ExperiencesAndAptitudes(
+        id: id,
+        text: text ?? this.text,
+        isSelected: isSelected ?? this.isSelected,
+      );
 }
 
 class AttestationsAndMentions extends SelectableTextItem {
@@ -28,11 +36,19 @@ class AttestationsAndMentions extends SelectableTextItem {
   });
   AttestationsAndMentions.fromSerialized(super.map) : super.fromSerialized();
 
-  AttestationsAndMentions.fromItem(SelectableTextItem item)
-      : super(id: item.id, text: item.text, isSelected: item.isSelected);
-
   static FetchableFields get fetchableFields =>
       SelectableTextItem.fetchableFields;
+
+  @override
+  AttestationsAndMentions copyWith({
+    String? text,
+    bool? isSelected,
+  }) =>
+      AttestationsAndMentions(
+        id: id,
+        text: text ?? this.text,
+        isSelected: isSelected ?? this.isSelected,
+      );
 }
 
 class SstTraining extends SelectableTextItem {
@@ -47,10 +63,6 @@ class SstTraining extends SelectableTextItem {
   SstTraining.fromSerialized(super.map)
       : hide = map?['hide'] ?? false,
         super.fromSerialized();
-
-  SstTraining.fromItem(SelectableTextItem item)
-      : hide = false,
-        super(id: item.id, text: item.text, isSelected: item.isSelected);
 
   static List<String> get availableTrainings => [
         'Manutention sécuritaire',
@@ -158,11 +170,19 @@ class Skill extends SelectableTextItem {
   });
   Skill.fromSerialized(super.map) : super.fromSerialized();
 
-  Skill.fromItem(SelectableTextItem item)
-      : super(id: item.id, text: item.text, isSelected: item.isSelected);
-
   static FetchableFields get fetchableFields =>
       SelectableTextItem.fetchableFields;
+
+  @override
+  Skill copyWith({
+    String? text,
+    bool? isSelected,
+  }) =>
+      Skill(
+        id: id,
+        text: text ?? this.text,
+        isSelected: isSelected ?? this.isSelected,
+      );
 }
 
 class Attitude extends SelectableTextItem {
@@ -172,9 +192,6 @@ class Attitude extends SelectableTextItem {
     super.isSelected,
   });
   Attitude.fromSerialized(super.map) : super.fromSerialized();
-
-  Attitude.fromItem(SelectableTextItem item)
-      : super(id: item.id, text: item.text, isSelected: item.isSelected);
 
   static FetchableFields get fetchableFields =>
       SelectableTextItem.fetchableFields;
@@ -191,6 +208,17 @@ class Attitude extends SelectableTextItem {
         'Prise d\'initiative',
         'Adaptation aux changements',
       ];
+
+  @override
+  Attitude copyWith({
+    String? text,
+    bool? isSelected,
+  }) =>
+      Attitude(
+        id: id,
+        text: text ?? this.text,
+        isSelected: isSelected ?? this.isSelected,
+      );
 }
 
 class VisaEvaluation extends ItemSerializable {
@@ -206,6 +234,8 @@ class VisaEvaluation extends ItemSerializable {
   final List<Attitude> forces;
   final List<Attitude> challenges;
 
+  final String successConditions;
+
   VisaEvaluation({
     super.id,
     required this.experiencesAndAptitudes,
@@ -217,6 +247,7 @@ class VisaEvaluation extends ItemSerializable {
     required this.reference,
     required this.forces,
     required this.challenges,
+    required this.successConditions,
   });
   VisaEvaluation.fromSerialized(super.map)
       : experiencesAndAptitudes = (map?['experiences_and_aptitudes'] as List?)
@@ -249,6 +280,7 @@ class VisaEvaluation extends ItemSerializable {
                 ?.map((e) => Attitude.fromSerialized(e))
                 .toList() ??
             [],
+        successConditions = StringExt.from(map?['success_conditions']) ?? '',
         super.fromSerialized();
 
   @override
@@ -264,6 +296,7 @@ class VisaEvaluation extends ItemSerializable {
       'reference': reference.serialize(),
       'forces': forces.serialize(),
       'challenges': challenges.serialize(),
+      'success_conditions': successConditions.serialize(),
     };
   }
 
@@ -277,6 +310,7 @@ class VisaEvaluation extends ItemSerializable {
     String? reference,
     List<Attitude>? forces,
     List<Attitude>? challenges,
+    String? successConditions,
   }) {
     return VisaEvaluation(
       id: id,
@@ -292,6 +326,7 @@ class VisaEvaluation extends ItemSerializable {
       reference: reference ?? this.reference,
       forces: forces ?? this.forces,
       challenges: challenges ?? this.challenges,
+      successConditions: successConditions ?? this.successConditions,
     );
   }
 
@@ -307,6 +342,7 @@ class VisaEvaluation extends ItemSerializable {
         ', reference: $reference'
         ', forces: ${forces.toString()}'
         ', challenges: ${challenges.toString()}'
+        ', successConditions: $successConditions'
         '}';
   }
 
@@ -342,6 +378,7 @@ class VisaEvaluation extends ItemSerializable {
           ..addAll(FetchableFields.reference({
             '*': Attitude.fetchableFields,
           })),
+        'success_conditions': FetchableFields.optional,
       });
 }
 
