@@ -64,6 +64,7 @@ class VisaFormController {
   bool _isGatewayToFmsAvailable = false;
   final _sstCertificateController = SelectableTextItemsController();
   final _specificSkillsController = SelectableTextItemsController();
+  final _referenceController = TextEditingController();
 
   VisaFormController(
     BuildContext context, {
@@ -88,6 +89,15 @@ class VisaFormController {
     if (evaluationId != null) {
       _fillFromPreviousEvaluation(context, previousEvaluationId: evaluationId!);
     }
+  }
+
+  void dispose() {
+    _experiencesAndAptitudesController.dispose();
+    _attestationsAndMentionsController.dispose();
+    _sstTrainingsController.dispose();
+    _sstCertificateController.dispose();
+    _specificSkillsController.dispose();
+    _referenceController.dispose();
   }
 
   void clear() {
@@ -122,6 +132,7 @@ class VisaFormController {
       _specificSkillsController
           .add(Skill(text: skill.skillName, isSelected: false));
     }
+    _referenceController.text = '';
   }
 
   void _fillFromPreviousEvaluation(BuildContext context,
@@ -186,6 +197,7 @@ class VisaFormController {
       _specificSkillsController.updateOption(
           index, item.copyWith(isSelected: item.isSelected));
     }
+    _referenceController.text = visa.form.reference;
   }
 
   StudentVisa toVisa() {
@@ -203,6 +215,7 @@ class VisaFormController {
         certificates:
             _sstCertificateController.options.cast<Certificate>().toList(),
         skills: _specificSkillsController.options.cast<Skill>().toList(),
+        reference: _referenceController.text,
       ),
       formVersion: _formVersion,
     );
@@ -245,6 +258,12 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
               studentId: widget.studentId,
               evaluationId: widget.evaluationId!,
               canModify: false));
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -590,6 +609,8 @@ class _EmployabilityProfileSection extends StatelessWidget {
             _buildCertificatesToShow(context),
             SizedBox(height: 16.0),
             _buildSpecificSkills(context),
+            SizedBox(height: 16.0),
+            _buildReference(context),
           ],
         ),
       ),
@@ -759,5 +780,27 @@ class _EmployabilityProfileSection extends StatelessWidget {
                 ),
               ],
             ));
+  }
+
+  Widget _buildReference(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Référence', style: Theme.of(context).textTheme.titleSmall),
+        Text(
+            'Inscrire la référence, le nom de l\'entreprise si c\'est le milieu '
+            'de stage ou un employeur ainsi que le numéro de téléphone, à afficher dans le VISA en PDF.'),
+        SizedBox(height: 8.0),
+        TextFormField(
+          controller: controller._referenceController,
+          decoration: InputDecoration(
+            border: OutlineInputBorder(),
+          ),
+          maxLength: 300,
+          maxLines: 5,
+        ),
+      ],
+    );
   }
 }

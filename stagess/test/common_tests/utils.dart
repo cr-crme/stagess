@@ -295,38 +295,40 @@ visa.StudentVisa dummyStudentVisa({
       id: id,
       formVersion: visa.StudentVisa.currentVersion,
       form: visa.VisaEvaluation(
-          id: 'visaEvaluationId',
-          experiencesAndAptitudes: [
-            visa.ExperiencesAndAptitudes(text: 'Value1', isSelected: true),
-            visa.ExperiencesAndAptitudes(text: 'Value2', isSelected: false),
-          ],
-          attestationsAndMentions: [
-            visa.AttestationsAndMentions(text: 'Value3', isSelected: true),
-            visa.AttestationsAndMentions(text: 'Value4', isSelected: false),
-          ],
-          sstTrainings: [
-            visa.SstTraining(text: 'Value5', isSelected: true, hide: true),
-            visa.SstTraining(text: 'Value6', isSelected: false, hide: false),
-          ],
-          isGatewayToFmsAvailable: false,
-          certificates: [
-            visa.Certificate(
-              certificateType: visa.CertificateType.fpt,
-              isSelected: true,
-              specializationId: 'jobId',
-              year: 2020,
-            ),
-            visa.Certificate(
-              certificateType: visa.CertificateType.fms,
-              isSelected: false,
-              specializationId: 'jobId',
-              year: 2021,
-            ),
-          ],
-          skills: [
-            visa.Skill(text: 'Skill1', isSelected: true),
-            visa.Skill(text: 'Skill2', isSelected: false),
-          ]),
+        id: 'visaEvaluationId',
+        experiencesAndAptitudes: [
+          visa.ExperiencesAndAptitudes(text: 'Value1', isSelected: true),
+          visa.ExperiencesAndAptitudes(text: 'Value2', isSelected: false),
+        ],
+        attestationsAndMentions: [
+          visa.AttestationsAndMentions(text: 'Value3', isSelected: true),
+          visa.AttestationsAndMentions(text: 'Value4', isSelected: false),
+        ],
+        sstTrainings: [
+          visa.SstTraining(text: 'Value5', isSelected: true, hide: true),
+          visa.SstTraining(text: 'Value6', isSelected: false, hide: false),
+        ],
+        isGatewayToFmsAvailable: false,
+        certificates: [
+          visa.Certificate(
+            certificateType: visa.CertificateType.fpt,
+            isSelected: true,
+            specializationId: 'jobId',
+            year: 2020,
+          ),
+          visa.Certificate(
+            certificateType: visa.CertificateType.fms,
+            isSelected: false,
+            specializationId: 'jobId',
+            year: 2021,
+          ),
+        ],
+        skills: [
+          visa.Skill(text: 'Skill1', isSelected: true),
+          visa.Skill(text: 'Skill2', isSelected: false),
+        ],
+        reference: 'VisaReference123',
+      ),
     );
 
 Internship dummyInternship({

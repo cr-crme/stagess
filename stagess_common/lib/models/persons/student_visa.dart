@@ -173,6 +173,7 @@ class VisaEvaluation extends ItemSerializable {
   final bool isGatewayToFmsAvailable;
   final List<Certificate> certificates;
   final List<Skill> skills;
+  final String reference;
 
   VisaEvaluation({
     super.id,
@@ -182,6 +183,7 @@ class VisaEvaluation extends ItemSerializable {
     required this.isGatewayToFmsAvailable,
     required this.certificates,
     required this.skills,
+    required this.reference,
   });
   VisaEvaluation.fromSerialized(super.map)
       : experiencesAndAptitudes = (map?['experiences_and_aptitudes'] as List?)
@@ -205,6 +207,7 @@ class VisaEvaluation extends ItemSerializable {
                 ?.map((e) => Skill.fromSerialized(e))
                 .toList() ??
             [],
+        reference = StringExt.from(map?['reference']) ?? '',
         super.fromSerialized();
 
   @override
@@ -217,6 +220,7 @@ class VisaEvaluation extends ItemSerializable {
       'is_gateway_to_fms_available': isGatewayToFmsAvailable,
       'certificates': certificates.serialize(),
       'skills': skills.serialize(),
+      'reference': reference.serialize(),
     };
   }
 
@@ -227,6 +231,7 @@ class VisaEvaluation extends ItemSerializable {
     bool? isGatewayToFmsAvailable,
     List<Certificate>? certificates,
     List<Skill>? skills,
+    String? reference,
   }) {
     return VisaEvaluation(
       id: id,
@@ -239,6 +244,7 @@ class VisaEvaluation extends ItemSerializable {
           isGatewayToFmsAvailable ?? this.isGatewayToFmsAvailable,
       certificates: certificates ?? this.certificates,
       skills: skills ?? this.skills,
+      reference: reference ?? this.reference,
     );
   }
 
@@ -251,6 +257,7 @@ class VisaEvaluation extends ItemSerializable {
         ', isGatewayToFmsAvailable: $isGatewayToFmsAvailable'
         ', certificates: ${certificates.toString()}'
         ', skills: ${skills.toString()}'
+        ', reference: $reference'
         '}';
   }
 
@@ -277,6 +284,7 @@ class VisaEvaluation extends ItemSerializable {
           ..addAll(FetchableFields.reference({
             '*': Skill.fetchableFields,
           })),
+        'reference': FetchableFields.optional,
       });
 }
 
