@@ -29,6 +29,18 @@ class SelectableTextBoxesController {
     if (_setStateCallback != null) _setStateCallback!(() {});
   }
 
+  void add(SelectableTextItem item) => insert(_options.length, item);
+
+  void unselectAll() {
+    for (int i = 0; i < _options.length; i++) {
+      if (_options[i].isSelected) {
+        _options[i] = _options[i].copyWith(isSelected: false);
+      }
+    }
+
+    if (_setStateCallback != null) _setStateCallback!(() {});
+  }
+
   void insert(int index, SelectableTextItem item) {
     if (index < 0) return;
     if (index > _options.length) index = _options.length;

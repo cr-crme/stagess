@@ -6,7 +6,10 @@ import 'package:stagess/common/widgets/numbered_text.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/models/persons/student_visa.dart';
+import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
+import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
+import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
@@ -42,7 +45,8 @@ Future<Student?> showVisaEvaluationFormDialog(
 class VisaFormController {
   static const _formVersion = '1.0.0';
 
-  final String studentId;
+  final Student student;
+  final List<Specialization> specializations = [];
   final String? evaluationId;
   final bool canModify;
 
@@ -50,12 +54,25 @@ class VisaFormController {
   final _attestationsAndMentionsController = SelectableTextBoxesController();
   final _sstTrainingsController = SelectableTextBoxesController();
 
+  bool _isGatewayToFmsAvailable = false;
+  final _sstCertificateController = SelectableTextBoxesController();
+
   VisaFormController(
     BuildContext context, {
-    required this.studentId,
+    required String studentId,
     this.evaluationId,
     required this.canModify,
-  }) {
+  }) : student = StudentsProvider.of(context, listen: false).fromId(studentId) {
+    final internships =
+        InternshipsProvider.of(context, listen: false).byStudentId(studentId);
+    for (final internship in internships) {
+      final enterprise = EnterprisesProvider.of(context, listen: false)
+          .fromId(internship.enterpriseId);
+      specializations.add(enterprise.jobs
+          .fromId(internship.currentContract!.jobId)
+          .specialization);
+    }
+
     clear();
     if (evaluationId != null) {
       _fillFromPreviousEvaluation(context, previousEvaluationId: evaluationId!);
@@ -68,8 +85,22 @@ class VisaFormController {
     _sstTrainingsController.clear();
 
     for (final training in SstTraining.availableTrainings) {
-      _sstTrainingsController.insert(_sstTrainingsController.options.length,
-          SstTraining(text: training, isSelected: false, hide: true));
+      _sstTrainingsController
+          .add(SstTraining(text: training, isSelected: false, hide: true));
+    }
+
+    _isGatewayToFmsAvailable = false;
+
+    _sstCertificateController.clear();
+    _sstCertificateController.add(
+        Certificate(certificateType: CertificateType.none, isSelected: false));
+    _sstCertificateController.add(
+        Certificate(certificateType: CertificateType.fpt, isSelected: false));
+    for (final specialization in specializations) {
+      _sstCertificateController.add(Certificate(
+          certificateType: CertificateType.fms,
+          isSelected: false,
+          specializationId: specialization.id));
     }
   }
 
@@ -78,26 +109,22 @@ class VisaFormController {
     // Clear previous responses before filling from previous evaluation
     clear();
 
-    final student =
-        StudentsProvider.of(context, listen: false).fromId(studentId);
     final visa =
         student.allVisa.firstWhereOrNull((e) => e.id == previousEvaluationId);
     if (visa == null) {
       _logger.warning(
-          'No previous evaluation found for student $studentId with evaluationId $previousEvaluationId');
+          'No previous evaluation found for student ${student.id} with evaluationId $previousEvaluationId');
       return;
     }
 
-    for (final exp in visa.form.experiencesAndAptitudes) {
-      _experiencesAndAptitudesController.insert(
-        _experiencesAndAptitudesController.options.length,
-        ExperiencesAndAptitudes(text: exp.text, isSelected: exp.isSelected),
+    for (final item in visa.form.experiencesAndAptitudes) {
+      _experiencesAndAptitudesController.add(
+        ExperiencesAndAptitudes(text: item.text, isSelected: item.isSelected),
       );
     }
-    for (final att in visa.form.attestationsAndMentions) {
-      _attestationsAndMentionsController.insert(
-        _attestationsAndMentionsController.options.length,
-        AttestationsAndMentions(text: att.text, isSelected: att.isSelected),
+    for (final item in visa.form.attestationsAndMentions) {
+      _attestationsAndMentionsController.add(
+        AttestationsAndMentions(text: item.text, isSelected: item.isSelected),
       );
     }
 
@@ -113,6 +140,22 @@ class VisaFormController {
         training.copyWith(isSelected: training.isSelected, hide: training.hide),
       );
     }
+
+    _isGatewayToFmsAvailable = visa.form.isGatewayToFmsAvailable;
+    for (final item in visa.form.certificates) {
+      final index = _sstCertificateController.options.indexWhere((e) =>
+          e.text == item.text &&
+          (e as Certificate).specializationId == item.specializationId);
+      if (index < 0) {
+        // This should not happen, but if the student was drastically modified
+        // it is possible the previous certificates includes job that were since removed
+        // from the student internship list.
+        _sstCertificateController.add(item);
+      } else {
+        _sstCertificateController.updateOption(
+            index, item.copyWith(isSelected: item.isSelected));
+      }
+    }
   }
 
   StudentVisa toVisa() {
@@ -126,6 +169,9 @@ class VisaFormController {
             .toList(),
         sstTrainings:
             _sstTrainingsController.options.cast<SstTraining>().toList(),
+        isGatewayToFmsAvailable: _isGatewayToFmsAvailable,
+        certificates:
+            _sstCertificateController.options.cast<Certificate>().toList(),
       ),
       formVersion: _formVersion,
     );
@@ -204,6 +250,8 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             _ExpereinceAndAptitudeSection(
+                                controller: _controller),
+                            _EmployabilityProfileSection(
                                 controller: _controller),
                           ],
                         ),
@@ -289,9 +337,9 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
       children: [
         SubTitle('Expériences et aptitudes', left: 0.0),
         _buildExperienceAndAptitude(context),
-        SizedBox(height: 24.0),
+        SizedBox(height: 16.0),
         _buildAttestationsAndMentions(context),
-        SizedBox(height: 24.0),
+        SizedBox(height: 16.0),
         _buildSstTrainings(context),
       ],
     );
@@ -404,6 +452,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
 
                 return CheckboxListTile(
                   key: ValueKey('sst_training_${item.id}'),
+                  controlAffinity: ListTileControlAffinity.leading,
                   onChanged: (selected) {
                     controller._sstTrainingsController.updateOption(
                       index,
@@ -454,6 +503,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
                         );
                         setState(() {});
                       },
+                      controlAffinity: ListTileControlAffinity.leading,
                       value: !item.hide,
                       title: Text(item.text,
                           style: Theme.of(context).textTheme.bodyMedium),
@@ -470,4 +520,185 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
           ),
         ),
       );
+}
+
+class _EmployabilityProfileSection extends StatelessWidget {
+  const _EmployabilityProfileSection({required this.controller});
+
+  final VisaFormController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SubTitle('Profil d\'employabilité', left: 0.0),
+        _buildCertification(context),
+      ],
+    );
+  }
+
+  Widget _buildCertification(BuildContext context) {
+    return AnimatedExpandingCard(
+      elevation: 0.0,
+      header: (context, isExpanded) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          'Certification CFMS / CFPT',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 8.0),
+            _buildGatewayToFms(context),
+            SizedBox(height: 16.0),
+            _buildCertificatesToShow(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGatewayToFms(BuildContext context) {
+    return controller.student.program == Program.fpt
+        ? StatefulBuilder(
+            builder: (context, setState) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Pour les élèves de FPT-2 :',
+                        style: Theme.of(context).textTheme.titleSmall),
+                    CheckboxListTile(
+                      value: controller._isGatewayToFmsAvailable,
+                      onChanged: (value) {
+                        controller._isGatewayToFmsAvailable = value ?? false;
+                        setState(() {});
+                      },
+                      controlAffinity: ListTileControlAffinity.leading,
+                      title: Text('Élève est candidat à la passerelle FMS',
+                          style: Theme.of(context).textTheme.bodyMedium),
+                    ),
+                  ],
+                ))
+        : SizedBox.shrink();
+  }
+
+  Widget _buildCertificatesToShow(BuildContext context) {
+    return StatefulBuilder(
+        builder: (context, setState) => Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                    'Pour les élèves de FMS et de FPT-3, cocher les certificats à afficher dans le VISA',
+                    style: Theme.of(context).textTheme.titleSmall),
+                ...controller._sstCertificateController.options.map(
+                  (e) {
+                    final item = e as Certificate;
+                    final job = ActivitySectorsService.allSpecializations
+                        .firstWhereOrNull((e) => e.id == item.specializationId);
+
+                    final name = switch (item.certificateType) {
+                      CertificateType.none => 'Aucun certificat',
+                      CertificateType.fpt =>
+                        'Certificat de formation préparatoire au travail (CFPT)',
+                      CertificateType.fms =>
+                        'Certificat de formation à un métier semi-spécialisé (CFMS) pour le métier : ${job?.name ?? 'Métier non trouvé'}',
+                    };
+                    final noneIsChecked = controller
+                        ._sstCertificateController.options
+                        .cast<Certificate>()
+                        .any((e) =>
+                            e.isSelected &&
+                            e.certificateType == CertificateType.none);
+
+                    return CheckboxListTile(
+                      value: item.isSelected &&
+                          (!noneIsChecked ||
+                              item.certificateType == CertificateType.none),
+                      onChanged: (value) {
+                        controller._sstCertificateController.updateOption(
+                            controller._sstCertificateController.options
+                                .indexOf(item),
+                            item.copyWith(
+                                year: item.year < 0
+                                    ? DateTime.now().year
+                                    : item.year,
+                                isSelected: value));
+                        setState(() {});
+                      },
+                      enabled: item.certificateType == CertificateType.none ||
+                          !controller._sstCertificateController.options
+                              .cast<Certificate>()
+                              .any((e) =>
+                                  e.isSelected &&
+                                  e.certificateType == CertificateType.none),
+                      controlAffinity: ListTileControlAffinity.leading,
+                      title: Text(name,
+                          style: Theme.of(context).textTheme.bodyMedium),
+                      subtitle: item.certificateType == CertificateType.none ||
+                              !(item.isSelected && !noneIsChecked)
+                          ? null
+                          : Padding(
+                              padding: const EdgeInsets.only(left: 36.0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                      'Année certification\u00a0: ${item.year}'),
+                                  IconButton(
+                                      onPressed: () async {
+                                        final initialDate = DateTime(
+                                            item.year > 0
+                                                ? item.year
+                                                : DateTime.now().year);
+                                        final firstDate =
+                                            DateTime(DateTime.now().year - 5);
+                                        final lastDate =
+                                            DateTime(DateTime.now().year + 5);
+                                        final year = await showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            title: Text(
+                                                'Sélectionnez l\'année de certification'),
+                                            content: SizedBox(
+                                              width: 300,
+                                              height: 300,
+                                              child: YearPicker(
+                                                selectedDate: initialDate,
+                                                onChanged: (selectedDate) {
+                                                  Navigator.pop(context,
+                                                      selectedDate.year);
+                                                },
+                                                firstDate: firstDate,
+                                                lastDate: lastDate,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                        if (year == null) return;
+
+                                        controller._sstCertificateController
+                                            .updateOption(
+                                                controller
+                                                    ._sstCertificateController
+                                                    .options
+                                                    .indexOf(item),
+                                                item.copyWith(year: year));
+                                        setState(() {});
+                                      },
+                                      icon: Icon(Icons.calendar_month)),
+                                ],
+                              ),
+                            ),
+                    );
+                  },
+                ),
+              ],
+            ));
+  }
 }

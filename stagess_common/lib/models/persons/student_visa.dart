@@ -86,16 +86,85 @@ class SstTraining extends SelectableTextItem {
   }
 }
 
+enum CertificateType {
+  fpt,
+  fms,
+  none;
+
+  static CertificateType fromString(String value) => switch (value) {
+        'FPT' => CertificateType.fpt,
+        'FMS' => CertificateType.fms,
+        '__NONE__' => CertificateType.none,
+        _ => throw ArgumentError('Invalid certificate type: $value')
+      };
+
+  String get name =>
+      switch (this) { fpt => 'FPT', fms => 'FMS', none => '__NONE__' };
+}
+
+class Certificate extends SelectableTextItem {
+  final int year;
+  final String? specializationId;
+
+  Certificate({
+    super.id,
+    required CertificateType certificateType,
+    required super.isSelected,
+    this.year = -1,
+    this.specializationId,
+  }) : super(text: certificateType.name);
+  Certificate.fromSerialized(super.map)
+      : year = map?['year'] ?? -1,
+        specializationId = map?['specialization_id'],
+        super.fromSerialized();
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'text': FetchableFields.optional,
+        'year': FetchableFields.optional,
+        'specialization_id': FetchableFields.optional,
+      });
+
+  @override
+  Certificate copyWith({
+    String? text,
+    CertificateType? certificateType,
+    bool? isSelected,
+    int? year,
+    String? specializationId,
+  }) {
+    if (text != null && certificateType != null) {
+      throw Exception(
+          'Cannot provide both text and certificateType when copying Certificate.');
+    }
+    return Certificate(
+      id: id,
+      certificateType:
+          certificateType ?? CertificateType.fromString(text ?? this.text),
+      isSelected: isSelected ?? this.isSelected,
+      year: year ?? this.year,
+      specializationId: specializationId ?? this.specializationId,
+    );
+  }
+
+  CertificateType get certificateType => CertificateType.fromString(text);
+}
+
 class VisaEvaluation extends ItemSerializable {
   final List<ExperiencesAndAptitudes> experiencesAndAptitudes;
   final List<AttestationsAndMentions> attestationsAndMentions;
   final List<SstTraining> sstTrainings;
+
+  final bool isGatewayToFmsAvailable;
+  final List<Certificate> certificates;
 
   VisaEvaluation({
     super.id,
     required this.experiencesAndAptitudes,
     required this.attestationsAndMentions,
     required this.sstTrainings,
+    required this.isGatewayToFmsAvailable,
+    required this.certificates,
   });
   VisaEvaluation.fromSerialized(super.map)
       : experiencesAndAptitudes = (map?['experiences_and_aptitudes'] as List?)
@@ -110,6 +179,11 @@ class VisaEvaluation extends ItemSerializable {
                 ?.map((e) => SstTraining.fromSerialized(e))
                 .toList() ??
             [],
+        isGatewayToFmsAvailable = map?['is_gateway_to_fms_available'] ?? false,
+        certificates = (map?['certificates'] as List?)
+                ?.map((e) => Certificate.fromSerialized(e))
+                .toList() ??
+            [],
         super.fromSerialized();
 
   @override
@@ -119,7 +193,29 @@ class VisaEvaluation extends ItemSerializable {
       'experiences_and_aptitudes': experiencesAndAptitudes.serialize(),
       'attestation_and_mentions': attestationsAndMentions.serialize(),
       'sst_trainings': sstTrainings.serialize(),
+      'is_gateway_to_fms_available': isGatewayToFmsAvailable,
+      'certificates': certificates.serialize(),
     };
+  }
+
+  VisaEvaluation copyWith({
+    List<ExperiencesAndAptitudes>? experiencesAndAptitudes,
+    List<AttestationsAndMentions>? attestationsAndMentions,
+    List<SstTraining>? sstTrainings,
+    bool? isGatewayToFmsAvailable,
+    List<Certificate>? certificates,
+  }) {
+    return VisaEvaluation(
+      id: id,
+      experiencesAndAptitudes:
+          experiencesAndAptitudes ?? this.experiencesAndAptitudes,
+      attestationsAndMentions:
+          attestationsAndMentions ?? this.attestationsAndMentions,
+      sstTrainings: sstTrainings ?? this.sstTrainings,
+      isGatewayToFmsAvailable:
+          isGatewayToFmsAvailable ?? this.isGatewayToFmsAvailable,
+      certificates: certificates ?? this.certificates,
+    );
   }
 
   @override
@@ -128,6 +224,8 @@ class VisaEvaluation extends ItemSerializable {
         'experiencesAndAptitudes: ${experiencesAndAptitudes.toString()}'
         ', attestationsAndMentions: ${attestationsAndMentions.toString()}'
         ', sstTrainings: ${sstTrainings.toString()}'
+        ', isGatewayToFmsAvailable: $isGatewayToFmsAvailable'
+        ', certificates: ${certificates.toString()}'
         '}';
   }
 
@@ -144,6 +242,11 @@ class VisaEvaluation extends ItemSerializable {
         'sst_trainings': FetchableFields.mandatory
           ..addAll(FetchableFields.reference({
             '*': SstTraining.fetchableFields,
+          })),
+        'is_gateway_to_fms_available': FetchableFields.optional,
+        'certificates': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference({
+            '*': Certificate.fetchableFields,
           })),
       });
 }

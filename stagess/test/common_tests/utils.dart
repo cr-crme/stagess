@@ -308,6 +308,21 @@ visa.StudentVisa dummyStudentVisa({
           visa.SstTraining(text: 'Value5', isSelected: true, hide: true),
           visa.SstTraining(text: 'Value6', isSelected: false, hide: false),
         ],
+        isGatewayToFmsAvailable: false,
+        certificates: [
+          visa.Certificate(
+            certificateType: visa.CertificateType.fpt,
+            isSelected: true,
+            specializationId: 'jobId',
+            year: 2020,
+          ),
+          visa.Certificate(
+            certificateType: visa.CertificateType.fms,
+            isSelected: false,
+            specializationId: 'jobId',
+            year: 2021,
+          ),
+        ],
       ),
     );
 
