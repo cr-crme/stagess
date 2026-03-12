@@ -203,7 +203,8 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildExperiencesAndAptitude(),
+                            _ExpereinceAndAptitudeSection(
+                                controller: _controller),
                           ],
                         ),
                       ),
@@ -274,185 +275,199 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
       ),
     );
   }
+}
 
-  Widget _buildExperiencesAndAptitude() {
+class _ExpereinceAndAptitudeSection extends StatelessWidget {
+  const _ExpereinceAndAptitudeSection({required this.controller});
+
+  final VisaFormController controller;
+
+  @override
+  Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SubTitle('Expériences et aptitudes', left: 0.0),
-        AnimatedExpandingCard(
-          elevation: 0.0,
-          header: (context, isExpanded) => Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Expériences et aptitudes personnelles et scolaires complémentaires au '
-              'profil d\'employabilité',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 8.0),
-                NumberedText([
-                  'Inscrire les activités scolaires, parascolaires et extrascolaires '
-                      'pertinentes en employabilité en donnant des précisions, telles que '
-                      'le nom de l\'organisme ou l\'entreprise concernée et l\'année.',
-                  'Cocher celles à afficher dans le VISA en PDF (maximum de 8 items).'
-                ]),
-                SizedBox(height: 8.0),
-                SelectableTextBoxes(
-                  controller: _controller._experiencesAndAptitudesController,
-                  maxSelectedOptions: 8,
-                  newItemBuilder: (_) => ExperiencesAndAptitudes(),
-                ),
-              ],
-            ),
-          ),
-        ),
+        _buildExperienceAndAptitude(context),
         SizedBox(height: 24.0),
-        AnimatedExpandingCard(
-          elevation: 0.0,
-          header: (context, isExpanded) => Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Attestations et mentions',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 8.0),
-                NumberedText([
-                  'Inscrire les attestations et les mentions pertinentes reçues '
-                      'par l\'élève ainsi que les années correspondantes.',
-                  'Cocher celles à afficher dans le VISA en PDF (maximum de 5 items).'
-                ]),
-                SizedBox(height: 8.0),
-                SelectableTextBoxes(
-                  controller: _controller._attestationsAndMentionsController,
-                  maxSelectedOptions: 5,
-                  newItemBuilder: (_) => AttestationsAndMentions(),
-                ),
-              ],
-            ),
-          ),
-        ),
+        _buildAttestationsAndMentions(context),
         SizedBox(height: 24.0),
-        AnimatedExpandingCard(
-          elevation: 0.0,
-          header: (context, isExpanded) => Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(
-              'Formations relatives à la SST',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 8.0),
-                Center(
-                  child: TextButton(
-                      onPressed: _selectSstTrainingToShowDialog,
-                      child: Text(
-                        'Sélectionner les formations à la SST obtenues',
-                        textAlign: TextAlign.center,
-                      )),
-                ),
-                SizedBox(height: 8.0),
-                StatefulBuilder(
-                  builder: (context, setState) => Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ..._controller._sstTrainingsController.options
-                          .asMap()
-                          .entries
-                          .where(
-                              (element) => !(element.value as SstTraining).hide)
-                          .map((entry) {
-                        final index = entry.key;
-                        final item = entry.value as SstTraining;
-
-                        return CheckboxListTile(
-                          key: ValueKey('sst_training_${item.id}'),
-                          onChanged: (selected) {
-                            _controller._sstTrainingsController.updateOption(
-                              index,
-                              item.copyWith(isSelected: !item.isSelected),
-                            );
-                            setState(() {});
-                          },
-                          value: item.isSelected,
-                          title: Text(item.text,
-                              style: Theme.of(context).textTheme.bodyMedium),
-                        );
-                      })
-                    ],
-                  ),
-                )
-              ],
-            ),
-          ),
-        ),
+        _buildSstTrainings(context),
       ],
     );
   }
 
-  Future<void> _selectSstTrainingToShowDialog() async {
-    await showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: StatefulBuilder(
-            builder: (context, setState) => Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Liste des sujets pour lesquels l\'élève a pu recevoir une formation SST',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                SizedBox(height: 16.0),
-                ..._controller._sstTrainingsController.options
-                    .asMap()
-                    .entries
-                    .map((entry) {
-                  final index = entry.key;
-                  final item = entry.value as SstTraining;
+  Widget _buildExperienceAndAptitude(BuildContext context) {
+    return AnimatedExpandingCard(
+      elevation: 0.0,
+      header: (context, isExpanded) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          'Expériences et aptitudes personnelles et scolaires complémentaires au '
+          'profil d\'employabilité',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 8.0),
+            NumberedText([
+              'Inscrire les activités scolaires, parascolaires et extrascolaires '
+                  'pertinentes en employabilité en donnant des précisions, telles que '
+                  'le nom de l\'organisme ou l\'entreprise concernée et l\'année.',
+              'Cocher celles à afficher dans le VISA en PDF (maximum de 8 items).'
+            ]),
+            SizedBox(height: 8.0),
+            SelectableTextBoxes(
+              controller: controller._experiencesAndAptitudesController,
+              maxSelectedOptions: 8,
+              newItemBuilder: (_) => ExperiencesAndAptitudes(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-                  return CheckboxListTile(
-                    onChanged: (selected) {
-                      _controller._sstTrainingsController.updateOption(
-                        index,
-                        item.copyWith(hide: !item.hide),
-                      );
+  Widget _buildAttestationsAndMentions(BuildContext context) {
+    return AnimatedExpandingCard(
+      elevation: 0.0,
+      header: (context, isExpanded) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          'Attestations et mentions',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(height: 8.0),
+            NumberedText([
+              'Inscrire les attestations et les mentions pertinentes reçues '
+                  'par l\'élève ainsi que les années correspondantes.',
+              'Cocher celles à afficher dans le VISA en PDF (maximum de 5 items).'
+            ]),
+            SizedBox(height: 8.0),
+            SelectableTextBoxes(
+              controller: controller._attestationsAndMentionsController,
+              maxSelectedOptions: 5,
+              newItemBuilder: (_) => AttestationsAndMentions(),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSstTrainings(BuildContext context) {
+    return AnimatedExpandingCard(
+      elevation: 0.0,
+      header: (context, isExpanded) => Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          'Formations relatives à la SST',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: StatefulBuilder(
+          builder: (context, setState) => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 8.0),
+              Center(
+                child: TextButton(
+                    onPressed: () async {
+                      await _selectSstTrainingToShowDialog(context);
                       setState(() {});
                     },
-                    value: !item.hide,
-                    title: Text(item.text,
-                        style: Theme.of(context).textTheme.bodyMedium),
-                  );
-                }),
-                SizedBox(height: 16.0),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text('Fermer'),
-                ),
-              ],
-            ),
+                    child: Text(
+                      'Sélectionner les formations à la SST obtenues',
+                      textAlign: TextAlign.center,
+                    )),
+              ),
+              SizedBox(height: 8.0),
+              ...controller._sstTrainingsController.options
+                  .asMap()
+                  .entries
+                  .where((element) => !(element.value as SstTraining).hide)
+                  .map((entry) {
+                final index = entry.key;
+                final item = entry.value as SstTraining;
+
+                return CheckboxListTile(
+                  key: ValueKey('sst_training_${item.id}'),
+                  onChanged: (selected) {
+                    controller._sstTrainingsController.updateOption(
+                      index,
+                      item.copyWith(isSelected: !item.isSelected),
+                    );
+                    setState(() {});
+                  },
+                  value: item.isSelected,
+                  title: Text(item.text,
+                      style: Theme.of(context).textTheme.bodyMedium),
+                );
+              }),
+            ],
           ),
         ),
       ),
     );
-
-    setState(() {});
   }
+
+  Future<void> _selectSstTrainingToShowDialog(BuildContext context) async =>
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => Dialog(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: StatefulBuilder(
+              builder: (context, setState) => Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Liste des sujets pour lesquels l\'élève a pu recevoir une formation SST',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  SizedBox(height: 16.0),
+                  ...controller._sstTrainingsController.options
+                      .asMap()
+                      .entries
+                      .map((entry) {
+                    final index = entry.key;
+                    final item = entry.value as SstTraining;
+
+                    return CheckboxListTile(
+                      onChanged: (selected) {
+                        controller._sstTrainingsController.updateOption(
+                          index,
+                          item.copyWith(hide: !item.hide),
+                        );
+                        setState(() {});
+                      },
+                      value: !item.hide,
+                      title: Text(item.text,
+                          style: Theme.of(context).textTheme.bodyMedium),
+                    );
+                  }),
+                  SizedBox(height: 16.0),
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: Text('Fermer'),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
 }
