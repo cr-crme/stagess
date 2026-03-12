@@ -81,11 +81,8 @@ class AboutPageState extends State<AboutPage> {
                 decoration: const InputDecoration(
                   labelText: '* Nom de l\'entreprise',
                 ),
-                validator:
-                    (text) =>
-                        text!.isEmpty
-                            ? 'Ajouter le nom de l\'entreprise.'
-                            : null,
+                validator: (text) =>
+                    text!.isEmpty ? 'Ajouter le nom de l\'entreprise.' : null,
                 onChanged: (name) => this.name = name,
               ),
               AddressListTile(
@@ -105,31 +102,25 @@ class AboutPageState extends State<AboutPage> {
               const SubTitle('Entreprise représentée par', left: 0, top: 0),
               TextFormField(
                 decoration: const InputDecoration(labelText: '* Prénom'),
-                validator:
-                    (text) =>
-                        text!.isEmpty
-                            ? 'Ajouter le nom de la personne représentant l\'entreprise.'
-                            : null,
+                validator: (text) => text!.isEmpty
+                    ? 'Ajouter le nom de la personne représentant l\'entreprise.'
+                    : null,
                 onChanged: (name) => contactFirstName = name,
               ),
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: '* Nom de famille',
                 ),
-                validator:
-                    (text) =>
-                        text!.isEmpty
-                            ? 'Ajouter le nom de la personne représentant l\'entreprise.'
-                            : null,
+                validator: (text) => text!.isEmpty
+                    ? 'Ajouter le nom de la personne représentant l\'entreprise.'
+                    : null,
                 onChanged: (name) => contactLastName = name,
               ),
               TextFormField(
                 decoration: const InputDecoration(labelText: '* Fonction'),
-                validator:
-                    (text) =>
-                        text!.isEmpty
-                            ? 'Ajouter la fonction de cette personne.'
-                            : null,
+                validator: (text) => text!.isEmpty
+                    ? 'Ajouter la fonction de cette personne.'
+                    : null,
                 onChanged: (function) => contactFunction = function,
               ),
               PhoneListTile(
@@ -153,7 +144,7 @@ class AboutPageState extends State<AboutPage> {
               EnterpriseActivityTypeListTile(
                 hideTitle: true,
                 subtitle:
-                    '* Sélectionner les mots clefs illustrant les activités de l’entreprise',
+                    '* Sélectionner les mots clefs illustrant les activités de l\'entreprise',
                 controller: _activityTypesController,
                 editMode: true,
                 activityTabAtTop: false,

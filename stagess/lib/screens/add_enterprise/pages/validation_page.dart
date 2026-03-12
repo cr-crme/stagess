@@ -92,7 +92,7 @@ class ValidationPage extends StatelessWidget {
               : EnterpriseActivityTypeListTile(
                   hideTitle: true,
                   subtitle:
-                      '* Sélectionner les mots clefs illustrant les activités de l’entreprise',
+                      '* Sélectionner les mots clefs illustrant les activités de l\'entreprise',
                   controller: activityTypeController!,
                   editMode: false,
                   activityTabAtTop: false,

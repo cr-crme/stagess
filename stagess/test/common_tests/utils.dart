@@ -12,7 +12,6 @@ import 'package:stagess_common/models/internships/internship_contract.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart'
     as attitude;
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
-import 'package:stagess_common/models/persons/student_visa.dart' as visa;
 import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/sst_evaluation.dart';
@@ -24,6 +23,7 @@ import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/itineraries/waypoint.dart';
 import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common/models/persons/student_visa.dart' as visa;
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/models/school_boards/school.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
@@ -296,17 +296,18 @@ visa.StudentVisa dummyStudentVisa({
       formVersion: visa.StudentVisa.currentVersion,
       form: visa.VisaEvaluation(
         id: 'visaEvaluationId',
-        inattendance: visa.Inattendance.rarely,
-        ponctuality: visa.Ponctuality.sometimeLate,
-        sociability: visa.Sociability.veryLow,
-        politeness: visa.Politeness.alwaysSuitable,
-        motivation: visa.Motivation.low,
-        dressCode: visa.DressCode.notAppropriate,
-        qualityOfWork: visa.QualityOfWork.high,
-        productivity: visa.Productivity.low,
-        autonomy: visa.Autonomy.none,
-        cautiousness: visa.Cautiousness.mostly,
-        generalAppreciation: visa.GeneralAppreciation.passable,
+        experiencesAndAptitudes: [
+          visa.ExperiencesAndAptitudes(text: 'Value1', isSelected: true),
+          visa.ExperiencesAndAptitudes(text: 'Value2', isSelected: false),
+        ],
+        attestationsAndMentions: [
+          visa.AttestationsAndMentions(text: 'Value3', isSelected: true),
+          visa.AttestationsAndMentions(text: 'Value4', isSelected: false),
+        ],
+        sstTrainings: [
+          visa.SstTraining(text: 'Value5', isSelected: true, hide: true),
+          visa.SstTraining(text: 'Value6', isSelected: false, hide: false),
+        ],
       ),
     );
 

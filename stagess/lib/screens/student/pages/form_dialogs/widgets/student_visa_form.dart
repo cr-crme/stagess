@@ -56,7 +56,7 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
               children: [
                 _buildSummary(
                   title:
-                      'Expériences et aptitudes personnelles et scolaires complémentaires au profil d’employabilité',
+                      'Expériences et aptitudes personnelles et scolaires complémentaires au profil d\'employabilité',
                   elements: [],
                   emptyMessage: 'Aucune expérience renseignée.',
                 ),
