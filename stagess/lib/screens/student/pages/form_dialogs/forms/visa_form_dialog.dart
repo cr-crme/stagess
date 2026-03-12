@@ -1,12 +1,16 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:stagess/common/provider_helpers/internships_helpers.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/common/widgets/numbered_text.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
+import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/models/persons/student_visa.dart';
-import 'package:stagess_common/services/job_data_file_service.dart';
+import 'package:stagess_common/services/job_data_file_service.dart'
+    as job_service;
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
@@ -45,8 +49,11 @@ Future<Student?> showVisaEvaluationFormDialog(
 class VisaFormController {
   static const _formVersion = '1.0.0';
 
-  final Student student;
-  final List<Specialization> specializations = [];
+  final Student _student;
+  final List<Internship> _internships = [];
+  final List<job_service.Specialization> _specializations = [];
+  final Map<job_service.Specialization, List<SkillEvaluation>>
+      _evaluatedSkills = {};
   final String? evaluationId;
   final bool canModify;
 
@@ -56,22 +63,26 @@ class VisaFormController {
 
   bool _isGatewayToFmsAvailable = false;
   final _sstCertificateController = SelectableTextItemsController();
+  final _specificSkillsController = SelectableTextItemsController();
 
   VisaFormController(
     BuildContext context, {
     required String studentId,
     this.evaluationId,
     required this.canModify,
-  }) : student = StudentsProvider.of(context, listen: false).fromId(studentId) {
-    final internships =
-        InternshipsProvider.of(context, listen: false).byStudentId(studentId);
-    for (final internship in internships) {
+  }) : _student =
+            StudentsProvider.of(context, listen: false).fromId(studentId) {
+    _internships.addAll(
+        InternshipsProvider.of(context, listen: false).byStudentId(studentId));
+    for (final internship in _internships) {
       final enterprise = EnterprisesProvider.of(context, listen: false)
           .fromId(internship.enterpriseId);
-      specializations.add(enterprise.jobs
+      _specializations.add(enterprise.jobs
           .fromId(internship.currentContract!.jobId)
           .specialization);
     }
+    _evaluatedSkills.addAll(
+        InternshipsHelpers.getStudentSkills(context, studentId: studentId));
 
     clear();
     if (evaluationId != null) {
@@ -96,11 +107,20 @@ class VisaFormController {
         Certificate(certificateType: CertificateType.none, isSelected: false));
     _sstCertificateController.add(
         Certificate(certificateType: CertificateType.fpt, isSelected: false));
-    for (final specialization in specializations) {
+    for (final specialization in _specializations) {
       _sstCertificateController.add(Certificate(
           certificateType: CertificateType.fms,
           isSelected: false,
           specializationId: specialization.id));
+    }
+
+    _specificSkillsController.clear();
+    for (final skill
+        in InternshipsHelpers.filterAcquiredSkills(skills: _evaluatedSkills)
+            .values
+            .expand((e) => e)) {
+      _specificSkillsController
+          .add(Skill(text: skill.skillName, isSelected: false));
     }
   }
 
@@ -110,10 +130,10 @@ class VisaFormController {
     clear();
 
     final visa =
-        student.allVisa.firstWhereOrNull((e) => e.id == previousEvaluationId);
+        _student.allVisa.firstWhereOrNull((e) => e.id == previousEvaluationId);
     if (visa == null) {
       _logger.warning(
-          'No previous evaluation found for student ${student.id} with evaluationId $previousEvaluationId');
+          'No previous evaluation found for student ${_student.id} with evaluationId $previousEvaluationId');
       return;
     }
 
@@ -156,6 +176,16 @@ class VisaFormController {
             index, item.copyWith(isSelected: item.isSelected));
       }
     }
+
+    for (final item in visa.form.skills) {
+      final index = _specificSkillsController.options
+          .indexWhere((e) => e.text == item.text);
+      // If a skill was removed
+      if (index < 0) continue;
+
+      _specificSkillsController.updateOption(
+          index, item.copyWith(isSelected: item.isSelected));
+    }
   }
 
   StudentVisa toVisa() {
@@ -172,6 +202,7 @@ class VisaFormController {
         isGatewayToFmsAvailable: _isGatewayToFmsAvailable,
         certificates:
             _sstCertificateController.options.cast<Certificate>().toList(),
+        skills: _specificSkillsController.options.cast<Skill>().toList(),
       ),
       formVersion: _formVersion,
     );
@@ -557,6 +588,8 @@ class _EmployabilityProfileSection extends StatelessWidget {
             _buildGatewayToFms(context),
             SizedBox(height: 16.0),
             _buildCertificatesToShow(context),
+            SizedBox(height: 16.0),
+            _buildSpecificSkills(context),
           ],
         ),
       ),
@@ -564,7 +597,7 @@ class _EmployabilityProfileSection extends StatelessWidget {
   }
 
   Widget _buildGatewayToFms(BuildContext context) {
-    return controller.student.program == Program.fpt
+    return controller._student.program == Program.fpt
         ? StatefulBuilder(
             builder: (context, setState) => Column(
                   mainAxisSize: MainAxisSize.min,
@@ -589,112 +622,138 @@ class _EmployabilityProfileSection extends StatelessWidget {
 
   Widget _buildCertificatesToShow(BuildContext context) {
     return StatefulBuilder(
+      builder: (context, setState) => Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+              'Pour les élèves de FMS et de FPT-3, cocher les certificats à afficher dans le VISA',
+              style: Theme.of(context).textTheme.titleSmall),
+          ...controller._sstCertificateController.options.map(
+            (e) {
+              final item = e as Certificate;
+              final job = job_service.ActivitySectorsService.allSpecializations
+                  .firstWhereOrNull((e) => e.id == item.specializationId);
+
+              final name = switch (item.certificateType) {
+                CertificateType.none => 'Aucun certificat',
+                CertificateType.fpt =>
+                  'Certificat de formation préparatoire au travail (CFPT)',
+                CertificateType.fms =>
+                  'Certificat de formation à un métier semi-spécialisé (CFMS) pour le métier : ${job?.name ?? 'Métier non trouvé'}',
+              };
+              final noneIsChecked = controller._sstCertificateController.options
+                  .cast<Certificate>()
+                  .any((e) =>
+                      e.isSelected &&
+                      e.certificateType == CertificateType.none);
+
+              return CheckboxListTile(
+                value: item.isSelected &&
+                    (!noneIsChecked ||
+                        item.certificateType == CertificateType.none),
+                onChanged: (value) {
+                  controller._sstCertificateController.updateOption(
+                      controller._sstCertificateController.options
+                          .indexOf(item),
+                      item.copyWith(
+                          year: item.year < 0 ? DateTime.now().year : item.year,
+                          isSelected: value));
+                  setState(() {});
+                },
+                enabled: item.certificateType == CertificateType.none ||
+                    !controller._sstCertificateController.options
+                        .cast<Certificate>()
+                        .any((e) =>
+                            e.isSelected &&
+                            e.certificateType == CertificateType.none),
+                controlAffinity: ListTileControlAffinity.leading,
+                title:
+                    Text(name, style: Theme.of(context).textTheme.bodyMedium),
+                subtitle: item.certificateType == CertificateType.none ||
+                        !(item.isSelected && !noneIsChecked)
+                    ? null
+                    : Padding(
+                        padding: const EdgeInsets.only(left: 36.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Text('Année certification\u00a0: ${item.year}'),
+                            IconButton(
+                                onPressed: () async {
+                                  final initialDate = DateTime(item.year > 0
+                                      ? item.year
+                                      : DateTime.now().year);
+                                  final firstDate =
+                                      DateTime(DateTime.now().year - 5);
+                                  final lastDate =
+                                      DateTime(DateTime.now().year + 5);
+                                  final year = await showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: Text(
+                                          'Sélectionnez l\'année de certification'),
+                                      content: SizedBox(
+                                        width: 300,
+                                        height: 300,
+                                        child: YearPicker(
+                                          selectedDate: initialDate,
+                                          onChanged: (selectedDate) {
+                                            Navigator.pop(
+                                                context, selectedDate.year);
+                                          },
+                                          firstDate: firstDate,
+                                          lastDate: lastDate,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                  if (year == null) return;
+
+                                  controller._sstCertificateController
+                                      .updateOption(
+                                          controller
+                                              ._sstCertificateController.options
+                                              .indexOf(item),
+                                          item.copyWith(year: year));
+                                  setState(() {});
+                                },
+                                icon: Icon(Icons.calendar_month)),
+                          ],
+                        ),
+                      ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSpecificSkills(BuildContext context) {
+    return StatefulBuilder(
         builder: (context, setState) => Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                    'Pour les élèves de FMS et de FPT-3, cocher les certificats à afficher dans le VISA',
+                Text('Compétences spécifiques',
                     style: Theme.of(context).textTheme.titleSmall),
-                ...controller._sstCertificateController.options.map(
-                  (e) {
-                    final item = e as Certificate;
-                    final job = ActivitySectorsService.allSpecializations
-                        .firstWhereOrNull((e) => e.id == item.specializationId);
-
-                    final name = switch (item.certificateType) {
-                      CertificateType.none => 'Aucun certificat',
-                      CertificateType.fpt =>
-                        'Certificat de formation préparatoire au travail (CFPT)',
-                      CertificateType.fms =>
-                        'Certificat de formation à un métier semi-spécialisé (CFMS) pour le métier : ${job?.name ?? 'Métier non trouvé'}',
-                    };
-                    final noneIsChecked = controller
-                        ._sstCertificateController.options
-                        .cast<Certificate>()
-                        .any((e) =>
-                            e.isSelected &&
-                            e.certificateType == CertificateType.none);
-
+                Text(
+                    'Cocher les compétences à afficher dans le VISA en PDF dans la liste des compétences réussies.'),
+                ...controller._specificSkillsController.options.map(
+                  (item) {
                     return CheckboxListTile(
-                      value: item.isSelected &&
-                          (!noneIsChecked ||
-                              item.certificateType == CertificateType.none),
+                      value: item.isSelected,
                       onChanged: (value) {
-                        controller._sstCertificateController.updateOption(
-                            controller._sstCertificateController.options
+                        controller._specificSkillsController.updateOption(
+                            controller._specificSkillsController.options
                                 .indexOf(item),
-                            item.copyWith(
-                                year: item.year < 0
-                                    ? DateTime.now().year
-                                    : item.year,
-                                isSelected: value));
+                            item.copyWith(isSelected: value));
                         setState(() {});
                       },
-                      enabled: item.certificateType == CertificateType.none ||
-                          !controller._sstCertificateController.options
-                              .cast<Certificate>()
-                              .any((e) =>
-                                  e.isSelected &&
-                                  e.certificateType == CertificateType.none),
                       controlAffinity: ListTileControlAffinity.leading,
-                      title: Text(name,
+                      title: Text(item.text,
                           style: Theme.of(context).textTheme.bodyMedium),
-                      subtitle: item.certificateType == CertificateType.none ||
-                              !(item.isSelected && !noneIsChecked)
-                          ? null
-                          : Padding(
-                              padding: const EdgeInsets.only(left: 36.0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                      'Année certification\u00a0: ${item.year}'),
-                                  IconButton(
-                                      onPressed: () async {
-                                        final initialDate = DateTime(
-                                            item.year > 0
-                                                ? item.year
-                                                : DateTime.now().year);
-                                        final firstDate =
-                                            DateTime(DateTime.now().year - 5);
-                                        final lastDate =
-                                            DateTime(DateTime.now().year + 5);
-                                        final year = await showDialog(
-                                          context: context,
-                                          builder: (context) => AlertDialog(
-                                            title: Text(
-                                                'Sélectionnez l\'année de certification'),
-                                            content: SizedBox(
-                                              width: 300,
-                                              height: 300,
-                                              child: YearPicker(
-                                                selectedDate: initialDate,
-                                                onChanged: (selectedDate) {
-                                                  Navigator.pop(context,
-                                                      selectedDate.year);
-                                                },
-                                                firstDate: firstDate,
-                                                lastDate: lastDate,
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                        if (year == null) return;
-
-                                        controller._sstCertificateController
-                                            .updateOption(
-                                                controller
-                                                    ._sstCertificateController
-                                                    .options
-                                                    .indexOf(item),
-                                                item.copyWith(year: year));
-                                        setState(() {});
-                                      },
-                                      icon: Icon(Icons.calendar_month)),
-                                ],
-                              ),
-                            ),
                     );
                   },
                 ),

@@ -150,6 +150,21 @@ class Certificate extends SelectableTextItem {
   CertificateType get certificateType => CertificateType.fromString(text);
 }
 
+class Skill extends SelectableTextItem {
+  Skill({
+    super.id,
+    super.text,
+    super.isSelected,
+  });
+  Skill.fromSerialized(super.map) : super.fromSerialized();
+
+  Skill.fromItem(SelectableTextItem item)
+      : super(id: item.id, text: item.text, isSelected: item.isSelected);
+
+  static FetchableFields get fetchableFields =>
+      SelectableTextItem.fetchableFields;
+}
+
 class VisaEvaluation extends ItemSerializable {
   final List<ExperiencesAndAptitudes> experiencesAndAptitudes;
   final List<AttestationsAndMentions> attestationsAndMentions;
@@ -157,6 +172,7 @@ class VisaEvaluation extends ItemSerializable {
 
   final bool isGatewayToFmsAvailable;
   final List<Certificate> certificates;
+  final List<Skill> skills;
 
   VisaEvaluation({
     super.id,
@@ -165,6 +181,7 @@ class VisaEvaluation extends ItemSerializable {
     required this.sstTrainings,
     required this.isGatewayToFmsAvailable,
     required this.certificates,
+    required this.skills,
   });
   VisaEvaluation.fromSerialized(super.map)
       : experiencesAndAptitudes = (map?['experiences_and_aptitudes'] as List?)
@@ -184,6 +201,10 @@ class VisaEvaluation extends ItemSerializable {
                 ?.map((e) => Certificate.fromSerialized(e))
                 .toList() ??
             [],
+        skills = (map?['skills'] as List?)
+                ?.map((e) => Skill.fromSerialized(e))
+                .toList() ??
+            [],
         super.fromSerialized();
 
   @override
@@ -195,6 +216,7 @@ class VisaEvaluation extends ItemSerializable {
       'sst_trainings': sstTrainings.serialize(),
       'is_gateway_to_fms_available': isGatewayToFmsAvailable,
       'certificates': certificates.serialize(),
+      'skills': skills.serialize(),
     };
   }
 
@@ -204,6 +226,7 @@ class VisaEvaluation extends ItemSerializable {
     List<SstTraining>? sstTrainings,
     bool? isGatewayToFmsAvailable,
     List<Certificate>? certificates,
+    List<Skill>? skills,
   }) {
     return VisaEvaluation(
       id: id,
@@ -215,6 +238,7 @@ class VisaEvaluation extends ItemSerializable {
       isGatewayToFmsAvailable:
           isGatewayToFmsAvailable ?? this.isGatewayToFmsAvailable,
       certificates: certificates ?? this.certificates,
+      skills: skills ?? this.skills,
     );
   }
 
@@ -226,6 +250,7 @@ class VisaEvaluation extends ItemSerializable {
         ', sstTrainings: ${sstTrainings.toString()}'
         ', isGatewayToFmsAvailable: $isGatewayToFmsAvailable'
         ', certificates: ${certificates.toString()}'
+        ', skills: ${skills.toString()}'
         '}';
   }
 
@@ -247,6 +272,10 @@ class VisaEvaluation extends ItemSerializable {
         'certificates': FetchableFields.mandatory
           ..addAll(FetchableFields.reference({
             '*': Certificate.fetchableFields,
+          })),
+        'skills': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference({
+            '*': Skill.fetchableFields,
           })),
       });
 }
