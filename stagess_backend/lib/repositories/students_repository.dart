@@ -301,16 +301,43 @@ class MySqlStudentsRepository extends StudentsRepository {
                 fieldsToFetch: [
                   'id',
                   'visa_id',
-                  'is_gateway_to_fms_available',
-                  'reference',
-                  'success_conditions',
                 ],
                 idNameToDataTable: 'visa_id',
               ),
             ]))
             .first;
 
-        visa['form'] = (evaluationSubquery['visa'] as List).firstOrNull ?? {};
+        final form = (evaluationSubquery['visa'] as List).firstOrNull ?? {};
+
+// TODO RENDU ICI
+        final formSubquery = (await sqlInterface.performSelectQuery(
+            user: user,
+            tableName: 'student_visa',
+            fieldsToFetch: [
+              'id',
+              'visa_id',
+              'is_gateway_to_fms_available',
+              'reference',
+              'success_conditions',
+            ],
+            filters: {
+              'visa_id': form['visa_id']
+            },
+            subqueries: [
+              sqlInterface.selectSubquery(
+                dataTableName: 'student_visa_experiences_and_aptitude_items',
+                asName: 'visa',
+                fieldsToFetch: [
+                  'id',
+                  'visa_id',
+                  'is_gateway_to_fms_available',
+                  'reference',
+                  'success_conditions',
+                ],
+                idNameToDataTable: 'visa_items_id',
+              ),
+            ]));
+
         allVisa.add(visa);
       }
       student['all_visa'] = allVisa;
@@ -419,7 +446,7 @@ class MySqlStudentsRepository extends StudentsRepository {
         'form_version': evaluation['form_version'],
       });
 
-      // Insert the attitude
+      // Insert the form
       await sqlInterface
           .performInsertQuery(tableName: 'student_visa_items', data: {
         'id': evaluation['form']['id'],
@@ -429,6 +456,107 @@ class MySqlStudentsRepository extends StudentsRepository {
         'reference': evaluation['form']['reference'],
         'success_conditions': evaluation['form']['success_conditions'],
       });
+
+      final toWait = <Future>[];
+      for (final element
+          in (evaluation['form']['experiences_and_aptitudes'] as List?) ?? []) {
+        toWait.add(
+          sqlInterface.performInsertQuery(
+            tableName: 'student_visa_experiences_and_aptitude_items',
+            data: {
+              'id': element['id'],
+              'visa_items_id': evaluation['form']['id'],
+              'text': element['text'],
+              'is_selected': element['is_selected'],
+            },
+          ),
+        );
+      }
+      for (final element
+          in (evaluation['form']['attestation_and_mentions'] as List?) ?? []) {
+        toWait.add(
+          sqlInterface.performInsertQuery(
+            tableName: 'student_visa_attestations_and_mentions_items',
+            data: {
+              'id': element['id'],
+              'visa_items_id': evaluation['form']['id'],
+              'text': element['text'],
+              'is_selected': element['is_selected'],
+            },
+          ),
+        );
+      }
+      for (final element
+          in (evaluation['form']['sst_trainings'] as List?) ?? []) {
+        toWait.add(
+          sqlInterface.performInsertQuery(
+            tableName: 'student_visa_sst_training_items',
+            data: {
+              'id': element['id'],
+              'visa_items_id': evaluation['form']['id'],
+              'text': element['text'],
+              'is_selected': element['is_selected'],
+            },
+          ),
+        );
+      }
+      for (final element
+          in (evaluation['form']['certificates'] as List?) ?? []) {
+        toWait.add(
+          sqlInterface.performInsertQuery(
+            tableName: 'student_visa_certificate_items',
+            data: {
+              'id': element['id'],
+              'visa_items_id': evaluation['form']['id'],
+              'text': element['text'],
+              'year': element['year'],
+              'specialization_id': element['specialization_id'],
+              'is_selected': element['is_selected'],
+            },
+          ),
+        );
+      }
+      for (final element in (evaluation['form']['skills'] as List?) ?? []) {
+        toWait.add(
+          sqlInterface.performInsertQuery(
+            tableName: 'student_visa_skill_items',
+            data: {
+              'id': element['id'],
+              'visa_items_id': evaluation['form']['id'],
+              'text': element['text'],
+              'is_selected': element['is_selected'],
+            },
+          ),
+        );
+      }
+      for (final element in (evaluation['form']['forces'] as List?) ?? []) {
+        toWait.add(
+          sqlInterface.performInsertQuery(
+            tableName: 'student_visa_forces_items',
+            data: {
+              'id': element['id'],
+              'visa_items_id': evaluation['form']['id'],
+              'text': element['text'],
+              'is_selected': element['is_selected'],
+            },
+          ),
+        );
+      }
+      for (final element in (evaluation['form']['challenges'] as List?) ?? []) {
+        toWait.add(
+          sqlInterface.performInsertQuery(
+            tableName: 'student_visa_challenges_items',
+            data: {
+              'id': element['id'],
+              'visa_items_id': evaluation['form']['id'],
+              'text': element['text'],
+              'is_selected': element['is_selected'],
+            },
+          ),
+        );
+      }
+
+      await Future.wait(toWait);
     }
   }
 

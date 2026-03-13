@@ -70,17 +70,17 @@ class SstTraining extends SelectableTextItem {
       : hide = map?['hide'] ?? false,
         super.fromSerialized();
 
-  static List<String> get availableTrainings => [
-        'Manutention sécuritaire',
-        'Utilisation d\'un exacto',
-        'Prévention des troubles musculosquelettiques',
-        'Substances potentiellement dangereuses pour la santé',
-        'Utilisation exemplaire des EPI (raison, tâche, comment / quel modèle choisir)'
+  static Map<String, String> get availableTrainings => {
+        '0001': 'Manutention sécuritaire',
+        '0002': 'Utilisation d\'un exacto',
+        '0003': 'Prévention des troubles musculosquelettiques',
+        '0004': 'Substances potentiellement dangereuses pour la santé',
+        '0005': 'Utilisation exemplaire des EPI (raison, tâche, comment / quel modèle choisir)'
             'comment les entretenir, comment les ajuster, comment les nettoyer, '
             'comment les mettre / enlever)',
-        'Conduite de chariot élévateur',
-        'Utilisation d\'échelles ou d\'escabeaux',
-      ];
+        '0006': 'Conduite de chariot élévateur',
+        '0007': 'Utilisation d\'échelles ou d\'escabeaux',
+      };
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
@@ -208,18 +208,18 @@ class Attitude extends SelectableTextItem {
         'is_selected': FetchableFields.optional,
       });
 
-  static List<String> get availableItems => [
-        'Ponctualité',
-        'Assuiduité',
-        'Qualité du travail',
-        'Rendement et constance',
-        'Communication avec l\'équipe',
-        'Respect des personnes en autorité',
-        'Communication au sujet de la SST',
-        'Matrise de soi',
-        'Prise d\'initiative',
-        'Adaptation aux changements',
-      ];
+  static Map<String, String> get availableItems => {
+        '0001': 'Ponctualité',
+        '0002': 'Assuiduité',
+        '0003': 'Qualité du travail',
+        '0004': 'Rendement et constance',
+        '0005': 'Communication avec l\'équipe',
+        '0006': 'Respect des personnes en autorité',
+        '0007': 'Communication au sujet de la SST',
+        '0008': 'Matrise de soi',
+        '0009': 'Prise d\'initiative',
+        '0010': 'Adaptation aux changements',
+      };
 
   @override
   Attitude copyWith({

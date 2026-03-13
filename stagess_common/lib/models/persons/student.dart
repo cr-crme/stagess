@@ -138,8 +138,7 @@ class Student extends Person {
       'group': FetchableFields.mandatory,
       'contact': Person.fetchableFields,
       'contact_link': FetchableFields.optional,
-      'all_visa': FetchableFields.mandatory
-        ..addAll(FetchableFields.reference({'*': StudentVisa.fetchableFields})),
+      'all_visa': FetchableFields.optional,
     }));
 
   Student get limitedInfo => Student(

@@ -40,9 +40,7 @@ Future<Student?> showVisaEvaluationFormDialog(
 
   final student = StudentsProvider.of(context, listen: false).fromId(studentId);
 
-  // Erase the previous visa and replace it by the new one
   return Student.fromSerialized(student.serialize())
-    ..allVisa.clear()
     ..allVisa.add(newEvaluation);
 }
 
@@ -113,7 +111,7 @@ class VisaFormController {
     _attestationsAndMentionsController.clear();
     _sstTrainingsController.clear();
 
-    for (final training in SstTraining.availableTrainings) {
+    for (final training in SstTraining.availableTrainings.keys) {
       _sstTrainingsController
           .add(SstTraining(text: training, isSelected: false, hide: true));
     }
@@ -138,13 +136,13 @@ class VisaFormController {
             .values
             .expand((e) => e)) {
       _specificSkillsController
-          .add(Skill(text: skill.skillName, isSelected: false));
+          .add(Skill(text: skill.specializationId, isSelected: false));
     }
     _referenceController.text = '';
 
     _forcesController.clear();
     _challengesController.clear();
-    for (final attitude in Attitude.availableItems) {
+    for (final attitude in Attitude.availableItems.keys) {
       _forcesController.add(Attitude(text: attitude, isSelected: false));
       _challengesController.add(Attitude(text: attitude, isSelected: false));
     }
@@ -178,9 +176,9 @@ class VisaFormController {
 
     for (int i = 0; i < visa.form.sstTrainings.length; i++) {
       final training = visa.form.sstTrainings[i];
-      if (!SstTraining.availableTrainings.contains(training.text)) {
+      if (!SstTraining.availableTrainings.containsKey(training.text)) {
         throw Exception(
-            'The training "${training.text}" is not in the list of available trainings. '
+            'The training id "${training.text}" is not in the list of available trainings. '
             'Please update the list of available trainings in SstTraining.availableTrainings.');
       }
       _sstTrainingsController.updateOption(
@@ -360,13 +358,35 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
   Future<void> _submit() async {
     _logger.info('Submitting attitude evaluation form');
 
-    if (!_controller.canModify) {
-      Navigator.of(context).pop();
+    // if (!_controller.canModify) {
+    //   Navigator.of(context).pop();
+    //   return;
+    // }
+
+    _logger.fine('Visa evaluation form submitted successfully');
+    // Navigator.of(context).pop(_controller.toVisa());
+    await _send();
+  }
+
+  Future<void> _send() async {
+    final students = StudentsProvider.of(context, listen: false);
+
+    final hasLock = await students.getLockForItem(_controller._student);
+    if (!hasLock || !context.mounted) {
+      if (context.mounted) {
+        print(
+          'Impossible de modifier cet étudiant, car il est en cours de modification par un autre utilisateur.',
+        );
+      }
       return;
     }
 
-    _logger.fine('Visa evaluation form submitted successfully');
-    Navigator.of(context).pop(_controller.toVisa());
+    final newEvaluation = _controller.toVisa();
+    final newStudent = Student.fromSerialized(_controller._student.serialize())
+      ..allVisa.add(newEvaluation);
+
+    await students.replaceWithConfirmation(newStudent);
+    await students.releaseLockForItem(newStudent);
   }
 
   void _cancel() async {
@@ -542,7 +562,9 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
                     setState(() {});
                   },
                   value: item.isSelected,
-                  title: Text(item.text,
+                  title: Text(
+                      SstTraining.availableTrainings[item.text] ??
+                          'Entrainement non trouvé',
                       style: Theme.of(context).textTheme.bodyMedium),
                 );
               }),
@@ -586,7 +608,9 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
                       },
                       controlAffinity: ListTileControlAffinity.leading,
                       value: !item.hide,
-                      title: Text(item.text,
+                      title: Text(
+                          SstTraining.availableTrainings[item.text] ??
+                              'Entrainement non trouvé',
                           style: Theme.of(context).textTheme.bodyMedium),
                     );
                   }),
@@ -801,6 +825,8 @@ class _EmployabilityProfileSection extends StatelessWidget {
                           'Cocher les compétences à afficher dans le VISA en PDF dans la liste des compétences réussies.'),
                       ...controller._specificSkillsController.options.map(
                         (item) {
+                          final specializationId = item.text;
+
                           return CheckboxListTile(
                             value: item.isSelected,
                             onChanged: (value) {
@@ -811,7 +837,13 @@ class _EmployabilityProfileSection extends StatelessWidget {
                               setState(() {});
                             },
                             controlAffinity: ListTileControlAffinity.leading,
-                            title: Text(item.text,
+                            title: Text(
+                                job_service.ActivitySectorsService
+                                        .allSpecializations
+                                        .firstWhereOrNull(
+                                            (e) => e.id == specializationId)
+                                        ?.idWithName ??
+                                    'Compétence non trouvée',
                                 style: Theme.of(context).textTheme.bodyMedium),
                           );
                         },
@@ -911,20 +943,26 @@ class _ForcesAndChallengesSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(definition),
-                  ...controller.options.map((item) => CheckboxListTile(
-                        value: item.isSelected,
-                        onChanged: (value) {
-                          controller.updateOption(
-                              controller.options.indexOf(item),
-                              item.copyWith(isSelected: value));
-                          setState(() {});
-                        },
-                        enabled: item.isSelected ||
-                            controller.selectedCount < maxSelectedOptions,
-                        controlAffinity: ListTileControlAffinity.leading,
-                        title: Text(item.text,
-                            style: Theme.of(context).textTheme.bodyMedium),
-                      )),
+                  ...controller.options.map((item) {
+                    final attitudeId = item.text;
+
+                    return CheckboxListTile(
+                      value: item.isSelected,
+                      onChanged: (value) {
+                        controller.updateOption(
+                            controller.options.indexOf(item),
+                            item.copyWith(isSelected: value));
+                        setState(() {});
+                      },
+                      enabled: item.isSelected ||
+                          controller.selectedCount < maxSelectedOptions,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      title: Text(
+                          Attitude.availableItems[attitudeId] ??
+                              'Attitude non trouvée',
+                          style: Theme.of(context).textTheme.bodyMedium),
+                    );
+                  }),
                 ],
               )),
     );
