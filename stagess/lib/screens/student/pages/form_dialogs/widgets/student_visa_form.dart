@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
-import 'package:stagess/screens/student/pages/form_dialogs/forms/visa_form_dialog.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/forms/show_forms.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/forms/visa_evaluation_form_dialog.dart';
 import 'package:stagess_common/models/persons/student_visa.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
@@ -123,11 +124,10 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
       child: Align(
         alignment: Alignment.centerRight,
         child: TextButton(
-          onPressed: () async => await showVisaEvaluationFormDialog(
-            context,
-            studentId: widget.studentId,
-            evaluationId: _currentEvaluation?.id,
-          ),
+          onPressed: () async => await showStudentEvaluationFormDialog(context,
+              studentId: widget.studentId,
+              evaluationId: _currentEvaluation?.id,
+              showEvaluationDialog: showVisaEvaluationFormDialog),
           child: const Text('Modifier'),
         ),
       ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/dialogs/show_pdf_dialog.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/forms/attitude_evaluation_form_dialog.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/forms/show_forms.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/pdf/evaluation_attitude_pdf_template.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/widgets/internship_evaluation_card.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';

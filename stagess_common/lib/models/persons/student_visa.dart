@@ -13,8 +13,11 @@ class ExperiencesAndAptitudes extends SelectableTextItem {
   });
   ExperiencesAndAptitudes.fromSerialized(super.map) : super.fromSerialized();
 
-  static FetchableFields get fetchableFields =>
-      SelectableTextItem.fetchableFields;
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'text': FetchableFields.optional,
+        'is_selected': FetchableFields.optional,
+      });
 
   @override
   ExperiencesAndAptitudes copyWith({
@@ -36,8 +39,11 @@ class AttestationsAndMentions extends SelectableTextItem {
   });
   AttestationsAndMentions.fromSerialized(super.map) : super.fromSerialized();
 
-  static FetchableFields get fetchableFields =>
-      SelectableTextItem.fetchableFields;
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'text': FetchableFields.optional,
+        'is_selected': FetchableFields.optional,
+      });
 
   @override
   AttestationsAndMentions copyWith({
@@ -170,8 +176,11 @@ class Skill extends SelectableTextItem {
   });
   Skill.fromSerialized(super.map) : super.fromSerialized();
 
-  static FetchableFields get fetchableFields =>
-      SelectableTextItem.fetchableFields;
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'text': FetchableFields.optional,
+        'is_selected': FetchableFields.optional,
+      });
 
   @override
   Skill copyWith({
@@ -193,8 +202,11 @@ class Attitude extends SelectableTextItem {
   });
   Attitude.fromSerialized(super.map) : super.fromSerialized();
 
-  static FetchableFields get fetchableFields =>
-      SelectableTextItem.fetchableFields;
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'text': FetchableFields.optional,
+        'is_selected': FetchableFields.optional,
+      });
 
   static List<String> get availableItems => [
         'Ponctualité',
@@ -262,7 +274,8 @@ class VisaEvaluation extends ItemSerializable {
                 ?.map((e) => SstTraining.fromSerialized(e))
                 .toList() ??
             [],
-        isGatewayToFmsAvailable = map?['is_gateway_to_fms_available'] ?? false,
+        isGatewayToFmsAvailable =
+            BoolExt.from(map?['is_gateway_to_fms_available']) ?? false,
         certificates = (map?['certificates'] as List?)
                 ?.map((e) => Certificate.fromSerialized(e))
                 .toList() ??

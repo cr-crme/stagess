@@ -144,8 +144,10 @@ class Connexions {
     } catch (e, st) {
       if (!skipLog) {
         _logger.severe(
-            'Internal error while processing request from client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $e',
-            st);
+          'Internal error while processing request from client '
+          '(${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $e',
+          st,
+        );
       }
       await _send(client,
           message: CommunicationProtocol(

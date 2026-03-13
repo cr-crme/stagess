@@ -71,7 +71,7 @@ abstract class StudentsRepository extends RepositoryAbstract {
     required DatabaseUser user,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified || user.accessLevel < AccessLevel.admin) {
+    if (user.isNotVerified) {
       throw InvalidRequestException(
           'You do not have permission to put students');
     }
@@ -93,8 +93,13 @@ abstract class StudentsRepository extends RepositoryAbstract {
     final newStudent = previous?.copyWithData(data) ??
         Student.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
 
-    if (user.accessLevel <= AccessLevel.admin &&
-        newStudent.schoolBoardId != user.schoolBoardId) {
+    // Teachers are only allowed to change the internships
+    final differences = newStudent.getDifference(previous);
+    if (user.accessLevel != AccessLevel.superAdmin &&
+        (newStudent.schoolBoardId != user.schoolBoardId ||
+            (user.accessLevel == AccessLevel.teacher &&
+                (differences.length > 1 ||
+                    !differences.contains('all_visa'))))) {
       throw InvalidRequestException(
           'You do not have permission to put this student');
     }
@@ -295,25 +300,17 @@ class MySqlStudentsRepository extends StudentsRepository {
                 asName: 'visa',
                 fieldsToFetch: [
                   'id',
-                  'evaluation_id',
-                  'inattendance',
-                  'ponctuality',
-                  'sociability',
-                  'politeness',
-                  'motivation',
-                  'dressCode',
-                  'quality_of_work',
-                  'productivity',
-                  'autonomy',
-                  'cautiousness',
-                  'general_appreciation',
+                  'visa_id',
+                  'is_gateway_to_fms_available',
+                  'reference',
+                  'success_conditions',
                 ],
                 idNameToDataTable: 'visa_id',
               ),
             ]))
             .first;
 
-        visa['visa'] = (evaluationSubquery['visa'] as List).first;
+        visa['form'] = (evaluationSubquery['visa'] as List).firstOrNull ?? {};
         allVisa.add(visa);
       }
       student['all_visa'] = allVisa;
@@ -347,6 +344,7 @@ class MySqlStudentsRepository extends StudentsRepository {
   Future<void> _updateToStudents(
       Student student, Student previous, DatabaseUser user) async {
     final differences = student.getDifference(previous);
+    if (user.accessLevel < AccessLevel.admin) return;
 
     if (differences.contains('school_board_id')) {
       throw InvalidRequestException(
@@ -399,6 +397,8 @@ class MySqlStudentsRepository extends StudentsRepository {
     required Student previous,
     required DatabaseUser user,
   }) async {
+    if (user.accessLevel < AccessLevel.admin) return;
+
     final differences = student.getDifference(previous);
     if (differences.contains('contact')) {
       await sqlInterface.performUpdatePerson(
@@ -422,26 +422,19 @@ class MySqlStudentsRepository extends StudentsRepository {
       // Insert the attitude
       await sqlInterface
           .performInsertQuery(tableName: 'student_visa_items', data: {
-        'id': evaluation['attitude']['id'],
-        'evaluation_id': evaluation['id'],
-        'inattendance': evaluation['attitude']['inattendance'],
-        'ponctuality': evaluation['attitude']['ponctuality'],
-        'sociability': evaluation['attitude']['sociability'],
-        'politeness': evaluation['attitude']['politeness'],
-        'motivation': evaluation['attitude']['motivation'],
-        'dressCode': evaluation['attitude']['dressCode'],
-        'quality_of_work': evaluation['attitude']['quality_of_work'],
-        'productivity': evaluation['attitude']['productivity'],
-        'autonomy': evaluation['attitude']['autonomy'],
-        'cautiousness': evaluation['attitude']['cautiousness'],
-        'general_appreciation': evaluation['attitude']['general_appreciation']
+        'id': evaluation['form']['id'],
+        'visa_id': evaluation['id'],
+        'is_gateway_to_fms_available': evaluation['form']
+            ['is_gateway_to_fms_available'],
+        'reference': evaluation['form']['reference'],
+        'success_conditions': evaluation['form']['success_conditions'],
       });
     }
   }
 
   Future<void> _updateToVisa(Student student, Student previous) async {
     // Attitude evaluations are not updated, but stacked
-    _insertToVisa(student, previous);
+    await _insertToVisa(student, previous);
   }
 
   @override
