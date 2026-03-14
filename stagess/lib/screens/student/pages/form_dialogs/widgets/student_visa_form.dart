@@ -89,27 +89,47 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
                 ),
                 _buildSummary(
                   title: 'Certification CFMS / CFPT',
-                  elements: evaluation?.form.certificates
-                          .map((e) {
-                            if (!e.isSelected) return null;
+                  elements: CertificateType.values
+                      .map((certificateType) {
+                        switch (certificateType) {
+                          case CertificateType.none:
+                            {
+                              return null;
+                            }
+                          case CertificateType.fpt:
+                            {
+                              return evaluation?.form.certificates
+                                  .where((c) =>
+                                      c.certificateType == CertificateType.fpt)
+                                  .map((c) =>
+                                      'CFPT: Certificat de formation préparatoire au travail \u2014 ${c.year ?? 'Année non renseignée'}')
+                                  .firstOrNull;
+                            }
+                          case CertificateType.fms:
+                            {
+                              final certificates = evaluation?.form.certificates
+                                  .where((c) =>
+                                      c.certificateType == CertificateType.fms);
 
-                            final specialization = ActivitySectorsService
-                                    .allSpecializations
-                                    .firstWhereOrNull((specialization) =>
-                                        specialization.id == e.specializationId)
-                                    ?.idWithName ??
-                                'Métier non trouvé';
+                              if (certificates?.isEmpty ?? true) return null;
 
-                            return switch (e.certificateType) {
-                              CertificateType.fpt => 'FPT',
-                              CertificateType.fms => 'FMS ($specialization)',
-                              CertificateType.none => null,
-                            };
-                          })
-                          .nonNulls
-                          .toList() ??
-                      [],
-                  emptyMessage: 'Aucune certification renseignée.',
+                              return 'CFMS: Certificat de formation à un métier semi-spécialisé obtenu pour :\n'
+                                  '${certificates!.map((certificate) {
+                                final job = ActivitySectorsService
+                                        .allSpecializations
+                                        .firstWhereOrNull((specialization) =>
+                                            specialization.id ==
+                                            certificate.specializationId)
+                                        ?.idWithName ??
+                                    'Métier non trouvé';
+                                return '    $job \u2014 ${certificate.year ?? 'Année non renseignée'}';
+                              }).join('\n')}';
+                            }
+                        }
+                      })
+                      .nonNulls
+                      .toList(),
+                  emptyMessage: 'Aucun certificat à afficher.',
                 ),
                 SizedBox(height: 16.0),
                 _buildModifyFormButton(),
