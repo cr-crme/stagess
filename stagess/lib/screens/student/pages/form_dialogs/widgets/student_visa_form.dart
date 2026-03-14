@@ -1,4 +1,6 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/forms/show_forms.dart';
@@ -80,8 +82,10 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
                   emptyMessage: 'Aucune certification renseignée.',
                 ),
                 SizedBox(height: 16.0),
-                _buildShowOtherForms(),
-                // TODO: Add previous evaluations when multiple evaluations are supported
+                _buildModifyFormButton(),
+                SizedBox(height: 16),
+                _buildSelectShowPreviousEvaluations(),
+                SizedBox(height: 16),
               ],
             ),
           ],
@@ -118,19 +122,71 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
     );
   }
 
-  Widget _buildShowOtherForms() {
+  Widget _buildModifyFormButton() {
     return Padding(
       padding: const EdgeInsets.only(bottom: _interline, right: _interline),
       child: Align(
         alignment: Alignment.centerRight,
         child: TextButton(
-          onPressed: () async => await showStudentEvaluationFormDialog(context,
-              studentId: widget.studentId,
-              evaluationId: _currentEvaluation?.id,
-              showEvaluationDialog: showVisaEvaluationFormDialog),
+          onPressed: () async => await _showEvaluationDialog(
+              evaluationId: _evaluations.lastOrNull?.id, canModify: true),
           child: const Text('Modifier'),
         ),
       ),
     );
+  }
+
+  Widget _buildSelectShowPreviousEvaluations() {
+    final orderedEvaluations = _evaluations.sortedBy((e) => e.date).reversed;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: _interline),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Voir les versions du VISA',
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          Column(
+            mainAxisSize: MainAxisSize.min,
+            children: orderedEvaluations.map(
+              (evaluation) {
+                // Reminder the list is reversed for display
+                return Row(
+                  children: [
+                    SizedBox(
+                      width: 150,
+                      child: Text(
+                        '\u2022 ${DateFormat('dd MMMM yyyy', 'fr_CA').format(evaluation.date)}',
+                      ),
+                    ),
+                    IconButton(
+                        onPressed: () => _showEvaluationDialog(
+                            evaluationId: evaluation.id, canModify: false),
+                        color: Theme.of(context).primaryColor,
+                        icon: const Icon(Icons.insert_drive_file)),
+                    SizedBox(width: 4),
+                    IconButton(
+                        onPressed: () => _showEvaluationDialog(
+                            evaluationId: evaluation.id, canModify: false),
+                        color: Theme.of(context).primaryColor,
+                        icon: const Icon(Icons.picture_as_pdf)),
+                  ],
+                );
+              },
+            ).toList(),
+          )
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showEvaluationDialog(
+      {required String? evaluationId, required bool canModify}) async {
+    await showStudentEvaluationFormDialog(context,
+        studentId: widget.studentId,
+        evaluationId: evaluationId,
+        canModify: canModify,
+        showEvaluationDialog: showVisaEvaluationFormDialog);
   }
 }

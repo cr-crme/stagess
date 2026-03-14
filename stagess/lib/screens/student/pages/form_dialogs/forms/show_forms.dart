@@ -56,17 +56,19 @@ Future<void> showStudentEvaluationFormDialog(
   BuildContext context, {
   required String studentId,
   String? evaluationId,
+  required bool canModify,
   required Future<Student?> Function(BuildContext,
-          {required String studentId, String? evaluationId})
+          {required String studentId,
+          String? evaluationId,
+          required bool canModify})
       showEvaluationDialog,
 }) async {
-  final editMode = evaluationId == null;
   _logger.info(
-      'Showing StudentEvaluationFormDialog for student: $studentId, editMode: $editMode');
+      'Showing StudentEvaluationFormDialog for student: $studentId, canModify: $canModify');
   final students = StudentsProvider.of(context, listen: false);
   final student = students.fromId(studentId);
 
-  if (editMode) {
+  if (canModify) {
     final hasLock = await students.getLockForItem(student);
     if (!hasLock || !context.mounted) {
       if (context.mounted) {
@@ -81,8 +83,8 @@ Future<void> showStudentEvaluationFormDialog(
   }
 
   final newStudent = await showEvaluationDialog(context,
-      studentId: studentId, evaluationId: evaluationId);
-  if (!editMode) return;
+      studentId: studentId, evaluationId: evaluationId, canModify: canModify);
+  if (!canModify) return;
 
   if (newStudent == null) {
     await students.releaseLockForItem(student);

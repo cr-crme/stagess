@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
@@ -101,7 +102,7 @@ class _InternshipEvaluationCardState extends State<InternshipEvaluationCard> {
 
   Widget _buildSelectShowPreviousEvaluations() {
     final orderedEvaluations =
-        widget.evaluations.reversed; // .sortedBy((e) => e.date);
+        widget.evaluations.sortedBy((e) => e.date).reversed;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: _interline),

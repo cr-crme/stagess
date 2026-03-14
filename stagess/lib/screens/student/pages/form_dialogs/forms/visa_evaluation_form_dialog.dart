@@ -25,6 +25,7 @@ Future<Student?> showVisaEvaluationFormDialog(
   BuildContext context, {
   required String studentId,
   String? evaluationId,
+  required bool canModify,
 }) async {
   final newEvaluation = await showDialog<StudentVisa>(
     context: context,
@@ -33,6 +34,7 @@ Future<Student?> showVisaEvaluationFormDialog(
       child: _VisaEvaluationScreen(
         studentId: studentId,
         evaluationId: evaluationId,
+        canModify: canModify,
       ),
     ),
   );
@@ -313,36 +315,22 @@ class _VisaEvaluationScreen extends StatefulWidget {
   const _VisaEvaluationScreen({
     required this.studentId,
     required this.evaluationId,
+    required this.canModify,
   });
 
   final String studentId;
   final String? evaluationId;
+  final bool canModify;
 
   @override
   State<_VisaEvaluationScreen> createState() => _VisaEvaluationScreenState();
 }
 
 class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
-  late final _controller = widget.evaluationId == null
-      ? VisaFormController(context,
-          studentId: widget.studentId,
-          evaluationId: StudentsProvider.of(context, listen: false)
-              .fromId(widget.studentId)
-              .allVisa
-              .lastOrNull
-              ?.id,
-          canModify: true)
-      : (StudentsProvider.of(context, listen: false)
-                  .fromId(widget.studentId)
-                  .allVisa
-                  .firstWhereOrNull((e) => e.id == widget.evaluationId) ==
-              null
-          ? VisaFormController(context,
-              studentId: widget.studentId, canModify: false)
-          : VisaFormController(context,
-              studentId: widget.studentId,
-              evaluationId: widget.evaluationId!,
-              canModify: false));
+  late final _controller = VisaFormController(context,
+      studentId: widget.studentId,
+      evaluationId: widget.evaluationId,
+      canModify: widget.canModify);
 
   @override
   void dispose() {
@@ -408,35 +396,13 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
   Future<void> _submit() async {
     _logger.info('Submitting attitude evaluation form');
 
-    // if (!_controller.canModify) {
-    //   Navigator.of(context).pop();
-    //   return;
-    // }
-
-    _logger.fine('Visa evaluation form submitted successfully');
-    // Navigator.of(context).pop(_controller.toVisa());
-    await _send();
-  }
-
-  Future<void> _send() async {
-    final students = StudentsProvider.of(context, listen: false);
-
-    final hasLock = await students.getLockForItem(_controller._student);
-    if (!hasLock || !context.mounted) {
-      if (context.mounted) {
-        print(
-          'Impossible de modifier cet étudiant, car il est en cours de modification par un autre utilisateur.',
-        );
-      }
+    if (!_controller.canModify) {
+      Navigator.of(context).pop();
       return;
     }
 
-    final newEvaluation = _controller.toVisa();
-    final newStudent = Student.fromSerialized(_controller._student.serialize())
-      ..allVisa.add(newEvaluation);
-
-    await students.replaceWithConfirmation(newStudent);
-    await students.releaseLockForItem(newStudent);
+    _logger.fine('Visa evaluation form submitted successfully');
+    Navigator.of(context).pop(_controller.toVisa());
   }
 
   void _cancel() async {
@@ -522,6 +488,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
             SizedBox(height: 8.0),
             SelectableTextBoxes(
               controller: controller._experiencesAndAptitudesController,
+              enabled: controller.canModify,
               maxSelectedOptions: 8,
               newItemBuilder: (index) => ExperiencesAndAptitudes(
                   index: index, text: '', isSelected: false),
@@ -556,6 +523,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
             SizedBox(height: 8.0),
             SelectableTextBoxes(
               controller: controller._attestationsAndMentionsController,
+              enabled: controller.canModify,
               maxSelectedOptions: 5,
               newItemBuilder: (index) => AttestationsAndMentions(
                   index: index, text: '', isSelected: false),
@@ -582,18 +550,21 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
           builder: (context, setState) => Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 8.0),
-              Center(
-                child: TextButton(
-                    onPressed: () async {
-                      await _selectSstTrainingToShowDialog(context);
-                      setState(() {});
-                    },
-                    child: Text(
-                      'Sélectionner les formations à la SST obtenues',
-                      textAlign: TextAlign.center,
-                    )),
-              ),
+              if (controller.canModify)
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Center(
+                    child: TextButton(
+                        onPressed: () async {
+                          await _selectSstTrainingToShowDialog(context);
+                          setState(() {});
+                        },
+                        child: Text(
+                          'Sélectionner les formations à la SST obtenues',
+                          textAlign: TextAlign.center,
+                        )),
+                  ),
+                ),
               SizedBox(height: 8.0),
               ...controller._sstTrainingsController.options
                   .asMap()
@@ -606,6 +577,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
                 return CheckboxListTile(
                   key: ValueKey('sst_training_${item.id}'),
                   controlAffinity: ListTileControlAffinity.leading,
+                  enabled: controller.canModify,
                   onChanged: (selected) {
                     controller._sstTrainingsController.updateOption(
                       index,
@@ -651,6 +623,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
                     final item = entry.value as SstTraining;
 
                     return CheckboxListTile(
+                      enabled: controller.canModify,
                       onChanged: (selected) {
                         controller._sstTrainingsController.updateOption(
                           index,
@@ -735,6 +708,7 @@ class _EmployabilityProfileSection extends StatelessWidget {
                         style: Theme.of(context).textTheme.titleSmall),
                     CheckboxListTile(
                       value: controller._isGatewayToFmsAvailable,
+                      enabled: controller.canModify,
                       onChanged: (value) {
                         controller._isGatewayToFmsAvailable = value ?? false;
                         setState(() {});
@@ -789,12 +763,13 @@ class _EmployabilityProfileSection extends StatelessWidget {
                           isSelected: value));
                   setState(() {});
                 },
-                enabled: item.certificateType == CertificateType.none ||
-                    !controller._sstCertificateController.options
-                        .cast<Certificate>()
-                        .any((e) =>
-                            e.isSelected &&
-                            e.certificateType == CertificateType.none),
+                enabled: controller.canModify &&
+                    (item.certificateType == CertificateType.none ||
+                        !controller._sstCertificateController.options
+                            .cast<Certificate>()
+                            .any((e) =>
+                                e.isSelected &&
+                                e.certificateType == CertificateType.none)),
                 controlAffinity: ListTileControlAffinity.leading,
                 title:
                     Text(name, style: Theme.of(context).textTheme.bodyMedium),
@@ -808,43 +783,46 @@ class _EmployabilityProfileSection extends StatelessWidget {
                           children: [
                             Text('Année certification\u00a0: ${item.year}'),
                             IconButton(
-                                onPressed: () async {
-                                  final initialDate = DateTime(
-                                      item.year ?? DateTime.now().year);
-                                  final firstDate =
-                                      DateTime(DateTime.now().year - 5);
-                                  final lastDate =
-                                      DateTime(DateTime.now().year + 5);
-                                  final year = await showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      title: Text(
-                                          'Sélectionnez l\'année de certification'),
-                                      content: SizedBox(
-                                        width: 300,
-                                        height: 300,
-                                        child: YearPicker(
-                                          selectedDate: initialDate,
-                                          onChanged: (selectedDate) {
-                                            Navigator.pop(
-                                                context, selectedDate.year);
-                                          },
-                                          firstDate: firstDate,
-                                          lastDate: lastDate,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                  if (year == null) return;
+                                onPressed: controller.canModify
+                                    ? () async {
+                                        final initialDate = DateTime(
+                                            item.year ?? DateTime.now().year);
+                                        final firstDate =
+                                            DateTime(DateTime.now().year - 5);
+                                        final lastDate =
+                                            DateTime(DateTime.now().year + 5);
+                                        final year = await showDialog(
+                                          context: context,
+                                          builder: (context) => AlertDialog(
+                                            title: Text(
+                                                'Sélectionnez l\'année de certification'),
+                                            content: SizedBox(
+                                              width: 300,
+                                              height: 300,
+                                              child: YearPicker(
+                                                selectedDate: initialDate,
+                                                onChanged: (selectedDate) {
+                                                  Navigator.pop(context,
+                                                      selectedDate.year);
+                                                },
+                                                firstDate: firstDate,
+                                                lastDate: lastDate,
+                                              ),
+                                            ),
+                                          ),
+                                        );
+                                        if (year == null) return;
 
-                                  controller._sstCertificateController
-                                      .updateOption(
-                                          controller
-                                              ._sstCertificateController.options
-                                              .indexOf(item),
-                                          item.copyWith(year: year));
-                                  setState(() {});
-                                },
+                                        controller._sstCertificateController
+                                            .updateOption(
+                                                controller
+                                                    ._sstCertificateController
+                                                    .options
+                                                    .indexOf(item),
+                                                item.copyWith(year: year));
+                                        setState(() {});
+                                      }
+                                    : null,
                                 icon: Icon(Icons.calendar_month)),
                           ],
                         ),
@@ -880,6 +858,7 @@ class _EmployabilityProfileSection extends StatelessWidget {
 
                           return CheckboxListTile(
                             value: item.isSelected,
+                            enabled: controller.canModify,
                             onChanged: (value) {
                               controller._specificSkillsController.updateOption(
                                   controller._specificSkillsController.options
@@ -924,6 +903,7 @@ class _EmployabilityProfileSection extends StatelessWidget {
               SizedBox(height: 8.0),
               TextFormField(
                 controller: controller._referenceController,
+                enabled: controller.canModify,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                 ),
@@ -954,6 +934,7 @@ class _ForcesAndChallengesSection extends StatelessWidget {
               'Cocher les cinq rubriques, correspondant aux cinq résultats '
               'les plus forts dans les évaluations, à afficher dans le VISA en PDF.',
           controller: controller._forcesController,
+          enabled: controller.canModify,
           maxSelectedOptions: 5,
         ),
         SizedBox(height: 16.0),
@@ -965,6 +946,7 @@ class _ForcesAndChallengesSection extends StatelessWidget {
               'plus faibles dans les évaluations (maximum de 2 rubriques), à afficher '
               'dans le VISA en PDF.',
           controller: controller._challengesController,
+          enabled: controller.canModify,
           maxSelectedOptions: 2,
         ),
         SizedBox(height: 16.0),
@@ -977,6 +959,7 @@ class _ForcesAndChallengesSection extends StatelessWidget {
     BuildContext context, {
     required String title,
     required String definition,
+    required bool enabled,
     required SelectableTextItemsController controller,
     required int maxSelectedOptions,
   }) {
@@ -1006,8 +989,9 @@ class _ForcesAndChallengesSection extends StatelessWidget {
                             item.copyWith(isSelected: value));
                         setState(() {});
                       },
-                      enabled: item.isSelected ||
-                          controller.selectedCount < maxSelectedOptions,
+                      enabled: enabled &&
+                          (item.isSelected ||
+                              controller.selectedCount < maxSelectedOptions),
                       controlAffinity: ListTileControlAffinity.leading,
                       title: Text(
                           Attitude.availableItems[item.attitudeId] ??
@@ -1042,6 +1026,7 @@ class _ForcesAndChallengesSection extends StatelessWidget {
             SizedBox(height: 8.0),
             TextFormField(
               controller: controller._successConditionsController,
+              enabled: controller.canModify,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
               ),
