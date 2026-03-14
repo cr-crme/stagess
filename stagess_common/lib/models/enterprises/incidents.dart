@@ -14,9 +14,7 @@ class Incident extends ItemSerializable {
   Incident.fromSerialized(super.map)
       : incident = map?['incident'] ?? '',
         teacherId = map?['teacher_id'] ?? '',
-        date = map?['date'] == null
-            ? DateTime(0)
-            : DateTime.fromMillisecondsSinceEpoch(map!['date']),
+        date = DateTimeExt.from(map?['date']) ?? DateTime(0),
         super.fromSerialized();
 
   @override
@@ -24,7 +22,7 @@ class Incident extends ItemSerializable {
         'id': id,
         'teacher_id': teacherId,
         'incident': incident,
-        'date': date.millisecondsSinceEpoch,
+        'date': date.serialize(),
       };
 
   @override

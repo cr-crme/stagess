@@ -227,7 +227,7 @@ class MySqlStudentsRepository extends StudentsRepository {
         sqlInterface.selectSubquery(
           dataTableName: 'student_visa',
           asName: 'all_visa',
-          fieldsToFetch: ['id', 'form_version'],
+          fieldsToFetch: ['id', 'date', 'form_version'],
           idNameToDataTable: 'student_id',
         ),
       ],
@@ -278,67 +278,103 @@ class MySqlStudentsRepository extends StudentsRepository {
           .addAll((student['persons'] as List).first as Map<String, dynamic>);
       student['date_birth'] = student['date_birthday'] == null
           ? null
-          : DateTime.parse(student['date_birthday']).millisecondsSinceEpoch;
+          : DateTime.parse(student['date_birthday']).serialize();
 
       student['phone'] =
           (student['phone_numbers'] as List?)?.firstOrNull as Map? ?? {};
       student['address'] =
           (student['addresses'] as List?)?.firstOrNull as Map? ?? {};
 
-      final allVisa = [];
-      for (final Map<String, dynamic> visa
-          in (student['all_visa'] as List? ?? [])) {
-        final evaluationSubquery = (await sqlInterface.performSelectQuery(
-                user: user,
-                tableName: 'student_visa',
-                filters: {
-              'id': visa['id']
-            },
-                subqueries: [
-              sqlInterface.selectSubquery(
-                dataTableName: 'student_visa_items',
-                asName: 'visa',
-                fieldsToFetch: [
-                  'id',
-                  'visa_id',
-                ],
-                idNameToDataTable: 'visa_id',
-              ),
-            ]))
-            .first;
+      final allVisa = (student['all_visa'] as List? ?? []);
+      for (final visa in allVisa) {
+        final visaForm = (await sqlInterface.performSelectQuery(
+              user: user,
+              tableName: 'student_visa_forms',
+              filters: {'form_id': visa['id']},
+              subqueries: [
+                sqlInterface.selectSubquery(
+                  dataTableName: 'student_visa_experiences_and_aptitude_items',
+                  asName: 'experiences_and_aptitudes',
+                  fieldsToFetch: ['id', 'idx', 'text', 'is_selected'],
+                  idNameToDataTable: 'visa_form_id',
+                ),
+                sqlInterface.selectSubquery(
+                  dataTableName: 'student_visa_attestations_and_mentions_items',
+                  asName: 'attestations_and_mentions',
+                  fieldsToFetch: ['id', 'idx', 'text', 'is_selected'],
+                  idNameToDataTable: 'visa_form_id',
+                ),
+                sqlInterface.selectSubquery(
+                  dataTableName: 'student_visa_sst_training_items',
+                  asName: 'sst_trainings',
+                  fieldsToFetch: [
+                    'id',
+                    'idx',
+                    'text',
+                    'is_selected',
+                    'is_hidden'
+                  ],
+                  idNameToDataTable: 'visa_form_id',
+                ),
+                sqlInterface.selectSubquery(
+                  dataTableName: 'student_visa_certificate_items',
+                  asName: 'certificates',
+                  fieldsToFetch: [
+                    'id',
+                    'idx',
+                    'text',
+                    'is_selected',
+                    'year',
+                    'specialization_id'
+                  ],
+                  idNameToDataTable: 'visa_form_id',
+                ),
+                sqlInterface.selectSubquery(
+                  dataTableName: 'student_visa_skill_items',
+                  asName: 'skills',
+                  fieldsToFetch: ['id', 'idx', 'text', 'is_selected'],
+                  idNameToDataTable: 'visa_form_id',
+                ),
+                sqlInterface.selectSubquery(
+                  dataTableName: 'student_visa_forces_items',
+                  asName: 'forces',
+                  fieldsToFetch: ['id', 'idx', 'text', 'is_selected'],
+                  idNameToDataTable: 'visa_form_id',
+                ),
+                sqlInterface.selectSubquery(
+                  dataTableName: 'student_visa_challenges_items',
+                  asName: 'challenges',
+                  fieldsToFetch: ['id', 'idx', 'text', 'is_selected'],
+                  idNameToDataTable: 'visa_form_id',
+                ),
+              ],
+            ))
+                .firstOrNull ??
+            {};
 
-        final form = (evaluationSubquery['visa'] as List).firstOrNull ?? {};
+        for (final element in visaForm['experiences_and_aptitudes'] ?? []) {
+          element['index'] = element['idx'];
+        }
+        for (final element in visaForm['attestations_and_mentions'] ?? []) {
+          element['index'] = element['idx'];
+        }
+        for (final element in visaForm['sst_trainings'] ?? []) {
+          element['index'] = element['idx'];
+        }
+        for (final element in visaForm['certificates'] ?? []) {
+          element['index'] = element['idx'];
+        }
+        for (final element in visaForm['skills'] ?? []) {
+          element['index'] = element['idx'];
+        }
+        for (final element in visaForm['forces'] ?? []) {
+          element['index'] = element['idx'];
+        }
+        for (final element in visaForm['challenges'] ?? []) {
+          element['index'] = element['idx'];
+        }
 
-// TODO RENDU ICI
-        final formSubquery = (await sqlInterface.performSelectQuery(
-            user: user,
-            tableName: 'student_visa',
-            fieldsToFetch: [
-              'id',
-              'visa_id',
-              'is_gateway_to_fms_available',
-              'reference',
-              'success_conditions',
-            ],
-            filters: {
-              'visa_id': form['visa_id']
-            },
-            subqueries: [
-              sqlInterface.selectSubquery(
-                dataTableName: 'student_visa_experiences_and_aptitude_items',
-                asName: 'visa',
-                fieldsToFetch: [
-                  'id',
-                  'visa_id',
-                  'is_gateway_to_fms_available',
-                  'reference',
-                  'success_conditions',
-                ],
-                idNameToDataTable: 'visa_items_id',
-              ),
-            ]));
-
-        allVisa.add(visa);
+        visa['form'] = visaForm;
       }
       student['all_visa'] = allVisa;
 
@@ -434,125 +470,130 @@ class MySqlStudentsRepository extends StudentsRepository {
   }
 
   Future<void> _insertToVisa(Student student, [Student? previous]) async {
-    for (final evaluation in student.allVisa.serialize()) {
-      if (previous?.allVisa.any((e) => e.id == evaluation['id']) ?? false) {
+    for (final visa in student.allVisa) {
+      if (previous?.allVisa.any((e) => e.id == visa.id) ?? false) {
         // Skip if the evaluation already exists
         continue;
       }
 
       await sqlInterface.performInsertQuery(tableName: 'student_visa', data: {
-        'id': evaluation['id'],
+        'id': visa.id.serialize(),
+        'date': visa.date.serialize(),
         'student_id': student.id,
-        'form_version': evaluation['form_version'],
+        'form_version': visa.formVersion.serialize(),
       });
 
       // Insert the form
       await sqlInterface
-          .performInsertQuery(tableName: 'student_visa_items', data: {
-        'id': evaluation['form']['id'],
-        'visa_id': evaluation['id'],
-        'is_gateway_to_fms_available': evaluation['form']
-            ['is_gateway_to_fms_available'],
-        'reference': evaluation['form']['reference'],
-        'success_conditions': evaluation['form']['success_conditions'],
+          .performInsertQuery(tableName: 'student_visa_forms', data: {
+        'id': visa.form.id.serialize(),
+        'form_id': visa.id.serialize(),
+        'is_gateway_to_fms_available':
+            visa.form.isGatewayToFmsAvailable.serialize(),
+        'reference': visa.form.reference.serialize(),
+        'success_conditions': visa.form.successConditions.serialize(),
       });
 
       final toWait = <Future>[];
-      for (final element
-          in (evaluation['form']['experiences_and_aptitudes'] as List?) ?? []) {
-        toWait.add(
-          sqlInterface.performInsertQuery(
-            tableName: 'student_visa_experiences_and_aptitude_items',
-            data: {
-              'id': element['id'],
-              'visa_items_id': evaluation['form']['id'],
-              'text': element['text'],
-              'is_selected': element['is_selected'],
-            },
-          ),
+      for (final element in visa.form.experiencesAndAptitudes) {
+        // toWait.add(
+        await sqlInterface.performInsertQuery(
+          tableName: 'student_visa_experiences_and_aptitude_items',
+          data: {
+            'id': element.id.serialize(),
+            'idx': element.index.serialize(),
+            'visa_form_id': visa.form.id,
+            'text': element.text.serialize(),
+            'is_selected': element.isSelected.serialize(),
+          },
+          // ),
         );
       }
-      for (final element
-          in (evaluation['form']['attestation_and_mentions'] as List?) ?? []) {
-        toWait.add(
-          sqlInterface.performInsertQuery(
+      for (final element in visa.form.attestationsAndMentions) {
+        // toWait.add(
+        await sqlInterface.performInsertQuery(
             tableName: 'student_visa_attestations_and_mentions_items',
             data: {
-              'id': element['id'],
-              'visa_items_id': evaluation['form']['id'],
-              'text': element['text'],
-              'is_selected': element['is_selected'],
-            },
-          ),
-        );
+              'id': element.id.serialize(),
+              'idx': element.index.serialize(),
+              'visa_form_id': visa.form.id,
+              'text': element.text.serialize(),
+              'is_selected': element.isSelected.serialize(),
+            }
+            // ),
+            );
       }
-      for (final element
-          in (evaluation['form']['sst_trainings'] as List?) ?? []) {
-        toWait.add(
-          sqlInterface.performInsertQuery(
+      for (final element in visa.form.sstTrainings) {
+        // toWait.add(
+        await sqlInterface.performInsertQuery(
             tableName: 'student_visa_sst_training_items',
             data: {
-              'id': element['id'],
-              'visa_items_id': evaluation['form']['id'],
-              'text': element['text'],
-              'is_selected': element['is_selected'],
-            },
-          ),
-        );
+              'id': element.id.serialize(),
+              'idx': element.index.serialize(),
+              'visa_form_id': visa.form.id,
+              'text': element.text.serialize(),
+              'is_selected': element.isSelected.serialize(),
+              'is_hidden': element.isHidden.serialize(),
+            }
+            // ),
+            );
       }
-      for (final element
-          in (evaluation['form']['certificates'] as List?) ?? []) {
-        toWait.add(
-          sqlInterface.performInsertQuery(
+      for (final element in visa.form.certificates) {
+        // toWait.add(
+        await sqlInterface.performInsertQuery(
             tableName: 'student_visa_certificate_items',
             data: {
-              'id': element['id'],
-              'visa_items_id': evaluation['form']['id'],
-              'text': element['text'],
-              'year': element['year'],
-              'specialization_id': element['specialization_id'],
-              'is_selected': element['is_selected'],
-            },
-          ),
+              'id': element.id.serialize(),
+              'idx': element.index.serialize(),
+              'visa_form_id': visa.form.id,
+              'text': element.text.serialize(),
+              'is_selected': element.isSelected.serialize(),
+              'year': element.year?.serialize(),
+              'specialization_id': element.specializationId?.serialize(),
+            }
+            // ),
+            );
+      }
+      for (final element in visa.form.skills) {
+        // toWait.add(
+        await sqlInterface.performInsertQuery(
+          tableName: 'student_visa_skill_items',
+          data: {
+            'id': element.id.serialize(),
+            'idx': element.index.serialize(),
+            'visa_form_id': visa.form.id,
+            'text': element.text.serialize(),
+            'is_selected': element.isSelected.serialize(),
+          },
+          // ),
         );
       }
-      for (final element in (evaluation['form']['skills'] as List?) ?? []) {
-        toWait.add(
-          sqlInterface.performInsertQuery(
-            tableName: 'student_visa_skill_items',
-            data: {
-              'id': element['id'],
-              'visa_items_id': evaluation['form']['id'],
-              'text': element['text'],
-              'is_selected': element['is_selected'],
-            },
-          ),
+      for (final element in visa.form.forces) {
+        // toWait.add(
+        await sqlInterface.performInsertQuery(
+          tableName: 'student_visa_forces_items',
+          data: {
+            'id': element.id.serialize(),
+            'idx': element.index.serialize(),
+            'visa_form_id': visa.form.id,
+            'text': element.text.serialize(),
+            'is_selected': element.isSelected.serialize(),
+          },
+          // ),
         );
       }
-      for (final element in (evaluation['form']['forces'] as List?) ?? []) {
-        toWait.add(
-          sqlInterface.performInsertQuery(
-            tableName: 'student_visa_forces_items',
-            data: {
-              'id': element['id'],
-              'visa_items_id': evaluation['form']['id'],
-              'text': element['text'],
-              'is_selected': element['is_selected'],
-            },
-          ),
-        );
-      }
-      for (final element in (evaluation['form']['challenges'] as List?) ?? []) {
-        toWait.add(
-          sqlInterface.performInsertQuery(
-            tableName: 'student_visa_challenges_items',
-            data: {
-              'id': element['id'],
-              'visa_items_id': evaluation['form']['id'],
-              'text': element['text'],
-              'is_selected': element['is_selected'],
-            },
-          ),
+      for (final element in visa.form.challenges) {
+        // toWait.add(
+        await sqlInterface.performInsertQuery(
+          tableName: 'student_visa_challenges_items',
+          data: {
+            'id': element.id.serialize(),
+            'idx': element.index.serialize(),
+            'visa_form_id': visa.form.id,
+            'text': element.text.serialize(),
+            'is_selected': element.isSelected.serialize(),
+          },
+          // ),
         );
       }
 

@@ -21,10 +21,12 @@ import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common/models/persons/student_visa.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/models/school_boards/school.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
-import 'package:stagess_common/services/job_data_file_service.dart';
+import 'package:stagess_common/services/job_data_file_service.dart'
+    as job_data_service;
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/backend_list_provided.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
@@ -443,677 +445,792 @@ Future<void> _addDummyStudents(
         email: 'p.masson@email.com',
       ),
       contactLink: 'Père',
+      allVisa: [
+        StudentVisa(
+            date: DateTime(2025, 1, 1),
+            form: VisaForm(
+                experiencesAndAptitudes: [
+                  ExperiencesAndAptitudes(
+                      index: 0,
+                      text: 'La première expérience',
+                      isSelected: false),
+                  ExperiencesAndAptitudes(
+                      index: 1,
+                      text: 'La deuxième expérience',
+                      isSelected: true)
+                ],
+                attestationsAndMentions: [
+                  AttestationsAndMentions(
+                      index: 0,
+                      text: 'La première attestation',
+                      isSelected: false),
+                  AttestationsAndMentions(
+                      index: 1,
+                      text: 'La deuxième attestation',
+                      isSelected: true),
+                  AttestationsAndMentions(
+                      index: 2,
+                      text: 'La troisième attestation',
+                      isSelected: false),
+                ],
+                sstTrainings: [
+                  SstTraining(
+                    index: 0,
+                    trainingId:
+                        SstTraining.availableTrainings.keys.elementAt(4),
+                    isSelected: false,
+                    isHidden: false,
+                  ),
+                  SstTraining(
+                    index: 1,
+                    trainingId:
+                        SstTraining.availableTrainings.keys.elementAt(1),
+                    isSelected: true,
+                    isHidden: false,
+                  ),
+                  SstTraining(
+                    index: 2,
+                    trainingId:
+                        SstTraining.availableTrainings.keys.elementAt(2),
+                    isSelected: false,
+                    isHidden: true,
+                  ),
+                  SstTraining(
+                    index: 3,
+                    trainingId:
+                        SstTraining.availableTrainings.keys.elementAt(3),
+                    isSelected: true,
+                    isHidden: true,
+                  ),
+                ],
+                isGatewayToFmsAvailable: true,
+                certificates: [
+                  Certificate(
+                      index: 0,
+                      certificateType: CertificateType.fpt,
+                      isSelected: true,
+                      year: 2023),
+                  Certificate(
+                      index: 1,
+                      certificateType: CertificateType.fms,
+                      isSelected: true,
+                      year: 2023,
+                      specializationId: job_data_service.ActivitySectorsService
+                          .activitySectors[2].specializations[1].id),
+                ],
+                skills: [
+                  Skill(
+                      index: 0,
+                      specializationId: job_data_service.ActivitySectorsService
+                          .activitySectors[2].specializations[1].id,
+                      isSelected: false),
+                  Skill(
+                      index: 1,
+                      specializationId: job_data_service.ActivitySectorsService
+                          .activitySectors[2].specializations[0].id,
+                      isSelected: true),
+                ],
+                reference: 'La référence de Cedric',
+                forces: [
+                  Attitude(
+                      index: 0,
+                      attitudeId: Attitude.availableItems.keys.elementAt(1),
+                      isSelected: false),
+                  Attitude(
+                      index: 1,
+                      attitudeId: Attitude.availableItems.keys.elementAt(2),
+                      isSelected: true),
+                  Attitude(
+                      index: 2,
+                      attitudeId: Attitude.availableItems.keys.elementAt(4),
+                      isSelected: true),
+                ],
+                challenges: [
+                  Attitude(
+                      index: 0,
+                      attitudeId: Attitude.availableItems.keys.elementAt(0),
+                      isSelected: true),
+                  Attitude(
+                      index: 1,
+                      attitudeId: Attitude.availableItems.keys.elementAt(5),
+                      isSelected: true),
+                  Attitude(
+                      index: 2,
+                      attitudeId: Attitude.availableItems.keys.elementAt(7),
+                      isSelected: false),
+                ],
+                successConditions: 'Aucune'),
+            formVersion: StudentVisa.currentVersion),
+      ],
+    ),
+  );
+
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Thomas',
+      lastName: 'Caron',
+      dateBirth: null,
+      email: 't.caron@email.com',
+      program: Program.fpt,
+      group: '550',
+      contact: Person(
+        firstName: 'Jean-Pierre',
+        middleName: null,
+        lastName: 'Caron Mathieu',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 9876'),
+        address: null,
+        email: 'j.caron@email.com',
+      ),
+      contactLink: 'Père',
+      address: Address(
+        civicNumber: 202,
+        street: 'Boulevard Saint-Joseph Est',
+        city: 'Montréal',
+        postalCode: 'H1X 2T2',
+        latitude: 45.5244564,
+        longitude: -73.5892134,
+      ),
+      phone: PhoneNumber.fromString('514 222 3344'),
       allVisa: [],
     ),
   );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Thomas',
-  //     lastName: 'Caron',
-  //     dateBirth: null,
-  //     email: 't.caron@email.com',
-  //     program: Program.fpt,
-  //     group: '550',
-  //     contact: Person(
-  //       firstName: 'Jean-Pierre',
-  //       middleName: null,
-  //       lastName: 'Caron Mathieu',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 9876'),
-  //       address: null,
-  //       email: 'j.caron@email.com',
-  //     ),
-  //     contactLink: 'Père',
-  //     address: Address(
-  //       civicNumber: 202,
-  //       street: 'Boulevard Saint-Joseph Est',
-  //       city: 'Montréal',
-  //       postalCode: 'H1X 2T2',
-  //       latitude: 45.5244564,
-  //       longitude: -73.5892134,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 222 3344'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Mikael',
+      lastName: 'Boucher',
+      dateBirth: null,
+      email: 'm.boucher@email.com',
+      program: Program.fpt,
+      group: '550',
+      contact: Person(
+        firstName: 'Nicole',
+        middleName: null,
+        lastName: 'Lefranc',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 9876'),
+        address: null,
+        email: 'n.lefranc@email.com',
+      ),
+      contactLink: 'Mère',
+      address: Address(
+        civicNumber: 6723,
+        street: '25e Ave',
+        city: 'Montréal',
+        postalCode: 'H1T 3M1',
+        latitude: 45.565836,
+        longitude: -73.582566,
+      ),
+      phone: PhoneNumber.fromString('514 333 4455'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Mikael',
-  //     lastName: 'Boucher',
-  //     dateBirth: null,
-  //     email: 'm.boucher@email.com',
-  //     program: Program.fpt,
-  //     group: '550',
-  //     contact: Person(
-  //       firstName: 'Nicole',
-  //       middleName: null,
-  //       lastName: 'Lefranc',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 9876'),
-  //       address: null,
-  //       email: 'n.lefranc@email.com',
-  //     ),
-  //     contactLink: 'Mère',
-  //     address: Address(
-  //       civicNumber: 6723,
-  //       street: '25e Ave',
-  //       city: 'Montréal',
-  //       postalCode: 'H1T 3M1',
-  //       latitude: 45.565836,
-  //       longitude: -73.582566,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 333 4455'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Kevin',
+      lastName: 'Leblanc',
+      dateBirth: null,
+      email: 'k.leblanc@email.com',
+      program: Program.fpt,
+      group: '550',
+      contact: Person(
+        firstName: 'Martine',
+        middleName: null,
+        lastName: 'Gagnon',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 9876'),
+        address: null,
+        email: 'm.gagnon@email.com',
+      ),
+      contactLink: 'Mère',
+      address: Address(
+        civicNumber: 9277,
+        street: 'Rue Meunier',
+        city: 'Montréal',
+        postalCode: 'H2N 1W4',
+        latitude: 45.5405668,
+        longitude: -73.6525667,
+      ),
+      phone: PhoneNumber.fromString('514 999 8877'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Kevin',
-  //     lastName: 'Leblanc',
-  //     dateBirth: null,
-  //     email: 'k.leblanc@email.com',
-  //     program: Program.fpt,
-  //     group: '550',
-  //     contact: Person(
-  //       firstName: 'Martine',
-  //       middleName: null,
-  //       lastName: 'Gagnon',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 9876'),
-  //       address: null,
-  //       email: 'm.gagnon@email.com',
-  //     ),
-  //     contactLink: 'Mère',
-  //     address: Address(
-  //       civicNumber: 9277,
-  //       street: 'Rue Meunier',
-  //       city: 'Montréal',
-  //       postalCode: 'H2N 1W4',
-  //       latitude: 45.5405668,
-  //       longitude: -73.6525667,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 999 8877'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolBId,
+      firstName: 'Simon',
+      lastName: 'Gingras',
+      dateBirth: null,
+      email: 's.gingras@email.com',
+      program: Program.fms,
+      group: '201',
+      contact: Person(
+        firstName: 'Raoul',
+        middleName: null,
+        lastName: 'Gingras',
+        email: 'r.gingras@email.com',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 9876'),
+        address: null,
+      ),
+      contactLink: 'Père',
+      address: Address(
+        civicNumber: 4517,
+        street: 'Rue d\'Assise',
+        city: 'Saint-Léonard',
+        postalCode: 'H1R 1W2',
+        latitude: 45.5763835,
+        longitude: -73.6008457,
+      ),
+      phone: PhoneNumber.fromString('514 888 7766'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolBId,
-  //     firstName: 'Simon',
-  //     lastName: 'Gingras',
-  //     dateBirth: null,
-  //     email: 's.gingras@email.com',
-  //     program: Program.fms,
-  //     group: '201',
-  //     contact: Person(
-  //       firstName: 'Raoul',
-  //       middleName: null,
-  //       lastName: 'Gingras',
-  //       email: 'r.gingras@email.com',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 9876'),
-  //       address: null,
-  //     ),
-  //     contactLink: 'Père',
-  //     address: Address(
-  //       civicNumber: 4517,
-  //       street: 'Rue d\'Assise',
-  //       city: 'Saint-Léonard',
-  //       postalCode: 'H1R 1W2',
-  //       latitude: 45.5763835,
-  //       longitude: -73.6008457,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 888 7766'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolBId,
+      firstName: 'Diego',
+      lastName: 'Vargas',
+      dateBirth: null,
+      email: 'd.vargas@email.com',
+      program: Program.fpt,
+      group: '200',
+      contact: Person(
+        firstName: 'Laura',
+        middleName: null,
+        lastName: 'Vargas',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 9876'),
+        address: Address(
+          civicNumber: 8204,
+          street: 'Rue de Blois',
+          city: 'Saint-Léonard',
+          postalCode: 'H1R 2X1',
+          latitude: 45.57746,
+          longitude: -73.6011,
+        ),
+        email: 'l.vargas@email.com',
+      ),
+      contactLink: 'Mère',
+      address: Address(
+        civicNumber: 8204,
+        street: 'Rue de Blois',
+        city: 'Saint-Léonard',
+        postalCode: 'H1R 2X1',
+        latitude: 45.57746,
+        longitude: -73.6011,
+      ),
+      phone: PhoneNumber.fromString('514 444 5566'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolBId,
-  //     firstName: 'Diego',
-  //     lastName: 'Vargas',
-  //     dateBirth: null,
-  //     email: 'd.vargas@email.com',
-  //     program: Program.fpt,
-  //     group: '200',
-  //     contact: Person(
-  //       firstName: 'Laura',
-  //       middleName: null,
-  //       lastName: 'Vargas',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 9876'),
-  //       address: Address(
-  //         civicNumber: 8204,
-  //         street: 'Rue de Blois',
-  //         city: 'Saint-Léonard',
-  //         postalCode: 'H1R 2X1',
-  //         latitude: 45.57746,
-  //         longitude: -73.6011,
-  //       ),
-  //       email: 'l.vargas@email.com',
-  //     ),
-  //     contactLink: 'Mère',
-  //     address: Address(
-  //       civicNumber: 8204,
-  //       street: 'Rue de Blois',
-  //       city: 'Saint-Léonard',
-  //       postalCode: 'H1R 2X1',
-  //       latitude: 45.57746,
-  //       longitude: -73.6011,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 444 5566'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Jeanne',
+      lastName: 'Tremblay',
+      dateBirth: null,
+      email: 'j.tremblay@email.com',
+      program: Program.fpt,
+      group: '550',
+      contact: Person(
+        firstName: 'Vincent',
+        middleName: null,
+        lastName: 'Tremblay',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 9876'),
+        address: null,
+        email: 'v.tremblay@email.com',
+      ),
+      contactLink: 'Père',
+      address: Address(
+        civicNumber: 8358,
+        street: 'Rue Jean-Nicolet',
+        city: 'Saint-Léonard',
+        postalCode: 'H1R 2R2',
+        latitude: 45.5821175,
+        longitude: -73.5993743,
+      ),
+      phone: PhoneNumber.fromString('514 555 9988'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Jeanne',
-  //     lastName: 'Tremblay',
-  //     dateBirth: null,
-  //     email: 'j.tremblay@email.com',
-  //     program: Program.fpt,
-  //     group: '550',
-  //     contact: Person(
-  //       firstName: 'Vincent',
-  //       middleName: null,
-  //       lastName: 'Tremblay',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 9876'),
-  //       address: null,
-  //       email: 'v.tremblay@email.com',
-  //     ),
-  //     contactLink: 'Père',
-  //     address: Address(
-  //       civicNumber: 8358,
-  //       street: 'Rue Jean-Nicolet',
-  //       city: 'Saint-Léonard',
-  //       postalCode: 'H1R 2R2',
-  //       latitude: 45.5821175,
-  //       longitude: -73.5993743,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 555 9988'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Vincent',
+      lastName: 'Picard',
+      dateBirth: null,
+      email: 'v.picard@email.com',
+      program: Program.fms,
+      group: '551',
+      contact: Person(
+        firstName: 'Jean-François',
+        middleName: null,
+        lastName: 'Picard',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 9876'),
+        address: null,
+        email: 'jp.picard@email.com',
+      ),
+      contactLink: 'Père',
+      address: Address(
+        civicNumber: 8382,
+        street: 'Rue du Laus',
+        city: 'Saint-Léonard',
+        postalCode: 'H1R 2P4',
+        latitude: 45.5832415,
+        longitude: -73.5986346,
+      ),
+      phone: PhoneNumber.fromString('514 778 8899'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Vincent',
-  //     lastName: 'Picard',
-  //     dateBirth: null,
-  //     email: 'v.picard@email.com',
-  //     program: Program.fms,
-  //     group: '551',
-  //     contact: Person(
-  //       firstName: 'Jean-François',
-  //       middleName: null,
-  //       lastName: 'Picard',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 9876'),
-  //       address: null,
-  //       email: 'jp.picard@email.com',
-  //     ),
-  //     contactLink: 'Père',
-  //     address: Address(
-  //       civicNumber: 8382,
-  //       street: 'Rue du Laus',
-  //       city: 'Saint-Léonard',
-  //       postalCode: 'H1R 2P4',
-  //       latitude: 45.5832415,
-  //       longitude: -73.5986346,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 778 8899'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Vanessa',
+      lastName: 'Monette',
+      dateBirth: null,
+      email: 'v.monette@email.com',
+      program: Program.fms,
+      group: '551',
+      contact: Person(
+        firstName: 'Stéphane',
+        middleName: null,
+        lastName: 'Monette',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 9876'),
+        address: null,
+        email: 's.monette@email.com',
+      ),
+      contactLink: 'Père',
+      address: Address(
+        civicNumber: 6865,
+        street: 'Rue Chaillot',
+        city: 'Saint-Léonard',
+        postalCode: 'H1T 3R5',
+        latitude: 45.5855643,
+        longitude: -73.5676913,
+      ),
+      phone: PhoneNumber.fromString('514 321 6655'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Vanessa',
-  //     lastName: 'Monette',
-  //     dateBirth: null,
-  //     email: 'v.monette@email.com',
-  //     program: Program.fms,
-  //     group: '551',
-  //     contact: Person(
-  //       firstName: 'Stéphane',
-  //       middleName: null,
-  //       lastName: 'Monette',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 9876'),
-  //       address: null,
-  //       email: 's.monette@email.com',
-  //     ),
-  //     contactLink: 'Père',
-  //     address: Address(
-  //       civicNumber: 6865,
-  //       street: 'Rue Chaillot',
-  //       city: 'Saint-Léonard',
-  //       postalCode: 'H1T 3R5',
-  //       latitude: 45.5855643,
-  //       longitude: -73.5676913,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 321 6655'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Melissa',
+      lastName: 'Poulain',
+      dateBirth: null,
+      email: 'm.poulain@email.com',
+      program: Program.fms,
+      group: '551',
+      contact: Person(
+        firstName: 'Mathieu',
+        middleName: null,
+        lastName: 'Poulain',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 9876'),
+        address: null,
+        email: 'm.poulain@email.com',
+      ),
+      contactLink: 'Père',
+      address: Address(
+        civicNumber: 6585,
+        street: 'Rue Lemay',
+        city: 'Montréal',
+        postalCode: 'H1T 2L8',
+        latitude: 45.5775083,
+        longitude: -73.5687893,
+      ),
+      phone: PhoneNumber.fromString('514 567 9999'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Melissa',
-  //     lastName: 'Poulain',
-  //     dateBirth: null,
-  //     email: 'm.poulain@email.com',
-  //     program: Program.fms,
-  //     group: '551',
-  //     contact: Person(
-  //       firstName: 'Mathieu',
-  //       middleName: null,
-  //       lastName: 'Poulain',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 9876'),
-  //       address: null,
-  //       email: 'm.poulain@email.com',
-  //     ),
-  //     contactLink: 'Père',
-  //     address: Address(
-  //       civicNumber: 6585,
-  //       street: 'Rue Lemay',
-  //       city: 'Montréal',
-  //       postalCode: 'H1T 2L8',
-  //       latitude: 45.5775083,
-  //       longitude: -73.5687893,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 567 9999'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Caroline',
+      lastName: 'Viger',
+      dateBirth: null,
+      email: 'c.viger@email.com',
+      program: Program.fms,
+      group: '551',
+      contact: Person(
+        firstName: 'Sandrine',
+        middleName: null,
+        lastName: 'Poulain',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 9876'),
+        address: null,
+        email: 's.poulain@email.com',
+      ),
+      contactLink: 'Mère',
+      address: Address(
+        civicNumber: 22,
+        street: 'Rue Villebon',
+        city: 'Repentigny',
+        postalCode: 'J6A 1P5',
+        latitude: 45.726073,
+        longitude: -73.471654,
+      ),
+      phone: PhoneNumber.fromString('514 567 9999'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Caroline',
-  //     lastName: 'Viger',
-  //     dateBirth: null,
-  //     email: 'c.viger@email.com',
-  //     program: Program.fms,
-  //     group: '551',
-  //     contact: Person(
-  //       firstName: 'Sandrine',
-  //       middleName: null,
-  //       lastName: 'Poulain',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 9876'),
-  //       address: null,
-  //       email: 's.poulain@email.com',
-  //     ),
-  //     contactLink: 'Mère',
-  //     address: Address(
-  //       civicNumber: 22,
-  //       street: 'Rue Villebon',
-  //       city: 'Repentigny',
-  //       postalCode: 'J6A 1P5',
-  //       latitude: 45.726073,
-  //       longitude: -73.471654,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 567 9999'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Virginie',
+      lastName: 'Marien',
+      dateBirth: null,
+      email: 'v.marien@email.com',
+      program: Program.fpt,
+      group: '550',
+      contact: Person(
+        firstName: 'Dominique',
+        middleName: null,
+        lastName: 'Marien',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 9876'),
+        address: null,
+        email: 'd.marien@email.com',
+      ),
+      contactLink: 'Père',
+      address: Address(
+        civicNumber: 22,
+        street: 'Rue Mauriac',
+        city: 'Repentigny',
+        postalCode: 'J6A 5S2',
+        latitude: 45.7353273,
+        longitude: -73.4590631,
+      ),
+      phone: PhoneNumber.fromString('514 567 1111'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Virginie',
-  //     lastName: 'Marien',
-  //     dateBirth: null,
-  //     email: 'v.marien@email.com',
-  //     program: Program.fpt,
-  //     group: '550',
-  //     contact: Person(
-  //       firstName: 'Dominique',
-  //       middleName: null,
-  //       lastName: 'Marien',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 9876'),
-  //       address: null,
-  //       email: 'd.marien@email.com',
-  //     ),
-  //     contactLink: 'Père',
-  //     address: Address(
-  //       civicNumber: 22,
-  //       street: 'Rue Mauriac',
-  //       city: 'Repentigny',
-  //       postalCode: 'J6A 5S2',
-  //       latitude: 45.7353273,
-  //       longitude: -73.4590631,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 567 1111'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Fabien',
+      lastName: 'Lamotte',
+      dateBirth: null,
+      email: 'f.lamotte@email.com',
+      program: Program.fpt,
+      group: '550',
+      contact: Person(
+        firstName: 'Antoine',
+        middleName: null,
+        lastName: 'Lamotte',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 9876'),
+        address: null,
+        email: 'a.lamotte@email.com',
+      ),
+      contactLink: 'Père',
+      address: Address(
+        civicNumber: 53,
+        street: 'Rue Jasmin',
+        city: 'Repentigny',
+        postalCode: 'J6A 6V3',
+        latitude: 45.7491448,
+        longitude: -73.43585,
+      ),
+      phone: PhoneNumber.fromString('514 567 1111'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Fabien',
-  //     lastName: 'Lamotte',
-  //     dateBirth: null,
-  //     email: 'f.lamotte@email.com',
-  //     program: Program.fpt,
-  //     group: '550',
-  //     contact: Person(
-  //       firstName: 'Antoine',
-  //       middleName: null,
-  //       lastName: 'Lamotte',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 9876'),
-  //       address: null,
-  //       email: 'a.lamotte@email.com',
-  //     ),
-  //     contactLink: 'Père',
-  //     address: Address(
-  //       civicNumber: 53,
-  //       street: 'Rue Jasmin',
-  //       city: 'Repentigny',
-  //       postalCode: 'J6A 6V3',
-  //       latitude: 45.7491448,
-  //       longitude: -73.43585,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 567 1111'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Frédéric',
+      lastName: 'Dorval',
+      dateBirth: null,
+      email: 'f.dorval@email.com',
+      program: Program.fpt,
+      group: '550',
+      contact: Person(
+        firstName: 'Marie',
+        middleName: null,
+        lastName: 'Lerouge',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 0987'),
+        address: null,
+        email: 'm.lerouge@email.com',
+      ),
+      contactLink: 'Mère',
+      address: Address(
+        civicNumber: 43,
+        street: 'Rue De Bienville',
+        city: 'Repentigny',
+        postalCode: 'J6A 3K7',
+        latitude: 45.723759,
+        longitude: -73.4712249,
+      ),
+      phone: PhoneNumber.fromString('514 567 2222'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Frédéric',
-  //     lastName: 'Dorval',
-  //     dateBirth: null,
-  //     email: 'f.dorval@email.com',
-  //     program: Program.fpt,
-  //     group: '550',
-  //     contact: Person(
-  //       firstName: 'Marie',
-  //       middleName: null,
-  //       lastName: 'Lerouge',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 0987'),
-  //       address: null,
-  //       email: 'm.lerouge@email.com',
-  //     ),
-  //     contactLink: 'Mère',
-  //     address: Address(
-  //       civicNumber: 43,
-  //       street: 'Rue De Bienville',
-  //       city: 'Repentigny',
-  //       postalCode: 'J6A 3K7',
-  //       latitude: 45.723759,
-  //       longitude: -73.4712249,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 567 2222'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Jérémy',
+      lastName: 'Cloutier',
+      dateBirth: null,
+      email: 'j.cloutier@email.com',
+      program: Program.fms,
+      group: '551',
+      contact: Person(
+        firstName: 'François',
+        middleName: null,
+        lastName: 'Cloutier',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 1012'),
+        address: null,
+        email: 'f.cloutier@email.com',
+      ),
+      contactLink: 'Père',
+      address: Address(
+        civicNumber: 73,
+        street: 'Rue Lépine',
+        city: 'Repentigny',
+        postalCode: 'J6A 5P2',
+        latitude: 45.7449154,
+        longitude: -73.4719261,
+      ),
+      phone: PhoneNumber.fromString('514 567 2222'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Jérémy',
-  //     lastName: 'Cloutier',
-  //     dateBirth: null,
-  //     email: 'j.cloutier@email.com',
-  //     program: Program.fms,
-  //     group: '551',
-  //     contact: Person(
-  //       firstName: 'François',
-  //       middleName: null,
-  //       lastName: 'Cloutier',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 1012'),
-  //       address: null,
-  //       email: 'f.cloutier@email.com',
-  //     ),
-  //     contactLink: 'Père',
-  //     address: Address(
-  //       civicNumber: 73,
-  //       street: 'Rue Lépine',
-  //       city: 'Repentigny',
-  //       postalCode: 'J6A 5P2',
-  //       latitude: 45.7449154,
-  //       longitude: -73.4719261,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 567 2222'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Jacob',
+      lastName: 'Labbé',
+      dateBirth: null,
+      email: 'j.labbé@email.com',
+      program: Program.fms,
+      group: '551',
+      contact: Person(
+        firstName: 'Martine',
+        middleName: null,
+        lastName: 'Rousseau',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 4567'),
+        address: null,
+        email: 'm.rousseau@email.com',
+      ),
+      contactLink: 'Mère',
+      address: Address(
+        civicNumber: 827,
+        street: 'Bd de Terrebonne',
+        city: 'Terrebonne',
+        postalCode: 'J6W 2H4',
+        latitude: 45.702261,
+        longitude: -73.6298599,
+      ),
+      phone: PhoneNumber.fromString('514 567 9988'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Jacob',
-  //     lastName: 'Labbé',
-  //     dateBirth: null,
-  //     email: 'j.labbé@email.com',
-  //     program: Program.fms,
-  //     group: '551',
-  //     contact: Person(
-  //       firstName: 'Martine',
-  //       middleName: null,
-  //       lastName: 'Rousseau',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 4567'),
-  //       address: null,
-  //       email: 'm.rousseau@email.com',
-  //     ),
-  //     contactLink: 'Mère',
-  //     address: Address(
-  //       civicNumber: 827,
-  //       street: 'Bd de Terrebonne',
-  //       city: 'Terrebonne',
-  //       postalCode: 'J6W 2H4',
-  //       latitude: 45.702261,
-  //       longitude: -73.6298599,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 567 9988'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Benoit',
+      lastName: 'Girard',
+      dateBirth: null,
+      email: 'b.girard@email.com',
+      program: Program.fpt,
+      group: '550',
+      contact: Person(
+        firstName: 'Jessica',
+        middleName: null,
+        lastName: 'Brière',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 4567'),
+        address: null,
+        email: 'j.briere@email.com',
+      ),
+      contactLink: 'Mère',
+      address: Address(
+        civicNumber: 1024,
+        street: 'Rue de Daine',
+        city: 'Terrebonne',
+        postalCode: 'J6X 1P2',
+        latitude: 45.7076598,
+        longitude: -73.6632507,
+      ),
+      phone: PhoneNumber.fromString('514 567 9988'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Benoit',
-  //     lastName: 'Girard',
-  //     dateBirth: null,
-  //     email: 'b.girard@email.com',
-  //     program: Program.fpt,
-  //     group: '550',
-  //     contact: Person(
-  //       firstName: 'Jessica',
-  //       middleName: null,
-  //       lastName: 'Brière',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 4567'),
-  //       address: null,
-  //       email: 'j.briere@email.com',
-  //     ),
-  //     contactLink: 'Mère',
-  //     address: Address(
-  //       civicNumber: 1024,
-  //       street: 'Rue de Daine',
-  //       city: 'Terrebonne',
-  //       postalCode: 'J6X 1P2',
-  //       latitude: 45.7076598,
-  //       longitude: -73.6632507,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 567 9988'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Julien',
+      lastName: 'Adam',
+      dateBirth: null,
+      email: 'j.adam@email.com',
+      program: Program.fpt,
+      group: '550',
+      contact: Person(
+        firstName: 'Daniel',
+        middleName: null,
+        lastName: 'Adam',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 4567'),
+        address: null,
+        email: 'd.adam@email.com',
+      ),
+      contactLink: 'Père',
+      address: Address(
+        civicNumber: 1590,
+        street: 'Rue Bouvier',
+        city: 'Terrebonne',
+        postalCode: 'J6X 1P4',
+        latitude: 45.7156374,
+        longitude: -73.659025,
+      ),
+      phone: PhoneNumber.fromString('514 567 9988'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Julien',
-  //     lastName: 'Adam',
-  //     dateBirth: null,
-  //     email: 'j.adam@email.com',
-  //     program: Program.fpt,
-  //     group: '550',
-  //     contact: Person(
-  //       firstName: 'Daniel',
-  //       middleName: null,
-  //       lastName: 'Adam',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 4567'),
-  //       address: null,
-  //       email: 'd.adam@email.com',
-  //     ),
-  //     contactLink: 'Père',
-  //     address: Address(
-  //       civicNumber: 1590,
-  //       street: 'Rue Bouvier',
-  //       city: 'Terrebonne',
-  //       postalCode: 'J6X 1P4',
-  //       latitude: 45.7156374,
-  //       longitude: -73.659025,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 567 9988'),
-  //     allVisa: [],
-  //   ),
-  // );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Dave',
+      lastName: 'Vachon',
+      dateBirth: null,
+      email: 'd.vachon@email.com',
+      program: Program.fpt,
+      group: '550',
+      contact: Person(
+        firstName: 'Romain',
+        middleName: null,
+        lastName: 'Vachon',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 4567'),
+        address: null,
+        email: 'r.vachon@email.com',
+      ),
+      contactLink: 'Père',
+      address: Address(
+        civicNumber: 3725,
+        street: 'Rue de Brest',
+        city: 'Terrebonne',
+        postalCode: 'J6X 3N3',
+        latitude: 45.7214894,
+        longitude: -73.6764422,
+      ),
+      phone: PhoneNumber.fromString('514 567 9988'),
+      allVisa: [],
+    ),
+  );
 
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Dave',
-  //     lastName: 'Vachon',
-  //     dateBirth: null,
-  //     email: 'd.vachon@email.com',
-  //     program: Program.fpt,
-  //     group: '550',
-  //     contact: Person(
-  //       firstName: 'Romain',
-  //       middleName: null,
-  //       lastName: 'Vachon',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 4567'),
-  //       address: null,
-  //       email: 'r.vachon@email.com',
-  //     ),
-  //     contactLink: 'Père',
-  //     address: Address(
-  //       civicNumber: 3725,
-  //       street: 'Rue de Brest',
-  //       city: 'Terrebonne',
-  //       postalCode: 'J6X 3N3',
-  //       latitude: 45.7214894,
-  //       longitude: -73.6764422,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 567 9988'),
-  //     allVisa: [],
-  //   ),
-  // );
-
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolAId,
-  //     firstName: 'Guillaume',
-  //     lastName: 'Robin',
-  //     dateBirth: null,
-  //     email: 'g.robin@email.com',
-  //     program: Program.fms,
-  //     group: '551',
-  //     contact: Person(
-  //       firstName: 'Patricia',
-  //       middleName: null,
-  //       lastName: 'Leduc',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('514 321 0987'),
-  //       address: null,
-  //       email: 'p.leduc@email.com',
-  //     ),
-  //     contactLink: 'Mère',
-  //     address: Address(
-  //       civicNumber: 3945,
-  //       street: 'Rue Daniel',
-  //       city: 'Terrebonne',
-  //       postalCode: 'J6X 2P9',
-  //       latitude: 45.7231859,
-  //       longitude: -73.6709275,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 567 9988'),
-  //     allVisa: [],
-  //   ),
-  // );
-  // students.add(
-  //   Student(
-  //     schoolBoardId: schoolBoardId,
-  //     schoolId: schoolCId,
-  //     firstName: 'Sébastien',
-  //     lastName: 'Desmarais',
-  //     dateBirth: null,
-  //     email: 's.desmarais@email.com',
-  //     program: Program.fpt,
-  //     group: '300',
-  //     contact: Person(
-  //       firstName: 'Tony',
-  //       middleName: null,
-  //       lastName: 'Desmarais',
-  //       dateBirth: null,
-  //       phone: PhoneNumber.fromString('450 234 5678'),
-  //       address: null,
-  //       email: 't.desmarais@email.com',
-  //     ),
-  //     contactLink: 'Père',
-  //     address: Address(
-  //       civicNumber: 1466,
-  //       street: 'Av Châteaubriant',
-  //       city: 'Mascouche',
-  //       postalCode: 'J7K 2B4',
-  //       latitude: 45.757801,
-  //       longitude: -73.608841,
-  //     ),
-  //     phone: PhoneNumber.fromString('514 567 9988'),
-  //     allVisa: [],
-  //   ),
-  // );
-  // await _waitForDatabaseUpdate(students, 21);
-  await _waitForDatabaseUpdate(students, 1);
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolAId,
+      firstName: 'Guillaume',
+      lastName: 'Robin',
+      dateBirth: null,
+      email: 'g.robin@email.com',
+      program: Program.fms,
+      group: '551',
+      contact: Person(
+        firstName: 'Patricia',
+        middleName: null,
+        lastName: 'Leduc',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('514 321 0987'),
+        address: null,
+        email: 'p.leduc@email.com',
+      ),
+      contactLink: 'Mère',
+      address: Address(
+        civicNumber: 3945,
+        street: 'Rue Daniel',
+        city: 'Terrebonne',
+        postalCode: 'J6X 2P9',
+        latitude: 45.7231859,
+        longitude: -73.6709275,
+      ),
+      phone: PhoneNumber.fromString('514 567 9988'),
+      allVisa: [],
+    ),
+  );
+  students.add(
+    Student(
+      schoolBoardId: schoolBoardId,
+      schoolId: schoolCId,
+      firstName: 'Sébastien',
+      lastName: 'Desmarais',
+      dateBirth: null,
+      email: 's.desmarais@email.com',
+      program: Program.fpt,
+      group: '300',
+      contact: Person(
+        firstName: 'Tony',
+        middleName: null,
+        lastName: 'Desmarais',
+        dateBirth: null,
+        phone: PhoneNumber.fromString('450 234 5678'),
+        address: null,
+        email: 't.desmarais@email.com',
+      ),
+      contactLink: 'Père',
+      address: Address(
+        civicNumber: 1466,
+        street: 'Av Châteaubriant',
+        city: 'Mascouche',
+        postalCode: 'J7K 2B4',
+        latitude: 45.757801,
+        longitude: -73.608841,
+      ),
+      phone: PhoneNumber.fromString('514 567 9988'),
+      allVisa: [],
+    ),
+  );
+  await _waitForDatabaseUpdate(students, 21);
 }
 
 Future<void> _addDummyEnterprises(
@@ -1144,8 +1261,8 @@ Future<void> _addDummyEnterprises(
   JobList jobs = JobList();
   jobs.add(
     Job(
-      specialization:
-          ActivitySectorsService.activitySectors[2].specializations[9],
+      specialization: job_data_service
+          .ActivitySectorsService.activitySectors[2].specializations[9],
       positionsOffered: {schoolAId: 2, schoolBId: 5, schoolCId: 1},
       incidents: Incidents(
         severeInjuries: [
@@ -1177,8 +1294,8 @@ Future<void> _addDummyEnterprises(
   );
   jobs.add(
     Job(
-      specialization:
-          ActivitySectorsService.activitySectors[0].specializations[7],
+      specialization: job_data_service
+          .ActivitySectorsService.activitySectors[0].specializations[7],
       positionsOffered: {schoolAId: 3, schoolBId: 5},
       incidents: Incidents(
         minorInjuries: [
@@ -1261,8 +1378,8 @@ Future<void> _addDummyEnterprises(
   jobs = JobList();
   jobs.add(
     Job(
-      specialization:
-          ActivitySectorsService.activitySectors[0].specializations[7],
+      specialization: job_data_service
+          .ActivitySectorsService.activitySectors[0].specializations[7],
       positionsOffered: {schoolAId: 3, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
@@ -1319,8 +1436,8 @@ Future<void> _addDummyEnterprises(
   jobs = JobList();
   jobs.add(
     Job(
-      specialization:
-          ActivitySectorsService.activitySectors[9].specializations[3],
+      specialization: job_data_service
+          .ActivitySectorsService.activitySectors[9].specializations[3],
       positionsOffered: {schoolAId: 3, schoolBId: 5},
       incidents: Incidents.empty.copyWith(
         severeInjuries: [
@@ -1395,8 +1512,8 @@ Future<void> _addDummyEnterprises(
   jobs = JobList();
   jobs.add(
     Job(
-      specialization:
-          ActivitySectorsService.activitySectors[9].specializations[3],
+      specialization: job_data_service
+          .ActivitySectorsService.activitySectors[9].specializations[3],
       positionsOffered: {schoolAId: 2, schoolBId: 5},
       incidents: Incidents.empty.copyWith(severeInjuries: [
         Incident(
@@ -1460,8 +1577,8 @@ Future<void> _addDummyEnterprises(
   jobs = JobList();
   jobs.add(
     Job(
-      specialization:
-          ActivitySectorsService.activitySectors[2].specializations[9],
+      specialization: job_data_service
+          .ActivitySectorsService.activitySectors[2].specializations[9],
       positionsOffered: {schoolAId: 2, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
@@ -1519,8 +1636,8 @@ Future<void> _addDummyEnterprises(
   jobs = JobList();
   jobs.add(
     Job(
-      specialization:
-          ActivitySectorsService.activitySectors[2].specializations[7],
+      specialization: job_data_service
+          .ActivitySectorsService.activitySectors[2].specializations[7],
       positionsOffered: {schoolAId: 1, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
@@ -1578,8 +1695,8 @@ Future<void> _addDummyEnterprises(
   jobs = JobList();
   jobs.add(
     Job(
-      specialization:
-          ActivitySectorsService.activitySectors[0].specializations[7],
+      specialization: job_data_service
+          .ActivitySectorsService.activitySectors[0].specializations[7],
       positionsOffered: {schoolAId: 2, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
@@ -1637,8 +1754,8 @@ Future<void> _addDummyEnterprises(
   jobs = JobList();
   jobs.add(
     Job(
-      specialization:
-          ActivitySectorsService.activitySectors[2].specializations[14],
+      specialization: job_data_service
+          .ActivitySectorsService.activitySectors[2].specializations[14],
       positionsOffered: {schoolAId: 1, schoolBId: 5, schoolCId: 1},
       incidents: Incidents.empty,
       minimumAge: 15,
@@ -1691,8 +1808,8 @@ Future<void> _addDummyEnterprises(
   jobs = JobList();
   jobs.add(
     Job(
-      specialization:
-          ActivitySectorsService.activitySectors[0].specializations[7],
+      specialization: job_data_service
+          .ActivitySectorsService.activitySectors[0].specializations[7],
       positionsOffered: {schoolAId: 3, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
@@ -1754,8 +1871,8 @@ Future<void> _addDummyEnterprises(
   jobs = JobList();
   jobs.add(
     Job(
-      specialization:
-          ActivitySectorsService.activitySectors[1].specializations[2],
+      specialization: job_data_service
+          .ActivitySectorsService.activitySectors[1].specializations[2],
       positionsOffered: {schoolAId: 1, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
@@ -1811,8 +1928,8 @@ Future<void> _addDummyEnterprises(
   jobs = JobList();
   jobs.add(
     Job(
-      specialization:
-          ActivitySectorsService.activitySectors[1].specializations[2],
+      specialization: job_data_service
+          .ActivitySectorsService.activitySectors[1].specializations[2],
       positionsOffered: {schoolAId: 1, schoolBId: 5},
       incidents: Incidents.empty,
       minimumAge: 15,
@@ -1913,8 +2030,10 @@ Future<void> _addDummyInternships(
           jobId:
               enterprises.firstWhere((e) => e.name == 'Auto Care').jobs[0].id,
           extraSpecializationIds: [
-            ActivitySectorsService.activitySectors[2].specializations[1].id,
-            ActivitySectorsService.activitySectors[1].specializations[0].id,
+            job_data_service.ActivitySectorsService.activitySectors[2]
+                .specializations[1].id,
+            job_data_service.ActivitySectorsService.activitySectors[1]
+                .specializations[0].id,
           ],
           program:
               students.firstWhere((e) => e.fullName == 'Cedric Masson').program,
@@ -2033,952 +2152,951 @@ Future<void> _addDummyInternships(
     ),
   );
 
-  // startingPeriod = DateTime.now().add(Duration(days: 15));
-  // period = time_utils.DateTimeRange(
-  //   start: startingPeriod,
-  //   end: startingPeriod.add(Duration(days: 180)),
-  // );
-  // internships.add(
-  //   Internship(
-  //       schoolBoardId: schoolBoardId,
-  //       studentId: students.firstWhere((e) => e.fullName == 'Thomas Caron').id,
-  //       signatoryTeacherId: teacherA1Id,
-  //       extraSupervisingTeacherIds: [],
-  //       enterpriseId:
-  //           enterprises.firstWhere((e) => e.name == 'Boucherie Marien').id,
-  //       achievedDuration: -1,
-  //       endDate: DateTime(0),
-  //       contracts: [
-  //         InternshipContract(
-  //           date: DateTime.now(),
-  //           jobId: enterprises
-  //               .firstWhere((e) => e.name == 'Boucherie Marien')
-  //               .jobs[0]
-  //               .id,
-  //           extraSpecializationIds: [],
-  //           program: students
-  //               .firstWhere((e) => e.fullName == 'Thomas Caron')
-  //               .program,
-  //           supervisor: Person(
-  //             firstName: 'Claude',
-  //             middleName: null,
-  //             lastName: 'Simard',
-  //             dateBirth: null,
-  //             phone: null,
-  //             address: null,
-  //             email: '',
-  //           ),
-  //           dates: period,
-  //           weeklySchedules: [
-  //             WeeklySchedule(
-  //               schedule: {
-  //                 Day.monday: DailySchedule(
-  //                   blocks: [
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                     ),
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                     ),
-  //                   ],
-  //                 ),
-  //                 Day.tuesday: DailySchedule(
-  //                   blocks: [
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                     ),
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                     ),
-  //                   ],
-  //                 ),
-  //                 Day.wednesday: DailySchedule(
-  //                   blocks: [
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                     ),
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                     ),
-  //                   ],
-  //                 ),
-  //                 Day.thursday: DailySchedule(
-  //                   blocks: [
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                     ),
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                     ),
-  //                   ],
-  //                 ),
-  //                 Day.friday: DailySchedule(
-  //                   blocks: [
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                     ),
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               },
-  //               period: period,
-  //             ),
-  //           ],
-  //           transportations: [
-  //             Transportation.walk,
-  //             Transportation.adaptedTransport
-  //           ].map((e) => e.toString()).toList(),
-  //           visitFrequencies: 'Une visite par semaine',
-  //           expectedDuration: 135,
-  //           formVersion: InternshipContract.currentVersion,
-  //         ),
-  //       ],
-  //       skillEvaluations: [],
-  //       attitudeEvaluations: [],
-  //       enterpriseEvaluations: [],
-  //       teacherNotes: '',
-  //       sstEvaluations: [
-  //         SstEvaluation(
-  //           presentAtEvaluation: ['Responsable en milieu de stage'],
-  //           questions: {
-  //             'Q1': ['Oui'],
-  //             'Q1+t': [
-  //               'En début et en fin de journée, surtout des pots de fleurs.',
-  //             ],
-  //             'Q3': ['Un diable'],
-  //             'Q5': ['Un couteau', 'Des ciseaux'],
-  //             'Q7': ['Des pesticides', 'Engrais'],
-  //             'Q12': ['__NOT_APPLICABLE_INTERNAL__'],
-  //             'Q15': ['Oui'],
-  //             'Q15+t': ['Aucun'],
-  //             'Q16': ['Ranger le local avant de quitter'],
-  //           },
-  //         )
-  //       ]),
-  // );
+  startingPeriod = DateTime.now().add(Duration(days: 15));
+  period = time_utils.DateTimeRange(
+    start: startingPeriod,
+    end: startingPeriod.add(Duration(days: 180)),
+  );
+  internships.add(
+    Internship(
+        schoolBoardId: schoolBoardId,
+        studentId: students.firstWhere((e) => e.fullName == 'Thomas Caron').id,
+        signatoryTeacherId: teacherA1Id,
+        extraSupervisingTeacherIds: [],
+        enterpriseId:
+            enterprises.firstWhere((e) => e.name == 'Boucherie Marien').id,
+        achievedDuration: -1,
+        endDate: DateTime(0),
+        contracts: [
+          InternshipContract(
+            date: DateTime.now(),
+            jobId: enterprises
+                .firstWhere((e) => e.name == 'Boucherie Marien')
+                .jobs[0]
+                .id,
+            extraSpecializationIds: [],
+            program: students
+                .firstWhere((e) => e.fullName == 'Thomas Caron')
+                .program,
+            supervisor: Person(
+              firstName: 'Claude',
+              middleName: null,
+              lastName: 'Simard',
+              dateBirth: null,
+              phone: null,
+              address: null,
+              email: '',
+            ),
+            dates: period,
+            weeklySchedules: [
+              WeeklySchedule(
+                schedule: {
+                  Day.monday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                  Day.tuesday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                  Day.wednesday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                  Day.thursday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                  Day.friday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                },
+                period: period,
+              ),
+            ],
+            transportations: [
+              Transportation.walk,
+              Transportation.adaptedTransport
+            ].map((e) => e.toString()).toList(),
+            visitFrequencies: 'Une visite par semaine',
+            expectedDuration: 135,
+            formVersion: InternshipContract.currentVersion,
+          ),
+        ],
+        skillEvaluations: [],
+        attitudeEvaluations: [],
+        enterpriseEvaluations: [],
+        teacherNotes: '',
+        sstEvaluations: [
+          SstEvaluation(
+            presentAtEvaluation: ['Responsable en milieu de stage'],
+            questions: {
+              'Q1': ['Oui'],
+              'Q1+t': [
+                'En début et en fin de journée, surtout des pots de fleurs.',
+              ],
+              'Q3': ['Un diable'],
+              'Q5': ['Un couteau', 'Des ciseaux'],
+              'Q7': ['Des pesticides', 'Engrais'],
+              'Q12': ['__NOT_APPLICABLE_INTERNAL__'],
+              'Q15': ['Oui'],
+              'Q15+t': ['Aucun'],
+              'Q16': ['Ranger le local avant de quitter'],
+            },
+          )
+        ]),
+  );
 
-  // startingPeriod = DateTime.now();
-  // period = time_utils.DateTimeRange(
-  //   start: startingPeriod,
-  //   end: startingPeriod.add(Duration(days: 180)),
-  // );
-  // var internship = Internship(
-  //   schoolBoardId: schoolBoardId,
-  //   studentId: students.firstWhere((e) => e.fullName == 'Melissa Poulain').id,
-  //   signatoryTeacherId: teacherA1Id,
-  //   extraSupervisingTeacherIds: [],
-  //   enterpriseId: enterprises.firstWhere((e) => e.name == 'Subway').id,
-  //   endDate: DateTime.now().add(const Duration(days: 10)),
-  //   achievedDuration: 125,
-  //   contracts: [
-  //     InternshipContract(
-  //       date: DateTime.now(),
-  //       jobId: enterprises.firstWhere((e) => e.name == 'Subway').jobs[0].id,
-  //       extraSpecializationIds: [],
-  //       program:
-  //           students.firstWhere((e) => e.fullName == 'Melissa Poulain').program,
-  //       supervisor: Person(
-  //         firstName: 'Carole',
-  //         middleName: null,
-  //         lastName: 'Moisan',
-  //         dateBirth: null,
-  //         phone: null,
-  //         address: null,
-  //         email: '',
-  //       ),
-  //       dates: period,
-  //       weeklySchedules: [
-  //         WeeklySchedule(
-  //           schedule: {
-  //             Day.monday: DailySchedule(
-  //               blocks: [
-  //                 TimeBlock(
-  //                   start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                   end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                 ),
-  //                 TimeBlock(
-  //                   start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                   end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                 ),
-  //               ],
-  //             ),
-  //             Day.tuesday: DailySchedule(
-  //               blocks: [
-  //                 TimeBlock(
-  //                   start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                   end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                 ),
-  //                 TimeBlock(
-  //                   start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                   end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                 ),
-  //               ],
-  //             ),
-  //             Day.wednesday: DailySchedule(
-  //               blocks: [
-  //                 TimeBlock(
-  //                   start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                   end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                 ),
-  //                 TimeBlock(
-  //                   start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                   end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                 ),
-  //               ],
-  //             ),
-  //             Day.thursday: DailySchedule(
-  //               blocks: [
-  //                 TimeBlock(
-  //                   start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                   end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                 ),
-  //                 TimeBlock(
-  //                   start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                   end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                 ),
-  //               ],
-  //             ),
-  //           },
-  //           period: period,
-  //         ),
-  //       ],
-  //       transportations:
-  //           [Transportation.publicTransport].map((e) => e.toString()).toList(),
-  //       visitFrequencies: 'Une visite par mois',
-  //       expectedDuration: 135,
-  //       formVersion: InternshipContract.currentVersion,
-  //     ),
-  //   ],
-  //   skillEvaluations: [],
-  //   attitudeEvaluations: [],
-  //   enterpriseEvaluations: [],
-  //   sstEvaluations: [],
-  //   teacherNotes: '',
-  // );
-  // internship.enterpriseEvaluations.add(PostInternshipEnterpriseEvaluation(
-  //   date: period.end.add(Duration(days: 5)),
-  //   internshipId: internship.id,
-  //   program:
-  //       students.firstWhere((e) => e.fullName == 'Melissa Poulain').program,
-  //   skillsRequired: ['Communiquer à l\'écrit', 'Interagir avec des clients'],
-  //   taskVariety: 0,
-  //   trainingPlanRespect: 1,
-  //   autonomyExpected: 4,
-  //   efficiencyExpected: 2,
-  //   specialNeedsAccommodation: 3,
-  //   supervisionStyle: 1,
-  //   easeOfCommunication: 5,
-  //   absenceAcceptance: 4,
-  //   sstManagement: 1,
-  // ));
-  // internships.add(internship);
+  startingPeriod = DateTime.now();
+  period = time_utils.DateTimeRange(
+    start: startingPeriod,
+    end: startingPeriod.add(Duration(days: 180)),
+  );
+  var internship = Internship(
+    schoolBoardId: schoolBoardId,
+    studentId: students.firstWhere((e) => e.fullName == 'Melissa Poulain').id,
+    signatoryTeacherId: teacherA1Id,
+    extraSupervisingTeacherIds: [],
+    enterpriseId: enterprises.firstWhere((e) => e.name == 'Subway').id,
+    endDate: DateTime.now().add(const Duration(days: 10)),
+    achievedDuration: 125,
+    contracts: [
+      InternshipContract(
+        date: DateTime.now(),
+        jobId: enterprises.firstWhere((e) => e.name == 'Subway').jobs[0].id,
+        extraSpecializationIds: [],
+        program:
+            students.firstWhere((e) => e.fullName == 'Melissa Poulain').program,
+        supervisor: Person(
+          firstName: 'Carole',
+          middleName: null,
+          lastName: 'Moisan',
+          dateBirth: null,
+          phone: null,
+          address: null,
+          email: '',
+        ),
+        dates: period,
+        weeklySchedules: [
+          WeeklySchedule(
+            schedule: {
+              Day.monday: DailySchedule(
+                blocks: [
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                  ),
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                  ),
+                ],
+              ),
+              Day.tuesday: DailySchedule(
+                blocks: [
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                  ),
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                  ),
+                ],
+              ),
+              Day.wednesday: DailySchedule(
+                blocks: [
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                  ),
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                  ),
+                ],
+              ),
+              Day.thursday: DailySchedule(
+                blocks: [
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                  ),
+                  TimeBlock(
+                    start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                    end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                  ),
+                ],
+              ),
+            },
+            period: period,
+          ),
+        ],
+        transportations:
+            [Transportation.publicTransport].map((e) => e.toString()).toList(),
+        visitFrequencies: 'Une visite par mois',
+        expectedDuration: 135,
+        formVersion: InternshipContract.currentVersion,
+      ),
+    ],
+    skillEvaluations: [],
+    attitudeEvaluations: [],
+    enterpriseEvaluations: [],
+    sstEvaluations: [],
+    teacherNotes: '',
+  );
+  internship.enterpriseEvaluations.add(PostInternshipEnterpriseEvaluation(
+    date: period.end.add(Duration(days: 5)),
+    internshipId: internship.id,
+    program:
+        students.firstWhere((e) => e.fullName == 'Melissa Poulain').program,
+    skillsRequired: ['Communiquer à l\'écrit', 'Interagir avec des clients'],
+    taskVariety: 0,
+    trainingPlanRespect: 1,
+    autonomyExpected: 4,
+    efficiencyExpected: 2,
+    specialNeedsAccommodation: 3,
+    supervisionStyle: 1,
+    easeOfCommunication: 5,
+    absenceAcceptance: 4,
+    sstManagement: 1,
+  ));
+  internships.add(internship);
 
-  // startingPeriod = DateTime.now().subtract(Duration(days: 10));
-  // period = time_utils.DateTimeRange(
-  //   start: startingPeriod,
-  //   end: startingPeriod.add(Duration(days: 120)),
-  // );
-  // internships.add(
-  //   Internship(
-  //     schoolBoardId: schoolBoardId,
-  //     studentId: students.firstWhere((e) => e.fullName == 'Vincent Picard').id,
-  //     signatoryTeacherId: teacherA2Id,
-  //     extraSupervisingTeacherIds: [],
-  //     enterpriseId: enterprises.firstWhere((e) => e.name == 'IGA').id,
-  //     achievedDuration: -1,
-  //     endDate: DateTime(0),
-  //     contracts: [
-  //       InternshipContract(
-  //         date: DateTime.now(),
-  //         jobId: enterprises.firstWhere((e) => e.name == 'IGA').jobs[0].id,
-  //         extraSpecializationIds: [],
-  //         program: students
-  //             .firstWhere((e) => e.fullName == 'Vincent Picard')
-  //             .program,
-  //         supervisor: Person(
-  //           firstName: 'Charles',
-  //           middleName: null,
-  //           lastName: 'Villeneuve',
-  //           dateBirth: null,
-  //           phone: null,
-  //           address: null,
-  //           email: '',
-  //         ),
-  //         dates: period,
-  //         weeklySchedules: [
-  //           WeeklySchedule(
-  //             schedule: {
-  //               Day.monday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //               Day.tuesday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //               Day.wednesday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //             },
-  //             period: period,
-  //           ),
-  //         ],
-  //         transportations: [Transportation.publicTransport]
-  //             .map((e) => e.toString())
-  //             .toList(),
-  //         visitFrequencies: 'Une visite par semaine',
-  //         expectedDuration: 135,
-  //         formVersion: InternshipContract.currentVersion,
-  //       ),
-  //     ],
-  //     skillEvaluations: [],
-  //     attitudeEvaluations: [],
-  //     enterpriseEvaluations: [],
-  //     sstEvaluations: [],
-  //     teacherNotes: '',
-  //   ),
-  // );
+  startingPeriod = DateTime.now().subtract(Duration(days: 10));
+  period = time_utils.DateTimeRange(
+    start: startingPeriod,
+    end: startingPeriod.add(Duration(days: 120)),
+  );
+  internships.add(
+    Internship(
+      schoolBoardId: schoolBoardId,
+      studentId: students.firstWhere((e) => e.fullName == 'Vincent Picard').id,
+      signatoryTeacherId: teacherA2Id,
+      extraSupervisingTeacherIds: [],
+      enterpriseId: enterprises.firstWhere((e) => e.name == 'IGA').id,
+      achievedDuration: -1,
+      endDate: DateTime(0),
+      contracts: [
+        InternshipContract(
+          date: DateTime.now(),
+          jobId: enterprises.firstWhere((e) => e.name == 'IGA').jobs[0].id,
+          extraSpecializationIds: [],
+          program: students
+              .firstWhere((e) => e.fullName == 'Vincent Picard')
+              .program,
+          supervisor: Person(
+            firstName: 'Charles',
+            middleName: null,
+            lastName: 'Villeneuve',
+            dateBirth: null,
+            phone: null,
+            address: null,
+            email: '',
+          ),
+          dates: period,
+          weeklySchedules: [
+            WeeklySchedule(
+              schedule: {
+                Day.monday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.tuesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.wednesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+              },
+              period: period,
+            ),
+          ],
+          transportations: [Transportation.publicTransport]
+              .map((e) => e.toString())
+              .toList(),
+          visitFrequencies: 'Une visite par semaine',
+          expectedDuration: 135,
+          formVersion: InternshipContract.currentVersion,
+        ),
+      ],
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      sstEvaluations: [],
+      teacherNotes: '',
+    ),
+  );
 
-  // startingPeriod = DateTime.now();
-  // period = time_utils.DateTimeRange(
-  //   start: startingPeriod,
-  //   end: startingPeriod.add(Duration(days: 120)),
-  // );
-  // internships.add(
-  //   Internship(
-  //     schoolBoardId: schoolBoardId,
-  //     studentId: students.firstWhere((e) => e.fullName == 'Simon Gingras').id,
-  //     // This is a Roméo Montaigu's student
-  //     signatoryTeacherId: teacherB1Id,
-  //     extraSupervisingTeacherIds: [],
-  //     enterpriseId: enterprises.firstWhere((e) => e.name == 'Auto Care').id,
-  //     endDate: DateTime.now().add(const Duration(days: 10)),
-  //     achievedDuration: -1,
-  //     contracts: [
-  //       InternshipContract(
-  //         date: DateTime.now(),
-  //         jobId:
-  //             enterprises.firstWhere((e) => e.name == 'Auto Care').jobs[0].id,
-  //         extraSpecializationIds: [],
-  //         program:
-  //             students.firstWhere((e) => e.fullName == 'Simon Gingras').program,
-  //         supervisor: Person(
-  //           firstName: 'Thomas',
-  //           middleName: null,
-  //           lastName: 'Giroud',
-  //           dateBirth: null,
-  //           phone: null,
-  //           address: null,
-  //           email: '',
-  //         ),
-  //         dates: period,
-  //         weeklySchedules: [
-  //           WeeklySchedule(
-  //             schedule: {
-  //               Day.monday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //               Day.wednesday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //               Day.friday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //             },
-  //             period: period,
-  //           ),
-  //         ],
-  //         transportations:
-  //             [Transportation.walk].map((e) => e.toString()).toList(),
-  //         visitFrequencies: 'Une visite par semaine',
-  //         expectedDuration: 135,
-  //         formVersion: InternshipContract.currentVersion,
-  //       ),
-  //     ],
-  //     sstEvaluations: [
-  //       SstEvaluation(
-  //         presentAtEvaluation: ['Responsable en milieu de stage'],
-  //         questions: {
-  //           'Q1': ['Non'],
-  //           'Q5': ['Des couteaux'],
-  //           'Q9': ['Des solvants', 'Des produits ménagers'],
-  //           'Q12': ['__NOT_APPLICABLE_INTERNAL__'],
-  //           'Q12+t': ['Bouchons a oreilles'],
-  //           'Q15': ['Oui'],
-  //           'Q15+t': ['Travail quotidien avec les clients'],
-  //         },
-  //         date: DateTime.now(),
-  //       )
-  //     ],
-  //     skillEvaluations: [],
-  //     attitudeEvaluations: [],
-  //     enterpriseEvaluations: [],
-  //     teacherNotes: '',
-  //   ),
-  // );
+  startingPeriod = DateTime.now();
+  period = time_utils.DateTimeRange(
+    start: startingPeriod,
+    end: startingPeriod.add(Duration(days: 120)),
+  );
+  internships.add(
+    Internship(
+      schoolBoardId: schoolBoardId,
+      studentId: students.firstWhere((e) => e.fullName == 'Simon Gingras').id,
+      // This is a Roméo Montaigu's student
+      signatoryTeacherId: teacherB1Id,
+      extraSupervisingTeacherIds: [],
+      enterpriseId: enterprises.firstWhere((e) => e.name == 'Auto Care').id,
+      endDate: DateTime.now().add(const Duration(days: 10)),
+      achievedDuration: -1,
+      contracts: [
+        InternshipContract(
+          date: DateTime.now(),
+          jobId:
+              enterprises.firstWhere((e) => e.name == 'Auto Care').jobs[0].id,
+          extraSpecializationIds: [],
+          program:
+              students.firstWhere((e) => e.fullName == 'Simon Gingras').program,
+          supervisor: Person(
+            firstName: 'Thomas',
+            middleName: null,
+            lastName: 'Giroud',
+            dateBirth: null,
+            phone: null,
+            address: null,
+            email: '',
+          ),
+          dates: period,
+          weeklySchedules: [
+            WeeklySchedule(
+              schedule: {
+                Day.monday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.wednesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.friday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+              },
+              period: period,
+            ),
+          ],
+          transportations:
+              [Transportation.walk].map((e) => e.toString()).toList(),
+          visitFrequencies: 'Une visite par semaine',
+          expectedDuration: 135,
+          formVersion: InternshipContract.currentVersion,
+        ),
+      ],
+      sstEvaluations: [
+        SstEvaluation(
+          presentAtEvaluation: ['Responsable en milieu de stage'],
+          questions: {
+            'Q1': ['Non'],
+            'Q5': ['Des couteaux'],
+            'Q9': ['Des solvants', 'Des produits ménagers'],
+            'Q12': ['__NOT_APPLICABLE_INTERNAL__'],
+            'Q12+t': ['Bouchons a oreilles'],
+            'Q15': ['Oui'],
+            'Q15+t': ['Travail quotidien avec les clients'],
+          },
+          date: DateTime.now(),
+        )
+      ],
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      teacherNotes: '',
+    ),
+  );
 
-  // startingPeriod = DateTime.now().subtract(const Duration(days: 100));
-  // period = time_utils.DateTimeRange(
-  //   start: startingPeriod,
-  //   end: startingPeriod.add(Duration(days: 400)),
-  // );
-  // internships.add(
-  //   Internship(
-  //     schoolBoardId: schoolBoardId,
-  //     studentId: students.firstWhere((e) => e.fullName == 'Jeanne Tremblay').id,
-  //     signatoryTeacherId: teacherA1Id,
-  //     extraSupervisingTeacherIds: [],
-  //     enterpriseId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').id,
-  //     achievedDuration: -1,
-  //     endDate: DateTime(0),
-  //     contracts: [
-  //       InternshipContract(
-  //         date: DateTime.now(),
-  //         jobId: enterprises
-  //             .firstWhere((e) => e.name == 'Metro Gagnon')
-  //             .jobs[0]
-  //             .id,
-  //         extraSpecializationIds: [],
-  //         program: students
-  //             .firstWhere((e) => e.fullName == 'Jeanne Tremblay')
-  //             .program,
-  //         supervisor: Person(
-  //           firstName: 'Maxime',
-  //           middleName: null,
-  //           lastName: 'Lefrançois',
-  //           dateBirth: null,
-  //           phone: PhoneNumber.fromString('123-456-7890'),
-  //           address: null,
-  //           email: '',
-  //         ),
-  //         dates: period,
-  //         weeklySchedules: [
-  //           WeeklySchedule(
-  //             schedule: {
-  //               Day.monday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //               Day.tuesday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //               Day.wednesday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //               Day.thursday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //               Day.friday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //             },
-  //             period: period,
-  //           ),
-  //         ],
-  //         transportations:
-  //             [Transportation.walk].map((e) => e.toString()).toList(),
-  //         visitFrequencies: 'Jamais',
-  //         expectedDuration: 135,
-  //         formVersion: InternshipContract.currentVersion,
-  //       )
-  //     ],
-  //     skillEvaluations: [],
-  //     attitudeEvaluations: [],
-  //     enterpriseEvaluations: [],
-  //     sstEvaluations: [],
-  //     teacherNotes: '',
-  //   ),
-  // );
+  startingPeriod = DateTime.now().subtract(const Duration(days: 100));
+  period = time_utils.DateTimeRange(
+    start: startingPeriod,
+    end: startingPeriod.add(Duration(days: 400)),
+  );
+  internships.add(
+    Internship(
+      schoolBoardId: schoolBoardId,
+      studentId: students.firstWhere((e) => e.fullName == 'Jeanne Tremblay').id,
+      signatoryTeacherId: teacherA1Id,
+      extraSupervisingTeacherIds: [],
+      enterpriseId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').id,
+      achievedDuration: -1,
+      endDate: DateTime(0),
+      contracts: [
+        InternshipContract(
+          date: DateTime.now(),
+          jobId: enterprises
+              .firstWhere((e) => e.name == 'Metro Gagnon')
+              .jobs[0]
+              .id,
+          extraSpecializationIds: [],
+          program: students
+              .firstWhere((e) => e.fullName == 'Jeanne Tremblay')
+              .program,
+          supervisor: Person(
+            firstName: 'Maxime',
+            middleName: null,
+            lastName: 'Lefrançois',
+            dateBirth: null,
+            phone: PhoneNumber.fromString('123-456-7890'),
+            address: null,
+            email: '',
+          ),
+          dates: period,
+          weeklySchedules: [
+            WeeklySchedule(
+              schedule: {
+                Day.monday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.tuesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.wednesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.thursday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.friday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+              },
+              period: period,
+            ),
+          ],
+          transportations:
+              [Transportation.walk].map((e) => e.toString()).toList(),
+          visitFrequencies: 'Jamais',
+          expectedDuration: 135,
+          formVersion: InternshipContract.currentVersion,
+        )
+      ],
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      sstEvaluations: [],
+      teacherNotes: '',
+    ),
+  );
 
-  // startingPeriod = DateTime.now();
-  // period = time_utils.DateTimeRange(
-  //   start: startingPeriod,
-  //   end: startingPeriod.add(Duration(days: 120)),
-  // );
-  // internships.add(
-  //   Internship(
-  //     schoolBoardId: schoolBoardId,
-  //     studentId: students.firstWhere((e) => e.fullName == 'Diego Vargas').id,
-  //     signatoryTeacherId: teacherB1Id,
-  //     extraSupervisingTeacherIds: [teacherB1Id],
-  //     enterpriseId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').id,
-  //     achievedDuration: -1,
-  //     endDate: DateTime(0),
-  //     contracts: [
-  //       InternshipContract(
-  //         date: DateTime.now(),
-  //         jobId: enterprises
-  //             .firstWhere((e) => e.name == 'Metro Gagnon')
-  //             .jobs[1]
-  //             .id,
-  //         extraSpecializationIds: [],
-  //         program:
-  //             students.firstWhere((e) => e.fullName == 'Diego Vargas').program,
-  //         supervisor: Person(
-  //           firstName: 'Mathilde',
-  //           middleName: null,
-  //           lastName: 'Delaume',
-  //           dateBirth: null,
-  //           phone: null,
-  //           address: null,
-  //           email: '',
-  //         ),
-  //         dates: period,
-  //         weeklySchedules: [
-  //           WeeklySchedule(
-  //             schedule: {
-  //               Day.monday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //               Day.tuesday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //               Day.wednesday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //               Day.thursday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //               Day.friday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //             },
-  //             period: period,
-  //           ),
-  //         ],
-  //         transportations: [],
-  //         visitFrequencies: 'Une visite par semaine',
-  //         expectedDuration: 135,
-  //         formVersion: InternshipContract.currentVersion,
-  //       ),
-  //     ],
-  //     skillEvaluations: [],
-  //     attitudeEvaluations: [],
-  //     enterpriseEvaluations: [],
-  //     sstEvaluations: [],
-  //     teacherNotes: '',
-  //   ),
-  // );
+  startingPeriod = DateTime.now();
+  period = time_utils.DateTimeRange(
+    start: startingPeriod,
+    end: startingPeriod.add(Duration(days: 120)),
+  );
+  internships.add(
+    Internship(
+      schoolBoardId: schoolBoardId,
+      studentId: students.firstWhere((e) => e.fullName == 'Diego Vargas').id,
+      signatoryTeacherId: teacherB1Id,
+      extraSupervisingTeacherIds: [teacherB1Id],
+      enterpriseId: enterprises.firstWhere((e) => e.name == 'Metro Gagnon').id,
+      achievedDuration: -1,
+      endDate: DateTime(0),
+      contracts: [
+        InternshipContract(
+          date: DateTime.now(),
+          jobId: enterprises
+              .firstWhere((e) => e.name == 'Metro Gagnon')
+              .jobs[1]
+              .id,
+          extraSpecializationIds: [],
+          program:
+              students.firstWhere((e) => e.fullName == 'Diego Vargas').program,
+          supervisor: Person(
+            firstName: 'Mathilde',
+            middleName: null,
+            lastName: 'Delaume',
+            dateBirth: null,
+            phone: null,
+            address: null,
+            email: '',
+          ),
+          dates: period,
+          weeklySchedules: [
+            WeeklySchedule(
+              schedule: {
+                Day.monday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.tuesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.wednesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.thursday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.friday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+              },
+              period: period,
+            ),
+          ],
+          transportations: [],
+          visitFrequencies: 'Une visite par semaine',
+          expectedDuration: 135,
+          formVersion: InternshipContract.currentVersion,
+        ),
+      ],
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      sstEvaluations: [],
+      teacherNotes: '',
+    ),
+  );
 
-  // startingPeriod = DateTime.now().subtract(Duration(days: 30));
-  // period = time_utils.DateTimeRange(
-  //   start: startingPeriod,
-  //   end: startingPeriod.add(Duration(days: 180)),
-  // );
-  // internships.add(
-  //   Internship(
-  //     schoolBoardId: schoolBoardId,
-  //     studentId: students.firstWhere((e) => e.fullName == 'Vanessa Monette').id,
-  //     signatoryTeacherId: teacherA1Id,
-  //     extraSupervisingTeacherIds: [],
-  //     enterpriseId: enterprises.firstWhere((e) => e.name == 'Jean Coutu').id,
-  //     endDate: period.end,
-  //     achievedDuration: 100,
-  //     contracts: [
-  //       InternshipContract(
-  //           date: DateTime.now(),
-  //           jobId: enterprises
-  //               .firstWhere((e) => e.name == 'Jean Coutu')
-  //               .jobs[0]
-  //               .id,
-  //           extraSpecializationIds: [],
-  //           program: students
-  //               .firstWhere((e) => e.fullName == 'Vanessa Monette')
-  //               .program,
-  //           supervisor: Person(
-  //             firstName: 'Francis',
-  //             middleName: null,
-  //             lastName: 'Beaudet',
-  //             dateBirth: null,
-  //             phone: null,
-  //             address: null,
-  //             email: '',
-  //           ),
-  //           dates: period,
-  //           weeklySchedules: [
-  //             WeeklySchedule(
-  //               schedule: {
-  //                 Day.monday: DailySchedule(
-  //                   blocks: [
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                     ),
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                     ),
-  //                   ],
-  //                 ),
-  //                 Day.tuesday: DailySchedule(
-  //                   blocks: [
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                     ),
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               },
-  //               period: period,
-  //             ),
-  //           ],
-  //           transportations:
-  //               [Transportation.walk].map((e) => e.toString()).toList(),
-  //           visitFrequencies: 'Une visite par semaine',
-  //           expectedDuration: 135,
-  //           formVersion: InternshipContract.currentVersion),
-  //     ],
-  //     skillEvaluations: [],
-  //     attitudeEvaluations: [],
-  //     enterpriseEvaluations: [],
-  //     sstEvaluations: [
-  //       SstEvaluation(
-  //         presentAtEvaluation: ['Responsable en milieu de stage'],
-  //         questions: {
-  //           'Q1': ['Oui'],
-  //           'Q1+t': ['Plusieurs fois par jour, surtout des pots de fleurs.'],
-  //           'Q3': ['Un diable'],
-  //           'Q5': ['Un couteau', 'Des ciseaux', 'Un sécateur'],
-  //           'Q7': ['Des pesticides', 'Engrais'],
-  //           'Q12': ['Bruyant'],
-  //           'Q15': ['Non'],
-  //         },
-  //       )
-  //     ],
-  //     teacherNotes: '',
-  //   ),
-  // );
+  startingPeriod = DateTime.now().subtract(Duration(days: 30));
+  period = time_utils.DateTimeRange(
+    start: startingPeriod,
+    end: startingPeriod.add(Duration(days: 180)),
+  );
+  internships.add(
+    Internship(
+      schoolBoardId: schoolBoardId,
+      studentId: students.firstWhere((e) => e.fullName == 'Vanessa Monette').id,
+      signatoryTeacherId: teacherA1Id,
+      extraSupervisingTeacherIds: [],
+      enterpriseId: enterprises.firstWhere((e) => e.name == 'Jean Coutu').id,
+      endDate: period.end,
+      achievedDuration: 100,
+      contracts: [
+        InternshipContract(
+            date: DateTime.now(),
+            jobId: enterprises
+                .firstWhere((e) => e.name == 'Jean Coutu')
+                .jobs[0]
+                .id,
+            extraSpecializationIds: [],
+            program: students
+                .firstWhere((e) => e.fullName == 'Vanessa Monette')
+                .program,
+            supervisor: Person(
+              firstName: 'Francis',
+              middleName: null,
+              lastName: 'Beaudet',
+              dateBirth: null,
+              phone: null,
+              address: null,
+              email: '',
+            ),
+            dates: period,
+            weeklySchedules: [
+              WeeklySchedule(
+                schedule: {
+                  Day.monday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                  Day.tuesday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                },
+                period: period,
+              ),
+            ],
+            transportations:
+                [Transportation.walk].map((e) => e.toString()).toList(),
+            visitFrequencies: 'Une visite par semaine',
+            expectedDuration: 135,
+            formVersion: InternshipContract.currentVersion),
+      ],
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      sstEvaluations: [
+        SstEvaluation(
+          presentAtEvaluation: ['Responsable en milieu de stage'],
+          questions: {
+            'Q1': ['Oui'],
+            'Q1+t': ['Plusieurs fois par jour, surtout des pots de fleurs.'],
+            'Q3': ['Un diable'],
+            'Q5': ['Un couteau', 'Des ciseaux', 'Un sécateur'],
+            'Q7': ['Des pesticides', 'Engrais'],
+            'Q12': ['Bruyant'],
+            'Q15': ['Non'],
+          },
+        )
+      ],
+      teacherNotes: '',
+    ),
+  );
 
-  // startingPeriod = DateTime.now().subtract(Duration(days: 30));
-  // period = time_utils.DateTimeRange(
-  //   start: startingPeriod,
-  //   end: startingPeriod.add(Duration(days: 180)),
-  // );
-  // internships.add(
-  //   Internship(
-  //     schoolBoardId: schoolBoardId,
-  //     studentId: students.firstWhere((e) => e.fullName == 'Vanessa Monette').id,
-  //     signatoryTeacherId: teacherA1Id,
-  //     extraSupervisingTeacherIds: [],
-  //     enterpriseId: enterprises.firstWhere((e) => e.name == 'Pharmaprix').id,
-  //     endDate: period.end,
-  //     achievedDuration: 100,
-  //     contracts: [
-  //       InternshipContract(
-  //         date: DateTime.now(),
-  //         jobId:
-  //             enterprises.firstWhere((e) => e.name == 'Pharmaprix').jobs[0].id,
-  //         extraSpecializationIds: [],
-  //         program: students
-  //             .firstWhere((e) => e.fullName == 'Vanessa Monette')
-  //             .program,
-  //         supervisor: Person(
-  //           firstName: 'Thierry',
-  //           middleName: null,
-  //           lastName: 'Joly',
-  //           dateBirth: null,
-  //           phone: null,
-  //           address: null,
-  //           email: '',
-  //         ),
-  //         dates: period,
-  //         weeklySchedules: [
-  //           WeeklySchedule(
-  //             schedule: {
-  //               Day.monday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //               Day.tuesday: DailySchedule(
-  //                 blocks: [
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                   ),
-  //                   TimeBlock(
-  //                     start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                     end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                   ),
-  //                 ],
-  //               ),
-  //             },
-  //             period: period,
-  //           ),
-  //         ],
-  //         transportations: ['Vélo'].map((e) => e.toString()).toList(),
-  //         visitFrequencies: 'Tous les jours',
-  //         expectedDuration: 135,
-  //         formVersion: InternshipContract.currentVersion,
-  //       ),
-  //     ],
-  //     skillEvaluations: [],
-  //     attitudeEvaluations: [],
-  //     enterpriseEvaluations: [],
-  //     sstEvaluations: [],
-  //     teacherNotes: '',
-  //   ),
-  // );
+  startingPeriod = DateTime.now().subtract(Duration(days: 30));
+  period = time_utils.DateTimeRange(
+    start: startingPeriod,
+    end: startingPeriod.add(Duration(days: 180)),
+  );
+  internships.add(
+    Internship(
+      schoolBoardId: schoolBoardId,
+      studentId: students.firstWhere((e) => e.fullName == 'Vanessa Monette').id,
+      signatoryTeacherId: teacherA1Id,
+      extraSupervisingTeacherIds: [],
+      enterpriseId: enterprises.firstWhere((e) => e.name == 'Pharmaprix').id,
+      endDate: period.end,
+      achievedDuration: 100,
+      contracts: [
+        InternshipContract(
+          date: DateTime.now(),
+          jobId:
+              enterprises.firstWhere((e) => e.name == 'Pharmaprix').jobs[0].id,
+          extraSpecializationIds: [],
+          program: students
+              .firstWhere((e) => e.fullName == 'Vanessa Monette')
+              .program,
+          supervisor: Person(
+            firstName: 'Thierry',
+            middleName: null,
+            lastName: 'Joly',
+            dateBirth: null,
+            phone: null,
+            address: null,
+            email: '',
+          ),
+          dates: period,
+          weeklySchedules: [
+            WeeklySchedule(
+              schedule: {
+                Day.monday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+                Day.tuesday: DailySchedule(
+                  blocks: [
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                    ),
+                    TimeBlock(
+                      start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                      end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                    ),
+                  ],
+                ),
+              },
+              period: period,
+            ),
+          ],
+          transportations: ['Vélo'].map((e) => e.toString()).toList(),
+          visitFrequencies: 'Tous les jours',
+          expectedDuration: 135,
+          formVersion: InternshipContract.currentVersion,
+        ),
+      ],
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      sstEvaluations: [],
+      teacherNotes: '',
+    ),
+  );
 
-  // startingPeriod = DateTime.now().subtract(Duration(days: 30));
-  // period = time_utils.DateTimeRange(
-  //   start: startingPeriod,
-  //   end: startingPeriod.add(Duration(days: 180)),
-  // );
-  // internships.add(
-  //   Internship(
-  //     schoolBoardId: schoolBoardId,
-  //     studentId:
-  //         students.firstWhere((e) => e.fullName == 'Sébastien Desmarais').id,
-  //     signatoryTeacherId: teacherC1Id,
-  //     extraSupervisingTeacherIds: [],
-  //     enterpriseId: enterprises.firstWhere((e) => e.name == 'Subway').id,
-  //     endDate: period.end,
-  //     achievedDuration: 100,
-  //     contracts: [
-  //       InternshipContract(
-  //           date: DateTime.now(),
-  //           jobId: enterprises.firstWhere((e) => e.name == 'Subway').jobs[0].id,
-  //           extraSpecializationIds: [],
-  //           program: students
-  //               .firstWhere((e) => e.fullName == 'Sébastien Desmarais')
-  //               .program,
-  //           supervisor: Person(
-  //             firstName: 'Carlos',
-  //             middleName: null,
-  //             lastName: 'Rodriguez',
-  //             dateBirth: null,
-  //             phone: PhoneNumber.fromString('514 555 3333'),
-  //             address: null,
-  //             email: 'c.rodriguez@email.com',
-  //           ),
-  //           dates: period,
-  //           weeklySchedules: [
-  //             WeeklySchedule(
-  //               schedule: {
-  //                 Day.monday: DailySchedule(
-  //                   blocks: [
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                     ),
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                     ),
-  //                   ],
-  //                 ),
-  //                 Day.tuesday: DailySchedule(
-  //                   blocks: [
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 12, minute: 00),
-  //                     ),
-  //                     TimeBlock(
-  //                       start: const time_utils.TimeOfDay(hour: 13, minute: 00),
-  //                       end: const time_utils.TimeOfDay(hour: 15, minute: 00),
-  //                     ),
-  //                   ],
-  //                 ),
-  //               },
-  //               period: period,
-  //             ),
-  //           ],
-  //           transportations:
-  //               [Transportation.walk].map((e) => e.toString()).toList(),
-  //           visitFrequencies: 'Tous les jours',
-  //           expectedDuration: 135,
-  //           formVersion: InternshipContract.currentVersion),
-  //     ],
-  //     skillEvaluations: [],
-  //     attitudeEvaluations: [],
-  //     enterpriseEvaluations: [],
-  //     sstEvaluations: [],
-  //     teacherNotes: '',
-  //   ),
-  // );
-  // await _waitForDatabaseUpdate(internships, 10);
+  startingPeriod = DateTime.now().subtract(Duration(days: 30));
+  period = time_utils.DateTimeRange(
+    start: startingPeriod,
+    end: startingPeriod.add(Duration(days: 180)),
+  );
+  internships.add(
+    Internship(
+      schoolBoardId: schoolBoardId,
+      studentId:
+          students.firstWhere((e) => e.fullName == 'Sébastien Desmarais').id,
+      signatoryTeacherId: teacherC1Id,
+      extraSupervisingTeacherIds: [],
+      enterpriseId: enterprises.firstWhere((e) => e.name == 'Subway').id,
+      endDate: period.end,
+      achievedDuration: 100,
+      contracts: [
+        InternshipContract(
+            date: DateTime.now(),
+            jobId: enterprises.firstWhere((e) => e.name == 'Subway').jobs[0].id,
+            extraSpecializationIds: [],
+            program: students
+                .firstWhere((e) => e.fullName == 'Sébastien Desmarais')
+                .program,
+            supervisor: Person(
+              firstName: 'Carlos',
+              middleName: null,
+              lastName: 'Rodriguez',
+              dateBirth: null,
+              phone: PhoneNumber.fromString('514 555 3333'),
+              address: null,
+              email: 'c.rodriguez@email.com',
+            ),
+            dates: period,
+            weeklySchedules: [
+              WeeklySchedule(
+                schedule: {
+                  Day.monday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                  Day.tuesday: DailySchedule(
+                    blocks: [
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 9, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 12, minute: 00),
+                      ),
+                      TimeBlock(
+                        start: const time_utils.TimeOfDay(hour: 13, minute: 00),
+                        end: const time_utils.TimeOfDay(hour: 15, minute: 00),
+                      ),
+                    ],
+                  ),
+                },
+                period: period,
+              ),
+            ],
+            transportations:
+                [Transportation.walk].map((e) => e.toString()).toList(),
+            visitFrequencies: 'Tous les jours',
+            expectedDuration: 135,
+            formVersion: InternshipContract.currentVersion),
+      ],
+      skillEvaluations: [],
+      attitudeEvaluations: [],
+      enterpriseEvaluations: [],
+      sstEvaluations: [],
+      teacherNotes: '',
+    ),
+  );
+  await _waitForDatabaseUpdate(internships, 10);
 
-  // // Set the visiting priorities of the internships for teacherA1Id
-  // final currentTeacher = teachers.firstWhere((t) => t.id == teacherA1Id);
-  // var studentId = students.firstWhere((e) => e.fullName == 'Cedric Masson').id;
-  // var internshipId = internships
-  //     .firstWhere((internship) => internship.studentId == studentId)
-  //     .id;
-  // currentTeacher.setVisitingPriority(internshipId, VisitingPriority.values[2]);
+  // Set the visiting priorities of the internships for teacherA1Id
+  final currentTeacher = teachers.firstWhere((t) => t.id == teacherA1Id);
+  var studentId = students.firstWhere((e) => e.fullName == 'Cedric Masson').id;
+  var internshipId = internships
+      .firstWhere((internship) => internship.studentId == studentId)
+      .id;
+  currentTeacher.setVisitingPriority(internshipId, VisitingPriority.values[2]);
 
-  // studentId = students.firstWhere((e) => e.fullName == 'Thomas Caron').id;
-  // internshipId = internships
-  //     .firstWhere((internship) => internship.studentId == studentId)
-  //     .id;
-  // currentTeacher.setVisitingPriority(internshipId, VisitingPriority.values[1]);
+  studentId = students.firstWhere((e) => e.fullName == 'Thomas Caron').id;
+  internshipId = internships
+      .firstWhere((internship) => internship.studentId == studentId)
+      .id;
+  currentTeacher.setVisitingPriority(internshipId, VisitingPriority.values[1]);
 
-  // await teachers.replaceWithConfirmation(currentTeacher);
-  await _waitForDatabaseUpdate(internships, 1);
+  await teachers.replaceWithConfirmation(currentTeacher);
 }
 
 Future<void> _waitForDatabaseUpdate(

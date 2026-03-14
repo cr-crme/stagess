@@ -111,40 +111,59 @@ class VisaFormController {
     _attestationsAndMentionsController.clear();
     _sstTrainingsController.clear();
 
-    for (final training in SstTraining.availableTrainings.keys) {
-      _sstTrainingsController
-          .add(SstTraining(text: training, isSelected: false, hide: true));
+    for (final trainingId in SstTraining.availableTrainings.keys) {
+      _sstTrainingsController.add(SstTraining(
+          index: int.parse(trainingId),
+          trainingId: trainingId,
+          isSelected: false,
+          isHidden: true));
     }
 
     _isGatewayToFmsAvailable = false;
 
     _sstCertificateController.clear();
-    _sstCertificateController.add(
-        Certificate(certificateType: CertificateType.none, isSelected: false));
-    _sstCertificateController.add(
-        Certificate(certificateType: CertificateType.fpt, isSelected: false));
-    for (final specialization in _specializations) {
-      _sstCertificateController.add(Certificate(
+    _sstCertificateController.add(Certificate(
+        index: 0, certificateType: CertificateType.none, isSelected: false));
+    _sstCertificateController.add(Certificate(
+        index: 1, certificateType: CertificateType.fpt, isSelected: false));
+    for (final entries in _specializations.asMap().entries) {
+      final index = entries.key + 2; // because of the previous 2
+      final specialization = entries.value;
+
+      _sstCertificateController.add(
+        Certificate(
+          index: index,
           certificateType: CertificateType.fms,
           isSelected: false,
-          specializationId: specialization.id));
+          specializationId: specialization.id,
+        ),
+      );
     }
 
     _specificSkillsController.clear();
-    for (final skill
-        in InternshipsHelpers.filterAcquiredSkills(skills: _evaluatedSkills)
+    final acquiredSkills =
+        InternshipsHelpers.filterAcquiredSkills(skills: _evaluatedSkills)
             .values
-            .expand((e) => e)) {
-      _specificSkillsController
-          .add(Skill(text: skill.specializationId, isSelected: false));
+            .expand((e) => e)
+            .toList();
+    for (final entry in acquiredSkills.asMap().entries) {
+      final index = entry.key;
+      final skill = entry.value;
+
+      _specificSkillsController.add(Skill(
+          index: index,
+          specializationId: skill.specializationId,
+          isSelected: false));
     }
     _referenceController.text = '';
 
     _forcesController.clear();
     _challengesController.clear();
-    for (final attitude in Attitude.availableItems.keys) {
-      _forcesController.add(Attitude(text: attitude, isSelected: false));
-      _challengesController.add(Attitude(text: attitude, isSelected: false));
+    for (final key in Attitude.availableItems.keys) {
+      _forcesController.add(
+          Attitude(index: int.parse(key), attitudeId: key, isSelected: false));
+      _challengesController.add(
+          Attitude(index: int.parse(key), attitudeId: key, isSelected: false));
     }
 
     _successConditionsController.text = '';
@@ -163,27 +182,40 @@ class VisaFormController {
       return;
     }
 
-    for (final item in visa.form.experiencesAndAptitudes) {
+    for (final entry in visa.form.experiencesAndAptitudes.asMap().entries) {
+      final index = entry.key;
+      final item = entry.value;
+
       _experiencesAndAptitudesController.add(
-        ExperiencesAndAptitudes(text: item.text, isSelected: item.isSelected),
+        ExperiencesAndAptitudes(
+            index: index, text: item.text, isSelected: item.isSelected),
       );
     }
-    for (final item in visa.form.attestationsAndMentions) {
+    for (final entry in visa.form.attestationsAndMentions.asMap().entries) {
+      final index = entry.key;
+      final item = entry.value;
+
       _attestationsAndMentionsController.add(
-        AttestationsAndMentions(text: item.text, isSelected: item.isSelected),
+        AttestationsAndMentions(
+            index: index, text: item.text, isSelected: item.isSelected),
       );
     }
 
     for (int i = 0; i < visa.form.sstTrainings.length; i++) {
-      final training = visa.form.sstTrainings[i];
-      if (!SstTraining.availableTrainings.containsKey(training.text)) {
+      final previousSstTrainings = visa.form.sstTrainings[i];
+
+      final index = _sstTrainingsController.options.indexWhere((e) =>
+          (e as SstTraining).trainingId == previousSstTrainings.trainingId);
+      if (index < 0) {
         throw Exception(
-            'The training id "${training.text}" is not in the list of available trainings. '
+            'The training id "${previousSstTrainings.trainingId}" is not in the list of available trainings. '
             'Please update the list of available trainings in SstTraining.availableTrainings.');
       }
       _sstTrainingsController.updateOption(
-        i,
-        training.copyWith(isSelected: training.isSelected, hide: training.hide),
+        index,
+        (_sstTrainingsController.options[index] as SstTraining).copyWith(
+            isSelected: previousSstTrainings.isSelected,
+            isHidden: previousSstTrainings.isHidden),
       );
     }
 
@@ -206,29 +238,46 @@ class VisaFormController {
     for (final item in visa.form.skills) {
       final index = _specificSkillsController.options
           .indexWhere((e) => e.text == item.text);
-      // If a skill was removed
-      if (index < 0) continue;
-
-      _specificSkillsController.updateOption(
-          index, item.copyWith(isSelected: item.isSelected));
+      if (index < 0) {
+        _specificSkillsController.add(item);
+      } else {
+        _specificSkillsController.updateOption(
+            index, item.copyWith(isSelected: item.isSelected));
+      }
     }
     _referenceController.text = visa.form.reference;
 
-    for (final item in visa.form.forces) {
-      final index =
-          _forcesController.options.indexWhere((e) => e.text == item.text);
-      if (index < 0) continue;
+    for (int i = 0; i < visa.form.forces.length; i++) {
+      final previousForces = visa.form.forces[i];
 
+      final index = _forcesController.options.indexWhere(
+          (e) => (e as Attitude).attitudeId == previousForces.attitudeId);
+      if (index < 0) {
+        throw Exception(
+            'The attitude id "${previousForces.attitudeId}" is not in the list of available items. '
+            'Please update the list of available attitudes in Attitude.availableItems.');
+      }
       _forcesController.updateOption(
-          index, item.copyWith(isSelected: item.isSelected));
+        index,
+        (_forcesController.options[index] as Attitude)
+            .copyWith(isSelected: previousForces.isSelected),
+      );
     }
-    for (final item in visa.form.challenges) {
-      final index =
-          _challengesController.options.indexWhere((e) => e.text == item.text);
-      if (index < 0) continue;
+    for (int i = 0; i < visa.form.challenges.length; i++) {
+      final previousChallenges = visa.form.challenges[i];
 
+      final index = _challengesController.options.indexWhere(
+          (e) => (e as Attitude).attitudeId == previousChallenges.attitudeId);
+      if (index < 0) {
+        throw Exception(
+            'The attitude id "${previousChallenges.attitudeId}" is not in the list of available items. '
+            'Please update the list of available attitudes in Attitude.availableItems.');
+      }
       _challengesController.updateOption(
-          index, item.copyWith(isSelected: item.isSelected));
+        index,
+        (_challengesController.options[index] as Attitude)
+            .copyWith(isSelected: previousChallenges.isSelected),
+      );
     }
 
     _successConditionsController.text = visa.form.successConditions;
@@ -236,7 +285,8 @@ class VisaFormController {
 
   StudentVisa toVisa() {
     return StudentVisa(
-      form: VisaEvaluation(
+      date: DateTime.now(),
+      form: VisaForm(
         experiencesAndAptitudes: _experiencesAndAptitudesController.options
             .cast<ExperiencesAndAptitudes>()
             .toList(),
@@ -473,7 +523,8 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
             SelectableTextBoxes(
               controller: controller._experiencesAndAptitudesController,
               maxSelectedOptions: 8,
-              newItemBuilder: (_) => ExperiencesAndAptitudes(),
+              newItemBuilder: (index) => ExperiencesAndAptitudes(
+                  index: index, text: '', isSelected: false),
             ),
           ],
         ),
@@ -506,7 +557,8 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
             SelectableTextBoxes(
               controller: controller._attestationsAndMentionsController,
               maxSelectedOptions: 5,
-              newItemBuilder: (_) => AttestationsAndMentions(),
+              newItemBuilder: (index) => AttestationsAndMentions(
+                  index: index, text: '', isSelected: false),
             ),
           ],
         ),
@@ -546,7 +598,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
               ...controller._sstTrainingsController.options
                   .asMap()
                   .entries
-                  .where((element) => !(element.value as SstTraining).hide)
+                  .where((element) => !(element.value as SstTraining).isHidden)
                   .map((entry) {
                 final index = entry.key;
                 final item = entry.value as SstTraining;
@@ -563,7 +615,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
                   },
                   value: item.isSelected,
                   title: Text(
-                      SstTraining.availableTrainings[item.text] ??
+                      SstTraining.availableTrainings[item.trainingId] ??
                           'Entrainement non trouvé',
                       style: Theme.of(context).textTheme.bodyMedium),
                 );
@@ -602,14 +654,14 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
                       onChanged: (selected) {
                         controller._sstTrainingsController.updateOption(
                           index,
-                          item.copyWith(hide: !item.hide),
+                          item.copyWith(isHidden: !item.isHidden),
                         );
                         setState(() {});
                       },
                       controlAffinity: ListTileControlAffinity.leading,
-                      value: !item.hide,
+                      value: !item.isHidden,
                       title: Text(
-                          SstTraining.availableTrainings[item.text] ??
+                          SstTraining.availableTrainings[item.trainingId] ??
                               'Entrainement non trouvé',
                           style: Theme.of(context).textTheme.bodyMedium),
                     );
@@ -706,8 +758,8 @@ class _EmployabilityProfileSection extends StatelessWidget {
               'Pour les élèves de FMS et de FPT-3, cocher les certificats à afficher dans le VISA',
               style: Theme.of(context).textTheme.titleSmall),
           ...controller._sstCertificateController.options.map(
-            (e) {
-              final item = e as Certificate;
+            (entry) {
+              final item = entry as Certificate;
               final job = job_service.ActivitySectorsService.allSpecializations
                   .firstWhereOrNull((e) => e.id == item.specializationId);
 
@@ -733,7 +785,7 @@ class _EmployabilityProfileSection extends StatelessWidget {
                       controller._sstCertificateController.options
                           .indexOf(item),
                       item.copyWith(
-                          year: item.year < 0 ? DateTime.now().year : item.year,
+                          year: item.year ?? DateTime.now().year,
                           isSelected: value));
                   setState(() {});
                 },
@@ -757,9 +809,8 @@ class _EmployabilityProfileSection extends StatelessWidget {
                             Text('Année certification\u00a0: ${item.year}'),
                             IconButton(
                                 onPressed: () async {
-                                  final initialDate = DateTime(item.year > 0
-                                      ? item.year
-                                      : DateTime.now().year);
+                                  final initialDate = DateTime(
+                                      item.year ?? DateTime.now().year);
                                   final firstDate =
                                       DateTime(DateTime.now().year - 5);
                                   final lastDate =
@@ -824,8 +875,8 @@ class _EmployabilityProfileSection extends StatelessWidget {
                       Text(
                           'Cocher les compétences à afficher dans le VISA en PDF dans la liste des compétences réussies.'),
                       ...controller._specificSkillsController.options.map(
-                        (item) {
-                          final specializationId = item.text;
+                        (e) {
+                          final item = e as Skill;
 
                           return CheckboxListTile(
                             value: item.isSelected,
@@ -840,8 +891,8 @@ class _EmployabilityProfileSection extends StatelessWidget {
                             title: Text(
                                 job_service.ActivitySectorsService
                                         .allSpecializations
-                                        .firstWhereOrNull(
-                                            (e) => e.id == specializationId)
+                                        .firstWhereOrNull((e) =>
+                                            e.id == item.specializationId)
                                         ?.idWithName ??
                                     'Compétence non trouvée',
                                 style: Theme.of(context).textTheme.bodyMedium),
@@ -916,6 +967,7 @@ class _ForcesAndChallengesSection extends StatelessWidget {
           controller: controller._challengesController,
           maxSelectedOptions: 2,
         ),
+        SizedBox(height: 16.0),
         _buildSuccessConditions(context),
       ],
     );
@@ -943,8 +995,8 @@ class _ForcesAndChallengesSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(definition),
-                  ...controller.options.map((item) {
-                    final attitudeId = item.text;
+                  ...controller.options.map((e) {
+                    final item = e as Attitude;
 
                     return CheckboxListTile(
                       value: item.isSelected,
@@ -958,7 +1010,7 @@ class _ForcesAndChallengesSection extends StatelessWidget {
                           controller.selectedCount < maxSelectedOptions,
                       controlAffinity: ListTileControlAffinity.leading,
                       title: Text(
-                          Attitude.availableItems[attitudeId] ??
+                          Attitude.availableItems[item.attitudeId] ??
                               'Attitude non trouvée',
                           style: Theme.of(context).textTheme.bodyMedium),
                     );

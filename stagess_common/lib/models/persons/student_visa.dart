@@ -8,16 +8,18 @@ export 'package:stagess_common/models/generic/selectable_text_items.dart';
 class ExperiencesAndAptitudes extends SelectableTextItem {
   ExperiencesAndAptitudes({
     super.id,
-    super.text,
-    super.isSelected,
+    required super.index,
+    required super.text,
+    required super.isSelected,
   });
+
   ExperiencesAndAptitudes.fromSerialized(super.map) : super.fromSerialized();
 
-  static FetchableFields get fetchableFields => FetchableFields.reference({
-        'id': FetchableFields.mandatory,
-        'text': FetchableFields.optional,
-        'is_selected': FetchableFields.optional,
-      });
+  @override
+  Map<String, dynamic> serializedMap() => super.serializedMap()..addAll({});
+
+  static FetchableFields get fetchableFields =>
+      SelectableTextItem.fetchableFields..addAll(FetchableFields.reference({}));
 
   @override
   ExperiencesAndAptitudes copyWith({
@@ -26,6 +28,7 @@ class ExperiencesAndAptitudes extends SelectableTextItem {
   }) =>
       ExperiencesAndAptitudes(
         id: id,
+        index: index,
         text: text ?? this.text,
         isSelected: isSelected ?? this.isSelected,
       );
@@ -34,16 +37,18 @@ class ExperiencesAndAptitudes extends SelectableTextItem {
 class AttestationsAndMentions extends SelectableTextItem {
   AttestationsAndMentions({
     super.id,
-    super.text,
-    super.isSelected,
+    required super.index,
+    required super.text,
+    required super.isSelected,
   });
+
   AttestationsAndMentions.fromSerialized(super.map) : super.fromSerialized();
 
-  static FetchableFields get fetchableFields => FetchableFields.reference({
-        'id': FetchableFields.mandatory,
-        'text': FetchableFields.optional,
-        'is_selected': FetchableFields.optional,
-      });
+  @override
+  Map<String, dynamic> serializedMap() => super.serializedMap()..addAll({});
+
+  static FetchableFields get fetchableFields =>
+      SelectableTextItem.fetchableFields..addAll(FetchableFields.reference({}));
 
   @override
   AttestationsAndMentions copyWith({
@@ -52,23 +57,38 @@ class AttestationsAndMentions extends SelectableTextItem {
   }) =>
       AttestationsAndMentions(
         id: id,
+        index: index,
         text: text ?? this.text,
         isSelected: isSelected ?? this.isSelected,
       );
 }
 
 class SstTraining extends SelectableTextItem {
-  bool hide;
+  bool isHidden;
 
   SstTraining({
     super.id,
-    required super.text,
+    required super.index,
+    required String trainingId,
     required super.isSelected,
-    required this.hide,
-  });
+    required this.isHidden,
+  }) : super(text: trainingId);
+
   SstTraining.fromSerialized(super.map)
-      : hide = map?['hide'] ?? false,
+      : isHidden = BoolExt.from(map?['is_hidden']) ?? false,
         super.fromSerialized();
+
+  @override
+  Map<String, dynamic> serializedMap() => super.serializedMap()
+    ..addAll({
+      'is_hidden': isHidden.serialize(),
+    });
+
+  static FetchableFields get fetchableFields =>
+      SelectableTextItem.fetchableFields
+        ..addAll(FetchableFields.reference({
+          'hidden': FetchableFields.optional,
+        }));
 
   static Map<String, String> get availableTrainings => {
         '0001': 'Manutention sécuritaire',
@@ -82,26 +102,22 @@ class SstTraining extends SelectableTextItem {
         '0007': 'Utilisation d\'échelles ou d\'escabeaux',
       };
 
-  static FetchableFields get fetchableFields => FetchableFields.reference({
-        'id': FetchableFields.mandatory,
-        'text': FetchableFields.optional,
-        'is_selected': FetchableFields.optional,
-        'hide': FetchableFields.optional,
-      });
-
   @override
   SstTraining copyWith({
     String? text,
     bool? isSelected,
-    bool? hide,
+    bool? isHidden,
   }) {
     return SstTraining(
       id: id,
-      text: text ?? this.text,
+      index: index,
+      trainingId: text ?? this.text,
       isSelected: isSelected ?? this.isSelected,
-      hide: hide ?? this.hide,
+      isHidden: isHidden ?? this.isHidden,
     );
   }
+
+  String get trainingId => text;
 }
 
 enum CertificateType {
@@ -121,27 +137,36 @@ enum CertificateType {
 }
 
 class Certificate extends SelectableTextItem {
-  final int year;
+  final int? year;
   final String? specializationId;
 
   Certificate({
     super.id,
+    required super.index,
     required CertificateType certificateType,
     required super.isSelected,
-    this.year = -1,
+    this.year,
     this.specializationId,
   }) : super(text: certificateType.name);
+
   Certificate.fromSerialized(super.map)
-      : year = map?['year'] ?? -1,
-        specializationId = map?['specialization_id'],
+      : year = IntExt.from(map?['year']),
+        specializationId = StringExt.from(map?['specialization_id']),
         super.fromSerialized();
 
-  static FetchableFields get fetchableFields => FetchableFields.reference({
-        'id': FetchableFields.mandatory,
-        'text': FetchableFields.optional,
-        'year': FetchableFields.optional,
-        'specialization_id': FetchableFields.optional,
-      });
+  @override
+  Map<String, dynamic> serializedMap() => super.serializedMap()
+    ..addAll({
+      'year': year?.serialize(),
+      'specialization_id': specializationId?.serialize(),
+    });
+
+  static FetchableFields get fetchableFields =>
+      SelectableTextItem.fetchableFields
+        ..addAll(FetchableFields.reference({
+          'year': FetchableFields.optional,
+          'specialization_id': FetchableFields.optional,
+        }));
 
   @override
   Certificate copyWith({
@@ -157,6 +182,7 @@ class Certificate extends SelectableTextItem {
     }
     return Certificate(
       id: id,
+      index: index,
       certificateType:
           certificateType ?? CertificateType.fromString(text ?? this.text),
       isSelected: isSelected ?? this.isSelected,
@@ -171,16 +197,18 @@ class Certificate extends SelectableTextItem {
 class Skill extends SelectableTextItem {
   Skill({
     super.id,
-    super.text,
+    required super.index,
+    required String specializationId,
     super.isSelected,
-  });
+  }) : super(text: specializationId);
+
   Skill.fromSerialized(super.map) : super.fromSerialized();
 
-  static FetchableFields get fetchableFields => FetchableFields.reference({
-        'id': FetchableFields.mandatory,
-        'text': FetchableFields.optional,
-        'is_selected': FetchableFields.optional,
-      });
+  @override
+  Map<String, dynamic> serializedMap() => super.serializedMap()..addAll({});
+
+  static FetchableFields get fetchableFields =>
+      SelectableTextItem.fetchableFields..addAll(FetchableFields.reference({}));
 
   @override
   Skill copyWith({
@@ -189,24 +217,29 @@ class Skill extends SelectableTextItem {
   }) =>
       Skill(
         id: id,
-        text: text ?? this.text,
+        index: index,
+        specializationId: text ?? this.text,
         isSelected: isSelected ?? this.isSelected,
       );
+
+  String get specializationId => text;
 }
 
 class Attitude extends SelectableTextItem {
   Attitude({
     super.id,
-    super.text,
-    super.isSelected,
-  });
+    required super.index,
+    required String attitudeId,
+    required super.isSelected,
+  }) : super(text: attitudeId);
+
   Attitude.fromSerialized(super.map) : super.fromSerialized();
 
-  static FetchableFields get fetchableFields => FetchableFields.reference({
-        'id': FetchableFields.mandatory,
-        'text': FetchableFields.optional,
-        'is_selected': FetchableFields.optional,
-      });
+  @override
+  Map<String, dynamic> serializedMap() => super.serializedMap()..addAll({});
+
+  static FetchableFields get fetchableFields =>
+      SelectableTextItem.fetchableFields..addAll(FetchableFields.reference({}));
 
   static Map<String, String> get availableItems => {
         '0001': 'Ponctualité',
@@ -228,12 +261,15 @@ class Attitude extends SelectableTextItem {
   }) =>
       Attitude(
         id: id,
-        text: text ?? this.text,
+        index: index,
+        attitudeId: text ?? this.text,
         isSelected: isSelected ?? this.isSelected,
       );
+
+  String get attitudeId => text;
 }
 
-class VisaEvaluation extends ItemSerializable {
+class VisaForm extends ItemSerializable {
   final List<ExperiencesAndAptitudes> experiencesAndAptitudes;
   final List<AttestationsAndMentions> attestationsAndMentions;
   final List<SstTraining> sstTrainings;
@@ -248,7 +284,7 @@ class VisaEvaluation extends ItemSerializable {
 
   final String successConditions;
 
-  VisaEvaluation({
+  VisaForm({
     super.id,
     required this.experiencesAndAptitudes,
     required this.attestationsAndMentions,
@@ -260,13 +296,16 @@ class VisaEvaluation extends ItemSerializable {
     required this.forces,
     required this.challenges,
     required this.successConditions,
-  });
-  VisaEvaluation.fromSerialized(super.map)
+  }) {
+    _sortAllByIndices();
+  }
+
+  VisaForm.fromSerialized(super.map)
       : experiencesAndAptitudes = (map?['experiences_and_aptitudes'] as List?)
                 ?.map((e) => ExperiencesAndAptitudes.fromSerialized(e))
                 .toList() ??
             [],
-        attestationsAndMentions = (map?['attestation_and_mentions'] as List?)
+        attestationsAndMentions = (map?['attestations_and_mentions'] as List?)
                 ?.map((e) => AttestationsAndMentions.fromSerialized(e))
                 .toList() ??
             [],
@@ -294,14 +333,26 @@ class VisaEvaluation extends ItemSerializable {
                 .toList() ??
             [],
         successConditions = StringExt.from(map?['success_conditions']) ?? '',
-        super.fromSerialized();
+        super.fromSerialized() {
+    _sortAllByIndices();
+  }
+
+  void _sortAllByIndices() {
+    experiencesAndAptitudes.sort((a, b) => a.index.compareTo(b.index));
+    attestationsAndMentions.sort((a, b) => a.index.compareTo(b.index));
+    sstTrainings.sort((a, b) => a.index.compareTo(b.index));
+    certificates.sort((a, b) => a.index.compareTo(b.index));
+    skills.sort((a, b) => a.index.compareTo(b.index));
+    forces.sort((a, b) => a.index.compareTo(b.index));
+    challenges.sort((a, b) => a.index.compareTo(b.index));
+  }
 
   @override
   Map<String, dynamic> serializedMap() {
     return {
       'id': id,
       'experiences_and_aptitudes': experiencesAndAptitudes.serialize(),
-      'attestation_and_mentions': attestationsAndMentions.serialize(),
+      'attestations_and_mentions': attestationsAndMentions.serialize(),
       'sst_trainings': sstTrainings.serialize(),
       'is_gateway_to_fms_available': isGatewayToFmsAvailable,
       'certificates': certificates.serialize(),
@@ -313,7 +364,7 @@ class VisaEvaluation extends ItemSerializable {
     };
   }
 
-  VisaEvaluation copyWith({
+  VisaForm copyWith({
     List<ExperiencesAndAptitudes>? experiencesAndAptitudes,
     List<AttestationsAndMentions>? attestationsAndMentions,
     List<SstTraining>? sstTrainings,
@@ -325,7 +376,7 @@ class VisaEvaluation extends ItemSerializable {
     List<Attitude>? challenges,
     String? successConditions,
   }) {
-    return VisaEvaluation(
+    return VisaForm(
       id: id,
       experiencesAndAptitudes:
           experiencesAndAptitudes ?? this.experiencesAndAptitudes,
@@ -365,7 +416,7 @@ class VisaEvaluation extends ItemSerializable {
           ..addAll(FetchableFields.reference({
             '*': ExperiencesAndAptitudes.fetchableFields,
           })),
-        'attestation_and_mentions': FetchableFields.mandatory
+        'attestations_and_mentions': FetchableFields.mandatory
           ..addAll(FetchableFields.reference({
             '*': AttestationsAndMentions.fetchableFields,
           })),
@@ -398,39 +449,43 @@ class VisaEvaluation extends ItemSerializable {
 class StudentVisa extends ItemSerializable {
   static const String currentVersion = '1.0.0';
 
-  VisaEvaluation form;
-  String
-      formVersion; // The version of the evaluation form (so data can be parsed properly)
+  DateTime date;
+  VisaForm form;
+  // The version of the evaluation form (so data can be parsed properly)
+  String formVersion;
 
   StudentVisa({
     super.id,
+    required this.date,
     required this.form,
     required this.formVersion,
   });
   StudentVisa.fromSerialized(super.map)
-      : form = VisaEvaluation.fromSerialized(map?['form'] ?? {}),
+      : date = DateTimeExt.from(map?['date']) ?? DateTime(0),
+        form = VisaForm.fromSerialized(map?['form'] ?? {}),
         formVersion = map?['form_version'] ?? currentVersion,
         super.fromSerialized();
 
   @override
   Map<String, dynamic> serializedMap() {
     return {
-      'id': id,
+      'id': id.serialize(),
+      'date': date.serialize(),
       'form': form.serialize(),
-      'form_version': formVersion,
+      'form_version': formVersion.serialize(),
     };
   }
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
+        'date': FetchableFields.mandatory,
         'form': FetchableFields.mandatory
-          ..addAll(
-              FetchableFields.reference({'*': VisaEvaluation.fetchableFields})),
+          ..addAll(FetchableFields.reference({'*': VisaForm.fetchableFields})),
         'form_version': FetchableFields.mandatory,
       });
 
   @override
   String toString() {
-    return 'StudentEvaluationVisa(form: $form.toString())';
+    return 'StudentEvaluationVisa from $date, (form: ${form.toString()})';
   }
 }

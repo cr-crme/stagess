@@ -149,8 +149,8 @@ class WeeklySchedule extends ItemSerializable {
                 Day.values[int.parse(day)], DailySchedule.fromSerialized(e))) ??
             {},
         period = DateTimeRange(
-            start: DateTime.fromMillisecondsSinceEpoch(map?['start'] ?? 0),
-            end: DateTime.fromMillisecondsSinceEpoch(map?['end'] ?? 0)),
+            start:DateTimeExt.from(map?['start']) ?? DateTime(0),
+            end: DateTimeExt.from(map?['end']) ?? DateTime(0),),
         super.fromSerialized();
 
   @override
@@ -158,8 +158,8 @@ class WeeklySchedule extends ItemSerializable {
         'id': id,
         'days': schedule
             .map((day, e) => MapEntry(day.index.toString(), e?.serialize())),
-        'start': period.start.millisecondsSinceEpoch,
-        'end': period.end.millisecondsSinceEpoch,
+        'start': period.start.serialize(),
+        'end': period.end.serialize(),
       };
 
   static FetchableFields get fetchableFields => FetchableFields.reference({

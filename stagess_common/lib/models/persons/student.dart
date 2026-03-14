@@ -95,7 +95,9 @@ class Student extends Person {
     required this.contact,
     required this.contactLink,
     required this.allVisa,
-  }) : photo = photo ?? Random().nextInt(0xFFFFFF).toString();
+  }) : photo = photo ?? Random().nextInt(0xFFFFFF).toString() {
+    _sortAll();
+  }
 
   Student.fromSerialized(super.map)
       : schoolBoardId = StringExt.from(map?['school_board_id']) ?? '-1',
@@ -111,7 +113,9 @@ class Student extends Person {
         allVisa = ListExt.from(map?['all_visa'],
                 deserializer: (map) => StudentVisa.fromSerialized(map)) ??
             [],
-        super.fromSerialized();
+        super.fromSerialized() {
+    _sortAll();
+  }
 
   @override
   Map<String, dynamic> serializedMap() {
@@ -125,7 +129,7 @@ class Student extends Person {
         'group': group.serialize(),
         'contact': contact.serialize(),
         'contact_link': contactLink.serialize(),
-        'all_visa': allVisa.serialize(),
+        'all_visa': allVisa.map((visa) => visa.serialize()).toList(),
       });
   }
 
@@ -140,6 +144,10 @@ class Student extends Person {
       'contact_link': FetchableFields.optional,
       'all_visa': FetchableFields.optional,
     }));
+
+  void _sortAll() {
+    allVisa.sort((a, b) => a.date.compareTo(b.date));
+  }
 
   Student get limitedInfo => Student(
         id: id,

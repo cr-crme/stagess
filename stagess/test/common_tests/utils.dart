@@ -294,29 +294,38 @@ visa.StudentVisa dummyStudentVisa({
     visa.StudentVisa(
       id: id,
       formVersion: visa.StudentVisa.currentVersion,
-      form: visa.VisaEvaluation(
+      date: DateTime(2025, 1, 1),
+      form: visa.VisaForm(
         id: 'visaEvaluationId',
         experiencesAndAptitudes: [
-          visa.ExperiencesAndAptitudes(text: 'Value1', isSelected: true),
-          visa.ExperiencesAndAptitudes(text: 'Value2', isSelected: false),
+          visa.ExperiencesAndAptitudes(
+              index: 0, text: 'Value1', isSelected: true),
+          visa.ExperiencesAndAptitudes(
+              index: 1, text: 'Value2', isSelected: false),
         ],
         attestationsAndMentions: [
-          visa.AttestationsAndMentions(text: 'Value3', isSelected: true),
-          visa.AttestationsAndMentions(text: 'Value4', isSelected: false),
+          visa.AttestationsAndMentions(
+              index: 0, text: 'Value3', isSelected: true),
+          visa.AttestationsAndMentions(
+              index: 1, text: 'Value4', isSelected: false),
         ],
         sstTrainings: [
-          visa.SstTraining(text: 'Value5', isSelected: true, hide: true),
-          visa.SstTraining(text: 'Value6', isSelected: false, hide: false),
+          visa.SstTraining(
+              index: 0, trainingId: '0001', isSelected: true, isHidden: true),
+          visa.SstTraining(
+              index: 1, trainingId: '0002', isSelected: false, isHidden: false),
         ],
         isGatewayToFmsAvailable: false,
         certificates: [
           visa.Certificate(
+            index: 0,
             certificateType: visa.CertificateType.fpt,
             isSelected: true,
             specializationId: 'jobId',
             year: 2020,
           ),
           visa.Certificate(
+            index: 1,
             certificateType: visa.CertificateType.fms,
             isSelected: false,
             specializationId: 'jobId',
@@ -324,17 +333,17 @@ visa.StudentVisa dummyStudentVisa({
           ),
         ],
         skills: [
-          visa.Skill(text: 'Skill1', isSelected: true),
-          visa.Skill(text: 'Skill2', isSelected: false),
+          visa.Skill(index: 0, specializationId: '8118', isSelected: true),
+          visa.Skill(index: 1, specializationId: '8168', isSelected: false),
         ],
         reference: 'VisaReference123',
         forces: [
-          visa.Attitude(text: 'Force1', isSelected: true),
-          visa.Attitude(text: 'Force2', isSelected: false),
+          visa.Attitude(index: 0, attitudeId: '0001', isSelected: true),
+          visa.Attitude(index: 1, attitudeId: '0002', isSelected: false),
         ],
         challenges: [
-          visa.Attitude(text: 'Challenge1', isSelected: true),
-          visa.Attitude(text: 'Challenge2', isSelected: false),
+          visa.Attitude(index: 0, attitudeId: '0003', isSelected: true),
+          visa.Attitude(index: 1, attitudeId: '0004', isSelected: false),
         ],
         successConditions: 'Well supported',
       ),

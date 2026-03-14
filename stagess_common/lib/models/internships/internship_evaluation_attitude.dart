@@ -1,5 +1,6 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
+import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/internships/internship_evaluation.dart';
 
 class AttitudeEvaluation extends ItemSerializable {
@@ -107,9 +108,7 @@ class InternshipEvaluationAttitude extends InternshipEvaluation {
     required this.formVersion,
   });
   InternshipEvaluationAttitude.fromSerialized(super.map)
-      : date = map?['date'] == null
-            ? DateTime(0)
-            : DateTime.fromMillisecondsSinceEpoch(map!['date']),
+      : date = DateTimeExt.from(map?['date']) ?? DateTime(0),
         presentAtEvaluation =
             (map?['present'] as List?)?.map((e) => e as String).toList() ?? [],
         attitude = AttitudeEvaluation.fromSerialized(map?['attitude'] ?? {}),
@@ -120,7 +119,7 @@ class InternshipEvaluationAttitude extends InternshipEvaluation {
   Map<String, dynamic> serializedMap() {
     return {
       'id': id,
-      'date': date.millisecondsSinceEpoch,
+      'date': date.serialize(),
       'present': presentAtEvaluation,
       'attitude': attitude.serialize(),
       'form_version': formVersion,

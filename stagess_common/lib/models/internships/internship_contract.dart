@@ -94,7 +94,7 @@ class InternshipContract extends InternshipEvaluation {
   Map<String, dynamic> serializedMap() {
     return {
       'id': id,
-      'date': date.millisecondsSinceEpoch,
+      'date': date.serialize(),
       'job_id': jobId.serialize(),
       'extra_specialization_ids': extraSpecializationIds.serialize(),
       'program': program.serialize(currentVersion),
