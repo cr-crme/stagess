@@ -6,6 +6,7 @@ import 'package:stagess/common/widgets/itemized_text.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/forms/show_forms.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/forms/visa_evaluation_form_dialog.dart';
 import 'package:stagess_common/models/persons/student_visa.dart';
+import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 
@@ -34,6 +35,8 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
       'Building StudentVisaForm for ${widget.studentId}',
     );
 
+    final evaluation = _evaluations.lastOrNull;
+
     return AnimatedExpandingCard(
       header: (ctx, isExpanded) => ListTile(
         title: Padding(
@@ -48,7 +51,7 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.only(left: 24.0, top: 8.0),
+        padding: const EdgeInsets.only(left: 24.0, top: 8.0, right: 24.0),
         child: Column(
           children: [
             Column(
@@ -57,25 +60,55 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
                 _buildSummary(
                   title:
                       'Expériences et aptitudes personnelles et scolaires complémentaires au profil d\'employabilité',
-                  elements: [],
+                  elements: evaluation?.form.experiencesAndAptitudes
+                          .map((e) => e.isSelected ? e.text : null)
+                          .nonNulls
+                          .toList() ??
+                      [],
                   emptyMessage: 'Aucune expérience renseignée.',
                 ),
                 _buildSummary(
                   title: 'Attestations et mentions',
-                  elements: [
-                    'Attestation de stage 1',
-                    'Attestation de stage 2'
-                  ],
+                  elements: evaluation?.form.attestationsAndMentions
+                          .map((e) => e.isSelected ? e.text : null)
+                          .nonNulls
+                          .toList() ??
+                      [],
                   emptyMessage: 'Aucune attestation renseignée.',
                 ),
                 _buildSummary(
                   title: 'Formations relatives à la SST',
-                  elements: [],
+                  elements: evaluation?.form.sstTrainings
+                          .map((e) => e.isSelected && !e.isHidden
+                              ? SstTraining.availableTrainings[e.trainingId]
+                              : null)
+                          .nonNulls
+                          .toList() ??
+                      [],
                   emptyMessage: 'Aucune formation à la SST renseignée.',
                 ),
                 _buildSummary(
                   title: 'Certification CFMS / CFPT',
-                  elements: [],
+                  elements: evaluation?.form.certificates
+                          .map((e) {
+                            if (!e.isSelected) return null;
+
+                            final specialization = ActivitySectorsService
+                                    .allSpecializations
+                                    .firstWhereOrNull((specialization) =>
+                                        specialization.id == e.specializationId)
+                                    ?.idWithName ??
+                                'Métier non trouvé';
+
+                            return switch (e.certificateType) {
+                              CertificateType.fpt => 'FPT',
+                              CertificateType.fms => 'FMS ($specialization)',
+                              CertificateType.none => null,
+                            };
+                          })
+                          .nonNulls
+                          .toList() ??
+                      [],
                   emptyMessage: 'Aucune certification renseignée.',
                 ),
                 SizedBox(height: 16.0),
@@ -121,7 +154,7 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
 
   Widget _buildModifyFormButton() {
     return Padding(
-      padding: const EdgeInsets.only(bottom: _interline, right: _interline),
+      padding: const EdgeInsets.only(bottom: _interline, right: _interline * 2),
       child: Align(
         alignment: Alignment.centerRight,
         child: TextButton(
