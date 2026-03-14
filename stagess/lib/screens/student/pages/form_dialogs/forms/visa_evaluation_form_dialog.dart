@@ -615,12 +615,11 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   SizedBox(height: 16.0),
-                  ...controller._sstTrainingsController.options
-                      .asMap()
-                      .entries
-                      .map((entry) {
-                    final index = entry.key;
-                    final item = entry.value as SstTraining;
+                  ...controller._sstTrainingsController.options.map((entry) {
+                    final index = controller._sstTrainingsController.options
+                        .indexWhere((element) =>
+                            element.id == (entry as SstTraining).id);
+                    final item = entry as SstTraining;
 
                     return CheckboxListTile(
                       enabled: controller.canModify,
@@ -733,6 +732,11 @@ class _EmployabilityProfileSection extends StatelessWidget {
               style: Theme.of(context).textTheme.titleSmall),
           ...controller._sstCertificateController.options.map(
             (entry) {
+              final index = controller._sstCertificateController.options
+                  .indexWhere((element) =>
+                      element.text == entry.text &&
+                      (element as Certificate).specializationId ==
+                          (entry as Certificate).specializationId);
               final item = entry as Certificate;
               final job = job_service.ActivitySectorsService.allSpecializations
                   .firstWhereOrNull((e) => e.id == item.specializationId);
@@ -756,8 +760,7 @@ class _EmployabilityProfileSection extends StatelessWidget {
                         item.certificateType == CertificateType.none),
                 onChanged: (value) {
                   controller._sstCertificateController.updateOption(
-                      controller._sstCertificateController.options
-                          .indexOf(item),
+                      index,
                       item.copyWith(
                           year: item.year ?? DateTime.now().year,
                           isSelected: value));
@@ -814,11 +817,7 @@ class _EmployabilityProfileSection extends StatelessWidget {
                                         if (year == null) return;
 
                                         controller._sstCertificateController
-                                            .updateOption(
-                                                controller
-                                                    ._sstCertificateController
-                                                    .options
-                                                    .indexOf(item),
+                                            .updateOption(index,
                                                 item.copyWith(year: year));
                                         setState(() {});
                                       }
@@ -853,17 +852,19 @@ class _EmployabilityProfileSection extends StatelessWidget {
                       Text(
                           'Cocher les compétences à afficher dans le VISA en PDF dans la liste des compétences réussies.'),
                       ...controller._specificSkillsController.options.map(
-                        (e) {
-                          final item = e as Skill;
+                        (entry) {
+                          final index = controller
+                              ._specificSkillsController.options
+                              .indexWhere((element) =>
+                                  element.id == (entry as Skill).id);
+                          final item = entry as Skill;
 
                           return CheckboxListTile(
                             value: item.isSelected,
                             enabled: controller.canModify,
                             onChanged: (value) {
                               controller._specificSkillsController.updateOption(
-                                  controller._specificSkillsController.options
-                                      .indexOf(item),
-                                  item.copyWith(isSelected: value));
+                                  index, item.copyWith(isSelected: value));
                               setState(() {});
                             },
                             controlAffinity: ListTileControlAffinity.leading,
@@ -978,15 +979,16 @@ class _ForcesAndChallengesSection extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(definition),
-                  ...controller.options.map((e) {
-                    final item = e as Attitude;
+                  ...controller.options.map((entry) {
+                    final index = controller.options.indexWhere(
+                        (element) => element.id == (entry as Attitude).id);
+                    final item = entry as Attitude;
 
                     return CheckboxListTile(
                       value: item.isSelected,
                       onChanged: (value) {
                         controller.updateOption(
-                            controller.options.indexOf(item),
-                            item.copyWith(isSelected: value));
+                            index, item.copyWith(isSelected: value));
                         setState(() {});
                       },
                       enabled: enabled &&

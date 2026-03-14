@@ -27,9 +27,6 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
       StudentsProvider.of(context, listen: false)
           .fromId(widget.studentId)
           .allVisa;
-  final int _currentFormIndex = 0;
-  StudentVisa? get _currentEvaluation =>
-      _evaluations.isEmpty ? null : _evaluations[_currentFormIndex];
 
   @override
   Widget build(BuildContext context) {
