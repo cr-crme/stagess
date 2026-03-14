@@ -496,104 +496,101 @@ class MySqlStudentsRepository extends StudentsRepository {
 
       final toWait = <Future>[];
       for (final element in visa.form.experiencesAndAptitudes) {
-        // toWait.add(
-        await sqlInterface.performInsertQuery(
-          tableName: 'student_visa_experiences_and_aptitude_items',
-          data: {
-            'id': element.id.serialize(),
-            'idx': element.index.serialize(),
-            'visa_form_id': visa.form.id,
-            'text': element.text.serialize(),
-            'is_selected': element.isSelected.serialize(),
-          },
-          // ),
+        toWait.add(
+          sqlInterface.performInsertQuery(
+            tableName: 'student_visa_experiences_and_aptitude_items',
+            data: {
+              'id': element.id.serialize(),
+              'idx': element.index.serialize(),
+              'visa_form_id': visa.form.id,
+              'text': element.text.serialize(),
+              'is_selected': element.isSelected.serialize(),
+            },
+          ),
         );
       }
       for (final element in visa.form.attestationsAndMentions) {
-        // toWait.add(
-        await sqlInterface.performInsertQuery(
-            tableName: 'student_visa_attestations_and_mentions_items',
-            data: {
-              'id': element.id.serialize(),
-              'idx': element.index.serialize(),
-              'visa_form_id': visa.form.id,
-              'text': element.text.serialize(),
-              'is_selected': element.isSelected.serialize(),
-            }
-            // ),
-            );
+        toWait.add(
+          sqlInterface.performInsertQuery(
+              tableName: 'student_visa_attestations_and_mentions_items',
+              data: {
+                'id': element.id.serialize(),
+                'idx': element.index.serialize(),
+                'visa_form_id': visa.form.id,
+                'text': element.text.serialize(),
+                'is_selected': element.isSelected.serialize(),
+              }),
+        );
       }
       for (final element in visa.form.sstTrainings) {
-        // toWait.add(
-        await sqlInterface.performInsertQuery(
-            tableName: 'student_visa_sst_training_items',
-            data: {
-              'id': element.id.serialize(),
-              'idx': element.index.serialize(),
-              'visa_form_id': visa.form.id,
-              'text': element.text.serialize(),
-              'is_selected': element.isSelected.serialize(),
-              'is_hidden': element.isHidden.serialize(),
-            }
-            // ),
-            );
+        toWait.add(
+          sqlInterface.performInsertQuery(
+              tableName: 'student_visa_sst_training_items',
+              data: {
+                'id': element.id.serialize(),
+                'idx': element.index.serialize(),
+                'visa_form_id': visa.form.id,
+                'text': element.text.serialize(),
+                'is_selected': element.isSelected.serialize(),
+                'is_hidden': element.isHidden.serialize(),
+              }),
+        );
       }
       for (final element in visa.form.certificates) {
-        // toWait.add(
-        await sqlInterface.performInsertQuery(
-            tableName: 'student_visa_certificate_items',
+        toWait.add(
+          sqlInterface.performInsertQuery(
+              tableName: 'student_visa_certificate_items',
+              data: {
+                'id': element.id.serialize(),
+                'idx': element.index.serialize(),
+                'visa_form_id': visa.form.id,
+                'text': element.text.serialize(),
+                'is_selected': element.isSelected.serialize(),
+                'year': element.year?.serialize(),
+                'specialization_id': element.specializationId?.serialize(),
+              }),
+        );
+      }
+      for (final element in visa.form.skills) {
+        toWait.add(
+          sqlInterface.performInsertQuery(
+            tableName: 'student_visa_skill_items',
             data: {
               'id': element.id.serialize(),
               'idx': element.index.serialize(),
               'visa_form_id': visa.form.id,
               'text': element.text.serialize(),
               'is_selected': element.isSelected.serialize(),
-              'year': element.year?.serialize(),
-              'specialization_id': element.specializationId?.serialize(),
-            }
-            // ),
-            );
-      }
-      for (final element in visa.form.skills) {
-        // toWait.add(
-        await sqlInterface.performInsertQuery(
-          tableName: 'student_visa_skill_items',
-          data: {
-            'id': element.id.serialize(),
-            'idx': element.index.serialize(),
-            'visa_form_id': visa.form.id,
-            'text': element.text.serialize(),
-            'is_selected': element.isSelected.serialize(),
-          },
-          // ),
+            },
+          ),
         );
       }
       for (final element in visa.form.forces) {
-        // toWait.add(
-        await sqlInterface.performInsertQuery(
-          tableName: 'student_visa_forces_items',
-          data: {
-            'id': element.id.serialize(),
-            'idx': element.index.serialize(),
-            'visa_form_id': visa.form.id,
-            'text': element.text.serialize(),
-            'is_selected': element.isSelected.serialize(),
-          },
-          // ),
+        toWait.add(
+          sqlInterface.performInsertQuery(
+            tableName: 'student_visa_forces_items',
+            data: {
+              'id': element.id.serialize(),
+              'idx': element.index.serialize(),
+              'visa_form_id': visa.form.id,
+              'text': element.text.serialize(),
+              'is_selected': element.isSelected.serialize(),
+            },
+          ),
         );
       }
       for (final element in visa.form.challenges) {
-        // toWait.add(
-        await sqlInterface.performInsertQuery(
-          tableName: 'student_visa_challenges_items',
-          data: {
-            'id': element.id.serialize(),
-            'idx': element.index.serialize(),
-            'visa_form_id': visa.form.id,
-            'text': element.text.serialize(),
-            'is_selected': element.isSelected.serialize(),
-          },
-          // ),
+        toWait.add(
+          sqlInterface.performInsertQuery(
+            tableName: 'student_visa_challenges_items',
+            data: {
+              'id': element.id.serialize(),
+              'idx': element.index.serialize(),
+              'visa_form_id': visa.form.id,
+              'text': element.text.serialize(),
+              'is_selected': element.isSelected.serialize(),
+            },
+          ),
         );
       }
 

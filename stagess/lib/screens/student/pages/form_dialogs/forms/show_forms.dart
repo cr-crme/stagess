@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
@@ -82,11 +83,20 @@ Future<void> showStudentEvaluationFormDialog(
     }
   }
 
+  final lastEvaluation =
+      !canModify || student.allVisa.isEmpty ? null : student.allVisa.last;
   final newStudent = await showEvaluationDialog(context,
       studentId: studentId, evaluationId: evaluationId, canModify: canModify);
   if (!canModify) return;
+  final newEvaluation =
+      (newStudent?.allVisa.isEmpty ?? true) ? null : newStudent!.allVisa.last;
 
-  if (newStudent == null) {
+  final isDifferent = newStudent != null &&
+      (newEvaluation
+                  ?.getDifference(lastEvaluation, ignoreKeys: ['id', 'date']) ??
+              [])
+          .isNotEmpty;
+  if (!isDifferent) {
     await students.releaseLockForItem(student);
     return;
   }

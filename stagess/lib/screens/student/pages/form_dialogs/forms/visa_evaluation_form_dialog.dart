@@ -230,10 +230,20 @@ class VisaFormController {
         // This should not happen, but if the student was drastically modified
         // it is possible the previous certificates includes job that were since removed
         // from the student internship list.
-        _sstCertificateController.add(item);
+        _sstCertificateController.add(
+          Certificate(
+            index: item.index,
+            certificateType: item.certificateType,
+            isSelected: item.isSelected,
+            year: item.year,
+            specializationId: item.specializationId,
+          ),
+        );
       } else {
         _sstCertificateController.updateOption(
-            index, item.copyWith(isSelected: item.isSelected));
+            index,
+            (_sstCertificateController.options[index] as Certificate)
+                .copyWith(isSelected: item.isSelected));
       }
     }
 
@@ -241,10 +251,18 @@ class VisaFormController {
       final index = _specificSkillsController.options
           .indexWhere((e) => e.text == item.text);
       if (index < 0) {
-        _specificSkillsController.add(item);
+        _specificSkillsController.add(
+          Skill(
+            index: item.index,
+            specializationId: item.specializationId,
+            isSelected: item.isSelected,
+          ),
+        );
       } else {
         _specificSkillsController.updateOption(
-            index, item.copyWith(isSelected: item.isSelected));
+            index,
+            (_specificSkillsController.options[index] as Skill)
+                .copyWith(isSelected: item.isSelected));
       }
     }
     _referenceController.text = visa.form.reference;
