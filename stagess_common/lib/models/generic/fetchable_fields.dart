@@ -116,21 +116,26 @@ class FetchableFields {
 
       if (current.includeAll) {
         throw 'The reference [FetchableFields] cannot have includeAll = true for any of its fields';
-      } else if (current.isMandatory && keepMandatory) {
-        out[fieldName] = current;
       } else if (other.includeAll) {
         out[fieldName] = current;
-      } else if (otherCurrent != null) {
-        if (current._fields.isEmpty) {
-          out[fieldName] = current;
+      } else if (keepMandatory &&
+          (current.isMandatory || current.isReference)) {
+        if (current.hasSubfields) {
+          // We must travers all the local subfields to make sure we keep the mandatory ones
+          final filt = current.filter(otherCurrent ?? FetchableFields.none,
+              keepMandatory: keepMandatory);
+          if (filt.hasSubfields) out[fieldName] = filt;
         } else {
-          out[fieldName] =
-              current.filter(otherCurrent, keepMandatory: keepMandatory);
+          out[fieldName] = current;
         }
-      } else if (keepMandatory && current.hasSubfields) {
-        // We must travers all the local subfields to make sure we keep the mandatory ones
-        final filt = current.filter(FetchableFields.none, keepMandatory: true);
-        if (filt.hasSubfields) out[fieldName] = filt;
+      } else if (otherCurrent != null) {
+        if (current.hasSubfields) {
+          final filt =
+              current.filter(otherCurrent, keepMandatory: keepMandatory);
+          if (filt.hasSubfields) out[fieldName] = filt;
+        } else {
+          out[fieldName] = current;
+        }
       }
     }
     return out;
@@ -174,7 +179,9 @@ class FetchableFields {
     return FetchableFields(out);
   }
 
-  bool get hasSubfields => _fields.isNotEmpty;
+  bool get hasSubfields =>
+      (!_fields.containsKey('*') || _fields['*']!.hasSubfields) &&
+      _fields.isNotEmpty;
   bool get hasData => hasSubfields || includeAll || isMandatory;
   bool get isEmpty => !hasData;
 

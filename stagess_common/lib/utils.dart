@@ -160,14 +160,25 @@ extension _MapExtensions on Map<String, dynamic> {
       if (key == '*') {
         for (final thisKey in keys) {
           if (this[thisKey] is! Map<String, dynamic>) continue;
-          this[thisKey] =
-              (this[thisKey] as Map<String, dynamic>).filter(subfields!);
+          final element = (this[thisKey] as Map<String, dynamic>)
+              .filter(subfields?[thisKey] ?? FetchableFields.none);
+          if (element.isEmpty) {
+            remove(thisKey);
+          } else {
+            this[thisKey] = element;
+          }
         }
       }
 
       final subElements = this[key];
       if (subElements is Map<String, dynamic>) {
-        this[key] = subElements.filter(subfields!);
+        this[key] = subElements.map((key, value) {
+          if (value is Map<String, dynamic>) {
+            return MapEntry(
+                key, value.filter(subfields ?? FetchableFields.none));
+          }
+          return MapEntry(key, value);
+        });
       } else if (subElements is List) {
         this[key] = subElements.map((element) {
           if (element is Map<String, dynamic>) {

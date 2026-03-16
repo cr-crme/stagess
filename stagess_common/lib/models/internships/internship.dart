@@ -153,30 +153,24 @@ class Internship extends ExtendedItemSerializable {
         'signatory_teacher_id': FetchableFields.mandatory,
         'enterprise_id': FetchableFields.mandatory,
         'extra_supervising_teacher_ids': FetchableFields.mandatory,
-        'contracts': FetchableFields.optional,
-        // FetchableFields.mandatory
-        // ..addAll(FetchableFields.reference(
-        //     {'*': InternshipContract.fetchableFields})),
+        'contracts': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference(
+              {'*': InternshipContract.fetchableFields})),
         'achieved_duration': FetchableFields.optional,
         'teacher_notes': FetchableFields.optional,
         'end_date': FetchableFields.mandatory,
-        // TODO: Fix the Fethchable subfields not working if top field is mandatory
-        'skill_evaluations': FetchableFields.optional,
-        // FetchableFields.mandatory
-        // ..addAll(FetchableFields.reference(
-        //     {'*': InternshipEvaluationSkill.fetchableFields})),
-        'attitude_evaluations': FetchableFields.optional,
-        // FetchableFields.mandatory
-        // ..addAll(FetchableFields.reference(
-        //     {'*': InternshipEvaluationAttitude.fetchableFields})),
-        'sst_evaluations': FetchableFields.optional,
-        // FetchableFields.mandatory
-        // ..addAll(
-        //     FetchableFields.reference({'*': SstEvaluation.fetchableFields})),
-        'enterprise_evaluations': FetchableFields.optional,
-        // FetchableFields.mandatory
-        // ..addAll(FetchableFields.reference(
-        //     {'*': PostInternshipEnterpriseEvaluation.fetchableFields})),
+        'skill_evaluations': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference(
+              {'*': InternshipEvaluationSkill.fetchableFields})),
+        'attitude_evaluations': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference(
+              {'*': InternshipEvaluationAttitude.fetchableFields})),
+        'sst_evaluations': FetchableFields.mandatory
+          ..addAll(
+              FetchableFields.reference({'*': SstEvaluation.fetchableFields})),
+        'enterprise_evaluations': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference(
+              {'*': PostInternshipEnterpriseEvaluation.fetchableFields})),
       });
 
   Internship copyWith({

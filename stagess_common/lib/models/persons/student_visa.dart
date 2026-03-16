@@ -478,7 +478,7 @@ class StudentVisa extends ItemSerializable {
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
-        'date': FetchableFields.mandatory,
+        'date': FetchableFields.optional,
         'form': FetchableFields.mandatory
           ..addAll(FetchableFields.reference({'*': VisaForm.fetchableFields})),
         'form_version': FetchableFields.mandatory,

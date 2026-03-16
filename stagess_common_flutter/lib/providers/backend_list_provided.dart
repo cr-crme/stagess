@@ -259,10 +259,9 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
   final Map<String, FetchableFields> _registeredFields = {};
   FetchableFields getRegisteredFieldsOf(String id) {
     if (_registeredFields[id] == null) {
-      _registeredFields[id] = referenceFetchableFields.filter(
-        FetchableFields.none,
-        keepMandatory: true,
-      );
+      final toFilt = referenceFetchableFields;
+      _registeredFields[id] =
+          toFilt.filter(FetchableFields.none, keepMandatory: true);
     }
 
     return _registeredFields[id]!;
