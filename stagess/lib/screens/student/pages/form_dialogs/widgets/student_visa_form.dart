@@ -2,9 +2,11 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
+import 'package:stagess/common/widgets/dialogs/show_pdf_dialog.dart';
 import 'package:stagess/common/widgets/itemized_text.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/forms/show_forms.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/forms/visa_evaluation_form_dialog.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/pdf/visa_pdf_template.dart';
 import 'package:stagess_common/models/persons/student_visa.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
@@ -114,15 +116,15 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
                               if (certificates?.isEmpty ?? true) return null;
 
                               return 'CFMS: Certificat de formation à un métier semi-spécialisé obtenu pour :\n'
-                                  '${certificates!.map((certificate) {
+                                  '${certificates!.where((e) => e.isSelected).map((e) {
                                 final job = ActivitySectorsService
                                         .allSpecializations
                                         .firstWhereOrNull((specialization) =>
                                             specialization.id ==
-                                            certificate.specializationId)
+                                            e.specializationId)
                                         ?.idWithName ??
                                     'Métier non trouvé';
-                                return '    $job \u2014 ${certificate.year ?? 'Année non renseignée'}';
+                                return '    $job \u2014 ${e.year ?? 'Année non renseignée'}';
                               }).join('\n')}';
                             }
                         }
@@ -217,8 +219,11 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
                         icon: const Icon(Icons.insert_drive_file)),
                     SizedBox(width: 4),
                     IconButton(
-                        onPressed: () => _showEvaluationDialog(
-                            evaluationId: evaluation.id, canModify: false),
+                        onPressed: () => showPdfDialog(context,
+                            pdfGeneratorCallback: (context, format) =>
+                                generateVisaPdf(context, format,
+                                    studentId: widget.studentId,
+                                    studentVisa: evaluation)),
                         color: Theme.of(context).primaryColor,
                         icon: const Icon(Icons.picture_as_pdf)),
                   ],

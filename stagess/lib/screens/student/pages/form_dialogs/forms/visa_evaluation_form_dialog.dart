@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/provider_helpers/internships_helpers.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
+import 'package:stagess/common/widgets/dialogs/show_pdf_dialog.dart';
 import 'package:stagess/common/widgets/numbered_text.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
+import 'package:stagess/screens/student/pages/form_dialogs/pdf/visa_pdf_template.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/models/persons/student.dart';
@@ -455,6 +457,22 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
               onPressed: _cancel,
               child: const Text('Annuler'),
             ),
+          const SizedBox(width: 20),
+          OutlinedButton(
+            onPressed: () => showPdfDialog(context,
+                pdfGeneratorCallback: (context, format) => generateVisaPdf(
+                    context, format,
+                    studentId: widget.studentId,
+                    studentVisa: _controller.toVisa())),
+            style: OutlinedButton.styleFrom(
+              backgroundColor: const Color(0xFFB8D8E6),
+            ),
+            child: Text(
+                _controller.canModify
+                    ? 'Prévisualiser le PDF'
+                    : 'Visualiser le PDF',
+                textAlign: TextAlign.center),
+          ),
           const SizedBox(width: 20),
           TextButton(
             onPressed: () async => await _submit(),
