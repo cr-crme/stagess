@@ -203,6 +203,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
               'id',
               'date',
               'job_id',
+              'specialization_id',
               'program',
               'supervisor_first_name',
               'supervisor_last_name',
@@ -381,8 +382,8 @@ class MySqlInternshipsRepository extends InternshipsRepository {
                 asName: 'skills',
                 fieldsToFetch: [
                   'id',
-                  'job_id',
-                  'skill_name',
+                  'specialization_id',
+                  'skill_id',
                   'appreciation',
                   'comments'
                 ],
@@ -400,8 +401,8 @@ class MySqlInternshipsRepository extends InternshipsRepository {
           );
           evaluation['skills'].add({
             'id': skill['id'],
-            'job_id': skill['job_id'],
-            'skill': skill['skill_name'],
+            'specialization_id': skill['specialization_id'],
+            'skill_id': skill['skill_id'],
             'appreciation': skill['appreciation'],
             'comments': skill['comments'],
             'tasks': [
@@ -616,6 +617,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
         'internship_id': internship.id,
         'date': contract.date.serialize(),
         'job_id': contract.jobId.serialize(),
+        'specialization_id': contract.specializationId.serialize(),
         'program':
             contract.program.serialize(InternshipContract.currentVersion),
         'supervisor_first_name': contract.supervisor.firstName.serialize(),
@@ -728,8 +730,8 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             data: {
               'id': skill['id'],
               'evaluation_id': evaluation['id'],
-              'job_id': skill['job_id'],
-              'skill_name': skill['skill'],
+              'specialization_id': skill['specialization_id'],
+              'skill_id': skill['skill_id'],
               'appreciation': skill['appreciation'],
               'comments': skill['comments'],
             });
@@ -971,7 +973,8 @@ class InternshipsRepositoryMock extends InternshipsRepository {
       contracts: [
         InternshipContract(
           date: DateTime(2000, 1, 1),
-          jobId: '67890',
+          specializationId: '67890',
+          jobId: 'abcdefghij',
           extraSpecializationIds: ['12345'],
           program: Program.fpt,
           dates: DateTimeRange(
@@ -1040,7 +1043,8 @@ class InternshipsRepositoryMock extends InternshipsRepository {
       contracts: [
         InternshipContract(
           date: DateTime(2000, 2, 1),
-          jobId: '09876',
+          jobId: 'jihgfedcba',
+          specializationId: '09876',
           extraSpecializationIds: ['54321', '09876'],
           program: Program.fpt,
           dates: DateTimeRange(

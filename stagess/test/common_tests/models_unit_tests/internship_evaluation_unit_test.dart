@@ -319,7 +319,7 @@ void main() {
         expect(serialized, {
           'id': 'skillEvaluationId',
           'job_id': 'specializationId',
-          'skill': 'skillName',
+          'skill': 'skillId',
           'tasks': skill.tasks.map((e) => e.serialize()).toList(),
           'appreciation': skill.appreciation.index,
           'comments': skill.comments,
@@ -327,7 +327,7 @@ void main() {
 
         expect(deserialized.id, 'skillEvaluationId');
         expect(deserialized.specializationId, 'specializationId');
-        expect(deserialized.skillName, 'skillName');
+        expect(deserialized.skillId, 'skillId');
         expect(deserialized.tasks.length, skill.tasks.length);
         expect(deserialized.appreciation, skill.appreciation);
         expect(deserialized.comments, skill.comments);
@@ -337,7 +337,7 @@ void main() {
             SkillEvaluation.fromSerialized({'id': 'emptyId'});
         expect(emptyDeserialized.id, 'emptyId');
         expect(emptyDeserialized.specializationId, '');
-        expect(emptyDeserialized.skillName, '');
+        expect(emptyDeserialized.skillId, '');
         expect(emptyDeserialized.tasks.length, 0);
         expect(emptyDeserialized.appreciation, SkillAppreciation.notSelected);
         expect(emptyDeserialized.comments, '');

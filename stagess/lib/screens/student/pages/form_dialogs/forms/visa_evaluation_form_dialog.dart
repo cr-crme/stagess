@@ -14,7 +14,6 @@ import 'package:stagess_common/models/persons/student_visa.dart';
 import 'package:stagess_common/services/job_data_file_service.dart'
     as job_service;
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
-import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
@@ -83,11 +82,21 @@ class VisaFormController {
     _internships.addAll(
         InternshipsProvider.of(context, listen: false).byStudentId(studentId));
     for (final internship in _internships) {
-      final enterprise = EnterprisesProvider.of(context, listen: false)
-          .fromId(internship.enterpriseId);
-      _specializations.add(enterprise.jobs
-          .fromId(internship.currentContract!.jobId)
-          .specialization);
+      {
+        final specialization =
+            job_service.ActivitySectorsService.specializationOrNull(
+                internship.currentContract?.specializationId);
+        if (specialization == null) continue;
+        _specializations.add(specialization);
+      }
+      for (final extraSpecializationId
+          in (internship.currentContract?.extraSpecializationIds ?? [])) {
+        final specialization =
+            job_service.ActivitySectorsService.specializationOrNull(
+                extraSpecializationId);
+        if (specialization == null) continue;
+        _specializations.add(specialization);
+      }
     }
     _evaluatedSkills.addAll(
         InternshipsHelpers.getStudentSkills(context, studentId: studentId));
@@ -119,7 +128,7 @@ class VisaFormController {
       _sstTrainingsController.add(SstTraining(
           index: int.parse(trainingId),
           trainingId: trainingId,
-          isSelected: false,
+          isSelected: true,
           isHidden: true));
     }
 
@@ -154,10 +163,8 @@ class VisaFormController {
       final index = entry.key;
       final skill = entry.value;
 
-      _specificSkillsController.add(Skill(
-          index: index,
-          specializationId: skill.specializationId,
-          isSelected: false));
+      _specificSkillsController
+          .add(Skill(index: index, skillId: skill.skillId, isSelected: false));
     }
     _referenceController.text = '';
 
@@ -262,7 +269,7 @@ class VisaFormController {
         _specificSkillsController.add(
           Skill(
             index: item.index,
-            specializationId: item.specializationId,
+            skillId: item.skillId,
             isSelected: item.isSelected,
           ),
         );
@@ -380,7 +387,7 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
           title: Text(
             student == null
                 ? 'En attente des informations'
-                : 'Génération du visa pour ${student.firstName} ${student.lastName}',
+                : 'Modification du VISA pour ${student.firstName} ${student.lastName}',
           ),
           leading: IconButton(
             onPressed: _cancel,
@@ -458,21 +465,18 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
               child: const Text('Annuler'),
             ),
           const SizedBox(width: 20),
-          OutlinedButton(
-            onPressed: () => showPdfDialog(context,
-                pdfGeneratorCallback: (context, format) => generateVisaPdf(
-                    context, format,
-                    studentId: widget.studentId,
-                    studentVisa: _controller.toVisa())),
-            style: OutlinedButton.styleFrom(
-              backgroundColor: const Color(0xFFB8D8E6),
+          if (_controller.canModify)
+            OutlinedButton(
+              onPressed: () => showPdfDialog(context,
+                  pdfGeneratorCallback: (context, format) => generateVisaPdf(
+                      context, format,
+                      studentId: widget.studentId,
+                      studentVisa: _controller.toVisa())),
+              style: OutlinedButton.styleFrom(
+                backgroundColor: const Color(0xFFB8D8E6),
+              ),
+              child: Text('Prévisualiser le PDF', textAlign: TextAlign.center),
             ),
-            child: Text(
-                _controller.canModify
-                    ? 'Prévisualiser le PDF'
-                    : 'Visualiser le PDF',
-                textAlign: TextAlign.center),
-          ),
           const SizedBox(width: 20),
           TextButton(
             onPressed: () async => await _submit(),
@@ -607,6 +611,16 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
                         )),
                   ),
                 ),
+              if (controller.canModify &&
+                  controller._sstTrainingsController.options
+                      .any((e) => !(e as SstTraining).isHidden))
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: Text(
+                    'Cocher celles à afficher dans le VISA en PDF.',
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               SizedBox(height: 8.0),
               ...controller._sstTrainingsController.options
                   .asMap()
@@ -653,7 +667,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Liste des sujets pour lesquels l\'élève a pu recevoir une formation SST',
+                    'Liste des sujets pour lesquels l\'élève a reçu une formation SST',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   SizedBox(height: 16.0),
@@ -788,7 +802,8 @@ class _EmployabilityProfileSection extends StatelessWidget {
                 CertificateType.fpt =>
                   'Certificat de formation préparatoire au travail (CFPT)',
                 CertificateType.fms =>
-                  'Certificat de formation à un métier semi-spécialisé (CFMS) pour le métier : ${job?.name ?? 'Métier non trouvé'}',
+                  'Certificat de formation à un métier semi-spécialisé (CFMS) pour le métier\u00a0:\n'
+                      '${job?.name ?? 'Métier non trouvé'}',
               };
               final noneIsChecked = controller._sstCertificateController.options
                   .cast<Certificate>()
@@ -827,44 +842,47 @@ class _EmployabilityProfileSection extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text('Année certification\u00a0: ${item.year}'),
-                            IconButton(
-                                onPressed: controller.canModify
-                                    ? () async {
-                                        final initialDate = DateTime(
-                                            item.year ?? DateTime.now().year);
-                                        final firstDate =
-                                            DateTime(DateTime.now().year - 5);
-                                        final lastDate =
-                                            DateTime(DateTime.now().year + 5);
-                                        final year = await showDialog(
-                                          context: context,
-                                          builder: (context) => AlertDialog(
-                                            title: Text(
-                                                'Sélectionnez l\'année de certification'),
-                                            content: SizedBox(
-                                              width: 300,
-                                              height: 300,
-                                              child: YearPicker(
-                                                selectedDate: initialDate,
-                                                onChanged: (selectedDate) {
-                                                  Navigator.pop(context,
-                                                      selectedDate.year);
-                                                },
-                                                firstDate: firstDate,
-                                                lastDate: lastDate,
-                                              ),
-                                            ),
+                            SizedBox(width: 8.0),
+                            if (controller.canModify)
+                              IconButton(
+                                  onPressed: () async {
+                                    final initialDate = DateTime(
+                                        item.year ?? DateTime.now().year);
+                                    final firstDate =
+                                        DateTime(DateTime.now().year - 5);
+                                    final lastDate =
+                                        DateTime(DateTime.now().year + 5);
+                                    final year = await showDialog(
+                                      context: context,
+                                      builder: (context) => AlertDialog(
+                                        title: Text(
+                                            'Sélectionnez l\'année de certification'),
+                                        content: SizedBox(
+                                          width: 300,
+                                          height: 300,
+                                          child: YearPicker(
+                                            selectedDate: initialDate,
+                                            onChanged: (selectedDate) {
+                                              Navigator.pop(
+                                                  context, selectedDate.year);
+                                            },
+                                            firstDate: firstDate,
+                                            lastDate: lastDate,
                                           ),
-                                        );
-                                        if (year == null) return;
+                                        ),
+                                      ),
+                                    );
+                                    if (year == null) return;
 
-                                        controller._sstCertificateController
-                                            .updateOption(index,
-                                                item.copyWith(year: year));
-                                        setState(() {});
-                                      }
-                                    : null,
-                                icon: Icon(Icons.calendar_month)),
+                                    controller._sstCertificateController
+                                        .updateOption(
+                                            index, item.copyWith(year: year));
+                                    setState(() {});
+                                  },
+                                  icon: Icon(
+                                    Icons.calendar_month,
+                                    color: Theme.of(context).primaryColor,
+                                  )),
                           ],
                         ),
                       ),
@@ -900,7 +918,6 @@ class _EmployabilityProfileSection extends StatelessWidget {
                               .indexWhere((element) =>
                                   element.id == (entry as Skill).id);
                           final item = entry as Skill;
-
                           return CheckboxListTile(
                             value: item.isSelected,
                             enabled: controller.canModify,
@@ -911,10 +928,8 @@ class _EmployabilityProfileSection extends StatelessWidget {
                             },
                             controlAffinity: ListTileControlAffinity.leading,
                             title: Text(
-                                job_service.ActivitySectorsService
-                                        .allSpecializations
-                                        .firstWhereOrNull((e) =>
-                                            e.id == item.specializationId)
+                                job_service.ActivitySectorsService.skillOrNull(
+                                            item.skillId)
                                         ?.idWithName ??
                                     'Compétence non trouvée',
                                 style: Theme.of(context).textTheme.bodyMedium),
@@ -950,6 +965,7 @@ class _EmployabilityProfileSection extends StatelessWidget {
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                 ),
+                style: TextStyle(color: Colors.black),
                 maxLength: 300,
                 maxLines: 5,
               ),
@@ -974,8 +990,8 @@ class _ForcesAndChallengesSection extends StatelessWidget {
           context,
           title: 'Forces',
           definition:
-              'Cocher les cinq rubriques, correspondant aux cinq résultats '
-              'les plus forts dans les évaluations, à afficher dans le VISA en PDF.',
+              'Cocher les rubriques correspondant aux résultats les plus forts '
+              'dans les évaluations (maximum de 5 rubriques), à afficher dans le VISA en PDF.',
           controller: controller._forcesController,
           enabled: controller.canModify,
           maxSelectedOptions: 5,
@@ -985,9 +1001,8 @@ class _ForcesAndChallengesSection extends StatelessWidget {
           context,
           title: 'Défis à relever',
           definition:
-              'Cocher le ou les deux rubriques, correspondant aux résultats les '
-              'plus faibles dans les évaluations (maximum de 2 rubriques), à afficher '
-              'dans le VISA en PDF.',
+              'Cocher les rubriques correspondant aux résultats les plus faibles '
+              'dans les évaluations (maximum de 2 rubriques), à afficher dans le VISA en PDF.',
           controller: controller._challengesController,
           enabled: controller.canModify,
           maxSelectedOptions: 2,
@@ -1074,6 +1089,7 @@ class _ForcesAndChallengesSection extends StatelessWidget {
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
               ),
+              style: TextStyle(color: Colors.black),
               maxLength: 300,
               maxLines: 5,
             ),

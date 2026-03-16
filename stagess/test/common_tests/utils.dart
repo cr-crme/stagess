@@ -333,8 +333,8 @@ visa.StudentVisa dummyStudentVisa({
           ),
         ],
         skills: [
-          visa.Skill(index: 0, specializationId: '8118', isSelected: true),
-          visa.Skill(index: 1, specializationId: '8168', isSelected: false),
+          visa.Skill(index: 0, skillId: '834301', isSelected: true),
+          visa.Skill(index: 1, skillId: '834303', isSelected: false),
         ],
         reference: 'VisaReference123',
         forces: [
@@ -353,6 +353,7 @@ Internship dummyInternship({
   String id = 'internshipId',
   String schoolBoardId = 'schoolBoardId',
   String jobId = 'jobId',
+  String specializationId = 'specializationId',
   DateTime? versionDate,
   String studentId = 'studentId',
   String teacherId = 'teacherId',
@@ -370,7 +371,8 @@ Internship dummyInternship({
     endDate: hasEndDate ? DateTime(2034, 10, 28) : DateTime(0),
     achievedDuration: achievedLength,
     contracts: [
-      dummyInternshipContract(date: versionDate, jobId: jobId),
+      dummyInternshipContract(
+          date: versionDate, jobId: jobId, specializationId: specializationId),
     ],
     enterpriseEvaluations: [
       dummyPostInternshipEnterpriseEvaluation(internshipId: id)
@@ -487,7 +489,7 @@ SkillEvaluation dummySkillEvaluation({String id = 'skillEvaluationId'}) =>
     SkillEvaluation(
       id: id,
       specializationId: 'specializationId',
-      skillName: 'skillName',
+      skillId: 'skillId',
       tasks: [dummyTaskAppreciation()],
       appreciation: SkillAppreciation.failed,
       comments: 'comment',
@@ -506,14 +508,17 @@ InternshipEvaluationSkill dummyInternshipEvaluationSkill({
       formVersion: '1.0.0',
     );
 
-InternshipContract dummyInternshipContract(
-        {String id = 'internshipContractId',
-        String jobId = 'jobId',
-        DateTime? date}) =>
+InternshipContract dummyInternshipContract({
+  String id = 'internshipContractId',
+  String jobId = 'jobId',
+  String specializationId = 'specializationId',
+  DateTime? date,
+}) =>
     InternshipContract(
       id: id,
       date: date ?? DateTime(1980, 5, 20),
       jobId: jobId,
+      specializationId: specializationId,
       extraSpecializationIds: [
         ActivitySectorsService.activitySectors[2].specializations[1].id,
         ActivitySectorsService.activitySectors[1].specializations[0].id,

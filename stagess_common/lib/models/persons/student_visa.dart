@@ -198,9 +198,9 @@ class Skill extends SelectableTextItem {
   Skill({
     super.id,
     required super.index,
-    required String specializationId,
+    required String skillId,
     super.isSelected,
-  }) : super(text: specializationId);
+  }) : super(text: skillId);
 
   Skill.fromSerialized(super.map) : super.fromSerialized();
 
@@ -218,11 +218,11 @@ class Skill extends SelectableTextItem {
       Skill(
         id: id,
         index: index,
-        specializationId: text ?? this.text,
+        skillId: text ?? this.text,
         isSelected: isSelected ?? this.isSelected,
       );
 
-  String get specializationId => text;
+  String get skillId => text;
 }
 
 class Attitude extends SelectableTextItem {

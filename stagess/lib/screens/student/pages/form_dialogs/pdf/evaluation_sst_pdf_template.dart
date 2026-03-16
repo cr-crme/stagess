@@ -10,8 +10,8 @@ import 'package:stagess/misc/question_file_service.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/sst_evaluation.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common/utils.dart';
-import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 
@@ -95,11 +95,11 @@ pw.Widget _buildPersonsPresent({
 
 pw.Widget _buildQuestions(BuildContext context,
     {required Internship internship, required SstEvaluation evaluation}) {
-  final enterprise = EnterprisesProvider.of(context, listen: false)
-      .fromId(internship.enterpriseId);
-  final job = enterprise.jobs.fromId(internship.currentContract?.jobId ?? '-1');
+  final specialization = ActivitySectorsService.specializationOrNull(
+      internship.currentContract!.specializationId);
+
   // Sort the question by "id"
-  final questionIds = [...job.specialization.questions]
+  final questionIds = [...?specialization?.questions]
     ..sort((a, b) => int.parse(a) - int.parse(b));
   final questions =
       questionIds.map((e) => QuestionFileService.fromId(e)).toList();

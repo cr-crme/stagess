@@ -87,6 +87,20 @@ class AttitudeEvaluation extends ItemSerializable {
         'takeInitiative: ${takeInitiative.name}, '
         'adaptability: ${adaptability.name}';
   }
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'ponctuality': FetchableFields.mandatory,
+        'inattendance': FetchableFields.mandatory,
+        'quality_of_work': FetchableFields.mandatory,
+        'productivity': FetchableFields.mandatory,
+        'team_communication': FetchableFields.mandatory,
+        'respect_of_authority': FetchableFields.mandatory,
+        'communication_about_sst': FetchableFields.mandatory,
+        'self_control': FetchableFields.mandatory,
+        'take_initiative': FetchableFields.mandatory,
+        'adaptability': FetchableFields.mandatory,
+      });
 }
 
 class InternshipEvaluationAttitude extends InternshipEvaluation {
@@ -130,7 +144,9 @@ class InternshipEvaluationAttitude extends InternshipEvaluation {
         'id': FetchableFields.mandatory,
         'date': FetchableFields.optional,
         'present': FetchableFields.optional,
-        'attitude': FetchableFields.optional,
+        'attitude': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference(
+              {'*': AttitudeEvaluation.fetchableFields})),
         'form_version': FetchableFields.mandatory,
       });
 

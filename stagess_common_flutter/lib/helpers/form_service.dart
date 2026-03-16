@@ -75,8 +75,6 @@ abstract class FormService {
   static String? passwordValidator(String? password) {
     if (password == null || password.isEmpty) {
       return 'Le champ ne peut pas être vide.';
-    } else if (password.length < 8) {
-      return 'Le mot de passe ne répond pas aux critères.';
     }
     return null;
   }

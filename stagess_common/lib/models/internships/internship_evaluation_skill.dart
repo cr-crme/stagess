@@ -44,7 +44,7 @@ enum SkillEvaluationGranularity {
 
 class SkillEvaluation extends ItemSerializable {
   final String specializationId;
-  final String skillName;
+  final String skillId;
   final List<TaskAppreciation> tasks;
 
   final SkillAppreciation appreciation;
@@ -53,14 +53,14 @@ class SkillEvaluation extends ItemSerializable {
   SkillEvaluation({
     super.id,
     required this.specializationId,
-    required this.skillName,
+    required this.skillId,
     required this.tasks,
     required this.appreciation,
     required this.comments,
   });
   SkillEvaluation.fromSerialized(super.map)
-      : specializationId = map?['job_id'] ?? '',
-        skillName = map?['skill'] ?? '',
+      : specializationId = map?['specialization_id'] ?? '',
+        skillId = map?['skill_id'] ?? '',
         tasks = map?['tasks'] == null
             ? []
             : (map!['tasks'] as List)
@@ -75,8 +75,8 @@ class SkillEvaluation extends ItemSerializable {
   @override
   Map<String, dynamic> serializedMap() => {
         'id': id,
-        'job_id': specializationId,
-        'skill': skillName,
+        'specialization_id': specializationId,
+        'skill_id': skillId,
         'tasks': tasks.map((e) => e.serialize()).toList(),
         'appreciation': appreciation.index,
         'comments': comments,
@@ -85,7 +85,7 @@ class SkillEvaluation extends ItemSerializable {
   @override
   String toString() {
     return 'SkillEvaluation(specializationId: $specializationId, '
-        'skillName: $skillName, '
+        'skillId: $skillId, '
         'tasks: $tasks, '
         'appreciation: $appreciation, '
         'comments: $comments)';

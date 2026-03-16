@@ -83,12 +83,7 @@ class _SkillTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(color: Colors.black)),
-          Text('Nombre total = ${_countNumberOfSkills()}',
+          Text('$title (N = ${_countNumberOfSkills()})',
               style: Theme.of(context)
                   .textTheme
                   .titleMedium
@@ -138,15 +133,16 @@ class _SkillTile extends StatelessWidget {
     final specialization =
         ActivitySectorsService.specialization(skillEvaluation.specializationId);
     final skill = specialization.skills
-        .firstWhere((skill) => skill.idWithName == skillEvaluation.skillName);
+        .firstWhere((skill) => skill.id == skillEvaluation.skillId);
     return skill.complexity;
   }
 
   List<String> skillsToStrings(Specialization specialization) {
     return skills[specialization]!
-        .sorted((a, b) => a.skillName.compareTo(b.skillName))
+        .sorted((a, b) => a.skillId.compareTo(b.skillId))
         .map((skillEvaluation) =>
-            '${skillEvaluation.skillName}\u00a0(Niv.${_skillComplexity(skillEvaluation)})')
+            '${ActivitySectorsService.skillOrNull(skillEvaluation.skillId)?.idWithName ?? 'Compétence non trouvée'}'
+            '\u00a0(Niv.${_skillComplexity(skillEvaluation)})')
         .toList();
   }
 }

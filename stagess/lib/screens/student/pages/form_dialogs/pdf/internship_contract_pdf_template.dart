@@ -61,9 +61,14 @@ Future<Uint8List> generateInternshipContractPdf(
   final enterprise = EnterprisesProvider.of(mainContext, listen: false)
       .fromId(internship.enterpriseId);
   final contract = internship.contracts.firstWhere((c) => c.id == contractId);
-  final specialization = enterprise.jobs
-      .firstWhere((job) => job.id == internship.currentContract?.jobId)
-      .specialization;
+  final specialization = ActivitySectorsService.specializationOrNull(
+      internship.currentContract!.specializationId);
+
+  if (specialization == null) {
+    _logger.warning(
+        'No specialization found for internship ${internship.id} with specialization id ${internship.currentContract?.specializationId}');
+    return Uint8List(0);
+  }
 
   document.addPage(pw.MultiPage(
       pageFormat: PdfPageFormat.letter,

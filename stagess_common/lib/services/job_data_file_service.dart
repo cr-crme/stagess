@@ -39,6 +39,25 @@ abstract class ActivitySectorsService {
     }
     return out;
   }
+
+  static Skill? skillOrNull(String? id) {
+    if (id == null) return null;
+    try {
+      return allSkills.firstWhere((skill) => skill.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  static List<Skill> get allSkills {
+    final List<Skill> out = [];
+    for (final specialization in allSpecializations) {
+      for (final skill in specialization.skills) {
+        out.add(skill);
+      }
+    }
+    return out;
+  }
 }
 
 class ActivitySector extends NamedItemSerializable {

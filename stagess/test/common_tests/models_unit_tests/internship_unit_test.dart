@@ -94,8 +94,8 @@ void main() {
         internshipSame.currentContract!.date.toString(),
         internship.currentContract!.date.toString(),
       );
-      expect(internshipSame.currentContract!.jobId,
-          internship.currentContract!.jobId);
+      expect(internshipSame.currentContract!.specializationId,
+          internship.currentContract!.specializationId);
       expect(internshipSame.currentContract!.extraSpecializationIds,
           internship.currentContract!.extraSpecializationIds);
       expect(

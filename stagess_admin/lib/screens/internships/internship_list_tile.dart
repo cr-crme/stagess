@@ -183,6 +183,8 @@ class InternshipListTileState extends State<InternshipListTile> {
           InternshipContract(
             date: DateTime.now(),
             jobId: widget.internship.currentContract?.jobId ?? '',
+            specializationId:
+                widget.internship.currentContract?.specializationId ?? '',
             extraSpecializationIds:
                 widget.internship.currentContract?.extraSpecializationIds ?? [],
             program:

@@ -155,6 +155,7 @@ class _SelectableTextBoxesState extends State<SelectableTextBoxes> {
                     enabled: widget.enabled,
                     maxLength: 100,
                     maxLines: 5,
+                    style: const TextStyle(color: Colors.black),
                     onEditingComplete: () => _controller.updateOption(
                         i,
                         _controller.options[i].copyWith(

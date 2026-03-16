@@ -62,7 +62,7 @@ class HttpRequestHandler {
       _logger.info(
           'Request from ${request.connectionInfo?.remoteAddress.address}:${request.connectionInfo?.remotePort} failed: $message');
       request.response.statusCode = statusCode;
-      request.response.write(message);
+      request.response.write('Connexion refused');
       await request.response.close();
     } catch (e) {
       //coverage:ignore-start

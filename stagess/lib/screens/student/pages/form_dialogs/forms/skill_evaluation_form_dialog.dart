@@ -10,7 +10,6 @@ import 'package:stagess_common/models/internships/internship_evaluation_skill.da
 import 'package:stagess_common/models/internships/task_appreciation.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
-import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
@@ -114,7 +113,7 @@ class SkillEvaluationFormController {
     if (isFilledUsingPreviousEvaluation) {
       final evaluation = _previousEvaluation(context);
       final skill = _idToSkill[skillId]!;
-      if (evaluation!.skills.any((e) => e.skillName == skill.idWithName)) {
+      if (evaluation!.skills.any((e) => e.skillId == skill.id)) {
         _evaluatedSkills[skillId] = -1;
       }
     }
@@ -130,13 +129,10 @@ class SkillEvaluationFormController {
   void clearForm(BuildContext context) {
     _resetForm(context);
 
-    final internshipTp = internship(context, listen: false);
-    final enterprise = EnterprisesProvider.of(context,
-        listen: false)[internshipTp.enterpriseId];
-    final specialization =
-        enterprise.jobs[internshipTp.currentContract?.jobId].specialization;
+    final specialization = ActivitySectorsService.specializationOrNull(
+        internship(context, listen: false).currentContract?.specializationId);
 
-    for (final skill in specialization.skills) {
+    for (final skill in (specialization?.skills ?? SkillList.empty())) {
       addSkill(skill.id);
     }
   }
@@ -172,7 +168,7 @@ class SkillEvaluationFormController {
     for (final skillEvaluation in evaluation.skills) {
       final skillId = _evaluatedSkills.keys.firstWhere((skillId) {
         final skill = _idToSkill[skillId]!;
-        return skill.idWithName == skillEvaluation.skillName;
+        return skill.id == skillEvaluation.skillId;
       });
 
       addSkill(skillId);
@@ -209,7 +205,7 @@ class SkillEvaluationFormController {
       skillEvaluation.add(
         SkillEvaluation(
           specializationId: _skillsAreFromSpecializationId[skillId]!,
-          skillName: skill.idWithName,
+          skillId: skill.id,
           tasks: tasks,
           appreciation: appreciations[skillId]!,
           comments: skillCommentsControllers[skillId]!.text,
@@ -280,15 +276,13 @@ class SkillEvaluationFormController {
     _idToSkill.clear();
 
     final internshipTp = internship(context, listen: false);
-    final enterprise = EnterprisesProvider.of(context,
-        listen: false)[internshipTp.enterpriseId];
+    final specialization = ActivitySectorsService.specializationOrNull(
+        internshipTp.currentContract?.specializationId);
 
-    final specialization =
-        enterprise.jobs[internshipTp.currentContract?.jobId].specialization;
-    for (final skill in specialization.skills) {
+    for (final skill in (specialization?.skills ?? SkillList.empty())) {
       _idToSkill[skill.id] = skill;
       _evaluatedSkills[skill.id] = 0;
-      _skillsAreFromSpecializationId[skill.id] = specialization.id;
+      _skillsAreFromSpecializationId[skill.id] = specialization!.id;
     }
 
     for (final extraSpecializationId
@@ -712,9 +706,8 @@ class _JobToEvaluate extends StatefulWidget {
 class _JobToEvaluateState extends State<_JobToEvaluate> {
   Specialization get specialization {
     final internship = widget.formController.internship(context, listen: false);
-    final enterprise =
-        EnterprisesProvider.of(context, listen: false)[internship.enterpriseId];
-    return enterprise.jobs[internship.currentContract?.jobId].specialization;
+    return ActivitySectorsService.specializationOrNull(
+        internship.currentContract?.specializationId)!;
   }
 
   List<Specialization> get extraSpecializations {
@@ -872,10 +865,10 @@ class _JobToEvaluateState extends State<_JobToEvaluate> {
     final Map<String, bool> usedDuplicateSkills = {};
 
     final internship = widget.formController.internship(context, listen: false);
-    final enterprise =
-        EnterprisesProvider.of(context, listen: false)[internship.enterpriseId];
-    final mainSkills = enterprise
-        .jobs[internship.currentContract?.jobId].specialization.skills;
+    final mainSkills = ActivitySectorsService.specializationOrNull(
+                internship.currentContract?.specializationId)
+            ?.skills ??
+        SkillList.empty();
 
     for (final extra in extraSpecializations) {
       for (final skill in extra.skills) {

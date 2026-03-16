@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
-import 'package:logging/logging.dart';
-import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 
 final _logger = Logger('InternshipsHelpers');
@@ -13,7 +12,6 @@ class InternshipsHelpers {
       {required String studentId}) {
     _logger.finer('Fetching all skills for student: $studentId');
 
-    final enterprises = EnterprisesProvider.of(context, listen: false);
     final internships =
         InternshipsProvider.of(context, listen: false).byStudentId(studentId);
 
@@ -22,10 +20,8 @@ class InternshipsHelpers {
       final List<Specialization?> specializations = [];
 
       // Fetch all the specialization of the current internship
-      specializations.add(enterprises
-          .fromIdOrNull(internship.enterpriseId)
-          ?.jobs[internship.currentContract?.jobId]
-          .specialization);
+      specializations.add(ActivitySectorsService.specializationOrNull(
+          internship.currentContract?.specializationId));
       specializations.addAll(
           (internship.currentContract?.extraSpecializationIds ?? [])
               .map((id) => ActivitySectorsService.specialization(id)));
@@ -37,12 +33,10 @@ class InternshipsHelpers {
 
         for (final evaluation in internship.skillEvaluations) {
           for (final skill in evaluation.skills) {
-            if (specialization!.skills
-                .any((e) => e.idWithName == skill.skillName)) {
-              if (out[specialization]!
-                  .any((e) => e.skillName == skill.skillName)) {
+            if (specialization!.skills.any((e) => e.id == skill.skillId)) {
+              if (out[specialization]!.any((e) => e.skillId == skill.skillId)) {
                 final index = out[specialization]!
-                    .indexWhere((e) => e.skillName == skill.skillName);
+                    .indexWhere((e) => e.skillId == skill.skillId);
                 out[specialization]![index] = skill;
               } else {
                 out[specialization]!.add(skill);
@@ -83,7 +77,7 @@ class InternshipsHelpers {
       if (!out.containsKey(specialization)) out[specialization] = [];
       for (final skillEvaluation in skills[specialization]!) {
         if (!acquired[specialization]!
-                .any((eval) => eval.skillName == skillEvaluation.skillName) &&
+                .any((eval) => eval.skillId == skillEvaluation.skillId) &&
             (skillEvaluation.appreciation == SkillAppreciation.toPursuit ||
                 skillEvaluation.appreciation == SkillAppreciation.failed)) {
           out[specialization]!.add(skillEvaluation);

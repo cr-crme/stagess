@@ -716,13 +716,6 @@ class _StudentTileState extends State<_StudentTile> {
     setState(() {});
   }
 
-  Specialization? _getSpecialization(BuildContext context) {
-    if (_enterprise == null) return null;
-    return _enterprise!.jobs
-        .fromIdOrNull(widget.meta.internship.currentContract?.jobId ?? '-1')
-        ?.specialization;
-  }
-
   void _cyclePriority() {
     setState(() {
       widget.meta.visitingPriority = widget.meta.visitingPriority.next;
@@ -731,7 +724,8 @@ class _StudentTileState extends State<_StudentTile> {
 
   @override
   Widget build(BuildContext context) {
-    final specialization = _getSpecialization(context);
+    final specialization = ActivitySectorsService.specializationOrNull(
+        widget.meta.internship.currentContract?.specializationId);
     if (_enterprise == null || specialization == null) return Container();
 
     return Card(

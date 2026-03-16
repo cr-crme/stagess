@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/dialogs/show_pdf_dialog.dart';
-import 'package:stagess/common/widgets/itemized_text.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/forms/show_forms.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/forms/visa_evaluation_form_dialog.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/pdf/visa_pdf_template.dart';
 import 'package:stagess_common/models/persons/student_visa.dart';
-import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 
@@ -55,121 +53,21 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
       child: Padding(
         padding: const EdgeInsets.only(left: 24.0, top: 8.0, right: 24.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildSummary(
-                  title:
-                      'Expériences et aptitudes personnelles et scolaires complémentaires au profil d\'employabilité',
-                  elements: evaluation?.form.experiencesAndAptitudes
-                          .map((e) => e.isSelected ? e.text : null)
-                          .nonNulls
-                          .toList() ??
-                      [],
-                  emptyMessage: 'Aucune expérience renseignée.',
-                ),
-                _buildSummary(
-                  title: 'Attestations et mentions',
-                  elements: evaluation?.form.attestationsAndMentions
-                          .map((e) => e.isSelected ? e.text : null)
-                          .nonNulls
-                          .toList() ??
-                      [],
-                  emptyMessage: 'Aucune attestation renseignée.',
-                ),
-                _buildSummary(
-                  title: 'Formations relatives à la SST',
-                  elements: evaluation?.form.sstTrainings
-                          .map((e) => e.isSelected && !e.isHidden
-                              ? SstTraining.availableTrainings[e.trainingId]
-                              : null)
-                          .nonNulls
-                          .toList() ??
-                      [],
-                  emptyMessage: 'Aucune formation à la SST renseignée.',
-                ),
-                _buildSummary(
-                  title: 'Certification CFMS / CFPT',
-                  elements: CertificateType.values
-                      .map((certificateType) {
-                        switch (certificateType) {
-                          case CertificateType.none:
-                            {
-                              return null;
-                            }
-                          case CertificateType.fpt:
-                            {
-                              return evaluation?.form.certificates
-                                  .where((c) =>
-                                      c.certificateType == CertificateType.fpt)
-                                  .map((c) =>
-                                      'CFPT: Certificat de formation préparatoire au travail \u2014 ${c.year ?? 'Année non renseignée'}')
-                                  .firstOrNull;
-                            }
-                          case CertificateType.fms:
-                            {
-                              final certificates = evaluation?.form.certificates
-                                  .where((c) =>
-                                      c.certificateType == CertificateType.fms);
-
-                              if (certificates?.isEmpty ?? true) return null;
-
-                              return 'CFMS: Certificat de formation à un métier semi-spécialisé obtenu pour :\n'
-                                  '${certificates!.where((e) => e.isSelected).map((e) {
-                                final job = ActivitySectorsService
-                                        .allSpecializations
-                                        .firstWhereOrNull((specialization) =>
-                                            specialization.id ==
-                                            e.specializationId)
-                                        ?.idWithName ??
-                                    'Métier non trouvé';
-                                return '    $job \u2014 ${e.year ?? 'Année non renseignée'}';
-                              }).join('\n')}';
-                            }
-                        }
-                      })
-                      .nonNulls
-                      .toList(),
-                  emptyMessage: 'Aucun certificat à afficher.',
-                ),
-                SizedBox(height: 16.0),
-                _buildModifyFormButton(),
-                SizedBox(height: 16),
-                _buildSelectShowPreviousEvaluations(),
-                SizedBox(height: 16),
-              ],
+            Text(
+              _evaluations.isEmpty
+                  ? 'Aucune information renseignée.'
+                  : 'Des informations ont été ajoutées au VISA.\n'
+                      'Dernière modification le\u00a0: ${DateFormat.yMMMEd('fr_CA').format(evaluation!.date)}',
             ),
+            SizedBox(height: 16.0),
+            _buildModifyFormButton(),
+            SizedBox(height: 16),
+            _buildSelectShowPreviousEvaluations(),
+            SizedBox(height: 16),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildSummary({
-    required String title,
-    String? subtitle,
-    required List<String> elements,
-    required String emptyMessage,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: _interline),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          if (subtitle != null)
-            Text(
-              subtitle,
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          const SizedBox(height: 8.0),
-          if (elements.isEmpty) Text(emptyMessage) else ItemizedText(elements),
-          const SizedBox(height: 12.0),
-        ],
       ),
     );
   }

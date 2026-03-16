@@ -13,7 +13,6 @@ Future<Uint8List> generateVisaPdf(BuildContext context, PdfPageFormat format,
   _logger.info('Generating visa PDF for student: $studentId');
 
   final document = pw.Document();
-  print(studentVisa);
 
   document.addPage(
     pw.Page(

@@ -7,6 +7,7 @@ import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/misc/question_file_service.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/sst_evaluation.dart';
+import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/form_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
@@ -268,7 +269,9 @@ class _SstEvaluationFormScreenState extends State<_SstEvaluationFormScreen> {
                             internship.sstEvaluations.lastOrNull,
                         wereAtMeetingController: wereAtMeetingController,
                         enterpriseId: internship.enterpriseId,
-                        jobId: internship.currentContract?.jobId ?? '-1'),
+                        specializationId:
+                            internship.currentContract?.specializationId ??
+                                '-1'),
                   ),
                 ),
                 _controlBuilder(),
@@ -308,14 +311,14 @@ class _QuestionsStep extends StatefulWidget {
     required this.initialSstEvaluation,
     required this.wereAtMeetingController,
     required this.enterpriseId,
-    required this.jobId,
+    required this.specializationId,
   });
 
   final bool editMode;
   final SstEvaluation? initialSstEvaluation;
   final CheckboxWithOtherController<String> wereAtMeetingController;
   final String enterpriseId;
-  final String jobId;
+  final String specializationId;
 
   @override
   State<_QuestionsStep> createState() => _QuestionsStepState();
@@ -340,12 +343,11 @@ class _QuestionsStepState extends State<_QuestionsStep> {
   }
 
   Widget _buildQuestions() {
-    final enterprise = EnterprisesProvider.of(context, listen: false)
-        .fromId(widget.enterpriseId);
-    final job = enterprise.jobs.fromId(widget.jobId);
+    final specialization =
+        ActivitySectorsService.specializationOrNull(widget.specializationId);
 
     // Sort the question by "id"
-    final questionIds = [...job.specialization.questions]
+    final questionIds = [...?specialization?.questions]
       ..sort((a, b) => int.parse(a) - int.parse(b));
     final questions =
         questionIds.map((e) => QuestionFileService.fromId(e)).toList();
@@ -479,7 +481,8 @@ class _QuestionsStepState extends State<_QuestionsStep> {
 
     final enterprise = EnterprisesProvider.of(context, listen: false)
         .fromId(widget.enterpriseId);
-    final job = enterprise.jobs.fromId(widget.jobId);
+    final specialization =
+        ActivitySectorsService.specializationOrNull(widget.specializationId);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -504,7 +507,7 @@ class _QuestionsStepState extends State<_QuestionsStep> {
           ),
           style: styleOverride,
           controller: TextEditingController(
-            text: job.specialization.name,
+            text: specialization?.name ?? '',
           ),
           maxLines: null,
           enabled: false,

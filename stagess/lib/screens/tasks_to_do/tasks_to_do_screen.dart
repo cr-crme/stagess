@@ -14,6 +14,7 @@ import 'package:stagess/screens/student/pages/form_dialogs/forms/sst_evaluation_
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
@@ -217,22 +218,23 @@ class _SstRisk extends StatelessWidget {
             : data.map((e) {
                 final internship = e.internship;
                 final enterprise = e.enterprise;
-                final job = enterprise?.jobs.firstWhere(
-                    (j) => j.id == internship?.currentContract?.jobId);
+                final specialization =
+                    ActivitySectorsService.specializationOrNull(
+                        internship?.currentContract?.specializationId);
                 final student = e.student;
                 if (internship == null ||
                     enterprise == null ||
-                    job == null ||
+                    specialization == null ||
                     student == null) {
                   _logger.severe(
                       'Missing data for SST task tile: internship=${internship?.id}, '
-                      'enterprise=${enterprise?.id}, job=${job?.id}, student=${student?.id}');
+                      'enterprise=${enterprise?.id}, specialization=${specialization?.id}, student=${student?.id}');
                   return const SizedBox.shrink();
                 }
 
                 return _TaskTile(
                   title: student.fullName,
-                  subtitle: '${enterprise.name} (${job.specialization.name})',
+                  subtitle: '${enterprise.name} (${specialization.name})',
                   student: student,
                   icon: Icons.warning,
                   iconColor: Theme.of(context).colorScheme.secondary,

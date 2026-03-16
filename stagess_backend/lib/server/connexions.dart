@@ -126,7 +126,7 @@ class Connexions {
               id: protocol?.id,
               field: protocol?.field,
               requestType: RequestType.response,
-              data: {'error': e.toString()},
+              data: {'error': 'Connexion refused'},
               response: Response.connexionRefused));
     } on InternshipBankException catch (e, st) {
       if (!skipLog) {
@@ -139,7 +139,7 @@ class Connexions {
               id: protocol?.id,
               field: protocol?.field,
               requestType: RequestType.response,
-              data: {'error': e.toString()},
+              data: {'error': 'Invalid request'},
               response: Response.failure));
     } catch (e, st) {
       if (!skipLog) {
@@ -154,7 +154,7 @@ class Connexions {
               id: protocol?.id,
               field: protocol?.field,
               requestType: RequestType.response,
-              data: {'error': 'Invalid message format: $e'},
+              data: {'error': 'Invalid request'},
               response: Response.failure));
     }
   }
@@ -506,7 +506,7 @@ class Connexions {
         message: CommunicationProtocol(
             requestType: RequestType.response,
             field: null,
-            data: {'error': message},
+            data: {'error': 'Connexion refused'},
             response: Response.failure));
     await _onConnexionClosed(client, message: message);
   }

@@ -478,6 +478,7 @@ CREATE TABLE internship_contracts (
     internship_id VARCHAR(36) NOT NULL,
     date BIGINT NOT NULL,
     job_id VARCHAR(36) NOT NULL,
+    specialization_id VARCHAR(36) NOT NULL,
     program INT NOT NULL,
     supervisor_first_name VARCHAR(50) NOT NULL,
     supervisor_last_name VARCHAR(50) NOT NULL,
@@ -542,8 +543,8 @@ CREATE TABLE internship_skill_evaluation_persons (
 CREATE TABLE internship_skill_evaluation_items (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     evaluation_id VARCHAR(36) NOT NULL,
-    job_id VARCHAR(36) NOT NULL,
-    skill_name VARCHAR(1000) NOT NULL,
+    specialization_id VARCHAR(36) NOT NULL,
+    skill_id VARCHAR(1000) NOT NULL,
     appreciation INT NOT NULL,
     comments VARCHAR(2000),
     FOREIGN KEY (evaluation_id) REFERENCES internship_skill_evaluations(id) ON DELETE CASCADE

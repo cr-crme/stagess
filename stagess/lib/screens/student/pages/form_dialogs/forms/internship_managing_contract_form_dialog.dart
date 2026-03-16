@@ -171,6 +171,7 @@ class InternshipContractFormController {
       date: creationDate,
       supervisor: _supervisor,
       jobId: _primaryJobController.job.id,
+      specializationId: _primaryJobController.job.specialization.id,
       extraSpecializationIds:
           _extraJobControllers.map((e) => e.job.specialization.id).toList(),
       program: program,

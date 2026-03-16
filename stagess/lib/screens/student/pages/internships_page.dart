@@ -14,6 +14,7 @@ import 'package:stagess/screens/student/pages/form_dialogs/widgets/internship_ma
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
@@ -219,14 +220,11 @@ class _StudentInternshipListViewState
                       internship.currentContract?.dates.end ?? DateTime.now())
                   : DateFormat.yMMMd('fr_CA').format(internship.endDate);
 
-              final String specializationIdWithName = EnterprisesProvider.of(
-                          context)
-                      .fromIdOrNull(internship.enterpriseId)
-                      ?.jobs
-                      .fromIdOrNull(internship.currentContract?.jobId ?? '-1')
-                      ?.specialization
-                      .idWithName ??
-                  '';
+              final String specializationIdWithName =
+                  ActivitySectorsService.specializationOrNull(
+                              internship.currentContract!.specializationId)
+                          ?.idWithName ??
+                      '';
 
               return AnimatedExpandingCard(
                 initialExpandedState: _expanded[internship.id]!,

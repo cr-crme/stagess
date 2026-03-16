@@ -196,7 +196,8 @@ class _InternshipListState extends State<_InternshipList> {
               if (contract == null) return Container();
 
               final specialization =
-                  widget.enterprise.jobs[contract.jobId].specialization;
+                  ActivitySectorsService.specializationOrNull(
+                      contract.specializationId);
               final student = StudentsProvider.of(
                 context,
               ).firstWhereOrNull((e) => e.id == internship.studentId);
@@ -205,7 +206,7 @@ class _InternshipListState extends State<_InternshipList> {
               );
               final canSeeDetails = _canSeeDetails(internshipId: internship.id);
 
-              if (student == null) return Container();
+              if (specialization == null || student == null) return Container();
 
               var internshipDays = <Day>{};
               for (final weeklySchedule in contract.weeklySchedules) {

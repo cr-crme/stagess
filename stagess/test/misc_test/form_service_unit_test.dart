@@ -169,12 +169,10 @@ void main() {
     });
 
     test('passwordValidator', () {
-      const errorMessage = 'Le mot de passe ne répond pas aux critères.';
       expect(
         FormService.passwordValidator(''),
         'Le champ ne peut pas être vide.',
       );
-      expect(FormService.passwordValidator('1234567'), errorMessage);
       expect(FormService.passwordValidator('12345678'), isNull);
     });
 

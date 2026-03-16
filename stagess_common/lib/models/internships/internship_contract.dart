@@ -14,8 +14,9 @@ class InternshipContract extends InternshipEvaluation {
   String formVersion;
 
   final DateTimeRange dates;
-  final String jobId; // Main job attached to the enterprise
-  final List<String> extraSpecializationIds; // Any extra specialization
+  final String jobId;
+  final String specializationId;
+  final List<String> extraSpecializationIds;
   final Program program;
   final Person supervisor;
   final List<WeeklySchedule> weeklySchedules;
@@ -27,6 +28,7 @@ class InternshipContract extends InternshipEvaluation {
     super.id,
     required this.date,
     required this.jobId,
+    required this.specializationId,
     required this.extraSpecializationIds,
     required this.program,
     required this.supervisor,
@@ -42,6 +44,7 @@ class InternshipContract extends InternshipEvaluation {
   InternshipContract.fromSerialized(super.map)
       : date = DateTimeExt.from(map?['date']) ?? DateTime.now(),
         jobId = StringExt.from(map?['job_id']) ?? '',
+        specializationId = StringExt.from(map?['specialization_id']) ?? '',
         extraSpecializationIds = ListExt.from(map?['extra_specialization_ids'],
                 deserializer: (e) => StringExt.from(e)!) ??
             [],
@@ -71,6 +74,7 @@ class InternshipContract extends InternshipEvaluation {
   static InternshipContract get empty => InternshipContract(
         date: DateTime.now(),
         jobId: '',
+        specializationId: '',
         extraSpecializationIds: [],
         program: Program.undefined,
         supervisor: Person.empty,
@@ -96,6 +100,7 @@ class InternshipContract extends InternshipEvaluation {
       'id': id,
       'date': date.serialize(),
       'job_id': jobId.serialize(),
+      'specialization_id': specializationId.serialize(),
       'extra_specialization_ids': extraSpecializationIds.serialize(),
       'program': program.serialize(currentVersion),
       'supervisor_first_name': supervisor.firstName.serialize(),
@@ -115,6 +120,7 @@ class InternshipContract extends InternshipEvaluation {
   InternshipContract copyWith({
     DateTime? date,
     String? jobId,
+    String? specializationId,
     List<String>? extraSpecializationIds,
     Program? program,
     Person? supervisor,
@@ -129,6 +135,7 @@ class InternshipContract extends InternshipEvaluation {
       id: id,
       date: date ?? this.date,
       jobId: jobId ?? this.jobId,
+      specializationId: specializationId ?? this.specializationId,
       extraSpecializationIds:
           extraSpecializationIds ?? this.extraSpecializationIds,
       program: program ?? this.program,
@@ -149,6 +156,8 @@ class InternshipContract extends InternshipEvaluation {
       id: id,
       date: DateTimeExt.from(serialized['date']) ?? date,
       jobId: StringExt.from(serialized['job_id']) ?? jobId,
+      specializationId:
+          StringExt.from(serialized['specialization_id']) ?? specializationId,
       extraSpecializationIds: ListExt.from(
               serialized['extra_specialization_ids'],
               deserializer: (e) => StringExt.from(e)!) ??
@@ -184,7 +193,7 @@ class InternshipContract extends InternshipEvaluation {
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
         'date': FetchableFields.optional,
-        'job_id': FetchableFields.mandatory,
+        'specialization_id': FetchableFields.mandatory,
         'extra_specialization_ids': FetchableFields.mandatory,
         'program': FetchableFields.optional,
         'supervisor_first_name': FetchableFields.optional,
@@ -204,6 +213,7 @@ class InternshipContract extends InternshipEvaluation {
   String toString() {
     return 'InternshipManagingContract(date: $date, '
         'jobId: $jobId, '
+        'specializationId: $specializationId, '
         'extraSpecializationIds: $extraSpecializationIds, '
         'program: ${program.name}, '
         'supervisor: ${supervisor.fullName}, '
