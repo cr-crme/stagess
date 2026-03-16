@@ -223,9 +223,11 @@ class VisaFormController {
 
     _isGatewayToFmsAvailable = visa.form.isGatewayToFmsAvailable;
     for (final item in visa.form.certificates) {
-      final index = _sstCertificateController.options.indexWhere((e) =>
-          e.text == item.text &&
-          (e as Certificate).specializationId == item.specializationId);
+      final index = _sstCertificateController.options.indexWhere((e) {
+        final formItem = e as Certificate;
+        return formItem.certificateType == item.certificateType &&
+            formItem.specializationId == item.specializationId;
+      });
       if (index < 0) {
         // This should not happen, but if the student was drastically modified
         // it is possible the previous certificates includes job that were since removed
@@ -241,9 +243,13 @@ class VisaFormController {
         );
       } else {
         _sstCertificateController.updateOption(
-            index,
-            (_sstCertificateController.options[index] as Certificate)
-                .copyWith(isSelected: item.isSelected));
+          index,
+          (_sstCertificateController.options[index] as Certificate).copyWith(
+            isSelected: item.isSelected,
+            year: item.year,
+            specializationId: item.specializationId,
+          ),
+        );
       }
     }
 

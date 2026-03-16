@@ -101,7 +101,6 @@ Future<void> showStudentEvaluationFormDialog(
     return;
   }
 
-  // TODO Find why changing not results in erasing the year of the FPT certificate
   await students.replaceWithConfirmation(newStudent);
   if (context.mounted) {
     showSnackBar(context, message: 'L\'étudiant a été mis à jour');
