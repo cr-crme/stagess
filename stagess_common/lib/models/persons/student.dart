@@ -140,7 +140,7 @@ class Student extends Person {
       'photo': FetchableFields.optional,
       'program': FetchableFields.mandatory,
       'group': FetchableFields.mandatory,
-      'contact': Person.fetchableFields,
+      'contact': FetchableFields.optional,
       'contact_link': FetchableFields.optional,
       'all_visa': FetchableFields.mandatory
         ..addAll(FetchableFields.reference({'*': StudentVisa.fetchableFields})),

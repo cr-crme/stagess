@@ -333,33 +333,42 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
     required SchoolBoard? previous,
     required DatabaseUser user,
   }) async {
-    if (previous == null) {
-      await _insertToSchoolBoards(schoolBoard, user: user);
-    } else {
-      await _updateToSchoolBoards(schoolBoard, previous, user: user);
-    }
+    try {
+      await sqlInterface.beginTransaction();
 
-    // Insert the schools
-    final toWait = <Future>[];
-    for (final school in schoolBoard.schools) {
-      final previousSchool =
-          previous?.schools.firstWhereOrNull((e) => e.id == school.id);
-      if (previousSchool == null) {
-        toWait.add(_insertToSchools(school, schoolBoard, user: user));
+      if (previous == null) {
+        await _insertToSchoolBoards(schoolBoard, user: user);
       } else {
-        toWait.add(_updateToSchools(school, previousSchool,
-            schoolBoard: schoolBoard, user: user));
+        await _updateToSchoolBoards(schoolBoard, previous, user: user);
       }
-    }
 
-    // Remove the schools that are not in the new list
-    for (final school in previous?.schools ?? <School>[]) {
-      if (!schoolBoard.schools.any((e) => e.id == school.id)) {
-        toWait.add(_deleteFromSchools(school.id, user: user));
+      // Insert the schools
+      final toWait = <Future>[];
+      for (final school in schoolBoard.schools) {
+        final previousSchool =
+            previous?.schools.firstWhereOrNull((e) => e.id == school.id);
+        if (previousSchool == null) {
+          toWait.add(_insertToSchools(school, schoolBoard, user: user));
+        } else {
+          toWait.add(_updateToSchools(school, previousSchool,
+              schoolBoard: schoolBoard, user: user));
+        }
       }
-    }
 
-    await Future.wait(toWait);
+      // Remove the schools that are not in the new list
+      for (final school in previous?.schools ?? <School>[]) {
+        if (!schoolBoard.schools.any((e) => e.id == school.id)) {
+          toWait.add(_deleteFromSchools(school.id, user: user));
+        }
+      }
+
+      await Future.wait(toWait);
+
+      await sqlInterface.commitTransaction();
+    } catch (e) {
+      await sqlInterface.rollbackTransaction();
+      rethrow;
+    }
   }
 
   Future<void> _deleteFromSchools(String schoolId,
@@ -386,6 +395,8 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
     }
 
     try {
+      await sqlInterface.beginTransaction();
+
       final schools = await sqlInterface.performSelectQuery(
         user: user,
         tableName: 'schools',
@@ -400,8 +411,10 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
         filters: {'shared_id': id},
       );
 
+      await sqlInterface.commitTransaction();
       return id;
     } catch (e) {
+      await sqlInterface.rollbackTransaction();
       return null;
     }
   }

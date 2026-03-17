@@ -36,7 +36,7 @@ class InternshipsPage extends StatefulWidget {
 }
 
 class InternshipsPageState extends State<InternshipsPage> {
-  Future<void> addStage() async =>
+  Future<void> addInternship() async =>
       widget.onAddInternshipRequest(widget.enterprise, null);
 
   List<Internship> _getActiveInternships(List<Internship> internships) {

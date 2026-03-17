@@ -24,6 +24,21 @@ abstract class SqlInterface {
   dynamic get connection;
 
   ///
+  /// Start a transaction. All the queries performed after this call will be part
+  /// of the transaction, until a call to [commitTransaction] or [rollbackTransaction].
+  /// If an error occurs during the transaction, it is recommended to call [rollbackTransaction]
+  /// to revert the database to its previous state.
+  Future<void> beginTransaction();
+
+  /// Commit the current transaction. All the queries performed since the last call to [beginTransaction]
+  /// will be permanently applied to the database.
+  Future<void> commitTransaction();
+
+  /// Rollback the current transaction. All the queries performed since the last call to [beginTransaction]
+  /// will be reverted, and the database will be restored to its previous state.
+  Future<void> rollbackTransaction();
+
+  ///
   /// Try to perform a query, and catch any database exception to rethrow
   Future<Results> tryQuery(String query, [List<Object?>? values]);
 
@@ -168,6 +183,15 @@ class MySqlInterface implements SqlInterface {
       _connection = await connectToDatabase();
     }
   }
+
+  @override
+  Future<void> beginTransaction() async =>
+      await connection.query('START TRANSACTION');
+  @override
+  Future<void> commitTransaction() async => await connection.query('COMMIT');
+  @override
+  Future<void> rollbackTransaction() async =>
+      await connection.query('ROLLBACK');
 
 // coverage:ignore-start
   @override

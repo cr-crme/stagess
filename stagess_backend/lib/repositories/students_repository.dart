@@ -609,14 +609,24 @@ class MySqlStudentsRepository extends StudentsRepository {
     required Student? previous,
     required DatabaseUser user,
   }) async {
-    if (previous == null) {
-      await _insertToStudents(student);
-      await _insertToContacts(student);
-      await _insertToVisa(student);
-    } else {
-      await _updateToStudents(student, previous, user);
-      await _updateToContacts(student: student, previous: previous, user: user);
-      await _updateToVisa(student, previous);
+    try {
+      await sqlInterface.beginTransaction();
+
+      if (previous == null) {
+        await _insertToStudents(student);
+        await _insertToContacts(student);
+        await _insertToVisa(student);
+      } else {
+        await _updateToStudents(student, previous, user);
+        await _updateToContacts(
+            student: student, previous: previous, user: user);
+        await _updateToVisa(student, previous);
+      }
+
+      await sqlInterface.commitTransaction();
+    } catch (e) {
+      await sqlInterface.rollbackTransaction();
+      rethrow;
     }
   }
 
@@ -628,6 +638,8 @@ class MySqlStudentsRepository extends StudentsRepository {
     // Note: This will fail if the student was involved in an internship. The
     // data from the internship needs to be deleted first.
     try {
+      await sqlInterface.beginTransaction();
+
       final contacts = (await sqlInterface.performSelectQuery(
         user: user,
         tableName: 'student_contacts',
@@ -650,8 +662,11 @@ class MySqlStudentsRepository extends StudentsRepository {
         tableName: 'entities',
         filters: {'shared_id': id},
       );
+
+      await sqlInterface.commitTransaction();
       return id;
     } catch (e) {
+      await sqlInterface.rollbackTransaction();
       return null;
     }
   }

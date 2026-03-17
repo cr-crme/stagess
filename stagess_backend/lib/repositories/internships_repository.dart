@@ -915,30 +915,39 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     required Internship? previous,
     required DatabaseUser user,
   }) async {
-    if (previous == null) {
-      await _insertToInternships(internship);
-    } else {
-      await _updateToInternships(internship, previous);
-    }
+    try {
+      await sqlInterface.beginTransaction();
 
-    // Insert simultaneously elements
-    final toWait = <Future>[];
-    if (previous == null) {
-      toWait.add(_insertToSupervisingTeachers(internship));
-      toWait.add(_insertToContracts(internship, user: user));
-      toWait.add(_insertToSkillEvaluations(internship));
-      toWait.add(_insertToAttitudeEvaluations(internship));
-      toWait.add(_insertToEnterpriseEvaluation(internship));
-      toWait.add(_insertJobSstEvaluation(internship));
-    } else {
-      toWait.add(_updateToSupervisingTeachers(internship, previous));
-      toWait.add(_updateToContracts(internship, previous, user));
-      toWait.add(_updateToSkillEvaluations(internship, previous));
-      toWait.add(_updateToAttitudeEvaluations(internship, previous));
-      toWait.add(_updateToEnterpriseEvaluation(internship, previous));
-      toWait.add(_updateJobSstEvaluation(internship, previous));
+      if (previous == null) {
+        await _insertToInternships(internship);
+      } else {
+        await _updateToInternships(internship, previous);
+      }
+
+      // Insert simultaneously elements
+      final toWait = <Future>[];
+      if (previous == null) {
+        toWait.add(_insertToSupervisingTeachers(internship));
+        toWait.add(_insertToContracts(internship, user: user));
+        toWait.add(_insertToSkillEvaluations(internship));
+        toWait.add(_insertToAttitudeEvaluations(internship));
+        toWait.add(_insertToEnterpriseEvaluation(internship));
+        toWait.add(_insertJobSstEvaluation(internship));
+      } else {
+        toWait.add(_updateToSupervisingTeachers(internship, previous));
+        toWait.add(_updateToContracts(internship, previous, user));
+        toWait.add(_updateToSkillEvaluations(internship, previous));
+        toWait.add(_updateToAttitudeEvaluations(internship, previous));
+        toWait.add(_updateToEnterpriseEvaluation(internship, previous));
+        toWait.add(_updateJobSstEvaluation(internship, previous));
+      }
+      await Future.wait(toWait);
+
+      await sqlInterface.commitTransaction();
+    } catch (e) {
+      await sqlInterface.rollbackTransaction();
+      rethrow;
     }
-    await Future.wait(toWait);
   }
 
   @override
@@ -947,12 +956,15 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     required DatabaseUser user,
   }) async {
     try {
+      await sqlInterface.beginTransaction();
       await sqlInterface.performDeleteQuery(
         tableName: 'entities',
         filters: {'shared_id': id},
       );
+      await sqlInterface.commitTransaction();
       return id;
     } catch (e) {
+      await sqlInterface.rollbackTransaction();
       return null;
     }
   }

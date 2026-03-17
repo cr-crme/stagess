@@ -91,11 +91,10 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
   }
 
   late Enterprise _currentEnterprise = Enterprise.empty.copyWith(
-    schoolBoardId:
-        TeachersProvider.of(
-          context,
-          listen: false,
-        ).currentTeacher?.schoolBoardId,
+    schoolBoardId: TeachersProvider.of(
+      context,
+      listen: false,
+    ).currentTeacher?.schoolBoardId,
     recruiterId: TeachersProvider.of(context, listen: false).currentTeacher?.id,
   );
 
@@ -137,36 +136,44 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
 
     if (_aboutKey.currentState == null) return;
     _updateEnterprise();
-    enterprises.add(_currentEnterprise);
+    final isSuccess = await enterprises.addWithConfirmation(_currentEnterprise);
+    if (!mounted) return;
+
+    if (!isSuccess) {
+      _logger.warning('Failed to add enterprise: ${_currentEnterprise.name}');
+      showSnackBar(
+        context,
+        message: 'Erreur lors de l\'ajout de l\'entreprise.',
+      );
+      return;
+    }
 
     await showDialog(
       context: context,
-      builder:
-          (ctx) => AlertDialog(
-            title: const SubTitle('Entreprise ajoutée', left: 0, bottom: 0),
-            content: RichText(
-              text: TextSpan(
-                children: [
-                  const TextSpan(text: 'L\'entreprise '),
-                  TextSpan(
-                    text: _currentEnterprise.name,
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const TextSpan(
-                    text:
-                        ' a bien été ajoutée à la liste des entreprises.\n\n'
-                        'Vous pouvez maintenant y inscrire des stagiaires.',
-                  ),
-                ],
+      builder: (ctx) => AlertDialog(
+        title: const SubTitle('Entreprise ajoutée', left: 0, bottom: 0),
+        content: RichText(
+          text: TextSpan(
+            children: [
+              const TextSpan(text: 'L\'entreprise '),
+              TextSpan(
+                text: _currentEnterprise.name,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Ok'),
+              const TextSpan(
+                text: ' a bien été ajoutée à la liste des entreprises.\n\n'
+                    'Vous pouvez maintenant y inscrire des stagiaires.',
               ),
             ],
           ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Ok'),
+          ),
+        ],
+      ),
     );
 
     _logger.fine('Entreprise added: ${_currentEnterprise.name}');
@@ -206,12 +213,11 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
             scrollController: _scrollController,
             currentStep: _currentStep,
             onTapContinue: _nextStep,
-            onStepTapped:
-                (int tapped) => setState(() {
-                  _updateEnterprise();
-                  _scrollController.jumpTo(0);
-                  _currentStep = tapped;
-                }),
+            onStepTapped: (int tapped) => setState(() {
+              _updateEnterprise();
+              _scrollController.jumpTo(0);
+              _currentStep = tapped;
+            }),
             onTapCancel: _cancel,
             steps: [
               Step(
@@ -267,8 +273,8 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
                   _currentStep == 2
                       ? 'Valider'
                       : _currentStep == 1
-                      ? 'Enregistrer'
-                      : 'Suivant',
+                          ? 'Enregistrer'
+                          : 'Suivant',
                 ),
               ),
             ],

@@ -1048,32 +1048,43 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     required DatabaseUser user,
     required InternshipsRepository internshipsRepository,
   }) async {
-    if (previous == null) {
-      await _insertToEnterprises(enterprise);
-    } else {
-      await _updateToEnterprises(enterprise, previous);
-    }
+    try {
+      // Set to transaction to rollback at the end of the operation
+      await sqlInterface.beginTransaction();
 
-    final toWait = <Future>[];
-    if (previous == null) {
-      toWait.add(_insertToEnterprisesActivityTypes(enterprise));
-      toWait.add(_insertToEnterprisesJobs(enterprise));
-      toWait.add(_insertToContact(enterprise));
-      toWait.add(_insertToEnterpriseAddress(enterprise));
-      toWait.add(_insertToEnterpriseHeadquartersAddress(enterprise));
-      toWait.add(_insertToEnterprisePhoneNumber(enterprise));
-      toWait.add(_insertToEnterpriseFax(enterprise));
-    } else {
-      toWait.add(_updateToEnterprisesActivityTypes(enterprise, previous));
-      toWait.add(_updateToEnterprisesJobs(enterprise, previous,
-          user: user, internshipsRepository: internshipsRepository));
-      toWait.add(_updateToContact(enterprise, previous));
-      toWait.add(_updateToEnterpriseAddress(enterprise, previous));
-      toWait.add(_updateToEnterpriseHeadquartersAddress(enterprise, previous));
-      toWait.add(_updateToEnterprisePhoneNumber(enterprise, previous));
-      toWait.add(_updateToEnterpriseFax(enterprise, previous));
+      if (previous == null) {
+        await _insertToEnterprises(enterprise);
+      } else {
+        await _updateToEnterprises(enterprise, previous);
+      }
+
+      final toWait = <Future>[];
+      if (previous == null) {
+        toWait.add(_insertToEnterprisesActivityTypes(enterprise));
+        toWait.add(_insertToEnterprisesJobs(enterprise));
+        toWait.add(_insertToContact(enterprise));
+        toWait.add(_insertToEnterpriseAddress(enterprise));
+        toWait.add(_insertToEnterpriseHeadquartersAddress(enterprise));
+        toWait.add(_insertToEnterprisePhoneNumber(enterprise));
+        toWait.add(_insertToEnterpriseFax(enterprise));
+      } else {
+        toWait.add(_updateToEnterprisesActivityTypes(enterprise, previous));
+        toWait.add(_updateToEnterprisesJobs(enterprise, previous,
+            user: user, internshipsRepository: internshipsRepository));
+        toWait.add(_updateToContact(enterprise, previous));
+        toWait.add(_updateToEnterpriseAddress(enterprise, previous));
+        toWait
+            .add(_updateToEnterpriseHeadquartersAddress(enterprise, previous));
+        toWait.add(_updateToEnterprisePhoneNumber(enterprise, previous));
+        toWait.add(_updateToEnterpriseFax(enterprise, previous));
+      }
+      await Future.wait(toWait);
+
+      await sqlInterface.commitTransaction();
+    } catch (_) {
+      await sqlInterface.rollbackTransaction();
+      rethrow;
     }
-    await Future.wait(toWait);
   }
 
   Future<void> _deleteInternshipsFromJob(
@@ -1107,6 +1118,8 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     final out = RepositoryResponse();
 
     try {
+      await sqlInterface.beginTransaction();
+
       final enterprise = await _getEnterpriseById(id: id, user: user);
 
       if (enterprise?.jobs != null) {
@@ -1171,7 +1184,10 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
 
       out.deletedData ??= {};
       out.deletedData![RequestFields.enterprise] ??= {id: FetchableFields.all};
+
+      await sqlInterface.commitTransaction();
     } catch (e) {
+      await sqlInterface.rollbackTransaction();
       throw InvalidRequestException(
           'Unable to delete the enterprise with id $id. Is there any internships associated with this enterprise? $e');
     }

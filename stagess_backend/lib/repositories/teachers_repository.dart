@@ -467,23 +467,31 @@ class MySqlTeachersRepository extends TeachersRepository {
     required Teacher? previous,
     required DatabaseUser user,
   }) async {
-    if (previous == null) {
-      await _insertToTeachers(teacher);
-    } else {
-      await _updateToTeachers(teacher, previous, user);
-    }
+    try {
+      await sqlInterface.beginTransaction();
 
-    final toWait = <Future>[];
-    if (previous == null) {
-      toWait.add(_insertToGroups(teacher));
-      toWait.add(_insertToItineraries(teacher));
-      toWait.add(_insertToPriorities(teacher));
-    } else {
-      toWait.add(_updateToGroups(teacher, previous, user));
-      toWait.add(_updateToItineraries(teacher, previous));
-      toWait.add(_updateToPriorities(user, teacher, previous));
+      if (previous == null) {
+        await _insertToTeachers(teacher);
+      } else {
+        await _updateToTeachers(teacher, previous, user);
+      }
+
+      final toWait = <Future>[];
+      if (previous == null) {
+        toWait.add(_insertToGroups(teacher));
+        toWait.add(_insertToItineraries(teacher));
+        toWait.add(_insertToPriorities(teacher));
+      } else {
+        toWait.add(_updateToGroups(teacher, previous, user));
+        toWait.add(_updateToItineraries(teacher, previous));
+        toWait.add(_updateToPriorities(user, teacher, previous));
+      }
+      await Future.wait(toWait);
+      await sqlInterface.commitTransaction();
+    } catch (e) {
+      await sqlInterface.rollbackTransaction();
+      rethrow;
     }
-    await Future.wait(toWait);
   }
 
   @override

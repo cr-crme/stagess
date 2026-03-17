@@ -75,8 +75,8 @@ class JobsPageState extends State<JobsPage> {
     setState(() {});
   }
 
-  Future<void> addJob() async {
-    if (_forceDisabled) return;
+  Future<bool> addJob() async {
+    if (_forceDisabled) return false;
     setState(() {
       _forceDisabled = true;
     });
@@ -95,7 +95,7 @@ class JobsPageState extends State<JobsPage> {
       setState(() {
         _forceDisabled = false;
       });
-      return;
+      return false;
     }
 
     // Building the dialog in a Scaffold allows for the Snackbar to be shown
@@ -113,18 +113,23 @@ class JobsPageState extends State<JobsPage> {
       setState(() {
         _forceDisabled = false;
       });
-      return;
+      return false;
     }
     widget.enterprise.jobs.add(newJob);
-    await enterprises.replaceWithConfirmation(widget.enterprise);
+    final isSuccess =
+        await enterprises.replaceWithConfirmation(widget.enterprise);
     await enterprises.releaseLockForItem(widget.enterprise);
     if (mounted) {
-      showSnackBar(context, message: 'Le poste a bien été ajouté');
+      showSnackBar(context,
+          message: isSuccess
+              ? 'Le poste a bien été ajouté'
+              : 'Une erreur est survenue lors de l\'ajout du poste');
     }
     setState(() {
       _forceDisabled = false;
     });
     _logger.finer('Job added: ${newJob.specialization.name}');
+    return isSuccess;
   }
 
   void _addImage(Job job, ImageSource source) async {
@@ -414,14 +419,19 @@ class JobsPageState extends State<JobsPage> {
         uniforms: _prerequisitesFormKeys[job.id]!.currentState!.uniforms,
         protections: _prerequisitesFormKeys[job.id]!.currentState!.protections,
       );
+      bool isSuccess = true;
       if (job.getDifference(newJob).isNotEmpty) {
         widget.enterprise.jobs.replace(newJob);
-        await enterprises.replaceWithConfirmation(widget.enterprise);
+        isSuccess =
+            await enterprises.replaceWithConfirmation(widget.enterprise);
       }
       await enterprises.releaseLockForItem(widget.enterprise);
 
       if (mounted) {
-        showSnackBar(context, message: 'Les informations ont été sauvegardées');
+        showSnackBar(context,
+            message: isSuccess
+                ? 'Les informations ont été sauvegardées'
+                : 'Une erreur est survenue lors de la sauvegarde des informations');
       }
     } else {
       final isSuccess = await enterprises.getLockForItem(widget.enterprise);

@@ -168,7 +168,7 @@ class _EnterpriseScreenInternalState extends State<_EnterpriseScreenInternal>
         } else if (_tabController.index == 1) {
           await _aboutPageKey.currentState?.toggleEdit();
         } else if (_tabController.index == 2) {
-          await _stagePageKey.currentState?.addStage();
+          await _stagePageKey.currentState?.addInternship();
         }
 
         _updateActionButton();

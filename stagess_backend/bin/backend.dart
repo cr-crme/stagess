@@ -114,7 +114,7 @@ void main() async {
   final getRequestRateLimiter =
       NetworkRateLimiter(maxRequests: 50, duration: Duration(minutes: 1));
   final websocketRateLimiter =
-      NetworkRateLimiter(maxRequests: 200, duration: Duration(minutes: 1));
+      NetworkRateLimiter(maxRequests: 500, duration: Duration(minutes: 1));
 
   server.listen(
     (HttpRequest request) => requestHandler.answer(
