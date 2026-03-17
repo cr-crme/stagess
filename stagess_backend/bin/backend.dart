@@ -111,12 +111,18 @@ void main() async {
   final requestHandler = HttpRequestHandler(
       devConnexions: devConnexions, productionConnexions: productionConnexions);
 
-  final rateLimiter =
+  final getRequestRateLimiter =
       NetworkRateLimiter(maxRequests: 50, duration: Duration(minutes: 1));
+  final websocketRateLimiter =
+      NetworkRateLimiter(maxRequests: 200, duration: Duration(minutes: 1));
 
   server.listen(
-    (HttpRequest request) => requestHandler.answer(request,
-        rateLimiter: rateLimiter, allowedOrigins: _allowedOrigins),
+    (HttpRequest request) => requestHandler.answer(
+      request,
+      getRequestRateLimiter: getRequestRateLimiter,
+      websocketRateLimiter: websocketRateLimiter,
+      allowedOrigins: _allowedOrigins,
+    ),
     onError: (error, stackTrace) =>
         _logger.severe('Error in server', error, stackTrace),
     cancelOnError: false,

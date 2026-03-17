@@ -12,8 +12,6 @@
     - Ne pas retourner l'erreur technique au client (retourner erreur interne)
 
 ## Backend
-- Rate limit pour le websocket
-- Size limit pour les requêtes (pour éviter les attaques de type DoS) (https et websocket)
 - Changer mot de passe "devpassword"
 
 ## Collectif HUB

@@ -16,8 +16,8 @@ class PhotoExpansionPanel extends StatefulWidget {
   });
 
   final Job job;
-  final void Function(Job job, ImageSource source) addImage;
-  final void Function(Job job, int index) removeImage;
+  final void Function(Job job, ImageSource source)? addImage;
+  final void Function(Job job, int index)? removeImage;
 
   @override
   State<PhotoExpansionPanel> createState() => _PhotoExpansionPanelState();
@@ -55,11 +55,13 @@ class _PhotoExpansionPanelState extends State<PhotoExpansionPanel> {
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: InkWell(
-                  onTap: () {
-                    widget.removeImage(widget.job, index);
-                    setState(() {});
-                    Navigator.of(context).pop();
-                  },
+                  onTap: widget.removeImage != null
+                      ? () {
+                          widget.removeImage!(widget.job, index);
+                          setState(() {});
+                          Navigator.of(context).pop();
+                        }
+                      : null,
                   borderRadius: BorderRadius.circular(25),
                   child: const Icon(Icons.delete, color: Colors.red),
                 ),
@@ -85,6 +87,8 @@ class _PhotoExpansionPanelState extends State<PhotoExpansionPanel> {
         (_scrollController.offset <
                 _scrollController.position.maxScrollExtent ||
             (widget.job.photos.length > 2 && _scrollController.offset == 0));
+
+    final canAddPhotos = widget.addImage != null;
 
     return AnimatedExpandingCard(
       elevation: 0.0,
@@ -162,12 +166,13 @@ class _PhotoExpansionPanelState extends State<PhotoExpansionPanel> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
-                    onPressed: widget.job.photos.length < 3
-                        ? () => widget.addImage(widget.job, ImageSource.gallery)
+                    onPressed: canAddPhotos
+                        ? () =>
+                            widget.addImage!(widget.job, ImageSource.gallery)
                         : null,
                     icon: Icon(
                       Icons.image,
-                      color: widget.job.photos.length < 3
+                      color: canAddPhotos
                           ? Theme.of(context).primaryColor
                           : Colors.grey,
                       size: 36,
@@ -175,12 +180,12 @@ class _PhotoExpansionPanelState extends State<PhotoExpansionPanel> {
                   ),
                   const SizedBox(width: 12),
                   IconButton(
-                    onPressed: widget.job.photos.length < 3
-                        ? () => widget.addImage(widget.job, ImageSource.camera)
+                    onPressed: canAddPhotos
+                        ? () => widget.addImage!(widget.job, ImageSource.camera)
                         : null,
                     icon: Icon(
                       Icons.camera_alt,
-                      color: widget.job.photos.length < 3
+                      color: canAddPhotos
                           ? Theme.of(context).primaryColor
                           : Colors.grey,
                       size: 36,

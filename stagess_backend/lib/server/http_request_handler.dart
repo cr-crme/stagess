@@ -19,16 +19,30 @@ class HttpRequestHandler {
       : _devConnexions = devConnexions,
         _productionConnexions = productionConnexions;
 
-  Future<void> answer(HttpRequest request,
-      {NetworkRateLimiter? rateLimiter,
-      List<Uri> allowedOrigins = const []}) async {
+  Future<void> answer(
+    HttpRequest request, {
+    NetworkRateLimiter? getRequestRateLimiter,
+    NetworkRateLimiter? websocketRateLimiter,
+    List<Uri> allowedOrigins = const [],
+  }) async {
     try {
-      if (rateLimiter != null && rateLimiter.isRefused(request)) {
+      // Control the rate of incoming requests to prevent abuse and DoS attacks
+      if (getRequestRateLimiter != null &&
+          getRequestRateLimiter
+              .isRefused(request.connectionInfo?.remoteAddress.address)) {
         throw RateLimitedException();
       }
 
+      // Control the size of incoming requests to prevent abuse and DoS attacks
+      if (request.contentLength > 1 * 1024) {
+        // 1 KB limit
+        throw ConnexionRefusedException('Request size exceeds limit');
+      }
+
+      // Handle the request based on its method and path
       if (request.method == 'GET') {
-        return await _answerGetRequest(request, allowedOrigins: allowedOrigins);
+        return await _answerGetRequest(request,
+            allowedOrigins: allowedOrigins, rateLimiter: websocketRateLimiter);
       } else {
         // Handle other HTTP methods
         throw ConnexionRefusedException('Unsupported method');
@@ -68,8 +82,11 @@ class HttpRequestHandler {
     }
   }
 
-  Future<void> _answerGetRequest(HttpRequest request,
-      {required List<Uri> allowedOrigins}) async {
+  Future<void> _answerGetRequest(
+    HttpRequest request, {
+    required List<Uri> allowedOrigins,
+    NetworkRateLimiter? rateLimiter,
+  }) async {
     final ipAddress =
         request.connectionInfo?.remoteAddress.address ?? 'unknown';
     final port = request.connectionInfo?.remotePort ?? 0;
@@ -87,10 +104,12 @@ class HttpRequestHandler {
     if (request.uri.path ==
         '/${BackendHelpers.connectEndpoint(useDevDatabase: false)}') {
       try {
-        _productionConnexions?.add(CustomWebSocket(
-            socket: await WebSocketTransformer.upgrade(request),
-            ipAddress: ipAddress,
-            port: port));
+        _productionConnexions?.add(
+            CustomWebSocket(
+                socket: await WebSocketTransformer.upgrade(request),
+                ipAddress: ipAddress,
+                port: port),
+            rateLimiter: rateLimiter);
         return;
       } catch (e) {
         throw ConnexionRefusedException('WebSocket upgrade failed');
@@ -98,10 +117,12 @@ class HttpRequestHandler {
     } else if (request.uri.path ==
         '/${BackendHelpers.connectEndpoint(useDevDatabase: true)}') {
       try {
-        _devConnexions?.add(CustomWebSocket(
-            socket: await WebSocketTransformer.upgrade(request),
-            ipAddress: ipAddress,
-            port: port));
+        _devConnexions?.add(
+            CustomWebSocket(
+                socket: await WebSocketTransformer.upgrade(request),
+                ipAddress: ipAddress,
+                port: port),
+            rateLimiter: rateLimiter);
         return;
       } catch (e) {
         throw ConnexionRefusedException('WebSocket upgrade failed');

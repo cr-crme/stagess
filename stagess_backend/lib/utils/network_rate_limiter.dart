@@ -1,5 +1,3 @@
-import 'dart:io';
-
 class NetworkRateLimiter {
   final int maxRequests;
   final Duration duration;
@@ -7,9 +5,8 @@ class NetworkRateLimiter {
 
   NetworkRateLimiter({required this.maxRequests, required this.duration});
 
-  bool isRefused(HttpRequest request) {
+  bool isRefused(String? clientIp) {
     final now = DateTime.now();
-    final clientIp = request.connectionInfo?.remoteAddress.address;
 
     // Refuse connection if the client IP is undefined
     if (clientIp == null) return true;

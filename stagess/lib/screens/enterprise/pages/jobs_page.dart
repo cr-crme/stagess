@@ -605,7 +605,7 @@ class JobsPageState extends State<JobsPage> {
                       padding: const EdgeInsets.only(bottom: 4.0),
                       child: PhotoExpansionPanel(
                         job: job,
-                        addImage: _addImage,
+                        addImage: job.photos.length > 1 ? null : _addImage,
                         removeImage: _removeImage,
                       ),
                     ),

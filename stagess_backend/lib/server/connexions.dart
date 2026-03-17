@@ -9,6 +9,7 @@ import 'package:stagess_backend/server/database_manager.dart';
 import 'package:stagess_backend/utils/custom_web_socket.dart';
 import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
+import 'package:stagess_backend/utils/network_rate_limiter.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
@@ -36,11 +37,16 @@ class Connexions {
         _firebaseApiKey = firebaseApiKey;
   // coverage:ignore-end
 
-  Future<bool> add(CustomWebSocket client) async {
+  Future<bool> add(
+    CustomWebSocket client, {
+    NetworkRateLimiter? rateLimiter,
+  }) async {
     try {
       _clients[client] = DatabaseUser.empty();
 
-      client.listen((message) => _incomingMessage(client, message: message),
+      client.listen(
+          (message) => _incomingMessage(client,
+              message: message, rateLimiter: rateLimiter),
           onDone: () =>
               _onConnexionClosed(client, message: 'Client disconnected'),
           onError: (error) =>
@@ -77,10 +83,29 @@ class Connexions {
     return true;
   }
 
-  Future<void> _incomingMessage(CustomWebSocket client,
-      {required dynamic message}) async {
+  Future<void> _incomingMessage(
+    CustomWebSocket client, {
+    required dynamic message,
+    required NetworkRateLimiter? rateLimiter,
+  }) async {
     CommunicationProtocol? protocol;
     try {
+      // Control the rate of incoming messages to prevent abuse and DoS attacks
+      if (rateLimiter != null && rateLimiter.isRefused(client.ipAddress)) {
+        throw RateLimitedException();
+      }
+
+      // Control type and size of the messages to prevent abuse and DoS attacks
+      if (message is! String) {
+        throw InvalidRequestTypeException('Invalid message format');
+      }
+      if (message.isEmpty) {
+        throw InvalidRequestTypeException('Empty message');
+      } else if (message.length > 10 * 1024 * 1024) {
+        // 10 MB limit
+        throw InvalidRequestTypeException('Message too long');
+      }
+
       final map = jsonDecode(message);
       protocol = CommunicationProtocol.deserialize(map);
 
