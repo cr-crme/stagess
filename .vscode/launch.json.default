@@ -25,6 +25,7 @@
             ],
             "env": {
                 "STAGESS_USE_SSL": "< [true] | false >",
+                "STAGESS_ALLOWED_ORIGINS": "http://localhost,https://localhost",
                 "STAGESS_BACKEND_PORT": "< PORT | [3457] >",
                 "STAGESS_GOOGLE_MAPS_API_KEY": "< YOUR_GOOGLE_MAPS_API_KEY >",
                 "STAGESS_FIREBASE_WEB_API_KEY": "<PUT YOUR FIREBASE WEB API KEY HERE>",

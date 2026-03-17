@@ -36,6 +36,7 @@ launcher:
 	append_to_file ""; \
 	append_to_file "# Define the required exports"; \
 	append_to_file "export STAGESS_USE_SSL=false"; \
+	append_to_file "export STAGESS_ALLOWED_ORIGINS=${STAGESS_ALLOWED_ORIGINS}"; \
 	append_to_file "export STAGESS_BACKEND_PORT=${STAGESS_BACKEND_PORT}"; \
 	append_to_file "export STAGESS_GOOGLE_MAPS_API_KEY=${STAGESS_GOOGLE_MAPS_API_KEY}"; \
 	append_to_file "export STAGESS_FIREBASE_WEB_API_KEY=${STAGESS_FIREBASE_WEB_API_KEY}"; \

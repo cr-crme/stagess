@@ -53,6 +53,10 @@ final _productionSettings = ConnectionSettings(
   password: _getFromEnvironment('STAGESS_DATABASE_PRODUCTION_PASSWORD'),
   db: _getFromEnvironment('STAGESS_DATABASE_PRODUCTION_NAME'),
 );
+final _allowedOrigins = _getFromEnvironment('STAGESS_ALLOWED_ORIGINS')
+    .split(',')
+    .map((origin) => Uri.parse(origin))
+    .toList();
 
 void main() async {
   // Set up logging
@@ -111,8 +115,8 @@ void main() async {
       NetworkRateLimiter(maxRequests: 50, duration: Duration(minutes: 1));
 
   server.listen(
-    (HttpRequest request) =>
-        requestHandler.answer(request, rateLimiter: rateLimiter),
+    (HttpRequest request) => requestHandler.answer(request,
+        rateLimiter: rateLimiter, allowedOrigins: _allowedOrigins),
     onError: (error, stackTrace) =>
         _logger.severe('Error in server', error, stackTrace),
     cancelOnError: false,

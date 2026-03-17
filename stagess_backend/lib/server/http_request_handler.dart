@@ -20,16 +20,15 @@ class HttpRequestHandler {
         _productionConnexions = productionConnexions;
 
   Future<void> answer(HttpRequest request,
-      {NetworkRateLimiter? rateLimiter}) async {
+      {NetworkRateLimiter? rateLimiter,
+      List<Uri> allowedOrigins = const []}) async {
     try {
       if (rateLimiter != null && rateLimiter.isRefused(request)) {
         throw RateLimitedException();
       }
 
-      if (request.method == 'OPTIONS') {
-        return await _answerOptionsRequest(request);
-      } else if (request.method == 'GET') {
-        return await _answerGetRequest(request);
+      if (request.method == 'GET') {
+        return await _answerGetRequest(request, allowedOrigins: allowedOrigins);
       } else {
         // Handle other HTTP methods
         throw ConnexionRefusedException('Unsupported method');
@@ -69,37 +68,21 @@ class HttpRequestHandler {
     }
   }
 
-  Future<void> _answerOptionsRequest(HttpRequest request) async {
-    // TODO Complete this
-    const allowedOrigins = {
-      'https://myfrontend.com',
-      'https://admin.myfrontend.com',
-    };
-    final requestOrigin = request.headers.value('origin');
-
-    if (allowedOrigins.contains(requestOrigin)) {
-      request.response.headers
-          .set('Access-Control-Allow-Origin', requestOrigin!);
-    }
-
-    // Handle preflight requests
-    request.response.headers
-      ..set('Access-Control-Allow-Origin', '*')
-      ..set('Access-Control-Allow-Methods', 'GET, OPTIONS')
-      ..set('Access-Control-Max-Age', '86400') // cache for 24h
-      // ..set('X-Frame-Options', 'ALLOWALL') // Uncomment this line if InAppWebView is used
-      ..set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-    await request.response.close();
-  }
-
-  Future<void> _answerGetRequest(HttpRequest request) async {
+  Future<void> _answerGetRequest(HttpRequest request,
+      {required List<Uri> allowedOrigins}) async {
     final ipAddress =
         request.connectionInfo?.remoteAddress.address ?? 'unknown';
     final port = request.connectionInfo?.remotePort ?? 0;
 
     _logger.info('Received a GET request from $ipAddress:$port '
         'to endpoint ${request.uri.path}');
+
+    // Check the origin header for CORS
+    final origin = Uri.parse(request.headers.value('Origin') ?? '');
+    if (!allowedOrigins.any((allowed) =>
+        allowed.scheme == origin.scheme && allowed.host == origin.host)) {
+      throw ConnexionRefusedException('Origin not allowed');
+    }
 
     if (request.uri.path ==
         '/${BackendHelpers.connectEndpoint(useDevDatabase: false)}') {
