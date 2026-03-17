@@ -40,7 +40,7 @@ class _LoginScreenState extends State<LoginScreen> {
       ).signInWithEmailAndPassword(email: _email!, password: _password!);
     } catch (e) {
       if (!mounted) return;
-      showSnackBar(context, message: 'Erreur de connexion');
+      showSnackBar(context, message: 'Identifiant ou mot de passe incorrect');
     }
 
     _logger.fine('Sign in successful');

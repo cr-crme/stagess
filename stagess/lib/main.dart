@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:crcrme_material_theme/crcrme_material_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -43,30 +41,21 @@ void main() async {
     '${BackendHelpers.useSsl ? '' : 'not '}using a secured connection',
   );
 
-  BugReporter.loggerSetup();
   const showDebugElements = true;
   const useMockers = false;
   final backendUri = BackendHelpers.backendConnectUri(useDevDatabase: useDevDb);
-  final errorReportUri = BackendHelpers.backendUriForBugReport();
 
-  await runZonedGuarded(
-    () async {
-      WidgetsFlutterBinding.ensureInitialized();
-      await ProgramInitializer.initialize(
-        showDebugElements: showDebugElements,
-        mockMe: useMockers,
-      );
-
-      await TileProvider.instance
-          .initialize(provider: MapTileProvider.googleMaps);
-      await ReverseGeocodingProvider.instance
-          .initialize(provider: MapReverseGeocodingProvider.googleMaps);
-
-      runApp(StagessApp(useMockers: useMockers, backendUri: backendUri));
-    },
-    (error, stackTrace) =>
-        BugReporter.report(error, stackTrace, errorReportUri: errorReportUri),
+  WidgetsFlutterBinding.ensureInitialized();
+  await ProgramInitializer.initialize(
+    showDebugElements: showDebugElements,
+    mockMe: useMockers,
   );
+
+  await TileProvider.instance.initialize(provider: MapTileProvider.googleMaps);
+  await ReverseGeocodingProvider.instance
+      .initialize(provider: MapReverseGeocodingProvider.googleMaps);
+
+  runApp(StagessApp(useMockers: useMockers, backendUri: backendUri));
 }
 // coverage:ignore-end
 

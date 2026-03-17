@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:logging/logging.dart';
-import 'package:stagess_backend/server/bug_report_management.dart';
 import 'package:stagess_backend/server/connexions.dart';
 import 'package:stagess_backend/utils/custom_web_socket.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
@@ -31,8 +30,6 @@ class HttpRequestHandler {
         return await _answerOptionsRequest(request);
       } else if (request.method == 'GET') {
         return await _answerGetRequest(request);
-      } else if (request.method == 'POST') {
-        return await _answerPostRequest(request);
       } else {
         // Handle other HTTP methods
         throw ConnexionRefusedException('Unsupported method');
@@ -42,7 +39,8 @@ class HttpRequestHandler {
           statusCode: HttpStatus.unauthorized, message: 'Unauthorized: $e');
     } on RateLimitedException catch (e) {
       await _sendFailedAndClose(request,
-          statusCode: HttpStatus.tooManyRequests, message: 'Unauthorized: $e');
+          statusCode: HttpStatus.tooManyRequests,
+          message: 'Too Many Requests: $e');
     } catch (e) {
       // This is a catch-all for any exceptions so the server doesn't crash on an
       // unhandled/unexpected exception. This should never actually happens
@@ -72,10 +70,23 @@ class HttpRequestHandler {
   }
 
   Future<void> _answerOptionsRequest(HttpRequest request) async {
+    // TODO Complete this
+    const allowedOrigins = {
+      'https://myfrontend.com',
+      'https://admin.myfrontend.com',
+    };
+    final requestOrigin = request.headers.value('origin');
+
+    if (allowedOrigins.contains(requestOrigin)) {
+      request.response.headers
+          .set('Access-Control-Allow-Origin', requestOrigin!);
+    }
+
     // Handle preflight requests
     request.response.headers
       ..set('Access-Control-Allow-Origin', '*')
-      ..set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
+      ..set('Access-Control-Allow-Methods', 'GET, OPTIONS')
+      ..set('Access-Control-Max-Age', '86400') // cache for 24h
       // ..set('X-Frame-Options', 'ALLOWALL') // Uncomment this line if InAppWebView is used
       ..set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 
@@ -112,18 +123,6 @@ class HttpRequestHandler {
       } catch (e) {
         throw ConnexionRefusedException('WebSocket upgrade failed');
       }
-    } else {
-      throw ConnexionRefusedException('Invalid endpoint');
-    }
-  }
-
-  Future<void> _answerPostRequest(HttpRequest request) async {
-    _logger.info(
-        'Received a POST request from ${request.connectionInfo?.remoteAddress.address}:${request.connectionInfo?.remotePort} '
-        'to endpoint ${request.uri.path}');
-
-    if (request.uri.path == '/${BackendHelpers.bugReportEndpoint}') {
-      await answerBugReportRequest(request);
     } else {
       throw ConnexionRefusedException('Invalid endpoint');
     }
