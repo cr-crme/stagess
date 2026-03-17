@@ -36,7 +36,7 @@ enum DatabaseBackend {
 
 final _databaseBackend =
     DatabaseBackend.fromString(_getFromEnvironment('STAGESS_DATABASE_BACKEND'));
-final _backendIp = InternetAddress.anyIPv4;
+final _backendIp = InternetAddress.loopbackIPv4;
 final _backendPort = int.parse(
     _getFromEnvironment('STAGESS_BACKEND_PORT', defaultValue: '3457'));
 final _devSettings = ConnectionSettings(

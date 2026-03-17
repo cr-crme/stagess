@@ -4,12 +4,9 @@
 ## Reverse proxy
 - 34210 => Port ouvert
 - Port SSH à mettre à mettre à jour (version sensible)
-- Politique de mot de passe
-    - S'assurer que sécuritaire
 - Security headers 
     - Est-ce que CORS est activé?
     - Apprendre sur HSTS?
-- IP dédié? (localhost est techniquement accessible par les voisins)
 
 ## Frontend
 - Mot de passe ne devrait pas empêcher de se connecter sans respecter la politique (pour éviter brute force)
