@@ -72,6 +72,28 @@ abstract class FormService {
     return null;
   }
 
+  static String? strongPasswordValidator(String? password) {
+    if (password == null || password.isEmpty) {
+      return 'Le mot de passe est obligatoire.';
+    }
+    if (password.length < 8) {
+      return 'Huit caractères sont nécessaires.';
+    }
+    if (!RegExp(r'[A-Z]').hasMatch(password)) {
+      return 'Une lettre majuscule est nécessaire.';
+    }
+    if (!RegExp(r'[a-z]').hasMatch(password)) {
+      return 'Une lettre minuscule est nécessaire.';
+    }
+    if (!RegExp(r'[0-9]').hasMatch(password)) {
+      return 'Un chiffre est nécessaire.';
+    }
+    if (!RegExp(r'[!@#$%^&*(),.?":{}|<>]').hasMatch(password)) {
+      return 'Un caractère spécial est nécessaire.';
+    }
+    return null;
+  }
+
   static String? passwordValidator(String? password) {
     if (password == null || password.isEmpty) {
       return 'Le champ ne peut pas être vide.';

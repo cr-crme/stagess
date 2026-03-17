@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
+
+final _logger = Logger('AuthProvider');
 
 class AuthProvider extends ChangeNotifier {
   AuthProvider({
@@ -51,9 +54,18 @@ class AuthProvider extends ChangeNotifier {
     return user;
   }
 
-  Future<void> updatePassword(String newPassword) async {
-    await _firebaseAuth.currentUser!.updatePassword(newPassword);
+  Future<bool> updatePassword(String newPassword) async {
+    bool isSuccess = false;
+    try {
+      await _firebaseAuth.currentUser!.updatePassword(newPassword);
+      isSuccess = true;
+    } catch (e) {
+      _logger.severe('Failed to update password: $e');
+      isSuccess = false;
+    }
+
     notifyListeners();
+    return isSuccess;
   }
 
   Future<void> resetPassword(String email) async {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:stagess/common/widgets/itemized_text.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
@@ -283,6 +284,7 @@ class TeacherListTileState extends State<TeacherListTile> {
           content: Form(
             key: formKey,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
@@ -299,9 +301,16 @@ class TeacherListTileState extends State<TeacherListTile> {
                   },
                 ),
                 SizedBox(height: 24.0),
-                Text(
-                  'Le mot de passe doit contenir au moins 8 caractères.',
-                  style: Theme.of(context).textTheme.titleSmall,
+                Text('Le mot de passe doit contenir\u00a0:'),
+                Padding(
+                  padding: const EdgeInsets.only(left: 12.0),
+                  child: ItemizedText([
+                    'Au moins 8 caractères',
+                    'Au moins 1 lettre majuscule',
+                    'Au moins 1 lettre minuscule',
+                    'Au moins 1 chiffre',
+                    'Au moins 1 caractère spécial',
+                  ]),
                 ),
                 TextFormField(
                   controller: newPasswordController,
@@ -310,7 +319,7 @@ class TeacherListTileState extends State<TeacherListTile> {
                   ),
                   obscureText: true,
                   validator: (value) {
-                    return FormService.passwordValidator(value);
+                    return FormService.strongPasswordValidator(value);
                   },
                 ),
                 TextFormField(
@@ -356,9 +365,20 @@ class TeacherListTileState extends State<TeacherListTile> {
                 }
                 if (!context.mounted) return;
 
-                await authProvider.updatePassword(newPasswordController.text);
+                final isSuccess = await authProvider
+                    .updatePassword(newPasswordController.text);
                 if (!context.mounted) return;
-                Navigator.of(context).pop(true);
+
+                if (isSuccess) {
+                  Navigator.of(context).pop(true);
+                } else {
+                  _logger.severe('Failed to update password');
+                  showSnackBar(
+                    context,
+                    message:
+                        'Une erreur est survenue lors de la mise à jour du mot de passe',
+                  );
+                }
               },
               child: Text('Confirmer'),
             ),
