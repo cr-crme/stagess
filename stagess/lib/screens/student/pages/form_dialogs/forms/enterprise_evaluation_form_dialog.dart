@@ -372,7 +372,7 @@ class _EnterpriseEvaluationScreenState
     );
   }
 
-  TextField _buildEnterpriseName(Enterprise enterprise) {
+  Widget _buildEnterpriseName(Enterprise enterprise) {
     // ThemeData does not work anymore so we have to override the style manually
     const styleOverride = TextStyle(color: Colors.black);
 
@@ -388,7 +388,7 @@ class _EnterpriseEvaluationScreenState
     );
   }
 
-  TextField _buildStudentName(Student student) {
+  Widget _buildStudentName(Student student) {
     // ThemeData does not work anymore so we have to override the style manually
     const styleOverride = TextStyle(color: Colors.black);
 

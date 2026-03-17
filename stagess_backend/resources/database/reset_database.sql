@@ -403,7 +403,7 @@ CREATE TABLE enterprise_job_comments(
     job_id VARCHAR(36) NOT NULL,
     teacher_id VARCHAR(36) NOT NULL,
     date BIGINT NOT NULL,
-    comment VARCHAR(255) NOT NULL,
+    comment VARCHAR(200) NOT NULL,
     FOREIGN KEY (job_id) REFERENCES enterprise_jobs(id) ON DELETE CASCADE
 );
 
@@ -486,7 +486,7 @@ CREATE TABLE internship_contracts (
     supervisor_email VARCHAR(100),
     starting_date BIGINT NOT NULL,
     ending_date BIGINT NOT NULL,
-    visit_frequencies VARCHAR(255) NOT NULL,
+    visit_frequencies VARCHAR(100) NOT NULL,
     expected_duration INT NOT NULL,
     FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE,
     FOREIGN KEY (job_id) REFERENCES enterprise_jobs(id)
@@ -520,7 +520,7 @@ CREATE TABLE internship_daily_schedules (
 
 CREATE TABLE internship_transportations (
     contract_id VARCHAR(36) NOT NULL,
-    transportation VARCHAR(255) NOT NULL,
+    transportation VARCHAR(100) NOT NULL,
     FOREIGN KEY (contract_id) REFERENCES internship_contracts(id) ON DELETE CASCADE
 );
 

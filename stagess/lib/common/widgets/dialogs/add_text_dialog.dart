@@ -5,9 +5,11 @@ class AddTextDialog extends StatefulWidget {
   const AddTextDialog({
     super.key,
     required this.title,
+    this.maxLength,
   });
 
   final String title;
+  final int? maxLength;
 
   @override
   State<AddTextDialog> createState() => _AddTextDialogState();
@@ -41,6 +43,7 @@ class _AddTextDialogState extends State<AddTextDialog> {
           keyboardType: TextInputType.multiline,
           minLines: 4,
           maxLines: null,
+          maxLength: widget.maxLength,
         ),
       ),
       actions: [

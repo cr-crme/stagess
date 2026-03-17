@@ -38,6 +38,7 @@ class School extends ItemSerializable {
     };
   }
 
+// TODO Find why the school does not appear anymore at the right place
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
         'name': FetchableFields.mandatory,

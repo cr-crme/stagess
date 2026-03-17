@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/extensions/enterprise_extension.dart';
@@ -735,6 +736,7 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
                       labelText: '* Prénom',
                       labelStyle: TextStyle(color: Colors.black),
                     ),
+                    maxLength: 50,
                     style: TextStyle(color: Colors.black),
                     validator: (text) =>
                         text!.isEmpty ? 'Ajouter un prénom.' : null,
@@ -746,6 +748,7 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
                       labelText: '* Nom de famille',
                       labelStyle: TextStyle(color: Colors.black),
                     ),
+                    maxLength: 50,
                     style: TextStyle(color: Colors.black),
                     validator: (text) =>
                         text!.isEmpty ? 'Ajouter un nom de famille.' : null,
@@ -787,6 +790,7 @@ class _TransportationsCheckBoxes extends StatelessWidget {
         CheckboxWithOther(
           controller: controller._transportationsController,
           enabled: controller.canModify,
+          otherMaxLength: 100,
         ),
       ],
     );
@@ -1018,6 +1022,8 @@ class _Hours extends StatelessWidget {
               labelText: '* Nombre total d\'heures de stage à faire',
               labelStyle: TextStyle(color: Colors.black),
             ),
+            maxLength: 10,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             style: TextStyle(color: Colors.black),
             validator: (text) =>
                 text!.isEmpty ? 'Indiquer un nombre d\'heures.' : null,
@@ -1045,6 +1051,7 @@ class _VisitFrequencies extends StatelessWidget {
           child: TextFormField(
             controller: controller._visitFrequenciesController,
             enabled: controller.canModify,
+            maxLength: 100,
             decoration: const InputDecoration(
               labelText: 'Fréquence des visites de l\'enseignant\u00b7e',
               labelStyle: TextStyle(color: Colors.black),

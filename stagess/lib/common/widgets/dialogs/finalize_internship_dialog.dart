@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
@@ -103,6 +104,9 @@ class FinalizeInternshipDialog extends StatelessWidget {
                         textAlign: TextAlign.right,
                         controller: hourController,
                         keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly,
+                        ],
                       ),
                     ),
                     const Text('h'),

@@ -176,6 +176,7 @@ class CheckboxWithOther<T> extends StatefulWidget {
     this.onOptionSelected,
     this.followUpChild,
     this.enabled = true,
+    this.otherMaxLength,
   });
 
   final CheckboxWithOtherController<T> controller;
@@ -188,6 +189,7 @@ class CheckboxWithOther<T> extends StatefulWidget {
   final Function(List<String>)? onOptionSelected;
   final Widget? followUpChild;
   final bool enabled;
+  final int? otherMaxLength;
 
   @override
   State<CheckboxWithOther<T>> createState() => _CheckboxWithOtherState<T>();
@@ -314,6 +316,7 @@ class _CheckboxWithOtherState<T> extends State<CheckboxWithOther<T>> {
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(),
                   ),
+                  maxLength: widget.otherMaxLength,
                   minLines: 1,
                   maxLines: null,
                   style: Theme.of(context).textTheme.bodyMedium,

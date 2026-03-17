@@ -49,7 +49,8 @@ class SchoolBoard extends ExtendedItemSerializable {
         'id': FetchableFields.mandatory,
         'name': FetchableFields.mandatory,
         'logo': FetchableFields.optional,
-        'schools': School.fetchableFields,
+        'schools': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference({'*': School.fetchableFields})),
         'cnesst_number': FetchableFields.optional,
       });
 

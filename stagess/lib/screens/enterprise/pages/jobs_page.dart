@@ -355,7 +355,7 @@ class JobsPageState extends State<JobsPage> {
       barrierDismissible: false,
       context: context,
       builder: (context) =>
-          const AddTextDialog(title: 'Ajouter un commentaire'),
+          const AddTextDialog(title: 'Ajouter un commentaire', maxLength: 200),
     );
 
     if (newComment == null) {
