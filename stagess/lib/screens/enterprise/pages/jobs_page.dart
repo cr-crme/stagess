@@ -54,7 +54,7 @@ class JobsPage extends StatefulWidget {
 }
 
 class JobsPageState extends State<JobsPage> {
-  final _formKey = GlobalKey<FormState>();
+  final Map<String, GlobalKey<FormState>> _formKeys = {};
   final Map<String, UniqueKey> _cardKey = {};
   final Map<String, GlobalKey<PrerequisitesExpansionPanelState>>
       _prerequisitesFormKeys = {};
@@ -380,6 +380,7 @@ class JobsPageState extends State<JobsPage> {
 
   void _updateSectionsIfNeeded() {
     for (Job job in widget.enterprise.jobs) {
+      _formKeys.putIfAbsent(job.id, () => GlobalKey<FormState>());
       _cardKey.putIfAbsent(job.id, () => UniqueKey());
       _prerequisitesFormKeys.putIfAbsent(
         job.id,
@@ -398,7 +399,7 @@ class JobsPageState extends State<JobsPage> {
     // If we have to validate something before switching
     final enterprises = EnterprisesProvider.of(context, listen: false);
     if (_isEditingPrerequisites[job.id]!) {
-      if (!(_formKey.currentState?.validate() ?? false)) {
+      if (!(_formKeys[job.id]?.currentState?.validate() ?? false)) {
         setState(() {
           _forceDisabled = false;
         });
@@ -485,7 +486,7 @@ class JobsPageState extends State<JobsPage> {
               );
 
               return Form(
-                key: _formKey,
+                key: _formKeys[job.id],
                 child: AnimatedExpandingCard(
                   key: _cardKey[job.id],
                   header: (ctx, isExpanded) => Column(

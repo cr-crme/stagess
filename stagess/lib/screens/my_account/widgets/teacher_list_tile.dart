@@ -345,8 +345,8 @@ class TeacherListTileState extends State<TeacherListTile> {
                     email: widget.teacher.email ?? '',
                     password: oldPasswordController.text,
                   );
-                } catch (e) {
-                  _logger.severe('Failed to reauthenticate user: $e');
+                } catch (_) {
+                  _logger.severe('Failed to reauthenticate user');
                   if (!context.mounted) return;
                   showSnackBar(
                     context,

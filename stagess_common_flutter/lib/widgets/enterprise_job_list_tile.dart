@@ -27,7 +27,9 @@ class EnterpriseJobListController {
   late final _minimumAgeController = TextEditingController(
     text: _job.minimumAge.toString(),
   );
-  final Map<String, int> _positionsOffered;
+  late final Map<String, int> _positionsOffered = _job.positionsOffered.map(
+    (key, value) => MapEntry(key, value),
+  );
   Map<String, int> get _realPositionsOffered {
     final statuses = enterpriseStatus == EnterpriseStatus.active
         ? _positionsOffered.map((key, value) => MapEntry(key, value))
@@ -46,7 +48,7 @@ class EnterpriseJobListController {
     return statuses;
   }
 
-  final Map<String, int> _positionsOccupied;
+  final Map<String, int> _positionsOccupied = {};
   Map<String, int> get positionsOccupied =>
       enterpriseStatus == EnterpriseStatus.active ? _positionsOccupied : {};
 
@@ -71,15 +73,11 @@ class EnterpriseJobListController {
   EnterpriseJobListController({
     required this.context,
     required this.enterpriseStatus,
-    required Job job,
+    required Job? job,
     List<Specialization>? specializationWhiteList,
     List<Specialization>? specializationBlackList,
     EntityPickerController? reservedForPickerController,
-  })  : _job = job.copyWith(),
-        _positionsOffered = job.positionsOffered.map(
-          (key, value) => MapEntry(key, value),
-        ),
-        _positionsOccupied = {},
+  })  : _job = job?.copyWith() ?? Job.empty,
         _specializationsWhiteList = specializationWhiteList,
         _specializationBlacklist = specializationBlackList,
         _reservedForPickerController = reservedForPickerController {
@@ -88,7 +86,7 @@ class EnterpriseJobListController {
 
     _positionsOccupied.clear();
     for (final intership in internships) {
-      if (intership.currentContract?.jobId == job.id && intership.isActive) {
+      if (intership.currentContract?.jobId == _job.id && intership.isActive) {
         final schoolId = students
             .firstWhereOrNull(
               (student) => student.id == intership.studentId,

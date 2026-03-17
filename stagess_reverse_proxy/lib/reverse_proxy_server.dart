@@ -75,10 +75,10 @@ class ReverseProxyServer {
           retryCount = 0;
           await Future.delayed(Duration(seconds: 5));
         }
-      } catch (e) {
+      } catch (e, st) {
         // This error can only happen during server starting
         // If it happens retry up to max retries and then exit
-        _logger.severe('Error while starting the server: $e');
+        _logger.severe('Error while starting the server', e, st);
         if (retryCount < maxRetries) {
           retryCount++;
           _logger
@@ -138,7 +138,7 @@ class ReverseProxyServer {
             backlog: maxLiveConnections,
           )) as Stream<Socket>);
     _server!.listen(_handleIncomingClient,
-        onError: (e, st) => _logger.severe('TLS server listen error: $e\n$st'),
+        onError: (e, st) => _logger.severe('TLS server listen error', e, st),
         onDone: () => _logger.info('TLS server done'));
 
     _logger.info('TLS server bound; accepting connections');
@@ -152,8 +152,8 @@ class ReverseProxyServer {
       await (useSecure
           ? (_server as SecureServerSocket).close()
           : (_server as ServerSocket).close());
-    } catch (e) {
-      _logger.severe('Error closing reverse proxy server: $e');
+    } catch (e, st) {
+      _logger.severe('Error closing reverse proxy server', e, st);
     } finally {
       _server = null;
     }
@@ -211,15 +211,14 @@ class ReverseProxyServer {
 
     void handleBackendDone([e]) => handleConnexionDone(e);
     void handleBackendError(e) {
-      _logger.severe('Error on backend socket: $e.\nKilling all connexions.');
+      _logger.severe('Error on backend socket: Killing all connexions.', e);
       _isReconnecting = true;
       handleConnexionDone(e);
     }
 
     void handleClientDone([e]) => handleConnexionDone(e);
     void handleClientError(e) {
-      _logger
-          .severe('Error on client ($remote) socket: $e.\nClosing connexion.');
+      _logger.severe('Error on client ($remote) socket: Closing connexion.', e);
       handleConnexionDone(e);
     }
 

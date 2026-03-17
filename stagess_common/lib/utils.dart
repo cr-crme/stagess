@@ -158,7 +158,7 @@ extension _MapExtensions on Map<String, dynamic> {
       if (subfields?.isEmpty ?? true) continue;
 
       if (key == '*') {
-        for (final thisKey in keys) {
+        for (final thisKey in keys.toList()) {
           if (this[thisKey] is! Map<String, dynamic>) continue;
           final element = (this[thisKey] as Map<String, dynamic>)
               .filter(subfields?[thisKey] ?? FetchableFields.none);

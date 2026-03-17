@@ -131,7 +131,8 @@ class Connexions {
     } on InternshipBankException catch (e, st) {
       if (!skipLog) {
         _logger.severe(
-            'Error while processing request from client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $e',
+            'Error while processing request from client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port})',
+            e,
             st);
       }
       await _send(client,
@@ -145,7 +146,8 @@ class Connexions {
       if (!skipLog) {
         _logger.severe(
           'Internal error while processing request from client '
-          '(${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $e',
+          '(${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port})',
+          e,
           st,
         );
       }

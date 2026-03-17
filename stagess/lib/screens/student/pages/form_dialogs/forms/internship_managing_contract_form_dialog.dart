@@ -6,6 +6,7 @@ import 'package:stagess/common/extensions/students_extension.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/common/widgets/add_job_button.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
+import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
@@ -166,11 +167,15 @@ class InternshipContractFormController {
     return controller;
   }
 
-  InternshipContract toContract() {
+  InternshipContract toContract(Enterprise enterprise) {
     return InternshipContract(
       date: creationDate,
       supervisor: _supervisor,
-      jobId: _primaryJobController.job.id,
+      jobId: enterprise.jobs
+          .firstWhere((job) =>
+              job.specialization.id ==
+              _primaryJobController.job.specialization.id)
+          .id,
       specializationId: _primaryJobController.job.specialization.id,
       extraSpecializationIds:
           _extraJobControllers.map((e) => e.job.specialization.id).toList(),
@@ -270,7 +275,16 @@ class _InternshipDetailsScreenState extends State<_InternshipDetailsScreen> {
       return;
     }
 
-    final newContract = _controller.toContract();
+    final enterprise = EnterprisesProvider.of(context, listen: false)
+        .fromIdOrNull(_controller.internship.enterpriseId);
+    if (enterprise == null) {
+      _logger.severe(
+          'Cannot create internship with missing student, teacher, or school information');
+      Navigator.of(widget.rootContext).pop(null);
+      return;
+    }
+
+    final newContract = _controller.toContract(enterprise);
     final previousContract = widget.internship.contracts.lastOrNull;
     final contractDifferences = newContract
         .getDifference(previousContract, ignoreKeys: ['id'])
@@ -295,13 +309,11 @@ class _InternshipDetailsScreenState extends State<_InternshipDetailsScreen> {
       final school = schoolBoard?.schools
           .firstWhereOrNull((s) => s.id == student?.schoolId);
       final teacherId = AuthProvider.of(context).teacherId;
-      final enterprise = EnterprisesProvider.of(context, listen: false)
-          .fromIdOrNull(_controller.internship.enterpriseId);
+
       if (student == null ||
           teacherId == null ||
           schoolBoard == null ||
-          school == null ||
-          enterprise == null) {
+          school == null) {
         _logger.severe(
             'Cannot create internship with missing student, teacher, or school information');
         Navigator.of(widget.rootContext).pop(null);
@@ -1080,13 +1092,7 @@ EnterpriseJobListController _jobListControllerOf(BuildContext context,
   return EnterpriseJobListController(
     context: context,
     enterpriseStatus: EnterpriseStatus.active,
-    job: internship.currentContract == null
-        ? (enterprise?.availablejobs(context).length == 1
-            ? enterprise!.availablejobs(context).first
-            : Job.empty)
-        : (enterprise?.jobs.firstWhereOrNull(
-                (job) => job.id == internship.currentContract!.jobId) ??
-            Job.empty),
+    job: null,
     specializationWhiteList: enterprise
         ?.jobsWithRemainingPositions(
           context,

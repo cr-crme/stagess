@@ -64,9 +64,9 @@ class HttpRequestHandler {
       request.response.statusCode = statusCode;
       request.response.write('Connexion refused');
       await request.response.close();
-    } catch (e) {
+    } catch (e, st) {
       //coverage:ignore-start
-      _logger.severe('Failed to send error response: $e');
+      _logger.severe('Failed to send error response', e, st);
       //coverage:ignore-end
     }
   }

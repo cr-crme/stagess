@@ -59,6 +59,12 @@ void main() async {
   Logger.root.level = Level.INFO;
   Logger.root.onRecord.listen((record) {
     print('${record.level.name}: ${record.time}: ${record.message}');
+    if (record.error != null) {
+      print('Error: ${record.error}');
+    }
+    if (record.stackTrace != null) {
+      print('StackTrace: ${record.stackTrace}');
+    }
   });
 
   // Connect to the authentication service
@@ -108,7 +114,7 @@ void main() async {
     (HttpRequest request) =>
         requestHandler.answer(request, rateLimiter: rateLimiter),
     onError: (error, stackTrace) =>
-        _logger.severe('Error in server: $error\n$stackTrace'),
+        _logger.severe('Error in server', error, stackTrace),
     cancelOnError: false,
   );
 
