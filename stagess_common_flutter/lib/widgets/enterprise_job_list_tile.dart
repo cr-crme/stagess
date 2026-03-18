@@ -641,6 +641,7 @@ class BuildPrerequisitesCheckboxes extends StatelessWidget {
           ? null
           : 'Exigences de l\'entreprise avant d\'accueillir des élèves en stage:',
       titleStyle: Theme.of(context).textTheme.bodyLarge,
+      otherMaxLength: 500,
       enabled: enabled,
       onOptionSelected: (_) {
         if (onChanged != null) {
@@ -705,6 +706,7 @@ class BuildUniformRadio extends StatelessWidget {
               controller: uniformTextController,
               decoration: const InputDecoration(border: OutlineInputBorder()),
               enabled: enabled,
+              maxLength: 200,
               minLines: 1,
               maxLines: null,
               keyboardType: TextInputType.multiline,
@@ -767,6 +769,7 @@ class BuildProtectionsRadio extends StatelessWidget {
           final protections = values.map((e) => e.toString()).toList();
           onChanged(status, protections);
         },
+        otherMaxLength: 200,
       ),
       onChanged: (value) {
         final status = radioController.value ?? ProtectionsStatus.none;

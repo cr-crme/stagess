@@ -83,7 +83,7 @@ class _EmailListTileState extends State<EmailListTile> {
                         : const TextStyle(color: Colors.black)),
                 disabledBorder: InputBorder.none,
               ),
-              maxLength: 100,
+              maxLength: 200,
               style: widget.contentStyle ??
                   (widget.enabled
                       ? null

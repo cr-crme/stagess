@@ -93,10 +93,10 @@ CREATE TABLE addresses (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     entity_id VARCHAR(36) NOT NULL,
     civic INT,
-    street VARCHAR(100),
-    apartment VARCHAR(20),
+    street VARCHAR(200),
+    apartment VARCHAR(50),
     city VARCHAR(50),
-    postal_code VARCHAR(10),
+    postal_code VARCHAR(50),
     latitude FLOAT,
     longitude FLOAT,
     FOREIGN KEY (entity_id) REFERENCES entities(shared_id) ON DELETE CASCADE
@@ -121,7 +121,7 @@ CREATE TABLE admins (
     first_name VARCHAR(50) NOT NULL,
     middle_name VARCHAR(50),
     last_name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) NOT NULL,
+    email VARCHAR(200) NOT NULL,
     access_level INT NOT NULL,
     FOREIGN KEY (id) REFERENCES entities(shared_id) ON DELETE CASCADE
 );
@@ -135,7 +135,7 @@ CREATE TABLE school_boards (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     name VARCHAR(200) NOT NULL,
     logo BLOB,
-    cnesst_number VARCHAR(20) NOT NULL,
+    cnesst_number VARCHAR(50) NOT NULL,
     FOREIGN KEY (id) REFERENCES entities(shared_id) ON DELETE CASCADE
 );
 
@@ -162,7 +162,7 @@ CREATE TABLE persons (
     middle_name VARCHAR(50),
     last_name VARCHAR(50) NOT NULL,
     date_birthday DATE,
-    email VARCHAR(100),
+    email VARCHAR(200),
     FOREIGN KEY (id) REFERENCES entities(shared_id) ON DELETE CASCADE
 );
 
@@ -174,10 +174,10 @@ CREATE TABLE students (
     version VARCHAR(36) NOT NULL,
     school_board_id VARCHAR(36) NOT NULL,
     school_id VARCHAR(36) NOT NULL,
-    photo VARCHAR(255) NOT NULL,
+    photo VARCHAR(200) NOT NULL,
     program INT NOT NULL,
-    group_name VARCHAR(20) NOT NULL,
-    contact_link VARCHAR(255) NOT NULL,
+    group_name VARCHAR(50) NOT NULL,
+    contact_link VARCHAR(50) NOT NULL,
     FOREIGN KEY (id) REFERENCES persons(id) ON DELETE CASCADE,
     FOREIGN KEY (school_board_id) REFERENCES school_boards(id) ON DELETE CASCADE,
     FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
@@ -202,8 +202,8 @@ CREATE TABLE student_visa_forms (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     form_id VARCHAR(36) NOT NULL,
     is_gateway_to_fms_available BOOLEAN NOT NULL,
-    reference VARCHAR(350) NOT NULL,
-    success_conditions VARCHAR(350) NOT NULL,
+    reference VARCHAR(500) NOT NULL,
+    success_conditions VARCHAR(500) NOT NULL,
     FOREIGN KEY (form_id) REFERENCES student_visa(id) ON DELETE CASCADE
 );
 
@@ -211,7 +211,7 @@ CREATE TABLE student_visa_experiences_and_aptitude_items (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     idx INT NOT NULL,
     visa_form_id VARCHAR(36) NOT NULL,
-    text VARCHAR(150) NOT NULL,
+    text VARCHAR(200) NOT NULL,
     is_selected BOOLEAN NOT NULL,
     FOREIGN KEY (visa_form_id) REFERENCES student_visa_forms(id) ON DELETE CASCADE
 );
@@ -220,7 +220,7 @@ CREATE TABLE student_visa_attestations_and_mentions_items (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     idx INT NOT NULL,
     visa_form_id VARCHAR(36) NOT NULL,
-    text VARCHAR(150) NOT NULL,
+    text VARCHAR(200) NOT NULL,
     is_selected BOOLEAN NOT NULL,
     FOREIGN KEY (visa_form_id) REFERENCES student_visa_forms(id) ON DELETE CASCADE
 );
@@ -287,7 +287,7 @@ CREATE TABLE teachers (
 
 CREATE TABLE teaching_groups (
     teacher_id VARCHAR(36) NOT NULL,
-    group_name VARCHAR(20) NOT NULL, 
+    group_name VARCHAR(50) NOT NULL, 
     FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE
 );
 
@@ -305,9 +305,9 @@ CREATE TABLE teacher_itinerary_waypoints (
     subtitle VARCHAR(50) NOT NULL,
     address_civic INT,
     address_street VARCHAR(100),
-    address_apartment VARCHAR(20),
+    address_apartment VARCHAR(50),
     address_city VARCHAR(50),
-    address_postal_code VARCHAR(10),
+    address_postal_code VARCHAR(50),
     address_latitude FLOAT NOT NULL,
     address_longitude FLOAT NOT NULL,
     visiting_priority INT NOT NULL,
@@ -326,8 +326,8 @@ CREATE TABLE enterprises (
     name VARCHAR(50) NOT NULL,
     status INT NOT NULL,
     recruiter_id VARCHAR(36), 
-    contact_function VARCHAR(255) NOT NULL,
-    website VARCHAR(255),
+    contact_function VARCHAR(50) NOT NULL,
+    website VARCHAR(200),
     neq VARCHAR(50),
     FOREIGN KEY (id) REFERENCES entities(shared_id) ON DELETE CASCADE,
     FOREIGN KEY (school_board_id) REFERENCES school_boards(id) ON DELETE CASCADE
@@ -403,14 +403,14 @@ CREATE TABLE enterprise_job_comments(
     job_id VARCHAR(36) NOT NULL,
     teacher_id VARCHAR(36) NOT NULL,
     date BIGINT NOT NULL,
-    comment VARCHAR(200) NOT NULL,
+    comment VARCHAR(2000) NOT NULL,
     FOREIGN KEY (job_id) REFERENCES enterprise_jobs(id) ON DELETE CASCADE
 );
 
 CREATE TABLE enterprise_job_pre_internship_requests(
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     job_id VARCHAR(36) NOT NULL,
-    other VARCHAR(255),
+    other VARCHAR(500),
     is_applicable BOOLEAN NOT NULL,
     FOREIGN KEY (job_id) REFERENCES enterprise_jobs(id) ON DELETE CASCADE
 );
@@ -424,14 +424,14 @@ CREATE TABLE enterprise_job_pre_internship_request_items(
 CREATE TABLE enterprise_job_uniforms(
     job_id VARCHAR(36) NOT NULL,
     status INT NOT NULL,
-    uniform VARCHAR(255) NOT NULL,
+    uniform VARCHAR(200) NOT NULL,
     FOREIGN KEY (job_id) REFERENCES enterprise_jobs(id) ON DELETE CASCADE
 );
 
 CREATE TABLE enterprise_job_protections(
     job_id VARCHAR(36) NOT NULL,
     status INT NOT NULL,
-    protection VARCHAR(255) NOT NULL,
+    protection VARCHAR(200) NOT NULL,
     FOREIGN KEY (job_id) REFERENCES enterprise_jobs(id) ON DELETE CASCADE
 );
 
@@ -439,7 +439,7 @@ CREATE TABLE enterprise_job_incidents(
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     teacher_id VARCHAR(36) NOT NULL,
     job_id VARCHAR(36) NOT NULL,
-    incident_type VARCHAR(20) NOT NULL,
+    incident_type VARCHAR(50) NOT NULL,
     incident VARCHAR(2000) NOT NULL,
     date BIGINT NOT NULL,
     FOREIGN KEY (job_id) REFERENCES enterprise_jobs(id) ON DELETE CASCADE, 
@@ -483,7 +483,7 @@ CREATE TABLE internship_contracts (
     supervisor_first_name VARCHAR(50) NOT NULL,
     supervisor_last_name VARCHAR(50) NOT NULL,
     supervisor_phone_number VARCHAR(50),
-    supervisor_email VARCHAR(100),
+    supervisor_email VARCHAR(200),
     starting_date BIGINT NOT NULL,
     ending_date BIGINT NOT NULL,
     visit_frequencies VARCHAR(100) NOT NULL,
@@ -536,7 +536,7 @@ CREATE TABLE internship_skill_evaluations (
 
 CREATE TABLE internship_skill_evaluation_persons (
     evaluation_id VARCHAR(36) NOT NULL,
-    person_name VARCHAR(100) NOT NULL,
+    person_name VARCHAR(200) NOT NULL,
     FOREIGN KEY (evaluation_id) REFERENCES internship_skill_evaluations(id) ON DELETE CASCADE
 );
 
@@ -544,7 +544,7 @@ CREATE TABLE internship_skill_evaluation_items (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     evaluation_id VARCHAR(36) NOT NULL,
     specialization_id VARCHAR(36) NOT NULL,
-    skill_id VARCHAR(1000) NOT NULL,
+    skill_id VARCHAR(36) NOT NULL,
     appreciation INT NOT NULL,
     comments VARCHAR(2000),
     FOREIGN KEY (evaluation_id) REFERENCES internship_skill_evaluations(id) ON DELETE CASCADE
@@ -553,7 +553,7 @@ CREATE TABLE internship_skill_evaluation_items (
 CREATE TABLE internship_skill_evaluation_item_tasks (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     evaluation_item_id VARCHAR(36) NOT NULL,
-    title VARCHAR(1000) NOT NULL,
+    title VARCHAR(500) NOT NULL,
     level INT NOT NULL,
     FOREIGN KEY (evaluation_item_id) REFERENCES internship_skill_evaluation_items(id) ON DELETE CASCADE
 );
@@ -578,7 +578,7 @@ CREATE TABLE internship_attitude_evaluations (
 
 CREATE TABLE internship_attitude_evaluation_persons (
     evaluation_id VARCHAR(36) NOT NULL,
-    person_name VARCHAR(100) NOT NULL,
+    person_name VARCHAR(200) NOT NULL,
     FOREIGN KEY (evaluation_id) REFERENCES internship_attitude_evaluations(id) ON DELETE CASCADE
 );
 
@@ -591,13 +591,13 @@ CREATE TABLE internship_sst_evaluations(
 
 CREATE TABLE internship_sst_evaluation_persons (
     evaluation_id VARCHAR(36) NOT NULL,
-    person_name VARCHAR(100) NOT NULL,
+    person_name VARCHAR(200) NOT NULL,
     FOREIGN KEY (evaluation_id) REFERENCES internship_sst_evaluations(id) ON DELETE CASCADE
 );
 
 CREATE TABLE internship_sst_evaluation_questions(
     evaluation_id VARCHAR(36) NOT NULL,
-    question VARCHAR(255) NOT NULL,
+    question VARCHAR(500) NOT NULL,
     answers VARCHAR(2000) NOT NULL,
     FOREIGN KEY (evaluation_id) REFERENCES internship_sst_evaluations(id) ON DELETE CASCADE
 );
@@ -621,7 +621,7 @@ CREATE TABLE post_internship_enterprise_evaluations (
 
 CREATE TABLE post_internship_enterprise_evaluation_skills (
     post_evaluation_id VARCHAR(36) NOT NULL,
-    skill_name VARCHAR(100) NOT NULL,
+    skill_name VARCHAR(500) NOT NULL,
     FOREIGN KEY (post_evaluation_id) REFERENCES post_internship_enterprise_evaluations(id) ON DELETE CASCADE
 );
 

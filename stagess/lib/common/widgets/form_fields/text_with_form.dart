@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-// TODO Limit these text fields
 class TextWithForm extends StatelessWidget {
   const TextWithForm({
+    super.key,
     required this.title,
     this.enabled,
     this.titleStyle,
@@ -11,7 +11,7 @@ class TextWithForm extends StatelessWidget {
     this.onChanged,
     this.onSaved,
     this.validator,
-    super.key,
+    this.maxLength,
   });
 
   final String title;
@@ -22,6 +22,7 @@ class TextWithForm extends StatelessWidget {
   final void Function(String? text)? onChanged;
   final void Function(String? text)? onSaved;
   final String? Function(String? text)? validator;
+  final int? maxLength;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +43,7 @@ class TextWithForm extends StatelessWidget {
           style: Theme.of(context).textTheme.bodyMedium,
           minLines: 1,
           maxLines: 10,
+          maxLength: maxLength,
         ),
       ],
     );

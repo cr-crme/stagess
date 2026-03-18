@@ -61,11 +61,11 @@ class AdminListTileState extends State<AdminListTile> {
   late final _emailController = TextEditingController(text: widget.admin.email);
 
   Admin get editedAdmin => widget.admin.copyWith(
-    schoolBoardId: _selectedSchoolId,
-    firstName: _firstNameController.text,
-    lastName: _lastNameController.text,
-    email: _emailController.text,
-  );
+        schoolBoardId: _selectedSchoolId,
+        firstName: _firstNameController.text,
+        lastName: _lastNameController.text,
+        email: _emailController.text,
+      );
 
   @override
   void initState() {
@@ -115,10 +115,9 @@ class AdminListTileState extends State<AdminListTile> {
     if (mounted) {
       showSnackBar(
         context,
-        message:
-            isSuccess
-                ? 'L\'administrateur a été supprimé avec succès.'
-                : 'Une erreur est survenue lors de la suppression de l\'administrateur.',
+        message: isSuccess
+            ? 'L\'administrateur a été supprimé avec succès.'
+            : 'Une erreur est survenue lors de la suppression de l\'administrateur.',
       );
     }
     await admins.releaseLockForItem(widget.admin);
@@ -150,10 +149,9 @@ class AdminListTileState extends State<AdminListTile> {
         if (mounted) {
           showSnackBar(
             context,
-            message:
-                isSuccess
-                    ? 'L\'administrateur a été modifié avec succès.'
-                    : 'Une erreur est survenue lors de la modification de l\'administrateur.',
+            message: isSuccess
+                ? 'L\'administrateur a été modifié avec succès.'
+                : 'Une erreur est survenue lors de la modification de l\'administrateur.',
           );
         }
       }
@@ -214,71 +212,62 @@ class AdminListTileState extends State<AdminListTile> {
     return widget.forceEditingMode
         ? _buildEditingForm()
         : AnimatedExpandingCard(
-          expandingDuration: ConfigurationService.expandingTileDuration,
-          initialExpandedState: _isExpanded,
-          onTapHeader: (isExpanded) {
-            setState(() => _isExpanded = isExpanded);
-            _fetchData();
-          },
-          header:
-              (ctx, isExpanded) => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 12.0,
-                      top: 8,
-                      bottom: 8,
-                    ),
-                    child: Text(
-                      '${widget.admin.firstName} ${widget.admin.lastName}',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+            expandingDuration: ConfigurationService.expandingTileDuration,
+            initialExpandedState: _isExpanded,
+            onTapHeader: (isExpanded) {
+              setState(() => _isExpanded = isExpanded);
+              _fetchData();
+            },
+            header: (ctx, isExpanded) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 12.0,
+                    top: 8,
+                    bottom: 8,
                   ),
-                  if (_isExpanded)
-                    FutureBuilder(
-                      future: _fetchFullDataCompleter.future,
-                      builder:
-                          (context, snapshot) =>
-                              snapshot.connectionState == ConnectionState.done
-                                  ? Row(
-                                    children: [
-                                      IconButton(
-                                        icon: Icon(
-                                          Icons.delete,
-                                          color:
-                                              _forceDisabled
-                                                  ? Colors.grey
-                                                  : Colors.red,
-                                        ),
-                                        onPressed:
-                                            _forceDisabled
-                                                ? null
-                                                : _onClickedDeleting,
-                                      ),
-                                      IconButton(
-                                        icon: Icon(
-                                          _isEditing ? Icons.save : Icons.edit,
-                                          color:
-                                              _forceDisabled
-                                                  ? Colors.grey
-                                                  : Theme.of(
-                                                    context,
-                                                  ).primaryColor,
-                                        ),
-                                        onPressed:
-                                            _forceDisabled
-                                                ? null
-                                                : _onClickedEditing,
-                                      ),
-                                    ],
-                                  )
-                                  : SizedBox.shrink(),
-                    ),
-                ],
-              ),
-          child: _buildEditingForm(),
-        );
+                  child: Text(
+                    '${widget.admin.firstName} ${widget.admin.lastName}',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                if (_isExpanded)
+                  FutureBuilder(
+                    future: _fetchFullDataCompleter.future,
+                    builder: (context, snapshot) => snapshot.connectionState ==
+                            ConnectionState.done
+                        ? Row(
+                            children: [
+                              IconButton(
+                                icon: Icon(
+                                  Icons.delete,
+                                  color:
+                                      _forceDisabled ? Colors.grey : Colors.red,
+                                ),
+                                onPressed:
+                                    _forceDisabled ? null : _onClickedDeleting,
+                              ),
+                              IconButton(
+                                icon: Icon(
+                                  _isEditing ? Icons.save : Icons.edit,
+                                  color: _forceDisabled
+                                      ? Colors.grey
+                                      : Theme.of(
+                                          context,
+                                        ).primaryColor,
+                                ),
+                                onPressed:
+                                    _forceDisabled ? null : _onClickedEditing,
+                              ),
+                            ],
+                          )
+                        : SizedBox.shrink(),
+                  ),
+              ],
+            ),
+            child: _buildEditingForm(),
+          );
   }
 
   Widget _buildEditingForm() {
@@ -334,54 +323,53 @@ class AdminListTileState extends State<AdminListTile> {
 
     return _isEditing
         ? FormBuilderRadioGroup(
-          key: _radioKey,
-          initialValue: widget.admin.schoolBoardId,
-          name: 'School board selection',
-          orientation: OptionsOrientation.vertical,
-          decoration: InputDecoration(
-            labelText: 'Assigner à un centre de services scolaire',
-          ),
-          onChanged:
-              (value) => setState(() => _selectedSchoolId = value ?? '-1'),
-          validator: (_) {
-            return _selectedSchoolId == '-1'
-                ? 'Sélectionner un centre de services scolaire'
-                : null;
-          },
-          options:
-              schoolBoards
-                  .map(
-                    (e) => FormBuilderFieldOption(
-                      value: e.id,
-                      child: Text(e.name),
-                    ),
-                  )
-                  .toList(),
-        )
+            key: _radioKey,
+            initialValue: widget.admin.schoolBoardId,
+            name: 'School board selection',
+            orientation: OptionsOrientation.vertical,
+            decoration: InputDecoration(
+              labelText: 'Assigner à un centre de services scolaire',
+            ),
+            onChanged: (value) =>
+                setState(() => _selectedSchoolId = value ?? '-1'),
+            validator: (_) {
+              return _selectedSchoolId == '-1'
+                  ? 'Sélectionner un centre de services scolaire'
+                  : null;
+            },
+            options: schoolBoards
+                .map(
+                  (e) => FormBuilderFieldOption(
+                    value: e.id,
+                    child: Text(e.name),
+                  ),
+                )
+                .toList(),
+          )
         : Container();
   }
 
   Widget _buildName() {
     return _isEditing
         ? Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextFormField(
-              controller: _firstNameController,
-              validator:
-                  (value) =>
-                      value?.isEmpty == true ? 'Le prénom est requis' : null,
-              decoration: const InputDecoration(labelText: 'Prénom'),
-            ),
-            TextFormField(
-              controller: _lastNameController,
-              validator:
-                  (value) =>
-                      value?.isEmpty == true ? 'Le nom est requis' : null,
-              decoration: const InputDecoration(labelText: 'Nom de famille'),
-            ),
-          ],
-        )
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: _firstNameController,
+                validator: (value) =>
+                    value?.isEmpty == true ? 'Le prénom est requis' : null,
+                maxLength: 50,
+                decoration: const InputDecoration(labelText: 'Prénom'),
+              ),
+              TextFormField(
+                controller: _lastNameController,
+                validator: (value) =>
+                    value?.isEmpty == true ? 'Le nom est requis' : null,
+                maxLength: 50,
+                decoration: const InputDecoration(labelText: 'Nom de famille'),
+              ),
+            ],
+          )
         : Container();
   }
 
@@ -412,10 +400,9 @@ class AdminListTileState extends State<AdminListTile> {
 
                 showSnackBar(
                   context,
-                  message:
-                      isSuccess
-                          ? 'Compte utilisateur créé avec succès.'
-                          : 'Échec de la création du compte utilisateur.',
+                  message: isSuccess
+                      ? 'Compte utilisateur créé avec succès.'
+                      : 'Échec de la création du compte utilisateur.',
                 );
               },
               child: const Text('Créer un compte'),
@@ -432,10 +419,9 @@ class AdminListTileState extends State<AdminListTile> {
 
                 showSnackBar(
                   context,
-                  message:
-                      isSuccess
-                          ? 'Compte utilisateur supprimé avec succès.'
-                          : 'Échec de la suppression du compte utilisateur.',
+                  message: isSuccess
+                      ? 'Compte utilisateur supprimé avec succès.'
+                      : 'Échec de la suppression du compte utilisateur.',
                 );
               },
               child: const Text('Supprimer un compte'),

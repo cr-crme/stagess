@@ -594,6 +594,7 @@ class InternshipListTileState extends State<InternshipListTile> {
                       child: TextFormField(
                         controller: _contactFirstNameController,
                         decoration: const InputDecoration(labelText: 'Prénom'),
+                        maxLength: 50,
                         validator: (value) {
                           if (value?.isEmpty == true) {
                             return 'Le prénom du contact est requis';
@@ -609,6 +610,7 @@ class InternshipListTileState extends State<InternshipListTile> {
                         decoration: const InputDecoration(
                           labelText: 'Nom de famille',
                         ),
+                        maxLength: 50,
                         validator: (value) {
                           if (value?.isEmpty == true) {
                             return 'Le nom du contact est requis';
@@ -698,6 +700,7 @@ class InternshipListTileState extends State<InternshipListTile> {
           CheckboxWithOther(
             controller: _transportations,
             enabled: _isEditing && _isActive,
+            otherMaxLength: 100,
           ),
         ],
       ),
@@ -716,6 +719,7 @@ class InternshipListTileState extends State<InternshipListTile> {
             child: TextFormField(
               controller: _visitFrequenciesController,
               enabled: _isEditing,
+              maxLength: 100,
               style: TextStyle(color: Colors.black),
               decoration: const InputDecoration(
                 labelText: 'Fréquence des visites de l\'enseignant\u00b7e',
@@ -795,6 +799,7 @@ class InternshipListTileState extends State<InternshipListTile> {
             controller: _teacherNotesController,
             enabled: _isEditing,
             style: TextStyle(color: Colors.black),
+            maxLength: 2000,
             decoration: const InputDecoration(
               labelText: 'Notes de l\'enseignant·e·s',
               labelStyle: TextStyle(color: Colors.black),

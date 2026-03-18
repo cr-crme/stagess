@@ -635,6 +635,7 @@ class _PersonAtMeeting extends StatelessWidget {
           child: CheckboxWithOther(
             controller: formController.wereAtMeetingController,
             enabled: editMode,
+            otherMaxLength: 200,
           ),
         ),
       ],
@@ -1257,6 +1258,7 @@ class _EvaluateSkill extends StatelessWidget {
         TextFormField(
           decoration: const InputDecoration(label: Text('Commentaires')),
           controller: formController.skillCommentsControllers[skill.id]!,
+          maxLength: 2000,
           maxLines: null,
           enabled: editMode,
         ),
@@ -1568,6 +1570,7 @@ class _Comments extends StatelessWidget {
         TextFormField(
           controller: formController.commentsController,
           enabled: editMode,
+          maxLength: 2000,
           maxLines: null,
         ),
       ],

@@ -81,20 +81,21 @@ class SelectableTextItemsController {
 }
 
 class SelectableTextBoxes extends StatefulWidget {
-  const SelectableTextBoxes({
-    super.key,
-    required this.controller,
-    this.enabled = true,
-    this.maxOptions,
-    this.maxSelectedOptions,
-    required this.newItemBuilder,
-  });
+  const SelectableTextBoxes(
+      {super.key,
+      required this.controller,
+      this.enabled = true,
+      this.maxOptions,
+      this.maxSelectedOptions,
+      required this.newItemBuilder,
+      this.maxLength});
 
   final SelectableTextItemsController? controller;
   final bool enabled;
   final int? maxOptions;
   final int? maxSelectedOptions;
   final SelectableTextItem Function(int index) newItemBuilder;
+  final int? maxLength;
 
   @override
   State<SelectableTextBoxes> createState() => _SelectableTextBoxesState();
@@ -153,7 +154,7 @@ class _SelectableTextBoxesState extends State<SelectableTextBoxes> {
                           EdgeInsets.symmetric(horizontal: 8.0, vertical: 12.0),
                     ),
                     enabled: widget.enabled,
-                    maxLength: 100,
+                    maxLength: widget.maxLength,
                     maxLines: 5,
                     style: const TextStyle(color: Colors.black),
                     onEditingComplete: () => _controller.updateOption(

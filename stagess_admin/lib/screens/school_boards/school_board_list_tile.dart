@@ -67,14 +67,14 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
   bool _isEditing = false;
   late final bool _canEdit =
       AuthProvider.of(context, listen: false).databaseAccessLevel >=
-          AccessLevel.superAdmin ||
-      (AuthProvider.of(context, listen: false).databaseAccessLevel ==
-              AccessLevel.admin &&
-          widget.schoolBoard.id ==
-              AuthProvider.of(context, listen: false).schoolBoardId);
+              AccessLevel.superAdmin ||
+          (AuthProvider.of(context, listen: false).databaseAccessLevel ==
+                  AccessLevel.admin &&
+              widget.schoolBoard.id ==
+                  AuthProvider.of(context, listen: false).schoolBoardId);
   late final bool _canDelete =
       AuthProvider.of(context, listen: false).databaseAccessLevel >=
-      AccessLevel.superAdmin;
+          AccessLevel.superAdmin;
 
   late final _nameController = TextEditingController(
     text: widget.schoolBoard.name,
@@ -87,10 +87,10 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
   );
 
   SchoolBoard get editedSchoolBoard => widget.schoolBoard.copyWith(
-    name: _nameController.text,
-    logo: _logoController,
-    cnesstNumber: _cnesstController.text,
-  );
+        name: _nameController.text,
+        logo: _logoController,
+        cnesstNumber: _cnesstController.text,
+      );
 
   @override
   void initState() {
@@ -128,9 +128,8 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
     // Show confirmation dialog
     final answer = await showDialog(
       context: context,
-      builder:
-          (context) =>
-              ConfirmDeleteSchoolBoardDialog(schoolBoard: widget.schoolBoard),
+      builder: (context) =>
+          ConfirmDeleteSchoolBoardDialog(schoolBoard: widget.schoolBoard),
     );
     if (answer == null || !answer || !mounted) {
       await schoolBoards.releaseLockForItem(widget.schoolBoard);
@@ -146,10 +145,9 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
     if (mounted) {
       showSnackBar(
         context,
-        message:
-            isSuccess
-                ? 'Centre de services scolaire supprimé avec succès'
-                : 'Échec de la suppression de la centre de services scolaire',
+        message: isSuccess
+            ? 'Centre de services scolaire supprimé avec succès'
+            : 'Échec de la suppression de la centre de services scolaire',
       );
     }
     await schoolBoards.releaseLockForItem(widget.schoolBoard);
@@ -184,10 +182,9 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
         if (mounted) {
           showSnackBar(
             context,
-            message:
-                isSuccess
-                    ? 'Centre de services scolaire modifiée avec succès'
-                    : 'Échec de la modification de la centre de services scolaire',
+            message: isSuccess
+                ? 'Centre de services scolaire modifiée avec succès'
+                : 'Échec de la modification de la centre de services scolaire',
           );
         }
       }
@@ -238,81 +235,73 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
     return widget.forceEditingMode
         ? _buildEditingForm()
         : AnimatedExpandingCard(
-          expandingDuration: ConfigurationService.expandingTileDuration,
-          initialExpandedState: _isExpanded,
-          elevation: widget.elevation,
-          onTapHeader: (isExpanded) {
-            setState(() => _isExpanded = isExpanded);
-            _fetchData();
-          },
-          header:
-              (ctx, isExpanded) => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Flexible(
-                    child: Padding(
-                      padding: const EdgeInsets.only(
-                        left: 12.0,
-                        top: 8,
-                        bottom: 8,
-                      ),
-                      child: Text(
-                        widget.schoolBoard.name,
-                        overflow: TextOverflow.ellipsis,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleLarge!.copyWith(color: Colors.black),
-                      ),
+            expandingDuration: ConfigurationService.expandingTileDuration,
+            initialExpandedState: _isExpanded,
+            elevation: widget.elevation,
+            onTapHeader: (isExpanded) {
+              setState(() => _isExpanded = isExpanded);
+              _fetchData();
+            },
+            header: (ctx, isExpanded) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      left: 12.0,
+                      top: 8,
+                      bottom: 8,
+                    ),
+                    child: Text(
+                      widget.schoolBoard.name,
+                      overflow: TextOverflow.ellipsis,
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleLarge!.copyWith(color: Colors.black),
                     ),
                   ),
-                  if (_isExpanded)
-                    FutureBuilder(
-                      future: _fetchFullDataCompleter.future,
-                      builder:
-                          (context, snapshot) =>
-                              snapshot.connectionState == ConnectionState.done
-                                  ? Row(
-                                    children: [
-                                      if (_canDelete)
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.delete,
-                                            color:
-                                                _forceDisabled
-                                                    ? Colors.grey
-                                                    : Colors.red,
-                                          ),
-                                          onPressed:
-                                              _forceDisabled
-                                                  ? null
-                                                  : _onClickedDeleting,
-                                        ),
-                                      if (_canEdit)
-                                        IconButton(
-                                          icon: Icon(
-                                            _isEditing
-                                                ? Icons.save
-                                                : Icons.edit,
-                                            color:
-                                                _forceDisabled
-                                                    ? Colors.grey
-                                                    : Theme.of(
-                                                      context,
-                                                    ).primaryColor,
-                                          ),
-                                          onPressed:
-                                              _forceDisabled
-                                                  ? null
-                                                  : _onClickedEditing,
-                                        ),
-                                    ],
-                                  )
-                                  : SizedBox.shrink(),
-                    ),
-                ],
-              ),
-          child: _buildEditingForm(),
-        );
+                ),
+                if (_isExpanded)
+                  FutureBuilder(
+                    future: _fetchFullDataCompleter.future,
+                    builder: (context, snapshot) =>
+                        snapshot.connectionState == ConnectionState.done
+                            ? Row(
+                                children: [
+                                  if (_canDelete)
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: _forceDisabled
+                                            ? Colors.grey
+                                            : Colors.red,
+                                      ),
+                                      onPressed: _forceDisabled
+                                          ? null
+                                          : _onClickedDeleting,
+                                    ),
+                                  if (_canEdit)
+                                    IconButton(
+                                      icon: Icon(
+                                        _isEditing ? Icons.save : Icons.edit,
+                                        color: _forceDisabled
+                                            ? Colors.grey
+                                            : Theme.of(
+                                                context,
+                                              ).primaryColor,
+                                      ),
+                                      onPressed: _forceDisabled
+                                          ? null
+                                          : _onClickedEditing,
+                                    ),
+                                ],
+                              )
+                            : SizedBox.shrink(),
+                  ),
+              ],
+            ),
+            child: _buildEditingForm(),
+          );
   }
 
   Widget _buildEditingForm() {
@@ -355,24 +344,23 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
   Widget _buildName() {
     return _isEditing
         ? Padding(
-          padding: const EdgeInsets.only(right: 12.0, bottom: 12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                controller: _nameController,
-                validator:
-                    (value) =>
-                        value?.isEmpty == true
-                            ? 'Le nom du centre de services scolaire est obligatoire'
-                            : null,
-                decoration: const InputDecoration(
-                  labelText: 'Nom du centre de services scolaire',
+            padding: const EdgeInsets.only(right: 12.0, bottom: 12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: _nameController,
+                  validator: (value) => value?.isEmpty == true
+                      ? 'Le nom du centre de services scolaire est obligatoire'
+                      : null,
+                  maxLength: 200,
+                  decoration: const InputDecoration(
+                    labelText: 'Nom du centre de services scolaire',
+                  ),
                 ),
-              ),
-            ],
-          ),
-        )
+              ],
+            ),
+          )
         : Container();
   }
 
@@ -385,28 +373,28 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
           Text('Logo du centre de services scolaire'),
           _logoController.isEmpty
               ? Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: Container(
-                    width: ImageHelpers.logoWidth.toDouble(),
-                    height: ImageHelpers.logoHeight.toDouble(),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.black),
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Center(
-                      child: const Text(
-                        'Aucun logo n\'a été téléversé',
-                        style: TextStyle(
-                          fontStyle: FontStyle.italic,
-                          fontWeight: FontWeight.bold,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: Container(
+                      width: ImageHelpers.logoWidth.toDouble(),
+                      height: ImageHelpers.logoHeight.toDouble(),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Center(
+                        child: const Text(
+                          'Aucun logo n\'a été téléversé',
+                          style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
                   ),
-                ),
-              )
+                )
               : Center(child: Image.memory(_logoController)),
           if (_isEditing)
             Center(
@@ -469,6 +457,7 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
               labelText: 'Numéro de dossier à la CNESST',
               labelStyle: TextStyle(color: Colors.black),
             ),
+            maxLength: 50,
             style: TextStyle(color: Colors.black),
           ),
         ],
@@ -493,10 +482,9 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
 
     showSnackBar(
       context,
-      message:
-          isSuccess
-              ? 'École ajoutée avec succès'
-              : 'Échec de l\'ajout de l\'école',
+      message: isSuccess
+          ? 'École ajoutée avec succès'
+          : 'Échec de l\'ajout de l\'école',
     );
   }
 
@@ -509,30 +497,30 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
         children: [
           schools.isEmpty
               ? Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 12.0),
-                  child: const Text(
-                    'Aucune école n\'a été associée pour l\'instant',
-                  ),
-                ),
-              )
-              : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ...schools.map(
-                    (school) => Padding(
-                      padding: const EdgeInsets.only(top: 4),
-                      child: SchoolListTile(
-                        school: school,
-                        schoolBoard: widget.schoolBoard,
-                        elevation: 0,
-                        canEdit: _canEdit,
-                        canDelete: _canDelete,
-                      ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: const Text(
+                      'Aucune école n\'a été associée pour l\'instant',
                     ),
                   ),
-                ],
-              ),
+                )
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ...schools.map(
+                      (school) => Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: SchoolListTile(
+                          school: school,
+                          schoolBoard: widget.schoolBoard,
+                          elevation: 0,
+                          canEdit: _canEdit,
+                          canDelete: _canDelete,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
           if (_canEdit && !widget.forceEditingMode)
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),

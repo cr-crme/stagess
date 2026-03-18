@@ -60,7 +60,7 @@ class SchoolListTileState extends State<SchoolListTile> {
   bool _isEditing = false;
   late final bool _canEdit =
       AuthProvider.of(context, listen: false).databaseAccessLevel >=
-      AccessLevel.admin;
+          AccessLevel.admin;
 
   late final _nameController = TextEditingController(text: widget.school.name);
   late final _addressController = AddressController(
@@ -71,13 +71,13 @@ class SchoolListTileState extends State<SchoolListTile> {
   );
 
   School get editedSchool => widget.school.copyWith(
-    name: _nameController.text,
-    address: _addressController.address,
-    phone: PhoneNumber.fromString(
-      _phoneController.text,
-      id: widget.school.phone.id,
-    ),
-  );
+        name: _nameController.text,
+        address: _addressController.address,
+        phone: PhoneNumber.fromString(
+          _phoneController.text,
+          id: widget.school.phone.id,
+        ),
+      );
 
   @override
   void initState() {
@@ -129,10 +129,9 @@ class SchoolListTileState extends State<SchoolListTile> {
     if (mounted) {
       showSnackBar(
         context,
-        message:
-            isSuccess
-                ? 'L\'école a été supprimée avec succès'
-                : 'Une erreur est survenue lors de la suppression de l\'école',
+        message: isSuccess
+            ? 'L\'école a été supprimée avec succès'
+            : 'Une erreur est survenue lors de la suppression de l\'école',
       );
     }
     await schoolBoards.releaseLockForItem(widget.schoolBoard);
@@ -171,10 +170,9 @@ class SchoolListTileState extends State<SchoolListTile> {
         if (mounted) {
           showSnackBar(
             context,
-            message:
-                isSuccess
-                    ? 'L\'école a été modifiée avec succès'
-                    : 'Une erreur est survenue lors de la modification de l\'école',
+            message: isSuccess
+                ? 'L\'école a été modifiée avec succès'
+                : 'Une erreur est survenue lors de la modification de l\'école',
           );
         }
       }
@@ -218,54 +216,51 @@ class SchoolListTileState extends State<SchoolListTile> {
   Widget build(BuildContext context) {
     return widget.isExpandable
         ? AnimatedExpandingCard(
-          initialExpandedState: _isExpanded,
-          elevation: widget.elevation,
-          onTapHeader: (isExpanded) => setState(() => _isExpanded = isExpanded),
-          header:
-              (ctx, isExpanded) => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 12.0,
-                      top: 8,
-                      bottom: 8,
-                    ),
-                    child: Text(
-                      widget.school.name,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+            initialExpandedState: _isExpanded,
+            elevation: widget.elevation,
+            onTapHeader: (isExpanded) =>
+                setState(() => _isExpanded = isExpanded),
+            header: (ctx, isExpanded) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 12.0,
+                    top: 8,
+                    bottom: 8,
                   ),
-                  if (_isExpanded && _canEdit)
-                    Row(
-                      children: [
-                        if (widget.canDelete)
-                          IconButton(
-                            icon: Icon(
-                              Icons.delete,
-                              color: _forceDisabled ? Colors.grey : Colors.red,
-                            ),
-                            onPressed:
-                                _forceDisabled ? null : _onClickedDeleting,
+                  child: Text(
+                    widget.school.name,
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                if (_isExpanded && _canEdit)
+                  Row(
+                    children: [
+                      if (widget.canDelete)
+                        IconButton(
+                          icon: Icon(
+                            Icons.delete,
+                            color: _forceDisabled ? Colors.grey : Colors.red,
                           ),
-                        if (widget.canEdit)
-                          IconButton(
-                            icon: Icon(
-                              _isEditing ? Icons.save : Icons.edit,
-                              color:
-                                  _forceDisabled
-                                      ? Colors.grey
-                                      : Theme.of(context).primaryColor,
-                            ),
-                            onPressed:
-                                _forceDisabled ? null : _onClickedEditing,
+                          onPressed: _forceDisabled ? null : _onClickedDeleting,
+                        ),
+                      if (widget.canEdit)
+                        IconButton(
+                          icon: Icon(
+                            _isEditing ? Icons.save : Icons.edit,
+                            color: _forceDisabled
+                                ? Colors.grey
+                                : Theme.of(context).primaryColor,
                           ),
-                      ],
-                    ),
-                ],
-              ),
-          child: _buildEditingForm(),
-        )
+                          onPressed: _forceDisabled ? null : _onClickedEditing,
+                        ),
+                    ],
+                  ),
+              ],
+            ),
+            child: _buildEditingForm(),
+          )
         : _buildEditingForm();
   }
 
@@ -285,22 +280,22 @@ class SchoolListTileState extends State<SchoolListTile> {
   Widget _buildName() {
     return _isEditing
         ? Padding(
-          padding: const EdgeInsets.only(right: 12.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextFormField(
-                controller: _nameController,
-                validator:
-                    (value) =>
-                        value?.isEmpty == true
-                            ? 'Le nom de l\'école est requis'
-                            : null,
-                decoration: const InputDecoration(labelText: 'Nom de l\'école'),
-              ),
-            ],
-          ),
-        )
+            padding: const EdgeInsets.only(right: 12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                TextFormField(
+                  controller: _nameController,
+                  validator: (value) => value?.isEmpty == true
+                      ? 'Le nom de l\'école est requis'
+                      : null,
+                  maxLength: 200,
+                  decoration:
+                      const InputDecoration(labelText: 'Nom de l\'école'),
+                ),
+              ],
+            ),
+          )
         : Container();
   }
 

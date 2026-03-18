@@ -118,6 +118,7 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
       contactFunction: about?.contactFunction,
       address: about?.addressController.address,
       phone: PhoneNumber.fromString(about?.phoneController.text ?? ''),
+      website: about?.websiteController.text,
     );
     setState(() {});
   }

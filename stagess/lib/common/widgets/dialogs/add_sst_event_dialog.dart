@@ -94,6 +94,7 @@ class _AddSstEventDialogState extends State<AddSstEventDialog> {
                   onSaved: (text) => setState(() => _description = text),
                   validator: (text) =>
                       text?.isEmpty ?? true ? 'Que s\'est-il passé?' : null,
+                  maxLength: 2000,
                 ),
               ],
             ),

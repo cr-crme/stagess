@@ -186,7 +186,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                     decoration: InputDecoration(
                       labelText: 'Nom de l\'itinéraire',
                     ),
-                    maxLength: 25,
+                    maxLength: 50,
                     initialValue: '',
                     onChanged: (newValue) => itineraryName = newValue,
                     validator: (value) {

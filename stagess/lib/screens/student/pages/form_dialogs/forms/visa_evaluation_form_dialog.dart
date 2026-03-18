@@ -538,6 +538,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
               maxSelectedOptions: 8,
               newItemBuilder: (index) => ExperiencesAndAptitudes(
                   index: index, text: '', isSelected: false),
+              maxLength: 200,
             ),
           ],
         ),
@@ -573,6 +574,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
               maxSelectedOptions: 5,
               newItemBuilder: (index) => AttestationsAndMentions(
                   index: index, text: '', isSelected: false),
+              maxLength: 200,
             ),
           ],
         ),
@@ -966,7 +968,7 @@ class _EmployabilityProfileSection extends StatelessWidget {
                   border: OutlineInputBorder(),
                 ),
                 style: TextStyle(color: Colors.black),
-                maxLength: 300,
+                maxLength: 500,
                 maxLines: 5,
               ),
             ],
@@ -1090,7 +1092,7 @@ class _ForcesAndChallengesSection extends StatelessWidget {
                 border: OutlineInputBorder(),
               ),
               style: TextStyle(color: Colors.black),
-              maxLength: 300,
+              maxLength: 500,
               maxLines: 5,
             ),
           ],

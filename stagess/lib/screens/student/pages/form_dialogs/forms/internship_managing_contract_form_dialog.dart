@@ -1022,7 +1022,6 @@ class _Hours extends StatelessWidget {
               labelText: '* Nombre total d\'heures de stage à faire',
               labelStyle: TextStyle(color: Colors.black),
             ),
-            maxLength: 10,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             style: TextStyle(color: Colors.black),
             validator: (text) =>

@@ -369,6 +369,7 @@ class _EnterpriseEvaluationScreenState
       title: '* Habiletés requises pour le stage\u00a0:',
       enabled: _controller.canModify,
       errorMessageOther: 'Préciser les autres habiletés requises.',
+      otherMaxLength: 500,
     );
   }
 

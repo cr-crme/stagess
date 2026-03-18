@@ -563,6 +563,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                   validator: (value) => value?.isEmpty == true
                       ? 'Le nom de l\'entreprise est requis'
                       : null,
+                  maxLength: 50,
                   decoration: const InputDecoration(
                     labelText: 'Nom de l\'entreprise',
                   ),
@@ -765,6 +766,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                       child: TextFormField(
                         controller: _contactFirstNameController,
                         decoration: const InputDecoration(labelText: 'Prénom'),
+                        maxLength: 50,
                         validator: (value) {
                           if (value?.isEmpty == true) {
                             return 'Le prénom du contact est requis';
@@ -780,6 +782,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                         decoration: const InputDecoration(
                           labelText: 'Nom de famille',
                         ),
+                        maxLength: 50,
                         validator: (value) {
                           if (value?.isEmpty == true) {
                             return 'Le nom du contact est requis';
@@ -796,6 +799,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                   decoration: const InputDecoration(
                     labelText: 'Fonction dans l\'entreprise',
                   ),
+                  maxLength: 50,
                 ),
               const SizedBox(height: 4),
               PhoneListTile(
@@ -827,6 +831,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
           labelText: 'Numéro d\'entreprise (NEQ)',
           labelStyle: TextStyle(color: Colors.black),
         ),
+        maxLength: 50,
         style: TextStyle(color: Colors.black),
       ),
     );

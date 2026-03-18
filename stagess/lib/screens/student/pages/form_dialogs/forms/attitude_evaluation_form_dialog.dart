@@ -468,6 +468,7 @@ class _PersonAtMeeting extends StatelessWidget {
         CheckboxWithOther(
           controller: formController.wereAtMeetingController,
           enabled: editMode,
+          otherMaxLength: 200,
         ),
       ],
     );

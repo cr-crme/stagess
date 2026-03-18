@@ -226,12 +226,14 @@ class TeacherListTileState extends State<TeacherListTile> {
                 validator: (value) =>
                     value?.isEmpty == true ? 'Le prénom est requis' : null,
                 decoration: const InputDecoration(labelText: 'Prénom'),
+                maxLength: 50,
               ),
               TextFormField(
                 controller: _lastNameController,
                 validator: (value) =>
                     value?.isEmpty == true ? 'Le nom est requis' : null,
                 decoration: const InputDecoration(labelText: 'Nom de famille'),
+                maxLength: 50,
               ),
             ],
           )

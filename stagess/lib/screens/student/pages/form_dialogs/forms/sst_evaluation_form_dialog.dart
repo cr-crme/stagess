@@ -389,7 +389,8 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                     },
                     followUpChild: question.followUpQuestion == null
                         ? null
-                        : _buildFollowUpQuestion(question, context),
+                        : _buildFollowUpQuestion(question, context,
+                            maxLength: 2000),
                   ),
                 );
 
@@ -407,6 +408,7 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                           ?.map((e) => e as String)
                           .toList(),
                     ),
+                    otherMaxLength: 2000,
                     onOptionSelected: (values) {
                       answer['Q${question.id}'] = values;
                       if (!question.choices!.any((q) => values.contains(q))) {
@@ -416,7 +418,8 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                     },
                     followUpChild: question.followUpQuestion == null
                         ? null
-                        : _buildFollowUpQuestion(question, context),
+                        : _buildFollowUpQuestion(question, context,
+                            maxLength: 2000),
                   ),
                 );
 
@@ -431,6 +434,7 @@ class _QuestionsStepState extends State<_QuestionsStep> {
                         '',
                     onChanged: (text) => answer['Q${question.id}'] =
                         text == null ? null : [text],
+                    maxLength: 2000,
                   ),
                 );
             }
@@ -450,13 +454,15 @@ class _QuestionsStepState extends State<_QuestionsStep> {
           child: CheckboxWithOther(
             controller: widget.wereAtMeetingController,
             enabled: widget.editMode,
+            otherMaxLength: 200,
           ),
         ),
       ],
     );
   }
 
-  Padding _buildFollowUpQuestion(Question question, BuildContext context) {
+  Padding _buildFollowUpQuestion(Question question, BuildContext context,
+      {required int maxLength}) {
     _followUpController['Q${question.id}+t'] = TextEditingController(
       text:
           widget.initialSstEvaluation?.questions['Q${question.id}+t']?.first ??
@@ -471,6 +477,7 @@ class _QuestionsStepState extends State<_QuestionsStep> {
         titleStyle: Theme.of(context).textTheme.bodyMedium,
         onChanged: (text) =>
             answer['Q${question.id}+t'] = text == null ? null : [text],
+        maxLength: maxLength,
       ),
     );
   }

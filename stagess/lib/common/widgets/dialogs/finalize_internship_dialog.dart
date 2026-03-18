@@ -105,7 +105,7 @@ class FinalizeInternshipDialog extends StatelessWidget {
                         controller: hourController,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
+                          FilteringTextInputFormatter.digitsOnly
                         ],
                       ),
                     ),

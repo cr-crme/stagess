@@ -417,12 +417,14 @@ class TeacherListTileState extends State<TeacherListTile> {
             children: [
               TextFormField(
                 controller: _firstNameController,
+                maxLength: 50,
                 validator: (value) =>
                     value?.isEmpty == true ? 'Le prénom est requis' : null,
                 decoration: const InputDecoration(labelText: 'Prénom'),
               ),
               TextFormField(
                 controller: _lastNameController,
+                maxLength: 50,
                 validator: (value) =>
                     value?.isEmpty == true ? 'Le nom est requis' : null,
                 decoration: const InputDecoration(labelText: 'Nom de famille'),
@@ -451,6 +453,7 @@ class TeacherListTileState extends State<TeacherListTile> {
                       child: TextFormField(
                         controller: _currentGroups[i],
                         keyboardType: TextInputType.number,
+                        maxLength: 50,
                         decoration: i == 0
                             ? const InputDecoration(labelText: 'Groupes')
                             : null,

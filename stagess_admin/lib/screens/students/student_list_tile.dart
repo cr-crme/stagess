@@ -123,35 +123,33 @@ class StudentListTileState extends State<StudentListTile> {
   );
 
   Student get editedStudent => widget.student.copyWith(
-    schoolBoardId: widget.schoolBoard.id,
-    schoolId: _selectedSchoolId,
-    firstName: _firstNameController.text,
-    lastName: _lastNameController.text,
-    dateBirth: _birthController.value,
-    group: _groupController.text,
-    program: _selectedProgram,
-    address:
-        _addressController.address ??
-        Address.empty.copyWith(id: widget.student.address?.id),
-    phone: PhoneNumber.fromString(
-      _phoneController.text,
-      id: widget.student.phone?.id,
-    ),
-    email: _emailController.text,
-    contactLink: _contactLinkController.text,
-    contact: widget.student.contact.copyWith(
-      firstName: _contactFirstNameController.text,
-      lastName: _contactLastNameController.text,
-      address:
-          _contactAddressController.address ??
-          Address.empty.copyWith(id: widget.student.contact.address?.id),
-      phone: PhoneNumber.fromString(
-        _contactPhoneController.text,
-        id: widget.student.contact.phone?.id,
-      ),
-      email: _contactEmailController.text,
-    ),
-  );
+        schoolBoardId: widget.schoolBoard.id,
+        schoolId: _selectedSchoolId,
+        firstName: _firstNameController.text,
+        lastName: _lastNameController.text,
+        dateBirth: _birthController.value,
+        group: _groupController.text,
+        program: _selectedProgram,
+        address: _addressController.address ??
+            Address.empty.copyWith(id: widget.student.address?.id),
+        phone: PhoneNumber.fromString(
+          _phoneController.text,
+          id: widget.student.phone?.id,
+        ),
+        email: _emailController.text,
+        contactLink: _contactLinkController.text,
+        contact: widget.student.contact.copyWith(
+          firstName: _contactFirstNameController.text,
+          lastName: _contactLastNameController.text,
+          address: _contactAddressController.address ??
+              Address.empty.copyWith(id: widget.student.contact.address?.id),
+          phone: PhoneNumber.fromString(
+            _contactPhoneController.text,
+            id: widget.student.contact.phone?.id,
+          ),
+          email: _contactEmailController.text,
+        ),
+      );
 
   @override
   void initState() {
@@ -201,10 +199,9 @@ class StudentListTileState extends State<StudentListTile> {
     if (mounted) {
       showSnackBar(
         context,
-        message:
-            isSuccess
-                ? 'L\'élève a été supprimé avec succès.'
-                : 'Une erreur est survenue lors de la suppression de l\'élève.',
+        message: isSuccess
+            ? 'L\'élève a été supprimé avec succès.'
+            : 'Une erreur est survenue lors de la suppression de l\'élève.',
       );
     }
     await students.releaseLockForItem(widget.student);
@@ -238,10 +235,9 @@ class StudentListTileState extends State<StudentListTile> {
         if (mounted) {
           showSnackBar(
             context,
-            message:
-                isSuccess
-                    ? 'L\'élève a été modifié avec succès.'
-                    : 'Une erreur est survenue lors de la modification de l\'élève.',
+            message: isSuccess
+                ? 'L\'élève a été modifié avec succès.'
+                : 'Une erreur est survenue lors de la modification de l\'élève.',
           );
         }
       }
@@ -323,75 +319,67 @@ class StudentListTileState extends State<StudentListTile> {
     return widget.forceEditingMode
         ? _buildEditingForm()
         : AnimatedExpandingCard(
-          expandingDuration: ConfigurationService.expandingTileDuration,
-          initialExpandedState: _isExpanded,
-          onTapHeader: (isExpanded) {
-            setState(() => _isExpanded = isExpanded);
-            _fetchData();
-          },
-          header:
-              (ctx, isExpanded) => Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                      left: 12.0,
-                      top: 8,
-                      bottom: 8,
-                    ),
-                    child: Text(
-                      '${widget.student.firstName} ${widget.student.lastName}',
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
+            expandingDuration: ConfigurationService.expandingTileDuration,
+            initialExpandedState: _isExpanded,
+            onTapHeader: (isExpanded) {
+              setState(() => _isExpanded = isExpanded);
+              _fetchData();
+            },
+            header: (ctx, isExpanded) => Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(
+                    left: 12.0,
+                    top: 8,
+                    bottom: 8,
                   ),
-                  if (_isExpanded)
-                    FutureBuilder(
-                      future: _fetchFullDataCompleter.future,
-                      builder:
-                          (ctx, snapshot) =>
-                              snapshot.connectionState == ConnectionState.done
-                                  ? Row(
-                                    children: [
-                                      if (widget.canDelete)
-                                        IconButton(
-                                          icon: Icon(
-                                            Icons.delete,
-                                            color:
-                                                _forceDisabled
-                                                    ? Colors.grey
-                                                    : Colors.red,
-                                          ),
-                                          onPressed:
-                                              _forceDisabled
-                                                  ? null
-                                                  : _onClickedDeleting,
-                                        ),
-                                      if (widget.canEdit)
-                                        IconButton(
-                                          icon: Icon(
-                                            _isEditing
-                                                ? Icons.save
-                                                : Icons.edit,
-                                            color:
-                                                _forceDisabled
-                                                    ? Colors.grey
-                                                    : Theme.of(
-                                                      context,
-                                                    ).primaryColor,
-                                          ),
-                                          onPressed:
-                                              _forceDisabled
-                                                  ? null
-                                                  : _onClickedEditing,
-                                        ),
-                                    ],
-                                  )
-                                  : SizedBox.shrink(),
-                    ),
-                ],
-              ),
-          child: _buildEditingForm(),
-        );
+                  child: Text(
+                    '${widget.student.firstName} ${widget.student.lastName}',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                ),
+                if (_isExpanded)
+                  FutureBuilder(
+                    future: _fetchFullDataCompleter.future,
+                    builder: (ctx, snapshot) =>
+                        snapshot.connectionState == ConnectionState.done
+                            ? Row(
+                                children: [
+                                  if (widget.canDelete)
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: _forceDisabled
+                                            ? Colors.grey
+                                            : Colors.red,
+                                      ),
+                                      onPressed: _forceDisabled
+                                          ? null
+                                          : _onClickedDeleting,
+                                    ),
+                                  if (widget.canEdit)
+                                    IconButton(
+                                      icon: Icon(
+                                        _isEditing ? Icons.save : Icons.edit,
+                                        color: _forceDisabled
+                                            ? Colors.grey
+                                            : Theme.of(
+                                                context,
+                                              ).primaryColor,
+                                      ),
+                                      onPressed: _forceDisabled
+                                          ? null
+                                          : _onClickedEditing,
+                                    ),
+                                ],
+                              )
+                            : SizedBox.shrink(),
+                  ),
+              ],
+            ),
+            child: _buildEditingForm(),
+          );
   }
 
   Widget _buildEditingForm() {
@@ -447,95 +435,97 @@ class StudentListTileState extends State<StudentListTile> {
   Widget _buildSchoolSelection() {
     return _isEditing
         ? FormBuilderRadioGroup(
-          key: _schoolRadioKey,
-          initialValue: widget.student.schoolId,
-          name: 'School selection',
-          orientation: OptionsOrientation.vertical,
-          decoration: InputDecoration(labelText: 'Assigner à une école'),
-          onChanged:
-              (value) => setState(() => _selectedSchoolId = value ?? '-1'),
-          validator: (_) {
-            return _selectedSchoolId == '-1' ? 'Sélectionner une école' : null;
-          },
-          options:
-              widget.schoolBoard.schools
-                  .map(
-                    (e) => FormBuilderFieldOption(
-                      value: e.id,
-                      child: Text(e.name),
-                    ),
-                  )
-                  .toList(),
-        )
+            key: _schoolRadioKey,
+            initialValue: widget.student.schoolId,
+            name: 'School selection',
+            orientation: OptionsOrientation.vertical,
+            decoration: InputDecoration(labelText: 'Assigner à une école'),
+            onChanged: (value) =>
+                setState(() => _selectedSchoolId = value ?? '-1'),
+            validator: (_) {
+              return _selectedSchoolId == '-1'
+                  ? 'Sélectionner une école'
+                  : null;
+            },
+            options: widget.schoolBoard.schools
+                .map(
+                  (e) => FormBuilderFieldOption(
+                    value: e.id,
+                    child: Text(e.name),
+                  ),
+                )
+                .toList(),
+          )
         : Container();
   }
 
   Widget _buildName() {
     return _isEditing
         ? Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextFormField(
-              controller: _firstNameController,
-              validator:
-                  (value) =>
-                      value?.isEmpty == true ? 'Le prénom est requis' : null,
-              decoration: const InputDecoration(labelText: 'Prénom'),
-            ),
-            TextFormField(
-              controller: _lastNameController,
-              validator:
-                  (value) =>
-                      value?.isEmpty == true ? 'Le nom est requis' : null,
-              decoration: const InputDecoration(labelText: 'Nom de famille'),
-            ),
-          ],
-        )
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                controller: _firstNameController,
+                validator: (value) =>
+                    value?.isEmpty == true ? 'Le prénom est requis' : null,
+                maxLength: 50,
+                decoration: const InputDecoration(labelText: 'Prénom'),
+              ),
+              TextFormField(
+                controller: _lastNameController,
+                validator: (value) =>
+                    value?.isEmpty == true ? 'Le nom est requis' : null,
+                maxLength: 50,
+                decoration: const InputDecoration(labelText: 'Nom de famille'),
+              ),
+            ],
+          )
         : Container();
   }
 
   Widget _buildGroup() {
     return _isEditing
         ? TextFormField(
-          controller: _groupController,
-          inputFormatters: [
-            FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z]')),
-          ],
-          keyboardType: TextInputType.number,
-          validator:
-              (value) => value?.isEmpty == true ? 'Le groupe est requis' : null,
-          decoration: const InputDecoration(labelText: 'Groupe'),
-        )
+            controller: _groupController,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9a-zA-Z]')),
+            ],
+            maxLength: 50,
+            keyboardType: TextInputType.number,
+            validator: (value) =>
+                value?.isEmpty == true ? 'Le groupe est requis' : null,
+            decoration: const InputDecoration(labelText: 'Groupe'),
+          )
         : Text('Groupe : ${widget.student.group}');
   }
 
   Widget _buildProgramSelection() {
     return _isEditing
         ? FormBuilderRadioGroup(
-          key: _programRadioKey,
-          initialValue: widget.student.program,
-          name: 'Program selection',
-          enabled: _isEditing,
-          orientation: OptionsOrientation.vertical,
-          decoration: InputDecoration(labelText: 'Assigner à un programme'),
-          onChanged:
-              (value) =>
-                  setState(() => _selectedProgram = value ?? Program.undefined),
-          validator: (_) {
-            return _selectedProgram == Program.undefined
-                ? 'Sélectionner un programme'
-                : null;
-          },
-          options:
-              (widget.forceEditingMode ? Program.values : Program.allowedValues)
-                  .map(
-                    (e) => FormBuilderFieldOption(
-                      value: e,
-                      child: Text(e.toString()),
-                    ),
-                  )
-                  .toList(),
-        )
+            key: _programRadioKey,
+            initialValue: widget.student.program,
+            name: 'Program selection',
+            enabled: _isEditing,
+            orientation: OptionsOrientation.vertical,
+            decoration: InputDecoration(labelText: 'Assigner à un programme'),
+            onChanged: (value) =>
+                setState(() => _selectedProgram = value ?? Program.undefined),
+            validator: (_) {
+              return _selectedProgram == Program.undefined
+                  ? 'Sélectionner un programme'
+                  : null;
+            },
+            options: (widget.forceEditingMode
+                    ? Program.values
+                    : Program.allowedValues)
+                .map(
+                  (e) => FormBuilderFieldOption(
+                    value: e,
+                    child: Text(e.toString()),
+                  ),
+                )
+                .toList(),
+          )
         : Text('Programme : ${widget.student.program.toString()}');
   }
 
@@ -586,8 +576,8 @@ class StudentListTileState extends State<StudentListTile> {
         _isEditing
             ? Text('Contact')
             : Text(
-              'Contact : ${widget.student.contact.toString()} (${widget.student.contactLink})',
-            ),
+                'Contact : ${widget.student.contact.toString()} (${widget.student.contactLink})',
+              ),
         Padding(
           padding: const EdgeInsets.only(left: 16.0),
           child: Column(
@@ -600,6 +590,7 @@ class StudentListTileState extends State<StudentListTile> {
                       child: TextFormField(
                         controller: _contactFirstNameController,
                         decoration: const InputDecoration(labelText: 'Prénom'),
+                        maxLength: 50,
                         validator: (value) {
                           if (value?.isEmpty == true) {
                             return 'Le prénom du contact est requis';
@@ -615,6 +606,7 @@ class StudentListTileState extends State<StudentListTile> {
                         decoration: const InputDecoration(
                           labelText: 'Nom de famille',
                         ),
+                        maxLength: 50,
                         validator: (value) {
                           if (value?.isEmpty == true) {
                             return 'Le nom du contact est requis';
@@ -631,6 +623,7 @@ class StudentListTileState extends State<StudentListTile> {
                   decoration: const InputDecoration(
                     labelText: 'Lien avec l\'élève',
                   ),
+                  maxLength: 50,
                   validator: (value) {
                     if (value?.isEmpty == true) {
                       return 'Le lien du contact est requis';

@@ -5,6 +5,7 @@ import 'package:stagess_common_flutter/widgets/address_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/enterprise_activity_type_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
+import 'package:stagess_common_flutter/widgets/web_site_list_tile.dart';
 
 final _logger = Logger('InformationsPage');
 
@@ -21,6 +22,7 @@ class AboutPageState extends State<AboutPage> {
   String? name;
   final addressController = AddressController();
   final phoneController = TextEditingController();
+  final websiteController = TextEditingController();
 
   String? contactFirstName;
   String? contactLastName;
@@ -83,6 +85,7 @@ class AboutPageState extends State<AboutPage> {
                 ),
                 validator: (text) =>
                     text!.isEmpty ? 'Ajouter le nom de l\'entreprise.' : null,
+                maxLength: 50,
                 onChanged: (name) => this.name = name,
               ),
               AddressListTile(
@@ -98,6 +101,11 @@ class AboutPageState extends State<AboutPage> {
                 isMandatory: true,
                 enabled: true,
               ),
+              WebSiteListTile(
+                title: 'Site web de l\'établissement',
+                controller: websiteController,
+                enabled: true,
+              ),
               SizedBox(height: 16),
               const SubTitle('Entreprise représentée par', left: 0, top: 0),
               TextFormField(
@@ -105,6 +113,7 @@ class AboutPageState extends State<AboutPage> {
                 validator: (text) => text!.isEmpty
                     ? 'Ajouter le nom de la personne représentant l\'entreprise.'
                     : null,
+                maxLength: 50,
                 onChanged: (name) => contactFirstName = name,
               ),
               TextFormField(
@@ -114,6 +123,7 @@ class AboutPageState extends State<AboutPage> {
                 validator: (text) => text!.isEmpty
                     ? 'Ajouter le nom de la personne représentant l\'entreprise.'
                     : null,
+                maxLength: 50,
                 onChanged: (name) => contactLastName = name,
               ),
               TextFormField(
@@ -121,6 +131,7 @@ class AboutPageState extends State<AboutPage> {
                 validator: (text) => text!.isEmpty
                     ? 'Ajouter la fonction de cette personne.'
                     : null,
+                maxLength: 50,
                 onChanged: (function) => contactFunction = function,
               ),
               PhoneListTile(
