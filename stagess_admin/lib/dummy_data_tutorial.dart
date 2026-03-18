@@ -2415,7 +2415,7 @@ Future<void> _addDummyInternships(
     supervisionStyle: 1,
     easeOfCommunication: 5,
     absenceAcceptance: 4,
-    sstManagement: 1,
+    sstSupervision: 1,
   ));
   internships.add(internship);
 

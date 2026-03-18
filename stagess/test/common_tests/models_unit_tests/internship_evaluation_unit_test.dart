@@ -403,7 +403,7 @@ void main() {
         'supervision_style': evaluation.supervisionStyle,
         'ease_of_communication': evaluation.easeOfCommunication,
         'absence_acceptance': evaluation.absenceAcceptance,
-        'sst_management': evaluation.sstManagement,
+        'sst_supervision': evaluation.sstSupervision,
       });
 
       expect(deserialized.id, evaluation.id);
@@ -418,7 +418,7 @@ void main() {
       expect(deserialized.supervisionStyle, evaluation.supervisionStyle);
       expect(deserialized.easeOfCommunication, evaluation.easeOfCommunication);
       expect(deserialized.absenceAcceptance, evaluation.absenceAcceptance);
-      expect(deserialized.sstManagement, evaluation.sstManagement);
+      expect(deserialized.sstSupervision, evaluation.sstSupervision);
 
       // Test for empty deserialize to make sure it doesn't crash
       final emptyDeserialized =
@@ -434,7 +434,7 @@ void main() {
       expect(emptyDeserialized.supervisionStyle, 0);
       expect(emptyDeserialized.easeOfCommunication, 0);
       expect(emptyDeserialized.absenceAcceptance, 0);
-      expect(emptyDeserialized.sstManagement, 0);
+      expect(emptyDeserialized.sstSupervision, 0);
     });
   });
 }

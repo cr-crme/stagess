@@ -615,7 +615,7 @@ CREATE TABLE post_internship_enterprise_evaluations (
     supervision_style FLOAT NOT NULL,
     ease_of_communication FLOAT NOT NULL,
     absence_acceptance FLOAT NOT NULL,
-    sst_management FLOAT NOT NULL,
+    sst_supervision FLOAT NOT NULL,
     FOREIGN KEY (internship_id) REFERENCES internships(id) ON DELETE CASCADE
 );
 

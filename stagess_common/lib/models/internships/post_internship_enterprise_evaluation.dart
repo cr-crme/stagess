@@ -23,7 +23,7 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
     required this.supervisionStyle,
     required this.easeOfCommunication,
     required this.absenceAcceptance,
-    required this.sstManagement,
+    required this.sstSupervision,
   });
 
   PostInternshipEnterpriseEvaluation.fromSerialized(super.map)
@@ -46,7 +46,7 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
         easeOfCommunication =
             _doubleFromSerialized(map?['ease_of_communication']),
         absenceAcceptance = _doubleFromSerialized(map?['absence_acceptance']),
-        sstManagement = _doubleFromSerialized(map?['sst_management']),
+        sstSupervision = _doubleFromSerialized(map?['sst_supervision']),
         super.fromSerialized();
 
   PostInternshipEnterpriseEvaluation copyWith({
@@ -63,7 +63,7 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
     double? supervisionStyle,
     double? easeOfCommunication,
     double? absenceAcceptance,
-    double? sstManagement,
+    double? sstSupervision,
   }) {
     return PostInternshipEnterpriseEvaluation(
       id: id ?? this.id,
@@ -80,7 +80,7 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
       supervisionStyle: supervisionStyle ?? this.supervisionStyle,
       easeOfCommunication: easeOfCommunication ?? this.easeOfCommunication,
       absenceAcceptance: absenceAcceptance ?? this.absenceAcceptance,
-      sstManagement: sstManagement ?? this.sstManagement,
+      sstSupervision: sstSupervision ?? this.sstSupervision,
     );
   }
 
@@ -118,8 +118,8 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
           defaultValue: easeOfCommunication),
       absenceAcceptance: _doubleFromSerialized(serialized['absence_acceptance'],
           defaultValue: absenceAcceptance),
-      sstManagement: _doubleFromSerialized(serialized['sst_management'],
-          defaultValue: sstManagement),
+      sstSupervision: _doubleFromSerialized(serialized['sst_supervision'],
+          defaultValue: sstSupervision),
     );
   }
 
@@ -142,7 +142,7 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
   final double supervisionStyle;
   final double easeOfCommunication;
   final double absenceAcceptance;
-  final double sstManagement;
+  final double sstSupervision;
 
   // Supervision
 
@@ -161,7 +161,7 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
         'supervision_style': supervisionStyle,
         'ease_of_communication': easeOfCommunication,
         'absence_acceptance': absenceAcceptance,
-        'sst_management': sstManagement,
+        'sst_supervision': sstSupervision,
       };
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
@@ -177,7 +177,7 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
         'supervision_style': FetchableFields.optional,
         'ease_of_communication': FetchableFields.optional,
         'absence_acceptance': FetchableFields.optional,
-        'sst_management': FetchableFields.optional,
+        'sst_supervision': FetchableFields.optional,
       });
 
   @override
@@ -194,7 +194,7 @@ class PostInternshipEnterpriseEvaluation extends InternshipEvaluation {
         'supervisionStyle: $supervisionStyle, '
         'easeOfCommunication: $easeOfCommunication, '
         'absenceAcceptance: $absenceAcceptance, '
-        'sstManagement: $sstManagement, '
+        'sstSupervision: $sstSupervision, '
         '}';
   }
 }

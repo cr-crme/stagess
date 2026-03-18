@@ -264,7 +264,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
               'supervision_style',
               'ease_of_communication',
               'absence_acceptance',
-              'sst_management',
+              'sst_supervision',
             ],
             idNameToDataTable: 'internship_id',
           ),
@@ -872,7 +872,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
             'supervision_style': serialized['supervision_style'],
             'ease_of_communication': serialized['ease_of_communication'],
             'absence_acceptance': serialized['absence_acceptance'],
-            'sst_management': serialized['sst_management'],
+            'sst_supervision': serialized['sst_supervision'],
           });
 
       for (final skill in (serialized['skills_required'] as List?) ?? []) {

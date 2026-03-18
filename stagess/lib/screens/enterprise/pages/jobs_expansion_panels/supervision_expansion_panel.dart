@@ -88,7 +88,7 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
                         const SizedBox(height: 12),
                         _buildAbsenceAcceptance(evaluations),
                         const SizedBox(height: 12),
-                        _buildSstManagement(evaluations),
+                        _buildSstSupervision(evaluations),
                         const SizedBox(height: 12),
                       ],
                     ),
@@ -237,14 +237,14 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
     );
   }
 
-  Widget _buildSstManagement(
+  Widget _buildSstSupervision(
       List<PostInternshipEnterpriseEvaluation> evaluations) {
     return _TitledFixSlider(
-      sliderKey: ValueKey('sst_management_$_currentProgramToShow'),
+      sliderKey: ValueKey('sst_supervision_$_currentProgramToShow'),
       title: 'Encadrement par rapport à la SST',
-      value: _meanOf(evaluations, (e) => e.sstManagement),
-      lowLabel: SstManagement.low.label,
-      highLabel: SstManagement.high.label,
+      value: _meanOf(evaluations, (e) => e.sstSupervision),
+      lowLabel: SstSupervision.low.label,
+      highLabel: SstSupervision.high.label,
     );
   }
 }

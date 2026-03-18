@@ -77,19 +77,38 @@ class EnterpriseEvaluationFormController {
   final Program program;
 
   DateTime _evaluationDate = DateTime.now();
+  DateTime get evaluationDate => _evaluationDate;
 
   final _skillController = CheckboxWithOtherController<RequiredSkills>(
       elements: RequiredSkills.values);
+  List<RequiredSkills> get selectedRequiredSkills => _skillController.selected;
+  String get otherRequiredSkills => _skillController.otherText;
+
   TaskVariety _taskVariety = TaskVariety.none;
+  TaskVariety get taskVariety => _taskVariety;
   TrainingPlan _trainingPlan = TrainingPlan.none;
+  TrainingPlan get trainingPlan => _trainingPlan;
 
   double _autonomyExpected = _defaultValue;
-  double _supervisionStyle = _defaultValue;
+  double get autonomyExpected => _autonomyExpected;
+
   double _efficiencyExpected = _defaultValue;
+  double get efficiencyExpected => _efficiencyExpected;
+
   double _specialNeedsAccommodation = _defaultValue;
+  double get specialNeedsAccommodation => _specialNeedsAccommodation;
+
+  double _supervisionStyle = _defaultValue;
+  double get supervisionStyle => _supervisionStyle;
+
   double _easeOfCommunication = _defaultValue;
+  double get easeOfCommunication => _easeOfCommunication;
+
   double _absenceAcceptance = _defaultValue;
-  double _sstManagement = _defaultValue;
+  double get absenceAcceptance => _absenceAcceptance;
+
+  double _sstSupervision = _defaultValue;
+  double get sstSupervision => _sstSupervision;
 
   void dispose() {
     try {
@@ -142,8 +161,8 @@ class EnterpriseEvaluationFormController {
     if (!canModify || evaluation.absenceAcceptance >= 0) {
       _absenceAcceptance = evaluation.absenceAcceptance;
     }
-    if (!canModify || evaluation.sstManagement >= 0) {
-      _sstManagement = evaluation.sstManagement;
+    if (!canModify || evaluation.sstSupervision >= 0) {
+      _sstSupervision = evaluation.sstSupervision;
     }
   }
 
@@ -173,7 +192,7 @@ class EnterpriseEvaluationFormController {
       specialNeedsAccommodation: _specialNeedsAccommodation,
       easeOfCommunication: _easeOfCommunication,
       absenceAcceptance: _absenceAcceptance,
-      sstManagement: _sstManagement,
+      sstSupervision: _sstSupervision,
     );
   }
 
@@ -192,7 +211,7 @@ class EnterpriseEvaluationFormController {
     _specialNeedsAccommodation = _defaultValue;
     _easeOfCommunication = _defaultValue;
     _absenceAcceptance = _defaultValue;
-    _sstManagement = _defaultValue;
+    _sstSupervision = _defaultValue;
   }
 }
 
@@ -290,7 +309,6 @@ class _EnterpriseEvaluationScreenState
                                 const SubTitle('Habiletés', left: 0),
                                 const SizedBox(height: 16),
                                 _buildSkillsRequired(),
-                                const Text('Encadrement'),
                                 const SubTitle(
                                     'Attentes envers le ou la stagiaire',
                                     left: 0),
@@ -306,7 +324,7 @@ class _EnterpriseEvaluationScreenState
                                 const SizedBox(height: 8),
                                 _buildAbsenceTolerance(),
                                 const SizedBox(height: 8),
-                                _buildSstManagement(),
+                                _buildSstSupervision(),
                               ],
                             ),
                           ),
@@ -447,7 +465,7 @@ class _EnterpriseEvaluationScreenState
                   dense: true,
                   visualDensity: VisualDensity.compact,
                   title: Text(
-                    'Peu variées',
+                    TaskVariety.low.toString(),
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
@@ -460,7 +478,7 @@ class _EnterpriseEvaluationScreenState
                   dense: true,
                   visualDensity: VisualDensity.compact,
                   title: Text(
-                    'Variées',
+                    TaskVariety.mid.toString(),
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
@@ -473,7 +491,7 @@ class _EnterpriseEvaluationScreenState
                   dense: true,
                   visualDensity: VisualDensity.compact,
                   title: Text(
-                    'Très variées',
+                    TaskVariety.high.toString(),
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
@@ -511,7 +529,7 @@ class _EnterpriseEvaluationScreenState
                   dense: true,
                   visualDensity: VisualDensity.compact,
                   title: Text(
-                    'Oui',
+                    TrainingPlan.followed.toString(),
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
@@ -524,7 +542,7 @@ class _EnterpriseEvaluationScreenState
                   dense: true,
                   visualDensity: VisualDensity.compact,
                   title: Text(
-                    'Non',
+                    TrainingPlan.notFollowed.toString(),
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
@@ -559,7 +577,7 @@ class _EnterpriseEvaluationScreenState
     );
   }
 
-  Widget _buildSstManagement() {
+  Widget _buildSstSupervision() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -591,11 +609,11 @@ class _EnterpriseEvaluationScreenState
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: LowHighSliderFormField(
-            initialValue: _controller._sstManagement,
+            initialValue: _controller._sstSupervision,
             fixed: !_controller.canModify,
-            onChanged: (value) => _controller._sstManagement = value,
-            lowLabel: SstManagement.low.label,
-            highLabel: SstManagement.high.label,
+            onChanged: (value) => _controller._sstSupervision = value,
+            lowLabel: SstSupervision.low.label,
+            highLabel: SstSupervision.high.label,
           ),
         )
       ],

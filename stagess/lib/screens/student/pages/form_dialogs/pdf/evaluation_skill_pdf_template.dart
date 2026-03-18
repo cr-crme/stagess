@@ -1,24 +1,20 @@
 import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
-import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:stagess/common/pdf_widgets/pdf_bullet_points.dart';
+import 'package:stagess/common/pdf_widgets/pdf_check_boxes.dart';
+import 'package:stagess/common/pdf_widgets/pdf_evaluation_date.dart';
 import 'package:stagess/common/pdf_widgets/pdf_text_box.dart';
+import 'package:stagess/common/pdf_widgets/pdf_theme.dart';
 import 'package:stagess/common/pdf_widgets/pdf_were_present.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/forms/skill_evaluation_form_dialog.dart';
 import 'package:stagess_common/models/internships/task_appreciation.dart';
-import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 
 final _logger = Logger('GenerateSkillEvaluationPdf');
-
-final _textStyle = pw.TextStyle(font: pw.Font.times());
-final _textStyleBold = pw.TextStyle(font: pw.Font.timesBold());
-final _textStyleBoldItalic = pw.TextStyle(font: pw.Font.timesBoldItalic());
 
 Future<Uint8List> generateSkillEvaluationPdf(
     BuildContext context, PdfPageFormat format,
@@ -38,44 +34,30 @@ Future<Uint8List> generateSkillEvaluationPdf(
   final document = pw.Document(pageMode: PdfPageMode.outlines);
 
   document.addPage(
-    pw.Page(
-      build: (pw.Context context) =>
-          pw.Center(child: pw.Text('Évaluation des compétences')),
-    ),
-  );
-
-  document.addPage(
     pw.MultiPage(
       build: (pw.Context context) => [
-        pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-          _buildPersonsPresent(controller: controller, student: student),
-          ...controller.skillResults().map((e) => pw.Padding(
-              padding: pw.EdgeInsets.only(top: 24),
-              child: _buildSkillTile(skill: e, controller: controller))),
-          pw.SizedBox(height: 24),
-          _buildGeneralComments(controller: controller),
-        ])
+        pw.Center(child: PdfTheme.titleLarge('Évaluation de l\'attitude')),
+        pw.SizedBox(height: 12),
+        PdfTheme.titleMedium('Informations générales'),
+        PdfEvaluationDate(evaluationDate: controller.evaluationDate),
+        pw.SizedBox(height: 12),
+        PdfWerePresentAtMeeting(
+            werePresent: controller.wereAtMeeting,
+            studentName: student.fullName),
+        pw.SizedBox(height: 24),
+        ...controller.skillResults().expand((e) => [
+              pw.NewPage(),
+              pw.Padding(
+                  padding: pw.EdgeInsets.only(top: 24),
+                  child: _buildSkillTile(skill: e, controller: controller)),
+            ]),
+        pw.SizedBox(height: 24),
+        _buildGeneralComments(controller: controller),
       ],
     ),
   );
 
   return document.save();
-}
-
-pw.Widget _buildPersonsPresent({
-  required SkillEvaluationFormController controller,
-  required Student student,
-}) {
-  return pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
-    pw.Text(
-        'Personnes présentes à l\'évaluation du ${DateFormat(
-          'dd MMMM yyyy',
-          'fr_CA',
-        ).format(controller.evaluationDate)} :',
-        style: _textStyleBold),
-    PdfWerePresentAtMeeting(
-        werePresent: controller.wereAtMeeting, studentName: student.fullName),
-  ]);
 }
 
 pw.Widget _buildSkillTile({
@@ -85,34 +67,21 @@ pw.Widget _buildSkillTile({
   return pw.Column(
     crossAxisAlignment: pw.CrossAxisAlignment.start,
     children: [
-      pw.RichText(
-        text: pw.TextSpan(children: [
-          pw.TextSpan(text: 'Pour la compétence « ', style: _textStyleBold),
-          pw.TextSpan(text: skill.name, style: _textStyleBoldItalic),
-          pw.TextSpan(text: ' »', style: _textStyleBold)
-        ]),
-      ),
-      pw.SizedBox(height: 8),
-      pw.Text('Tâches réussies :', style: _textStyle),
+      PdfTheme.titleMedium(skill.name),
+      PdfTheme.titleSmall('L\'élève a réussi les tâches suivantes'),
       pw.SizedBox(height: 4),
-      ...(controller.taskCompleted[skill.id]?.keys.map((task) =>
-              controller.taskCompleted[skill.id]?[task] ==
-                      TaskAppreciationLevel.evaluated
-                  ? PdfBulletPoint(
-                      textStyle: _textStyle,
-                      child: pw.Text(task, style: _textStyle),
-                    )
-                  : pw.Container()) ??
-          []),
+      PdfCheckBoxes(
+          options: controller.taskCompleted[skill.id]!.map(
+              (task, taskAppreciation) => MapEntry(task.toString(),
+                  taskAppreciation == TaskAppreciationLevel.evaluated))),
       if (controller.skillCommentsControllers[skill.id]?.text != null)
         pw.SizedBox(height: 8),
-      pw.Text(
-          'Commentaires : ${controller.skillCommentsControllers[skill.id]!.text}',
-          style: _textStyle),
+      PdfTheme.titleSmall('Commentaires'),
+      PdfTheme.bodyMedium(controller.skillCommentsControllers[skill.id]!.text),
       pw.SizedBox(height: 8),
-      pw.Text(
-          'Appréciation générale de la compétence : ${controller.appreciations[skill.id]?.name ?? 'Non évaluée'}',
-          style: _textStyle),
+      PdfTheme.titleSmall('Appréciation générale de la compétence'),
+      PdfTheme.bodyMedium(
+          controller.appreciations[skill.id]?.name ?? 'Non évaluée'),
     ],
   );
 }
@@ -122,11 +91,9 @@ pw.Widget _buildGeneralComments(
   return pw.Column(
     crossAxisAlignment: pw.CrossAxisAlignment.start,
     children: [
-      pw.Text('Commentaires généraux :', style: _textStyleBold),
-      pw.SizedBox(height: 8),
+      PdfTheme.titleMedium('Commentaires généraux'),
       PdfTextBox(
-          child:
-              pw.Text(controller.commentsController.text, style: _textStyle)),
+          child: PdfTheme.bodyMedium(controller.commentsController.text)),
     ],
   );
 }

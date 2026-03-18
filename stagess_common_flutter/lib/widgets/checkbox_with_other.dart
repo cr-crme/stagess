@@ -138,6 +138,7 @@ class CheckboxWithOtherController<T> {
   }
 
   void _forceSetOtherText(String text) {
+    _otherTextController.text = text;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // We must delay the update of the text controller to avoid a setState() issue
       _otherTextController.text = text;

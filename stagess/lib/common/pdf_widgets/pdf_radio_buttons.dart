@@ -1,6 +1,7 @@
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:stagess/common/pdf_widgets/pdf_colors_extension.dart';
+import 'package:stagess/common/pdf_widgets/pdf_theme.dart';
 
 class PdfRadioButtons extends pw.StatelessWidget {
   PdfRadioButtons({
@@ -44,7 +45,8 @@ class PdfRadioButtons extends pw.StatelessWidget {
                     ),
                   ),
                   pw.SizedBox(width: 4),
-                  pw.Text(entry.key, style: textStyle),
+                  pw.Text(entry.key,
+                      style: textStyle ?? PdfTheme.textStyleNormal),
                 ],
               ));
         },

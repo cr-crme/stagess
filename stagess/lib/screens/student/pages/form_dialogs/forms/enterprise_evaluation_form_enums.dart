@@ -16,12 +16,26 @@ enum TaskVariety {
         return 1.0;
     }
   }
+
+  @override
+  String toString() {
+    switch (this) {
+      case TaskVariety.none:
+        return 'Aucune varieté';
+      case TaskVariety.low:
+        return 'Peu variées';
+      case TaskVariety.mid:
+        return 'Variées';
+      case TaskVariety.high:
+        return 'Très variées';
+    }
+  }
 }
 
 enum TrainingPlan {
   none,
-  notFollowed,
-  followed;
+  followed,
+  notFollowed;
 
   double toDouble() {
     switch (this) {
@@ -31,6 +45,18 @@ enum TrainingPlan {
         return 0.0;
       case TrainingPlan.followed:
         return 1.0;
+    }
+  }
+
+  @override
+  String toString() {
+    switch (this) {
+      case TrainingPlan.none:
+        return 'Non évalué';
+      case TrainingPlan.notFollowed:
+        return 'Non';
+      case TrainingPlan.followed:
+        return 'Oui';
     }
   }
 }
@@ -129,15 +155,15 @@ enum SpecialNeedsAccommodation {
   }
 }
 
-enum SstManagement {
+enum SstSupervision {
   low,
   high;
 
   String get label {
     switch (this) {
-      case SstManagement.low:
+      case SstSupervision.low:
         return 'Insuffisant';
-      case SstManagement.high:
+      case SstSupervision.high:
         return 'Rigoureux';
     }
   }

@@ -1,6 +1,7 @@
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:stagess/common/pdf_widgets/pdf_colors_extension.dart';
+import 'package:stagess/common/pdf_widgets/pdf_theme.dart';
 
 class PdfCheckBoxes extends pw.StatelessWidget {
   PdfCheckBoxes({
@@ -46,15 +47,16 @@ class PdfCheckBoxes extends pw.StatelessWidget {
                     activeColor: PdfColors.white,
                   )),
               pw.SizedBox(width: 6.0),
-              pw.Text(
-                  entry.key == '__OTHER__'
-                      ? 'Autre${hasOther ? ' : ' : ''}'
-                      : entry.key,
-                  style: textStyle),
+              entry.key == '__OTHER__'
+                  ? pw.Text('Autre : ',
+                      style: textStyle ?? PdfTheme.textStyleNormal)
+                  : pw.Expanded(
+                      child: pw.Text(entry.key,
+                          style: textStyle ?? PdfTheme.textStyleNormal)),
               pw.Padding(
                 padding: const pw.EdgeInsets.only(left: 12.0),
                 child: pw.Container(
-                  width: 200,
+                  width: hasOther ? 200 : null,
                   height: 24,
                   padding: const pw.EdgeInsets.only(left: 4.0),
                   decoration: hasOther
@@ -69,10 +71,12 @@ class PdfCheckBoxes extends pw.StatelessWidget {
                           alignment: pw.Alignment.centerLeft,
                           child: pw.Text(
                             otherValue!,
-                            style: textStyle?.copyWith(
-                                color: includeOthers && entry.key == '__OTHER__'
-                                    ? null
-                                    : PdfColorsExtension.transparent),
+                            style: (textStyle ?? PdfTheme.textStyleNormal)
+                                .copyWith(
+                                    color: includeOthers &&
+                                            entry.key == '__OTHER__'
+                                        ? null
+                                        : PdfColorsExtension.transparent),
                           ))
                       : null,
                 ),
