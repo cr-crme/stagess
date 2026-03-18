@@ -1,25 +1,21 @@
 import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
-import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:stagess/common/pdf_widgets/pdf_check_boxes.dart';
+import 'package:stagess/common/pdf_widgets/pdf_evaluation_date.dart';
+import 'package:stagess/common/pdf_widgets/pdf_radio_buttons.dart';
+import 'package:stagess/common/pdf_widgets/pdf_theme.dart';
 import 'package:stagess/common/pdf_widgets/pdf_were_present.dart';
 import 'package:stagess/misc/question_file_service.dart';
-import 'package:stagess_common/models/internships/internship.dart';
-import 'package:stagess_common/models/internships/sst_evaluation.dart';
-import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 
 final _logger = Logger('GenerateSstEvaluationPdf');
-
-final _textStyle = pw.TextStyle(font: pw.Font.times());
-final _textStyleBold = pw.TextStyle(font: pw.Font.timesBold());
-final _textStyleBoldItalic = pw.TextStyle(font: pw.Font.timesBoldItalic());
 
 Future<Uint8List> generateSstEvaluationPdf(
     BuildContext context, PdfPageFormat format,
@@ -41,30 +37,45 @@ Future<Uint8List> generateSstEvaluationPdf(
 
   final document = pw.Document(pageMode: PdfPageMode.outlines);
 
-  document.addPage(
-    pw.Page(
-      build: (pw.Context context) =>
-          pw.Center(child: pw.Text('Repérer les risques SST')),
-    ),
-  );
+  // Sort the question by "id"
+  final specialization = ActivitySectorsService.specializationOrNull(
+      internship.currentContract!.specializationId);
+
+  final questionIds = [...?specialization?.questions]
+    ..sort((a, b) => int.parse(a) - int.parse(b));
+  final questions =
+      questionIds.map((e) => QuestionFileService.fromId(e)).toList();
 
   document.addPage(
     pw.MultiPage(
-      build: (pw.Context ctx) => [
-        pw.Column(
-          crossAxisAlignment: pw.CrossAxisAlignment.start,
-          children: [
-            _buildPersonsPresent(
-                internship: internship,
-                evaluation: evaluation,
-                student: student),
-            pw.SizedBox(height: 24),
-            pw.Text('Questions', style: _textStyleBold),
-            _buildQuestions(context,
-                internship: internship, evaluation: evaluation),
-            pw.SizedBox(height: 24),
-          ],
-        )
+      build: (pw.Context cxt) => [
+        pw.Center(child: PdfTheme.titleLarge('Repérer les risques SST')),
+        pw.SizedBox(height: 12),
+        PdfTheme.titleMedium('Informations générales'),
+        PdfEvaluationDate(evaluationDate: evaluation.date),
+        pw.SizedBox(height: 12),
+        PdfWerePresentAtMeeting(
+            werePresent: evaluation.presentAtEvaluation,
+            studentName: student.fullName),
+        pw.SizedBox(height: 24),
+        ...questions.asMap().keys.expand((index) {
+          final question = questions[index];
+          final answer = evaluation.questions['Q${question.id}'];
+          final followUpAnswer = evaluation.questions['Q${question.id}+t'];
+
+          return [
+            pw.Padding(
+              padding: pw.EdgeInsets.only(top: 24),
+              child: _buildQuestion(
+                context,
+                index: index,
+                question: question,
+                answer: answer,
+                followUpAnswer: followUpAnswer,
+              ),
+            ),
+          ];
+        }),
       ],
     ),
   );
@@ -72,62 +83,79 @@ Future<Uint8List> generateSstEvaluationPdf(
   return document.save();
 }
 
-pw.Widget _buildPersonsPresent({
-  required Internship internship,
-  required SstEvaluation evaluation,
-  required Student student,
-}) {
-  return pw.Column(
-    crossAxisAlignment: pw.CrossAxisAlignment.start,
-    children: [
-      pw.Text(
-          'Personnes présentes à l\'évaluation du ${DateFormat(
-            'dd MMMM yyyy',
-            'fr_CA',
-          ).format(evaluation.date)} :',
-          style: _textStyleBold),
-      PdfWerePresentAtMeeting(
-          werePresent: evaluation.presentAtEvaluation,
-          studentName: student.fullName),
-    ],
-  );
+String _sanitize(String input) {
+  final out = input.replaceAll('\u2019', '\'').replaceAll('\u2026', '...');
+  if (out.startsWith('*')) {
+    return out.substring(1).trim();
+  }
+  return out;
 }
 
-pw.Widget _buildQuestions(BuildContext context,
-    {required Internship internship, required SstEvaluation evaluation}) {
-  final specialization = ActivitySectorsService.specializationOrNull(
-      internship.currentContract!.specializationId);
-
-  // Sort the question by "id"
-  final questionIds = [...?specialization?.questions]
-    ..sort((a, b) => int.parse(a) - int.parse(b));
-  final questions =
-      questionIds.map((e) => QuestionFileService.fromId(e)).toList();
-
-  return pw.Column(
-    crossAxisAlignment: pw.CrossAxisAlignment.start,
-    children: questions.asMap().entries.map((entry) {
-      final index = entry.key;
-      final question = entry.value;
-
-      // Fill the initial answer
-      final baseAnswer = evaluation.questions['Q${question.id}'];
-      final followUpAnswer = evaluation.questions['Q${question.id}+t'];
-
-      return pw.Column(
+pw.Widget _buildQuestion(
+  BuildContext context, {
+  required int index,
+  required Question question,
+  required List<String>? answer,
+  required List<String>? followUpAnswer,
+}) {
+  return pw.Column(crossAxisAlignment: pw.CrossAxisAlignment.start, children: [
+    PdfTheme.titleSmall('${index + 1}. ${_sanitize(question.question)}'),
+    switch (question.type) {
+      QuestionType.radio => pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
-            pw.Text('${index + 1}. ${question.question}'),
-            switch (question.type) {
-              QuestionType.radio =>
-                pw.Text(baseAnswer?.join(', ') ?? 'Aucune réponse'),
-              QuestionType.checkbox =>
-                pw.Text(baseAnswer?.join(', ') ?? 'Aucune réponse'),
-              QuestionType.text =>
-                pw.Text(baseAnswer?.join(', ') ?? 'Aucune réponse'),
-            },
-            pw.SizedBox(height: 12),
-          ]);
-    }).toList(),
-  );
+            pw.Padding(
+              padding: pw.EdgeInsets.only(top: 8.0, left: 12.0),
+              child: PdfRadioButtons(
+                options: question.choices?.toList().asMap().map(
+                          (i, choice) => MapEntry(
+                              _sanitize(question.choices!.elementAt(i)),
+                              answer?.contains(choice) ?? false),
+                        ) ??
+                    {},
+              ),
+            ),
+            if (question.followUpQuestion != null &&
+                (answer?.contains(question.choices!.first) ?? false))
+              pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.SizedBox(height: 8),
+                    pw.Text(_sanitize(question.followUpQuestion!),
+                        style: PdfTheme.textStyleItalic),
+                    PdfTheme.bodyMedium(
+                        followUpAnswer?.join(', ') ?? 'Aucune réponse'),
+                  ]),
+          ],
+        ),
+      QuestionType.checkbox => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Padding(
+              padding: pw.EdgeInsets.only(top: 8.0, left: 12.0),
+              child: PdfCheckBoxes(
+                  options: question.choices?.toList().asMap().map(
+                            (i, choice) => MapEntry(
+                                _sanitize(question.choices!.elementAt(i)),
+                                answer?.contains(choice) ?? false),
+                          ) ??
+                      {}),
+            ),
+            if (question.followUpQuestion != null && answer?.isNotEmpty == true)
+              pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.SizedBox(height: 8),
+                    pw.Text(_sanitize(question.followUpQuestion!),
+                        style: PdfTheme.textStyleItalic),
+                    PdfTheme.bodyMedium(
+                        followUpAnswer?.join(', ') ?? 'Aucune réponse'),
+                  ]),
+          ],
+        ),
+      QuestionType.text =>
+        PdfTheme.bodyMedium(followUpAnswer?.join(', ') ?? 'Aucune réponse'),
+    },
+    pw.SizedBox(height: 12),
+  ]);
 }

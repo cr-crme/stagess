@@ -5,6 +5,8 @@ class PdfTheme {
       pw.TextStyle(font: pw.Font.times(), fontSize: 12);
   static pw.TextStyle get textStyleBold =>
       pw.TextStyle(font: pw.Font.timesBold(), fontSize: 12);
+  static pw.TextStyle get textStyleItalic =>
+      pw.TextStyle(font: pw.Font.timesItalic(), fontSize: 12);
   static pw.TextStyle get textStyleBoldItalic =>
       pw.TextStyle(font: pw.Font.timesBoldItalic(), fontSize: 12);
 
