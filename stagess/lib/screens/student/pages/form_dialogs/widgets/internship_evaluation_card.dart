@@ -14,6 +14,7 @@ class InternshipEvaluationCard extends StatefulWidget {
     super.key,
     required this.title,
     this.header,
+    this.isInitiallyExpanded = false,
     this.showEvaluationsTitle,
     required this.internshipId,
     required this.evaluateButtonText,
@@ -27,6 +28,7 @@ class InternshipEvaluationCard extends StatefulWidget {
   final String title;
   final String? header;
   final String? showEvaluationsTitle;
+  final bool isInitiallyExpanded;
   final String internshipId;
   final String evaluateButtonText;
   final String reevaluateButtonText;
@@ -56,6 +58,7 @@ class _InternshipEvaluationCardState extends State<InternshipEvaluationCard> {
 
     return AnimatedExpandingCard(
       elevation: 0.0,
+      initialExpandedState: widget.isInitiallyExpanded,
       header: (ctx, isExpanded) => Text(
         widget.title,
         style: Theme.of(context)

@@ -18,14 +18,16 @@ class EvaluationPost extends StatelessWidget {
   Widget build(BuildContext context) {
     _logger.finer('Building EvaluationPost for job: $internshipId');
 
+    final internship =
+        InternshipsProvider.of(context, listen: true).fromId(internshipId);
+
     return InternshipEvaluationCard(
         title: 'Évaluation de l\'encadrement de l\'entreprise',
         internshipId: internshipId,
         evaluateButtonText: 'Évaluer l\'entreprise',
         reevaluateButtonText: 'Évaluer de nouveau',
-        evaluations: InternshipsProvider.of(context)
-            .fromId(internshipId)
-            .enterpriseEvaluations,
+        isInitiallyExpanded: internship.isEnterpriseEvaluationPending,
+        evaluations: internship.enterpriseEvaluations,
         onClickedNewEvaluation: () => showInternshipEvaluationFormDialog(
             context,
             internshipId: internshipId,

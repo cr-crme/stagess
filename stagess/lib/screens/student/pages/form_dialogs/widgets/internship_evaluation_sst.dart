@@ -9,7 +9,6 @@ import 'package:stagess_common_flutter/providers/internships_provider.dart';
 
 final _logger = Logger('InternshipEvaluationSst');
 
-// TODO Card is opened if they need to do something
 class EvaluationSst extends StatelessWidget {
   const EvaluationSst({super.key, required this.internshipId});
 
@@ -19,14 +18,17 @@ class EvaluationSst extends StatelessWidget {
   Widget build(BuildContext context) {
     _logger.finer('Building EvaluationSst for job: $internshipId');
 
+    final internship =
+        InternshipsProvider.of(context, listen: true).fromId(internshipId);
+
     return InternshipEvaluationCard(
         title: 'SST en entreprise',
         internshipId: internshipId,
         evaluateButtonText: 'Évaluer l\'entreprise',
         reevaluateButtonText: 'Évaluer de nouveau',
-        evaluations: InternshipsProvider.of(context, listen: true)
-            .fromId(internshipId)
-            .sstEvaluations,
+        isInitiallyExpanded:
+            internship.isActive && internship.sstEvaluations.isEmpty,
+        evaluations: internship.sstEvaluations,
         onClickedNewEvaluation: () => showInternshipEvaluationFormDialog(
             context,
             internshipId: internshipId,

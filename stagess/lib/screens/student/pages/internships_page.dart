@@ -5,7 +5,6 @@ import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/dialogs/finalize_internship_dialog.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/router.dart';
-import 'package:stagess/screens/student/pages/form_dialogs/forms/enterprise_evaluation_form_dialog.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/widgets/internship_evaluation_attitude.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/widgets/internship_evaluation_post.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/widgets/internship_evaluation_skill.dart';
@@ -189,11 +188,6 @@ class _StudentInternshipListViewState
     );
   }
 
-  void _evaluateEnterprise(BuildContext context, Internship internship) async {
-    await showEnterpriseEvaluationFormDialog(context,
-        internshipId: internship.id);
-  }
-
   @override
   Widget build(BuildContext context) {
     _prepareExpander(widget.internships);
@@ -263,20 +257,6 @@ class _StudentInternshipListViewState
                                 internshipId: internship.id,
                               ),
                               child: const Text('Terminer le stage'),
-                            ),
-                          ),
-                        if (internship.isEnterpriseEvaluationPending &&
-                            internship.supervisingTeacherIds.contains(
-                              teacherId,
-                            ))
-                          Align(
-                            alignment: Alignment.centerRight,
-                            child: TextButton(
-                              onPressed: () => _evaluateEnterprise(
-                                context,
-                                internship,
-                              ),
-                              child: const Text('Évaluer l\'entreprise'),
                             ),
                           ),
                       ],
