@@ -16,7 +16,7 @@ Future<Uint8List> generateVisaPdf(BuildContext context, PdfPageFormat format,
 
   document.addPage(
     pw.Page(
-      build: (pw.Context context) => pw.Center(child: pw.Text('Visa')),
+      build: (pw.Context context) => pw.Center(child: pw.Text('Visa à venir')),
     ),
   );
 

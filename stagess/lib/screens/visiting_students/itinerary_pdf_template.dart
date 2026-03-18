@@ -9,10 +9,6 @@ import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 final _logger = Logger('ItineraryPdfTemplate');
 
-final _textStyle = pw.TextStyle(font: pw.Font.times());
-final _textStyleBold = pw.TextStyle(font: pw.Font.timesBold());
-final _textStyleBoldItalic = pw.TextStyle(font: pw.Font.timesBoldItalic());
-
 Future<Uint8List> generateItineraryPdf(
     BuildContext context, PdfPageFormat format,
     {required String itineraryName}) async {
@@ -34,8 +30,8 @@ Future<Uint8List> generateItineraryPdf(
 
   document.addPage(
     pw.Page(
-      build: (pw.Context context) =>
-          pw.Center(child: pw.Text('Itinéraire de visite : ${itinerary.name}')),
+      build: (pw.Context context) => pw.Center(
+          child: pw.Text('Itinéraire de visite : ${itinerary.name}\nÀ venir')),
     ),
   );
 
