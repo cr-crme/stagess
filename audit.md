@@ -6,6 +6,5 @@
 ## Frontend
 
 ## Backend
-- Changer mot de passe "devpassword"
 
 ## Collectif HUB
