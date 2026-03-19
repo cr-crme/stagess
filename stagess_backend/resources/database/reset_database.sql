@@ -75,6 +75,7 @@ DROP TABLE IF EXISTS enterprise_job_sst_evaluation_questions;
 DROP TABLE IF EXISTS internship_sst_evaluation_info;
 DROP TABLE IF EXISTS internship_attitude_evaluation_items;
 DROP TABLE IF EXISTS internship_mutable_data;
+DROP TABLE IF EXISTS enterprise_job_photo_urls;
 /**************/
 
 SET FOREIGN_KEY_CHECKS = 1;

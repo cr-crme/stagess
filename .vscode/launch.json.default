@@ -46,6 +46,7 @@
             "type": "dart",
             "program": "stagess/lib/main.dart",
             "args": [
+                "--dart-define=STAGESS_SHOW_LOGS=< true | [false] >",
                 "--dart-define=STAGESS_GOOGLE_MAPS_API_KEY=< YOUR_GOOGLE_MAPS_API_KEY >",
                 "--dart-define=STAGESS_USE_SSL=< [true] | false >",
                 "--dart-define=STAGESS_BACKEND_IP=< IP_ADDRESS | [stagessserver.adoprevit.org] | localhost >",
@@ -60,6 +61,7 @@
             "type": "dart",
             "program": "stagess_admin/lib/main.dart",
             "args": [
+                "--dart-define=STAGESS_SHOW_LOGS=< true | [false] >",
                 "--dart-define=STAGESS_GOOGLE_MAPS_API_KEY=< YOUR_GOOGLE_MAPS_API_KEY >",
                 "--dart-define=STAGESS_USE_SSL=< [true] | false >",
                 "--dart-define=STAGESS_BACKEND_IP=< IP_ADDRESS | [stagessserver.adoprevit.org] | localhost >",

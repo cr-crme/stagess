@@ -22,8 +22,11 @@ import 'package:stagess_common_flutter/widgets/single_instance_manager.dart';
 
 void main() async {
   // Setup logger to INFO
+  const showLogs =
+      bool.fromEnvironment('STAGESS_SHOW_LOGS', defaultValue: false);
   Logger.root.level = Level.INFO;
   Logger.root.onRecord.listen((record) {
+    if (!showLogs) return;
     // ignore: avoid_print
     print(
       '[${record.level.name}] ${record.time}: ${record.loggerName}: ${record.message}'
