@@ -75,4 +75,10 @@ class Uniforms extends ItemSerializable {
   String toString() {
     return 'Uniforms{status: ${status.name}, uniforms: $uniforms}';
   }
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'status': FetchableFields.optional,
+        'uniforms': FetchableFields.optional,
+      });
 }

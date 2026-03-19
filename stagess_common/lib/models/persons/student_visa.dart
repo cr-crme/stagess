@@ -24,11 +24,12 @@ class ExperiencesAndAptitudes extends SelectableTextItem {
   @override
   ExperiencesAndAptitudes copyWith({
     String? text,
+    int? index,
     bool? isSelected,
   }) =>
       ExperiencesAndAptitudes(
         id: id,
-        index: index,
+        index: index ?? this.index,
         text: text ?? this.text,
         isSelected: isSelected ?? this.isSelected,
       );
@@ -53,11 +54,12 @@ class AttestationsAndMentions extends SelectableTextItem {
   @override
   AttestationsAndMentions copyWith({
     String? text,
+    int? index,
     bool? isSelected,
   }) =>
       AttestationsAndMentions(
         id: id,
-        index: index,
+        index: index ?? this.index,
         text: text ?? this.text,
         isSelected: isSelected ?? this.isSelected,
       );
@@ -105,12 +107,13 @@ class SstTraining extends SelectableTextItem {
   @override
   SstTraining copyWith({
     String? text,
+    int? index,
     bool? isSelected,
     bool? isHidden,
   }) {
     return SstTraining(
       id: id,
-      index: index,
+      index: index ?? this.index,
       trainingId: text ?? this.text,
       isSelected: isSelected ?? this.isSelected,
       isHidden: isHidden ?? this.isHidden,
@@ -171,6 +174,7 @@ class Certificate extends SelectableTextItem {
   @override
   Certificate copyWith({
     String? text,
+    int? index,
     CertificateType? certificateType,
     bool? isSelected,
     int? year,
@@ -182,7 +186,7 @@ class Certificate extends SelectableTextItem {
     }
     return Certificate(
       id: id,
-      index: index,
+      index: index ?? this.index,
       certificateType:
           certificateType ?? CertificateType.fromString(text ?? this.text),
       isSelected: isSelected ?? this.isSelected,
@@ -213,11 +217,12 @@ class Skill extends SelectableTextItem {
   @override
   Skill copyWith({
     String? text,
+    int? index,
     bool? isSelected,
   }) =>
       Skill(
         id: id,
-        index: index,
+        index: index ?? this.index,
         skillId: text ?? this.text,
         isSelected: isSelected ?? this.isSelected,
       );
@@ -257,11 +262,12 @@ class Attitude extends SelectableTextItem {
   @override
   Attitude copyWith({
     String? text,
+    int? index,
     bool? isSelected,
   }) =>
       Attitude(
         id: id,
-        index: index,
+        index: index ?? this.index,
         attitudeId: text ?? this.text,
         isSelected: isSelected ?? this.isSelected,
       );

@@ -44,11 +44,12 @@ class SelectableTextItem extends ItemSerializable {
 
   SelectableTextItem copyWith({
     String? text,
+    int? index,
     bool? isSelected,
   }) {
     return SelectableTextItem(
       id: id,
-      index: index,
+      index: index ?? this.index,
       text: text ?? this.text,
       isSelected: isSelected ?? this.isSelected,
     );

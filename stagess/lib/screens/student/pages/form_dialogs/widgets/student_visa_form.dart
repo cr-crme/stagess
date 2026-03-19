@@ -95,8 +95,9 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Voir les versions du VISA',
-              style: TextStyle(fontWeight: FontWeight.bold)),
+          if (orderedEvaluations.isNotEmpty)
+            Text('Voir les versions du VISA',
+                style: TextStyle(fontWeight: FontWeight.bold)),
           Column(
             mainAxisSize: MainAxisSize.min,
             children: orderedEvaluations.map(

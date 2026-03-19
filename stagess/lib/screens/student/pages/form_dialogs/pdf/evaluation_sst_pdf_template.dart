@@ -134,12 +134,19 @@ pw.Widget _buildQuestion(
             pw.Padding(
               padding: pw.EdgeInsets.only(top: 8.0, left: 12.0),
               child: PdfCheckBoxes(
-                  options: question.choices?.toList().asMap().map(
-                            (i, choice) => MapEntry(
-                                _sanitize(question.choices!.elementAt(i)),
-                                answer?.contains(choice) ?? false),
-                          ) ??
-                      {}),
+                options: question.choices?.toList().asMap().map(
+                          (i, choice) => MapEntry(
+                              _sanitize(question.choices!.elementAt(i)),
+                              answer?.contains(choice) ?? false),
+                        ) ??
+                    {},
+                otherValue: answer
+                        ?.where(
+                            (a) => !(question.choices?.contains(a) ?? false))
+                        .join(', ') ??
+                    '',
+                includeOthers: true,
+              ),
             ),
             if (question.followUpQuestion != null && answer?.isNotEmpty == true)
               pw.Column(

@@ -106,4 +106,10 @@ class Protections extends ItemSerializable {
   String toString() {
     return 'Protections{status: ${status.name}, protections: $protections}';
   }
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'status': FetchableFields.optional,
+        'protections': FetchableFields.optional,
+      });
 }

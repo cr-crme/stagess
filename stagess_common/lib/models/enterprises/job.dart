@@ -172,10 +172,13 @@ class Job extends ItemSerializable {
         'pre_internship_requests': FetchableFields.mandatory
           ..addAll(FetchableFields.reference(
               {'*': PreInternshipRequests.fetchableFields})),
-        'uniforms': FetchableFields.optional,
-        'protections': FetchableFields.optional,
+        'uniforms': FetchableFields.optional
+          ..addAll(FetchableFields.reference({'*': Uniforms.fetchableFields})),
+        'protections': FetchableFields.optional
+          ..addAll(
+              FetchableFields.reference({'*': Protections.fetchableFields})),
         'photos': FetchableFields.optional,
-        'incidents': FetchableFields.optional,
+        'incidents': Incidents.fetchableFields,
         'comments': FetchableFields.optional,
         'reserved_for_id': FetchableFields.mandatory,
       });

@@ -102,7 +102,7 @@ class Teacher extends Person {
       'has_registered_account': FetchableFields.mandatory,
       'groups': FetchableFields.mandatory,
       'itineraries': Itinerary.fetchableFields,
-      'visiting_priorities': FetchableFields.optional,
+      'visiting_priorities': FetchableFields.mandatory,
     }));
 
   @override

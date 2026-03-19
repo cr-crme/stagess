@@ -15,10 +15,9 @@ class SelectableTextItemsController {
             .toList();
 
   List<SelectableTextItem> get options =>
-      List.unmodifiable(_options.asMap().entries.map((entry) {
-        final index = entry.key;
-        final option = entry.value;
-        return option.copyWith(text: _optionControllers[index].text);
+      List.unmodifiable(_options.map((item) {
+        final index = _options.indexOf(item);
+        return item.copyWith(text: _optionControllers[index].text);
       }));
 
   int get length => _options.length;
@@ -52,6 +51,12 @@ class SelectableTextItemsController {
 
     _options.insert(index, item);
     _optionControllers.insert(index, TextEditingController(text: item.text));
+
+    // Update indices of subsequent items
+    for (int i = index + 1; i < _options.length; i++) {
+      _options[i] = _options[i].copyWith(index: i);
+    }
+
     if (_setStateCallback != null) _setStateCallback!(() {});
   }
 
@@ -62,12 +67,17 @@ class SelectableTextItemsController {
     _optionControllers[index].dispose();
     _optionControllers.removeAt(index);
 
+    // Update indices of subsequent items
+    for (int i = index; i < _options.length; i++) {
+      _options[i] = _options[i].copyWith(index: i);
+    }
+
     if (_setStateCallback != null) _setStateCallback!(() {});
   }
 
   void updateOption(int index, SelectableTextItem newValue) {
     if (index < 0 || index >= _options.length) return;
-    _options[index] = newValue;
+    _options[index] = newValue.copyWith(index: index);
 
     if (_setStateCallback != null) _setStateCallback!(() {});
   }

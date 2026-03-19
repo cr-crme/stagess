@@ -12,8 +12,9 @@ class InternshipsProvider extends BackendListProvided<Internship> {
   static InternshipsProvider of(BuildContext context, {listen = true}) =>
       Provider.of<InternshipsProvider>(context, listen: listen);
 
-  void updateTeacherNote(String studentId, String notes) {
-    replace(byStudentId(studentId).last.copyWith(teacherNotes: notes));
+  Future<bool> updateTeacherNote(String studentId, String notes) async {
+    return await replaceWithConfirmation(
+        byStudentId(studentId).last.copyWith(teacherNotes: notes));
   }
 
   List<Internship> byStudentId(String studentId) {

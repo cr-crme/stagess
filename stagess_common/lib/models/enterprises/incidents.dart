@@ -27,6 +27,13 @@ class Incident extends ItemSerializable {
 
   @override
   String toString() => incident;
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'teacher_id': FetchableFields.mandatory,
+        'incident': FetchableFields.optional,
+        'date': FetchableFields.optional,
+      });
 }
 
 class Incidents extends ItemSerializable {
@@ -88,4 +95,14 @@ class Incidents extends ItemSerializable {
         'verbal_abuses': verbalAbuses.map((e) => e.serialize()).toList(),
         'minor_injuries': minorInjuries.map((e) => e.serialize()).toList(),
       };
+
+  static FetchableFields get fetchableFields => FetchableFields.reference({
+        'id': FetchableFields.mandatory,
+        'severe_injuries': FetchableFields.optional
+          ..addAll(FetchableFields.reference({'*': Incident.fetchableFields})),
+        'verbal_abuses': FetchableFields.optional
+          ..addAll(FetchableFields.reference({'*': Incident.fetchableFields})),
+        'minor_injuries': FetchableFields.optional
+          ..addAll(FetchableFields.reference({'*': Incident.fetchableFields})),
+      });
 }

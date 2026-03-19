@@ -193,22 +193,17 @@ class VisaFormController {
       return;
     }
 
-    for (final entry in visa.form.experiencesAndAptitudes.asMap().entries) {
-      final index = entry.key;
-      final item = entry.value;
-
+    for (final item in visa.form.experiencesAndAptitudes) {
       _experiencesAndAptitudesController.add(
         ExperiencesAndAptitudes(
-            index: index, text: item.text, isSelected: item.isSelected),
+            index: item.index, text: item.text, isSelected: item.isSelected),
       );
     }
-    for (final entry in visa.form.attestationsAndMentions.asMap().entries) {
-      final index = entry.key;
-      final item = entry.value;
 
+    for (final item in visa.form.attestationsAndMentions) {
       _attestationsAndMentionsController.add(
         AttestationsAndMentions(
-            index: index, text: item.text, isSelected: item.isSelected),
+            index: item.index, text: item.text, isSelected: item.isSelected),
       );
     }
 

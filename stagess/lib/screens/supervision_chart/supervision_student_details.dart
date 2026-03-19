@@ -19,6 +19,7 @@ import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/schedule_selector.dart';
+import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final _logger = Logger('SupervisionStudentDetailsScreen');
@@ -334,13 +335,22 @@ class _PersonalNotesState extends State<_PersonalNotes> {
   late final _textController = TextEditingController()
     ..text = widget.internship.teacherNotes;
 
-  void _sendComments() {
+  Future<void> _sendComments() async {
     final internships = InternshipsProvider.of(context, listen: false);
     if (_textController.text == widget.internship.teacherNotes) return;
-    internships.updateTeacherNote(
+    final isSuccess = await internships.updateTeacherNote(
       widget.internship.studentId,
       _textController.text,
     );
+
+    if (!mounted) return;
+    showSnackBar(
+      context,
+      message: isSuccess
+          ? 'Commentaires mis à jour'
+          : 'Erreur lors de la mise à jour des commentaires',
+    );
+    return;
   }
 
   @override
