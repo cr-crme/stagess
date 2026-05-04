@@ -467,7 +467,7 @@ class _ContactInfo extends StatelessWidget {
                 controller: controller.contactPhone,
                 titleStyle: styleOverride,
                 contentStyle: styleOverride,
-                isMandatory: true,
+                isMandatory: false, // TODO Make this not mandatory
                 enabled: editMode,
               ),
               const SizedBox(height: 8),

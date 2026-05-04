@@ -36,8 +36,6 @@ import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 
-// TODO: Validate the .htaccess files that were added in this commit
-// TODO: Fix not guetting the values when adding (need refresh)
 Future<void> resetDummyDataTutorial(BuildContext context) async {
   // Show a waiting dialog
   showDialog(

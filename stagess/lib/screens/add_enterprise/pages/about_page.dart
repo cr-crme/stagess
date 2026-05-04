@@ -98,7 +98,7 @@ class AboutPageState extends State<AboutPage> {
               PhoneListTile(
                 title: 'Téléphone de l\'établissement',
                 controller: phoneController,
-                isMandatory: true,
+                isMandatory: false,
                 enabled: true,
               ),
               WebSiteListTile(
@@ -137,13 +137,13 @@ class AboutPageState extends State<AboutPage> {
               ),
               PhoneListTile(
                 controller: contactPhoneController,
-                isMandatory: true,
+                isMandatory: false,
                 canCall: false,
                 enabled: true,
               ),
               EmailListTile(
                 controller: contactEmailController,
-                isMandatory: true, // TODO Make this not mandatory
+                isMandatory: false, // TODO Make this not mandatory
                 enabled: true,
                 canMail: false,
               ),
