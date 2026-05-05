@@ -235,17 +235,6 @@ class _AttitudeEvaluationScreenState extends State<_AttitudeEvaluationScreen> {
       return;
     }
 
-    if (!_formController.isCompleted) {
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) => const AlertDialog(
-          title: Text('Formulaire incomplet'),
-          content: Text('Répondre à toutes les questions.'),
-        ),
-      );
-      return;
-    }
-
     _formController.setWereAtMeeting();
 
     _logger.fine('Attitude evaluation form submitted successfully');
