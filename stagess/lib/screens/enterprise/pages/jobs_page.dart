@@ -689,7 +689,7 @@ class _RecrutedBy extends StatelessWidget {
   final Enterprise enterprise;
 
   void _sendEmail(Teacher teacher) {
-    final Uri emailLaunchUri = Uri(scheme: 'mailto', path: teacher.email!);
+    final Uri emailLaunchUri = Uri(scheme: 'mailto', path: teacher.email);
     launchUrl(emailLaunchUri);
   }
 
@@ -727,7 +727,7 @@ class _RecrutedBy extends StatelessWidget {
                           : Axis.horizontal,
                       children: [
                         GestureDetector(
-                          onTap: teacher.email == null
+                          onTap: teacher.email.isEmpty
                               ? null
                               : () => _sendEmail(teacher),
                           child: Text(
@@ -735,10 +735,10 @@ class _RecrutedBy extends StatelessWidget {
                             style: Theme.of(
                               context,
                             ).textTheme.titleMedium!.copyWith(
-                                  decoration: teacher.email == null
+                                  decoration: teacher.email.isEmpty
                                       ? null
                                       : TextDecoration.underline,
-                                  color: teacher.email == null
+                                  color: teacher.email.isEmpty
                                       ? null
                                       : Colors.blue,
                                 ),

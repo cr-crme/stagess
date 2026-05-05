@@ -353,17 +353,15 @@ class MySqlInterface implements SqlInterface {
     await performInsertQuery(tableName: 'persons', data: {
       'id': person.id,
       'first_name': person.firstName,
-      'middle_name': person.middleName,
       'last_name': person.lastName,
       'date_birthday': person.dateBirth?.toIso8601String().substring(0, 10),
       'email': person.email,
     });
 
     await performInsertPhoneNumber(
-        phoneNumber: person.phone ?? PhoneNumber.empty, entityId: person.id);
+        phoneNumber: person.phone, entityId: person.id);
 
-    await performInsertAddress(
-        address: person.address ?? Address.empty, entityId: person.id);
+    await performInsertAddress(address: person.address, entityId: person.id);
   }
 
   @override
@@ -375,9 +373,6 @@ class MySqlInterface implements SqlInterface {
     final toUpdate = <String, dynamic>{};
     if (person.firstName != previous.firstName) {
       toUpdate['first_name'] = person.firstName;
-    }
-    if (person.middleName != previous.middleName) {
-      toUpdate['middle_name'] = person.middleName;
     }
     if (person.lastName != previous.lastName) {
       toUpdate['last_name'] = person.lastName;
@@ -400,35 +395,15 @@ class MySqlInterface implements SqlInterface {
     // Update the phone number if needed
     if (person.phone != previous.phone) {
       // Update the phone number
-      if (person.phone == null) {
-        // Delete the phone number
-        await performDeletePhoneNumber(phoneNumber: previous.phone!);
-      } else if (previous.phone == null) {
-        // Insert the new phone number
-        await performInsertPhoneNumber(
-            phoneNumber: person.phone!, entityId: person.id);
-      } else {
-        // Update the phone number
-        await performUpdatePhoneNumber(
-            phoneNumber: person.phone!, previous: previous.phone!);
-      }
+      await performUpdatePhoneNumber(
+          phoneNumber: person.phone, previous: previous.phone);
     }
 
     // Update the address if needed
     if (person.address != previous.address) {
       // Update the address
-      if (person.address == null) {
-        // Delete the address
-        await performDeleteAddress(address: previous.address!);
-      } else if (previous.address == null) {
-        // Insert the new address
-        await performInsertAddress(
-            address: person.address!, entityId: person.id);
-      } else {
-        // Update the address
-        await performUpdateAddress(
-            address: person.address!, previous: previous.address!);
-      }
+      await performUpdateAddress(
+          address: person.address, previous: previous.address);
     }
   }
 

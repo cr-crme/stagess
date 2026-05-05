@@ -2,7 +2,7 @@ import 'package:enhanced_containers_foundation/enhanced_containers_foundation.da
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 
 const _regExp =
-    r'^(?:\+\(d{1,3})?\s?\(?(\d{3})(?:[-.\)\s]|\)\s)?(\d{3})[-.\s]?(\d{4})(?:\s(?:poste)?\s(\d{1,6}))?$';
+    r'^(?:\+\(d{1,3})?\s?\(?(\d{3})(?:[-.\)\s]|\)\s)?(\d{3})[-.\s]?(\d{4})(?:\s(?:poste)?\s(\d{1,8}))?$';
 
 class PhoneNumber extends ItemSerializable {
   final String? areaCode;

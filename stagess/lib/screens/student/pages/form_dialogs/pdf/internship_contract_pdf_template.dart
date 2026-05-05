@@ -639,12 +639,16 @@ pw.Widget _studentInformations({
         pw.Expanded(
             child: _textCell(
           title: 'Téléphone',
-          content: student.phone?.toString() ?? 'N/A',
+          content: student.phone.toString().isEmpty
+              ? 'N/A'
+              : student.phone.toString(),
         )),
         pw.Expanded(
             child: _textCell(
           title: 'Téléphone urgence',
-          content: student.contact.phone?.toString() ?? 'N/A',
+          content: student.contact.phone.toString().isEmpty
+              ? 'N/A'
+              : student.contact.phone.toString(),
         )),
       ]),
       _textCell(
@@ -661,7 +665,7 @@ pw.Widget _studentInformations({
         title: 'Nom, adresse et téléphone de l\'école',
         content: '${school.name.toUpperCase()}\n'
             '${school.address.toString()}\n'
-            '${school.phone.toString()}',
+            '${school.phone.toString().isEmpty ? 'N/A' : school.phone.toString()}',
         sameLine: false,
       ),
       pw.SizedBox(height: 12),

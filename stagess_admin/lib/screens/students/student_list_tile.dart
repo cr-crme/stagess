@@ -94,7 +94,7 @@ class StudentListTileState extends State<StudentListTile> {
     initialValue: widget.student.address,
   );
   late final _phoneController = TextEditingController(
-    text: widget.student.phone?.toString() ?? '',
+    text: widget.student.phone.toString(),
   );
   late final _groupController = TextEditingController(
     text: widget.student.group == '-1' ? '' : widget.student.group,
@@ -116,7 +116,7 @@ class StudentListTileState extends State<StudentListTile> {
     initialValue: widget.student.contact.address,
   );
   late final _contactPhoneController = TextEditingController(
-    text: widget.student.contact.phone?.toString() ?? '',
+    text: widget.student.contact.phone.toString(),
   );
   late final _contactEmailController = TextEditingController(
     text: widget.student.contact.email,
@@ -131,22 +131,18 @@ class StudentListTileState extends State<StudentListTile> {
         group: _groupController.text,
         program: _selectedProgram,
         address: _addressController.address ??
-            Address.empty.copyWith(id: widget.student.address?.id),
-        phone: PhoneNumber.fromString(
-          _phoneController.text,
-          id: widget.student.phone?.id,
-        ),
+            Address.empty.copyWith(id: widget.student.address.id),
+        phone: PhoneNumber.fromString(_phoneController.text,
+            id: widget.student.phone.id),
         email: _emailController.text,
         contactLink: _contactLinkController.text,
         contact: widget.student.contact.copyWith(
           firstName: _contactFirstNameController.text,
           lastName: _contactLastNameController.text,
           address: _contactAddressController.address ??
-              Address.empty.copyWith(id: widget.student.contact.address?.id),
-          phone: PhoneNumber.fromString(
-            _contactPhoneController.text,
-            id: widget.student.contact.phone?.id,
-          ),
+              Address.empty.copyWith(id: widget.student.contact.address.id),
+          phone: PhoneNumber.fromString(_contactPhoneController.text,
+              id: widget.student.contact.phone.id),
           email: _contactEmailController.text,
         ),
       );
@@ -276,10 +272,8 @@ class StudentListTileState extends State<StudentListTile> {
     _lastNameController.text = widget.student.lastName;
 
     _birthController.updateValue(widget.student.dateBirth);
-    _addressController.setAddress(
-      widget.student.address,
-      forceIsValid: widget.student.address != null,
-    );
+    _addressController.setAddress(widget.student.address,
+        forceIsValid: widget.student.address.isNotEmpty);
     _phoneController.text = widget.student.phone.toString();
     _emailController.text = widget.student.email.toString();
 
@@ -290,10 +284,8 @@ class StudentListTileState extends State<StudentListTile> {
     _contactFirstNameController.text = widget.student.contact.firstName;
     _contactLastNameController.text = widget.student.contact.lastName;
     _contactLinkController.text = widget.student.contactLink;
-    _contactAddressController.setAddress(
-      widget.student.contact.address,
-      forceIsValid: widget.student.contact.address != null,
-    );
+    _contactAddressController.setAddress(widget.student.contact.address,
+        forceIsValid: widget.student.contact.address.isNotEmpty);
     _contactPhoneController.text = widget.student.contact.phone.toString();
     _contactEmailController.text = widget.student.contact.email.toString();
   }
@@ -507,12 +499,12 @@ class StudentListTileState extends State<StudentListTile> {
             name: 'Program selection',
             enabled: _isEditing,
             orientation: OptionsOrientation.vertical,
-            decoration: InputDecoration(labelText: 'Assigner à un programme'),
+            decoration: InputDecoration(labelText: 'Assigner à une formation'),
             onChanged: (value) =>
                 setState(() => _selectedProgram = value ?? Program.undefined),
             validator: (_) {
               return _selectedProgram == Program.undefined
-                  ? 'Sélectionner un programme'
+                  ? 'Sélectionner une formation'
                   : null;
             },
             options: (widget.forceEditingMode
@@ -526,7 +518,7 @@ class StudentListTileState extends State<StudentListTile> {
                 )
                 .toList(),
           )
-        : Text('Programme : ${widget.student.program.toString()}');
+        : Text('Formation : ${widget.student.program.toString()}');
   }
 
   Widget _buildBirthday() {
@@ -553,10 +545,10 @@ class StudentListTileState extends State<StudentListTile> {
 
   Widget _buildPhone() {
     return PhoneListTile(
+      title: 'Téléphone de l\'élève',
       controller: _phoneController,
       isMandatory: false,
       enabled: _isEditing,
-      title: 'Téléphone',
     );
   }
 
@@ -565,7 +557,7 @@ class StudentListTileState extends State<StudentListTile> {
       controller: _emailController,
       isMandatory: false,
       enabled: _isEditing,
-      title: 'Courriel',
+      title: 'Courriel de l\'élève',
     );
   }
 
@@ -640,12 +632,14 @@ class StudentListTileState extends State<StudentListTile> {
               ),
               const SizedBox(height: 4),
               PhoneListTile(
+                title: 'Téléphone du contact',
                 controller: _contactPhoneController,
                 isMandatory: false,
                 enabled: _isEditing,
               ),
               const SizedBox(height: 4),
               EmailListTile(
+                title: 'Courriel du contact',
                 controller: _contactEmailController,
                 isMandatory: false,
                 enabled: _isEditing,

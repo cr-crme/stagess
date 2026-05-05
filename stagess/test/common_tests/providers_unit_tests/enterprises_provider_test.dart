@@ -30,13 +30,12 @@ void main() {
           recruiterId: 'Nobody',
           jobs: JobList()..add(dummyJob()),
           contact: Person(
-            firstName: 'Not',
-            middleName: 'A',
+            firstName: 'Not A',
             lastName: 'Person',
             dateBirth: null,
             phone: PhoneNumber.empty,
             address: Address.empty,
-            email: null,
+            email: '',
           ),
         ),
       );

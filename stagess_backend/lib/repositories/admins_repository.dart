@@ -4,7 +4,9 @@ import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
+import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
+import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common/utils.dart';
@@ -151,16 +153,47 @@ class MySqlAdminsRepository extends AdminsRepository {
     String? adminId,
     required DatabaseUser user,
   }) async {
-    final users = await sqlInterface.performSelectQuery(
+    final admins = await sqlInterface.performSelectQuery(
       user: user,
       tableName: 'admins',
       filters: (adminId == null ? {} : {'id': adminId}),
+      subqueries: [
+        sqlInterface.selectSubquery(
+          dataTableName: 'persons',
+          fieldsToFetch: ['first_name', 'last_name', 'email'],
+        ),
+        sqlInterface.selectSubquery(
+            dataTableName: 'phone_numbers',
+            idNameToDataTable: 'entity_id',
+            fieldsToFetch: ['id', 'phone_number']),
+        sqlInterface.selectSubquery(
+            dataTableName: 'addresses',
+            idNameToDataTable: 'entity_id',
+            fieldsToFetch: [
+              'id',
+              'civic',
+              'street',
+              'apartment',
+              'city',
+              'postal_code',
+              'latitude',
+              'longitude',
+            ]),
+      ],
     );
 
     final map = <String, Admin>{};
-    for (final user in users) {
-      final id = user['id'].toString();
-      map[id] = Admin.fromSerialized(user);
+    for (final admin in admins) {
+      final id = admin['id'].toString();
+
+      admin.addAll((admin['persons'] as List).first as Map<String, dynamic>);
+
+      admin['phone'] =
+          (admin['phone_numbers'] as List?)?.firstOrNull as Map? ?? {};
+      admin['address'] =
+          (admin['addresses'] as List?)?.firstOrNull as Map? ?? {};
+
+      map[id] = Admin.fromSerialized(admin);
     }
     return map;
   }
@@ -173,16 +206,19 @@ class MySqlAdminsRepository extends AdminsRepository {
       (await _getAllAdmins(adminId: id, user: user))[id];
 
   Future<void> _insertToAdmins(Admin admin) async {
-    await sqlInterface.performInsertQuery(
-        tableName: 'entities', data: {'shared_id': admin.id});
+    final entity = (await sqlInterface.performSelectQuery(
+            tableName: 'entities',
+            filters: {'shared_id': admin.id},
+            user: DatabaseUser.empty()
+                .copyWith(accessLevel: AccessLevel.superAdmin)) as List)
+        .firstOrNull;
+
+    await sqlInterface.performInsertPerson(
+        person: admin, skipAddingEntity: entity != null);
     await sqlInterface.performInsertQuery(tableName: 'admins', data: {
       'id': admin.id.serialize(),
       'school_board_id': admin.schoolBoardId.serialize(),
       'has_registered_account': admin.hasRegisteredAccount,
-      'first_name': admin.firstName.serialize(),
-      'middle_name': admin.middleName?.serialize(),
-      'last_name': admin.lastName.serialize(),
-      'email': admin.email?.serialize(),
       'access_level': AccessLevel.admin.serialize(),
     });
   }
@@ -201,23 +237,14 @@ class MySqlAdminsRepository extends AdminsRepository {
     if (differences.contains('has_registered_account')) {
       toUpdate['has_registered_account'] = admin.hasRegisteredAccount;
     }
-    if (differences.contains('first_name')) {
-      toUpdate['first_name'] = admin.firstName;
-    }
-    if (differences.contains('middle_name')) {
-      toUpdate['middle_name'] = admin.middleName;
-    }
-    if (differences.contains('last_name')) {
-      toUpdate['last_name'] = admin.lastName;
-    }
-    if (differences.contains('email')) {
-      toUpdate['email'] = admin.email;
-    }
 
     if (toUpdate.isNotEmpty) {
       await sqlInterface.performUpdateQuery(
           tableName: 'admins', filters: {'id': admin.id}, data: toUpdate);
     }
+
+    // Update the persons table if needed
+    await sqlInterface.performUpdatePerson(person: admin, previous: previous);
   }
 
   @override
@@ -251,21 +278,23 @@ class AdminsRepositoryMock extends AdminsRepository {
     '0': Admin(
       id: '0',
       firstName: 'John',
-      middleName: null,
       lastName: 'Doe',
       schoolBoardId: '100',
       hasRegisteredAccount: true,
       email: 'john.doe@email.com',
+      phone: PhoneNumber.empty,
+      address: Address.empty,
       accessLevel: AccessLevel.admin,
     ),
     '1': Admin(
       id: '1',
       firstName: 'Jane',
-      middleName: null,
       lastName: 'Doe',
       schoolBoardId: '100',
       hasRegisteredAccount: true,
       email: 'jane.doe@email.com',
+      phone: PhoneNumber.empty,
+      address: Address.empty,
       accessLevel: AccessLevel.admin,
     ),
   };

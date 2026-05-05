@@ -192,7 +192,7 @@ class MySqlTeachersRepository extends TeachersRepository {
         subqueries: [
           sqlInterface.selectSubquery(
             dataTableName: 'persons',
-            fieldsToFetch: ['first_name', 'middle_name', 'last_name', 'email'],
+            fieldsToFetch: ['first_name', 'last_name', 'email'],
           ),
           sqlInterface.selectSubquery(
               dataTableName: 'phone_numbers',
@@ -550,7 +550,6 @@ class TeachersRepositoryMock extends TeachersRepository {
     '0': Teacher(
       id: '0',
       firstName: 'John',
-      middleName: null,
       lastName: 'Doe',
       schoolBoardId: '100',
       schoolId: '10',
@@ -566,7 +565,6 @@ class TeachersRepositoryMock extends TeachersRepository {
     '1': Teacher(
       id: '1',
       firstName: 'Jane',
-      middleName: null,
       lastName: 'Doe',
       schoolBoardId: '100',
       schoolId: '10',
@@ -582,7 +580,6 @@ class TeachersRepositoryMock extends TeachersRepository {
     '3': Teacher(
       id: '3',
       firstName: 'Jim',
-      middleName: null,
       lastName: 'Dungeon',
       schoolBoardId: '200',
       schoolId: '20',

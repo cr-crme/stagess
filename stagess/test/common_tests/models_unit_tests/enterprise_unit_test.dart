@@ -45,12 +45,11 @@ void main() {
         jobs: JobList()..add(dummyJob(id: 'newJobId')),
         contact: Person(
           firstName: 'Pariterre',
-          middleName: null,
           lastName: 'Nobody',
           dateBirth: null,
           phone: PhoneNumber.empty,
           address: Address.empty,
-          email: null,
+          email: '',
         ),
         contactFunction: 'newContactFunction',
         address: dummyAddress().copyWith(id: 'newAddressId'),

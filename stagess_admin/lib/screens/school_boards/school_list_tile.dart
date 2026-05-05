@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/school_boards/confirm_delete_school_dialog.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
+import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/school_boards/school.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
@@ -72,11 +73,11 @@ class SchoolListTileState extends State<SchoolListTile> {
 
   School get editedSchool => widget.school.copyWith(
         name: _nameController.text,
-        address: _addressController.address,
-        phone: PhoneNumber.fromString(
-          _phoneController.text,
-          id: widget.school.phone.id,
-        ),
+        address: _addressController.address?.isEmpty ?? true
+            ? Address.empty.copyWith(id: widget.school.address.id)
+            : _addressController.address!,
+        phone: PhoneNumber.fromString(_phoneController.text,
+            id: widget.school.phone.id),
       );
 
   @override
@@ -208,7 +209,8 @@ class SchoolListTileState extends State<SchoolListTile> {
     if (widget.school.getDifference(editedSchool).isEmpty) return;
 
     _nameController.text = widget.school.name;
-    _addressController.setAddress(widget.school.address, forceIsValid: true);
+    _addressController.setAddress(widget.school.address,
+        forceIsValid: widget.school.address.isNotEmpty);
     _phoneController.text = widget.school.phone.toString();
   }
 
@@ -305,7 +307,7 @@ class SchoolListTileState extends State<SchoolListTile> {
       child: AddressListTile(
         title: 'Adresse de l\'école',
         addressController: _addressController,
-        isMandatory: true,
+        isMandatory: false,
         enabled: _isEditing,
       ),
     );
@@ -317,7 +319,7 @@ class SchoolListTileState extends State<SchoolListTile> {
       child: PhoneListTile(
         title: 'Téléphone',
         controller: _phoneController,
-        isMandatory: true,
+        isMandatory: false,
         enabled: _isEditing,
       ),
     );

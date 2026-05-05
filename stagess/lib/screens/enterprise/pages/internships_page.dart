@@ -156,7 +156,7 @@ class _InternshipListState extends State<_InternshipList> {
   }
 
   void _sendEmail(Teacher teacher) {
-    final Uri emailLaunchUri = Uri(scheme: 'mailto', path: teacher.email!);
+    final Uri emailLaunchUri = Uri(scheme: 'mailto', path: teacher.email);
     launchUrl(emailLaunchUri);
   }
 
@@ -263,12 +263,12 @@ class _InternshipListState extends State<_InternshipList> {
                             MouseRegion(
                               cursor: SystemMouseCursors.click,
                               child: GestureDetector(
-                                onTap: signatoryTeacher.email == null
+                                onTap: signatoryTeacher.email.isEmpty
                                     ? null
                                     : () => _sendEmail(signatoryTeacher),
                                 child: Text(
                                   signatoryTeacher.fullName,
-                                  style: signatoryTeacher.email == null
+                                  style: signatoryTeacher.email.isEmpty
                                       ? null
                                       : Theme.of(
                                           context,

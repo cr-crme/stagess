@@ -48,7 +48,6 @@ void main() {
       final teacher = teachers.deserializeItem(dummyTeacher().serialize());
 
       expect(teacher.firstName, 'Pierre');
-      expect(teacher.middleName, 'Jean');
       expect(teacher.lastName, 'Jacques');
       expect(teacher.schoolBoardId, 'school_board_id');
       expect(teacher.schoolId, 'school_id');

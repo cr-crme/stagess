@@ -186,7 +186,8 @@ class _AddressListTileState extends State<AddressListTile> {
     if (newAddress.toString() == _address.toString()) {
       // Don't do anything if the address did not change
       _address = newAddress;
-      widget.addressController._textController.text = _address.toString();
+      widget.addressController._textController.text =
+          _address?.toString() ?? 'Addresse introuvable';
       addressHasChanged = false;
       setState(() => _isValidating = false);
       _previousValidatedMessage = null;

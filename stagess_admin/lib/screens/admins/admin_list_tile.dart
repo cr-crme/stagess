@@ -5,6 +5,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:stagess_admin/screens/admins/confirm_delete_admin_dialog.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
+import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
@@ -12,6 +13,7 @@ import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
+import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 class AdminListTile extends StatefulWidget {
@@ -42,6 +44,7 @@ class AdminListTileState extends State<AdminListTile> {
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
+    _phoneController.dispose();
     _emailController.dispose();
     super.dispose();
   }
@@ -58,12 +61,16 @@ class AdminListTileState extends State<AdminListTile> {
   late final _lastNameController = TextEditingController(
     text: widget.admin.lastName,
   );
+  late final _phoneController =
+      TextEditingController(text: widget.admin.phone.toString());
   late final _emailController = TextEditingController(text: widget.admin.email);
 
   Admin get editedAdmin => widget.admin.copyWith(
         schoolBoardId: _selectedSchoolId,
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
+        phone: PhoneNumber.fromString(_phoneController.text,
+            id: widget.admin.phone.id),
         email: _emailController.text,
       );
 
@@ -188,6 +195,7 @@ class AdminListTileState extends State<AdminListTile> {
 
     _firstNameController.text = widget.admin.firstName;
     _lastNameController.text = widget.admin.lastName;
+    _phoneController.text = widget.admin.phone.toString();
     _emailController.text = widget.admin.email.toString();
   }
 
@@ -299,13 +307,14 @@ class AdminListTileState extends State<AdminListTile> {
                 const SizedBox(height: 8),
                 _buildName(),
                 const SizedBox(height: 8),
+                _buildPhone(),
+                const SizedBox(height: 8),
                 _buildEmail(),
-                if (!_isEditing &&
-                    widget.admin.email != null &&
-                    widget.admin.email!.isNotEmpty)
+                if (!_isEditing && widget.admin.email.isNotEmpty)
                   Column(
                     children: [
                       const SizedBox(height: 8),
+                      // TODO: Make this button disappear when user is created
                       _buildCreateUserButton(),
                     ],
                   ),
@@ -371,6 +380,15 @@ class AdminListTileState extends State<AdminListTile> {
             ],
           )
         : Container();
+  }
+
+  Widget _buildPhone() {
+    return PhoneListTile(
+      controller: _phoneController,
+      isMandatory: false,
+      enabled: _isEditing,
+      title: 'Téléphone',
+    );
   }
 
   Widget _buildEmail() {

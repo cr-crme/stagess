@@ -60,8 +60,8 @@ class School extends ItemSerializable {
     return School(
       id: StringExt.from(data['id']) ?? id,
       name: data['name'] ?? name,
-      address: address.copyWithData(data['address']),
-      phone: PhoneNumber.fromSerialized(data['phone'] ?? {}),
+      address: Address.from(data['address']) ?? address,
+      phone: PhoneNumber.from(data['phone']) ?? phone,
     );
   }
 }

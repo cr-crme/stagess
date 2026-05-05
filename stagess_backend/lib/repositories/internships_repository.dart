@@ -623,8 +623,8 @@ class MySqlInternshipsRepository extends InternshipsRepository {
         'supervisor_first_name': contract.supervisor.firstName.serialize(),
         'supervisor_last_name': contract.supervisor.lastName.serialize(),
         'supervisor_phone_number':
-            contract.supervisor.phone?.serialize()['phone_number'],
-        'supervisor_email': contract.supervisor.email?.serialize(),
+            contract.supervisor.phone.serialize()['phone_number'],
+        'supervisor_email': contract.supervisor.email.serialize(),
         'starting_date': contract.dates.start.serialize(),
         'ending_date': contract.dates.end.serialize(),
         'visit_frequencies': contract.visitFrequencies.serialize(),
@@ -992,12 +992,11 @@ class InternshipsRepositoryMock extends InternshipsRepository {
               start: DateTime(1990, 1, 1), end: DateTime(1990, 1, 31)),
           supervisor: Person(
               firstName: 'Mine',
-              middleName: null,
               lastName: 'Yours',
               dateBirth: null,
               address: Address.empty,
               phone: PhoneNumber.empty,
-              email: null),
+              email: ''),
           weeklySchedules: [
             WeeklySchedule(
                 schedule: {
@@ -1062,12 +1061,11 @@ class InternshipsRepositoryMock extends InternshipsRepository {
               start: DateTime(1990, 2, 1), end: DateTime(1990, 2, 28)),
           supervisor: Person(
               firstName: 'Mine',
-              middleName: null,
               lastName: 'Yours',
               dateBirth: null,
               address: Address.empty,
               phone: PhoneNumber.empty,
-              email: null),
+              email: ''),
           weeklySchedules: [
             WeeklySchedule(
                 schedule: {

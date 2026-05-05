@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:stagess_admin/screens/teachers/confirm_delete_teacher_dialog.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
-import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
@@ -87,7 +86,7 @@ class TeacherListTileState extends State<TeacherListTile> {
   }
 
   late final _phoneController = TextEditingController(
-    text: widget.teacher.phone?.toString() ?? '',
+    text: widget.teacher.phone.toString(),
   );
   late final _emailController = TextEditingController(
     text: widget.teacher.email,
@@ -98,11 +97,9 @@ class TeacherListTileState extends State<TeacherListTile> {
         schoolBoardId: widget.schoolBoard.id,
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
-        address: Address.empty.copyWith(id: widget.teacher.address?.id),
-        phone: PhoneNumber.fromString(
-          _phoneController.text,
-          id: widget.teacher.phone?.id,
-        ),
+        address: widget.teacher.address,
+        phone: PhoneNumber.fromString(_phoneController.text,
+            id: widget.teacher.phone.id),
         email: _emailController.text,
         groups: _currentGroups
             .map((e) => e.text)
@@ -235,7 +232,7 @@ class TeacherListTileState extends State<TeacherListTile> {
     _firstNameController.text = widget.teacher.firstName;
     _lastNameController.text = widget.teacher.lastName;
 
-    _phoneController.text = widget.teacher.phone?.toString() ?? '';
+    _phoneController.text = widget.teacher.phone.toString();
     _emailController.text = widget.teacher.email.toString();
 
     if (areListsNotEqual(
@@ -365,12 +362,11 @@ class TeacherListTileState extends State<TeacherListTile> {
                 _buildEmail(),
                 const SizedBox(height: 8),
                 _buildGroups(),
-                if (!_isEditing &&
-                    widget.teacher.email != null &&
-                    widget.teacher.email!.isNotEmpty)
+                if (!_isEditing && widget.teacher.email.isNotEmpty)
                   Column(
                     children: [
                       const SizedBox(height: 8),
+                      // TODO: make this button disappear when user is created
                       _buildCreateUserButton(),
                     ],
                   ),

@@ -13,7 +13,6 @@ void main() {
       final teacherSame = teacher.copyWith();
       expect(teacherSame.id, teacher.id);
       expect(teacherSame.firstName, teacher.firstName);
-      expect(teacherSame.middleName, teacher.middleName);
       expect(teacherSame.lastName, teacher.lastName);
       expect(teacherSame.schoolId, teacher.schoolId);
       expect(teacherSame.groups, teacher.groups);
@@ -35,7 +34,6 @@ void main() {
       final teacherDifferent = teacher.copyWith(
         id: 'newId',
         firstName: 'newFirstName',
-        middleName: 'newMiddleName',
         lastName: 'newLastName',
         schoolId: 'newSchoolId',
         groups: ['newGroup'],
@@ -50,7 +48,6 @@ void main() {
 
       expect(teacherDifferent.id, 'newId');
       expect(teacherDifferent.firstName, 'newFirstName');
-      expect(teacherDifferent.middleName, 'newMiddleName');
       expect(teacherDifferent.lastName, 'newLastName');
       expect(teacherDifferent.schoolId, 'newSchoolId');
       expect(teacherDifferent.groups, ['newGroup']);
@@ -86,14 +83,13 @@ void main() {
         'school_board_id': teacher.schoolBoardId,
         'school_id': teacher.schoolId,
         'first_name': teacher.firstName,
-        'middle_name': teacher.middleName,
         'last_name': teacher.lastName,
         'groups': teacher.groups,
         'has_registered_account': false,
         'email': teacher.email,
-        'phone': teacher.phone?.serialize(),
+        'phone': teacher.phone.serialize(),
         'date_birth': null,
-        'address': teacher.address?.serialize(),
+        'address': teacher.address.serialize(),
         'itineraries': [],
         'visiting_priorities': {'element1': 0, 'element2': 2},
       });
@@ -102,11 +98,10 @@ void main() {
       expect(deserialized.schoolBoardId, teacher.schoolBoardId);
       expect(deserialized.schoolId, teacher.schoolId);
       expect(deserialized.firstName, teacher.firstName);
-      expect(deserialized.middleName, teacher.middleName);
       expect(deserialized.lastName, teacher.lastName);
       expect(deserialized.groups, teacher.groups);
       expect(deserialized.email, teacher.email);
-      expect(deserialized.phone?.toString(), dummyPhoneNumber().toString());
+      expect(deserialized.phone.toString(), dummyPhoneNumber().toString());
       expect(deserialized.dateBirth, isNull);
       expect(deserialized.address, isNull);
       expect(deserialized.itineraries, []);
@@ -118,7 +113,6 @@ void main() {
       expect(emptyDeserialized.id, 'emptyId');
       expect(emptyDeserialized.schoolBoardId, '-1');
       expect(emptyDeserialized.firstName, '');
-      expect(emptyDeserialized.middleName, isNull);
       expect(emptyDeserialized.lastName, '');
       expect(emptyDeserialized.schoolId, '-1');
       expect(emptyDeserialized.groups, []);

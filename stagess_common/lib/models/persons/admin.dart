@@ -15,21 +15,23 @@ class Admin extends Person {
   Admin({
     super.id,
     required super.firstName,
-    required super.middleName,
     required super.lastName,
     required this.schoolBoardId,
     required this.hasRegisteredAccount,
     required super.email,
+    required super.phone,
+    required super.address,
     required this.accessLevel,
-  }) : super(dateBirth: null, phone: null, address: null);
+  }) : super(dateBirth: null);
 
   static Admin get empty => Admin(
         firstName: '',
-        middleName: null,
         lastName: '',
         schoolBoardId: '-1',
         hasRegisteredAccount: false,
-        email: null,
+        email: '',
+        phone: PhoneNumber.empty,
+        address: Address.empty,
         accessLevel: AccessLevel.teacher,
       );
 
@@ -62,7 +64,6 @@ class Admin extends Person {
   Admin copyWith({
     String? id,
     String? firstName,
-    String? middleName,
     String? lastName,
     String? schoolBoardId,
     bool? hasRegisteredAccount,
@@ -75,11 +76,12 @@ class Admin extends Person {
       Admin(
         id: id ?? this.id,
         firstName: firstName ?? this.firstName,
-        middleName: middleName ?? this.middleName,
         lastName: lastName ?? this.lastName,
         schoolBoardId: schoolBoardId ?? this.schoolBoardId,
         hasRegisteredAccount: hasRegisteredAccount ?? this.hasRegisteredAccount,
         email: email ?? this.email,
+        phone: phone ?? this.phone,
+        address: address ?? this.address,
         accessLevel: accessLevel ?? this.accessLevel,
       );
 
@@ -93,7 +95,6 @@ class Admin extends Person {
           'school_board_id',
           'has_registered_account',
           'first_name',
-          'middle_name',
           'last_name',
           'date_birth',
           'address',
@@ -106,13 +107,14 @@ class Admin extends Person {
     return Admin(
       id: StringExt.from(data['id']) ?? id,
       firstName: StringExt.from(data['first_name']) ?? firstName,
-      middleName: StringExt.from(data['middle_name']) ?? middleName,
       lastName: StringExt.from(data['last_name']) ?? lastName,
       schoolBoardId: StringExt.from(data['school_board_id']) ?? schoolBoardId,
       hasRegisteredAccount:
           BoolExt.from(data['has_registered_account']) ?? hasRegisteredAccount,
       email: StringExt.from(data['email']) ?? email,
       accessLevel: AccessLevel.fromSerialized(data['access_level']),
+      phone: PhoneNumber.from(data['phone']) ?? phone,
+      address: Address.from(data['address']) ?? address,
     );
   }
 

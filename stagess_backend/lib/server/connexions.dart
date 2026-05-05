@@ -674,21 +674,37 @@ Future<Map<String, dynamic>?> _getTeacherFromDatabase(
 }
 
 Future<Map<String, dynamic>?> _getAdminFromDatabase(
-        {required DatabaseUser user,
-        required SqlInterface sqlInterface,
-        required String email}) async =>
-    (await sqlInterface.performSelectQuery(
-      user: user,
-      tableName: 'admins',
-      filters: {'email': email},
-      subqueries: [
-        sqlInterface.selectSubquery(
-            dataTableName: 'teachers',
-            idNameToDataTable: 'id',
-            fieldsToFetch: ['school_id'])
-      ],
-    ) as List)
-        .firstOrNull as Map<String, dynamic>?;
+    {required DatabaseUser user,
+    required SqlInterface sqlInterface,
+    required String email}) async {
+  final userFromDatabase = (await sqlInterface.performSelectQuery(
+    user: user,
+    tableName: 'persons',
+    filters: {'email': email},
+    subqueries: [
+      sqlInterface.selectSubquery(
+          dataTableName: 'admins',
+          idNameToDataTable: 'id',
+          fieldsToFetch: [
+            'school_board_id',
+            'has_registered_account',
+            'access_level'
+          ]),
+      sqlInterface.selectSubquery(
+          dataTableName: 'teachers',
+          idNameToDataTable: 'id',
+          fieldsToFetch: ['school_id'])
+    ],
+  ) as List)
+      .firstOrNull as Map<String, dynamic>?;
+
+  // If not an admin, return null
+  if ((userFromDatabase?['admins'] as List?)?.isEmpty ?? true) return null;
+
+  userFromDatabase?.addAll(
+      (userFromDatabase['admins'] as List).first as Map<String, dynamic>);
+  return userFromDatabase;
+}
 
 Future<void> _sendPasswordResetEmail(String email, String apiKey) async {
   final uri = Uri.parse(

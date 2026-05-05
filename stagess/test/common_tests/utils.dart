@@ -50,7 +50,6 @@ Teacher dummyTeacher({
     Teacher(
       id: id,
       firstName: 'Pierre',
-      middleName: 'Jean',
       lastName: 'Jacques',
       schoolBoardId: schoolBoardId,
       schoolId: schoolId,
@@ -58,7 +57,7 @@ Teacher dummyTeacher({
       groups: groups,
       email: 'peter.john.jakob@test.com',
       phone: dummyPhoneNumber(),
-      address: null,
+      address: Address.empty,
       dateBirth: null,
       itineraries: [],
       visitingPriorities: {
@@ -80,7 +79,6 @@ Student dummyStudent({
     schoolBoardId: 'schoolBoardId',
     schoolId: 'schoolId',
     firstName: tp.firstName,
-    middleName: tp.middleName,
     lastName: tp.lastName,
     dateBirth: tp.dateBirth,
     email: tp.email,
@@ -89,12 +87,11 @@ Student dummyStudent({
     contact: Person(
       id: 'My mother id',
       firstName: 'Jeanne',
-      middleName: null,
       lastName: 'Doe',
       dateBirth: null,
       phone: PhoneNumber.empty,
       address: Address.empty,
-      email: null,
+      email: '',
     ),
     photo: '0x00FF00',
     contactLink: 'Mère',
@@ -112,7 +109,6 @@ Person dummyPerson({
     Person(
       id: id,
       firstName: firstName,
-      middleName: 'Kathlin',
       lastName: lastName,
       address: dummyAddress(),
       dateBirth: DateTime(2000, 1, 1),

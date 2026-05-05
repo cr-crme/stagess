@@ -62,7 +62,7 @@ class TeacherListTileState extends State<TeacherListTile> {
     for (var group in widget.teacher.groups) TextEditingController(text: group),
   ];
   late final _phoneController = TextEditingController(
-    text: widget.teacher.phone?.toString() ?? '',
+    text: widget.teacher.phone.toString(),
   );
   late final _emailController = TextEditingController(
     text: widget.teacher.email,
@@ -71,11 +71,9 @@ class TeacherListTileState extends State<TeacherListTile> {
   Teacher get editedTeacher => widget.teacher.copyWith(
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
-        address: Address.empty.copyWith(id: widget.teacher.address?.id),
-        phone: PhoneNumber.fromString(
-          _phoneController.text,
-          id: widget.teacher.phone?.id,
-        ),
+        address: Address.empty.copyWith(id: widget.teacher.address.id),
+        phone: PhoneNumber.fromString(_phoneController.text,
+            id: widget.teacher.phone.id),
         email: _emailController.text,
         groups: _currentGroups
             .map((e) => e.text)
@@ -153,8 +151,8 @@ class TeacherListTileState extends State<TeacherListTile> {
 
     _firstNameController.text = widget.teacher.firstName;
     _lastNameController.text = widget.teacher.lastName;
-    _phoneController.text = widget.teacher.phone?.toString() ?? '';
-    _emailController.text = widget.teacher.email ?? '';
+    _phoneController.text = widget.teacher.phone.toString();
+    _emailController.text = widget.teacher.email;
   }
 
   @override
@@ -353,7 +351,7 @@ class TeacherListTileState extends State<TeacherListTile> {
                 // Reconnected
                 try {
                   await authProvider.signInWithEmailAndPassword(
-                    email: widget.teacher.email ?? '',
+                    email: widget.teacher.email,
                     password: oldPasswordController.text,
                   );
                 } catch (_) {

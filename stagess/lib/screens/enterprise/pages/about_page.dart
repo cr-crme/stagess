@@ -138,29 +138,22 @@ class EnterpriseAboutPageState extends State<EnterpriseAboutPage> {
       contact: widget.enterprise.contact.copyWith(
         firstName: _contactInfoController.firstName.text,
         lastName: _contactInfoController.lastName.text,
-        phone: _contactInfoController.contactPhone.text == ''
-            ? PhoneNumber.empty
-                .copyWith(id: widget.enterprise.contact.phone?.id)
-            : PhoneNumber.fromString(
-                _contactInfoController.contactPhone.text,
-                id: widget.enterprise.contact.phone?.id,
-              ),
+        phone: PhoneNumber.fromString(
+          _contactInfoController.contactPhone.text,
+          id: widget.enterprise.contact.phone.id,
+        ),
         email: _contactInfoController.contactEmail.text,
       ),
       contactFunction: _contactInfoController.contactFunction.text,
       address: _enterpriseInfoController.address.address,
-      phone: _enterpriseInfoController.phone.text == ''
-          ? PhoneNumber.empty.copyWith(id: widget.enterprise.phone.id)
-          : PhoneNumber.fromString(
-              _enterpriseInfoController.phone.text,
-              id: widget.enterprise.phone.id,
-            ),
-      fax: _enterpriseInfoController.fax.text == ''
-          ? PhoneNumber.empty.copyWith(id: widget.enterprise.fax.id)
-          : PhoneNumber.fromString(
-              _enterpriseInfoController.fax.text,
-              id: widget.enterprise.fax.id,
-            ),
+      phone: PhoneNumber.fromString(
+        _enterpriseInfoController.phone.text,
+        id: widget.enterprise.phone.id,
+      ),
+      fax: PhoneNumber.fromString(
+        _enterpriseInfoController.fax.text,
+        id: widget.enterprise.fax.id,
+      ),
       website: _enterpriseInfoController.website.text,
       headquartersAddress: _taxesInfoController.useSameAddress
           ? _enterpriseInfoController.address.address?.copyWith(
@@ -220,14 +213,14 @@ class EnterpriseAboutPageState extends State<EnterpriseAboutPage> {
     }
 
     if (_contactInfoController.contactPhone.text !=
-        widget.enterprise.contact.phone?.toString()) {
+        widget.enterprise.contact.phone.toString()) {
       _contactInfoController.contactPhone.text =
-          widget.enterprise.contact.phone?.toString() ?? '';
+          widget.enterprise.contact.phone.toString();
     }
     if (_contactInfoController.contactEmail.text !=
         widget.enterprise.contact.email) {
       _contactInfoController.contactEmail.text =
-          widget.enterprise.contact.email ?? '';
+          widget.enterprise.contact.email;
     }
 
     if (areSetsNotEqual(
@@ -375,7 +368,7 @@ class _ContactInfoController {
     lastName.text = enterprise.contact.lastName;
     contactFunction.text = enterprise.contactFunction;
     contactPhone.text = enterprise.contact.phone.toString();
-    contactEmail.text = enterprise.contact.email ?? '';
+    contactEmail.text = enterprise.contact.email;
   }
 
   void dispose() {

@@ -119,10 +119,6 @@ CREATE TABLE admins (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     school_board_id VARCHAR(36) NOT NULL,
     has_registered_account BOOLEAN NOT NULL DEFAULT FALSE,
-    first_name VARCHAR(50) NOT NULL,
-    middle_name VARCHAR(50),
-    last_name VARCHAR(50) NOT NULL,
-    email VARCHAR(200) NOT NULL,
     access_level INT NOT NULL,
     FOREIGN KEY (id) REFERENCES entities(shared_id) ON DELETE CASCADE
 );
@@ -160,10 +156,9 @@ CREATE TABLE schools (
 CREATE TABLE persons (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
-    middle_name VARCHAR(50),
     last_name VARCHAR(50) NOT NULL,
     date_birthday DATE,
-    email VARCHAR(200),
+    email VARCHAR(200) NOT NULL,
     FOREIGN KEY (id) REFERENCES entities(shared_id) ON DELETE CASCADE
 );
 

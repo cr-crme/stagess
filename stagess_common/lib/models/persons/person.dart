@@ -7,18 +7,16 @@ import 'package:stagess_common/models/generic/serializable_elements.dart';
 
 class Person extends ExtendedItemSerializable {
   final String firstName;
-  final String? middleName;
   final String lastName;
   final DateTime? dateBirth;
 
-  final PhoneNumber? phone;
-  final String? email;
-  final Address? address;
+  final PhoneNumber phone;
+  final String email;
+  final Address address;
 
   Person({
     super.id,
     required this.firstName,
-    required this.middleName,
     required this.lastName,
     required this.dateBirth,
     required this.phone,
@@ -28,13 +26,12 @@ class Person extends ExtendedItemSerializable {
 
   static Person get empty => Person(
       firstName: '',
-      middleName: null,
       lastName: '',
-      address: null,
+      address: Address.empty,
       dateBirth: null,
-      email: null,
+      email: '',
       id: null,
-      phone: null);
+      phone: PhoneNumber.empty);
 
   static Person? from(Map? map) {
     if (map == null) return null;
@@ -43,29 +40,26 @@ class Person extends ExtendedItemSerializable {
 
   Person.fromSerialized(super.map)
       : firstName = StringExt.from(map?['first_name']) ?? '',
-        middleName = StringExt.from(map?['middle_name']),
         lastName = StringExt.from(map?['last_name']) ?? '',
         dateBirth = DateTimeExt.from(map?['date_birth']),
-        phone = PhoneNumber.from(map?['phone']),
-        email = StringExt.from(map?['email']),
-        address = Address.from(map?['address']),
+        phone = PhoneNumber.from(map?['phone']) ?? PhoneNumber.empty,
+        email = StringExt.from(map?['email']) ?? '',
+        address = Address.from(map?['address']) ?? Address.empty,
         super.fromSerialized();
 
   @override
   Map<String, dynamic> serializedMap() => {
         'first_name': firstName.serialize(),
-        'middle_name': middleName?.serialize(),
         'last_name': lastName.serialize(),
         'date_birth': dateBirth?.serialize(),
-        'phone': phone?.serialize(),
-        'email': email?.serialize(),
-        'address': address?.serialize(),
+        'phone': phone.serialize(),
+        'email': email.serialize(),
+        'address': address.serialize(),
       };
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
         'first_name': FetchableFields.mandatory,
-        'middle_name': FetchableFields.mandatory,
         'last_name': FetchableFields.mandatory,
         'date_birth': FetchableFields.optional,
         'phone': FetchableFields.optional,
@@ -76,7 +70,6 @@ class Person extends ExtendedItemSerializable {
   Person copyWith({
     String? id,
     String? firstName,
-    String? middleName,
     String? lastName,
     DateTime? dateBirth,
     PhoneNumber? phone,
@@ -86,7 +79,6 @@ class Person extends ExtendedItemSerializable {
       Person(
         id: id ?? this.id,
         firstName: firstName ?? this.firstName,
-        middleName: middleName ?? this.middleName,
         lastName: lastName ?? this.lastName,
         dateBirth: dateBirth ?? this.dateBirth,
         phone: phone ?? this.phone,
@@ -101,7 +93,6 @@ class Person extends ExtendedItemSerializable {
     if (data.keys.any((key) => ![
           'id',
           'first_name',
-          'middle_name',
           'last_name',
           'date_birth',
           'phone',
@@ -113,18 +104,16 @@ class Person extends ExtendedItemSerializable {
     return Person(
       id: StringExt.from(data['id']) ?? id,
       firstName: StringExt.from(data['first_name']) ?? firstName,
-      middleName: StringExt.from(data['middle_name']) ?? middleName,
       lastName: StringExt.from(data['last_name']) ?? lastName,
       dateBirth: DateTimeExt.from(data['date_birth']) ?? dateBirth,
       phone: PhoneNumber.from(data['phone']) ?? phone,
       email: StringExt.from(data['email']) ?? email,
-      address: address?.copyWithData(data['address']) ??
-          Address.fromSerialized(data['address']),
+      address: address.copyWithData(data['address']),
     );
   }
 
   ///
-  /// Full name without the middle name
+  /// Full name
   String get fullName => '$firstName${lastName.isEmpty ? '' : ' $lastName'}';
 
   ///
@@ -136,6 +125,5 @@ class Person extends ExtendedItemSerializable {
   }
 
   @override
-  String toString() =>
-      '$firstName${middleName == null ? '' : ' $middleName'}${lastName.isEmpty ? '' : ' $lastName'}';
+  String toString() => '$firstName${lastName.isEmpty ? '' : ' $lastName'}';
 }

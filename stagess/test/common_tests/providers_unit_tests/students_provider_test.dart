@@ -145,13 +145,11 @@ void main() {
       );
       final student = students.deserializeItem({
         'first_name': 'NotPierre',
-        'middle_name': 'NotJean',
         'last_name': 'NotJacques',
         'group': '10101',
       });
 
       expect(student.firstName, 'NotPierre');
-      expect(student.middleName, 'NotJean');
       expect(student.lastName, 'NotJacques');
       expect(student.group, '10101');
     });

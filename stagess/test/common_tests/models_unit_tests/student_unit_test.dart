@@ -51,7 +51,6 @@ void main() {
 
       expect(limitedInfo.id, student.id);
       expect(limitedInfo.firstName, student.firstName);
-      expect(limitedInfo.middleName, student.middleName);
       expect(limitedInfo.lastName, student.lastName);
       expect(limitedInfo.group, student.group);
       expect(limitedInfo.program, student.program);
@@ -69,7 +68,6 @@ void main() {
       final studentSame = student.copyWith();
       expect(studentSame.id, student.id);
       expect(studentSame.firstName, student.firstName);
-      expect(studentSame.middleName, student.middleName);
       expect(studentSame.lastName, student.lastName);
       expect(studentSame.dateBirth, student.dateBirth);
       expect(studentSame.phone, student.phone);
@@ -84,7 +82,6 @@ void main() {
       final studentDifferent = student.copyWith(
         id: 'newId',
         firstName: 'newFirstName',
-        middleName: 'newMiddleName',
         lastName: 'newLastName',
         dateBirth: DateTime(2001, 1, 1),
         phone: PhoneNumber.fromString('866-666-6666'),
@@ -99,12 +96,11 @@ void main() {
 
       expect(studentDifferent.id, 'newId');
       expect(studentDifferent.firstName, 'newFirstName');
-      expect(studentDifferent.middleName, 'newMiddleName');
       expect(studentDifferent.lastName, 'newLastName');
       expect(studentDifferent.dateBirth, DateTime(2001, 1, 1));
       expect(studentDifferent.phone.toString(), '(866) 666-6666');
       expect(studentDifferent.email, 'newEmail');
-      expect(studentDifferent.address?.id, 'newAddressId');
+      expect(studentDifferent.address.id, 'newAddressId');
       expect(studentDifferent.photo.toString(), '0xFF0000');
       expect(studentDifferent.program, Program.fms);
       expect(studentDifferent.group, 'newGroup');
@@ -123,12 +119,11 @@ void main() {
         'school_board_id': student.schoolBoardId,
         'school_id': student.schoolId,
         'first_name': student.firstName,
-        'middle_name': student.middleName,
         'last_name': student.lastName,
         'date_birth': student.dateBirth!.millisecondsSinceEpoch,
-        'phone': student.phone?.serialize(),
+        'phone': student.phone.serialize(),
         'email': student.email,
-        'address': student.address?.serialize(),
+        'address': student.address.serialize(),
         'photo': student.photo,
         'program': student.program.index,
         'group': student.group,
@@ -141,12 +136,11 @@ void main() {
       expect(deserialized.schoolBoardId, student.schoolBoardId);
       expect(deserialized.schoolId, student.schoolId);
       expect(deserialized.firstName, student.firstName);
-      expect(deserialized.middleName, student.middleName);
       expect(deserialized.lastName, student.lastName);
       expect(deserialized.dateBirth, student.dateBirth);
       expect(deserialized.phone.toString(), student.phone.toString());
       expect(deserialized.email, student.email);
-      expect(deserialized.address?.id, student.address?.id);
+      expect(deserialized.address.id, student.address.id);
       expect(deserialized.photo, student.photo);
       expect(deserialized.program, student.program);
       expect(deserialized.group, student.group);
@@ -159,7 +153,6 @@ void main() {
       final emptyDeserialized = Student.fromSerialized({'id': 'emptyId'});
       expect(emptyDeserialized.id, 'emptyId');
       expect(emptyDeserialized.firstName, '');
-      expect(emptyDeserialized.middleName, isNull);
       expect(emptyDeserialized.lastName, '');
       expect(emptyDeserialized.dateBirth, isNull);
       expect(emptyDeserialized.phone, isNull);

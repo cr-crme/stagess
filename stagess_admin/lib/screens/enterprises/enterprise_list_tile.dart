@@ -154,7 +154,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     text: widget.enterprise.contactFunction,
   );
   late final _contactPhoneController = TextEditingController(
-    text: widget.enterprise.contact.phone?.toString(),
+    text: widget.enterprise.contact.phone.toString(),
   );
   late final _contactEmailController = TextEditingController(
     text: widget.enterprise.contact.email,
@@ -168,14 +168,10 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
         status: _enterpriseStatusController.value,
         activityTypes: _activityTypeController.activityTypes,
         recruiterId: _teacherPickerController.teacher?.id ?? '',
-        phone: PhoneNumber.fromString(
-          _phoneController.text,
-          id: widget.enterprise.phone.id,
-        ),
-        fax: PhoneNumber.fromString(
-          _faxController.text,
-          id: widget.enterprise.fax.id,
-        ),
+        phone: PhoneNumber.fromString(_phoneController.text,
+            id: widget.enterprise.phone.id),
+        fax: PhoneNumber.fromString(_faxController.text,
+            id: widget.enterprise.fax.id),
         jobs: JobList()
           ..addAll(
             _jobControllers.values.map((jobController) => jobController.job),
@@ -186,10 +182,8 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
         contact: widget.enterprise.contact.copyWith(
           firstName: _contactFirstNameController.text,
           lastName: _contactLastNameController.text,
-          phone: PhoneNumber.fromString(
-            _contactPhoneController.text,
-            id: widget.enterprise.contact.phone?.id,
-          ),
+          phone: PhoneNumber.fromString(_contactPhoneController.text,
+              id: widget.enterprise.contact.phone.id),
           email: _contactEmailController.text,
         ),
         contactFunction: _contactFunctionController.text,
@@ -359,19 +353,19 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     );
 
     _addressController.setAddress(widget.enterprise.address,
-        forceIsValid: true);
+        forceIsValid: widget.enterprise.address.isNotEmpty);
     _phoneController.text = widget.enterprise.phone.toString();
     _faxController.text = widget.enterprise.fax.toString();
     _websiteController.text = widget.enterprise.website;
-    _headquartersAddressController
-        .setAddress(widget.enterprise.headquartersAddress, forceIsValid: true);
+    _headquartersAddressController.setAddress(
+        widget.enterprise.headquartersAddress,
+        forceIsValid: widget.enterprise.headquartersAddress.isNotEmpty);
     _contactFirstNameController.text = widget.enterprise.contact.firstName;
     _contactLastNameController.text = widget.enterprise.contact.lastName;
     _contactFunctionController.text = widget.enterprise.contactFunction;
-    _contactPhoneController.text =
-        widget.enterprise.contact.phone?.toString() ?? '';
+    _contactPhoneController.text = widget.enterprise.contact.phone.toString();
 
-    _contactEmailController.text = widget.enterprise.contact.email ?? '';
+    _contactEmailController.text = widget.enterprise.contact.email;
     _neqController.text = widget.enterprise.neq;
     _activityTypeController.updateActivityTypes({
       ...widget.enterprise.activityTypes,

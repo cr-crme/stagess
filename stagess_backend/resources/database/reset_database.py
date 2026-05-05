@@ -6,7 +6,6 @@ import sys
 import subprocess
 import uuid
 
-
 _use_dev_database = True  # Set to False for production
 if _use_dev_database:
     _container_name = os.getenv("STAGESS_DATABASE_DEV_DOCKER")
@@ -88,9 +87,13 @@ def add_super_admin_user(super_admin_email: str) -> bool:
     if not _perform_query(query):
         return False
 
+    query = f"INSERT INTO admins (id, school_board_id, access_level) " f"VALUES ('{id}', '',  3);"
+    if not _perform_query(query):
+        return False
+
     query = (
-        f"INSERT INTO admins (id, school_board_id, first_name, last_name, email, access_level) "
-        f"VALUES ('{id}', '', 'Super', 'Admin', '{super_admin_email}', 3);"
+        f"INSERT INTO persons (id, first_name, last_name, email) "
+        f"VALUES ('{id}', 'Super', 'Admin', '{super_admin_email}');"
     )
     if not _perform_query(query):
         return False

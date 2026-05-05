@@ -107,7 +107,7 @@ class InternshipListTileState extends State<InternshipListTile> {
     text: widget.internship.currentContract?.supervisor.lastName ?? '',
   );
   late final _contactPhoneController = TextEditingController(
-    text: widget.internship.currentContract?.supervisor.phone?.toString() ?? '',
+    text: widget.internship.currentContract?.supervisor.phone.toString() ?? '',
   );
   late final _contactEmailController = TextEditingController(
     text: widget.internship.currentContract?.supervisor.email ?? '',
@@ -158,10 +158,8 @@ class InternshipListTileState extends State<InternshipListTile> {
     final supervisor = previousSupervisor.copyWith(
       firstName: _contactFirstNameController.text,
       lastName: _contactLastNameController.text,
-      phone: PhoneNumber.fromString(
-        _contactPhoneController.text,
-        id: previousSupervisor.phone?.id,
-      ),
+      phone: PhoneNumber.fromString(_contactPhoneController.text,
+          id: previousSupervisor.phone.id),
       email: _contactEmailController.text,
     );
 
@@ -341,8 +339,8 @@ class InternshipListTileState extends State<InternshipListTile> {
         widget.internship.currentContract?.supervisor ?? Person.empty;
     _contactFirstNameController.text = supervisor.firstName;
     _contactLastNameController.text = supervisor.lastName;
-    _contactPhoneController.text = supervisor.phone?.toString() ?? '';
-    _contactEmailController.text = supervisor.email ?? '';
+    _contactPhoneController.text = supervisor.phone.toString();
+    _contactEmailController.text = supervisor.email;
 
     _weeklySchedulesController.dateRange =
         widget.internship.currentContract?.dates;

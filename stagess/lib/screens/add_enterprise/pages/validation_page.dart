@@ -79,9 +79,9 @@ class ValidationPage extends StatelessWidget {
           const SizedBox(height: 8),
           Text('Courriel', style: Theme.of(context).textTheme.titleSmall),
           Text(
-            (enterprise.contact.email?.isEmpty ?? true)
+            enterprise.contact.email.isEmpty
                 ? 'Non spécifié'
-                : enterprise.contact.email!,
+                : enterprise.contact.email,
           ),
           const SizedBox(height: 16),
           Text(

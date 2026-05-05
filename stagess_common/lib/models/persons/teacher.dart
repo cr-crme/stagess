@@ -19,7 +19,6 @@ class Teacher extends Person {
   Teacher({
     super.id,
     required super.firstName,
-    required super.middleName,
     required super.lastName,
     required this.schoolBoardId,
     required this.schoolId,
@@ -40,15 +39,14 @@ class Teacher extends Person {
 
   static Teacher get empty => Teacher(
         firstName: '',
-        middleName: null,
         lastName: '',
         schoolBoardId: '-1',
         schoolId: '-1',
         hasRegisteredAccount: false,
         groups: [],
-        email: null,
-        phone: null,
-        address: null,
+        email: '',
+        phone: PhoneNumber.empty,
+        address: Address.empty,
         dateBirth: null,
         itineraries: [],
         visitingPriorities: {},
@@ -109,7 +107,6 @@ class Teacher extends Person {
   Teacher copyWith({
     String? id,
     String? firstName,
-    String? middleName,
     String? lastName,
     String? schoolBoardId,
     String? schoolId,
@@ -125,7 +122,6 @@ class Teacher extends Person {
       Teacher(
         id: id ?? this.id,
         firstName: firstName ?? this.firstName,
-        middleName: middleName ?? this.middleName,
         lastName: lastName ?? this.lastName,
         schoolBoardId: schoolBoardId ?? this.schoolBoardId,
         schoolId: schoolId ?? this.schoolId,
@@ -147,7 +143,6 @@ class Teacher extends Person {
     if (data.keys.any((key) => ![
           'id',
           'first_name',
-          'middle_name',
           'last_name',
           'school_board_id',
           'school_id',
@@ -165,7 +160,6 @@ class Teacher extends Person {
     return Teacher(
       id: StringExt.from(data['id']) ?? id,
       firstName: StringExt.from(data['first_name']) ?? firstName,
-      middleName: StringExt.from(data['middle_name']) ?? middleName,
       lastName: StringExt.from(data['last_name']) ?? lastName,
       schoolBoardId: StringExt.from(data['school_board_id']) ?? schoolBoardId,
       schoolId: StringExt.from(data['school_id']) ?? schoolId,

@@ -108,7 +108,6 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
       jobs: _jobsKey.currentState!.jobs,
       contact: _currentEnterprise.contact.copyWith(
         firstName: about?.contactFirstName,
-        middleName: null,
         lastName: about?.contactLastName,
         dateBirth: null,
         phone: PhoneNumber.fromString(about?.contactPhone ?? ''),

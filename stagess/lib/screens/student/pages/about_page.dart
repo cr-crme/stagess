@@ -23,14 +23,13 @@ class AboutPageState extends State<AboutPage> {
   final _formKey = GlobalKey<FormState>();
   final _dateFormat = DateFormat.yMd();
 
-  late final _addressController =
-      AddressController()..initialValue = widget.student.address;
+  late final _addressController = AddressController()
+    ..initialValue = widget.student.address;
 
   late final _birthdayController = BirthdayController(
-    initialValue:
-        (widget.student.dateBirth ?? DateTime(0)) == DateTime(0)
-            ? null
-            : widget.student.dateBirth,
+    initialValue: (widget.student.dateBirth ?? DateTime(0)) == DateTime(0)
+        ? null
+        : widget.student.dateBirth,
   );
 
   @override
@@ -95,6 +94,7 @@ class _GeneralInformation extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 PhoneListTile(
+                  title: 'Téléphone de l\'élève',
                   titleStyle: styleOverride,
                   contentStyle: styleOverride,
                   initialValue: student.phone,
@@ -103,6 +103,7 @@ class _GeneralInformation extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 EmailListTile(
+                  title: 'Courriel de l\'élève',
                   controller: TextEditingController(text: student.email),
                   titleStyle: styleOverride,
                   contentStyle: styleOverride,
@@ -184,6 +185,7 @@ class _EmergencyContact extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               PhoneListTile(
+                title: 'Téléphone du contact',
                 titleStyle: styleOverride,
                 contentStyle: styleOverride,
                 initialValue: student.contact.phone,
@@ -192,6 +194,7 @@ class _EmergencyContact extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               EmailListTile(
+                title: 'Courriel du contact',
                 titleStyle: styleOverride,
                 contentStyle: styleOverride,
                 controller: TextEditingController(text: student.contact.email),

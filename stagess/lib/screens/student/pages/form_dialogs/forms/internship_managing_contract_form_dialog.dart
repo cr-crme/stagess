@@ -10,6 +10,7 @@ import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_contract.dart';
@@ -98,11 +99,10 @@ class InternshipContractFormController {
   Person get _supervisor => Person(
         id: null,
         firstName: _superviserFirstNameController.text,
-        middleName: null,
         lastName: _supervisorLastNameController.text,
         phone: PhoneNumber.fromString(_supervisorPhoneController.text),
         email: _supervisorEmailController.text,
-        address: null,
+        address: Address.empty,
         dateBirth: null,
       );
 
@@ -148,7 +148,7 @@ class InternshipContractFormController {
         ? enterprise.contact.phone.toString()
         : (_previousContract?.supervisor.phone.toString() ?? '');
     _supervisorEmailController.text = isNewContract
-        ? (enterprise.contact.email ?? '')
+        ? (enterprise.contact.email)
         : (_previousContract?.supervisor.email ?? '');
     if (program != Program.fpt) _extraJobControllers.clear();
   }
@@ -694,7 +694,7 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
       widget.controller._supervisorPhoneController.text =
           enterprise.contact.phone.toString();
       widget.controller._supervisorEmailController.text =
-          enterprise.contact.email ?? '';
+          enterprise.contact.email;
     }
     setState(() {});
   }

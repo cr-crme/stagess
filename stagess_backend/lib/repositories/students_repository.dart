@@ -192,13 +192,7 @@ class MySqlStudentsRepository extends StudentsRepository {
       subqueries: [
         sqlInterface.selectSubquery(
           dataTableName: 'persons',
-          fieldsToFetch: [
-            'first_name',
-            'middle_name',
-            'last_name',
-            'date_birthday',
-            'email'
-          ],
+          fieldsToFetch: ['first_name', 'last_name', 'date_birthday', 'email'],
         ),
         sqlInterface.selectSubquery(
             dataTableName: 'phone_numbers',
@@ -681,7 +675,6 @@ class StudentsRepositoryMock extends StudentsRepository {
       schoolBoardId: '0',
       schoolId: '0',
       firstName: 'John',
-      middleName: null,
       lastName: 'Doe',
       phone: PhoneNumber.fromString('098-765-4321'),
       email: 'john.doe@email.com',
@@ -692,7 +685,6 @@ class StudentsRepositoryMock extends StudentsRepository {
       contact: Person(
           id: '1',
           firstName: 'Jane',
-          middleName: null,
           lastName: 'Doe',
           dateBirth: null,
           address: Address.empty,
@@ -706,7 +698,6 @@ class StudentsRepositoryMock extends StudentsRepository {
       schoolBoardId: '0',
       schoolId: '0',
       firstName: 'Jane',
-      middleName: null,
       lastName: 'Doe',
       phone: PhoneNumber.fromString('123-456-7890'),
       email: 'jane.doe@email.com',
@@ -717,7 +708,6 @@ class StudentsRepositoryMock extends StudentsRepository {
       contact: Person(
           id: '0',
           firstName: 'John',
-          middleName: null,
           lastName: 'Doe',
           dateBirth: null,
           address: Address.empty,
