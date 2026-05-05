@@ -34,8 +34,6 @@ void main() {
     test('"copyWith" behaves properly', () {
       final job = dummyJob(
         preInternshipId: 'newPreInternshipId',
-        uniformId: 'newUniformId',
-        protectionsId: 'newProtectionsId',
         incidentsId: 'newIncidentsId',
       );
 
@@ -45,8 +43,6 @@ void main() {
       expect(jobSame.positionsOffered, job.positionsOffered);
       expect(jobSame.minimumAge, job.minimumAge);
       expect(jobSame.preInternshipRequests, job.preInternshipRequests);
-      expect(jobSame.uniforms, job.uniforms);
-      expect(jobSame.protections, job.protections);
       expect(jobSame.photos, job.photos);
       expect(jobSame.incidents, job.incidents);
       expect(jobSame.comments, job.comments);
@@ -60,8 +56,6 @@ void main() {
         preInternshipRequests: dummyPreInternshipRequests(
           id: 'newPreInternshipId',
         ),
-        uniforms: dummyUniforms(id: 'newUniformId'),
-        protections: dummyProtections(id: 'newProtectionsId'),
         photos: [dummyPhoto()],
         incidents: dummyIncidents(id: 'newIncidentsId'),
         comments: [dummyJobComment()],
@@ -75,15 +69,11 @@ void main() {
       expect(jobDifferent.positionsOffered, {'school_id': 2});
       expect(jobDifferent.minimumAge, 12);
       expect(jobDifferent.preInternshipRequests.id, 'newPreInternshipId');
-      expect(jobDifferent.uniforms.id, 'newUniformId');
-      expect(jobDifferent.protections.id, 'newProtectionsId');
       expect(jobDifferent.photos, isA<List<Photo>>());
       expect(jobDifferent.photos.length, 1);
       expect(jobDifferent.photos[0].id, 'photoId');
       expect(jobDifferent.incidents.id, 'newIncidentsId');
       expect(jobDifferent.preInternshipRequests.id, 'newPreInternshipId');
-      expect(jobDifferent.uniforms.id, 'newUniformId');
-      expect(jobDifferent.protections.id, 'newProtectionsId');
       expect(jobDifferent.comments, isA<List<JobComment>>());
       expect(jobDifferent.comments.length, 1);
       expect(jobDifferent.comments[0].id, 'jobCommentId');
@@ -111,8 +101,6 @@ void main() {
         'positions_offered': job.positionsOffered,
         'minimum_age': job.minimumAge,
         'pre_internship_requests': job.preInternshipRequests.serialize(),
-        'uniforms': job.uniforms.serialize(),
-        'protections': job.protections.serialize(),
         'photos': job.photos.serialize(),
         'incidents': job.incidents.serialize(),
         'comments': job.comments,
@@ -127,8 +115,6 @@ void main() {
         deserialized.preInternshipRequests.id,
         job.preInternshipRequests.id,
       );
-      expect(deserialized.uniforms.id, job.uniforms.id);
-      expect(deserialized.protections.id, job.protections.id);
       expect(deserialized.photos, job.photos);
       expect(deserialized.incidents.id, job.incidents.id);
       expect(deserialized.comments, job.comments);
@@ -139,8 +125,6 @@ void main() {
       expect(emptyDeserialized.positionsOffered, {});
       expect(emptyDeserialized.minimumAge, 0);
       expect(emptyDeserialized.preInternshipRequests.id, isNotNull);
-      expect(emptyDeserialized.uniforms.id, isNotNull);
-      expect(emptyDeserialized.protections.id, isNotNull);
       expect(emptyDeserialized.photos, []);
       expect(emptyDeserialized.incidents.id, isNotNull);
       expect(emptyDeserialized.comments, []);
@@ -161,8 +145,6 @@ void main() {
             'positions_offered': e.positionsOffered,
             'minimum_age': e.minimumAge,
             'pre_internship_requests': e.preInternshipRequests.serialize(),
-            'uniforms': e.uniforms.serialize(),
-            'protections': e.protections.serialize(),
             'photos': e.photos,
             'incidents': e.incidents.serialize(),
             'comments': e.comments,
@@ -179,8 +161,6 @@ void main() {
         deserialized[0].preInternshipRequests.id,
         jobList[0].preInternshipRequests.id,
       );
-      expect(deserialized[0].uniforms.id, jobList[0].uniforms.id);
-      expect(deserialized[0].protections.id, jobList[0].protections.id);
 
       // Test for empty deserialize to make sure it doesn't crash
       final emptyDeserialized = JobList.fromSerialized({});

@@ -8,7 +8,6 @@ import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/enterprise_job_list_tile.dart';
-import 'package:stagess_common_flutter/widgets/radio_with_follow_up.dart';
 
 final _logger = Logger('PrerequisitesExpansionPanel');
 
@@ -41,42 +40,6 @@ class PrerequisitesExpansionPanelState
   int get minimumAge =>
       _ageController.text.isEmpty ? -1 : int.parse(_ageController.text);
 
-  late final _uniformRequestKey = ValueKey('${widget.job.id}_uniform_form');
-  late final _uniformRequestController =
-      RadioWithFollowUpController<UniformStatus>(
-    initialValue: widget.job.uniforms.status,
-  );
-  final _uniformTextController = TextEditingController();
-  Uniforms get uniforms => Uniforms(
-        status: _uniformRequestController.value!,
-        uniforms: _uniformRequestController.value! == UniformStatus.none
-            ? null
-            : [_uniformTextController.text],
-      );
-
-  late final _protectionsRadioKey = ValueKey(
-    '${widget.job.id}_protections_radio',
-  );
-  late final _protectionsRadioController =
-      RadioWithFollowUpController<ProtectionsStatus>(
-    initialValue: widget.job.protections.status,
-  );
-  late final _protectionsCheckboxKey = ValueKey(
-    '${widget.job.id}_protections_checkbox',
-  );
-  late final _protectionsCheckboxController = CheckboxWithOtherController(
-    elements: ProtectionsType.values,
-    initialValues:
-        widget.job.protections.protections.map((e) => e.toString()).toList(),
-  );
-  Protections get protections => Protections(
-        status: _protectionsRadioController.value!,
-        protections:
-            _protectionsRadioController.value! == ProtectionsStatus.none
-                ? []
-                : _protectionsCheckboxController.values,
-      );
-
   late final _preInternshipRequestKey = ValueKey(
     '${widget.job.id}_preinternship_requests',
   );
@@ -105,26 +68,6 @@ class PrerequisitesExpansionPanelState
           ...widget.job.preInternshipRequests.requests.map((e) => e.toString()),
           widget.job.preInternshipRequests.other ?? '',
         ],
-      ),
-    );
-
-    if (_uniformRequestController.value != widget.job.uniforms.status) {
-      _uniformRequestController.forceSet(widget.job.uniforms.status);
-    }
-    final uniformText = widget.job.uniforms.uniforms.join('\n');
-    if (_uniformTextController.text != uniformText) {
-      _uniformTextController.text = uniformText;
-    }
-
-    if (_protectionsRadioController.value != widget.job.protections.status) {
-      _protectionsRadioController.forceSet(widget.job.protections.status);
-    }
-    _protectionsCheckboxController.forceSetIfDifferent(
-      comparator: CheckboxWithOtherController(
-        elements: ProtectionsType.values,
-        initialValues: widget.job.protections.protections
-            .map((e) => e.toString())
-            .toList(),
       ),
     );
   }
@@ -177,10 +120,6 @@ class PrerequisitesExpansionPanelState
             const SizedBox(height: 12),
             _buildEntepriseRequests(),
             const SizedBox(height: 12),
-            _buildUniform(),
-            const SizedBox(height: 12),
-            _buildProtections(),
-            const SizedBox(height: 12),
             if (widget.isEditing)
               Center(
                   child: TextButton(
@@ -229,42 +168,6 @@ class PrerequisitesExpansionPanelState
     );
   }
 
-  Widget _buildUniform() {
-    // Workaround for job.uniforms
-    final uniforms = widget.job.uniforms;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // TODO Remove concept of Uniform
-        const Text(
-          'Tenue de travail',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        widget.isEditing
-            ? BuildUniformRadio(
-                hideTitle: true,
-                uniformKey: _uniformRequestKey,
-                controller: _uniformRequestController,
-                uniformTextController: _uniformTextController,
-                onChanged: (value) => setState(() {}),
-              )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (uniforms.status == UniformStatus.none)
-                    const Text('Aucune consigne de l\'entreprise'),
-                  if (uniforms.status == UniformStatus.suppliedByEnterprise)
-                    const Text('Fournie par l\'entreprise\u00a0:'),
-                  if (uniforms.status == UniformStatus.suppliedByStudent)
-                    const Text('Fournie par l\'élève\u00a0:'),
-                  ItemizedText(uniforms.uniforms),
-                ],
-              ),
-      ],
-    );
-  }
-
   Widget _buildEntepriseRequests() {
     final requests = widget.job.preInternshipRequests.requests
         .map((e) => e.toString())
@@ -288,44 +191,6 @@ class PrerequisitesExpansionPanelState
             : requests.isEmpty
                 ? const Text('Aucune exigence particulière')
                 : ItemizedText(requests),
-      ],
-    );
-  }
-
-  Widget _buildProtections() {
-    final protections = widget.job.protections;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Équipements de protection individuelle',
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        widget.isEditing
-            ? BuildProtectionsRadio(
-                hideTitle: true,
-                radioKey: _protectionsRadioKey,
-                radioController: _protectionsRadioController,
-                checkboxKey: _protectionsCheckboxKey,
-                checkboxController: _protectionsCheckboxController,
-                onChanged: (status, protections) => setState(() {}),
-              )
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (protections.status == ProtectionsStatus.none)
-                    const Text('Aucun équipement requis'),
-                  if (protections.status ==
-                      ProtectionsStatus.suppliedByEnterprise)
-                    const Text('Fournis par l\'entreprise\u00a0:'),
-                  if (protections.status == ProtectionsStatus.suppliedBySchool)
-                    const Text(
-                      'Non fournis par l\'entreprise.\n L\'élève devra porter\u00a0:',
-                    ),
-                  ItemizedText(protections.protections),
-                ],
-              ),
       ],
     );
   }

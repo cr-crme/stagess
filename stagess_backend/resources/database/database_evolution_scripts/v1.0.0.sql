@@ -1,86 +1,3 @@
-/* USE xxx must be done prior to this script to select the correct database */
-
-/* Clear the database */
-SET FOREIGN_KEY_CHECKS = 0;
-
-DROP TABLE IF EXISTS entities;
-DROP TABLE IF EXISTS phone_numbers;
-DROP TABLE IF EXISTS addresses;
-
-DROP TABLE IF EXISTS persons;
-DROP TABLE IF EXISTS admins;
-
-DROP TABLE IF EXISTS student_contacts;
-DROP TABLE IF EXISTS students;
-DROP TABLE IF EXISTS student_visa;
-DROP TABLE IF EXISTS student_visa_forms;
-DROP TABLE IF EXISTS student_visa_experiences_and_aptitude_items;
-DROP TABLE IF EXISTS student_visa_attestations_and_mentions_items;
-DROP TABLE IF EXISTS student_visa_sst_training_items;
-DROP TABLE IF EXISTS student_visa_certificate_items;
-DROP TABLE IF EXISTS student_visa_skill_items;
-DROP TABLE IF EXISTS student_visa_forces_items;
-DROP TABLE IF EXISTS student_visa_challenges_items;
-
-DROP TABLE IF EXISTS teaching_groups;
-DROP TABLE IF EXISTS teacher_itineraries;
-DROP TABLE IF EXISTS teacher_itinerary_waypoints;
-DROP TABLE IF EXISTS teachers;
-
-DROP TABLE IF EXISTS enterprise_addresses;
-DROP TABLE IF EXISTS enterprise_headquarters_addresses;
-DROP TABLE IF EXISTS enterprise_phone_numbers;
-DROP TABLE IF EXISTS enterprise_fax_numbers;
-DROP TABLE IF EXISTS enterprise_activity_types;
-DROP TABLE IF EXISTS enterprise_contacts;
-DROP TABLE IF EXISTS enterprise_jobs;
-DROP TABLE IF EXISTS enterprise_job_positions_offered;
-DROP TABLE IF EXISTS enterprise_job_photos;
-DROP TABLE IF EXISTS enterprise_job_comments;
-DROP TABLE IF EXISTS enterprise_job_pre_internship_request_items;
-DROP TABLE IF EXISTS enterprise_job_pre_internship_requests;
-DROP TABLE IF EXISTS enterprise_job_incidents;
-DROP TABLE IF EXISTS enterprises;
-
-DROP TABLE IF EXISTS internship_supervising_teachers;
-DROP TABLE IF EXISTS internship_extra_specializations;
-DROP TABLE IF EXISTS internship_weekly_schedules;
-DROP TABLE IF EXISTS internship_daily_schedules;
-DROP TABLE IF EXISTS internship_contracts;
-DROP TABLE IF EXISTS internship_transportations;
-DROP TABLE IF EXISTS internship_skill_evaluations;
-DROP TABLE IF EXISTS internship_skill_evaluation_persons;
-DROP TABLE IF EXISTS internship_skill_evaluation_items;
-DROP TABLE IF EXISTS internship_skill_evaluation_item_tasks;
-DROP TABLE IF EXISTS internship_attitude_evaluations;
-DROP TABLE IF EXISTS internship_attitude_evaluation_persons;
-DROP TABLE IF EXISTS internship_sst_evaluations;
-DROP TABLE IF EXISTS internship_sst_evaluation_questions;
-DROP TABLE IF EXISTS internship_sst_evaluation_persons;
-DROP TABLE IF EXISTS post_internship_enterprise_evaluations;
-DROP TABLE IF EXISTS post_internship_enterprise_evaluation_skills;
-DROP TABLE IF EXISTS internships;
-
-DROP TABLE IF EXISTS teachers_visiting_priorities;
-
-DROP TABLE IF EXISTS schools;
-DROP TABLE IF EXISTS school_boards;
-
-/* OLD TABLES */
-DROP TABLE IF EXISTS internship_visa_evaluations;
-DROP TABLE IF EXISTS internship_visa_evaluation_items;
-DROP TABLE IF EXISTS enterprise_job_sst_evaluation_questions;
-DROP TABLE IF EXISTS internship_sst_evaluation_info;
-DROP TABLE IF EXISTS internship_attitude_evaluation_items;
-DROP TABLE IF EXISTS internship_mutable_data;
-DROP TABLE IF EXISTS enterprise_job_photo_urls;
-DROP TABLE IF EXISTS enterprise_job_uniforms;
-DROP TABLE IF EXISTS enterprise_job_protections;
-/**************/
-
-SET FOREIGN_KEY_CHECKS = 1;
-
-
 /***********/
 /* GENERIC */
 /***********/
@@ -328,8 +245,8 @@ CREATE TABLE enterprises (
     status INT NOT NULL,
     recruiter_id VARCHAR(36), 
     contact_function VARCHAR(50) NOT NULL,
-    website VARCHAR(200) NOT NULL,
-    neq VARCHAR(50) NOT NULL,
+    website VARCHAR(200),
+    neq VARCHAR(50),
     FOREIGN KEY (id) REFERENCES entities(shared_id) ON DELETE CASCADE,
     FOREIGN KEY (school_board_id) REFERENCES school_boards(id) ON DELETE CASCADE
 );
@@ -420,6 +337,20 @@ CREATE TABLE enterprise_job_pre_internship_request_items(
     internship_request_id VARCHAR(36) NOT NULL,
     request INT NOT NULL,
     FOREIGN KEY (internship_request_id) REFERENCES enterprise_job_pre_internship_requests(id) ON DELETE CASCADE
+);
+
+CREATE TABLE enterprise_job_uniforms(
+    job_id VARCHAR(36) NOT NULL,
+    status INT NOT NULL,
+    uniform VARCHAR(200) NOT NULL,
+    FOREIGN KEY (job_id) REFERENCES enterprise_jobs(id) ON DELETE CASCADE
+);
+
+CREATE TABLE enterprise_job_protections(
+    job_id VARCHAR(36) NOT NULL,
+    status INT NOT NULL,
+    protection VARCHAR(200) NOT NULL,
+    FOREIGN KEY (job_id) REFERENCES enterprise_jobs(id) ON DELETE CASCADE
 );
 
 CREATE TABLE enterprise_job_incidents(

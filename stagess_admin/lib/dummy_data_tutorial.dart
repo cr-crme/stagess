@@ -1281,14 +1281,6 @@ Future<void> _addDummyEnterprises(
         ],
         notApplicableTag: CheckboxWithOther.notApplicableTag,
       ),
-      uniforms: Uniforms(
-        status: UniformStatus.suppliedByEnterprise,
-        uniforms: ['Un pantalon de cuisine, un tablier'],
-      ),
-      protections: Protections(
-        status: ProtectionsStatus.suppliedByEnterprise,
-        protections: ['Une veste chaude', 'Un gant en cotte de maille'],
-      ),
       reservedForId: '',
     ),
   );
@@ -1317,14 +1309,6 @@ Future<void> _addDummyEnterprises(
           'Savoir manoeuvrer un transpalette électrique',
         ],
         notApplicableTag: CheckboxWithOther.notApplicableTag,
-      ),
-      uniforms: Uniforms(
-        status: UniformStatus.suppliedByEnterprise,
-        uniforms: ['Un pantalon noir et un polo vert'],
-      ),
-      protections: Protections(
-        status: ProtectionsStatus.suppliedByEnterprise,
-        protections: ['Une veste pour aller dans les frigos'],
       ),
       reservedForId: '',
     ),
@@ -1387,8 +1371,6 @@ Future<void> _addDummyEnterprises(
         [],
         notApplicableTag: CheckboxWithOther.notApplicableTag,
       ),
-      uniforms: Uniforms(status: UniformStatus.none),
-      protections: Protections(status: ProtectionsStatus.none),
       reservedForId: teacherB1Id,
     ),
   );
@@ -1457,14 +1439,6 @@ Future<void> _addDummyEnterprises(
         ],
         notApplicableTag: CheckboxWithOther.notApplicableTag,
       ),
-      uniforms: Uniforms(
-        status: UniformStatus.suppliedByEnterprise,
-        uniforms: ['Un bleu de travail'],
-      ),
-      protections: Protections(
-        status: ProtectionsStatus.suppliedBySchool,
-        protections: ['Masque', 'Un masque de protection'],
-      ),
       reservedForId: teacherA1Id,
     ),
   );
@@ -1528,8 +1502,6 @@ Future<void> _addDummyEnterprises(
         [],
         notApplicableTag: CheckboxWithOther.notApplicableTag,
       ),
-      uniforms: Uniforms(status: UniformStatus.none),
-      protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
     ),
   );
@@ -1586,8 +1558,6 @@ Future<void> _addDummyEnterprises(
         [],
         notApplicableTag: CheckboxWithOther.notApplicableTag,
       ),
-      uniforms: Uniforms(status: UniformStatus.none),
-      protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
     ),
   );
@@ -1645,8 +1615,6 @@ Future<void> _addDummyEnterprises(
         [],
         notApplicableTag: CheckboxWithOther.notApplicableTag,
       ),
-      uniforms: Uniforms(status: UniformStatus.none),
-      protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
     ),
   );
@@ -1704,8 +1672,6 @@ Future<void> _addDummyEnterprises(
         [],
         notApplicableTag: CheckboxWithOther.notApplicableTag,
       ),
-      uniforms: Uniforms(status: UniformStatus.none),
-      protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
     ),
   );
@@ -1763,8 +1729,6 @@ Future<void> _addDummyEnterprises(
         [],
         notApplicableTag: CheckboxWithOther.notApplicableTag,
       ),
-      uniforms: Uniforms(status: UniformStatus.none),
-      protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
     ),
   );
@@ -1817,8 +1781,6 @@ Future<void> _addDummyEnterprises(
         [],
         notApplicableTag: CheckboxWithOther.notApplicableTag,
       ),
-      uniforms: Uniforms(status: UniformStatus.none),
-      protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
     ),
   );
@@ -1880,8 +1842,6 @@ Future<void> _addDummyEnterprises(
         [],
         notApplicableTag: CheckboxWithOther.notApplicableTag,
       ),
-      uniforms: Uniforms(status: UniformStatus.none),
-      protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
     ),
   );
@@ -1937,8 +1897,6 @@ Future<void> _addDummyEnterprises(
         [],
         notApplicableTag: CheckboxWithOther.notApplicableTag,
       ),
-      uniforms: Uniforms(status: UniformStatus.none),
-      protections: Protections(status: ProtectionsStatus.none),
       reservedForId: '',
     ),
   );

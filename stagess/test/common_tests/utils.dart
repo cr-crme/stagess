@@ -143,26 +143,6 @@ JobList dummyJobList() {
   return JobList()..add(dummyJob());
 }
 
-Uniforms dummyUniforms({String? id}) => Uniforms(
-      id: id,
-      status: UniformStatus.suppliedByEnterprise,
-      uniforms: [
-        'Un beau chapeu bleu',
-        'Une belle chemise rouge',
-        'Une cravate jaune peu désirable',
-      ],
-    );
-
-Protections dummyProtections({String? id}) => Protections(
-      id: id,
-      status: ProtectionsStatus.suppliedByEnterprise,
-      protections: [
-        'Une veste de mithril',
-        'Une cotte de maille',
-        'Une drole de bague',
-      ],
-    );
-
 Incidents dummyIncidents({String? id}) => Incidents(
       id: id,
       severeInjuries: [],
@@ -229,8 +209,6 @@ Job dummyJob({
   String id = 'jobId',
   String? incidentsId,
   String? preInternshipId,
-  String? uniformId,
-  String? protectionsId,
 }) =>
     Job(
       id: id,
@@ -241,8 +219,6 @@ Job dummyJob({
       minimumAge: 12,
       preInternshipRequests:
           dummyPreInternshipRequests(id: preInternshipId ?? id),
-      uniforms: dummyUniforms(id: uniformId ?? id),
-      protections: dummyProtections(id: protectionsId ?? id),
       reservedForId: '',
     );
 

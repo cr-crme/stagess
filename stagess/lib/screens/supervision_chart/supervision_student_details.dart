@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/extensions/students_extension.dart';
 import 'package:stagess/common/provider_helpers/students_helpers.dart';
-import 'package:stagess/common/widgets/itemized_text.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/router.dart';
@@ -197,7 +196,6 @@ class _SupervisionStudentDetailsScreenInternal extends StatelessWidget {
                       ),
                       _PersonalNotes(internship: internship),
                       _Schedule(internship: internship),
-                      _buildUniformAndEpi(context, job),
                       _MoreInfoButton(
                         studentId: studentId,
                         onTap: () => _navigateToStudentInternship(context),
@@ -214,58 +212,6 @@ class _SupervisionStudentDetailsScreenInternal extends StatelessWidget {
             ),
     );
   }
-
-  Widget _buildUniformAndEpi(BuildContext context, Job job) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SubTitle('Exigences de l\'entreprise'),
-        Padding(
-          padding: const EdgeInsets.only(left: 32.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildUniform(context, job),
-              const SizedBox(height: 24),
-              _buildProtections(context, job),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildUniform(BuildContext context, Job job) {
-    // Workaround for job.uniforms
-    final uniforms = job.uniforms;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Tenue de travail', style: Theme.of(context).textTheme.titleSmall),
-        uniforms.status == UniformStatus.none
-            ? const Text('Aucune consigne de l\'entreprise')
-            : ItemizedText(uniforms.uniforms),
-      ],
-    );
-  }
-}
-
-Widget _buildProtections(BuildContext context, Job job) {
-  final protections = job.protections;
-
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        'Équipements de protection individuelle',
-        style: Theme.of(context).textTheme.titleSmall,
-      ),
-      protections.status == ProtectionsStatus.none
-          ? const Text('Aucun équipement requis')
-          : ItemizedText(protections.protections),
-    ],
-  );
 }
 
 class _IsOver extends StatelessWidget {

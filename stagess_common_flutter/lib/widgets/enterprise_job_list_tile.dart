@@ -11,7 +11,6 @@ import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/autocomplete_options_builder.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/entity_picker_tile.dart';
-import 'package:stagess_common_flutter/widgets/radio_with_follow_up.dart';
 
 class EnterpriseJobListController {
   BuildContext context;
@@ -53,12 +52,6 @@ class EnterpriseJobListController {
       enterpriseStatus == EnterpriseStatus.active ? _positionsOccupied : {};
 
   late var _preInternshipRequests = _job.preInternshipRequests;
-  late var _uniformStatus = _job.uniforms.status;
-  late final _uniformDescription = TextEditingController(
-    text: _job.uniforms.uniforms.join('\n '),
-  );
-  late var _protectionStatus = _job.protections.status;
-  late var _protections = _job.protections.protections;
 
   final EntityPickerController? _reservedForPickerController;
   String? get _reservedForSchoolId =>
@@ -104,16 +97,6 @@ class EnterpriseJobListController {
         minimumAge: int.tryParse(_minimumAgeController.text),
         positionsOffered: _realPositionsOffered,
         preInternshipRequests: _preInternshipRequests,
-        uniforms: _job.uniforms.copyWith(
-          status: _uniformStatus,
-          uniforms: _uniformStatus == UniformStatus.none
-              ? []
-              : _uniformDescription.text.split('\n'),
-        ),
-        protections: _job.protections.copyWith(
-          status: _protectionStatus,
-          protections: _protections,
-        ),
         reservedForId: _reservedForPickerController == null
             ? _job.reservedForId
             : (_reservedForPickerController?.selectionId ?? ''),
@@ -121,7 +104,6 @@ class EnterpriseJobListController {
 
   void dispose() {
     _minimumAgeController.dispose();
-    _uniformDescription.dispose();
   }
 }
 
@@ -188,22 +170,6 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
           ...job.preInternshipRequests.requests.map((e) => e.toString()),
           job.preInternshipRequests.other ?? '',
         ],
-      ),
-    );
-
-    if (_uniformFormController.value != widget.controller._uniformStatus) {
-      _uniformFormController.forceSet(widget.controller._uniformStatus);
-    }
-
-    if (_protectionsRadioController.value !=
-        widget.controller._protectionStatus) {
-      _protectionsRadioController.forceSet(widget.controller._protectionStatus);
-    }
-    _protectionsCheckboxController.forceSetIfDifferent(
-      comparator: CheckboxWithOtherController(
-        elements: ProtectionsType.values,
-        initialValues:
-            job.protections.protections.map((e) => e.toString()).toList(),
       ),
     );
   }
@@ -309,9 +275,6 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
                     ),
                   _buildPrerequisites(),
                   const SizedBox(height: 8),
-                  _buildUniform(),
-                  const SizedBox(height: 8),
-                  _buildProtections(),
                 ],
               ),
           ],
@@ -540,50 +503,6 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
     );
   }
 
-  late final _uniformFormKey = ValueKey('${job.id}_uniform_form');
-  late final _uniformFormController =
-      RadioWithFollowUpController<UniformStatus>(
-    initialValue: job.uniforms.status,
-  );
-  Widget _buildUniform() {
-    return BuildUniformRadio(
-      uniformKey: _uniformFormKey,
-      controller: _uniformFormController,
-      uniformTextController: widget.controller._uniformDescription,
-      enabled: widget.editMode,
-      onChanged: (value) {
-        widget.controller._uniformStatus = value;
-      },
-    );
-  }
-
-  late final _protectionsRadioKey = ValueKey('${job.id}_protections_radio');
-  late final _protectionsRadioController =
-      RadioWithFollowUpController<ProtectionsStatus>(
-    initialValue: job.protections.status,
-  );
-  late final _protectionsCheckboxKey = ValueKey(
-    '${job.id}_protections_checkbox',
-  );
-  late final _protectionsCheckboxController = CheckboxWithOtherController(
-    elements: ProtectionsType.values,
-    initialValues:
-        job.protections.protections.map((e) => e.toString()).toList(),
-  );
-  Widget _buildProtections() {
-    return BuildProtectionsRadio(
-      radioKey: _protectionsRadioKey,
-      radioController: _protectionsRadioController,
-      checkboxKey: _protectionsCheckboxKey,
-      checkboxController: _protectionsCheckboxController,
-      enabled: widget.editMode,
-      onChanged: (status, protections) {
-        widget.controller._protectionStatus = status;
-        widget.controller._protections = protections;
-      },
-    );
-  }
-
   Widget _buildReservedFor() {
     return Padding(
       padding: const EdgeInsets.only(right: 36.0),
@@ -647,135 +566,6 @@ class BuildPrerequisitesCheckboxes extends StatelessWidget {
         if (onChanged != null) {
           onChanged!(controller.values);
         }
-      },
-    );
-  }
-}
-
-class BuildUniformRadio extends StatelessWidget {
-  const BuildUniformRadio({
-    super.key,
-    this.uniformKey,
-    required this.controller,
-    required this.uniformTextController,
-    this.enabled = true,
-    required this.onChanged,
-    this.hideTitle = false,
-  });
-
-  final Key? uniformKey;
-  final RadioWithFollowUpController<UniformStatus> controller;
-  final TextEditingController uniformTextController;
-  final bool enabled;
-  final bool hideTitle;
-  final Function(UniformStatus) onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return RadioWithFollowUp<UniformStatus>(
-      key: uniformKey,
-      controller: controller,
-      title: hideTitle
-          ? null
-          : 'Est-ce qu\'une tenue de travail spécifique est exigée pour '
-              'ce poste\u00a0?',
-      titleStyle: Theme.of(context).textTheme.bodyLarge,
-      elements: UniformStatus.values,
-      elementsThatShowChild: const [
-        UniformStatus.suppliedByEnterprise,
-        UniformStatus.suppliedByStudent,
-      ],
-      enabled: enabled,
-      onChanged: (value) => onChanged(value!),
-      followUpChild: Padding(
-        padding: const EdgeInsets.only(
-          left: 16.0,
-          right: 8,
-          top: 4,
-          bottom: 12,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Décrire la tenue exigée par l\'entreprise ou les '
-              'règles d\'habillement\u00a0:',
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-            TextFormField(
-              controller: uniformTextController,
-              decoration: const InputDecoration(border: OutlineInputBorder()),
-              enabled: enabled,
-              maxLength: 200,
-              minLines: 1,
-              maxLines: null,
-              keyboardType: TextInputType.multiline,
-              style: const TextStyle(color: Colors.black),
-              validator: (value) =>
-                  value == null || !RegExp('[a-zA-Z0-9]').hasMatch(value)
-                      ? 'Décrire la tenue de travail.'
-                      : null,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class BuildProtectionsRadio extends StatelessWidget {
-  const BuildProtectionsRadio({
-    super.key,
-    this.radioKey,
-    required this.radioController,
-    required this.checkboxKey,
-    required this.checkboxController,
-    this.enabled = true,
-    required this.onChanged,
-    this.hideTitle = false,
-  });
-
-  final Key? radioKey;
-  final RadioWithFollowUpController<ProtectionsStatus> radioController;
-  final Key? checkboxKey;
-  final CheckboxWithOtherController<ProtectionsType> checkboxController;
-  final bool enabled;
-  final Function(ProtectionsStatus status, List<String> protections) onChanged;
-  final bool hideTitle;
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO Remove EPI
-    return RadioWithFollowUp<ProtectionsStatus>(
-      key: radioKey,
-      title: hideTitle
-          ? null
-          : 'Est-ce que l\'élève devra porter des équipements de protection '
-              'individuelle (EPI)\u00a0?',
-      enabled: enabled,
-      titleStyle: Theme.of(context).textTheme.bodyLarge,
-      elements: ProtectionsStatus.values,
-      elementsThatShowChild: const [
-        ProtectionsStatus.suppliedByEnterprise,
-        ProtectionsStatus.suppliedBySchool,
-      ],
-      controller: radioController,
-      followUpChild: CheckboxWithOther<ProtectionsType>(
-        key: checkboxKey,
-        title: 'Lesquels\u00a0:',
-        enabled: enabled,
-        controller: checkboxController,
-        onOptionSelected: (values) {
-          final status = radioController.value ?? ProtectionsStatus.none;
-          final protections = values.map((e) => e.toString()).toList();
-          onChanged(status, protections);
-        },
-        otherMaxLength: 200,
-      ),
-      onChanged: (value) {
-        final status = radioController.value ?? ProtectionsStatus.none;
-        final protections = checkboxController.values;
-        onChanged(status, protections);
       },
     );
   }

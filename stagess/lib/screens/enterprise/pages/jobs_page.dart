@@ -416,8 +416,6 @@ class JobsPageState extends State<JobsPage> {
         preInternshipRequests: PreInternshipRequests.fromStrings(
             _prerequisitesFormKeys[job.id]!.currentState!.prerequisites,
             notApplicableTag: CheckboxWithOther.notApplicableTag),
-        uniforms: _prerequisitesFormKeys[job.id]!.currentState!.uniforms,
-        protections: _prerequisitesFormKeys[job.id]!.currentState!.protections,
       );
       bool isSuccess = true;
       if (job.getDifference(newJob).isNotEmpty) {

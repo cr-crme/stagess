@@ -371,16 +371,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
               idNameToDataTable: 'job_id',
               fieldsToFetch: ['id', 'other', 'is_applicable']),
           sqlInterface.selectSubquery(
-              dataTableName: 'enterprise_job_uniforms',
-              asName: 'uniforms',
-              idNameToDataTable: 'job_id',
-              fieldsToFetch: ['status', 'uniform']),
-          sqlInterface.selectSubquery(
-              dataTableName: 'enterprise_job_protections',
-              asName: 'protections',
-              idNameToDataTable: 'job_id',
-              fieldsToFetch: ['status', 'protection']),
-          sqlInterface.selectSubquery(
               dataTableName: 'enterprise_job_incidents',
               asName: 'incidents',
               idNameToDataTable: 'job_id',
@@ -436,20 +426,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
                     ?.map((e) => e['request'] as int)
                     .toList() ??
                 [];
-        final uniforms = job['uniforms'] as List? ?? [];
-        jobs[job['id']]['uniforms'] = uniforms.isEmpty
-            ? null
-            : {
-                'status': uniforms.first['status'],
-                'uniforms': uniforms.map((e) => e['uniform']).toList()
-              };
-        final protections = job['protections'] as List? ?? [];
-        jobs[job['id']]['protections'] = protections.isEmpty
-            ? null
-            : {
-                'status': protections.first['status'],
-                'protections': protections.map((e) => e['protection']).toList()
-              };
         final incidents = job['incidents'] as List? ?? [];
         jobs[job['id']]['incidents'] = incidents.isEmpty
             ? null
@@ -634,35 +610,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     await Future.wait(toWait);
   }
 
-  Future<void> _insertJobUniforms(Uniforms uniforms, String jobId) async {
-    final status = uniforms.serialize()['status'];
-    final toWait = <Future>[];
-    for (final uniform in uniforms.uniforms) {
-      toWait.add(sqlInterface
-          .performInsertQuery(tableName: 'enterprise_job_uniforms', data: {
-        'job_id': jobId.serialize(),
-        'status': status,
-        'uniform': uniform.serialize(),
-      }));
-    }
-    await Future.wait(toWait);
-  }
-
-  Future<void> _insertJobProtections(
-      Protections protections, String jobId) async {
-    final status = protections.serialize()['status'];
-    final toWait = <Future>[];
-    for (final protection in protections.protections) {
-      toWait.add(sqlInterface
-          .performInsertQuery(tableName: 'enterprise_job_protections', data: {
-        'job_id': jobId.serialize(),
-        'status': status,
-        'protection': protection.serialize(),
-      }));
-    }
-    await Future.wait(toWait);
-  }
-
   Future<void> _insertJobIncidents(Incidents incidents, String jobId) async {
     final serialized = incidents.serialize();
     final toWait = <Future>[];
@@ -701,8 +648,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     toWait.add(_insertJobComments(job.comments, job.id.serialize()));
     toWait.add(_insertJobPreintershipRequests(
         job.preInternshipRequests, job.id.serialize()));
-    toWait.add(_insertJobUniforms(job.uniforms, job.id.serialize()));
-    toWait.add(_insertJobProtections(job.protections, job.id.serialize()));
     toWait.add(_insertJobIncidents(job.incidents, job.id.serialize()));
 
     await Future.wait(toWait);
@@ -802,7 +747,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
         );
       }
 
-      // Position offered, Photos, Comments, Uniforms, protections and incidents are
+      // Position offered, Photos, Comments, and incidents are
       // tricky to update (particularly those who can be removed), so we delete them all
       // and reinsert all of them.
       final toWaitDeleted = <Future>[];
@@ -873,19 +818,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
             filters: {'job_id': job.id}));
         toWait.add(_insertJobPreintershipRequests(
             job.preInternshipRequests, job.id.serialize()));
-      }
-
-      if (differences.contains('uniforms')) {
-        toWaitDeleted.add(sqlInterface.performDeleteQuery(
-            tableName: 'enterprise_job_uniforms', filters: {'job_id': job.id}));
-        toWait.add(_insertJobUniforms(job.uniforms, job.id.serialize()));
-      }
-
-      if (differences.contains('protections')) {
-        toWaitDeleted.add(sqlInterface.performDeleteQuery(
-            tableName: 'enterprise_job_protections',
-            filters: {'job_id': job.id}));
-        toWait.add(_insertJobProtections(job.protections, job.id.serialize()));
       }
 
       if (differences.contains('incidents')) {
