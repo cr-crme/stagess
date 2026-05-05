@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/extensions/job_extension.dart';
 import 'package:stagess/common/widgets/form_fields/low_high_slider_form_field.dart';
@@ -8,6 +9,7 @@ import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
+import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('SupervisionExpansionPanel');
@@ -24,10 +26,20 @@ class SupervisionExpansionPanel extends StatefulWidget {
 
 class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
   var _currentProgramToShow = Program.fms;
+  DateTimeRange? _dateFilter;
 
   List<PostInternshipEnterpriseEvaluation> _getFilteredEvaluations() {
-    final evaluations =
+    var evaluations =
         widget.job.mostRecentPostInternshipEnterpriseEvaluations(context);
+
+    // Only keep evaluations after the date filter
+    if (_dateFilter != null) {
+      evaluations = evaluations
+          .where((eval) =>
+              eval.date.isAfter(_dateFilter!.start) &&
+              eval.date.isBefore(_dateFilter!.end.add(const Duration(days: 1))))
+          .toList();
+    }
 
     // Only keep evaluations from the requested students
     return evaluations
@@ -51,11 +63,11 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
           _buildInfoButton(context, isExpanded: isExpanded),
         ]),
       ),
-      // TODO Add a date filter
       child: Padding(
         padding: const EdgeInsets.only(left: 24.0, right: 24.0),
         child: Column(
           children: [
+            _buildDateFilter(),
             _buildStudentSelector(),
             Padding(
               padding: const EdgeInsets.only(left: 24.0, right: 24, top: 8),
@@ -98,6 +110,47 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
         ),
       ),
     );
+  }
+
+  Widget _buildDateFilter() {
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Padding(
+        padding: const EdgeInsets.only(right: 20.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Période : '
+                '${_dateFilter == null ? 'Toutes' : 'Du ${DateFormat.yMMMd('fr_CA').format(_dateFilter!.start)} au ${DateFormat.yMMMd('fr_CA').format(_dateFilter!.end)}'}'),
+            IconButton(
+              icon: const Icon(
+                Icons.calendar_month_outlined,
+                color: Colors.blue,
+              ),
+              onPressed: () => _promptDate(context),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _promptDate(BuildContext context) async {
+    final newDate = await showCustomDateRangePicker(
+      helpText: 'Sélectionner la date',
+      cancelText: 'Annuler',
+      confirmText: 'Confirmer',
+      context: context,
+      firstDate: DateTime(DateTime.now().year - 5),
+      lastDate: DateTime.now(),
+    );
+    if (newDate == null) {
+      _dateFilter = null;
+    } else {
+      _dateFilter = DateTimeRange(start: newDate.start, end: newDate.end);
+    }
+
+    setState(() {});
   }
 
   Widget _buildStudentSelector() {
