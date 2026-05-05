@@ -1470,7 +1470,7 @@ Future<void> _addDummyEnterprises(
   );
 
   enterprises.add(
-    Enterprise(
+    Enterprise.empty.copyWith(
       schoolBoardId: schoolBoardId,
       name: 'Auto Care',
       status: EnterpriseStatus.active,
@@ -1770,7 +1770,7 @@ Future<void> _addDummyEnterprises(
   );
 
   enterprises.add(
-    Enterprise(
+    Enterprise.empty.copyWith(
       schoolBoardId: schoolBoardId,
       name: 'Subway',
       status: EnterpriseStatus.active,
@@ -1800,7 +1800,7 @@ Future<void> _addDummyEnterprises(
       ),
       phone: PhoneNumber.fromString('514 555 7891'),
       website: 'fausse.ca',
-      headquartersAddress: null,
+      headquartersAddress: Address.empty,
       neq: '6790122996',
     ),
   );
@@ -1886,7 +1886,7 @@ Future<void> _addDummyEnterprises(
     ),
   );
   enterprises.add(
-    Enterprise(
+    Enterprise.empty.copyWith(
       schoolBoardId: schoolBoardId,
       name: 'Le jardin de Joanie',
       status: EnterpriseStatus.active,
@@ -1943,7 +1943,7 @@ Future<void> _addDummyEnterprises(
     ),
   );
   enterprises.add(
-    Enterprise(
+    Enterprise.empty.copyWith(
       schoolBoardId: schoolBoardId,
       name: 'Fleuriste Joli',
       status: EnterpriseStatus.active,

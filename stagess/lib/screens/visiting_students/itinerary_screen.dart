@@ -8,7 +8,6 @@ import 'package:stagess/common/widgets/dialogs/show_pdf_dialog.dart';
 import 'package:stagess/screens/visiting_students/itinerary_pdf_template.dart';
 import 'package:stagess/screens/visiting_students/widgets/routing_map.dart';
 import 'package:stagess/screens/visiting_students/widgets/waypoint_card.dart';
-import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/itineraries/itinerary.dart';
 import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/itineraries/waypoint.dart';
@@ -93,7 +92,7 @@ class _ItineraryMainScreenState extends State<ItineraryMainScreen> {
         Waypoint(
           title: '${student.firstName} ${student.lastName[0]}.',
           subtitle: enterprise.name,
-          address: enterprise.address ?? Address.empty,
+          address: enterprise.address,
           priority: currentTeacher.visitingPriority(internship.id),
         ),
       );

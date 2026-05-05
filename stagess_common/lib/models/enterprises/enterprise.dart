@@ -30,13 +30,13 @@ class Enterprise extends ExtendedItemSerializable {
   final Person contact;
   final String contactFunction;
 
-  final Address? address;
-  final PhoneNumber? phone;
-  final PhoneNumber? fax;
-  final String? website;
+  final Address address;
+  final PhoneNumber phone;
+  final PhoneNumber fax;
+  final String website;
 
-  final Address? headquartersAddress;
-  final String? neq;
+  final Address headquartersAddress;
+  final String neq;
 
   Enterprise({
     super.id,
@@ -47,13 +47,13 @@ class Enterprise extends ExtendedItemSerializable {
     required this.recruiterId,
     required JobList jobs,
     required this.contact,
-    this.contactFunction = '',
-    this.address,
-    this.phone,
-    this.fax,
-    this.website = '',
-    this.headquartersAddress,
-    this.neq = '',
+    required this.contactFunction,
+    required this.address,
+    required this.phone,
+    required this.fax,
+    required this.website,
+    required this.headquartersAddress,
+    required this.neq,
   }) : _jobs = jobs;
 
   static Enterprise get empty => Enterprise(
@@ -64,6 +64,13 @@ class Enterprise extends ExtendedItemSerializable {
         recruiterId: '-1',
         jobs: JobList(),
         contact: Person.empty,
+        contactFunction: '',
+        address: Address.empty,
+        phone: PhoneNumber.empty,
+        fax: PhoneNumber.empty,
+        website: '',
+        headquartersAddress: Address.empty,
+        neq: '',
       );
 
   Enterprise copyWith({
@@ -159,14 +166,12 @@ class Enterprise extends ExtendedItemSerializable {
       contact: contact.copyWithData(data['contact']),
       contactFunction:
           StringExt.from(data['contact_function']) ?? contactFunction,
-      address: address?.copyWithData(data['address']) ??
-          Address.from(data['address']),
+      address: address.copyWithData(data['address']),
       phone: PhoneNumber.from(data['phone']) ?? phone,
       fax: PhoneNumber.from(data['fax']) ?? fax,
       website: StringExt.from(data['website']) ?? website,
       headquartersAddress:
-          headquartersAddress?.copyWithData(data['headquarters_address']) ??
-              Address.from(data['headquarters_address']),
+          headquartersAddress.copyWithData(data['headquarters_address']),
       neq: StringExt.from(data['neq']) ?? neq,
     );
   }
@@ -183,12 +188,12 @@ class Enterprise extends ExtendedItemSerializable {
       'jobs': _jobs.serialize(),
       'contact': contact.serialize(),
       'contact_function': contactFunction.serialize(),
-      'address': address?.serialize(),
-      'phone': phone?.serialize(),
-      'fax': fax?.serialize(),
-      'website': website?.serialize(),
-      'headquarters_address': headquartersAddress?.serialize(),
-      'neq': neq?.serialize(),
+      'address': address.serialize(),
+      'phone': phone.serialize(),
+      'fax': fax.serialize(),
+      'website': website.serialize(),
+      'headquarters_address': headquartersAddress.serialize(),
+      'neq': neq.serialize(),
     };
   }
 
@@ -224,11 +229,12 @@ class Enterprise extends ExtendedItemSerializable {
         _jobs = JobList.fromSerialized(map?['jobs'] ?? {}),
         contact = Person.fromSerialized(map?['contact'] ?? {}),
         contactFunction = StringExt.from(map?['contact_function']) ?? '',
-        address = Address.from(map?['address']),
-        phone = PhoneNumber.from(map?['phone']),
-        fax = PhoneNumber.from(map?['fax']),
-        website = StringExt.from(map?['website']),
-        headquartersAddress = Address.from(map?['headquarters_address']),
-        neq = StringExt.from(map?['neq']),
+        address = Address.from(map?['address']) ?? Address.empty,
+        phone = PhoneNumber.from(map?['phone']) ?? PhoneNumber.empty,
+        fax = PhoneNumber.from(map?['fax']) ?? PhoneNumber.empty,
+        website = StringExt.from(map?['website']) ?? '',
+        headquartersAddress =
+            Address.from(map?['headquarters_address']) ?? Address.empty,
+        neq = StringExt.from(map?['neq']) ?? '',
         super.fromSerialized();
 }

@@ -33,8 +33,8 @@ class EnterpriseCard extends StatelessWidget {
     final availableJobs = [...enterprise.availablejobs(context)];
     jobs.sort(
       (a, b) => a.specialization.name.toLowerCase().compareTo(
-        b.specialization.name.toLowerCase(),
-      ),
+            b.specialization.name.toLowerCase(),
+          ),
     );
 
     return Card(
@@ -52,67 +52,69 @@ class EnterpriseCard extends StatelessWidget {
           children: [
             const SizedBox(height: 8),
             Visibility(
-              visible:
-                  enterprise.address != null ||
-                  enterprise.headquartersAddress != null,
+              visible: enterprise.address.isNotEmpty ||
+                  enterprise.headquartersAddress.isNotEmpty,
               child: Text(
-                enterprise.address != null
-                    ? enterprise.address.toString()
-                    : enterprise.headquartersAddress.toString(),
+                enterprise.address.isEmpty
+                    ? enterprise.headquartersAddress.toString()
+                    : enterprise.address.toString(),
                 style: TextStyle(color: Colors.grey[800]),
               ),
             ),
             ...(enterprise.status != EnterpriseStatus.active
                 ? [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 12, top: 8, bottom: 4),
-                    child: Text(
-                      'Aucun métier actif pour cette entreprise',
-                      style: TextStyle(color: Colors.grey[800]),
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(left: 12, top: 8, bottom: 4),
+                      child: Text(
+                        'Aucun métier actif pour cette entreprise',
+                        style: TextStyle(color: Colors.grey[800]),
+                      ),
                     ),
-                  ),
-                ]
+                  ]
                 : jobs.isEmpty
-                ? [
-                  Padding(
-                    padding: const EdgeInsets.only(left: 12, top: 8, bottom: 4),
-                    child: Text(
-                      'Aucun métier actif pour cette entreprise',
-                      style: TextStyle(color: Colors.grey[800]),
-                    ),
-                  ),
-                ]
-                : jobs.map((job) {
-                  final status = AvailabilityStatus.fromJob(
-                    context,
-                    enterprise: enterprise,
-                    job: job,
-                    availableJobs: availableJobs,
-                  );
-
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: Row(
-                      children: [
-                        DisponibilityCircle(
-                          positionsOffered: job.positionsOffered[schoolId] ?? 0,
-                          positionsOccupied: job.positionsOccupied(
-                            context,
-                            listen: true,
-                          ),
-                          enabled: status.isEnabled,
-                        ),
-                        const SizedBox(width: 8),
-                        Flexible(
+                    ? [
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 12, top: 8, bottom: 4),
                           child: Text(
-                            job.specialization.idWithName,
+                            'Aucun métier actif pour cette entreprise',
                             style: TextStyle(color: Colors.grey[800]),
                           ),
                         ),
-                      ],
-                    ),
-                  );
-                })),
+                      ]
+                    : jobs.map((job) {
+                        final status = AvailabilityStatus.fromJob(
+                          context,
+                          enterprise: enterprise,
+                          job: job,
+                          availableJobs: availableJobs,
+                        );
+
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Row(
+                            children: [
+                              DisponibilityCircle(
+                                positionsOffered:
+                                    job.positionsOffered[schoolId] ?? 0,
+                                positionsOccupied: job.positionsOccupied(
+                                  context,
+                                  listen: true,
+                                ),
+                                enabled: status.isEnabled,
+                              ),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                  job.specialization.idWithName,
+                                  style: TextStyle(color: Colors.grey[800]),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      })),
           ],
         ),
         trailing: Visibility(

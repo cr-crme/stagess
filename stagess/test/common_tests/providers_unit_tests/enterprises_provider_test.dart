@@ -22,7 +22,7 @@ void main() {
         mockMe: true,
       );
       enterprises.add(
-        Enterprise(
+        Enterprise.empty.copyWith(
           schoolBoardId: 'Test',
           name: 'Test Enterprise',
           status: EnterpriseStatus.active,

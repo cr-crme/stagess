@@ -495,8 +495,8 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
             ? null
             : enterprise.recruiterId.serialize(),
         'contact_function': enterprise.contactFunction.serialize(),
-        'website': enterprise.website?.serialize(),
-        'neq': enterprise.neq?.serialize(),
+        'website': enterprise.website.serialize(),
+        'neq': enterprise.neq.serialize(),
       },
     );
   }
@@ -529,10 +529,10 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       toUpdate['contact_function'] = enterprise.contactFunction.serialize();
     }
     if (differences.contains('website')) {
-      toUpdate['website'] = enterprise.website?.serialize();
+      toUpdate['website'] = enterprise.website.serialize();
     }
     if (differences.contains('neq')) {
-      toUpdate['neq'] = enterprise.neq?.serialize();
+      toUpdate['neq'] = enterprise.neq.serialize();
     }
 
     if (toUpdate.isNotEmpty) {
@@ -928,14 +928,13 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
   }
 
   Future<void> _insertToEnterpriseAddress(Enterprise enterprise) async {
-    if (enterprise.address == null) return;
     await sqlInterface.performInsertAddress(
-        address: enterprise.address!, entityId: enterprise.id);
+        address: enterprise.address, entityId: enterprise.id);
     await sqlInterface.performInsertQuery(
         tableName: 'enterprise_addresses',
         data: {
           'enterprise_id': enterprise.id,
-          'address_id': enterprise.address!.id
+          'address_id': enterprise.address.id
         });
   }
 
@@ -944,27 +943,19 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     final toUpdate = enterprise.getDifference(previous);
     if (!toUpdate.contains('address')) return;
 
-    if (previous.address == null) {
-      await _insertToEnterpriseAddress(enterprise);
-    } else if (enterprise.address == null) {
-      await sqlInterface.performDeleteAddress(address: previous.address!);
-    } else {
-      await sqlInterface.performUpdateAddress(
-          address: enterprise.address!, previous: previous.address!);
-    }
+    await sqlInterface.performUpdateAddress(
+        address: enterprise.address, previous: previous.address);
   }
 
   Future<void> _insertToEnterpriseHeadquartersAddress(
       Enterprise enterprise) async {
-    if (enterprise.headquartersAddress == null) return;
-
     await sqlInterface.performInsertAddress(
-        address: enterprise.headquartersAddress!, entityId: enterprise.id);
+        address: enterprise.headquartersAddress, entityId: enterprise.id);
     await sqlInterface.performInsertQuery(
         tableName: 'enterprise_headquarters_addresses',
         data: {
           'enterprise_id': enterprise.id,
-          'address_id': enterprise.headquartersAddress!.id
+          'address_id': enterprise.headquartersAddress.id
         });
   }
 
@@ -973,28 +964,19 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     final toUpdate = enterprise.getDifference(previous);
     if (!toUpdate.contains('headquarters_address')) return;
 
-    if (previous.headquartersAddress == null) {
-      await _insertToEnterpriseHeadquartersAddress(enterprise);
-    } else if (enterprise.headquartersAddress == null) {
-      await sqlInterface.performDeleteAddress(
-          address: previous.headquartersAddress!);
-    } else {
-      await sqlInterface.performUpdateAddress(
-          address: enterprise.headquartersAddress!,
-          previous: previous.headquartersAddress!);
-    }
+    await sqlInterface.performUpdateAddress(
+        address: enterprise.headquartersAddress,
+        previous: previous.headquartersAddress);
   }
 
   Future<void> _insertToEnterprisePhoneNumber(Enterprise enterprise) async {
-    if (enterprise.phone == null) return;
-
     await sqlInterface.performInsertPhoneNumber(
-        phoneNumber: enterprise.phone!, entityId: enterprise.id);
+        phoneNumber: enterprise.phone, entityId: enterprise.id);
     await sqlInterface.performInsertQuery(
         tableName: 'enterprise_phone_numbers',
         data: {
           'enterprise_id': enterprise.id,
-          'phone_number_id': enterprise.phone!.id
+          'phone_number_id': enterprise.phone.id
         });
   }
 
@@ -1003,26 +985,18 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     final toUpdate = enterprise.getDifference(previous);
     if (!toUpdate.contains('phone')) return;
 
-    if (previous.phone == null) {
-      await _insertToEnterprisePhoneNumber(enterprise);
-    } else if (enterprise.phone == null) {
-      await sqlInterface.performDeletePhoneNumber(phoneNumber: previous.phone!);
-    } else {
-      await sqlInterface.performUpdatePhoneNumber(
-          phoneNumber: enterprise.phone!, previous: previous.phone!);
-    }
+    await sqlInterface.performUpdatePhoneNumber(
+        phoneNumber: enterprise.phone, previous: previous.phone);
   }
 
   Future<void> _insertToEnterpriseFax(Enterprise enterprise) async {
-    if (enterprise.fax == null) return;
-
     await sqlInterface.performInsertPhoneNumber(
-        phoneNumber: enterprise.fax!, entityId: enterprise.id);
+        phoneNumber: enterprise.fax, entityId: enterprise.id);
     await sqlInterface.performInsertQuery(
         tableName: 'enterprise_fax_numbers',
         data: {
           'enterprise_id': enterprise.id,
-          'fax_number_id': enterprise.fax!.id
+          'fax_number_id': enterprise.fax.id
         });
   }
 
@@ -1031,14 +1005,8 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     final toUpdate = enterprise.getDifference(previous);
     if (!toUpdate.contains('fax')) return;
 
-    if (previous.fax == null) {
-      await _insertToEnterpriseFax(enterprise);
-    } else if (enterprise.fax == null) {
-      await sqlInterface.performDeletePhoneNumber(phoneNumber: previous.fax!);
-    } else {
-      await sqlInterface.performUpdatePhoneNumber(
-          phoneNumber: enterprise.fax!, previous: previous.fax!);
-    }
+    await sqlInterface.performUpdatePhoneNumber(
+        phoneNumber: enterprise.fax, previous: previous.fax);
   }
 
   @override
@@ -1121,15 +1089,18 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       await sqlInterface.beginTransaction();
 
       final enterprise = await _getEnterpriseById(id: id, user: user);
+      if (enterprise == null) {
+        throw InvalidRequestException('Enterprise with id $id not found');
+      }
 
-      if (enterprise?.jobs != null) {
-        if (internshipsRepository == null) {
+      if (enterprise.jobs.isNotEmpty) {
+        if (enterprise.jobs.isNotEmpty && internshipsRepository == null) {
           throw InvalidRequestException(
               'Cannot delete an enterprise with jobs without an internships repository');
         }
-        for (final job in enterprise!.jobs) {
+        for (final job in enterprise.jobs) {
           await _deleteInternshipsFromJob(job.id,
-              user: user, internshipsRepository: internshipsRepository);
+              user: user, internshipsRepository: internshipsRepository!);
         }
         out.deletedData ??= {};
         out.deletedData![RequestFields.internship] = {
@@ -1150,37 +1121,27 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
         filters: {'shared_id': id},
       );
 
-      if (enterprise?.address?.id != null) {
-        await sqlInterface.performDeleteQuery(
-          tableName: 'addresses',
-          filters: {'entity_id': enterprise!.address!.id},
-        );
-      }
-      if (enterprise?.headquartersAddress?.id != null) {
-        await sqlInterface.performDeleteQuery(
-          tableName: 'addresses',
-          filters: {'entity_id': enterprise!.headquartersAddress!.id},
-        );
-      }
-      if (enterprise?.phone?.id != null) {
-        await sqlInterface.performDeleteQuery(
-          tableName: 'phone_numbers',
-          filters: {'entity_id': enterprise!.phone!.id},
-        );
-      }
-      if (enterprise?.fax?.id != null) {
-        await sqlInterface.performDeleteQuery(
-          tableName: 'phone_numbers',
-          filters: {'entity_id': enterprise!.fax!.id},
-        );
-      }
+      await sqlInterface.performDeleteQuery(
+        tableName: 'addresses',
+        filters: {'entity_id': enterprise.address.id},
+      );
+      await sqlInterface.performDeleteQuery(
+        tableName: 'addresses',
+        filters: {'entity_id': enterprise.headquartersAddress.id},
+      );
+      await sqlInterface.performDeleteQuery(
+        tableName: 'phone_numbers',
+        filters: {'entity_id': enterprise.phone.id},
+      );
+      await sqlInterface.performDeleteQuery(
+        tableName: 'phone_numbers',
+        filters: {'entity_id': enterprise.fax.id},
+      );
 
-      if (enterprise?.contact.id != null) {
-        await sqlInterface.performDeleteQuery(
-          tableName: 'entities',
-          filters: {'shared_id': enterprise!.contact.id},
-        );
-      }
+      await sqlInterface.performDeleteQuery(
+        tableName: 'entities',
+        filters: {'shared_id': enterprise.contact.id},
+      );
 
       out.deletedData ??= {};
       out.deletedData![RequestFields.enterprise] ??= {id: FetchableFields.all};
@@ -1199,7 +1160,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
 class EnterprisesRepositoryMock extends EnterprisesRepository {
   // Simulate a database with a map
   final _dummyDatabase = {
-    '0': Enterprise(
+    '0': Enterprise.empty.copyWith(
       id: '0',
       schoolBoardId: '0',
       name: 'My First Enterprise',
@@ -1212,7 +1173,7 @@ class EnterprisesRepositoryMock extends EnterprisesRepository {
       phone: PhoneNumber.fromString('123-456-7890'),
       fax: PhoneNumber.fromString('098-765-4321'),
     ),
-    '1': Enterprise(
+    '1': Enterprise.empty.copyWith(
       id: '1',
       schoolBoardId: '0',
       name: 'My Second Enterprise',

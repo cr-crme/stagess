@@ -242,7 +242,7 @@ class _StudentInternshipListViewState
                                 .copyWith(fontWeight: FontWeight.bold),
                           ),
                         ),
-                        Text(enterprise.address?.toString() ?? ''),
+                        Text(enterprise.address.toString()),
                         Text(
                             '${DateFormat.yMMMd('fr_CA').format(internship.currentContract?.dates.start ?? DateTime.now())} - $endDate'),
                         if (internship.isActive &&

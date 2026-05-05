@@ -12,7 +12,6 @@ import 'package:stagess/screens/enterprises_list/widgets/enterprise_card.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
-import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/itineraries/waypoint.dart';
 import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
@@ -343,7 +342,7 @@ class _EnterprisesByMap extends StatelessWidget {
         SchoolBoardsProvider.of(context, listen: false).currentSchool;
     if (school == null) return out;
 
-    final schoolAsEnterprise = Enterprise(
+    final schoolAsEnterprise = Enterprise.empty.copyWith(
       schoolBoardId: schoolBoard.id,
       status: EnterpriseStatus.active,
       name: school.name,
@@ -359,7 +358,7 @@ class _EnterprisesByMap extends StatelessWidget {
     for (final enterprise in enterprises) {
       out[enterprise] = Waypoint(
         title: enterprise.name,
-        address: enterprise.address ?? Address.empty,
+        address: enterprise.address,
       );
     }
     return out;

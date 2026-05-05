@@ -143,7 +143,7 @@ class AboutPageState extends State<AboutPage> {
               ),
               EmailListTile(
                 controller: contactEmailController,
-                isMandatory: false, // TODO Make this not mandatory
+                isMandatory: false,
                 enabled: true,
                 canMail: false,
               ),

@@ -251,7 +251,7 @@ Enterprise dummyEnterprise({bool addJob = false}) {
   if (addJob) {
     jobs.add(dummyJob());
   }
-  return Enterprise(
+  return Enterprise.empty.copyWith(
     schoolBoardId: 'schoolBoardId',
     id: 'enterpriseId',
     name: 'Not named',

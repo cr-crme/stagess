@@ -484,11 +484,11 @@ class _Contact extends StatelessWidget {
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        enterprise.address == null
-                            ? 'Aucune adresse'
-                            : '${enterprise.address!.civicNumber} ${enterprise.address!.street}\n'
-                                '${enterprise.address!.city}\n'
-                                '${enterprise.address!.postalCode}',
+                        enterprise.address.isEmpty
+                            ? 'Aucune adresse fournie'
+                            : '${enterprise.address.civicNumber} ${enterprise.address.street}\n'
+                                '${enterprise.address.city}\n'
+                                '${enterprise.address.postalCode}',
                       ),
                     ],
                   ),

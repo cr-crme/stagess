@@ -139,40 +139,35 @@ class EnterpriseAboutPageState extends State<EnterpriseAboutPage> {
         firstName: _contactInfoController.firstName.text,
         lastName: _contactInfoController.lastName.text,
         phone: _contactInfoController.contactPhone.text == ''
-            ? null
+            ? PhoneNumber.empty
+                .copyWith(id: widget.enterprise.contact.phone?.id)
             : PhoneNumber.fromString(
                 _contactInfoController.contactPhone.text,
                 id: widget.enterprise.contact.phone?.id,
               ),
         email: _contactInfoController.contactEmail.text,
       ),
-      contactFunction: _contactInfoController.contactFunction.text == ''
-          ? null
-          : _contactInfoController.contactFunction.text,
+      contactFunction: _contactInfoController.contactFunction.text,
       address: _enterpriseInfoController.address.address,
       phone: _enterpriseInfoController.phone.text == ''
-          ? null
+          ? PhoneNumber.empty.copyWith(id: widget.enterprise.phone.id)
           : PhoneNumber.fromString(
               _enterpriseInfoController.phone.text,
-              id: widget.enterprise.phone?.id,
+              id: widget.enterprise.phone.id,
             ),
       fax: _enterpriseInfoController.fax.text == ''
-          ? null
+          ? PhoneNumber.empty.copyWith(id: widget.enterprise.fax.id)
           : PhoneNumber.fromString(
               _enterpriseInfoController.fax.text,
-              id: widget.enterprise.fax?.id,
+              id: widget.enterprise.fax.id,
             ),
-      website: _enterpriseInfoController.website.text == ''
-          ? null
-          : _enterpriseInfoController.website.text,
+      website: _enterpriseInfoController.website.text,
       headquartersAddress: _taxesInfoController.useSameAddress
           ? _enterpriseInfoController.address.address?.copyWith(
               id: _taxesInfoController.address.address?.id,
             )
           : _taxesInfoController.address.address,
-      neq: _taxesInfoController.neq.text == ''
-          ? null
-          : _taxesInfoController.neq.text,
+      neq: _taxesInfoController.neq.text,
     );
     if (widget.enterprise.getDifference(newEnteprise).isEmpty) {
       if (mounted) {
@@ -245,30 +240,28 @@ class EnterpriseAboutPageState extends State<EnterpriseAboutPage> {
     }
 
     if (_enterpriseInfoController.address.address?.toString() !=
-        widget.enterprise.address?.toString()) {
+        widget.enterprise.address.toString()) {
       _enterpriseInfoController.address.address = widget.enterprise.address;
     }
     if (_enterpriseInfoController.phone.text !=
-        widget.enterprise.phone?.toString()) {
-      _enterpriseInfoController.phone.text =
-          widget.enterprise.phone?.toString() ?? '';
+        widget.enterprise.phone.toString()) {
+      _enterpriseInfoController.phone.text = widget.enterprise.phone.toString();
     }
     if (_enterpriseInfoController.fax.text !=
-        widget.enterprise.fax?.toString()) {
-      _enterpriseInfoController.fax.text =
-          widget.enterprise.fax?.toString() ?? '';
+        widget.enterprise.fax.toString()) {
+      _enterpriseInfoController.fax.text = widget.enterprise.fax.toString();
     }
     if (_enterpriseInfoController.website.text != widget.enterprise.website) {
-      _enterpriseInfoController.website.text = widget.enterprise.website ?? '';
+      _enterpriseInfoController.website.text = widget.enterprise.website;
     }
 
     if (_taxesInfoController.address.address?.toString() !=
-        widget.enterprise.headquartersAddress?.toString()) {
+        widget.enterprise.headquartersAddress.toString()) {
       _taxesInfoController.address.address =
           widget.enterprise.headquartersAddress;
     }
     if (_taxesInfoController.neq.text != widget.enterprise.neq) {
-      _taxesInfoController.neq.text = widget.enterprise.neq ?? '';
+      _taxesInfoController.neq.text = widget.enterprise.neq;
     }
   }
 
@@ -467,7 +460,7 @@ class _ContactInfo extends StatelessWidget {
                 controller: controller.contactPhone,
                 titleStyle: styleOverride,
                 contentStyle: styleOverride,
-                isMandatory: false, // TODO Make this not mandatory
+                isMandatory: false,
                 enabled: editMode,
               ),
               const SizedBox(height: 8),
@@ -476,7 +469,7 @@ class _ContactInfo extends StatelessWidget {
                 titleStyle: styleOverride,
                 contentStyle: styleOverride,
                 enabled: editMode,
-                isMandatory: true,
+                isMandatory: false,
               ),
             ],
           ),
@@ -512,9 +505,9 @@ class _EnterpriseInfoController {
     name.text = enterprise.name;
     activityTypes.activityTypes = enterprise.activityTypes;
     address.initialValue = enterprise.address;
-    phone.text = enterprise.phone?.toString() ?? '';
-    fax.text = enterprise.fax?.toString() ?? '';
-    website.text = enterprise.website ?? '';
+    phone.text = enterprise.phone.toString();
+    fax.text = enterprise.fax.toString();
+    website.text = enterprise.website;
   }
 
   void dispose() {
@@ -631,13 +624,12 @@ class _TaxesInfoController {
 
   _TaxesInfoController({required this.enterprise}) {
     reset();
-    address.initialValue = enterprise.headquartersAddress ??
-        enterprise.address?.copyWith(id: Address.empty.id);
+    address.initialValue = enterprise.headquartersAddress;
   }
 
   void reset() {
     address.address = enterprise.headquartersAddress;
-    neq.text = enterprise.neq ?? '';
+    neq.text = enterprise.neq;
     useSameAddress = enterprise.address.toString() ==
         enterprise.headquartersAddress.toString();
   }

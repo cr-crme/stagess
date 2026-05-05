@@ -37,7 +37,9 @@ class ValidationPage extends StatelessWidget {
           Text(enterprise.name.isEmpty ? 'Non spécifié' : enterprise.name),
           const SizedBox(height: 8),
           Text('Adresse', style: Theme.of(context).textTheme.titleSmall),
-          Text(enterprise.address?.toString() ?? 'Non spécifiée'),
+          Text(enterprise.address.toString().isEmpty
+              ? 'Non spécifiée'
+              : enterprise.address.toString()),
           const SizedBox(height: 8),
           Text(
             'Téléphone de l\'établissement',

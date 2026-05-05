@@ -70,12 +70,12 @@ void main() {
       expect(enterpriseDifferent.jobs[0].id, 'newJobId');
       expect(enterpriseDifferent.contact.fullName, 'Pariterre Nobody');
       expect(enterpriseDifferent.contactFunction, 'newContactFunction');
-      expect(enterpriseDifferent.address!.id, 'newAddressId');
+      expect(enterpriseDifferent.address.id, 'newAddressId');
       expect(enterpriseDifferent.phone.toString(), '(866) 666-6666');
       expect(enterpriseDifferent.fax.toString(), '(866) 666-6666');
       expect(enterpriseDifferent.website, 'newWebsite');
       expect(
-        enterpriseDifferent.headquartersAddress!.id,
+        enterpriseDifferent.headquartersAddress.id,
         'newHeadquartersAddressId',
       );
       expect(enterpriseDifferent.neq, 'newNeq');
@@ -206,11 +206,11 @@ void main() {
         'jobs': enterprise.jobs.serialize(),
         'contact': enterprise.contact.serialize(),
         'contact_function': enterprise.contactFunction,
-        'address': enterprise.address?.serialize(),
-        'phone': enterprise.phone?.serialize(),
-        'fax': enterprise.fax?.serialize(),
+        'address': enterprise.address.serialize(),
+        'phone': enterprise.phone.serialize(),
+        'fax': enterprise.fax.serialize(),
         'website': enterprise.website,
-        'headquarters_address': enterprise.headquartersAddress?.serialize(),
+        'headquarters_address': enterprise.headquartersAddress.serialize(),
         'status': enterprise.status.index,
         'neq': enterprise.neq,
       });
@@ -223,13 +223,13 @@ void main() {
       expect(deserialized.jobs[0].id, enterprise.jobs[0].id);
       expect(deserialized.contact.id, enterprise.contact.id);
       expect(deserialized.contactFunction, enterprise.contactFunction);
-      expect(deserialized.address?.id, enterprise.address?.id);
+      expect(deserialized.address.id, enterprise.address.id);
       expect(deserialized.phone.toString(), enterprise.phone.toString());
       expect(deserialized.fax.toString(), enterprise.fax.toString());
       expect(deserialized.website, enterprise.website);
       expect(
-        deserialized.headquartersAddress?.id,
-        enterprise.headquartersAddress?.id,
+        deserialized.headquartersAddress.id,
+        enterprise.headquartersAddress.id,
       );
       expect(deserialized.status.index, enterprise.status.index);
       expect(deserialized.neq, enterprise.neq);
