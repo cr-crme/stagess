@@ -653,7 +653,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                       key: ValueKey(jobId),
                       controller: _jobControllers[jobId]!,
                       schools: _currentSchoolBoard?.schools ?? [],
-                      editMode: false,
+                      editMode: _isEditing,
                       onRequestDelete:
                           hasInternship ? null : () => _deleteJob(jobId),
                       initialExpandedState:
@@ -763,7 +763,8 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                     Expanded(
                       child: TextFormField(
                         controller: _contactFirstNameController,
-                        decoration: const InputDecoration(labelText: 'Prénom'),
+                        decoration:
+                            const InputDecoration(labelText: '* Prénom'),
                         maxLength: 50,
                         validator: (value) {
                           if (value?.isEmpty == true) {
@@ -778,7 +779,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                       child: TextFormField(
                         controller: _contactLastNameController,
                         decoration: const InputDecoration(
-                          labelText: 'Nom de famille',
+                          labelText: '* Nom de famille',
                         ),
                         maxLength: 50,
                         validator: (value) {
@@ -795,8 +796,11 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                 TextFormField(
                   controller: _contactFunctionController,
                   decoration: const InputDecoration(
-                    labelText: 'Fonction dans l\'entreprise',
+                    labelText: '* Fonction dans l\'entreprise',
                   ),
+                  validator: (value) => value?.isEmpty == true
+                      ? 'La fonction du contact est requise'
+                      : null,
                   maxLength: 50,
                 ),
               const SizedBox(height: 4),

@@ -158,7 +158,10 @@ class Enterprise extends ExtendedItemSerializable {
       recruiterId: StringExt.from(data['recruiter_id']) ?? recruiterId,
       jobs: JobList()
         ..addAll(ListExt.mergeWithData(
-          _jobs.toList(),
+          _jobs
+              .where(
+                  (job) => (data['jobs'] as Map?)?.containsKey(job.id) ?? false)
+              .toList(),
           (data['jobs'] as Map?)?.values.toList(),
           copyWithData: (job, serialized) => job.copyWithData(serialized),
           deserializer: (serialized) => Job.fromSerialized(serialized),
