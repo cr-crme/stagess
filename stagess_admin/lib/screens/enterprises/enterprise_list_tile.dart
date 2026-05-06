@@ -659,6 +659,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                       initialExpandedState:
                           _jobControllers[jobId]!.specialization?.idWithName ==
                               null,
+                      showExtended: !widget.forceEditingMode,
                     );
                   }),
                 ],

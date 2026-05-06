@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/school_boards/school.dart';
@@ -11,6 +12,7 @@ import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/autocomplete_options_builder.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/entity_picker_tile.dart';
+import 'package:stagess_common_flutter/widgets/itemized_text.dart';
 
 class EnterpriseJobListController {
   BuildContext context;
@@ -121,6 +123,7 @@ class EnterpriseJobListTile extends StatefulWidget {
     this.showHeader = true,
     this.jobPickerPadding,
     this.availabilityIsMandatory = false,
+    this.showExtended = false,
   });
 
   final EnterpriseJobListController controller;
@@ -134,6 +137,7 @@ class EnterpriseJobListTile extends StatefulWidget {
   final bool showHeader;
   final EdgeInsets? jobPickerPadding;
   final bool availabilityIsMandatory;
+  final bool showExtended;
 
   @override
   State<EnterpriseJobListTile> createState() => _EnterpriseJobListTileState();
@@ -274,7 +278,19 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
                       ],
                     ),
                   _buildPrerequisites(),
-                  const SizedBox(height: 8),
+                  if (widget.showExtended)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: AnimatedExpandingCard(
+                          elevation: 0.0,
+                          header: (context, isExpanded) => Text(
+                              isExpanded
+                                  ? 'Moins de détails sur le métier...'
+                                  : 'Plus de détails sur le métier...',
+                              style: Theme.of(context).textTheme.titleSmall),
+                          child: _buildMoreDetails()),
+                    ),
+                  const SizedBox(height: 12),
                 ],
               ),
           ],
@@ -490,6 +506,7 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
       job.preInternshipRequests.other ?? '',
     ],
   );
+
   Widget _buildPrerequisites() {
     return BuildPrerequisitesCheckboxes(
       checkboxKey: _preInternshipRequestKey,
@@ -531,6 +548,68 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildMoreDetails() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 12),
+        Text('Accidents et incidents liés à ce métier',
+            style: Theme.of(context).textTheme.titleSmall),
+        Padding(
+          padding: const EdgeInsets.only(left: 12.0, top: 8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // TODO Factorize this with the same code in teacher side?
+              _buildIncidents(context,
+                  titleIfNotHasIncidents: 'Aucune blessure grave d\'élève',
+                  titleIfHasIncidents: 'Blessures graves d\'élèves',
+                  incidents: job.incidents.severeInjuries),
+              const SizedBox(height: 8),
+              _buildIncidents(context,
+                  titleIfNotHasIncidents:
+                      'Aucun cas d\'agression ou de harcèlement',
+                  titleIfHasIncidents: 'Cas d\'agression ou de harcèlement',
+                  incidents: job.incidents.verbalAbuses),
+              const SizedBox(height: 8),
+              _buildIncidents(context,
+                  titleIfNotHasIncidents: 'Aucune blessure mineure',
+                  titleIfHasIncidents: 'Blessures mineures d\'élèves',
+                  incidents: job.incidents.minorInjuries),
+            ],
+            // TODO add evaluations? (Refactor of the code so it is accessible here)
+            // TODO add comments
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildIncidents(
+    BuildContext context, {
+    required String titleIfNotHasIncidents,
+    required String titleIfHasIncidents,
+    required List<Incident> incidents,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          incidents.isEmpty ? titleIfNotHasIncidents : titleIfHasIncidents,
+          style: Theme.of(context).textTheme.titleSmall,
+        ),
+        if (incidents.isNotEmpty)
+          ItemizedText(incidents.map((e) {
+            final teacher =
+                TeachersProvider.of(context, listen: false).fromId(e.teacherId);
+            return '${e.toString()}\nIncident rapporté par ${teacher.fullName}, le ${DateFormat.yMMMEd('fr_CA').format(e.date)}';
+          }).toList()),
+      ],
     );
   }
 }

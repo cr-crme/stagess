@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:stagess/common/widgets/itemized_text.dart';
 import 'package:stagess/screens/ref_sst/incident_history/models/incidents_by_enterprise.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
+import 'package:stagess_common_flutter/widgets/itemized_text.dart';
 
 class IncidentListTile extends StatelessWidget {
   const IncidentListTile({
