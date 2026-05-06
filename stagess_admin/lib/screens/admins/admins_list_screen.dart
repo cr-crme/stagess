@@ -32,10 +32,9 @@ class AdminsListScreen extends StatelessWidget {
 
     final admins = <SchoolBoard?, List<Admin>>{};
     for (final schoolBoard in schoolBoards) {
-      admins[schoolBoard] =
-          allAdmins
-              .where((admin) => admin.schoolBoardId == schoolBoard.id)
-              .toList();
+      admins[schoolBoard] = allAdmins
+          .where((admin) => admin.schoolBoardId == schoolBoard.id)
+          .toList();
     }
     admins[null] =
         allAdmins.where((admin) => admin.schoolBoardId == '').toList();
@@ -44,25 +43,19 @@ class AdminsListScreen extends StatelessWidget {
   }
 
   Future<void> _showAddAdminDialog(BuildContext context) async {
-    final answer = await showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => AddAdminDialog(),
-    );
-    if (answer is! Admin || !context.mounted) return;
-
-    final isSuccess = await AdminsProvider.of(
-      context,
-      listen: false,
-    ).addWithConfirmation(answer);
+    final isConfirmed = await showDialog<bool>(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) => AddAdminDialog(),
+        ) ??
+        false;
     if (!context.mounted) return;
 
     showSnackBar(
       context,
-      message:
-          isSuccess
-              ? 'Administrateur·trice ajouté·e avec succès'
-              : 'Échec de l\'ajout de l\'administrateur·trice',
+      message: isConfirmed
+          ? 'Administrateur·trice ajouté·e avec succès'
+          : 'Aucun administrateur·trice n\'a été ajouté·e',
     );
   }
 
@@ -97,14 +90,13 @@ class AdminsListScreen extends StatelessWidget {
                 (schoolBoardEntry) => Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: AnimatedExpandingCard(
-                    header:
-                        (ctx, isExpanded) => Text(
-                          schoolBoardEntry.key?.name ??
-                              'Super administrateurs·trices',
-                          style: Theme.of(
-                            context,
-                          ).textTheme.titleLarge!.copyWith(color: Colors.black),
-                        ),
+                    header: (ctx, isExpanded) => Text(
+                      schoolBoardEntry.key?.name ??
+                          'Super administrateurs·trices',
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleLarge!.copyWith(color: Colors.black),
+                    ),
                     elevation: 0.0,
                     initialExpandedState: true,
                     child: Column(

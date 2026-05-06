@@ -191,8 +191,12 @@ class MySqlTeachersRepository extends TeachersRepository {
               : {'school_board_id': user.schoolBoardId ?? ''}),
         subqueries: [
           sqlInterface.selectSubquery(
+            dataTableName: 'users',
+            fieldsToFetch: ['email'],
+          ),
+          sqlInterface.selectSubquery(
             dataTableName: 'persons',
-            fieldsToFetch: ['first_name', 'last_name', 'email'],
+            fieldsToFetch: ['first_name', 'last_name'],
           ),
           sqlInterface.selectSubquery(
               dataTableName: 'phone_numbers',
@@ -232,8 +236,12 @@ class MySqlTeachersRepository extends TeachersRepository {
     final map = <String, Teacher>{};
     for (final teacher in teachers) {
       final id = teacher['id'].toString();
-      teacher
-          .addAll((teacher['persons'] as List).first as Map<String, dynamic>);
+      teacher.addAll(
+          (teacher['users'] as List?)?.firstOrNull as Map<String, dynamic>? ??
+              {});
+      teacher.addAll(
+          (teacher['persons'] as List?)?.firstOrNull as Map<String, dynamic>? ??
+              {});
       final teachingGroups = teacher['teaching_groups'] as List?;
       teacher['groups'] =
           teachingGroups?.map((map) => map['group_name'] as String).toList();
@@ -301,6 +309,7 @@ class MySqlTeachersRepository extends TeachersRepository {
 
     await sqlInterface.performInsertPerson(
         person: teacher, skipAddingEntity: entity != null);
+    await sqlInterface.performInsertUser(id: teacher.id, email: teacher.email);
     await sqlInterface.performInsertQuery(tableName: 'teachers', data: {
       'id': teacher.id,
       'school_board_id': teacher.schoolBoardId,
@@ -343,7 +352,8 @@ class MySqlTeachersRepository extends TeachersRepository {
     }
 
     // Update the persons table if needed
-    await sqlInterface.performUpdatePerson(person: teacher, previous: previous);
+    await sqlInterface.performUpdatePerson(
+        person: teacher, previous: previous, canChangeEmail: false);
   }
 
   Future<void> _insertToGroups(Teacher teacher) async {
@@ -486,6 +496,7 @@ class MySqlTeachersRepository extends TeachersRepository {
         toWait.add(_updateToItineraries(teacher, previous));
         toWait.add(_updateToPriorities(user, teacher, previous));
       }
+
       await Future.wait(toWait);
       await sqlInterface.commitTransaction();
     } catch (e) {
@@ -501,12 +512,17 @@ class MySqlTeachersRepository extends TeachersRepository {
 
     // Delete the teacher from the database
     try {
+      await sqlInterface.beginTransaction();
+
       await sqlInterface.performDeleteQuery(
         tableName: 'entities',
         filters: {'shared_id': id},
       );
+
+      await sqlInterface.commitTransaction();
       return id;
     } catch (e) {
+      await sqlInterface.rollbackTransaction();
       return null;
     }
   }

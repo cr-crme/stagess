@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/admins/admin_list_tile.dart';
 import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
+import 'package:stagess_common_flutter/providers/admins_provider.dart';
 
 class AddAdminDialog extends StatefulWidget {
   const AddAdminDialog({super.key});
@@ -18,7 +19,34 @@ class _AddAdminDialogState extends State<AddAdminDialog> {
 
     // Validate the form
     if (!(await state.validate()) || !mounted) return;
-    Navigator.of(context).pop(state.editedAdmin);
+    final newAdmin = state.editedAdmin;
+
+    final isConfirmed = await AdminsProvider.of(context, listen: false)
+        .addWithConfirmation(newAdmin);
+    if (!mounted) return;
+
+    if (!isConfirmed) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Échec de l\'ajout de l\'administrateur·trice'),
+          content: SizedBox(
+            width: ResponsiveService.maxBodyWidth * 0.6,
+            child: Text(
+                'Impossible d\'ajouter l\'administrateur·trice. Assurez-vous que toutes les '
+                'informations sont correctes et que le courriel est valide et unique.'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      Navigator.of(context).pop(true);
+    }
   }
 
   void _onClickedCancel() {
@@ -42,7 +70,6 @@ class _AddAdminDialogState extends State<AddAdminDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-
               const SizedBox(height: 12),
               Text('Compléter les informations personnelles'),
               const SizedBox(height: 8),

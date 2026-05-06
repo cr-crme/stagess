@@ -91,6 +91,10 @@ def add_super_admin_user(super_admin_email: str) -> bool:
     if not _perform_query(query):
         return False
 
+    query = f"INSERT INTO users (id, email) " f"VALUES ('{id}', '{super_admin_email}');"
+    if not _perform_query(query):
+        return False
+
     query = (
         f"INSERT INTO persons (id, first_name, last_name, email) "
         f"VALUES ('{id}', 'Super', 'Admin', '{super_admin_email}');"

@@ -368,14 +368,15 @@ class AdminListTileState extends State<AdminListTile> {
                 validator: (value) =>
                     value?.isEmpty == true ? 'Le prénom est requis' : null,
                 maxLength: 50,
-                decoration: const InputDecoration(labelText: 'Prénom'),
+                decoration: const InputDecoration(labelText: '* Prénom'),
               ),
               TextFormField(
                 controller: _lastNameController,
                 validator: (value) =>
                     value?.isEmpty == true ? 'Le nom est requis' : null,
                 maxLength: 50,
-                decoration: const InputDecoration(labelText: 'Nom de famille'),
+                decoration:
+                    const InputDecoration(labelText: '* Nom de famille'),
               ),
             ],
           )
@@ -395,7 +396,7 @@ class AdminListTileState extends State<AdminListTile> {
     return EmailListTile(
       controller: _emailController,
       isMandatory: true,
-      enabled: _isEditing,
+      enabled: _isEditing && widget.forceEditingMode,
       title: 'Courriel',
     );
   }

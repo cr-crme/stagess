@@ -647,7 +647,7 @@ Future<Map<String, dynamic>?> _getTeacherFromDatabase(
     required String email}) async {
   final teacher = (await sqlInterface.performSelectQuery(
           user: user.copyWith(accessLevel: AccessLevel.superAdmin),
-          tableName: 'persons',
+          tableName: 'users',
           fieldsToFetch: [
         'email'
       ],
@@ -678,8 +678,8 @@ Future<Map<String, dynamic>?> _getAdminFromDatabase(
     required SqlInterface sqlInterface,
     required String email}) async {
   final userFromDatabase = (await sqlInterface.performSelectQuery(
-    user: user,
-    tableName: 'persons',
+    user: DatabaseUser.empty().copyWith(accessLevel: AccessLevel.superAdmin),
+    tableName: 'users',
     filters: {'email': email},
     subqueries: [
       sqlInterface.selectSubquery(

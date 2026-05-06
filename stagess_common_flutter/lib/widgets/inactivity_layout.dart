@@ -146,7 +146,7 @@ class _InactivityService {
   /// Start or restart the inactivity timer.
   ///
   void _startTimer() {
-    debugPrint('Inactivity timer started for ${duration.inSeconds} seconds.');
+    _logger.fine('Inactivity timer started for ${duration.inSeconds} seconds.');
     _timer?.cancel();
     _timer = Timer(duration, _hasTimedOut);
   }

@@ -12,6 +12,7 @@ import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/person.dart';
 
 final _protectedTables = [
+  'users',
   'students',
   'teachers',
   'enterprises',
@@ -75,6 +76,17 @@ abstract class SqlInterface {
   });
 
   ///
+  /// Craft and perform an INSERT queries for user entity
+  Future<void> performInsertUser({
+    required String id,
+    required String email,
+  });
+
+  ///
+  /// Craft and perform a DELETE queries for user entity
+  Future<void> performDeleteUser({required String id});
+
+  ///
   /// Craft and perform an INSERT queries for person entity
   Future<void> performInsertPerson({
     required Person person,
@@ -86,6 +98,7 @@ abstract class SqlInterface {
   Future<void> performUpdatePerson({
     required Person person,
     required Person previous,
+    bool canChangeEmail = true,
   });
 
   ///
@@ -342,6 +355,20 @@ class MySqlInterface implements SqlInterface {
   ///
   /// Specific helpers
   @override
+  Future<void> performInsertUser(
+      {required String id, required String email}) async {
+    await performInsertQuery(
+        tableName: 'users', data: {'id': id, 'email': email});
+  }
+
+  @override
+  Future<void> performDeleteUser({required String id}) async {
+    await performDeleteQuery(tableName: 'users', filters: {'id': id});
+  }
+
+  ///
+  /// Specific helpers
+  @override
   Future<void> performInsertPerson({
     required Person person,
     bool skipAddingEntity = false,
@@ -368,6 +395,7 @@ class MySqlInterface implements SqlInterface {
   Future<void> performUpdatePerson({
     required Person person,
     required Person previous,
+    bool canChangeEmail = true,
   }) async {
     // Update the person if needed
     final toUpdate = <String, dynamic>{};
@@ -382,6 +410,10 @@ class MySqlInterface implements SqlInterface {
           person.dateBirth?.toIso8601String().substring(0, 10);
     }
     if (person.email != previous.email) {
+      if (!canChangeEmail) {
+        throw InvalidRequestException(
+            'You cannot change the email of that person');
+      }
       toUpdate['email'] = person.email;
     }
     if (toUpdate.isNotEmpty) {

@@ -416,14 +416,15 @@ class TeacherListTileState extends State<TeacherListTile> {
                 maxLength: 50,
                 validator: (value) =>
                     value?.isEmpty == true ? 'Le prénom est requis' : null,
-                decoration: const InputDecoration(labelText: 'Prénom'),
+                decoration: const InputDecoration(labelText: '* Prénom'),
               ),
               TextFormField(
                 controller: _lastNameController,
                 maxLength: 50,
                 validator: (value) =>
                     value?.isEmpty == true ? 'Le nom est requis' : null,
-                decoration: const InputDecoration(labelText: 'Nom de famille'),
+                decoration:
+                    const InputDecoration(labelText: '* Nom de famille'),
               ),
             ],
           )
@@ -496,7 +497,7 @@ class TeacherListTileState extends State<TeacherListTile> {
     return EmailListTile(
       controller: _emailController,
       isMandatory: true,
-      enabled: _isEditing,
+      enabled: _isEditing && widget.forceEditingMode,
       title: 'Courriel',
     );
   }

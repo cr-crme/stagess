@@ -12,6 +12,7 @@ import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
+import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 class TeachersListScreen extends StatelessWidget {
   const TeachersListScreen({super.key});
@@ -30,10 +31,9 @@ class TeachersListScreen extends StatelessWidget {
       final teachersBySchool = <School, List<Teacher>>{};
 
       for (final school in schoolBoard.schools) {
-        final schoolTeachers =
-            teachersProvider
-                .where((teacher) => teacher.schoolId == school.id)
-                .toList();
+        final schoolTeachers = teachersProvider
+            .where((teacher) => teacher.schoolId == school.id)
+            .toList();
 
         schoolTeachers.sort((a, b) {
           final lastNameA = a.lastName.toLowerCase();
@@ -58,14 +58,18 @@ class TeachersListScreen extends StatelessWidget {
     final schoolBoard = await showSelectSchoolBoardDialog(context);
     if (schoolBoard == null || !context.mounted) return;
 
-    final answer = await showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => AddTeacherDialog(schoolBoard: schoolBoard),
-    );
-    if (answer is! Teacher || !context.mounted) return;
+    final isConfirmed = await showDialog<bool>(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) => AddTeacherDialog(schoolBoard: schoolBoard),
+        ) ??
+        false;
+    if (!context.mounted) return;
 
-    TeachersProvider.of(context, listen: false).add(answer);
+    showSnackBar(context,
+        message: isConfirmed
+            ? 'L\'enseignant·e a été ajouté·e avec succès'
+            : 'Aucun enseignant·e n\'a été ajouté·e');
   }
 
   @override
@@ -76,20 +80,18 @@ class TeachersListScreen extends StatelessWidget {
       context,
       appBar: AppBar(
         title: const Text('Liste des enseignant·e·s'),
-        actions:
-            authProvider.databaseAccessLevel >= AccessLevel.admin
-                ? [
-                  IconButton(
-                    onPressed: () => _showAddTeacherDialog(context),
-                    icon: Icon(Icons.add),
-                  ),
-                ]
-                : null,
+        actions: authProvider.databaseAccessLevel >= AccessLevel.admin
+            ? [
+                IconButton(
+                  onPressed: () => _showAddTeacherDialog(context),
+                  icon: Icon(Icons.add),
+                ),
+              ]
+            : null,
       ),
       smallDrawer: MainDrawer.small,
       mediumDrawer: MainDrawer.medium,
       largeDrawer: MainDrawer.large,
-
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -110,44 +112,43 @@ class TeachersListScreen extends StatelessWidget {
     }
 
     return switch (authProvider.databaseAccessLevel) {
-      AccessLevel.superAdmin =>
-        schoolBoardTeachers.entries
-            .map(
-              (schoolBoardEntry) => Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: AnimatedExpandingCard(
-                  header:
-                      (ctx, isExpanded) => Text(
-                        schoolBoardEntry.key.name,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleLarge!.copyWith(color: Colors.black),
+      AccessLevel.superAdmin => schoolBoardTeachers.entries
+          .map(
+            (schoolBoardEntry) => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: AnimatedExpandingCard(
+                header: (ctx, isExpanded) => Text(
+                  schoolBoardEntry.key.name,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge!.copyWith(color: Colors.black),
+                ),
+                elevation: 0.0,
+                initialExpandedState: true,
+                child: Column(
+                  children: [
+                    ...schoolBoardEntry.value.entries.map(
+                      (schoolEntry) => SchoolTeachersCard(
+                        schoolId: schoolEntry.key.id,
+                        teachers: schoolEntry.value,
+                        schoolBoard: schoolBoardEntry.key,
                       ),
-                  elevation: 0.0,
-                  initialExpandedState: true,
-                  child: Column(
-                    children: [
-                      ...schoolBoardEntry.value.entries.map(
-                        (schoolEntry) => SchoolTeachersCard(
-                          schoolId: schoolEntry.key.id,
-                          teachers: schoolEntry.value,
-                          schoolBoard: schoolBoardEntry.key,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            )
-            .toList(),
-      AccessLevel.admin || AccessLevel.teacher || AccessLevel.invalid =>
+            ),
+          )
+          .toList(),
+      AccessLevel.admin ||
+      AccessLevel.teacher ||
+      AccessLevel.invalid =>
         schoolBoardTeachers.values.firstOrNull?.entries
                 .map(
                   (schoolEntry) => SchoolTeachersCard(
                     schoolId: schoolEntry.key.id,
                     teachers: schoolEntry.value,
-                    schoolBoard:
-                        schoolBoardTeachers.keys.firstOrNull ??
+                    schoolBoard: schoolBoardTeachers.keys.firstOrNull ??
                         SchoolBoard.empty,
                   ),
                 )

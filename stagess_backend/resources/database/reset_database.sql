@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS addresses;
 
 DROP TABLE IF EXISTS persons;
 DROP TABLE IF EXISTS admins;
+DROP TABLE IF EXISTS users;
 
 DROP TABLE IF EXISTS student_contacts;
 DROP TABLE IF EXISTS students;
@@ -111,15 +112,25 @@ CREATE TABLE phone_numbers (
 );
 
 
-/*************************/
+/**************************/
 /** Admin related tables **/
-/*************************/
+/**************************/
 
 CREATE TABLE admins (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     school_board_id VARCHAR(36) NOT NULL,
     has_registered_account BOOLEAN NOT NULL DEFAULT FALSE,
     access_level INT NOT NULL,
+    FOREIGN KEY (id) REFERENCES entities(shared_id) ON DELETE CASCADE
+);
+
+/**************************/
+/** Users related tables **/
+/**************************/
+
+CREATE TABLE users (
+    id VARCHAR(36) NOT NULL PRIMARY KEY,
+    email VARCHAR(200) NOT NULL UNIQUE,
     FOREIGN KEY (id) REFERENCES entities(shared_id) ON DELETE CASCADE
 );
 

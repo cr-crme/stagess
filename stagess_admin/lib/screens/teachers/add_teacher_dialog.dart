@@ -3,6 +3,7 @@ import 'package:stagess_admin/screens/teachers/teacher_list_tile.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
+import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 class AddTeacherDialog extends StatefulWidget {
   const AddTeacherDialog({super.key, required this.schoolBoard});
@@ -21,7 +22,34 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
 
     // Validate the form
     if (!(await state.validate()) || !mounted) return;
-    Navigator.of(context).pop(state.editedTeacher);
+    final newTeacher = state.editedTeacher;
+
+    final isConfirmed = await TeachersProvider.of(context, listen: false)
+        .addWithConfirmation(newTeacher);
+    if (!mounted) return;
+
+    if (!isConfirmed) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Échec de l\'ajout de l\'enseignant·e'),
+          content: SizedBox(
+            width: ResponsiveService.maxBodyWidth * 0.6,
+            child: Text(
+                'Impossible d\'ajouter l\'enseignant·e. Assurez-vous que toutes les '
+                'informations sont correctes et que le courriel est valide et unique.'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      Navigator.of(context).pop(true);
+    }
   }
 
   void _onClickedCancel() {
@@ -45,7 +73,6 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-
               const SizedBox(height: 12),
               Text('Compléter les informations personnelles'),
               const SizedBox(height: 8),

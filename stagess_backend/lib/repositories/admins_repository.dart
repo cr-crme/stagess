@@ -159,8 +159,12 @@ class MySqlAdminsRepository extends AdminsRepository {
       filters: (adminId == null ? {} : {'id': adminId}),
       subqueries: [
         sqlInterface.selectSubquery(
+          dataTableName: 'users',
+          fieldsToFetch: ['email'],
+        ),
+        sqlInterface.selectSubquery(
           dataTableName: 'persons',
-          fieldsToFetch: ['first_name', 'last_name', 'email'],
+          fieldsToFetch: ['first_name', 'last_name'],
         ),
         sqlInterface.selectSubquery(
             dataTableName: 'phone_numbers',
@@ -186,7 +190,12 @@ class MySqlAdminsRepository extends AdminsRepository {
     for (final admin in admins) {
       final id = admin['id'].toString();
 
-      admin.addAll((admin['persons'] as List).first as Map<String, dynamic>);
+      admin.addAll(
+          (admin['users'] as List?)?.firstOrNull as Map<String, dynamic>? ??
+              {});
+      admin.addAll(
+          (admin['persons'] as List?)?.firstOrNull as Map<String, dynamic>? ??
+              {});
 
       admin['phone'] =
           (admin['phone_numbers'] as List?)?.firstOrNull as Map? ?? {};
@@ -215,6 +224,7 @@ class MySqlAdminsRepository extends AdminsRepository {
 
     await sqlInterface.performInsertPerson(
         person: admin, skipAddingEntity: entity != null);
+    await sqlInterface.performInsertUser(id: admin.id, email: admin.email);
     await sqlInterface.performInsertQuery(tableName: 'admins', data: {
       'id': admin.id.serialize(),
       'school_board_id': admin.schoolBoardId.serialize(),
@@ -250,10 +260,19 @@ class MySqlAdminsRepository extends AdminsRepository {
   @override
   Future<void> _putAdmin(
       {required Admin admin, required Admin? previous}) async {
-    if (previous == null) {
-      await _insertToAdmins(admin);
-    } else {
-      await _updateToAdmins(admin, previous);
+    try {
+      await sqlInterface.beginTransaction();
+
+      if (previous == null) {
+        await _insertToAdmins(admin);
+      } else {
+        await _updateToAdmins(admin, previous);
+      }
+
+      await sqlInterface.commitTransaction();
+    } catch (e) {
+      await sqlInterface.rollbackTransaction();
+      rethrow;
     }
   }
 
@@ -261,12 +280,17 @@ class MySqlAdminsRepository extends AdminsRepository {
   Future<String?> _deleteAdmin({required String id}) async {
     // Delete the administrator from the database
     try {
+      await sqlInterface.beginTransaction();
+
       await sqlInterface.performDeleteQuery(
         tableName: 'entities',
         filters: {'shared_id': id},
       );
+
+      await sqlInterface.commitTransaction();
       return id;
     } catch (e) {
+      await sqlInterface.rollbackTransaction();
       return null;
     }
   }
