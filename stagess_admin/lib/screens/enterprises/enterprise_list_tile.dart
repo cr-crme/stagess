@@ -513,6 +513,14 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                         _buildName(),
                         const SizedBox(height: 8),
                         _buildRecruiter(),
+                        const SizedBox(height: 16),
+                        Text('Entreprise représentée par',
+                            style: Theme.of(context).textTheme.titleSmall),
+                        const SizedBox(height: 8),
+                        _buildContact(),
+                        const SizedBox(height: 16),
+                        Text('Informations de l\'entreprise',
+                            style: Theme.of(context).textTheme.titleSmall),
                         const SizedBox(height: 8),
                         _buildAddress(),
                         const SizedBox(height: 8),
@@ -522,13 +530,14 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                         const SizedBox(height: 8),
                         _buildWebsite(),
                         const SizedBox(height: 8),
+                        _buildActivityTypes(),
+                        const SizedBox(height: 16),
+                        Text('Informations légales',
+                            style: Theme.of(context).textTheme.titleSmall),
+                        const SizedBox(height: 8),
                         _buildHeadquartersAddress(),
                         const SizedBox(height: 8),
-                        _buildContact(),
-                        const SizedBox(height: 8),
                         _buildNeq(),
-                        const SizedBox(height: 8),
-                        _buildActivityTypes(),
                       ],
                     ),
                   ),
@@ -692,7 +701,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
       child: PhoneListTile(
-        title: 'Fax',
+        title: 'Télécopieur',
         controller: _faxController,
         isMandatory: false,
         enabled: _isEditing,
@@ -739,11 +748,10 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _isEditing
-            ? Text('Contact')
-            : Text(
-                'Contact : ${widget.enterprise.contact.toString()} (${widget.enterprise.contactFunction})',
-              ),
+        if (!_isEditing)
+          Text(
+            '${widget.enterprise.contact.toString()} (${widget.enterprise.contactFunction})',
+          ),
         Padding(
           padding: const EdgeInsets.only(left: 16.0),
           child: Column(
