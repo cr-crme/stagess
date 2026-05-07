@@ -430,13 +430,13 @@ CREATE TABLE enterprise_job_pre_internship_request_items(
 
 CREATE TABLE enterprise_job_incidents(
     id VARCHAR(36) NOT NULL PRIMARY KEY,
-    teacher_id VARCHAR(36) NOT NULL,
+    user_id VARCHAR(36) NOT NULL,
     job_id VARCHAR(36) NOT NULL,
     incident_type VARCHAR(50) NOT NULL,
     incident VARCHAR(2000) NOT NULL,
     date BIGINT NOT NULL,
     FOREIGN KEY (job_id) REFERENCES enterprise_jobs(id) ON DELETE CASCADE, 
-    FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 

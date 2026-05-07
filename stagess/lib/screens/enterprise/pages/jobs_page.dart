@@ -7,13 +7,11 @@ import 'package:logging/logging.dart';
 import 'package:stagess/common/extensions/availability_status.dart';
 import 'package:stagess/common/extensions/enterprise_extension.dart';
 import 'package:stagess/common/extensions/job_extension.dart';
-import 'package:stagess/common/widgets/dialogs/add_sst_event_dialog.dart';
 import 'package:stagess/common/widgets/dialogs/add_text_dialog.dart';
 import 'package:stagess/common/widgets/dialogs/job_creator_dialog.dart';
 import 'package:stagess/common/widgets/disponibility_circle.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/comments_expansion_panel.dart';
-import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/incidents_expansion_panel.dart';
 import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/photo_expansion_panel.dart';
 import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/prerequisites_expansion_panel.dart';
 import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/supervision_expansion_panel.dart';
@@ -34,6 +32,8 @@ import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/add_sst_event_dialog.dart';
+import 'package:stagess_common_flutter/widgets/incidents_expansion_panel.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -236,6 +236,7 @@ class JobsPageState extends State<JobsPage> {
     setState(() {
       _forceDisabled = true;
     });
+
     _logger.finer('Adding SST event to job: ${job.specialization.name}');
     final enterprises = EnterprisesProvider.of(context, listen: false);
     final teacherId =
@@ -271,7 +272,7 @@ class JobsPageState extends State<JobsPage> {
     }
 
     final incident = Incident(
-        teacherId: teacherId, date: DateTime.now(), result['description']);
+        userId: teacherId, date: DateTime.now(), result['description']);
     switch (result['eventType'] as SstEventType) {
       case SstEventType.severe:
         job.incidents.severeInjuries.add(incident);
@@ -598,10 +599,7 @@ class JobsPageState extends State<JobsPage> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 4.0),
                       child: IncidentsExpansionPanel(
-                        enterprise: widget.enterprise,
-                        job: job,
-                        addSstEvent: _addSstEvent,
-                      ),
+                          job: job, addSstEvent: _addSstEvent),
                     ),
                     Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
                     Padding(

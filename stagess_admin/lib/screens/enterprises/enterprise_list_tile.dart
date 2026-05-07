@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:logging/logging.dart';
 import 'package:stagess_admin/screens/enterprises/confirm_delete_enterprise_dialog.dart';
 import 'package:stagess_admin/widgets/teacher_picker_tile.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
@@ -10,16 +11,20 @@ import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
+import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
+import 'package:stagess_common_flutter/providers/admins_provider.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/address_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/add_sst_event_dialog.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/enterprise_activity_type_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/enterprise_job_list_tile.dart';
@@ -28,6 +33,8 @@ import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/radio_with_follow_up.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 import 'package:stagess_common_flutter/widgets/web_site_list_tile.dart';
+
+final _logger = Logger('EnterpriseListTile');
 
 class EnterpriseListTile extends StatefulWidget {
   const EnterpriseListTile({
@@ -661,12 +668,76 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                           _jobControllers[jobId]!.specialization?.idWithName ==
                               null,
                       showExtended: !widget.forceEditingMode,
+                      addSstEvent: _isEditing ? null : _addSstEvent,
                     );
                   }),
                 ],
               ),
       ],
     );
+  }
+
+  void _addSstEvent(Job job) async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
+
+    final enterprises = EnterprisesProvider.of(context, listen: false);
+    final teacherId = AuthProvider.of(context, listen: false).teacherId;
+    if (teacherId == null) return;
+
+    final hasLock = await enterprises.getLockForItem(widget.enterprise);
+    if (!hasLock || !mounted) {
+      if (mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible d\'ajouter un événement SST, car l\'entreprise est en cours de modification par un autre utilisateur.',
+        );
+      }
+      setState(() {
+        _forceDisabled = false;
+      });
+      return;
+    }
+
+    final result = await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const AddSstEventDialog(),
+    );
+    if (result == null) {
+      await enterprises.releaseLockForItem(widget.enterprise);
+      setState(() {
+        _forceDisabled = false;
+      });
+      return;
+    }
+
+    final incident = Incident(
+        userId: teacherId, date: DateTime.now(), result['description']);
+    switch (result['eventType'] as SstEventType) {
+      case SstEventType.severe:
+        job.incidents.severeInjuries.add(incident);
+        break;
+      case SstEventType.verbal:
+        job.incidents.verbalAbuses.add(incident);
+        break;
+      case SstEventType.minor:
+        job.incidents.minorInjuries.add(incident);
+        break;
+    }
+    enterprises[widget.enterprise].jobs.replace(job);
+    await enterprises.replaceWithConfirmation(widget.enterprise);
+    await enterprises.releaseLockForItem(widget.enterprise);
+    if (mounted) {
+      showSnackBar(context, message: 'L\'événement SST a été ajouté');
+    }
+    setState(() {
+      _forceDisabled = false;
+    });
+    _logger.finer('SST event added to job: ${job.specialization.name}');
   }
 
   Widget _buildRecruiter() {

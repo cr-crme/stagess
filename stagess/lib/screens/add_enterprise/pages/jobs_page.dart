@@ -59,8 +59,8 @@ class JobsPageState extends State<JobsPage> {
               shrinkWrap: true,
               itemCount: _jobsControllers.length,
               physics: const NeverScrollableScrollPhysics(),
-              itemBuilder:
-                  (BuildContext context, int index) => _buildNewJobsForm(index),
+              itemBuilder: (BuildContext context, int index) =>
+                  _buildNewJobsForm(index),
             ),
             Align(
               alignment: Alignment.centerRight,
@@ -70,11 +70,10 @@ class JobsPageState extends State<JobsPage> {
                   controllers: _jobsControllers,
                   onJobAdded: () => setState(() {}),
                   style: Theme.of(context).textButtonTheme.style!.copyWith(
-                    backgroundColor:
-                        Theme.of(
+                        backgroundColor: Theme.of(
                           context,
                         ).elevatedButtonTheme.style!.backgroundColor,
-                  ),
+                      ),
                 ),
               ),
             ),
@@ -97,8 +96,8 @@ class JobsPageState extends State<JobsPage> {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             IconButton(
-              onPressed:
-                  () => setState(() => _jobsControllers.remove(controller)),
+              onPressed: () =>
+                  setState(() => _jobsControllers.remove(controller)),
               padding: const EdgeInsets.all(8.0),
               icon: const Icon(Icons.delete_forever),
               tooltip: 'Supprimer',

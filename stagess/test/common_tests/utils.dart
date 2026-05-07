@@ -144,17 +144,17 @@ Incidents dummyIncidents({String? id}) => Incidents(
       severeInjuries: [],
       minorInjuries: [
         Incident(
-            teacherId: 'teacher1',
+            userId: 'teacher1',
             date: DateTime.now(),
             'Un "petit" truc avec la scie sauteuse'),
         Incident(
-            teacherId: 'teacher1',
+            userId: 'teacher1',
             date: DateTime.now(),
             'Une "légère" entaille de la main au couteau'),
       ],
       verbalAbuses: [
         Incident(
-            teacherId: 'teacher1',
+            userId: 'teacher1',
             date: DateTime.now(),
             'Vaut mieux ne pas détailler...')
       ],

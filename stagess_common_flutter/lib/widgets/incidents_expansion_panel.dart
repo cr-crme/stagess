@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
-import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/itemized_text.dart';
@@ -12,14 +12,14 @@ final _logger = Logger('IncidentsExpansionPanel');
 class IncidentsExpansionPanel extends StatelessWidget {
   const IncidentsExpansionPanel({
     super.key,
-    required this.enterprise,
     required this.job,
     required this.addSstEvent,
+    this.isExpandable = true,
   });
 
-  final Enterprise enterprise;
   final Job job;
-  final void Function(Job job) addSstEvent;
+  final void Function(Job job)? addSstEvent;
+  final bool isExpandable;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +28,8 @@ class IncidentsExpansionPanel extends StatelessWidget {
 
     return AnimatedExpandingCard(
       elevation: 0.0,
+      canChangeExpandedState: isExpandable,
+      initialExpandedState: !isExpandable,
       header: (context, isExpanded) => ListTile(
         title: const Text('Accidents et incidents en stage'),
         trailing: Visibility(
@@ -67,13 +69,16 @@ class IncidentsExpansionPanel extends StatelessWidget {
                 titleIfNotHasIncidents: 'Aucune blessure mineure',
                 titleIfHasIncidents: 'Blessures mineures d\'élèves',
                 incidents: job.incidents.minorInjuries),
-            const SizedBox(height: 24),
-            Center(
-              child: ElevatedButton(
-                onPressed: () => addSstEvent(job),
-                child: const Text('Signaler un incident'),
+            if (addSstEvent != null)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 24.0),
+                  child: ElevatedButton(
+                    onPressed: () => addSstEvent!(job),
+                    child: const Text('Signaler un incident'),
+                  ),
+                ),
               ),
-            ),
             const SizedBox(height: 16),
           ],
         ),
@@ -96,9 +101,9 @@ class IncidentsExpansionPanel extends StatelessWidget {
         ),
         if (incidents.isNotEmpty)
           ItemizedText(incidents.map((e) {
-            final teacher =
-                TeachersProvider.of(context, listen: false).fromId(e.teacherId);
-            return '${e.toString()}\nIncident rapporté par ${teacher.fullName}, le ${DateFormat.yMMMEd('fr_CA').format(e.date)}';
+            final teacher = TeachersProvider.of(context, listen: false)
+                .fromIdOrNull(e.userId);
+            return '${e.toString()}\nIncident rapporté par ${teacher?.fullName ?? 'un·e administrateur·trice'}, le ${DateFormat.yMMMEd('fr_CA').format(e.date)}';
           }).toList()),
       ],
     );

@@ -2,25 +2,25 @@ part of 'package:stagess_common/models/enterprises/job.dart';
 
 class Incident extends ItemSerializable {
   String incident;
-  String teacherId;
+  String userId;
   DateTime date;
 
   Incident(
     this.incident, {
     required this.date,
-    required this.teacherId,
+    required this.userId,
   });
 
   Incident.fromSerialized(super.map)
       : incident = map?['incident'] ?? '',
-        teacherId = map?['teacher_id'] ?? '',
+        userId = map?['user_id'] ?? '',
         date = DateTimeExt.from(map?['date']) ?? DateTime(0),
         super.fromSerialized();
 
   @override
   Map<String, dynamic> serializedMap() => {
         'id': id,
-        'teacher_id': teacherId,
+        'user_id': userId,
         'incident': incident,
         'date': date.serialize(),
       };
@@ -30,7 +30,7 @@ class Incident extends ItemSerializable {
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
-        'teacher_id': FetchableFields.mandatory,
+        'user_id': FetchableFields.mandatory,
         'incident': FetchableFields.optional,
         'date': FetchableFields.optional,
       });

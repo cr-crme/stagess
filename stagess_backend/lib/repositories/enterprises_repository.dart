@@ -376,7 +376,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
               idNameToDataTable: 'job_id',
               fieldsToFetch: [
                 'id',
-                'teacher_id',
+                'user_id',
                 'incident_type',
                 'incident',
                 'date'
@@ -619,7 +619,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
         toWait.add(sqlInterface
             .performInsertQuery(tableName: 'enterprise_job_incidents', data: {
           'id': incident['id'],
-          'teacher_id': incident['teacher_id'],
+          'user_id': incident['user_id'],
           'job_id': jobId.serialize(),
           'incident_type': incidentType.serialize(),
           'incident': incident['incident'],
