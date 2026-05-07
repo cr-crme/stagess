@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
-import 'package:stagess_common_flutter/widgets/enterprise_job_list_tile.dart';
+import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/enterprise_job_list_tile.dart';
 
 class AddJobButton extends StatelessWidget {
   const AddJobButton({

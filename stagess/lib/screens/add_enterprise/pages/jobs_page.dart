@@ -5,7 +5,7 @@ import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
-import 'package:stagess_common_flutter/widgets/enterprise_job_list_tile.dart';
+import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/enterprise_job_list_tile.dart';
 
 final _logger = Logger('JobsPage');
 

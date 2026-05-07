@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
-import 'package:stagess/screens/enterprise/pages/jobs_page.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
-import 'package:stagess_common_flutter/widgets/enterprise_job_list_tile.dart';
+import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/itemized_text.dart';
+import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/enterprise_job_list_tile.dart';
 
 final _logger = Logger('PrerequisitesExpansionPanel');
 
@@ -84,7 +84,7 @@ class PrerequisitesExpansionPanelState
         final previousState = !nextState;
         if (widget.isEditing && previousState) widget.onClickCancel();
       },
-      tappingPermitted: (isExpanded) => tappingIsPermitted(context,
+      tappingPermitted: (isExpanded) => _tappingIsPermitted(context,
           isExpanded: isExpanded, isEditing: widget.isEditing),
       header: (context, isExpanded) => ListTile(
         title: Row(
@@ -194,4 +194,36 @@ class PrerequisitesExpansionPanelState
       ],
     );
   }
+}
+
+Future<bool> _tappingIsPermitted(BuildContext context,
+    {required bool isExpanded, required bool isEditing}) async {
+  if (!isEditing) return true;
+
+  return await ConfirmExitDialog.show(
+    context,
+    content: Text.rich(
+      TextSpan(
+        children: [
+          const TextSpan(
+            text: '** Vous quittez la page sans avoir '
+                'cliqué sur Enregistrer ',
+          ),
+          WidgetSpan(
+            child: SizedBox(
+              height: 22,
+              width: 22,
+              child: Icon(
+                Icons.save,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+          ),
+          const TextSpan(
+            text: '. **\n\nToutes vos modifications seront perdues.',
+          ),
+        ],
+      ),
+    ),
+  );
 }

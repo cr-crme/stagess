@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess/common/extensions/job_extension.dart';
 import 'package:stagess/program_helpers.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/enterprises/job_comment.dart';
@@ -7,6 +6,7 @@ import 'package:stagess_common/models/enterprises/job_list.dart';
 import 'package:stagess_common/models/generic/photo.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
+import 'package:stagess_common_flutter/helpers/job_extension.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 
 import '../../utils.dart';

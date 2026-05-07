@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
-import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/itemized_text.dart';

@@ -10,7 +10,7 @@ import 'package:stagess/common/pdf_widgets/pdf_radio_buttons.dart';
 import 'package:stagess/common/pdf_widgets/pdf_slider.dart';
 import 'package:stagess/common/pdf_widgets/pdf_theme.dart';
 import 'package:stagess/screens/student/pages/form_dialogs/forms/enterprise_evaluation_form_dialog.dart';
-import 'package:stagess/screens/student/pages/form_dialogs/forms/enterprise_evaluation_form_enums.dart';
+import 'package:stagess_common/models/enterprises/enterprise_evaluation_form_enums.dart';
 
 final _logger = Logger('GenerateEnterpriseEvaluationPdf');
 

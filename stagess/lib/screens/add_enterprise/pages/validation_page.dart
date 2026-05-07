@@ -4,7 +4,7 @@ import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/widgets/enterprise_activity_type_list_tile.dart';
-import 'package:stagess_common_flutter/widgets/enterprise_job_list_tile.dart';
+import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/enterprise_job_list_tile.dart';
 
 final _logger = Logger('ValidationPage');
 

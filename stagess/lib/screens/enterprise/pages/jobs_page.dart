@@ -6,15 +6,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/extensions/availability_status.dart';
 import 'package:stagess/common/extensions/enterprise_extension.dart';
-import 'package:stagess/common/extensions/job_extension.dart';
 import 'package:stagess/common/widgets/dialogs/add_text_dialog.dart';
 import 'package:stagess/common/widgets/dialogs/job_creator_dialog.dart';
 import 'package:stagess/common/widgets/disponibility_circle.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
-import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/comments_expansion_panel.dart';
-import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/photo_expansion_panel.dart';
-import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/prerequisites_expansion_panel.dart';
-import 'package:stagess/screens/enterprise/pages/jobs_expansion_panels/supervision_expansion_panel.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
@@ -24,6 +19,7 @@ import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/services/image_helpers.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common/utils.dart';
+import 'package:stagess_common_flutter/helpers/job_extension.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
@@ -34,6 +30,10 @@ import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/dialogs/add_sst_event_dialog.dart';
 import 'package:stagess_common_flutter/widgets/incidents_expansion_panel.dart';
+import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/comments_expansion_panel.dart';
+import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/photo_expansion_panel.dart';
+import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/prerequisites_expansion_panel.dart';
+import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/supervision_expansion_panel.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -581,7 +581,7 @@ class JobsPageState extends State<JobsPage> {
                     final previousState = !nextState;
                     if (isEditing && previousState) cancelEditing();
                   },
-                  tappingPermitted: (isExpanded) => tappingIsPermitted(context,
+                  tappingPermitted: (isExpanded) => _tappingIsPermitted(context,
                       isExpanded: isExpanded, isEditing: isEditing),
                   child: Column(children: [
                     Padding(
@@ -753,7 +753,7 @@ class _RecrutedBy extends StatelessWidget {
   }
 }
 
-Future<bool> tappingIsPermitted(BuildContext context,
+Future<bool> _tappingIsPermitted(BuildContext context,
     {required bool isExpanded, required bool isEditing}) async {
   if (!isEditing) return true;
 

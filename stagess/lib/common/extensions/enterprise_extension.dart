@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
-import 'package:stagess/common/extensions/job_extension.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common_flutter/helpers/job_extension.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';

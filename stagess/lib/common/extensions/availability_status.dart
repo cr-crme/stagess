@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:stagess/common/extensions/job_extension.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common_flutter/helpers/job_extension.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 
 enum AvailabilityStatus {

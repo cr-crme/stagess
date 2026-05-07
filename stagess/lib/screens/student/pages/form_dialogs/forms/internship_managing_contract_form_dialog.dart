@@ -28,7 +28,7 @@ import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
-import 'package:stagess_common_flutter/widgets/enterprise_job_list_tile.dart';
+import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/enterprise_job_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/schedule_selector.dart';
 import 'package:stagess_common_flutter/widgets/student_picker_tile.dart';
