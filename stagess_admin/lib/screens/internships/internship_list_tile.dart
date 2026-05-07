@@ -832,6 +832,7 @@ class InternshipListTileState extends State<InternshipListTile> {
           padding: const EdgeInsets.only(left: 8.0),
           child: Column(
             children: [
+              // TODO: Fix contrat not showing
               _buildSelectShowPreviousEvaluations(
                 title: (widget.internship.contracts.length > 1
                     ? 'Afficher les contrats de stage du\u00a0: '
@@ -850,7 +851,8 @@ class InternshipListTileState extends State<InternshipListTile> {
                                     .fromId(internshipId),
                                 evaluationId: evaluationId,
                                 isNewContract: false)),
-              )
+              ),
+              // TODO Add other documents
             ],
           ),
         ),
