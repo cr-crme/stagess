@@ -300,6 +300,8 @@ class InternshipListTileState extends State<InternshipListTile> {
         }
       }
       await internships.releaseLockForItem(widget.internship);
+
+      _weeklySchedulesController.changesWereDealtWith();
     } else {
       final hasLock = await internships.getLockForItem(widget.internship);
       if (!hasLock || !mounted) {

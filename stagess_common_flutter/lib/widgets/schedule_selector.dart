@@ -45,6 +45,9 @@ class WeeklySchedulesController {
   time_utils.DateTimeRange? _dateRange;
   time_utils.DateTimeRange? get dateRange => _dateRange;
   bool _hasChanged = false;
+  void changesWereDealtWith() {
+    _hasChanged = false;
+  }
 
   WeeklySchedulesController({
     List<WeeklySchedule>? weeklySchedules,
