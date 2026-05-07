@@ -2,13 +2,13 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
-import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
 import 'package:stagess/common/widgets/search.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess/screens/students_list/widgets/student_card.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
+import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
 
 final _logger = Logger('StudentsListScreen');
 

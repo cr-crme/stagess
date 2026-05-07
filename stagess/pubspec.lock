@@ -1179,7 +1179,7 @@ packages:
     source: hosted
     version: "6.5.0"
   printing:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: printing
       sha256: "482cd5a5196008f984bb43ed0e47cbfdca7373490b62f3b27b3299275bf22a93"

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
@@ -14,6 +13,7 @@ import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/enterprise_activity_type_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
+import 'package:stagess_common_flutter/widgets/sub_title.dart';
 import 'package:stagess_common_flutter/widgets/web_site_list_tile.dart';
 
 final _logger = Logger('EnterpriseAboutPage');

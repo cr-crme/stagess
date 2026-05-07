@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
-import 'package:stagess/misc/risk_data_file_service.dart';
-import 'package:stagess/screens/ref_sst/common/risk.dart';
 import 'package:stagess/screens/ref_sst/specialization_list_risks_and_skills/widgets/tile_job_risk.dart';
+import 'package:stagess_common/models/ref_sst/risk.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
+import 'package:stagess_common_flutter/services/risk_data_file_service.dart';
 
 final _logger = Logger('SpecializationListScreen');
 

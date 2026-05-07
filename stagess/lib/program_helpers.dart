@@ -2,9 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:stagess/firebase_options.dart';
-import 'package:stagess/misc/question_file_service.dart';
-import 'package:stagess/misc/risk_data_file_service.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
+import 'package:stagess_common_flutter/services/question_file_service.dart';
+import 'package:stagess_common_flutter/services/risk_data_file_service.dart';
 
 class ProgramInitializer {
   static bool _showDebugElements = kDebugMode;

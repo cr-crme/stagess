@@ -32,6 +32,9 @@ dependencies:
   http: ^1.6.0
   web: ^1.1.1
   image_picker: ^1.1.2
+  pdf: ^3.10.1
+  printing: ^5.10.3
+  shared_preferences: ^2.2.0
 
 dependency_overrides:
   enhanced_containers_foundation:

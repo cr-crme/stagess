@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess/common/extensions/students_extension.dart';
 import 'package:stagess/program_helpers.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common_flutter/helpers/students_extension.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 
 import '../../utils.dart';

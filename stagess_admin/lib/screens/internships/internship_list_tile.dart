@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -12,6 +13,7 @@ import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_contract.dart';
+import 'package:stagess_common/models/internships/internship_evaluation.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/transportation.dart';
 import 'package:stagess_common/models/persons/person.dart';
@@ -27,6 +29,8 @@ import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/forms/internship_managing_contract_form_dialog.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/forms/show_forms.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/schedule_selector.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
@@ -511,6 +515,13 @@ class InternshipListTileState extends State<InternshipListTile> {
                 _buildAchievedDuration(),
                 const SizedBox(height: 8),
                 _buildTeacherNotes(),
+                Padding(
+                  padding:
+                      const EdgeInsets.only(top: 4.0, bottom: 4.0, right: 24.0),
+                  child: Divider(height: 32, thickness: 2),
+                ),
+                _buildPdfSection(),
+                const SizedBox(height: 8),
               ],
             ),
           ),
@@ -805,6 +816,93 @@ class InternshipListTileState extends State<InternshipListTile> {
               labelStyle: TextStyle(color: Colors.black),
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPdfSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Documents générés lors de ce stage',
+            style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.only(left: 8.0),
+          child: Column(
+            children: [
+              _buildSelectShowPreviousEvaluations(
+                title: (widget.internship.contracts.length > 1
+                    ? 'Afficher les contrats de stage du\u00a0: '
+                    : 'Afficher le contrat de stage du\u00a0: '),
+                evaluations: widget.internship.contracts,
+                onClickedShowEvaluation: (contractId) =>
+                    showInternshipEvaluationFormDialog(context,
+                        internshipId: widget.internship.id,
+                        evaluationId: contractId,
+                        showEvaluationDialog: (BuildContext context,
+                                {required String internshipId,
+                                String? evaluationId}) =>
+                            showManagingContractFormDialog(context,
+                                internship: InternshipsProvider.of(context,
+                                        listen: false)
+                                    .fromId(internshipId),
+                                evaluationId: evaluationId,
+                                isNewContract: false)),
+              )
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSelectShowPreviousEvaluations(
+      {required String title,
+      required List<InternshipEvaluation> evaluations,
+      required Function(String contractId) onClickedShowEvaluation}) {
+    final orderedEvaluations = evaluations.sortedBy((e) => e.date).reversed;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+          Padding(
+            padding: const EdgeInsets.only(left: 12.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: orderedEvaluations.map(
+                (evaluation) {
+                  // Reminder the list is reversed for display
+                  return Row(
+                    children: [
+                      SizedBox(
+                        width: 150,
+                        child: Text(
+                          '\u2022 ${DateFormat('dd MMMM yyyy', 'fr_CA').format(evaluation.date)}',
+                        ),
+                      ),
+                      IconButton(
+                          onPressed: () =>
+                              onClickedShowEvaluation(evaluation.id),
+                          color: Theme.of(context).primaryColor,
+                          icon: const Icon(Icons.insert_drive_file)),
+                      SizedBox(width: 4),
+                      IconButton(
+                          onPressed: () => {},
+                          // onClickedShowEvaluationPdf(evaluation.id),
+                          color: Theme.of(context).primaryColor,
+                          icon: const Icon(Icons.picture_as_pdf)),
+                    ],
+                  );
+                },
+              ).toList(),
+            ),
+          )
         ],
       ),
     );

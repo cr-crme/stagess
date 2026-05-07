@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:stagess/common/extensions/students_extension.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common_flutter/helpers/students_extension.dart';
 
 class StudentCard extends StatelessWidget {
   const StudentCard({

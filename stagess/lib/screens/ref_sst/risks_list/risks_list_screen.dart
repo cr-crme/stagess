@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
-import 'package:stagess/misc/risk_data_file_service.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess/screens/ref_sst/risks_list/widgets/clickable_risk_tile.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
+import 'package:stagess_common_flutter/services/risk_data_file_service.dart';
 
 final _logger = Logger('RisksListScreen');
 

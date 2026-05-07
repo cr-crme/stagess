@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stagess/screens/ref_sst/common/risk.dart';
+import 'package:stagess_common/models/ref_sst/risk.dart';
 
 //SST
 class ClickableRiskTile extends StatelessWidget {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:stagess/misc/risk_data_file_service.dart';
-import 'package:stagess/screens/ref_sst/common/risk.dart' as common_risk;
 import 'package:stagess/screens/ref_sst/risk_card/widgets/link.dart';
 import 'package:stagess/screens/ref_sst/risk_card/widgets/sub_risk.dart';
+import 'package:stagess_common/models/ref_sst/risk.dart' as common_risk;
+import 'package:stagess_common_flutter/services/risk_data_file_service.dart';
 
 final _logger = Logger('RiskCardScreen');
 

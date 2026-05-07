@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stagess/common/widgets/sub_title.dart';
+import 'package:stagess_common_flutter/widgets/sub_title.dart';
 
 class SstMainCard extends StatelessWidget {
   const SstMainCard({

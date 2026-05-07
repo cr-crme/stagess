@@ -45,15 +45,13 @@ class _AddEnterpriseDialogState extends State<AddEnterpriseDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-
               const SizedBox(height: 12),
               Text('Compléter les informations'),
               const SizedBox(height: 8),
               EnterpriseListTile(
                 key: _editingKey,
-                enterprise: Enterprise.empty.copyWith(
-                  schoolBoardId: widget.schoolBoard.id,
-                ),
+                enterprise: Enterprise.empty
+                    .copyWith(schoolBoardId: widget.schoolBoard.id),
                 forceEditingMode: true,
               ),
             ],

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:stagess/screens/ref_sst/common/risk.dart' as common_risk;
 import 'package:stagess/screens/ref_sst/risk_card/widgets/factors.dart';
 import 'package:stagess/screens/ref_sst/risk_card/widgets/introduction.dart';
 import 'package:stagess/screens/ref_sst/risk_card/widgets/situation_risk.dart';
 import 'package:stagess/screens/ref_sst/risk_card/widgets/sub_title.dart';
 import 'package:stagess/screens/ref_sst/risk_card/widgets/symptoms.dart';
+import 'package:stagess_common/models/ref_sst/risk.dart' as common_risk;
 
 class SubRisk extends StatelessWidget {
   //params and variables

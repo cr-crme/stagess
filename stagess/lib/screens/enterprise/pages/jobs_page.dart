@@ -5,10 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/extensions/availability_status.dart';
-import 'package:stagess/common/extensions/enterprise_extension.dart';
 import 'package:stagess/common/widgets/dialogs/job_creator_dialog.dart';
 import 'package:stagess/common/widgets/disponibility_circle.dart';
-import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
@@ -18,6 +16,7 @@ import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/services/image_helpers.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common/utils.dart';
+import 'package:stagess_common_flutter/helpers/enterprise_extension.dart';
 import 'package:stagess_common_flutter/helpers/job_extension.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
@@ -35,6 +34,7 @@ import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/photo_expan
 import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/prerequisites_expansion_panel.dart';
 import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/supervision_expansion_panel.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
+import 'package:stagess_common_flutter/widgets/sub_title.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final _logger = Logger('JobsPage');

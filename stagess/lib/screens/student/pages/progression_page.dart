@@ -1,11 +1,11 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:stagess/common/provider_helpers/internships_helpers.dart';
-import 'package:stagess/screens/student/pages/form_dialogs/widgets/student_visa_form.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
+import 'package:stagess_common_flutter/providers/helpers/internships_helpers.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/widgets/student_visa_form.dart';
 import 'package:stagess_common_flutter/widgets/itemized_text.dart';
 
 final _logger = Logger('SkillsPage');

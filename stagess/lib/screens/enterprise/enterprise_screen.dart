@@ -3,12 +3,10 @@ import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
-import 'package:stagess/common/widgets/sub_title.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess/screens/enterprise/pages/about_page.dart';
 import 'package:stagess/screens/enterprise/pages/internships_page.dart';
 import 'package:stagess/screens/enterprise/pages/jobs_page.dart';
-import 'package:stagess/screens/student/pages/form_dialogs/forms/internship_managing_contract_form_dialog.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship.dart';
@@ -19,7 +17,9 @@ import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/forms/internship_managing_contract_form_dialog.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
+import 'package:stagess_common_flutter/widgets/sub_title.dart';
 
 final _logger = Logger('EnterpriseScreen');
 

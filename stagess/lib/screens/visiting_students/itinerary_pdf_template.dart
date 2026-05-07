@@ -4,10 +4,10 @@ import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:stagess/common/pdf_widgets/pdf_theme.dart';
 import 'package:stagess/screens/visiting_students/widgets/routing_map.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/widgets/pdf_widgets/pdf_theme.dart';
 
 final _logger = Logger('ItineraryPdfTemplate');
 

@@ -2,9 +2,9 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
-import 'package:stagess/misc/risk_data_file_service.dart';
 import 'package:stagess/screens/ref_sst/risk_card/risk_card_screen.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
+import 'package:stagess_common_flutter/services/risk_data_file_service.dart';
 
 final _logger = Logger('RisksInfoScreen');
 

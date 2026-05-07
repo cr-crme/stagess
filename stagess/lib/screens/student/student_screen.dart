@@ -1,14 +1,14 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:stagess/common/extensions/students_extension.dart';
-import 'package:stagess/common/provider_helpers/students_helpers.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
 import 'package:stagess/screens/student/pages/about_page.dart';
 import 'package:stagess/screens/student/pages/internships_page.dart';
 import 'package:stagess/screens/student/pages/progression_page.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
+import 'package:stagess_common_flutter/helpers/students_extension.dart';
+import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 

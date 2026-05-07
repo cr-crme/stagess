@@ -61,8 +61,8 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       _headquartersAddressController.waitForValidation(),
     ]);
     bool isValid = _formKey.currentState?.validate() ?? false;
-    isValid = _addressController.isValid && isValid;
-    isValid = _headquartersAddressController.isValid && isValid;
+    isValid = (_addressController.isValid) && isValid;
+    isValid = (_headquartersAddressController.isValid) && isValid;
     return isValid;
   }
 
