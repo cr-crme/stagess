@@ -16,7 +16,7 @@ class CommentsExpansionPanel extends StatelessWidget {
   });
 
   final Job job;
-  final void Function(Job job) addComment;
+  final void Function(Job job)? addComment;
 
   @override
   Widget build(BuildContext context) {
@@ -45,18 +45,19 @@ class CommentsExpansionPanel extends StatelessWidget {
                       job.comments
                           .map(
                             (e) =>
-                                '${teachers.fromId(e.teacherId).fullName} (${DateFormat.yMMMEd('fr_CA').format(e.date)}) - '
+                                '${teachers.fromIdOrNull(e.userId)?.fullName ?? 'Un·e administrateur·trice'} (${DateFormat.yMMMEd('fr_CA').format(e.date)}) - '
                                 '${e.comment}',
                           )
                           .toList(),
                       interline: 8),
-              Center(
-                child: IconButton(
-                  onPressed: () => addComment(job),
-                  icon: Icon(Icons.add_comment,
-                      color: Theme.of(context).primaryColor, size: 36),
+              if (addComment != null)
+                Center(
+                  child: IconButton(
+                    onPressed: () => addComment!(job),
+                    icon: Icon(Icons.add_comment,
+                        color: Theme.of(context).primaryColor, size: 36),
+                  ),
                 ),
-              ),
             ],
           ),
         ),

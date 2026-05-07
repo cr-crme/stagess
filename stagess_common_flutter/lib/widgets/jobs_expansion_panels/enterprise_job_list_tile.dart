@@ -12,6 +12,8 @@ import 'package:stagess_common_flutter/widgets/autocomplete_options_builder.dart
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/entity_picker_tile.dart';
 import 'package:stagess_common_flutter/widgets/incidents_expansion_panel.dart';
+import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/comments_expansion_panel.dart';
+import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/supervision_expansion_panel.dart';
 
 class EnterpriseJobListController {
   BuildContext context;
@@ -124,6 +126,7 @@ class EnterpriseJobListTile extends StatefulWidget {
     this.availabilityIsMandatory = false,
     this.showExtended = false,
     this.addSstEvent,
+    this.addComment,
   });
 
   final EnterpriseJobListController controller;
@@ -139,6 +142,7 @@ class EnterpriseJobListTile extends StatefulWidget {
   final bool availabilityIsMandatory;
   final bool showExtended;
   final void Function(Job job)? addSstEvent;
+  final void Function(Job job)? addComment;
 
   @override
   State<EnterpriseJobListTile> createState() => _EnterpriseJobListTileState();
@@ -156,6 +160,10 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
       if (widget.showExtended && widget.addSstEvent == null) {
         throw ArgumentError(
             'addSstEvent must be provided if showExtended is true');
+      }
+      if (widget.showExtended && widget.addComment == null) {
+        throw ArgumentError(
+            'addComment must be provided if showExtended is true');
       }
     }
   }
@@ -564,15 +572,11 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        IncidentsExpansionPanel(
-          job: job,
-          isExpandable: false,
-          addSstEvent: widget.addSstEvent,
-        ),
+        IncidentsExpansionPanel(job: job, addSstEvent: widget.addSstEvent),
         const SizedBox(height: 12),
-
-        // TODO add evaluations? (Refactor of the code so it is accessible here)
-        // TODO add comments
+        SupervisionExpansionPanel(job: job),
+        const SizedBox(height: 12),
+        CommentsExpansionPanel(job: job, addComment: widget.addComment)
       ],
     );
   }

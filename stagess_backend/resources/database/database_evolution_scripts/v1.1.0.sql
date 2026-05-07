@@ -74,8 +74,8 @@ START TRANSACTION;
 
 RENAME TABLE enterprise_job_incidents TO enterprise_job_incidents_bak;
 
-CREATE TABLE enterprise_job_incidents (
-id VARCHAR(36) NOT NULL PRIMARY KEY,
+CREATE TABLE enterprise_job_incidents(
+    id VARCHAR(36) NOT NULL PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
     job_id VARCHAR(36) NOT NULL,
     incident_type VARCHAR(50) NOT NULL,
@@ -90,5 +90,28 @@ INSERT INTO enterprise_job_incidents (id, user_id, job_id, incident_type, incide
     FROM enterprise_job_incidents_bak;
 
 DROP TABLE enterprise_job_incidents;
+
+COMMIT;
+
+
+/* Migrate the enterprise_job_comments table from teacher_id to user_id */
+START TRANSACTION;
+
+RENAME TABLE enterprise_job_comments TO enterprise_job_comments_bak;
+
+CREATE TABLE enterprise_job_comments(
+    job_id VARCHAR(36) NOT NULL,
+    user_id VARCHAR(36) NOT NULL,
+    date BIGINT NOT NULL,
+    comment VARCHAR(2000) NOT NULL,
+    FOREIGN KEY (job_id) REFERENCES enterprise_jobs(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+INSERT INTO enterprise_job_comments (job_id, user_id, date, comment)
+    SELECT job_id, teacher_id, date, comment
+    FROM enterprise_job_comments_bak;
+
+DROP TABLE enterprise_job_comments_bak;
 
 COMMIT;

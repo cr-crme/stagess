@@ -8,6 +8,7 @@ import 'package:stagess_admin/widgets/teacher_picker_tile.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common/models/enterprises/job_comment.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
@@ -23,6 +24,7 @@ import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/address_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/dialogs/add_sst_event_dialog.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/add_text_dialog.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/enterprise_activity_type_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/entity_picker_tile.dart';
@@ -667,6 +669,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                               null,
                       showExtended: !widget.forceEditingMode,
                       addSstEvent: _isEditing ? null : _addSstEvent,
+                      addComment: _isEditing ? null : _addComment,
                     );
                   }),
                 ],
@@ -682,8 +685,8 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     });
 
     final enterprises = EnterprisesProvider.of(context, listen: false);
-    final teacherId = AuthProvider.of(context, listen: false).teacherId;
-    if (teacherId == null) return;
+    final userId = AuthProvider.of(context, listen: false).teacherId;
+    if (userId == null) return;
 
     final hasLock = await enterprises.getLockForItem(widget.enterprise);
     if (!hasLock || !mounted) {
@@ -713,8 +716,8 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       return;
     }
 
-    final incident = Incident(
-        userId: teacherId, date: DateTime.now(), result['description']);
+    final incident =
+        Incident(userId: userId, date: DateTime.now(), result['description']);
     switch (result['eventType'] as SstEventType) {
       case SstEventType.severe:
         job.incidents.severeInjuries.add(incident);
@@ -736,6 +739,70 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       _forceDisabled = false;
     });
     _logger.finer('SST event added to job: ${job.specialization.name}');
+  }
+
+  void _addComment(Job job) async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
+
+    _logger.finer('Adding comment to job: ${job.specialization.name}');
+    final userId = AuthProvider.of(context, listen: false).teacherId;
+    if (userId == null) {
+      _logger.warning('No teacher ID found when adding comment to job.');
+      showSnackBar(
+        context,
+        message: 'Vous devez être connecté pour ajouter un commentaire.',
+      );
+      setState(() {
+        _forceDisabled = false;
+      });
+      return;
+    }
+    final enterprises = EnterprisesProvider.of(context, listen: false);
+
+    final hasLock = await enterprises.getLockForItem(widget.enterprise);
+    if (!hasLock || !mounted) {
+      if (mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible d\'ajouter un commentaire, car l\'entreprise est en cours de modification par un autre utilisateur.',
+        );
+      }
+      setState(() {
+        _forceDisabled = false;
+      });
+      return;
+    }
+
+    final newComment = await showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) =>
+          const AddTextDialog(title: 'Ajouter un commentaire', maxLength: 2000),
+    );
+
+    if (newComment == null) {
+      await enterprises.releaseLockForItem(widget.enterprise);
+      setState(() {
+        _forceDisabled = false;
+      });
+      return;
+    }
+    job.comments.add(
+      JobComment(comment: newComment, userId: userId, date: DateTime.now()),
+    );
+    await enterprises.replaceWithConfirmation(widget.enterprise);
+    await enterprises.releaseLockForItem(widget.enterprise);
+    if (mounted) {
+      showSnackBar(context, message: 'Le commentaire a été ajouté');
+    }
+    setState(() {
+      _forceDisabled = false;
+    });
+    _logger.finer('Comment added to job: ${job.specialization.name}');
   }
 
   Widget _buildRecruiter() {

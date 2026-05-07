@@ -191,13 +191,13 @@ Photo dummyPhoto() => Photo(
 
 JobComment dummyJobComment({
   String comment = 'This is a comment',
-  String teacherId = 'teacherId',
+  String userId = 'userId',
   DateTime? date,
 }) =>
     JobComment(
       id: 'jobCommentId',
       comment: 'newComment',
-      teacherId: 'teacherId',
+      userId: 'userId',
       date: DateTime(2023, 10, 1),
     );
 

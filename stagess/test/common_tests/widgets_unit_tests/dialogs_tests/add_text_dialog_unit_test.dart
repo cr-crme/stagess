@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess/common/widgets/dialogs/add_text_dialog.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/add_text_dialog.dart';
 
 import '../utils.dart';
 

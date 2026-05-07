@@ -6,7 +6,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/extensions/availability_status.dart';
 import 'package:stagess/common/extensions/enterprise_extension.dart';
-import 'package:stagess/common/widgets/dialogs/add_text_dialog.dart';
 import 'package:stagess/common/widgets/dialogs/job_creator_dialog.dart';
 import 'package:stagess/common/widgets/disponibility_circle.dart';
 import 'package:stagess/common/widgets/sub_title.dart';
@@ -29,6 +28,7 @@ import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/dialogs/add_sst_event_dialog.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/add_text_dialog.dart';
 import 'package:stagess_common_flutter/widgets/incidents_expansion_panel.dart';
 import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/comments_expansion_panel.dart';
 import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/photo_expansion_panel.dart';
@@ -239,9 +239,9 @@ class JobsPageState extends State<JobsPage> {
 
     _logger.finer('Adding SST event to job: ${job.specialization.name}');
     final enterprises = EnterprisesProvider.of(context, listen: false);
-    final teacherId =
+    final userId =
         TeachersProvider.of(context, listen: false).currentTeacher?.id;
-    if (teacherId == null) return;
+    if (userId == null) return;
 
     final hasLock = await enterprises.getLockForItem(widget.enterprise);
     if (!hasLock || !mounted) {
@@ -271,8 +271,8 @@ class JobsPageState extends State<JobsPage> {
       return;
     }
 
-    final incident = Incident(
-        userId: teacherId, date: DateTime.now(), result['description']);
+    final incident =
+        Incident(userId: userId, date: DateTime.now(), result['description']);
     switch (result['eventType'] as SstEventType) {
       case SstEventType.severe:
         job.incidents.severeInjuries.add(incident);
@@ -303,9 +303,9 @@ class JobsPageState extends State<JobsPage> {
     });
 
     _logger.finer('Adding comment to job: ${job.specialization.name}');
-    final teacherId =
+    final userId =
         TeachersProvider.of(context, listen: false).currentTeacher?.id;
-    if (teacherId == null) {
+    if (userId == null) {
       _logger.warning('No teacher ID found when adding comment to job.');
       showSnackBar(
         context,
@@ -320,11 +320,11 @@ class JobsPageState extends State<JobsPage> {
     final internship = InternshipsProvider.of(context, listen: false).where(
       (internship) =>
           internship.enterpriseId == widget.enterprise.id &&
-          internship.supervisingTeacherIds.contains(teacherId),
+          internship.supervisingTeacherIds.contains(userId),
     );
     if (internship.isEmpty) {
       _logger.warning(
-        'No internship found for teacher ID when adding comment to job: $teacherId',
+        'No internship found for teacher ID when adding comment to job: $userId',
       );
       showSnackBar(
         context,
@@ -367,11 +367,7 @@ class JobsPageState extends State<JobsPage> {
       return;
     }
     job.comments.add(
-      JobComment(
-        comment: newComment,
-        teacherId: teacherId,
-        date: DateTime.now(),
-      ),
+      JobComment(comment: newComment, userId: userId, date: DateTime.now()),
     );
     await enterprises.replaceWithConfirmation(widget.enterprise);
     await enterprises.releaseLockForItem(widget.enterprise);

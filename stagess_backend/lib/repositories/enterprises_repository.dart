@@ -364,7 +364,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
               dataTableName: 'enterprise_job_comments',
               asName: 'comments',
               idNameToDataTable: 'job_id',
-              fieldsToFetch: ['comment', 'teacher_id', 'date']),
+              fieldsToFetch: ['comment', 'user_id', 'date']),
           sqlInterface.selectSubquery(
               dataTableName: 'enterprise_job_pre_internship_requests',
               asName: 'pre_internship_requests',
@@ -405,7 +405,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
                 ?.map((e) => {
                       'id': e['job_id'],
                       'comment': e['comment'],
-                      'teacher_id': e['teacher_id'],
+                      'user_id': e['user_id'],
                       'date': e['date']
                     })
                 .toList() ??
@@ -577,7 +577,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       toWait.add(sqlInterface
           .performInsertQuery(tableName: 'enterprise_job_comments', data: {
         'job_id': jobId.serialize(),
-        'teacher_id': comment.teacherId.serialize(),
+        'user_id': comment.userId.serialize(),
         'date': comment.date.serialize(),
         'comment': comment.comment.serialize(),
       }));

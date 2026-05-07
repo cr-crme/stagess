@@ -408,10 +408,11 @@ CREATE TABLE enterprise_job_photos(
 
 CREATE TABLE enterprise_job_comments(
     job_id VARCHAR(36) NOT NULL,
-    teacher_id VARCHAR(36) NOT NULL,
+    user_id VARCHAR(36) NOT NULL,
     date BIGINT NOT NULL,
     comment VARCHAR(2000) NOT NULL,
-    FOREIGN KEY (job_id) REFERENCES enterprise_jobs(id) ON DELETE CASCADE
+    FOREIGN KEY (job_id) REFERENCES enterprise_jobs(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE enterprise_job_pre_internship_requests(
