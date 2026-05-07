@@ -495,6 +495,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                 const SizedBox(height: 8),
                 AnimatedExpandingCard(
                   elevation: 0.0,
+                  initialExpandedState: widget.forceEditingMode,
                   onTapHeader: (newState) => _wasDetailsExpanded = true,
                   header: (ctx, isExpanded) => Padding(
                     padding: const EdgeInsets.all(12.0),

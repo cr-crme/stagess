@@ -159,8 +159,9 @@ class Enterprise extends ExtendedItemSerializable {
       jobs: JobList()
         ..addAll(ListExt.mergeWithData(
           _jobs
-              .where(
-                  (job) => (data['jobs'] as Map?)?.containsKey(job.id) ?? false)
+              .where((job) =>
+                  (data['jobs'] == null) ||
+                  (data['jobs'] as Map).containsKey(job.id))
               .toList(),
           (data['jobs'] as Map?)?.values.toList(),
           copyWithData: (job, serialized) => job.copyWithData(serialized),
