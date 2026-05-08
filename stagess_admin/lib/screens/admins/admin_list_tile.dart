@@ -10,6 +10,7 @@ import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
@@ -123,7 +124,8 @@ class AdminListTileState extends State<AdminListTile> {
       showSnackBar(
         context,
         message: isSuccess
-            ? 'L\'administrateur a été supprimé avec succès.'
+            ? 'L\'administrateur a été supprimé avec succès. Attention uniquement les données ont été supprimées. '
+                'Pour supprimer complètement l\'administrateur, il faut aussi supprimer son compte utilisateur associé via la console de Firebase.'
             : 'Une erreur est survenue lors de la suppression de l\'administrateur.',
       );
     }
@@ -217,6 +219,8 @@ class AdminListTileState extends State<AdminListTile> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = AuthProvider.of(context, listen: true);
+
     return widget.forceEditingMode
         ? _buildEditingForm()
         : AnimatedExpandingCard(
@@ -240,7 +244,8 @@ class AdminListTileState extends State<AdminListTile> {
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
-                if (_isExpanded)
+                if (_isExpanded &&
+                    authProvider.databaseAccessLevel >= AccessLevel.superAdmin)
                   FutureBuilder(
                     future: _fetchFullDataCompleter.future,
                     builder: (context, snapshot) => snapshot.connectionState ==
@@ -314,7 +319,6 @@ class AdminListTileState extends State<AdminListTile> {
                   Column(
                     children: [
                       const SizedBox(height: 8),
-                      // TODO: Make this button disappear when user is created
                       _buildCreateUserButton(),
                     ],
                   ),
@@ -407,44 +411,27 @@ class AdminListTileState extends State<AdminListTile> {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (widget.admin.hasNotRegisteredAccount)
-            TextButton(
-              onPressed: () async {
-                final admins = AdminsProvider.of(context, listen: false);
-                final isSuccess = await admins.addUserToDatabase(
-                  email: _emailController.text,
-                  userType: AccessLevel.admin,
-                );
-                if (!mounted) return;
+          TextButton(
+            onPressed: () async {
+              final admins = AdminsProvider.of(context, listen: false);
+              final isSuccess = await admins.addUserToDatabase(
+                email: _emailController.text,
+                userType: AccessLevel.admin,
+              );
+              if (!mounted) return;
 
-                showSnackBar(
-                  context,
-                  message: isSuccess
-                      ? 'Compte utilisateur créé avec succès.'
-                      : 'Échec de la création du compte utilisateur.',
-                );
-              },
-              child: const Text('Créer un compte'),
+              showSnackBar(
+                context,
+                message: isSuccess
+                    ? 'Compte utilisateur créé avec succès.'
+                    : 'Échec de la création du compte utilisateur.',
+              );
+            },
+            child: Text(
+              'Envoyer un courriel de réinitialisation de mot de passe',
+              textAlign: TextAlign.center,
             ),
-          if (widget.admin.hasRegisteredAccount)
-            TextButton(
-              onPressed: () async {
-                final admins = AdminsProvider.of(context, listen: false);
-                final isSuccess = await admins.deleteUserFromDatabase(
-                  email: _emailController.text,
-                  userType: AccessLevel.admin,
-                );
-                if (!mounted) return;
-
-                showSnackBar(
-                  context,
-                  message: isSuccess
-                      ? 'Compte utilisateur supprimé avec succès.'
-                      : 'Échec de la suppression du compte utilisateur.',
-                );
-              },
-              child: const Text('Supprimer un compte'),
-            ),
+          ),
         ],
       ),
     );

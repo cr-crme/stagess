@@ -233,7 +233,7 @@ class Connexions {
     }
 
     // Make sure only previously added teachers can be registered
-    if (user == null || user['has_registered_account'] == 1) {
+    if (user == null) {
       throw ConnexionRefusedException(
           'No user found with email $email. Please add the user to the database before registering them.');
     }
@@ -244,11 +244,15 @@ class Connexions {
       await _sendPasswordResetEmail(email, _firebaseApiKey);
     } on FirebaseAuthError catch (e) {
       if (e.code == 'auth/email-already-exists') {
-        // Continue as it means the user is registered
+        // Continue as it means the user is registered but might need to reset their password
       } else {
         rethrow;
       }
     }
+
+    // Send a reset password email to the user
+    await _sendPasswordResetEmail(email, _firebaseApiKey);
+
     // Send confirmation to the client
     await _send(client,
         message: CommunicationProtocol(

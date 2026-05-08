@@ -75,10 +75,11 @@ class AdminsListScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Liste des administrateurs·trices'),
         actions: [
-          IconButton(
-            onPressed: () => _showAddAdminDialog(context),
-            icon: Icon(Icons.add),
-          ),
+          if (authProvider.databaseAccessLevel >= AccessLevel.superAdmin)
+            IconButton(
+              onPressed: () => _showAddAdminDialog(context),
+              icon: Icon(Icons.add),
+            ),
         ],
       ),
       smallDrawer: MainDrawer.small,

@@ -366,7 +366,6 @@ class TeacherListTileState extends State<TeacherListTile> {
                   Column(
                     children: [
                       const SizedBox(height: 8),
-                      // TODO: make this button disappear when user is created
                       _buildCreateUserButton(),
                     ],
                   ),
@@ -508,46 +507,27 @@ class TeacherListTileState extends State<TeacherListTile> {
         mainAxisAlignment: MainAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (widget.teacher.hasNotRegisteredAccount)
-            TextButton(
-              onPressed: () async {
-                final isSuccess =
-                    await AdminsProvider.of(context, listen: false)
-                        .addUserToDatabase(
-                  email: _emailController.text,
-                  userType: AccessLevel.teacher,
-                );
-                if (!mounted) return;
+          TextButton(
+            onPressed: () async {
+              final isSuccess = await AdminsProvider.of(context, listen: false)
+                  .addUserToDatabase(
+                email: _emailController.text,
+                userType: AccessLevel.teacher,
+              );
+              if (!mounted) return;
 
-                showSnackBar(
-                  context,
-                  message: isSuccess
-                      ? 'Compte utilisateur créé avec succès.'
-                      : 'Échec de la création du compte utilisateur.',
-                );
-              },
-              child: const Text('Créer un compte'),
+              showSnackBar(
+                context,
+                message: isSuccess
+                    ? 'Compte utilisateur créé avec succès.'
+                    : 'Échec de la création du compte utilisateur.',
+              );
+            },
+            child: Text(
+              'Envoyer un courriel de réinitialisation de mot de passe',
+              textAlign: TextAlign.center,
             ),
-          if (widget.teacher.hasRegisteredAccount)
-            TextButton(
-              onPressed: () async {
-                final isSuccess =
-                    await AdminsProvider.of(context, listen: false)
-                        .deleteUserFromDatabase(
-                  email: _emailController.text,
-                  userType: AccessLevel.teacher,
-                );
-                if (!mounted) return;
-
-                showSnackBar(
-                  context,
-                  message: isSuccess
-                      ? 'Compte utilisateur supprimé avec succès.'
-                      : 'Échec de la suppression du compte utilisateur.',
-                );
-              },
-              child: const Text('Supprimer un compte'),
-            ),
+          ),
         ],
       ),
     );

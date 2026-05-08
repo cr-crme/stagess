@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/admins/admin_list_tile.dart';
+import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
@@ -44,9 +45,40 @@ class _AddAdminDialogState extends State<AddAdminDialog> {
           ],
         ),
       );
-    } else {
-      Navigator.of(context).pop(true);
     }
+
+    if (!mounted) return;
+    final admins = AdminsProvider.of(context, listen: false);
+    final isSuccess = await admins.addUserToDatabase(
+      email: newAdmin.email,
+      userType: AccessLevel.admin,
+    );
+
+    if (!mounted) return;
+    if (!isSuccess) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Échec de l\'envoi du courriel de création de compte'),
+          content: SizedBox(
+            width: ResponsiveService.maxBodyWidth * 0.6,
+            child: Text(
+                'L\'administrateur·trice a été ajouté·e à la base de données, '
+                'mais l\'envoi du courriel de création de compte a échoué. '
+                'Veuillez contacter le support pour résoudre ce problème.'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (!mounted) return;
+    Navigator.of(context).pop(true);
   }
 
   void _onClickedCancel() {
