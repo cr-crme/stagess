@@ -28,8 +28,10 @@ abstract class AdminsRepository extends RepositoryAbstract {
     final admins = await _getAllAdmins(user: user);
 
     // Filter administrators based on user access level (this should already be done, but just in case)
-    admins
-        .removeWhere((key, value) => value.schoolBoardId != user.schoolBoardId);
+    if (user.accessLevel < AccessLevel.superAdmin) {
+      admins.removeWhere(
+          (key, value) => value.schoolBoardId != user.schoolBoardId);
+    }
 
     return RepositoryResponse(
         data: admins.map(
@@ -51,7 +53,8 @@ abstract class AdminsRepository extends RepositoryAbstract {
     if (admin == null) throw MissingDataException('Administrator not found');
 
     // Prevent from getting an administrator that the user does not have access to (this should already be done, but just in case)
-    if (admin.schoolBoardId != user.schoolBoardId) {
+    if (user.accessLevel < AccessLevel.superAdmin &&
+        admin.schoolBoardId != user.schoolBoardId) {
       throw MissingDataException('Administrator not found');
     }
 

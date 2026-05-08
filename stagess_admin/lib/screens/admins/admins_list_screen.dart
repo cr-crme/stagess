@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/admins/add_admin_dialog.dart';
 import 'package:stagess_admin/screens/admins/admin_list_tile.dart';
 import 'package:stagess_admin/screens/drawer/main_drawer.dart';
+import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
@@ -36,8 +38,12 @@ class AdminsListScreen extends StatelessWidget {
           .where((admin) => admin.schoolBoardId == schoolBoard.id)
           .toList();
     }
-    admins[null] =
-        allAdmins.where((admin) => admin.schoolBoardId == '').toList();
+
+    if (AuthProvider.of(context, listen: false).databaseAccessLevel >=
+        AccessLevel.superAdmin) {
+      admins[null] =
+          allAdmins.where((admin) => admin.schoolBoardId == '').toList();
+    }
 
     return admins;
   }
@@ -61,6 +67,7 @@ class AdminsListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = AuthProvider.of(context, listen: true);
     final schoolBoardAdmins = _getAdmins(context);
 
     return ResponsiveService.scaffoldOf(
@@ -86,32 +93,49 @@ class AdminsListScreen extends StatelessWidget {
                 child: Text('Aucun centre de services scolaire inscrit'),
               ),
             if (schoolBoardAdmins.isNotEmpty)
-              ...schoolBoardAdmins.entries.map(
-                (schoolBoardEntry) => Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: AnimatedExpandingCard(
-                    header: (ctx, isExpanded) => Text(
-                      schoolBoardEntry.key?.name ??
-                          'Super administrateurs·trices',
-                      style: Theme.of(
-                        context,
-                      ).textTheme.titleLarge!.copyWith(color: Colors.black),
-                    ),
-                    elevation: 0.0,
-                    initialExpandedState: true,
-                    child: Column(
-                      children: [
-                        ...schoolBoardEntry.value.map(
-                          (adminEntry) => AdminListTile(
-                            key: ValueKey(adminEntry.id),
-                            admin: adminEntry,
+              switch (authProvider.databaseAccessLevel) {
+                AccessLevel.superAdmin => Column(children: [
+                    ...schoolBoardAdmins.entries.map(
+                      (schoolBoardEntry) => Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: AnimatedExpandingCard(
+                          header: (ctx, isExpanded) => Text(
+                            schoolBoardEntry.key?.name ??
+                                'Super administrateurs·trices',
+                            style: Theme.of(
+                              context,
+                            )
+                                .textTheme
+                                .titleLarge!
+                                .copyWith(color: Colors.black),
+                          ),
+                          elevation: 0.0,
+                          initialExpandedState: true,
+                          child: Column(
+                            children: [
+                              ...schoolBoardEntry.value.map(
+                                (adminEntry) => AdminListTile(
+                                  key: ValueKey(adminEntry.id),
+                                  admin: adminEntry,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ),
+                  ]),
+                AccessLevel.admin ||
+                AccessLevel.teacher ||
+                AccessLevel.invalid =>
+                  Column(children: [
+                    ...?schoolBoardAdmins.values.firstOrNull
+                        ?.map((adminEntry) => AdminListTile(
+                              key: ValueKey(adminEntry.id),
+                              admin: adminEntry,
+                            ))
+                  ]),
+              },
           ],
         ),
       ),

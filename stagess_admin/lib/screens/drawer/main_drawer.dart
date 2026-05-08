@@ -82,15 +82,13 @@ class MainDrawer extends StatelessWidget {
                           iconOnly: iconOnly,
                           canPop: canPop,
                         ),
-                        if (authProvider.databaseAccessLevel >=
-                            AccessLevel.superAdmin)
-                          _DrawerItem(
-                            titleText: 'Administrateurs·trices',
-                            icon: Icons.admin_panel_settings,
-                            route: Screens.adminsListScreen,
-                            iconOnly: iconOnly,
-                            canPop: canPop,
-                          ),
+                        _DrawerItem(
+                          titleText: 'Administrateurs·trices',
+                          icon: Icons.admin_panel_settings,
+                          route: Screens.adminsListScreen,
+                          iconOnly: iconOnly,
+                          canPop: canPop,
+                        ),
                         _DrawerItem(
                           titleText: 'Enseignant·e·s',
                           icon: Icons.groups_3_outlined,
