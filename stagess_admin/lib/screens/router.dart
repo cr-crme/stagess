@@ -4,6 +4,7 @@ import 'package:stagess_admin/screens/admins/admins_list_screen.dart';
 import 'package:stagess_admin/screens/enterprises/enterprises_list_screen.dart';
 import 'package:stagess_admin/screens/internships/internships_list_screen.dart';
 import 'package:stagess_admin/screens/login/login_screen.dart';
+import 'package:stagess_admin/screens/my_account/my_account_screen.dart';
 import 'package:stagess_admin/screens/school_boards/school_boards_list_screen.dart';
 import 'package:stagess_admin/screens/students/students_list_screen.dart';
 import 'package:stagess_admin/screens/teachers/teachers_list_screen.dart';
@@ -19,31 +20,28 @@ abstract class Screens {
   static const studentsListScreen = StudentsListScreen.route;
   static const enterprisesListScreen = EnterprisesListScreen.route;
   static const internshipsListScreen = InternshipsListScreen.route;
+  static const myAccountScreen = MyAccountScreen.route;
 }
 
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 // Keep a reference of the last requested state so when login is successful, we can redirect to it
 final router = GoRouter(
   navigatorKey: rootNavigatorKey,
-  redirect:
-      (context, state) =>
-          AuthProvider.of(context).isFullySignedIn ? null : Screens.login,
+  redirect: (context, state) =>
+      AuthProvider.of(context).isFullySignedIn ? null : Screens.login,
   routes: [
     GoRoute(
       path: '/',
-      redirect:
-          (context, state) =>
-              AuthProvider.of(context).isFullySignedIn ? null : Screens.login,
+      redirect: (context, state) =>
+          AuthProvider.of(context).isFullySignedIn ? null : Screens.login,
     ),
     GoRoute(
       path: Screens.login,
       name: Screens.login,
       builder: (context, state) => const LoginScreen(),
-      redirect:
-          (context, state) =>
-              AuthProvider.of(context).isFullySignedIn
-                  ? Screens.home
-                  : Screens.login,
+      redirect: (context, state) => AuthProvider.of(context).isFullySignedIn
+          ? Screens.home
+          : Screens.login,
     ),
     GoRoute(
       path: Screens.schoolBoardsListScreen,
@@ -74,6 +72,11 @@ final router = GoRouter(
       path: Screens.internshipsListScreen,
       name: Screens.internshipsListScreen,
       builder: (context, state) => const InternshipsListScreen(),
+    ),
+    GoRoute(
+      path: Screens.myAccountScreen,
+      name: Screens.myAccountScreen,
+      builder: (context, state) => const MyAccountScreen(),
     ),
   ],
 );

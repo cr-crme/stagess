@@ -120,6 +120,13 @@ class MainDrawer extends StatelessWidget {
                           canPop: canPop,
                         ),
                         _DrawerItem(
+                          titleText: 'Mon compte',
+                          icon: Icons.manage_accounts,
+                          route: Screens.myAccountScreen,
+                          iconOnly: iconOnly,
+                          canPop: canPop,
+                        ),
+                        _DrawerItem(
                           titleText: 'Se déconnecter',
                           icon: Icons.logout,
                           onTap: () => AuthProviderExtension.disconnectAll(
