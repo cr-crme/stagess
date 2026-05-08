@@ -89,7 +89,7 @@ INSERT INTO enterprise_job_incidents (id, user_id, job_id, incident_type, incide
     SELECT id, teacher_id, job_id, incident_type, incident, date
     FROM enterprise_job_incidents_bak;
 
-DROP TABLE enterprise_job_incidents;
+DROP TABLE enterprise_job_incidents_bak;
 
 COMMIT;
 
