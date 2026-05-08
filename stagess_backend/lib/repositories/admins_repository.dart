@@ -20,12 +20,17 @@ abstract class AdminsRepository extends RepositoryAbstract {
     required FetchableFields fields,
     required DatabaseUser user,
   }) async {
-    if (user.accessLevel < AccessLevel.superAdmin) {
+    if (user.accessLevel < AccessLevel.admin) {
       throw InvalidRequestException(
           'You do not have permission to get all administrators');
     }
 
     final admins = await _getAllAdmins(user: user);
+
+    // Filter administrators based on user access level (this should already be done, but just in case)
+    admins
+        .removeWhere((key, value) => value.schoolBoardId != user.schoolBoardId);
+
     return RepositoryResponse(
         data: admins.map(
             (key, value) => MapEntry(key, value.serializeWithFields(fields))));
@@ -37,13 +42,18 @@ abstract class AdminsRepository extends RepositoryAbstract {
     required FetchableFields fields,
     required DatabaseUser user,
   }) async {
-    if (user.accessLevel < AccessLevel.superAdmin) {
+    if (user.accessLevel < AccessLevel.admin) {
       throw InvalidRequestException(
           'You do not have permission to get all administrators');
     }
 
     final admin = await _getAdminById(id: id, user: user);
     if (admin == null) throw MissingDataException('Administrator not found');
+
+    // Prevent from getting an administrator that the user does not have access to (this should already be done, but just in case)
+    if (admin.schoolBoardId != user.schoolBoardId) {
+      throw MissingDataException('Administrator not found');
+    }
 
     return RepositoryResponse(data: admin.serializeWithFields(fields));
   }
@@ -55,9 +65,9 @@ abstract class AdminsRepository extends RepositoryAbstract {
     required DatabaseUser user,
     bool tryRequestingLock = true,
   }) async {
-    if (user.accessLevel < AccessLevel.superAdmin) {
+    if (user.userId != id && user.accessLevel < AccessLevel.superAdmin) {
       throw InvalidRequestException(
-          'You do not have permission to get put administrators');
+          'You do not have permission to put administrators');
     }
 
     if (!canEdit(user: user, id: id)) {

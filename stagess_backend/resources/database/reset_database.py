@@ -102,6 +102,10 @@ def add_super_admin_user(super_admin_email: str) -> bool:
     if not _perform_query(query):
         return False
 
+    query = f"INSERT INTO phone_numbers (id, entity_id, phone_number) " f"VALUES ('{uuid.uuid4()}', '{id}', '');"
+    if not _perform_query(query):
+        return False
+
     return True
 
 

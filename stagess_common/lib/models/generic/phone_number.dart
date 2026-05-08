@@ -72,4 +72,17 @@ class PhoneNumber extends ItemSerializable {
         ? ''
         : '($areaCode) $cityCode-$number${extension != null ? ' poste $extension' : ''}';
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    if (other is! PhoneNumber) return false;
+    return areaCode == other.areaCode &&
+        cityCode == other.cityCode &&
+        number == other.number &&
+        extension == other.extension;
+  }
+
+  @override
+  int get hashCode => Object.hash(areaCode, cityCode, number, extension);
 }

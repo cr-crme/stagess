@@ -511,8 +511,9 @@ class TeacherListTileState extends State<TeacherListTile> {
           if (widget.teacher.hasNotRegisteredAccount)
             TextButton(
               onPressed: () async {
-                final admins = AdminsProvider.of(context, listen: false);
-                final isSuccess = await admins.addUserToDatabase(
+                final isSuccess =
+                    await AdminsProvider.of(context, listen: false)
+                        .addUserToDatabase(
                   email: _emailController.text,
                   userType: AccessLevel.teacher,
                 );
@@ -530,8 +531,9 @@ class TeacherListTileState extends State<TeacherListTile> {
           if (widget.teacher.hasRegisteredAccount)
             TextButton(
               onPressed: () async {
-                final admins = AdminsProvider.of(context, listen: false);
-                final isSuccess = await admins.deleteUserFromDatabase(
+                final isSuccess =
+                    await AdminsProvider.of(context, listen: false)
+                        .deleteUserFromDatabase(
                   email: _emailController.text,
                   userType: AccessLevel.teacher,
                 );

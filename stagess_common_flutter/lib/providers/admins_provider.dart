@@ -26,8 +26,7 @@ class AdminsProvider extends BackendListProvided<Admin> {
   FetchableFields get referenceFetchableFields => Admin.fetchableFields;
 
   void initializeAuth(AuthProvider auth) {
-    if (!auth.isFullySignedIn ||
-        auth.databaseAccessLevel < AccessLevel.superAdmin) {
+    if (!auth.isFullySignedIn || auth.databaseAccessLevel < AccessLevel.admin) {
       return;
     }
 
