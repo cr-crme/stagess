@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:intl/intl.dart';
 import 'package:stagess_admin/screens/students/confirm_delete_student_dialog.dart';
 import 'package:stagess_admin/widgets/section_divider.dart';
 import 'package:stagess_common/models/generic/address.dart';
@@ -16,7 +18,11 @@ import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/address_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/birthday_list_tile.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/show_pdf_dialog.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/forms/show_forms.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/forms/visa_evaluation_form_dialog.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/visa_pdf_template.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 import 'package:stagess_common_flutter/widgets/skill_progression_tile.dart';
@@ -420,6 +426,8 @@ class StudentListTileState extends State<StudentListTile> {
                 _buildContact(),
                 SectionDivider(),
                 _buildProgression(),
+                SectionDivider(),
+                _buildVisa(),
               ],
             ),
           ),
@@ -663,6 +671,79 @@ class StudentListTileState extends State<StudentListTile> {
             style: Theme.of(context).textTheme.titleMedium),
         SkillProgressionTile(studentId: widget.student.id),
       ],
+    );
+  }
+
+  Widget _buildVisa() {
+    final orderedEvaluations =
+        widget.student.allVisa.sortedBy((e) => e.date).reversed;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (orderedEvaluations.isNotEmpty)
+            Text('Voir les versions du VISA',
+                style: Theme.of(context).textTheme.titleMedium),
+          Padding(
+            padding: const EdgeInsets.only(left: 12.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: orderedEvaluations.map(
+                (evaluation) {
+                  // Reminder the list is reversed for display
+                  return Row(
+                    children: [
+                      SizedBox(
+                        width: 150,
+                        child: Text(
+                          '\u2022 ${DateFormat('dd MMMM yyyy', 'fr_CA').format(evaluation.date)}',
+                        ),
+                      ),
+                      IconButton(
+                          onPressed: () => showStudentEvaluationFormDialog(
+                              context,
+                              studentId: widget.student.id,
+                              evaluationId: evaluation.id,
+                              canModify: false,
+                              showEvaluationDialog:
+                                  showVisaEvaluationFormDialog),
+                          color: Theme.of(context).primaryColor,
+                          icon: const Icon(Icons.insert_drive_file)),
+                      SizedBox(width: 4),
+                      IconButton(
+                          onPressed: () => showPdfDialog(context,
+                              pdfGeneratorCallback: (context, format) =>
+                                  generateVisaPdf(context, format,
+                                      studentId: widget.student.id,
+                                      studentVisa: evaluation)),
+                          color: Theme.of(context).primaryColor,
+                          icon: const Icon(Icons.picture_as_pdf)),
+                    ],
+                  );
+                },
+              ).toList(),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0, right: 12.0),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () async => await showStudentEvaluationFormDialog(
+                    context,
+                    studentId: widget.student.id,
+                    evaluationId: widget.student.allVisa.lastOrNull?.id,
+                    canModify: true,
+                    showEvaluationDialog: showVisaEvaluationFormDialog),
+                child: const Text('Modifier le visa'),
+              ),
+            ),
+          )
+        ],
+      ),
     );
   }
 }
