@@ -5,7 +5,8 @@ import 'package:flutter/services.dart';
 
 abstract class QuestionFileService {
   static Future<void> loadData() async {
-    final file = await rootBundle.loadString('assets/questions.json');
+    final file = await rootBundle
+        .loadString('packages/stagess_common_flutter/assets/questions.json');
     final json = jsonDecode(file) as List;
 
     _questions = List.from(

@@ -30,8 +30,16 @@ import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/dialogs/show_pdf_dialog.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/forms/attitude_evaluation_form_dialog.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/forms/enterprise_evaluation_form_dialog.dart';
 import 'package:stagess_common_flutter/widgets/form_dialogs/forms/internship_managing_contract_form_dialog.dart';
 import 'package:stagess_common_flutter/widgets/form_dialogs/forms/show_forms.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/forms/skill_evaluation_form_dialog.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/forms/sst_evaluation_form_dialog.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/evaluation_attitude_pdf_template.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/evaluation_enterprise_pdf_template.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/evaluation_skill_pdf_template.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/evaluation_sst_pdf_template.dart';
 import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/internship_contract_pdf_template.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/schedule_selector.dart';
@@ -841,40 +849,14 @@ class InternshipListTileState extends State<InternshipListTile> {
         Padding(
           padding: const EdgeInsets.only(left: 8.0),
           child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSelectShowPreviousEvaluations(
-                title: (widget.internship.contracts.length > 1
-                    ? 'Afficher les contrats de stage du\u00a0: '
-                    : 'Afficher le contrat de stage du\u00a0: '),
-                evaluations: widget.internship.contracts,
-                onClickedShowEvaluation: (contractId) =>
-                    showInternshipEvaluationFormDialog(
-                  context,
-                  internshipId: widget.internship.id,
-                  evaluationId: contractId,
-                  showEvaluationDialog: (BuildContext context,
-                          {required String internshipId,
-                          String? evaluationId}) =>
-                      showManagingContractFormDialog(
-                    context,
-                    internship: InternshipsProvider.of(context, listen: false)
-                        .fromId(internshipId),
-                    evaluationId: evaluationId,
-                    isNewContract: false,
-                  ),
-                ),
-                onClickedShowEvaluationPdf: (contractId) => showPdfDialog(
-                  context,
-                  pdfGeneratorCallback: (context, format) =>
-                      generateInternshipContractPdf(
-                    context,
-                    format,
-                    internshipId: widget.internship.id,
-                    contractId: contractId,
-                  ),
-                ),
-              ),
-              // TODO Add other documents
+              _buildContractTile(),
+              _buildC1Tile(),
+              _buildC2Tile(),
+              _buildSstTile(),
+              _buildEnterpriseTile(),
             ],
           ),
         ),
@@ -882,11 +864,159 @@ class InternshipListTileState extends State<InternshipListTile> {
     );
   }
 
+  Widget _buildContractTile() => _buildSelectShowPreviousEvaluations(
+        title: widget.internship.contracts.isEmpty
+            ? 'Aucun contrat de stage généré pour ce stage.'
+            : (widget.internship.contracts.length == 1
+                ? 'Afficher le contrat de stage du\u00a0: '
+                : 'Afficher les contrats de stage du\u00a0: '),
+        evaluations: widget.internship.contracts,
+        onClickedShowEvaluation: (contractId) =>
+            showInternshipEvaluationFormDialog(
+          context,
+          internshipId: widget.internship.id,
+          evaluationId: contractId,
+          showEvaluationDialog: (BuildContext context,
+                  {required String internshipId, String? evaluationId}) =>
+              showManagingContractFormDialog(
+            context,
+            internship: InternshipsProvider.of(context, listen: false)
+                .fromId(internshipId),
+            evaluationId: evaluationId,
+            isNewContract: false,
+          ),
+        ),
+        onClickedShowEvaluationPdf: (contractId) => showPdfDialog(
+          context,
+          pdfGeneratorCallback: (context, format) =>
+              generateInternshipContractPdf(
+            context,
+            format,
+            internshipId: widget.internship.id,
+            contractId: contractId,
+          ),
+        ),
+      );
+
+  Widget _buildC1Tile() => _buildSelectShowPreviousEvaluations(
+        title: (widget.internship.skillEvaluations.isEmpty
+            ? 'Aucune évaluation de compétences spécifiques du métier (C1) générée pour ce stage.'
+            : (widget.internship.skillEvaluations.length == 1
+                ? 'Afficher l\'évaluation de compétences spécifiques du métier (C1) du\u00a0: '
+                : 'Afficher les évaluations de compétences spécifiques du métier (C1) du\u00a0: ')),
+        evaluations: widget.internship.skillEvaluations,
+        onClickedShowEvaluation: (evaluationId) =>
+            showInternshipEvaluationFormDialog(
+          context,
+          internshipId: widget.internship.id,
+          evaluationId: evaluationId,
+          showEvaluationDialog: (BuildContext context,
+                  {required String internshipId, String? evaluationId}) =>
+              showSkillEvaluationFormDialog(context,
+                  internshipId: internshipId, evaluationId: evaluationId),
+        ),
+        onClickedShowEvaluationPdf: (evaluationId) => showPdfDialog(
+          context,
+          pdfGeneratorCallback: (context, format) => generateSkillEvaluationPdf(
+            context,
+            format,
+            internshipId: widget.internship.id,
+            evaluationId: evaluationId,
+          ),
+        ),
+      );
+
+  Widget _buildC2Tile() => _buildSelectShowPreviousEvaluations(
+        title: (widget.internship.attitudeEvaluations.isEmpty
+            ? 'Aucune évaluation d\'attitude et de comportement (C2) générée pour ce stage.'
+            : (widget.internship.attitudeEvaluations.length == 1
+                ? 'Afficher l\'évaluation d\'attitude et de comportement (C2) du\u00a0: '
+                : 'Afficher les évaluations d\'attitude et de comportement (C2) du\u00a0: ')),
+        evaluations: widget.internship.attitudeEvaluations,
+        onClickedShowEvaluation: (evaluationId) =>
+            showInternshipEvaluationFormDialog(
+          context,
+          internshipId: widget.internship.id,
+          evaluationId: evaluationId,
+          showEvaluationDialog: (BuildContext context,
+                  {required String internshipId, String? evaluationId}) =>
+              showAttitudeEvaluationFormDialog(context,
+                  internshipId: internshipId, evaluationId: evaluationId),
+        ),
+        onClickedShowEvaluationPdf: (evaluationId) => showPdfDialog(
+          context,
+          pdfGeneratorCallback: (context, format) =>
+              generateAttitudeEvaluationPdf(
+            context,
+            format,
+            internshipId: widget.internship.id,
+            evaluationId: evaluationId,
+          ),
+        ),
+      );
+
+  Widget _buildSstTile() => _buildSelectShowPreviousEvaluations(
+        title: (widget.internship.sstEvaluations.isEmpty
+            ? 'Aucune évaluation de la SST en entreprise générée pour ce stage.'
+            : (widget.internship.sstEvaluations.length == 1
+                ? 'Afficher l\'évaluation de la SST en entreprise du\u00a0: '
+                : 'Afficher les évaluations de la SST en entreprise du\u00a0: ')),
+        evaluations: widget.internship.sstEvaluations,
+        onClickedShowEvaluation: (evaluationId) =>
+            showInternshipEvaluationFormDialog(
+          context,
+          internshipId: widget.internship.id,
+          evaluationId: evaluationId,
+          showEvaluationDialog: (BuildContext context,
+                  {required String internshipId, String? evaluationId}) =>
+              showSstEvaluationFormDialog(context,
+                  internshipId: internshipId, evaluationId: evaluationId),
+        ),
+        onClickedShowEvaluationPdf: (evaluationId) => showPdfDialog(
+          context,
+          pdfGeneratorCallback: (context, format) => generateSstEvaluationPdf(
+            context,
+            format,
+            internshipId: widget.internship.id,
+            evaluationId: evaluationId,
+          ),
+        ),
+      );
+
+  Widget _buildEnterpriseTile() => _buildSelectShowPreviousEvaluations(
+        title: (widget.internship.enterpriseEvaluations.isEmpty
+            ? 'Aucune évaluation de l\'encadrement de l\'entreprise générée pour ce stage.'
+            : (widget.internship.enterpriseEvaluations.length == 1
+                ? 'Afficher l\'évaluation de l\'encadrement de l\'entreprise du\u00a0: '
+                : 'Afficher les évaluations de l\'encadrement de l\'entreprise du\u00a0: ')),
+        evaluations: widget.internship.enterpriseEvaluations,
+        onClickedShowEvaluation: (evaluationId) =>
+            showInternshipEvaluationFormDialog(
+          context,
+          internshipId: widget.internship.id,
+          evaluationId: evaluationId,
+          showEvaluationDialog: (BuildContext context,
+                  {required String internshipId, String? evaluationId}) =>
+              showEnterpriseEvaluationFormDialog(context,
+                  internshipId: internshipId, evaluationId: evaluationId),
+        ),
+        onClickedShowEvaluationPdf: (evaluationId) => showPdfDialog(
+          context,
+          pdfGeneratorCallback: (context, format) =>
+              generateEnterpriseEvaluationPdf(
+            context,
+            format,
+            internshipId: widget.internship.id,
+            evaluationId: evaluationId,
+          ),
+        ),
+      );
+
   Widget _buildSelectShowPreviousEvaluations({
     required String title,
     required List<InternshipEvaluation> evaluations,
-    required Function(String contractId) onClickedShowEvaluation,
-    required Function(String contractId) onClickedShowEvaluationPdf,
+    required Function(String evaluationId) onClickedShowEvaluation,
+    required Function(String evaluationId) onClickedShowEvaluationPdf,
   }) {
     final orderedEvaluations = evaluations.sortedBy((e) => e.date).reversed;
 

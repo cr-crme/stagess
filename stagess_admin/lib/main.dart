@@ -17,6 +17,7 @@ import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/services/question_file_service.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
 import 'package:stagess_common_flutter/widgets/single_instance_manager.dart';
 
@@ -55,6 +56,8 @@ void main() async {
   await TileProvider.instance.initialize(provider: MapTileProvider.googleMaps);
   await ReverseGeocodingProvider.instance
       .initialize(provider: MapReverseGeocodingProvider.googleMaps);
+
+  await QuestionFileService.loadData();
 
   runApp(Home(useMockers: useMockers, backendUri: backendUri));
 }

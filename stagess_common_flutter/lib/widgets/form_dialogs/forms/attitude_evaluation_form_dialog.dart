@@ -12,9 +12,9 @@ import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/sub_title.dart';
 
-final _logger = Logger('AttitudeEvaluationScreen');
+final _logger = Logger('AttitudeEvaluationFormScreen');
 
-Future<Internship?> showAttitudeEvaluationDialog(
+Future<Internship?> showAttitudeEvaluationFormDialog(
   BuildContext context, {
   required String internshipId,
   String? evaluationId,

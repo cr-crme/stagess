@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
@@ -12,6 +13,10 @@ class StudentsHelpers {
   /// they are not supervising them personnally)
   static List<Student> studentsInMyGroups(BuildContext context,
       {bool listen = true}) {
+    if (AuthProvider.of(context, listen: false).isAdmin) {
+      return [...StudentsProvider.of(context, listen: listen)];
+    }
+
     final acceptedGroups =
         TeachersProvider.of(context, listen: false).currentTeacher?.groups;
     if (acceptedGroups == null || acceptedGroups.isEmpty) return [];
