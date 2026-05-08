@@ -28,6 +28,7 @@ import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/finalize_internship_dialog.dart';
 import 'package:stagess_common_flutter/widgets/dialogs/show_pdf_dialog.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/form_dialogs/forms/attitude_evaluation_form_dialog.dart';
@@ -538,7 +539,14 @@ class InternshipListTileState extends State<InternshipListTile> {
                       const EdgeInsets.only(top: 4.0, bottom: 4.0, right: 24.0),
                   child: Divider(height: 32, thickness: 2),
                 ),
-                _buildPdfSection(),
+                _buildActions(),
+                const SizedBox(height: 8),
+                Padding(
+                  padding:
+                      const EdgeInsets.only(top: 4.0, bottom: 4.0, right: 24.0),
+                  child: Divider(height: 32, thickness: 2),
+                ),
+                _buildDocumentsSection(),
                 const SizedBox(height: 8),
               ],
             ),
@@ -839,7 +847,32 @@ class InternshipListTileState extends State<InternshipListTile> {
     );
   }
 
-  Widget _buildPdfSection() {
+  Widget _buildActions() {
+    final hasActions = widget.internship.isActive;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Actions possibles pour ce stage',
+            style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 8),
+        if (!hasActions)
+          Center(
+            child: Text(
+              'Aucune action possible pour le moment.',
+              style: TextStyle(fontStyle: FontStyle.italic),
+            ),
+          ),
+        if (widget.internship.isActive)
+          TextButton(
+              onPressed: () => showFinalizeInternshipDialog(context,
+                  internshipId: widget.internship.id),
+              child: Text('Terminer le stage')),
+      ],
+    );
+  }
+
+  Widget _buildDocumentsSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [

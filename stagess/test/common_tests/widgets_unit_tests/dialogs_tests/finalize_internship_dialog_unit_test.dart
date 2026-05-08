@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess/common/widgets/dialogs/finalize_internship_dialog.dart';
 import 'package:stagess/program_helpers.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/finalize_internship_dialog.dart';
 
 import '../../../utils.dart';
 import '../../utils.dart';
