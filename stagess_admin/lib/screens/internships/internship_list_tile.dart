@@ -826,7 +826,7 @@ class InternshipListTileState extends State<InternshipListTile> {
         children: [
           TextFormField(
             controller: _teacherNotesController,
-            enabled: _isEditing,
+            enabled: false,
             style: TextStyle(color: Colors.black),
             maxLength: 2000,
             decoration: const InputDecoration(
@@ -840,26 +840,30 @@ class InternshipListTileState extends State<InternshipListTile> {
   }
 
   Widget _buildActions() {
-    final hasActions = widget.internship.isActive;
+    final canTerminate = widget.internship.isActive && !_isEditing;
+    final hasActions = canTerminate;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Actions possibles pour ce stage',
+        Text('Actions disponibles pour ce stage',
             style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
         if (!hasActions)
           Center(
             child: Text(
-              'Aucune action possible pour le moment.',
+              'Aucune action disponible pour le moment.',
               style: TextStyle(fontStyle: FontStyle.italic),
             ),
           ),
-        if (widget.internship.isActive)
-          TextButton(
-              onPressed: () => showFinalizeInternshipDialog(context,
-                  internshipId: widget.internship.id),
-              child: Text('Terminer le stage')),
+        if (canTerminate)
+          Padding(
+            padding: const EdgeInsets.only(left: 12.0),
+            child: TextButton(
+                onPressed: () => showFinalizeInternshipDialog(context,
+                    internshipId: widget.internship.id),
+                child: Text('Terminer le stage')),
+          ),
       ],
     );
   }
