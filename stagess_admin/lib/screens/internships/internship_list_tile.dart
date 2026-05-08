@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:stagess_admin/screens/internships/confirm_delete_internship_dialog.dart';
 import 'package:stagess_admin/screens/internships/schedule_list_tile.dart';
 import 'package:stagess_admin/widgets/enterprise_picker_tile.dart';
+import 'package:stagess_admin/widgets/section_divider.dart';
 import 'package:stagess_admin/widgets/teacher_picker_tile.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
@@ -534,18 +535,9 @@ class InternshipListTileState extends State<InternshipListTile> {
                 _buildAchievedDuration(),
                 const SizedBox(height: 8),
                 _buildTeacherNotes(),
-                Padding(
-                  padding:
-                      const EdgeInsets.only(top: 4.0, bottom: 4.0, right: 24.0),
-                  child: Divider(height: 32, thickness: 2),
-                ),
+                SectionDivider(),
                 _buildActions(),
-                const SizedBox(height: 8),
-                Padding(
-                  padding:
-                      const EdgeInsets.only(top: 4.0, bottom: 4.0, right: 24.0),
-                  child: Divider(height: 32, thickness: 2),
-                ),
+                SectionDivider(),
                 _buildDocumentsSection(),
                 const SizedBox(height: 8),
               ],

@@ -24,6 +24,7 @@ import 'package:stagess_common_flutter/widgets/single_instance_manager.dart';
 const useDevDb =
     bool.fromEnvironment('STAGESS_USE_DEV_DB', defaultValue: false);
 
+// TODO Add profile page
 void main() async {
   // Setup logger to INFO
   const showLogs =

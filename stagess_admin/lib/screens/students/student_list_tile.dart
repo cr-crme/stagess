@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:stagess_admin/screens/students/confirm_delete_student_dialog.dart';
+import 'package:stagess_admin/widgets/section_divider.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
@@ -18,6 +19,7 @@ import 'package:stagess_common_flutter/widgets/birthday_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
+import 'package:stagess_common_flutter/widgets/skill_progression_tile.dart';
 
 class StudentListTile extends StatefulWidget {
   const StudentListTile({
@@ -416,6 +418,8 @@ class StudentListTileState extends State<StudentListTile> {
                 _buildProgramSelection(),
                 const SizedBox(height: 8),
                 _buildContact(),
+                SectionDivider(),
+                _buildProgression(),
               ],
             ),
           ),
@@ -647,6 +651,17 @@ class StudentListTileState extends State<StudentListTile> {
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildProgression() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Plan de formation',
+            style: Theme.of(context).textTheme.titleMedium),
+        SkillProgressionTile(studentId: widget.student.id),
       ],
     );
   }
