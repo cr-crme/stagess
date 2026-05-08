@@ -535,6 +535,9 @@ class _MainJob extends StatelessWidget {
     _logger.finer(
       'Building _MainJob with controller job: ${controller._primaryJobController.job.id}',
     );
+    final currentSchool = AuthProvider.of(context, listen: false).isAdmin
+        ? null
+        : SchoolBoardsProvider.of(context, listen: false).currentSchool!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -550,9 +553,7 @@ class _MainJob extends StatelessWidget {
               ),
             EnterpriseJobListTile(
               controller: controller._primaryJobController,
-              schools: [
-                SchoolBoardsProvider.of(context, listen: false).currentSchool!,
-              ],
+              schools: currentSchool == null ? null : [currentSchool],
               editMode: controller.isNewContract,
               specializationOnly: true,
               canChangeExpandedState: false,
@@ -582,6 +583,10 @@ class _ExtraSpecialization extends StatelessWidget {
   final Function(void Function()) setState;
 
   Widget _extraJobTileBuilder(BuildContext context, int index) {
+    final currentSchool = AuthProvider.of(context, listen: false).isAdmin
+        ? null
+        : SchoolBoardsProvider.of(context, listen: false).currentSchool!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -608,9 +613,7 @@ class _ExtraSpecialization extends StatelessWidget {
         ),
         EnterpriseJobListTile(
           controller: controller._extraJobControllers[index],
-          schools: [
-            SchoolBoardsProvider.of(context, listen: false).currentSchool!,
-          ],
+          schools: currentSchool == null ? null : [currentSchool],
           editMode: controller.isNewContract || controller.canModify,
           specializationOnly: true,
           canChangeExpandedState: false,
@@ -1100,18 +1103,19 @@ EnterpriseJobListController _jobListControllerOf(BuildContext context,
   final enterprise = EnterprisesProvider.of(context, listen: false)
       .fromIdOrNull(internship.enterpriseId);
 
+  final jobs = AuthProvider.of(context, listen: false).isAdmin
+      ? enterprise?.jobs
+      : enterprise?.jobsWithRemainingPositions(
+          context,
+          schoolId: AuthProvider.of(context, listen: false).schoolId!,
+          listen: false,
+        );
+
   return EnterpriseJobListController(
     context: context,
     enterpriseStatus: EnterpriseStatus.active,
     job: null,
-    specializationWhiteList: enterprise
-        ?.jobsWithRemainingPositions(
-          context,
-          schoolId: AuthProvider.of(context, listen: false).schoolId!,
-          listen: false,
-        )
-        .map((job) => job.specialization)
-        .toList(),
+    specializationWhiteList: jobs?.map((job) => job.specialization).toList(),
   );
 }
 

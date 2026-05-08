@@ -28,9 +28,11 @@ import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/show_pdf_dialog.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/form_dialogs/forms/internship_managing_contract_form_dialog.dart';
 import 'package:stagess_common_flutter/widgets/form_dialogs/forms/show_forms.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/internship_contract_pdf_template.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/schedule_selector.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
@@ -92,9 +94,11 @@ class InternshipListTileState extends State<InternshipListTile> {
     ).firstWhereOrNull((student) => student.id == widget.internship.studentId),
   );
   late final _teacherPickerController = TeacherPickerController(
-    initial: TeachersProvider.of(context, listen: false).firstWhereOrNull(
-      (teacher) => teacher.id == widget.internship.signatoryTeacherId,
-    ),
+    initial: context.mounted
+        ? TeachersProvider.of(context, listen: false).firstWhereOrNull(
+            (teacher) => teacher.id == widget.internship.signatoryTeacherId,
+          )
+        : null,
   );
   late final _enterprisePickerController = EnterprisePickerController(
     initialEnterprise: EnterprisesProvider.of(
@@ -382,13 +386,19 @@ class InternshipListTileState extends State<InternshipListTile> {
         context,
         listen: false,
       ).fetchData(id: widget.internship.id, fields: FetchableFields.all);
+      if (!mounted) return;
+
+      await StudentsProvider.of(context, listen: false).fetchData(
+          id: widget.internship.studentId, fields: FetchableFields.all);
+
       _fetchFullDataCompleter.complete();
     } else {
       await Future.delayed(ConfigurationService.expandingTileDuration);
       _fetchFullDataCompleter = Completer<void>();
     }
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      setState(() {});
+      if (mounted) setState(() {});
     });
   }
 
@@ -832,25 +842,37 @@ class InternshipListTileState extends State<InternshipListTile> {
           padding: const EdgeInsets.only(left: 8.0),
           child: Column(
             children: [
-              // TODO: Fix contrat not showing
               _buildSelectShowPreviousEvaluations(
                 title: (widget.internship.contracts.length > 1
                     ? 'Afficher les contrats de stage du\u00a0: '
                     : 'Afficher le contrat de stage du\u00a0: '),
                 evaluations: widget.internship.contracts,
                 onClickedShowEvaluation: (contractId) =>
-                    showInternshipEvaluationFormDialog(context,
-                        internshipId: widget.internship.id,
-                        evaluationId: contractId,
-                        showEvaluationDialog: (BuildContext context,
-                                {required String internshipId,
-                                String? evaluationId}) =>
-                            showManagingContractFormDialog(context,
-                                internship: InternshipsProvider.of(context,
-                                        listen: false)
-                                    .fromId(internshipId),
-                                evaluationId: evaluationId,
-                                isNewContract: false)),
+                    showInternshipEvaluationFormDialog(
+                  context,
+                  internshipId: widget.internship.id,
+                  evaluationId: contractId,
+                  showEvaluationDialog: (BuildContext context,
+                          {required String internshipId,
+                          String? evaluationId}) =>
+                      showManagingContractFormDialog(
+                    context,
+                    internship: InternshipsProvider.of(context, listen: false)
+                        .fromId(internshipId),
+                    evaluationId: evaluationId,
+                    isNewContract: false,
+                  ),
+                ),
+                onClickedShowEvaluationPdf: (contractId) => showPdfDialog(
+                  context,
+                  pdfGeneratorCallback: (context, format) =>
+                      generateInternshipContractPdf(
+                    context,
+                    format,
+                    internshipId: widget.internship.id,
+                    contractId: contractId,
+                  ),
+                ),
               ),
               // TODO Add other documents
             ],
@@ -860,10 +882,12 @@ class InternshipListTileState extends State<InternshipListTile> {
     );
   }
 
-  Widget _buildSelectShowPreviousEvaluations(
-      {required String title,
-      required List<InternshipEvaluation> evaluations,
-      required Function(String contractId) onClickedShowEvaluation}) {
+  Widget _buildSelectShowPreviousEvaluations({
+    required String title,
+    required List<InternshipEvaluation> evaluations,
+    required Function(String contractId) onClickedShowEvaluation,
+    required Function(String contractId) onClickedShowEvaluationPdf,
+  }) {
     final orderedEvaluations = evaluations.sortedBy((e) => e.date).reversed;
 
     return Padding(
@@ -895,8 +919,8 @@ class InternshipListTileState extends State<InternshipListTile> {
                           icon: const Icon(Icons.insert_drive_file)),
                       SizedBox(width: 4),
                       IconButton(
-                          onPressed: () => {},
-                          // onClickedShowEvaluationPdf(evaluation.id),
+                          onPressed: () =>
+                              onClickedShowEvaluationPdf(evaluation.id),
                           color: Theme.of(context).primaryColor,
                           icon: const Icon(Icons.picture_as_pdf)),
                     ],

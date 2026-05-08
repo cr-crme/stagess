@@ -130,7 +130,7 @@ class EnterpriseJobListTile extends StatefulWidget {
   });
 
   final EnterpriseJobListController controller;
-  final List<School> schools;
+  final List<School>? schools;
   final bool editMode;
   final Function()? onRequestDelete;
   final bool canChangeExpandedState;
@@ -196,11 +196,12 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
 
   @override
   Widget build(BuildContext context) {
-    final schools = widget.schools.where(
-      (school) =>
-          widget.controller._reservedForSchoolId == null ||
-          widget.controller._reservedForSchoolId == school.id,
-    );
+    final schools = widget.schools?.where(
+          (school) =>
+              widget.controller._reservedForSchoolId == null ||
+              widget.controller._reservedForSchoolId == school.id,
+        ) ??
+        [];
 
     return AnimatedExpandingCard(
       elevation: widget.elevation,

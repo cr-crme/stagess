@@ -111,6 +111,7 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get isAdmin => databaseAccessLevel >= AccessLevel.admin;
   AccessLevel? _databaseAccessLevel;
   AccessLevel get databaseAccessLevel =>
       _databaseAccessLevel ?? AccessLevel.invalid;
