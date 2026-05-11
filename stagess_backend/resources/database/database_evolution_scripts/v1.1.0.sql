@@ -28,7 +28,7 @@ UPDATE persons
 
 ALTER TABLE persons
     MODIFY email VARCHAR(200) NOT NULL,
-    DELETE middle_name;
+    DROP COLUMN middle_name;
 
 
 
@@ -41,10 +41,10 @@ INSERT INTO persons (id, first_name, last_name, email)
     FROM admins;
 
 ALTER TABLE admins
-    DELETE first_name,
-    DELETE middle_name,
-    DELETE last_name,
-    DELETE email;
+    DROP COLUMN first_name,
+    DROP COLUMN middle_name,
+    DROP COLUMN last_name,
+    DROP COLUMN email;
 
 
 /**************************/
