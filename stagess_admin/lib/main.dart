@@ -17,6 +17,7 @@ import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/screens/in_maintenance_screen.dart';
 import 'package:stagess_common_flutter/services/question_file_service.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
 import 'package:stagess_common_flutter/widgets/single_instance_manager.dart';
@@ -25,6 +26,28 @@ const useDevDb =
     bool.fromEnvironment('STAGESS_USE_DEV_DB', defaultValue: false);
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  final inMaintenanceMode = const bool.fromEnvironment(
+      'STAGESS_MAINTENANCE_MODE',
+      defaultValue: false);
+
+  if (inMaintenanceMode) {
+    runApp(MaterialApp(
+      debugShowCheckedModeBanner: false,
+      onGenerateTitle: (context) => 'Stagess en maintenance',
+      theme: crcrmeMaterialTheme,
+      home: const InMaintenanceScreen(),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('fr', 'CA')],
+    ));
+    return;
+  }
+
   // Setup logger to INFO
   const showLogs =
       bool.fromEnvironment('STAGESS_SHOW_LOGS', defaultValue: false);

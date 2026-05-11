@@ -6,6 +6,7 @@ OUT_DIR := build
 ZIP := zip -r
 
 all: main tutorial
+maintenance: main_maintenance tutorial_maintenance
 
 # Generic rule: build/NAME.zip with USE_DEV_DB flag
 .FORCE:
@@ -17,6 +18,7 @@ build/%.zip: .FORCE
 	fi
 	flutter      build web --base-href=/$*/ \
 		    	    --dart-define=STAGESS_USE_DEV_DB=$(USE_DEV_DB) \
+                	--dart-define=STAGESS_MAINTENANCE_MODE=$(MAINTENANCE_MODE) \
 					--dart-define=STAGESS_GOOGLE_MAPS_API_KEY=$${STAGESS_GOOGLE_MAPS_API_KEY}
 	$(MoveDir)   $(OUT_DIR)/web $(OUT_DIR)/$*
 	$(ChangeDir) $(OUT_DIR) && $(ZIP) $*.zip $*
@@ -27,3 +29,11 @@ main: build/stagess.zip
 
 tutorial: USE_DEV_DB=true
 tutorial: build/tutoriel.zip
+
+main_maintenance: USE_DEV_DB=false
+main_maintenance: MAINTENANCE_MODE=true
+main_maintenance: build/stagess.zip
+
+tutorial_maintenance: USE_DEV_DB=true
+tutorial_maintenance: MAINTENANCE_MODE=true
+tutorial_maintenance: build/tutoriel.zip

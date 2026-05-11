@@ -1,4 +1,4 @@
-.PHONY: all backend web
+.PHONY: all backend web maintenance
 
 include utilities/makefile_commands.mk
 
@@ -19,6 +19,19 @@ web:
 	$(call CopyDir,stagess/build/stagess,$(WEB_BUILD_DIR)/stagess)
 	$(call CopyDir,stagess/build/tutoriel,$(WEB_BUILD_DIR)/tutoriel)
 	$(MAKE)      -C stagess_admin all
+	$(call CopyDir,stagess_admin/build/admin,$(WEB_BUILD_DIR)/admin)
+	$(call CopyDir,stagess_admin/build/tutoriel-admin,$(WEB_BUILD_DIR)/tutoriel-admin)
+	$(call CopyFile,utilities/index.html,$(WEB_BUILD_DIR)/index.html)
+	$(ChangeDir) $(WEB_BUILD_DIR) && zip -r stagess.zip .
+
+
+maintenance: 
+	$(call safe_rmdir, $(WEB_BUILD_DIR))
+	$(MakeDir)   $(WEB_BUILD_DIR)
+	$(MAKE)      -C stagess maintenance
+	$(call CopyDir,stagess/build/stagess,$(WEB_BUILD_DIR)/stagess)
+	$(call CopyDir,stagess/build/tutoriel,$(WEB_BUILD_DIR)/tutoriel)
+	$(MAKE)      -C stagess_admin maintenance
 	$(call CopyDir,stagess_admin/build/admin,$(WEB_BUILD_DIR)/admin)
 	$(call CopyDir,stagess_admin/build/tutoriel-admin,$(WEB_BUILD_DIR)/tutoriel-admin)
 	$(call CopyFile,utilities/index.html,$(WEB_BUILD_DIR)/index.html)
