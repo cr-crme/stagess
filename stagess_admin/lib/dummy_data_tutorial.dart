@@ -1,5 +1,7 @@
 // coverage:ignore-file
 import 'dart:developer' as dev;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
@@ -9,7 +11,9 @@ import 'package:stagess_common/models/enterprises/job_comment.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
+import 'package:stagess_common/models/generic/photo.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_contract.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart';
@@ -243,6 +247,7 @@ Future<void> _addDummyTeachers(
       schoolBoardId: schoolBoardId,
       schoolId: schoolAId,
       groups: ['550', '551'],
+      phone: PhoneNumber.fromString('555 321 1234'),
       email: 'a1@moncentre.qc',
     ),
   );
@@ -1406,6 +1411,14 @@ Future<void> _addDummyEnterprises(
           notApplicableTag: CheckboxWithOther.notApplicableTag,
         ),
         reservedForId: '',
+        photos: [
+          Photo(
+              bytes: await _createCircleImage(
+                  backgroundColor: Colors.blue, circleColor: Colors.white)),
+          Photo(
+              bytes: await _createCircleImage(
+                  backgroundColor: Colors.red, circleColor: Colors.white))
+        ],
         comments: [
           JobComment(
               date: DateTime.now().subtract(Duration(days: 1)),
@@ -3296,6 +3309,7 @@ Future<void> _addDummyInternships(
   await _waitForDatabaseUpdate(internships, 10);
 
   // Set the visiting priorities of the internships for teacherA1Id
+  await teachers.fetchData(id: teacherA1Id, fields: FetchableFields.all);
   final currentTeacher = teachers.firstWhere((t) => t.id == teacherA1Id);
   var studentId = students.firstWhere((e) => e.fullName == 'Cedric Masson').id;
   var internshipId = internships
@@ -3323,4 +3337,30 @@ Future<void> _waitForDatabaseUpdate(
       : list.length < expectedLength) {
     await Future.delayed(const Duration(milliseconds: 100));
   }
+}
+
+Future<Uint8List> _createCircleImage(
+    {required Color backgroundColor, required Color circleColor}) async {
+  final recorder = ui.PictureRecorder();
+  final canvas = Canvas(recorder);
+  const size = Size(200, 200); // Image dimensions
+  final center = Offset(size.width / 2, size.height / 2);
+
+  // 1. Draw white background
+  final backgroundPaint = Paint()..color = backgroundColor;
+  canvas.drawRect(
+      Rect.fromLTWH(0, 0, size.width, size.height), backgroundPaint);
+
+  // 2. Draw black circle
+  final circlePaint = Paint()
+    ..color = circleColor
+    ..style = PaintingStyle.fill;
+  canvas.drawCircle(center, 50.0, circlePaint);
+
+  // 3. Convert to image and bytes
+  final picture = recorder.endRecording();
+  final img = await picture.toImage(size.width.toInt(), size.height.toInt());
+  final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+
+  return byteData!.buffer.asUint8List();
 }

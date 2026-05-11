@@ -13,6 +13,7 @@ import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/entity_picker_tile.dart';
 import 'package:stagess_common_flutter/widgets/incidents_expansion_panel.dart';
 import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/comments_expansion_panel.dart';
+import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/photo_expansion_panel.dart';
 import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/supervision_expansion_panel.dart';
 
 class EnterpriseJobListController {
@@ -127,6 +128,7 @@ class EnterpriseJobListTile extends StatefulWidget {
     this.showExtended = false,
     this.addSstEvent,
     this.addComment,
+    this.removeImage,
   });
 
   final EnterpriseJobListController controller;
@@ -143,6 +145,7 @@ class EnterpriseJobListTile extends StatefulWidget {
   final bool showExtended;
   final void Function(Job job)? addSstEvent;
   final void Function(Job job)? addComment;
+  final void Function(Job job, int index)? removeImage;
 
   @override
   State<EnterpriseJobListTile> createState() => _EnterpriseJobListTileState();
@@ -576,6 +579,9 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
         IncidentsExpansionPanel(job: job, addSstEvent: widget.addSstEvent),
         const SizedBox(height: 12),
         SupervisionExpansionPanel(job: job),
+        const SizedBox(height: 12),
+        PhotoExpansionPanel(
+            job: job, addImage: null, removeImage: widget.removeImage),
         const SizedBox(height: 12),
         CommentsExpansionPanel(job: job, addComment: widget.addComment)
       ],

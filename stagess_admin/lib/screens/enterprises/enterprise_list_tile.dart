@@ -670,6 +670,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                       showExtended: !widget.forceEditingMode,
                       addSstEvent: _isEditing ? null : _addSstEvent,
                       addComment: _isEditing ? null : _addComment,
+                      removeImage: _isEditing ? null : _removeImageFromJob,
                     );
                   }),
                 ],
@@ -803,6 +804,40 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       _forceDisabled = false;
     });
     _logger.finer('Comment added to job: ${job.specialization.name}');
+  }
+
+  void _removeImageFromJob(Job job, int index) async {
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
+
+    final enterprises = EnterprisesProvider.of(context, listen: false);
+    final hasLock = await enterprises.getLockForItem(widget.enterprise);
+    if (!hasLock || !mounted) {
+      if (mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible de supprimer l\'image, car l\'entreprise est en cours de modification par un autre utilisateur.',
+        );
+      }
+      setState(() {
+        _forceDisabled = false;
+      });
+      return;
+    }
+
+    job.photos.removeAt(index);
+    await enterprises.replaceWithConfirmation(widget.enterprise);
+    await enterprises.releaseLockForItem(widget.enterprise);
+    if (mounted) {
+      showSnackBar(context, message: 'L\'image a été supprimée');
+    }
+    setState(() {
+      _forceDisabled = false;
+    });
+    _logger.finer('Image removed from job: ${job.specialization.name}');
   }
 
   Widget _buildRecruiter() {
