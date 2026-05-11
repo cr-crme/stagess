@@ -79,16 +79,22 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
             child: ListView.builder(
               shrinkWrap: true,
               itemCount: students.length,
-              itemBuilder: (context, index) => StudentCard(
-                student: students.elementAt(index),
-                onTap: (student) {
-                  FocusManager.instance.primaryFocus?.unfocus();
-                  GoRouter.of(context).goNamed(
-                    Screens.student,
-                    pathParameters: Screens.params(student),
-                    queryParameters: Screens.queryParams(pageIndex: '0'),
-                  );
-                },
+              itemBuilder: (context, index) => Padding(
+                padding: index == students.length - 1
+                    ? EdgeInsets.only(
+                        bottom: MediaQuery.of(context).size.height * 0.5)
+                    : const EdgeInsets.only(),
+                child: StudentCard(
+                  student: students.elementAt(index),
+                  onTap: (student) {
+                    FocusManager.instance.primaryFocus?.unfocus();
+                    GoRouter.of(context).goNamed(
+                      Screens.student,
+                      pathParameters: Screens.params(student),
+                      queryParameters: Screens.queryParams(pageIndex: '0'),
+                    );
+                  },
+                ),
               ),
             ),
           ),

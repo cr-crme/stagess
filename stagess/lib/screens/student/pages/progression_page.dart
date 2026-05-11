@@ -20,6 +20,7 @@ class SkillsPage extends StatelessWidget {
         children: [
           _SkillProgressionCard(studentId: studentId),
           StudentVisaForm(studentId: studentId),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.5),
         ],
       ),
     );

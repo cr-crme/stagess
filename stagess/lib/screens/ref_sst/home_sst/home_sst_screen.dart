@@ -54,6 +54,7 @@ class _HomeSstScreenState extends State<HomeSstScreen> {
             title: 'Aperçu des risques SST par métier',
             content: _buildRiskCard(),
             onTap: null),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.5),
       ],
     );
     // To refresh the scaffold body after the data are fetched

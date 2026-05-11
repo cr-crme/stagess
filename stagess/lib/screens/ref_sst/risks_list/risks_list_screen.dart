@@ -48,10 +48,11 @@ class _MenuRisksFormScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      children: RiskDataFileService.risks
-          .map((e) =>
-              ClickableRiskTile(e, onTap: (risk) => navigate(risk.number - 1)))
-          .toList(),
+      children: [
+        ...RiskDataFileService.risks.map((e) =>
+            ClickableRiskTile(e, onTap: (risk) => navigate(risk.number - 1))),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.5),
+      ],
     );
   }
 }

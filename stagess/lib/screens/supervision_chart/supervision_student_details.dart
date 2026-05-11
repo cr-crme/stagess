@@ -200,6 +200,8 @@ class _SupervisionStudentDetailsScreenInternal extends StatelessWidget {
                         studentId: studentId,
                         onTap: () => _navigateToStudentInternship(context),
                       ),
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.5),
                     ],
                   );
                 },

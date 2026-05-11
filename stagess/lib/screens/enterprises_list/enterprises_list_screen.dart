@@ -231,12 +231,18 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
           child: ListView.builder(
             shrinkWrap: true,
             itemCount: enterprises.length,
-            itemBuilder: (context, index) => EnterpriseCard(
-              enterprise: enterprises.elementAt(index),
-              onTap: (enterprise) => GoRouter.of(context).goNamed(
-                Screens.enterprise,
-                pathParameters: Screens.params(enterprise),
-                queryParameters: Screens.queryParams(pageIndex: '0'),
+            itemBuilder: (context, index) => Padding(
+              padding: index == enterprises.length - 1
+                  ? EdgeInsets.only(
+                      bottom: MediaQuery.of(context).size.height * 0.5)
+                  : const EdgeInsets.only(),
+              child: EnterpriseCard(
+                enterprise: enterprises.elementAt(index),
+                onTap: (enterprise) => GoRouter.of(context).goNamed(
+                  Screens.enterprise,
+                  pathParameters: Screens.params(enterprise),
+                  queryParameters: Screens.queryParams(pageIndex: '0'),
+                ),
               ),
             ),
           ),

@@ -51,6 +51,7 @@ class AboutPageState extends State<AboutPage> {
                 birthdayController: _birthdayController,
               ),
               _EmergencyContact(student: widget.student),
+              SizedBox(height: MediaQuery.of(context).size.height * 0.5),
             ],
           ),
         ),

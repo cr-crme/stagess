@@ -214,9 +214,17 @@ class _IncidentHistoryScreenInternalState
                       itemCount: incidents.length,
                       itemBuilder: (context, index) {
                         final specialization = sortedSpecializationId[index];
-                        return IncidentListTile(
-                          specializationId: specialization.id,
-                          incidents: incidents[specialization]!,
+                        return Padding(
+                          padding: index == incidents.length - 1
+                              ? EdgeInsets.only(
+                                  bottom:
+                                      MediaQuery.of(context).size.height * 0.5,
+                                )
+                              : const EdgeInsets.only(),
+                          child: IncidentListTile(
+                            specializationId: specialization.id,
+                            incidents: incidents[specialization]!,
+                          ),
                         );
                       },
                     ),

@@ -65,16 +65,23 @@ class _MyAccountScreenInternal extends StatelessWidget {
       smallDrawer: MainDrawer.small,
       mediumDrawer: MainDrawer.medium,
       largeDrawer: MainDrawer.large,
-      body:
-          hasFullData
-              ? (currentTeacher == null
-                  ? Center(child: Text('Aucun enseignant trouvé'))
-                  : TeacherListTile(teacher: currentTeacher))
-              : Center(
-                child: CircularProgressIndicator(
-                  color: Theme.of(context).primaryColor,
-                ),
+      body: hasFullData
+          ? (currentTeacher == null
+              ? Center(child: Text('Aucun enseignant trouvé'))
+              : SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      TeacherListTile(teacher: currentTeacher),
+                      SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.5),
+                    ],
+                  ),
+                ))
+          : Center(
+              child: CircularProgressIndicator(
+                color: Theme.of(context).primaryColor,
               ),
+            ),
     );
   }
 }

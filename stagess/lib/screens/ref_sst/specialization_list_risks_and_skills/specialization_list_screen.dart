@@ -194,12 +194,18 @@ class SpecializationListScreen extends StatelessWidget {
               shrinkWrap: true,
               itemCount: specialization.skills.length,
               padding: const EdgeInsets.all(16.0),
-              itemBuilder: (context, i) => TileJobRisk(
-                title: skills[i].name,
-                elements: risksAssociatedToSkill[skills[i]]!,
-                nbMaximumElements: 1000, // Show all in orange
-                tooltipMessage:
-                    'Nombre de compétences possiblement concernées par ce risque',
+              itemBuilder: (context, i) => Padding(
+                padding: i == specialization.skills.length - 1
+                    ? EdgeInsets.only(
+                        bottom: MediaQuery.of(context).size.height * 0.5)
+                    : const EdgeInsets.only(),
+                child: TileJobRisk(
+                  title: skills[i].name,
+                  elements: risksAssociatedToSkill[skills[i]]!,
+                  nbMaximumElements: 1000, // Show all in orange
+                  tooltipMessage:
+                      'Nombre de compétences possiblement concernées par ce risque',
+                ),
               ),
               separatorBuilder: (BuildContext context, int index) {
                 return const Divider(
@@ -213,12 +219,18 @@ class SpecializationListScreen extends StatelessWidget {
               shrinkWrap: true,
               itemCount: risks.length,
               padding: const EdgeInsets.all(16.0),
-              itemBuilder: (context, i) => TileJobRisk(
-                title: risks[i].name,
-                elements: skillsAssociatedToRisks[risks[i]]!,
-                nbMaximumElements: 1000, // Show all in orange
-                tooltipMessage:
-                    'Nombre de risques potentiellement présents pour cette compétence',
+              itemBuilder: (context, i) => Padding(
+                padding: i == risks.length - 1
+                    ? EdgeInsets.only(
+                        bottom: MediaQuery.of(context).size.height * 0.5)
+                    : const EdgeInsets.only(),
+                child: TileJobRisk(
+                  title: risks[i].name,
+                  elements: skillsAssociatedToRisks[risks[i]]!,
+                  nbMaximumElements: 1000, // Show all in orange
+                  tooltipMessage:
+                      'Nombre de risques potentiellement présents pour cette compétence',
+                ),
               ),
               separatorBuilder: (BuildContext context, int index) {
                 return const Divider(

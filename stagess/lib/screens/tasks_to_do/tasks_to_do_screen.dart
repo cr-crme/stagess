@@ -171,6 +171,7 @@ class TasksToDoScreen extends StatelessWidget {
             const _SstRisk(),
             const _EndingInternship(),
             const _PostInternshipEvaluation(),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.5)
           ],
         ),
       ),

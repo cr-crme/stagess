@@ -121,6 +121,7 @@ class InternshipsPageState extends State<InternshipsPage> {
               title: 'Historique',
               internships: closedInternships,
             ),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.5),
         ],
       ),
     );

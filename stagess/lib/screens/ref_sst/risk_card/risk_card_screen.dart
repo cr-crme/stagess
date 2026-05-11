@@ -23,7 +23,8 @@ class RisksCardsScreen extends StatelessWidget {
           padding: const EdgeInsets.only(top: 10.0),
           child: SubRisk(risk.subrisks),
         ),
-        Link(risk.links)
+        Link(risk.links),
+        SizedBox(height: MediaQuery.of(context).size.height * 0.5),
       ],
     );
   }

@@ -502,12 +502,27 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
                                 : filteredInternshipsMetaData.getSupervized(i);
                             if (meta == null) return Container();
 
-                            return _StudentTile(
-                              key: Key(meta.student.id),
-                              meta: meta,
-                              onTap: () => _navigateToStudentInfo(meta.student),
-                              editPrioritiesMode: _editPrioritiesMode,
-                              editSignatoriesMode: _editSignatoriesMode,
+                            return Padding(
+                              padding: i ==
+                                      (_editSignatoriesMode
+                                              ? filteredInternshipsMetaData
+                                                  .length
+                                              : filteredInternshipsMetaData
+                                                  .supervizedCount) -
+                                          1
+                                  ? EdgeInsets.only(
+                                      bottom:
+                                          MediaQuery.of(context).size.height *
+                                              0.5)
+                                  : const EdgeInsets.only(),
+                              child: _StudentTile(
+                                key: Key(meta.student.id),
+                                meta: meta,
+                                onTap: () =>
+                                    _navigateToStudentInfo(meta.student),
+                                editPrioritiesMode: _editPrioritiesMode,
+                                editSignatoriesMode: _editSignatoriesMode,
+                              ),
                             );
                           }),
                         ),
