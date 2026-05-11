@@ -12,16 +12,18 @@ class InactivityLayout extends StatefulWidget {
     required this.navigatorKey,
     this.timeout = const Duration(minutes: 15),
     this.gracePeriod = const Duration(seconds: 60),
-    required this.onTimedout,
+    required this.onTimedOut,
     required this.showGracePeriod,
+    required this.onDisconnect,
     required this.child,
   });
 
   final GlobalKey<NavigatorState> navigatorKey;
   final Duration timeout;
   final Duration gracePeriod;
-  final Future<bool> Function(BuildContext) onTimedout;
+  final Future<bool> Function(BuildContext) onTimedOut;
   final Future<bool> Function(BuildContext) showGracePeriod;
+  final Future<bool> Function(BuildContext) onDisconnect;
   final Widget child;
 
   @override
@@ -40,7 +42,7 @@ class _InactivityLayoutState extends State<InactivityLayout> {
       final shouldShowGracePeriod = await widget.showGracePeriod(context);
       if (!context.mounted) return;
 
-      final hasTimedout = shouldShowGracePeriod
+      final hasTimedOut = shouldShowGracePeriod
           ? (await showDialog<bool>(
                 barrierDismissible: false,
                 context: context,
@@ -49,7 +51,7 @@ class _InactivityLayoutState extends State<InactivityLayout> {
               ) ??
               true)
           : true;
-      if (!hasTimedout || !context.mounted) {
+      if (!hasTimedOut || !context.mounted) {
         _inactivityService.userHasInteracted();
         return;
       }
@@ -60,7 +62,7 @@ class _InactivityLayoutState extends State<InactivityLayout> {
         _isShowingWaitForReconnexionDialog = false;
       }
 
-      final restartTimer = await widget.onTimedout(context);
+      final restartTimer = await widget.onTimedOut(context);
       if (restartTimer) _inactivityService.userHasInteracted();
     },
   );
@@ -88,8 +90,20 @@ class _InactivityLayoutState extends State<InactivityLayout> {
       barrierDismissible: false,
       builder: (context) => AlertDialog(
         title: Text('Connexion perdue'),
-        content: Text(
-          'La connexion au serveur a été perdue. Nous tentons de nous reconnecter.',
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'La connexion au serveur a été perdue. Nous tentons de nous reconnecter.',
+            ),
+            SizedBox(height: 16),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                  onPressed: () => widget.onDisconnect(context),
+                  child: const Text('Annuler')),
+            ),
+          ],
         ),
       ),
     );

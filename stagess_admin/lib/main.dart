@@ -132,16 +132,8 @@ class Home extends StatelessWidget {
           gracePeriod: const Duration(seconds: 60),
           showGracePeriod: (context) async =>
               AuthProvider.of(context, listen: false).isFullySignedIn,
-          onTimedout: (context) async {
-            if (!AuthProvider.of(context, listen: false).isFullySignedIn) {
-              return true;
-            }
-            await AuthProviderExtension.disconnectAll(
-              context,
-              showConfirmDialog: false,
-            );
-            return true;
-          },
+          onTimedOut: _disconnect,
+          onDisconnect: _disconnect,
           child: MaterialApp.router(
             debugShowCheckedModeBanner: false,
             onGenerateTitle: (context) => 'Administration de Stagess',
@@ -158,4 +150,15 @@ class Home extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<bool> _disconnect(BuildContext context) async {
+  if (!AuthProvider.of(context, listen: false).isFullySignedIn) {
+    return true;
+  }
+  await AuthProviderExtension.disconnectAll(
+    context,
+    showConfirmDialog: false,
+  );
+  return true;
 }
