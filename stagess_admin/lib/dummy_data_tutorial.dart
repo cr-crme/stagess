@@ -5,15 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common/models/enterprises/job_comment.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_contract.dart';
+import 'package:stagess_common/models/internships/internship_evaluation_attitude.dart';
+import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/sst_evaluation.dart';
+import 'package:stagess_common/models/internships/task_appreciation.dart';
 import 'package:stagess_common/models/internships/time_utils.dart'
     as time_utils;
 import 'package:stagess_common/models/internships/transportation.dart';
@@ -760,7 +764,118 @@ Future<void> _addDummyStudents(
         longitude: -73.5993743,
       ),
       phone: PhoneNumber.fromString('514 555 9988'),
-      allVisa: [],
+      allVisa: [
+        StudentVisa(
+            date: DateTime.now().subtract(const Duration(days: 30)),
+            form: VisaForm(
+              experiencesAndAptitudes: [
+                ExperiencesAndAptitudes(
+                    index: 1, text: 'Une seconde expérience', isSelected: true),
+                ExperiencesAndAptitudes(
+                    index: 0,
+                    text: 'Une première expérience',
+                    isSelected: false)
+              ],
+              attestationsAndMentions: [
+                AttestationsAndMentions(
+                    index: 1,
+                    text: 'La deuxième attestation',
+                    isSelected: true),
+                AttestationsAndMentions(
+                    index: 0,
+                    text: 'La première attestation',
+                    isSelected: false),
+                AttestationsAndMentions(
+                    index: 2,
+                    text: 'La troisième attestation',
+                    isSelected: false)
+              ],
+              sstTrainings: [
+                SstTraining(
+                    index: 1,
+                    trainingId:
+                        SstTraining.availableTrainings.keys.elementAt(1),
+                    isSelected: true,
+                    isHidden: false),
+                SstTraining(
+                    index: 0,
+                    trainingId:
+                        SstTraining.availableTrainings.keys.elementAt(4),
+                    isSelected: false,
+                    isHidden: false),
+                SstTraining(
+                    index: 3,
+                    trainingId:
+                        SstTraining.availableTrainings.keys.elementAt(3),
+                    isSelected: true,
+                    isHidden: true),
+                SstTraining(
+                    index: 2,
+                    trainingId:
+                        SstTraining.availableTrainings.keys.elementAt(2),
+                    isSelected: false,
+                    isHidden: true)
+              ],
+              isGatewayToFmsAvailable: false,
+              certificates: [
+                Certificate(
+                    index: 1,
+                    certificateType: CertificateType.fms,
+                    isSelected: true,
+                    year: 2023,
+                    specializationId: job_data_service.ActivitySectorsService
+                        .activitySectors[2].specializations[1].id),
+                Certificate(
+                    index: 0,
+                    certificateType: CertificateType.fpt,
+                    isSelected: true,
+                    year: 2023)
+              ],
+              skills: [
+                Skill(
+                    index: 1,
+                    skillId: job_data_service.ActivitySectorsService
+                        .activitySectors[2].specializations[0].skills[1].id,
+                    isSelected: true),
+                Skill(
+                    index: 0,
+                    skillId: job_data_service.ActivitySectorsService
+                        .activitySectors[2].specializations[1].skills[0].id,
+                    isSelected: false)
+              ],
+              reference: 'La référence de Jeanne',
+              forces: [
+                Attitude(
+                    index: 2,
+                    attitudeId: Attitude.availableItems.keys.elementAt(4),
+                    isSelected: true),
+                Attitude(
+                    index: 1,
+                    attitudeId: Attitude.availableItems.keys.elementAt(2),
+                    isSelected: true),
+                Attitude(
+                    index: 0,
+                    attitudeId: Attitude.availableItems.keys.elementAt(1),
+                    isSelected: false)
+              ],
+              challenges: [
+                Attitude(
+                    index: 1,
+                    attitudeId: Attitude.availableItems.keys.elementAt(5),
+                    isSelected: true),
+                Attitude(
+                    index: 0,
+                    attitudeId: Attitude.availableItems.keys.elementAt(0),
+                    isSelected: true),
+                Attitude(
+                    index: 2,
+                    attitudeId: Attitude.availableItems.keys.elementAt(7),
+                    isSelected: false)
+              ],
+              successConditions: 'Lui parler respectueusement',
+            ),
+            formVersion: StudentVisa.currentVersion)
+      ],
     ),
   );
 
@@ -1266,32 +1381,42 @@ Future<void> _addDummyEnterprises(
   );
   jobs.add(
     Job(
-      specialization: job_data_service
-          .ActivitySectorsService.activitySectors[0].specializations[7],
-      positionsOffered: {schoolAId: 3, schoolBId: 5},
-      incidents: Incidents(
-        minorInjuries: [
-          Incident(
-            userId: teacherA1Id,
-            date: DateTime.now(),
-            'L\'élève a eu une entorse de cheville en tombant de l\'escabeau.',
-          ),
-          Incident(
-            userId: teacherB1Id,
-            date: DateTime.now(),
-            'Une élève s\'est fait mal au dos en soulevant des boites de lessive',
-          ),
-        ],
-      ),
-      minimumAge: 15,
-      preInternshipRequests: PreInternshipRequests.fromStrings(
-        [
-          'Savoir manoeuvrer un transpalette électrique',
-        ],
-        notApplicableTag: CheckboxWithOther.notApplicableTag,
-      ),
-      reservedForId: '',
-    ),
+        specialization: job_data_service
+            .ActivitySectorsService.activitySectors[0].specializations[7],
+        positionsOffered: {schoolAId: 3, schoolBId: 5},
+        incidents: Incidents(
+          minorInjuries: [
+            Incident(
+              userId: teacherA1Id,
+              date: DateTime.now(),
+              'L\'élève a eu une entorse de cheville en tombant de l\'escabeau.',
+            ),
+            Incident(
+              userId: teacherB1Id,
+              date: DateTime.now(),
+              'Une élève s\'est fait mal au dos en soulevant des boites de lessive',
+            ),
+          ],
+        ),
+        minimumAge: 15,
+        preInternshipRequests: PreInternshipRequests.fromStrings(
+          [
+            'Savoir manoeuvrer un transpalette électrique',
+          ],
+          notApplicableTag: CheckboxWithOther.notApplicableTag,
+        ),
+        reservedForId: '',
+        comments: [
+          JobComment(
+              date: DateTime.now().subtract(Duration(days: 1)),
+              userId: teacherB1Id,
+              comment: 'Réservé pour un élève de 11e année'),
+          JobComment(
+              date: DateTime.now().subtract(Duration(days: 2)),
+              userId: teacherA1Id,
+              comment:
+                  'L\'élève doit être à l\'aise avec les tâches de nettoyage')
+        ]),
   );
 
   enterprises.add(
@@ -2552,6 +2677,11 @@ Future<void> _addDummyInternships(
     start: startingPeriod,
     end: startingPeriod.add(Duration(days: 400)),
   );
+
+  final specialization = enterprises
+      .firstWhere((e) => e.name == 'Metro Gagnon')
+      .jobs[0]
+      .specialization;
   internships.add(
     Internship(
       schoolBoardId: schoolBoardId,
@@ -2660,11 +2790,127 @@ Future<void> _addDummyInternships(
           formVersion: InternshipContract.currentVersion,
         )
       ],
-      skillEvaluations: [],
-      attitudeEvaluations: [],
-      enterpriseEvaluations: [],
-      sstEvaluations: [],
-      teacherNotes: '',
+      skillEvaluations: [
+        InternshipEvaluationSkill(
+          date: DateTime.now().subtract(Duration(days: 90)),
+          presentAtEvaluation: ['Stagiaire', 'Jeannot Marchard'],
+          skillGranularity: SkillEvaluationGranularity.global,
+          skills: [
+            SkillEvaluation(
+              specializationId: specialization.id,
+              skillId: specialization.skills[0].id,
+              tasks: [
+                TaskAppreciation(
+                    id: specialization.skills[0].tasks[1].id,
+                    title: specialization.skills[0].tasks[1].title,
+                    level: TaskAppreciationLevel.evaluated)
+              ],
+              appreciation: SkillAppreciation.acquired,
+              comments: 'Tâche réalisée avec succès',
+            ),
+            SkillEvaluation(
+              specializationId: specialization.id,
+              skillId: specialization.skills[2].id,
+              tasks: [],
+              appreciation: SkillAppreciation.toPursuit,
+              comments: 'Tâche réalisée à poursuivre',
+            )
+          ],
+          comments: 'Jeanne a très bien performé lors de ce stage',
+          formVersion: InternshipEvaluationSkill.currentVersion,
+        ),
+        InternshipEvaluationSkill(
+          date: DateTime.now().subtract(Duration(days: 10)),
+          presentAtEvaluation: ['Stagiaire', 'Jeannot Marchard'],
+          skillGranularity: SkillEvaluationGranularity.byTask,
+          skills: [
+            SkillEvaluation(
+              specializationId: specialization.id,
+              skillId: specialization.skills[0].id,
+              tasks: [],
+              appreciation: SkillAppreciation.acquired,
+              comments: 'Tâche réalisée avec succès',
+            ),
+            SkillEvaluation(
+              specializationId: specialization.id,
+              skillId: specialization.skills[2].id,
+              tasks: [
+                TaskAppreciation(
+                    id: specialization.skills[2].tasks[0].id,
+                    title: specialization.skills[2].tasks[0].title,
+                    level: TaskAppreciationLevel.autonomous),
+                TaskAppreciation(
+                    id: specialization.skills[2].tasks[1].id,
+                    title: specialization.skills[2].tasks[1].title,
+                    level: TaskAppreciationLevel.withHelp),
+              ],
+              appreciation: SkillAppreciation.acquired,
+              comments: 'Tâche réalisée avec succès',
+            )
+          ],
+          comments: 'Jeanne a très bien performé lors de ce stage',
+          formVersion: InternshipEvaluationSkill.currentVersion,
+        ),
+      ],
+      attitudeEvaluations: [
+        InternshipEvaluationAttitude(
+          date: DateTime.now().subtract(Duration(days: 10)),
+          presentAtEvaluation: ['Stagiaire', 'Jeannot Marchard'],
+          attitude: AttitudeEvaluation(
+              ponctuality: Ponctuality.high,
+              inattendance: Inattendance.veryHigh,
+              qualityOfWork: QualityOfWork.insufficient,
+              productivity: Productivity.low,
+              teamCommunication: TeamCommunication.notEvaluated,
+              respectOfAuthority: RespectOfAuthority.high,
+              communicationAboutSst: CommunicationAboutSst.low,
+              selfControl: SelfControl.high,
+              takeInitiative: TakeInitiative.high,
+              adaptability: Adaptability.veryHigh),
+          formVersion: InternshipEvaluationAttitude.currentVersion,
+        ),
+      ],
+      sstEvaluations: [
+        SstEvaluation(
+          date: DateTime.now().subtract(Duration(days: 20)),
+          presentAtEvaluation: ['Stagiaire', 'Jeannot Marchard'],
+          questions: {
+            "Q1": ["Oui"],
+            "Q1+t": ["Tous les jours"],
+            "Q3": ["Un transpalette", "Une brouette", "Un gros transporteur"],
+            "Q3+t": ["C'est déjà prévu"],
+            "Q4": ["Un transpalette"],
+            "Q5": ["__NOT_APPLICABLE_INTERNAL__"],
+            "Q12": ["Chaud (supérieur à 25°C)", "Froid (inférieur à 10°C)"],
+            "Q15": ["Non"],
+            "Q17": ["L'arrivée au travail"],
+            "Q18": ["Oui"],
+          },
+        )
+      ],
+      enterpriseEvaluations: [
+        PostInternshipEnterpriseEvaluation(
+          date: DateTime.now().subtract(Duration(days: 5)),
+          internshipId: internship.id,
+          program: students
+              .firstWhere((e) => e.fullName == 'Jeanne Tremblay')
+              .program,
+          skillsRequired: [
+            'Communiquer à l\'écrit',
+            'Interagir avec des clients'
+          ],
+          taskVariety: 3,
+          trainingPlanRespect: 4,
+          autonomyExpected: 4,
+          efficiencyExpected: 3,
+          specialNeedsAccommodation: 4,
+          supervisionStyle: 4,
+          easeOfCommunication: 5,
+          absenceAcceptance: 5,
+          sstSupervision: 4,
+        )
+      ],
+      teacherNotes: 'Aucune note pour le moment',
     ),
   );
 

@@ -32,8 +32,10 @@ To stop the database, you can run the following command:
 NOTE: Please note that the production directory does not directly contain the `docker-compose.yml` file, but rather a `docker-compose.yml.default` file which must be copy-pasted and filled to `docker-compose.yml` before running the command.
 
 To interact with the database, you can run the following command: 
-`docker exec -it stagess_dev mysql -u devuser -p`
+`docker exec -it stagess_dev mariadb -u devuser -p`
 
+To inspect the database the database by exporting the full content of which, you can run the following command:
+`docker exec stagess_dev sh -c 'exec mariadb-dump -udevuser -pdevpassword dev_db' > dump.sql`
 
 # Database structure
 
@@ -46,7 +48,7 @@ This file contains the SQL commands to create the database and all the tables.
 ## Reset the database
 
 To reset the database, you can run the following command:
-`docker exec -i stagess_dev mysql -u devuser -pdevpassword < reset_database.sql`
+`docker exec -i stagess_dev mariadb -u devuser -pdevpassword < reset_database.sql`
 Make sure not to put space between the `-p` and the password.
 This will drop the database and create it again with the tables defined in the `reset_database.sql` file.
 

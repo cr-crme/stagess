@@ -16,4 +16,4 @@ docker-compose up -d
 cd ..
 
 # Reset the database
-docker exec -i stagess_dev mysql -u devuser < reset_database.sql
+# Run the python script `reset_database.py`

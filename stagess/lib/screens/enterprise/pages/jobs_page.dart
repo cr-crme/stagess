@@ -492,134 +492,143 @@ class JobsPageState extends State<JobsPage> {
 
               return Form(
                 key: _formKeys[job.id],
-                child: AnimatedExpandingCard(
-                  key: _cardKey[job.id],
-                  header: (ctx, isExpanded) => Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SubTitle(job.specialization.name, top: 12, bottom: 12),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _AvailablePlace(
-                                  positionsOffered: offered,
-                                  positionsOccupied: occupied,
-                                  status: status,
-                                ),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    if (widget.enterprise.status ==
-                                        EnterpriseStatus.active)
-                                      Expanded(
-                                        child: _RecrutedBy(
-                                          enterprise: widget.enterprise,
-                                        ),
-                                      ),
-                                    if (status ==
-                                            AvailabilityStatus.isAvailable ||
-                                        status == AvailabilityStatus.isFull)
-                                      Padding(
-                                        padding: const EdgeInsets.only(
-                                          left: 8.0,
-                                          top: 4.0,
-                                          bottom: 4.0,
-                                        ),
-                                        child: TextButton(
-                                          onPressed: status ==
-                                                  AvailabilityStatus.isAvailable
-                                              ? () =>
-                                                  widget.onAddInternshipRequest(
-                                                    widget.enterprise,
-                                                    job.specialization,
-                                                  )
-                                              : null,
-                                          style: Theme.of(
-                                            context,
-                                          ).textButtonTheme.style!.copyWith(
-                                                backgroundColor:
-                                                    WidgetStateProperty
-                                                        .resolveWith<Color>(
-                                                  (states) => states.contains(
-                                                    WidgetState.disabled,
-                                                  )
-                                                      ? Theme.of(
-                                                          context,
-                                                        ).disabledColor
-                                                      : Theme.of(
-                                                          context,
-                                                        ).primaryColor,
-                                                ),
-                                              ),
-                                          child: const Text(
-                                            'Inscrire un\nstagiaire',
-                                            textAlign: TextAlign.center,
+                child: Padding(
+                  padding: index == jobs.length - 1
+                      ? EdgeInsets.only(
+                          bottom: MediaQuery.of(context).size.height * 0.5)
+                      : const EdgeInsets.only(),
+                  child: AnimatedExpandingCard(
+                    key: _cardKey[job.id],
+                    header: (ctx, isExpanded) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SubTitle(job.specialization.name, top: 12, bottom: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _AvailablePlace(
+                                    positionsOffered: offered,
+                                    positionsOccupied: occupied,
+                                    status: status,
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      if (widget.enterprise.status ==
+                                          EnterpriseStatus.active)
+                                        Expanded(
+                                          child: _RecrutedBy(
+                                            enterprise: widget.enterprise,
                                           ),
                                         ),
-                                      )
-                                    else
-                                      (SizedBox(height: 100)),
-                                  ],
-                                ),
-                              ],
+                                      if (status ==
+                                              AvailabilityStatus.isAvailable ||
+                                          status == AvailabilityStatus.isFull)
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            left: 8.0,
+                                            top: 4.0,
+                                            bottom: 4.0,
+                                          ),
+                                          child: TextButton(
+                                            onPressed: status ==
+                                                    AvailabilityStatus
+                                                        .isAvailable
+                                                ? () => widget
+                                                        .onAddInternshipRequest(
+                                                      widget.enterprise,
+                                                      job.specialization,
+                                                    )
+                                                : null,
+                                            style: Theme.of(
+                                              context,
+                                            ).textButtonTheme.style!.copyWith(
+                                                  backgroundColor:
+                                                      WidgetStateProperty
+                                                          .resolveWith<Color>(
+                                                    (states) => states.contains(
+                                                      WidgetState.disabled,
+                                                    )
+                                                        ? Theme.of(
+                                                            context,
+                                                          ).disabledColor
+                                                        : Theme.of(
+                                                            context,
+                                                          ).primaryColor,
+                                                  ),
+                                                ),
+                                            child: const Text(
+                                              'Inscrire un\nstagiaire',
+                                              textAlign: TextAlign.center,
+                                            ),
+                                          ),
+                                        )
+                                      else
+                                        (SizedBox(height: 100)),
+                                    ],
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                      ],
+                    ),
+                    initialExpandedState: jobs.length == 1,
+                    onTapHeader: (nextState) {
+                      final previousState = !nextState;
+                      if (isEditing && previousState) cancelEditing();
+                    },
+                    tappingPermitted: (isExpanded) => _tappingIsPermitted(
+                        context,
+                        isExpanded: isExpanded,
+                        isEditing: isEditing),
+                    child: Column(children: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4.0),
+                        child: PrerequisitesExpansionPanel(
+                          key: _prerequisitesFormKeys[job.id]!,
+                          isEditing: _isEditingPrerequisites[job.id]!,
+                          enterprise: widget.enterprise,
+                          job: job,
+                          onClickSave: () => _onClickPrerequisiteEdit(job),
+                          onClickCancel: cancelEditing,
+                        ),
                       ),
-                    ],
+                      Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4.0),
+                        child: IncidentsExpansionPanel(
+                            job: job, addSstEvent: _addSstEvent),
+                      ),
+                      Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4.0),
+                        child: SupervisionExpansionPanel(job: job),
+                      ),
+                      Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4.0),
+                        child: PhotoExpansionPanel(
+                          job: job,
+                          addImage: job.photos.length > 1 ? null : _addImage,
+                          removeImage: _removeImage,
+                        ),
+                      ),
+                      Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4.0),
+                        child: CommentsExpansionPanel(
+                          job: job,
+                          addComment: _addComment,
+                        ),
+                      ),
+                    ]),
                   ),
-                  initialExpandedState: jobs.length == 1,
-                  onTapHeader: (nextState) {
-                    final previousState = !nextState;
-                    if (isEditing && previousState) cancelEditing();
-                  },
-                  tappingPermitted: (isExpanded) => _tappingIsPermitted(context,
-                      isExpanded: isExpanded, isEditing: isEditing),
-                  child: Column(children: [
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4.0),
-                      child: PrerequisitesExpansionPanel(
-                        key: _prerequisitesFormKeys[job.id]!,
-                        isEditing: _isEditingPrerequisites[job.id]!,
-                        enterprise: widget.enterprise,
-                        job: job,
-                        onClickSave: () => _onClickPrerequisiteEdit(job),
-                        onClickCancel: cancelEditing,
-                      ),
-                    ),
-                    Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4.0),
-                      child: IncidentsExpansionPanel(
-                          job: job, addSstEvent: _addSstEvent),
-                    ),
-                    Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4.0),
-                      child: SupervisionExpansionPanel(job: job),
-                    ),
-                    Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4.0),
-                      child: PhotoExpansionPanel(
-                        job: job,
-                        addImage: job.photos.length > 1 ? null : _addImage,
-                        removeImage: _removeImage,
-                      ),
-                    ),
-                    Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4.0),
-                      child: CommentsExpansionPanel(
-                        job: job,
-                        addComment: _addComment,
-                      ),
-                    ),
-                  ]),
                 ),
               );
             },

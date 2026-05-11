@@ -122,6 +122,7 @@ class InternshipsPageState extends State<InternshipsPage> {
               internships: closed,
               enterprise: widget.enterprise,
             ),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.5),
         ],
       ),
     );
