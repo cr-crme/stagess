@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:stagess_admin/extensions/auth_provider_extension.dart';
 import 'package:stagess_admin/firebase_options.dart';
 import 'package:stagess_admin/screens/router.dart';
+import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/map_providers.dart';
 import 'package:stagess_common/services/backend_helpers.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
@@ -62,7 +63,8 @@ void main() async {
     );
   });
 
-  debugPrint('Welcome to Admin Stagess!');
+  debugPrint(
+      'Welcome to Admin Stagess, version ${CommunicationProtocol.version}!');
   debugPrint(
     'We are connecting to the ${useDevDb ? 'development' : 'production'} database '
     'situated at ${BackendHelpers.backendIp}:${BackendHelpers.backendPort}, '

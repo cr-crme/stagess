@@ -41,7 +41,7 @@ final _uuid = Uuid();
 
 class CommunicationProtocol {
   final String id;
-  final String version = _currentVersion;
+  static final String version = _currentVersion;
   final RequestType requestType;
   final RequestFields? field;
   final Map<String, dynamic>? data;

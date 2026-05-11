@@ -25,9 +25,11 @@ build/%.zip: .FORCE
 
 # Named targets
 main: USE_DEV_DB=false
+main: MAINTENANCE_MODE=false
 main: build/admin.zip
 
 tutorial: USE_DEV_DB=true
+tutorial: MAINTENANCE_MODE=false
 tutorial: build/tutoriel-admin.zip
 
 main_maintenance: USE_DEV_DB=false

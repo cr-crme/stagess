@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:stagess/common/extensions/auth_provider_extension.dart';
 import 'package:stagess/program_helpers.dart';
 import 'package:stagess/router.dart';
+import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/map_providers.dart';
 import 'package:stagess_common/services/backend_helpers.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
@@ -58,7 +59,7 @@ void main() async {
 
   const useDevDb =
       bool.fromEnvironment('STAGESS_USE_DEV_DB', defaultValue: false);
-  debugPrint('Welcome to Stagess!');
+  debugPrint('Welcome to Stagess, version ${CommunicationProtocol.version}!');
   debugPrint(
     'We are connecting to the ${useDevDb ? 'development' : 'production'} database '
     'situated at "${BackendHelpers.backendIp}:${BackendHelpers.backendPort}", '
