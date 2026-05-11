@@ -95,7 +95,10 @@ class TeachersListScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: _buildTiles(context, _getTeachers(context)),
+          children: [
+            ..._buildTiles(context, _getTeachers(context)),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.5),
+          ],
         ),
       ),
     );

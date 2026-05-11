@@ -23,7 +23,7 @@ class InternshipsListScreen extends StatelessWidget {
   static const route = '/internships_list';
 
   Map<SchoolBoard, Map<bool, Map<School, Map<Teacher, List<Internship>>>>>
-  _getInternships(BuildContext context) {
+      _getInternships(BuildContext context) {
     final schoolBoards = SchoolBoardsProvider.of(context, listen: true);
     final teachers = TeachersProvider.of(context, listen: true);
 
@@ -115,7 +115,10 @@ class InternshipsListScreen extends StatelessWidget {
       mediumDrawer: MainDrawer.medium,
       largeDrawer: MainDrawer.large,
       body: SingleChildScrollView(
-        child: Column(children: _buildTiles(context, schoolBoardInternships)),
+        child: Column(children: [
+          ..._buildTiles(context, schoolBoardInternships),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.5),
+        ]),
       ),
     );
   }
@@ -123,7 +126,7 @@ class InternshipsListScreen extends StatelessWidget {
   List<Widget> _buildTiles(
     BuildContext context,
     Map<SchoolBoard, Map<bool, Map<School, Map<Teacher, List<Internship>>>>>
-    schoolBoardInternships,
+        schoolBoardInternships,
   ) {
     final authProvider = AuthProvider.of(context, listen: true);
 
@@ -132,51 +135,50 @@ class InternshipsListScreen extends StatelessWidget {
     }
 
     return switch (authProvider.databaseAccessLevel) {
-      AccessLevel.superAdmin =>
-        schoolBoardInternships.entries
-            .map(
-              (schoolBoardEntry) => AnimatedExpandingCard(
-                header:
-                    (ctx, isExpanded) => Padding(
-                      padding: const EdgeInsets.only(bottom: 4.0),
-                      child: Text(
-                        schoolBoardEntry.key.name,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleLarge!.copyWith(color: Colors.black),
-                      ),
-                    ),
-                elevation: 0.0,
-                initialExpandedState: true,
-                child: Column(
-                  children: [
-                    _InternshipsByStatus(
-                      key: const ValueKey('active_internships'),
-                      areActive: true,
-                      internships: schoolBoardEntry.value[true] ?? {},
-                    ),
-                    _InternshipsByStatus(
-                      key: const ValueKey('closed_internships'),
-                      areActive: false,
-                      internships: schoolBoardEntry.value[false] ?? {},
-                    ),
-                  ],
+      AccessLevel.superAdmin => schoolBoardInternships.entries
+          .map(
+            (schoolBoardEntry) => AnimatedExpandingCard(
+              header: (ctx, isExpanded) => Padding(
+                padding: const EdgeInsets.only(bottom: 4.0),
+                child: Text(
+                  schoolBoardEntry.key.name,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge!.copyWith(color: Colors.black),
                 ),
               ),
-            )
-            .toList(),
+              elevation: 0.0,
+              initialExpandedState: true,
+              child: Column(
+                children: [
+                  _InternshipsByStatus(
+                    key: const ValueKey('active_internships'),
+                    areActive: true,
+                    internships: schoolBoardEntry.value[true] ?? {},
+                  ),
+                  _InternshipsByStatus(
+                    key: const ValueKey('closed_internships'),
+                    areActive: false,
+                    internships: schoolBoardEntry.value[false] ?? {},
+                  ),
+                ],
+              ),
+            ),
+          )
+          .toList(),
       AccessLevel.admin || AccessLevel.teacher || AccessLevel.invalid => [
-        _InternshipsByStatus(
-          key: const ValueKey('active_internships'),
-          areActive: true,
-          internships: schoolBoardInternships.values.firstOrNull?[true] ?? {},
-        ),
-        _InternshipsByStatus(
-          key: const ValueKey('closed_internships'),
-          areActive: false,
-          internships: schoolBoardInternships.values.firstOrNull?[false] ?? {},
-        ),
-      ],
+          _InternshipsByStatus(
+            key: const ValueKey('active_internships'),
+            areActive: true,
+            internships: schoolBoardInternships.values.firstOrNull?[true] ?? {},
+          ),
+          _InternshipsByStatus(
+            key: const ValueKey('closed_internships'),
+            areActive: false,
+            internships:
+                schoolBoardInternships.values.firstOrNull?[false] ?? {},
+          ),
+        ],
     };
   }
 }
@@ -194,14 +196,13 @@ class _InternshipsByStatus extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedExpandingCard(
-      header:
-          (ctx, isExpanded) => Padding(
-            padding: const EdgeInsets.only(left: 12.0, top: 12, bottom: 8.0),
-            child: Text(
-              areActive ? 'Stages actifs' : 'Stages terminés',
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-          ),
+      header: (ctx, isExpanded) => Padding(
+        padding: const EdgeInsets.only(left: 12.0, top: 12, bottom: 8.0),
+        child: Text(
+          areActive ? 'Stages actifs' : 'Stages terminés',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+      ),
       initialExpandedState: areActive,
       child: Padding(
         padding: const EdgeInsets.only(left: 16.0),
@@ -220,23 +221,21 @@ class _InternshipsBySchools extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children:
-          internships.entries.map((entry) {
-            final school = entry.key;
-            final teachers = entry.value;
+      children: internships.entries.map((entry) {
+        final school = entry.key;
+        final teachers = entry.value;
 
-            return AnimatedExpandingCard(
-              key: ValueKey(school.id),
-              header:
-                  (ctx, isExpanded) => Text(
-                    school.name,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-              initialExpandedState: true,
-              elevation: 0,
-              child: _InternshipsByTeachers(teachers: teachers),
-            );
-          }).toList(),
+        return AnimatedExpandingCard(
+          key: ValueKey(school.id),
+          header: (ctx, isExpanded) => Text(
+            school.name,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+          initialExpandedState: true,
+          elevation: 0,
+          child: _InternshipsByTeachers(teachers: teachers),
+        );
+      }).toList(),
     );
   }
 }
@@ -262,11 +261,10 @@ class _InternshipsByTeachers extends StatelessWidget {
             padding: const EdgeInsets.only(left: 12.0),
             child: AnimatedExpandingCard(
               key: ValueKey(teacher.id),
-              header:
-                  (ctx, isExpanded) => Text(
-                    teacher.fullName,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
+              header: (ctx, isExpanded) => Text(
+                teacher.fullName,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
               elevation: 0,
               initialExpandedState: true,
               child: Column(

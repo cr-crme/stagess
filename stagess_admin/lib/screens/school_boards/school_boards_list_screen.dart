@@ -29,8 +29,8 @@ class SchoolBoardsListScreen extends StatelessWidget {
     final answer = await showDialog(
       barrierDismissible: false,
       context: context,
-      builder:
-          (context) => AddSchoolBoardDialog(schoolBoard: SchoolBoard.empty),
+      builder: (context) =>
+          AddSchoolBoardDialog(schoolBoard: SchoolBoard.empty),
     );
     if (answer is! SchoolBoard || !context.mounted) return;
 
@@ -42,10 +42,9 @@ class SchoolBoardsListScreen extends StatelessWidget {
 
     showSnackBar(
       context,
-      message:
-          isSuccess
-              ? 'Centre de services scolaire ajoutée avec succès'
-              : 'Échec de l\'ajout de la centre de services scolaire',
+      message: isSuccess
+          ? 'Centre de services scolaire ajoutée avec succès'
+          : 'Échec de l\'ajout de la centre de services scolaire',
     );
   }
 
@@ -61,15 +60,14 @@ class SchoolBoardsListScreen extends StatelessWidget {
               ? 'Liste des centres de services scolaires'
               : 'Liste des écoles',
         ),
-        actions:
-            authProvider.databaseAccessLevel >= AccessLevel.superAdmin
-                ? [
-                  IconButton(
-                    onPressed: () => _showAddSchoolBoardDialog(context),
-                    icon: Icon(Icons.add),
-                  ),
-                ]
-                : null,
+        actions: authProvider.databaseAccessLevel >= AccessLevel.superAdmin
+            ? [
+                IconButton(
+                  onPressed: () => _showAddSchoolBoardDialog(context),
+                  icon: Icon(Icons.add),
+                ),
+              ]
+            : null,
       ),
       smallDrawer: MainDrawer.small,
       mediumDrawer: MainDrawer.medium,
@@ -77,7 +75,10 @@ class SchoolBoardsListScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: _buildTiles(authProvider, _getSchoolBoards(context)),
+          children: [
+            ..._buildTiles(authProvider, _getSchoolBoards(context)),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.5)
+          ],
         ),
       ),
     );
@@ -94,20 +95,19 @@ class SchoolBoardsListScreen extends StatelessWidget {
     }
 
     return switch (authProvider.databaseAccessLevel) {
-      AccessLevel.superAdmin || AccessLevel.admin =>
-        schoolBoards
-            .map(
-              (schoolBoard) => SchoolBoardListTile(
-                key: ValueKey(schoolBoard.id),
-                schoolBoard: schoolBoard,
-                elevation:
-                    authProvider.databaseAccessLevel == AccessLevel.admin
-                        ? 0
-                        : null,
-              ),
-            )
-            .toList(),
-      AccessLevel.teacher || AccessLevel.invalid =>
+      AccessLevel.superAdmin || AccessLevel.admin => schoolBoards
+          .map(
+            (schoolBoard) => SchoolBoardListTile(
+              key: ValueKey(schoolBoard.id),
+              schoolBoard: schoolBoard,
+              elevation: authProvider.databaseAccessLevel == AccessLevel.admin
+                  ? 0
+                  : null,
+            ),
+          )
+          .toList(),
+      AccessLevel.teacher ||
+      AccessLevel.invalid =>
         schoolBoards.firstOrNull?.schools
                 .map(
                   (school) => SchoolListTile(

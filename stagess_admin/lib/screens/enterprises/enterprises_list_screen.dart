@@ -30,10 +30,9 @@ class EnterprisesListScreen extends StatelessWidget {
 
     final enterprises = <SchoolBoard, List<Enterprise>>{};
     for (final schoolBoard in schoolBoards) {
-      enterprises[schoolBoard] =
-          allEnterprises
-              .where((enterprise) => enterprise.schoolBoardId == schoolBoard.id)
-              .toList();
+      enterprises[schoolBoard] = allEnterprises
+          .where((enterprise) => enterprise.schoolBoardId == schoolBoard.id)
+          .toList();
     }
     return enterprises;
   }
@@ -57,10 +56,9 @@ class EnterprisesListScreen extends StatelessWidget {
 
     showSnackBar(
       context,
-      message:
-          isSuccess
-              ? 'Entreprise ajoutée avec succès'
-              : 'Échec de l\'ajout du l\'entreprise',
+      message: isSuccess
+          ? 'Entreprise ajoutée avec succès'
+          : 'Échec de l\'ajout du l\'entreprise',
     );
   }
 
@@ -85,7 +83,10 @@ class EnterprisesListScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: _buildTiles(context, schoolBoards),
+          children: [
+            ..._buildTiles(context, schoolBoards),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.5),
+          ],
         ),
       ),
     );
@@ -102,36 +103,36 @@ class EnterprisesListScreen extends StatelessWidget {
     }
 
     return switch (authProvider.databaseAccessLevel) {
-      AccessLevel.superAdmin =>
-        schoolBoardEnterprises.entries
-            .map(
-              (schoolBoardEntry) => Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: AnimatedExpandingCard(
-                  header:
-                      (ctx, isExpanded) => Text(
-                        schoolBoardEntry.key.name,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleLarge!.copyWith(color: Colors.black),
+      AccessLevel.superAdmin => schoolBoardEnterprises.entries
+          .map(
+            (schoolBoardEntry) => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: AnimatedExpandingCard(
+                header: (ctx, isExpanded) => Text(
+                  schoolBoardEntry.key.name,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge!.copyWith(color: Colors.black),
+                ),
+                elevation: 0.0,
+                initialExpandedState: true,
+                child: Column(
+                  children: [
+                    ...schoolBoardEntry.value.map(
+                      (enterprise) => EnterpriseListTile(
+                        key: ValueKey(enterprise.id),
+                        enterprise: enterprise,
                       ),
-                  elevation: 0.0,
-                  initialExpandedState: true,
-                  child: Column(
-                    children: [
-                      ...schoolBoardEntry.value.map(
-                        (enterprise) => EnterpriseListTile(
-                          key: ValueKey(enterprise.id),
-                          enterprise: enterprise,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            )
-            .toList(),
-      AccessLevel.admin || AccessLevel.teacher || AccessLevel.invalid =>
+            ),
+          )
+          .toList(),
+      AccessLevel.admin ||
+      AccessLevel.teacher ||
+      AccessLevel.invalid =>
         schoolBoardEnterprises.values.firstOrNull
                 ?.map(
                   (enterprise) => EnterpriseListTile(

@@ -89,57 +89,65 @@ class AdminsListScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (schoolBoardAdmins.isEmpty)
-              const Center(
-                child: Text('Aucun centre de services scolaire inscrit'),
-              ),
-            if (schoolBoardAdmins.isNotEmpty)
-              switch (authProvider.databaseAccessLevel) {
-                AccessLevel.superAdmin => Column(children: [
-                    ...schoolBoardAdmins.entries.map(
-                      (schoolBoardEntry) => Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: AnimatedExpandingCard(
-                          header: (ctx, isExpanded) => Text(
-                            schoolBoardEntry.key?.name ??
-                                'Super administrateurs·trices',
-                            style: Theme.of(
-                              context,
-                            )
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(color: Colors.black),
-                          ),
-                          elevation: 0.0,
-                          initialExpandedState: true,
-                          child: Column(
-                            children: [
-                              ...schoolBoardEntry.value.map(
-                                (adminEntry) => AdminListTile(
-                                  key: ValueKey(adminEntry.id),
-                                  admin: adminEntry,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ]),
-                AccessLevel.admin ||
-                AccessLevel.teacher ||
-                AccessLevel.invalid =>
-                  Column(children: [
-                    ...?schoolBoardAdmins.values.firstOrNull
-                        ?.map((adminEntry) => AdminListTile(
-                              key: ValueKey(adminEntry.id),
-                              admin: adminEntry,
-                            ))
-                  ]),
-              },
+            ..._buildTiles(context, authProvider, schoolBoardAdmins),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.5),
           ],
         ),
       ),
     );
+  }
+
+  List<Widget> _buildTiles(
+    BuildContext context,
+    AuthProvider authProvider,
+    Map<SchoolBoard?, List<Admin>> schoolBoardAdmins,
+  ) {
+    if (schoolBoardAdmins.isEmpty) {
+      return [
+        const Center(
+          child: Text('Aucun centre de services scolaire inscrit'),
+        )
+      ];
+    }
+
+    return switch (authProvider.databaseAccessLevel) {
+      AccessLevel.superAdmin => schoolBoardAdmins.entries
+          .map(
+            (schoolBoardEntry) => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: AnimatedExpandingCard(
+                header: (ctx, isExpanded) => Text(
+                  schoolBoardEntry.key?.name ?? 'Super administrateurs·trices',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge!.copyWith(color: Colors.black),
+                ),
+                elevation: 0.0,
+                initialExpandedState: true,
+                child: Column(
+                  children: [
+                    ...schoolBoardEntry.value.map(
+                      (adminEntry) => AdminListTile(
+                        key: ValueKey(adminEntry.id),
+                        admin: adminEntry,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          )
+          .toList(),
+      AccessLevel.admin ||
+      AccessLevel.teacher ||
+      AccessLevel.invalid =>
+        schoolBoardAdmins.values.firstOrNull
+                ?.map((adminEntry) => AdminListTile(
+                      key: ValueKey(adminEntry.id),
+                      admin: adminEntry,
+                    ))
+                .toList() ??
+            [],
+    };
   }
 }

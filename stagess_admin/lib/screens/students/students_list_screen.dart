@@ -44,10 +44,9 @@ class StudentsListScreen extends StatelessWidget {
     for (final schoolBoard in schoolBoards) {
       final studentsBySchoolsAndGroups = <School, Map<String, List<Student>>>{};
       for (final school in schoolBoard.schools) {
-        final studentsInSchool =
-            allStudents
-                .where((student) => student.schoolId == school.id)
-                .toList();
+        final studentsInSchool = allStudents
+            .where((student) => student.schoolId == school.id)
+            .toList();
         final studentsByGroups = <String, List<Student>>{};
         for (final student in studentsInSchool) {
           if (!studentsByGroups.containsKey(student.group)) {
@@ -85,15 +84,14 @@ class StudentsListScreen extends StatelessWidget {
       context,
       appBar: AppBar(
         title: const Text('Liste des élèves'),
-        actions:
-            authProvider.databaseAccessLevel >= AccessLevel.admin
-                ? [
-                  IconButton(
-                    onPressed: () => _showAddStudentDialog(context),
-                    icon: Icon(Icons.add),
-                  ),
-                ]
-                : null,
+        actions: authProvider.databaseAccessLevel >= AccessLevel.admin
+            ? [
+                IconButton(
+                  onPressed: () => _showAddStudentDialog(context),
+                  icon: Icon(Icons.add),
+                ),
+              ]
+            : null,
       ),
       smallDrawer: MainDrawer.small,
       mediumDrawer: MainDrawer.medium,
@@ -101,7 +99,10 @@ class StudentsListScreen extends StatelessWidget {
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: _buildTiles(context, schoolBoardStudents),
+          children: [
+            ..._buildTiles(context, schoolBoardStudents),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.5),
+          ],
         ),
       ),
     );
@@ -110,7 +111,7 @@ class StudentsListScreen extends StatelessWidget {
   List<Widget> _buildTiles(
     BuildContext context,
     Map<SchoolBoard, Map<School, Map<String, List<Student>>>>
-    schoolBoardStudents,
+        schoolBoardStudents,
   ) {
     final authProvider = AuthProvider.of(context, listen: true);
 
@@ -119,41 +120,41 @@ class StudentsListScreen extends StatelessWidget {
     }
 
     return switch (authProvider.databaseAccessLevel) {
-      AccessLevel.superAdmin =>
-        schoolBoardStudents.entries
-            .map(
-              (schoolBoardEntry) => Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: AnimatedExpandingCard(
-                  header:
-                      (ctx, isExpanded) => Text(
-                        schoolBoardEntry.key.name,
-                        style: Theme.of(
-                          context,
-                        ).textTheme.titleLarge!.copyWith(color: Colors.black),
+      AccessLevel.superAdmin => schoolBoardStudents.entries
+          .map(
+            (schoolBoardEntry) => Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: AnimatedExpandingCard(
+                header: (ctx, isExpanded) => Text(
+                  schoolBoardEntry.key.name,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge!.copyWith(color: Colors.black),
+                ),
+                elevation: 0.0,
+                initialExpandedState: true,
+                child: Column(
+                  children: [
+                    ...schoolBoardEntry.value.entries.map(
+                      (schoolEntry) => Column(
+                        children: [
+                          SchoolStudentsCard(
+                            schoolId: schoolEntry.key.id,
+                            studentsByGroups: schoolEntry.value,
+                            schoolBoard: schoolBoardEntry.key,
+                          ),
+                        ],
                       ),
-                  elevation: 0.0,
-                  initialExpandedState: true,
-                  child: Column(
-                    children: [
-                      ...schoolBoardEntry.value.entries.map(
-                        (schoolEntry) => Column(
-                          children: [
-                            SchoolStudentsCard(
-                              schoolId: schoolEntry.key.id,
-                              studentsByGroups: schoolEntry.value,
-                              schoolBoard: schoolBoardEntry.key,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            )
-            .toList(),
-      AccessLevel.admin || AccessLevel.teacher || AccessLevel.invalid =>
+            ),
+          )
+          .toList(),
+      AccessLevel.admin ||
+      AccessLevel.teacher ||
+      AccessLevel.invalid =>
         schoolBoardStudents.values.firstOrNull?.entries
                 .map(
                   (schoolEntry) => Column(
@@ -161,8 +162,7 @@ class StudentsListScreen extends StatelessWidget {
                       SchoolStudentsCard(
                         schoolId: schoolEntry.key.id,
                         studentsByGroups: schoolEntry.value,
-                        schoolBoard:
-                            schoolBoardStudents.keys.firstOrNull ??
+                        schoolBoard: schoolBoardStudents.keys.firstOrNull ??
                             SchoolBoard.empty,
                       ),
                     ],
