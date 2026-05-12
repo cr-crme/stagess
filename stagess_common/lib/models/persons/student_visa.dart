@@ -67,6 +67,7 @@ class AttestationsAndMentions extends SelectableTextItem {
 
 class SstTraining extends SelectableTextItem {
   bool isHidden;
+  bool get isNotHidden => !isHidden;
 
   SstTraining({
     super.id,
@@ -230,6 +231,64 @@ class Skill extends SelectableTextItem {
   String get skillId => text;
 }
 
+class Reference extends SelectableTextItem {
+  final String person;
+  final String enterprise;
+  final String phoneNumber;
+  final String email;
+
+  Reference({
+    super.id,
+    required super.index,
+    required super.text,
+    required super.isSelected,
+    required this.person,
+    required this.enterprise,
+    required this.phoneNumber,
+    required this.email,
+  });
+
+  Reference.fromSerialized(super.map)
+      : person = StringExt.from(map?['person']) ?? '',
+        enterprise = StringExt.from(map?['enterprise']) ?? '',
+        phoneNumber = StringExt.from(map?['phone_number']) ?? '',
+        email = StringExt.from(map?['email']) ?? '',
+        super.fromSerialized();
+
+  @override
+  Map<String, dynamic> serializedMap() => super.serializedMap()
+    ..addAll({
+      'person': person.serialize(),
+      'enterprise': enterprise.serialize(),
+      'phone_number': phoneNumber.serialize(),
+      'email': email.serialize(),
+    });
+
+  static FetchableFields get fetchableFields =>
+      SelectableTextItem.fetchableFields..addAll(FetchableFields.reference({}));
+
+  @override
+  Reference copyWith({
+    String? text,
+    int? index,
+    bool? isSelected,
+    String? person,
+    String? enterprise,
+    String? phoneNumber,
+    String? email,
+  }) =>
+      Reference(
+        id: id,
+        index: index ?? this.index,
+        text: text ?? this.text,
+        isSelected: isSelected ?? this.isSelected,
+        person: person ?? this.person,
+        enterprise: enterprise ?? this.enterprise,
+        phoneNumber: phoneNumber ?? this.phoneNumber,
+        email: email ?? this.email,
+      );
+}
+
 class Attitude extends SelectableTextItem {
   Attitude({
     super.id,
@@ -275,6 +334,36 @@ class Attitude extends SelectableTextItem {
   String get attitudeId => text;
 }
 
+class SuccessConditions extends SelectableTextItem {
+  SuccessConditions({
+    super.id,
+    required super.index,
+    required super.text,
+    required super.isSelected,
+  });
+
+  SuccessConditions.fromSerialized(super.map) : super.fromSerialized();
+
+  @override
+  Map<String, dynamic> serializedMap() => super.serializedMap()..addAll({});
+
+  static FetchableFields get fetchableFields =>
+      SelectableTextItem.fetchableFields..addAll(FetchableFields.reference({}));
+
+  @override
+  SuccessConditions copyWith({
+    String? text,
+    int? index,
+    bool? isSelected,
+  }) =>
+      SuccessConditions(
+        id: id,
+        index: index ?? this.index,
+        text: text ?? this.text,
+        isSelected: isSelected ?? this.isSelected,
+      );
+}
+
 class VisaForm extends ItemSerializable {
   final List<ExperiencesAndAptitudes> experiencesAndAptitudes;
   final List<AttestationsAndMentions> attestationsAndMentions;
@@ -283,12 +372,12 @@ class VisaForm extends ItemSerializable {
   final bool isGatewayToFmsAvailable;
   final List<Certificate> certificates;
   final List<Skill> skills;
-  final String reference;
+  final List<Reference> references;
 
   final List<Attitude> forces;
   final List<Attitude> challenges;
 
-  final String successConditions;
+  final List<SuccessConditions> successConditions;
 
   VisaForm({
     super.id,
@@ -298,7 +387,7 @@ class VisaForm extends ItemSerializable {
     required this.isGatewayToFmsAvailable,
     required this.certificates,
     required this.skills,
-    required this.reference,
+    required this.references,
     required this.forces,
     required this.challenges,
     required this.successConditions,
@@ -329,7 +418,10 @@ class VisaForm extends ItemSerializable {
                 ?.map((e) => Skill.fromSerialized(e))
                 .toList() ??
             [],
-        reference = StringExt.from(map?['reference']) ?? '',
+        references = (map?['references'] as List?)
+                ?.map((e) => Reference.fromSerialized(e))
+                .toList() ??
+            [],
         forces = (map?['forces'] as List?)
                 ?.map((e) => Attitude.fromSerialized(e))
                 .toList() ??
@@ -338,7 +430,10 @@ class VisaForm extends ItemSerializable {
                 ?.map((e) => Attitude.fromSerialized(e))
                 .toList() ??
             [],
-        successConditions = StringExt.from(map?['success_conditions']) ?? '',
+        successConditions = (map?['success_conditions'] as List?)
+                ?.map((e) => SuccessConditions.fromSerialized(e))
+                .toList() ??
+            [],
         super.fromSerialized() {
     _sortAllByIndices();
   }
@@ -349,8 +444,10 @@ class VisaForm extends ItemSerializable {
     sstTrainings.sort((a, b) => a.index.compareTo(b.index));
     certificates.sort((a, b) => a.index.compareTo(b.index));
     skills.sort((a, b) => a.index.compareTo(b.index));
+    references.sort((a, b) => a.index.compareTo(b.index));
     forces.sort((a, b) => a.index.compareTo(b.index));
     challenges.sort((a, b) => a.index.compareTo(b.index));
+    successConditions.sort((a, b) => a.index.compareTo(b.index));
   }
 
   @override
@@ -363,7 +460,7 @@ class VisaForm extends ItemSerializable {
       'is_gateway_to_fms_available': isGatewayToFmsAvailable,
       'certificates': certificates.serialize(),
       'skills': skills.serialize(),
-      'reference': reference.serialize(),
+      'references': references.serialize(),
       'forces': forces.serialize(),
       'challenges': challenges.serialize(),
       'success_conditions': successConditions.serialize(),
@@ -377,10 +474,10 @@ class VisaForm extends ItemSerializable {
     bool? isGatewayToFmsAvailable,
     List<Certificate>? certificates,
     List<Skill>? skills,
-    String? reference,
+    List<Reference>? references,
     List<Attitude>? forces,
     List<Attitude>? challenges,
-    String? successConditions,
+    List<SuccessConditions>? successConditions,
   }) {
     return VisaForm(
       id: id,
@@ -393,7 +490,7 @@ class VisaForm extends ItemSerializable {
           isGatewayToFmsAvailable ?? this.isGatewayToFmsAvailable,
       certificates: certificates ?? this.certificates,
       skills: skills ?? this.skills,
-      reference: reference ?? this.reference,
+      references: references ?? this.references,
       forces: forces ?? this.forces,
       challenges: challenges ?? this.challenges,
       successConditions: successConditions ?? this.successConditions,
@@ -409,10 +506,10 @@ class VisaForm extends ItemSerializable {
         ', isGatewayToFmsAvailable: $isGatewayToFmsAvailable'
         ', certificates: ${certificates.toString()}'
         ', skills: ${skills.toString()}'
-        ', reference: $reference'
+        ', references: ${references.toString()}'
         ', forces: ${forces.toString()}'
         ', challenges: ${challenges.toString()}'
-        ', successConditions: $successConditions'
+        ', successConditions: ${successConditions.toString()}'
         '}';
   }
 
@@ -439,7 +536,10 @@ class VisaForm extends ItemSerializable {
           ..addAll(FetchableFields.reference({
             '*': Skill.fetchableFields,
           })),
-        'reference': FetchableFields.optional,
+        'references': FetchableFields.mandatory
+          ..addAll(FetchableFields.reference({
+            '*': Reference.fetchableFields,
+          })),
         'forces': FetchableFields.mandatory
           ..addAll(FetchableFields.reference({
             '*': Attitude.fetchableFields,
@@ -448,7 +548,10 @@ class VisaForm extends ItemSerializable {
           ..addAll(FetchableFields.reference({
             '*': Attitude.fetchableFields,
           })),
-        'success_conditions': FetchableFields.optional,
+        'success_conditions': FetchableFields.optional
+          ..addAll(FetchableFields.reference({
+            '*': SuccessConditions.fetchableFields,
+          })),
       });
 }
 

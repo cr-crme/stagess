@@ -6,6 +6,7 @@ class SelectableTextItem extends ItemSerializable {
   final int index;
   final String text;
   final bool isSelected;
+  bool get isNotSelected => !isSelected;
 
   SelectableTextItem({
     super.id,

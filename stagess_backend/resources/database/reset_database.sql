@@ -210,7 +210,6 @@ CREATE TABLE student_visa_forms (
     form_id VARCHAR(36) NOT NULL,
     is_gateway_to_fms_available BOOLEAN NOT NULL,
     reference VARCHAR(500) NOT NULL,
-    success_conditions VARCHAR(500) NOT NULL,
     FOREIGN KEY (form_id) REFERENCES student_visa(id) ON DELETE CASCADE
 );
 
@@ -276,6 +275,15 @@ CREATE TABLE student_visa_challenges_items (
     idx INT NOT NULL,
     visa_form_id VARCHAR(36) NOT NULL,
     text VARCHAR(36) NOT NULL,
+    is_selected BOOLEAN NOT NULL,
+    FOREIGN KEY (visa_form_id) REFERENCES student_visa_forms(id) ON DELETE CASCADE
+);
+
+CREATE TABLE student_visa_success_conditions_items (
+    id VARCHAR(36) NOT NULL PRIMARY KEY,
+    idx INT NOT NULL,
+    visa_form_id VARCHAR(36) NOT NULL,
+    text VARCHAR(200) NOT NULL,
     is_selected BOOLEAN NOT NULL,
     FOREIGN KEY (visa_form_id) REFERENCES student_visa_forms(id) ON DELETE CASCADE
 );

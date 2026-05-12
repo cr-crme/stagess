@@ -458,117 +458,126 @@ Future<void> _addDummyStudents(
         StudentVisa(
             date: DateTime(2025, 1, 1),
             form: VisaForm(
-                experiencesAndAptitudes: [
-                  ExperiencesAndAptitudes(
-                      index: 0,
-                      text: 'La première expérience',
-                      isSelected: false),
-                  ExperiencesAndAptitudes(
-                      index: 1,
-                      text: 'La deuxième expérience',
-                      isSelected: true)
-                ],
-                attestationsAndMentions: [
-                  AttestationsAndMentions(
-                      index: 0,
-                      text: 'La première attestation',
-                      isSelected: false),
-                  AttestationsAndMentions(
-                      index: 1,
-                      text: 'La deuxième attestation',
-                      isSelected: true),
-                  AttestationsAndMentions(
-                      index: 2,
-                      text: 'La troisième attestation',
-                      isSelected: false),
-                ],
-                sstTrainings: [
-                  SstTraining(
+              experiencesAndAptitudes: [
+                ExperiencesAndAptitudes(
                     index: 0,
-                    trainingId:
-                        SstTraining.availableTrainings.keys.elementAt(4),
-                    isSelected: false,
-                    isHidden: false,
-                  ),
-                  SstTraining(
+                    text: 'La première expérience',
+                    isSelected: false),
+                ExperiencesAndAptitudes(
+                    index: 1, text: 'La deuxième expérience', isSelected: true)
+              ],
+              attestationsAndMentions: [
+                AttestationsAndMentions(
+                    index: 0,
+                    text: 'La première attestation',
+                    isSelected: false),
+                AttestationsAndMentions(
                     index: 1,
-                    trainingId:
-                        SstTraining.availableTrainings.keys.elementAt(1),
-                    isSelected: true,
-                    isHidden: false,
-                  ),
-                  SstTraining(
+                    text: 'La deuxième attestation',
+                    isSelected: true),
+                AttestationsAndMentions(
                     index: 2,
-                    trainingId:
-                        SstTraining.availableTrainings.keys.elementAt(2),
-                    isSelected: false,
-                    isHidden: true,
-                  ),
-                  SstTraining(
-                    index: 3,
-                    trainingId:
-                        SstTraining.availableTrainings.keys.elementAt(3),
+                    text: 'La troisième attestation',
+                    isSelected: false),
+              ],
+              sstTrainings: [
+                SstTraining(
+                  index: 0,
+                  trainingId: SstTraining.availableTrainings.keys.elementAt(4),
+                  isSelected: false,
+                  isHidden: false,
+                ),
+                SstTraining(
+                  index: 1,
+                  trainingId: SstTraining.availableTrainings.keys.elementAt(1),
+                  isSelected: true,
+                  isHidden: false,
+                ),
+                SstTraining(
+                  index: 2,
+                  trainingId: SstTraining.availableTrainings.keys.elementAt(2),
+                  isSelected: false,
+                  isHidden: true,
+                ),
+                SstTraining(
+                  index: 3,
+                  trainingId: SstTraining.availableTrainings.keys.elementAt(3),
+                  isSelected: true,
+                  isHidden: true,
+                ),
+              ],
+              isGatewayToFmsAvailable: true,
+              certificates: [
+                Certificate(
+                    index: 0,
+                    certificateType: CertificateType.fpt,
                     isSelected: true,
-                    isHidden: true,
-                  ),
-                ],
-                isGatewayToFmsAvailable: true,
-                certificates: [
-                  Certificate(
-                      index: 0,
-                      certificateType: CertificateType.fpt,
-                      isSelected: true,
-                      year: 2023),
-                  Certificate(
-                      index: 1,
-                      certificateType: CertificateType.fms,
-                      isSelected: true,
-                      year: 2023,
-                      specializationId: job_data_service.ActivitySectorsService
-                          .activitySectors[2].specializations[1].id),
-                ],
-                skills: [
-                  Skill(
-                      index: 0,
-                      skillId: job_data_service.ActivitySectorsService
-                          .activitySectors[2].specializations[1].skills[0].id,
-                      isSelected: false),
-                  Skill(
-                      index: 1,
-                      skillId: job_data_service.ActivitySectorsService
-                          .activitySectors[2].specializations[0].skills[1].id,
-                      isSelected: true),
-                ],
-                reference: 'La référence de Cedric',
-                forces: [
-                  Attitude(
-                      index: 0,
-                      attitudeId: Attitude.availableItems.keys.elementAt(1),
-                      isSelected: false),
-                  Attitude(
-                      index: 1,
-                      attitudeId: Attitude.availableItems.keys.elementAt(2),
-                      isSelected: true),
-                  Attitude(
-                      index: 2,
-                      attitudeId: Attitude.availableItems.keys.elementAt(4),
-                      isSelected: true),
-                ],
-                challenges: [
-                  Attitude(
-                      index: 0,
-                      attitudeId: Attitude.availableItems.keys.elementAt(0),
-                      isSelected: true),
-                  Attitude(
-                      index: 1,
-                      attitudeId: Attitude.availableItems.keys.elementAt(5),
-                      isSelected: true),
-                  Attitude(
-                      index: 2,
-                      attitudeId: Attitude.availableItems.keys.elementAt(7),
-                      isSelected: false),
-                ],
-                successConditions: 'Aucune'),
+                    year: 2023),
+                Certificate(
+                    index: 1,
+                    certificateType: CertificateType.fms,
+                    isSelected: true,
+                    year: 2023,
+                    specializationId: job_data_service.ActivitySectorsService
+                        .activitySectors[2].specializations[1].id),
+              ],
+              skills: [
+                Skill(
+                    index: 0,
+                    skillId: job_data_service.ActivitySectorsService
+                        .activitySectors[2].specializations[1].skills[0].id,
+                    isSelected: false),
+                Skill(
+                    index: 1,
+                    skillId: job_data_service.ActivitySectorsService
+                        .activitySectors[2].specializations[0].skills[1].id,
+                    isSelected: true),
+              ],
+              references: [
+                Reference(
+                    index: 0,
+                    text: 'Référence 1 - Entreprise ABC - 514 123 4567',
+                    isSelected: true),
+                Reference(
+                    index: 1,
+                    text: 'Référence 2 - Entreprise XYZ - 514 987 6543',
+                    isSelected: false),
+              ],
+              forces: [
+                Attitude(
+                    index: 0,
+                    attitudeId: Attitude.availableItems.keys.elementAt(1),
+                    isSelected: false),
+                Attitude(
+                    index: 1,
+                    attitudeId: Attitude.availableItems.keys.elementAt(2),
+                    isSelected: true),
+                Attitude(
+                    index: 2,
+                    attitudeId: Attitude.availableItems.keys.elementAt(4),
+                    isSelected: true),
+              ],
+              challenges: [
+                Attitude(
+                    index: 0,
+                    attitudeId: Attitude.availableItems.keys.elementAt(0),
+                    isSelected: true),
+                Attitude(
+                    index: 1,
+                    attitudeId: Attitude.availableItems.keys.elementAt(5),
+                    isSelected: true),
+                Attitude(
+                    index: 2,
+                    attitudeId: Attitude.availableItems.keys.elementAt(7),
+                    isSelected: false),
+              ],
+              successConditions: [
+                SuccessConditions(
+                    index: 0,
+                    text: 'Aucune condition de succès',
+                    isSelected: true),
+              ],
+            ),
             formVersion: StudentVisa.currentVersion),
       ],
     ),
@@ -877,7 +886,10 @@ Future<void> _addDummyStudents(
                     attitudeId: Attitude.availableItems.keys.elementAt(7),
                     isSelected: false)
               ],
-              successConditions: 'Lui parler respectueusement',
+              successConditions: [
+                SuccessConditions(
+                    index: 0, text: 'Lui parler doucement', isSelected: true),
+              ],
             ),
             formVersion: StudentVisa.currentVersion)
       ],

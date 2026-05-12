@@ -65,12 +65,12 @@ class VisaFormController {
   bool _isGatewayToFmsAvailable = false;
   final _sstCertificateController = SelectableTextItemsController();
   final _specificSkillsController = SelectableTextItemsController();
-  final _referenceController = TextEditingController();
+  final _referencesController = SelectableTextItemsController();
 
   final _forcesController = SelectableTextItemsController();
   final _challengesController = SelectableTextItemsController();
 
-  final _successConditionsController = TextEditingController();
+  final _successConditionsController = SelectableTextItemsController();
 
   VisaFormController(
     BuildContext context, {
@@ -113,7 +113,7 @@ class VisaFormController {
     _sstTrainingsController.dispose();
     _sstCertificateController.dispose();
     _specificSkillsController.dispose();
-    _referenceController.dispose();
+    _referencesController.dispose();
     _forcesController.dispose();
     _challengesController.dispose();
     _successConditionsController.dispose();
@@ -166,7 +166,7 @@ class VisaFormController {
       _specificSkillsController
           .add(Skill(index: index, skillId: skill.skillId, isSelected: false));
     }
-    _referenceController.text = '';
+    _referencesController.clear();
 
     _forcesController.clear();
     _challengesController.clear();
@@ -177,7 +177,7 @@ class VisaFormController {
           Attitude(index: int.parse(key), attitudeId: key, isSelected: false));
     }
 
-    _successConditionsController.text = '';
+    _successConditionsController.clear();
   }
 
   void _fillFromPreviousEvaluation(BuildContext context,
@@ -275,7 +275,13 @@ class VisaFormController {
                 .copyWith(isSelected: item.isSelected));
       }
     }
-    _referenceController.text = visa.form.reference;
+
+    for (final item in visa.form.references) {
+      _referencesController.add(
+        Reference(
+            index: item.index, text: item.text, isSelected: item.isSelected),
+      );
+    }
 
     for (int i = 0; i < visa.form.forces.length; i++) {
       final previousForces = visa.form.forces[i];
@@ -310,7 +316,12 @@ class VisaFormController {
       );
     }
 
-    _successConditionsController.text = visa.form.successConditions;
+    for (final item in visa.form.successConditions) {
+      _successConditionsController.add(
+        SuccessConditions(
+            index: item.index, text: item.text, isSelected: item.isSelected),
+      );
+    }
   }
 
   StudentVisa toVisa() {
@@ -329,10 +340,12 @@ class VisaFormController {
         certificates:
             _sstCertificateController.options.cast<Certificate>().toList(),
         skills: _specificSkillsController.options.cast<Skill>().toList(),
-        reference: _referenceController.text,
+        references: _referencesController.options.cast<Reference>().toList(),
         forces: _forcesController.options.cast<Attitude>().toList(),
         challenges: _challengesController.options.cast<Attitude>().toList(),
-        successConditions: _successConditionsController.text,
+        successConditions: _successConditionsController.options
+            .cast<SuccessConditions>()
+            .toList(),
       ),
       formVersion: _formVersion,
     );
@@ -610,7 +623,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
                 ),
               if (controller.canModify &&
                   controller._sstTrainingsController.options
-                      .any((e) => !(e as SstTraining).isHidden))
+                      .any((e) => (e as SstTraining).isNotHidden))
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Text(
@@ -622,7 +635,8 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
               ...controller._sstTrainingsController.options
                   .asMap()
                   .entries
-                  .where((element) => !(element.value as SstTraining).isHidden)
+                  .where(
+                      (element) => (element.value as SstTraining).isNotHidden)
                   .map((entry) {
                 final index = entry.key;
                 final item = entry.value as SstTraining;
@@ -956,15 +970,14 @@ class _EmployabilityProfileSection extends StatelessWidget {
                   'Inscrire la référence, le nom de l\'entreprise si c\'est le milieu '
                   'de stage ou un employeur ainsi que le numéro de téléphone, à afficher dans le VISA en PDF.'),
               SizedBox(height: 8.0),
-              TextFormField(
-                controller: controller._referenceController,
+              // TODO Change reference box to something more structured with separate fields for name, company and phone number
+              SelectableTextBoxes(
+                controller: controller._referencesController,
                 enabled: controller.canModify,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
-                style: TextStyle(color: Colors.black),
-                maxLength: 500,
-                maxLines: 5,
+                maxSelectedOptions: 5,
+                newItemBuilder: (index) =>
+                    Reference(index: index, text: '', isSelected: false),
+                maxLength: 200,
               ),
             ],
           ),
@@ -1080,15 +1093,13 @@ class _ForcesAndChallengesSection extends StatelessWidget {
                 'Lister toutes les adaptations, requises pour aider l\'élève à réussir, '
                 'à afficher dans le VISA en PDF.'),
             SizedBox(height: 8.0),
-            TextFormField(
+            SelectableTextBoxes(
               controller: controller._successConditionsController,
               enabled: controller.canModify,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-              ),
-              style: TextStyle(color: Colors.black),
-              maxLength: 500,
-              maxLines: 5,
+              maxSelectedOptions: 8,
+              newItemBuilder: (index) =>
+                  SuccessConditions(index: index, text: '', isSelected: false),
+              maxLength: 200,
             ),
           ],
         ),

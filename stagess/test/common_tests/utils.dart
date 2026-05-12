@@ -268,57 +268,64 @@ visa.StudentVisa dummyStudentVisa({
       formVersion: visa.StudentVisa.currentVersion,
       date: DateTime(2025, 1, 1),
       form: visa.VisaForm(
-        id: 'visaEvaluationId',
-        experiencesAndAptitudes: [
-          visa.ExperiencesAndAptitudes(
-              index: 0, text: 'Value1', isSelected: true),
-          visa.ExperiencesAndAptitudes(
-              index: 1, text: 'Value2', isSelected: false),
-        ],
-        attestationsAndMentions: [
-          visa.AttestationsAndMentions(
-              index: 0, text: 'Value3', isSelected: true),
-          visa.AttestationsAndMentions(
-              index: 1, text: 'Value4', isSelected: false),
-        ],
-        sstTrainings: [
-          visa.SstTraining(
-              index: 0, trainingId: '0001', isSelected: true, isHidden: true),
-          visa.SstTraining(
-              index: 1, trainingId: '0002', isSelected: false, isHidden: false),
-        ],
-        isGatewayToFmsAvailable: false,
-        certificates: [
-          visa.Certificate(
-            index: 0,
-            certificateType: visa.CertificateType.fpt,
-            isSelected: true,
-            specializationId: 'jobId',
-            year: 2020,
-          ),
-          visa.Certificate(
-            index: 1,
-            certificateType: visa.CertificateType.fms,
-            isSelected: false,
-            specializationId: 'jobId',
-            year: 2021,
-          ),
-        ],
-        skills: [
-          visa.Skill(index: 0, skillId: '834301', isSelected: true),
-          visa.Skill(index: 1, skillId: '834303', isSelected: false),
-        ],
-        reference: 'VisaReference123',
-        forces: [
-          visa.Attitude(index: 0, attitudeId: '0001', isSelected: true),
-          visa.Attitude(index: 1, attitudeId: '0002', isSelected: false),
-        ],
-        challenges: [
-          visa.Attitude(index: 0, attitudeId: '0003', isSelected: true),
-          visa.Attitude(index: 1, attitudeId: '0004', isSelected: false),
-        ],
-        successConditions: 'Well supported',
-      ),
+          id: 'visaEvaluationId',
+          experiencesAndAptitudes: [
+            visa.ExperiencesAndAptitudes(
+                index: 0, text: 'Value1', isSelected: true),
+            visa.ExperiencesAndAptitudes(
+                index: 1, text: 'Value2', isSelected: false),
+          ],
+          attestationsAndMentions: [
+            visa.AttestationsAndMentions(
+                index: 0, text: 'Value3', isSelected: true),
+            visa.AttestationsAndMentions(
+                index: 1, text: 'Value4', isSelected: false),
+          ],
+          sstTrainings: [
+            visa.SstTraining(
+                index: 0, trainingId: '0001', isSelected: true, isHidden: true),
+            visa.SstTraining(
+                index: 1,
+                trainingId: '0002',
+                isSelected: false,
+                isHidden: false),
+          ],
+          isGatewayToFmsAvailable: false,
+          certificates: [
+            visa.Certificate(
+              index: 0,
+              certificateType: visa.CertificateType.fpt,
+              isSelected: true,
+              specializationId: 'jobId',
+              year: 2020,
+            ),
+            visa.Certificate(
+              index: 1,
+              certificateType: visa.CertificateType.fms,
+              isSelected: false,
+              specializationId: 'jobId',
+              year: 2021,
+            ),
+          ],
+          skills: [
+            visa.Skill(index: 0, skillId: '834301', isSelected: true),
+            visa.Skill(index: 1, skillId: '834303', isSelected: false),
+          ],
+          reference: 'VisaReference123',
+          forces: [
+            visa.Attitude(index: 0, attitudeId: '0001', isSelected: true),
+            visa.Attitude(index: 1, attitudeId: '0002', isSelected: false),
+          ],
+          challenges: [
+            visa.Attitude(index: 0, attitudeId: '0003', isSelected: true),
+            visa.Attitude(index: 1, attitudeId: '0004', isSelected: false),
+          ],
+          successConditions: [
+            visa.SuccessConditions(
+                index: 0, text: 'Condition1', isSelected: true),
+            visa.SuccessConditions(
+                index: 1, text: 'Condition2', isSelected: false),
+          ]),
     );
 
 Internship dummyInternship({

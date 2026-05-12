@@ -13,6 +13,7 @@ import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 
+// TODO Add search bar to filter students by name, school, group, etc.
 class StudentsListScreen extends StatelessWidget {
   const StudentsListScreen({super.key});
 

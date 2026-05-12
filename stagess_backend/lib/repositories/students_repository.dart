@@ -341,6 +341,12 @@ class MySqlStudentsRepository extends StudentsRepository {
                   fieldsToFetch: ['id', 'idx', 'text', 'is_selected'],
                   idNameToDataTable: 'visa_form_id',
                 ),
+                sqlInterface.selectSubquery(
+                  dataTableName: 'student_visa_success_conditions_items',
+                  asName: 'success_conditions',
+                  fieldsToFetch: ['id', 'idx', 'text', 'is_selected'],
+                  idNameToDataTable: 'visa_form_id',
+                ),
               ],
             ))
                 .firstOrNull ??
@@ -365,6 +371,9 @@ class MySqlStudentsRepository extends StudentsRepository {
           element['index'] = element['idx'];
         }
         for (final element in visaForm['challenges'] ?? []) {
+          element['index'] = element['idx'];
+        }
+        for (final element in visaForm['success_conditions'] ?? []) {
           element['index'] = element['idx'];
         }
 
@@ -485,7 +494,6 @@ class MySqlStudentsRepository extends StudentsRepository {
         'is_gateway_to_fms_available':
             visa.form.isGatewayToFmsAvailable.serialize(),
         'reference': visa.form.reference.serialize(),
-        'success_conditions': visa.form.successConditions.serialize(),
       });
 
       final toWait = <Future>[];
@@ -577,6 +585,20 @@ class MySqlStudentsRepository extends StudentsRepository {
         toWait.add(
           sqlInterface.performInsertQuery(
             tableName: 'student_visa_challenges_items',
+            data: {
+              'id': element.id.serialize(),
+              'idx': element.index.serialize(),
+              'visa_form_id': visa.form.id,
+              'text': element.text.serialize(),
+              'is_selected': element.isSelected.serialize(),
+            },
+          ),
+        );
+      }
+      for (final element in visa.form.successConditions) {
+        toWait.add(
+          sqlInterface.performInsertQuery(
+            tableName: 'student_visa_success_conditions_items',
             data: {
               'id': element.id.serialize(),
               'idx': element.index.serialize(),
