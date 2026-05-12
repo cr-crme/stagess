@@ -13,6 +13,7 @@ class PhoneListTile extends StatefulWidget {
     this.initialValue,
     this.icon = Icons.phone,
     this.onSaved,
+    this.onChanged,
     required this.isMandatory,
     required this.enabled,
     this.canCall = true,
@@ -25,6 +26,7 @@ class PhoneListTile extends StatefulWidget {
   final PhoneNumber? initialValue;
   final IconData icon;
   final Function(String?)? onSaved;
+  final Function(String?)? onChanged;
   final bool isMandatory;
   final bool enabled;
   final TextEditingController? controller;
@@ -104,6 +106,7 @@ class _PhoneListTileState extends State<PhoneListTile> {
                   (widget.enabled ? null : TextStyle(color: Colors.black)),
               enabled: widget.enabled,
               onSaved: widget.onSaved,
+              onChanged: widget.onChanged,
               keyboardType: TextInputType.phone,
             ),
             Padding(

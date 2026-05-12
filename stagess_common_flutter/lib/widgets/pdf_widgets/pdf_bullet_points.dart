@@ -1,7 +1,7 @@
 import 'package:pdf/widgets.dart' as pw;
 
-class PdfBulletPoints extends pw.StatelessWidget {
-  PdfBulletPoints({required this.elements, this.spacing});
+class PdfTextBulletPoints extends pw.StatelessWidget {
+  PdfTextBulletPoints({required this.elements, this.spacing});
 
   final Iterable<String> elements;
   final pw.EdgeInsets? spacing;
@@ -12,6 +12,22 @@ class PdfBulletPoints extends pw.StatelessWidget {
       children: elements
           .map((element) =>
               PdfBulletPoint(child: pw.Text(element), spacing: spacing))
+          .toList(),
+    );
+  }
+}
+
+class PdfBulletPoints extends pw.StatelessWidget {
+  PdfBulletPoints({required this.children, this.spacing});
+
+  final Iterable<pw.Widget> children;
+  final pw.EdgeInsets? spacing;
+
+  @override
+  pw.Widget build(pw.Context context) {
+    return pw.Column(
+      children: children
+          .map((element) => PdfBulletPoint(child: element, spacing: spacing))
           .toList(),
     );
   }

@@ -311,7 +311,24 @@ visa.StudentVisa dummyStudentVisa({
             visa.Skill(index: 0, skillId: '834301', isSelected: true),
             visa.Skill(index: 1, skillId: '834303', isSelected: false),
           ],
-          reference: 'VisaReference123',
+          references: [
+            visa.Reference(
+              index: 0,
+              isSelected: true,
+              referee: 'Referee A',
+              enterprise: 'Enterprise A',
+              phoneNumber: PhoneNumber.fromString('1231231234'),
+              email: 'referee_a@enterprise_a.com',
+            ),
+            visa.Reference(
+              index: 0,
+              isSelected: false,
+              referee: 'Referee B',
+              enterprise: 'Enterprise B',
+              phoneNumber: PhoneNumber.fromString('3213214321'),
+              email: 'referee_b@enterprise_b.com',
+            ),
+          ],
           forces: [
             visa.Attitude(index: 0, attitudeId: '0001', isSelected: true),
             visa.Attitude(index: 1, attitudeId: '0002', isSelected: false),

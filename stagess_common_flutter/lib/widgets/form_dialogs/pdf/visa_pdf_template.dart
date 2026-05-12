@@ -68,7 +68,7 @@ pw.Page _buildSecondPage(StudentVisa studentVisa) {
               title:
                   'Expériences et aptitudes personnelles et scolaires complémentaires au profil d\'employabilité',
               height: pageHeight * 0.30,
-              child: PdfBulletPoints(
+              child: PdfTextBulletPoints(
                 elements: experiences,
                 spacing: _bulletPointSpacing,
               )),
@@ -76,7 +76,7 @@ pw.Page _buildSecondPage(StudentVisa studentVisa) {
           _BorderBox(
               title: 'Attestations et mentions',
               height: pageHeight * 0.20,
-              child: PdfBulletPoints(
+              child: PdfTextBulletPoints(
                 elements: attestations,
                 spacing: _bulletPointSpacing,
               )),
@@ -84,7 +84,7 @@ pw.Page _buildSecondPage(StudentVisa studentVisa) {
           _BorderBox(
               title: 'Formations relatives à la SST',
               height: pageHeight * 0.20,
-              child: PdfBulletPoints(
+              child: PdfTextBulletPoints(
                 elements: sstTrainings,
                 spacing: _bulletPointSpacing,
               )),
@@ -124,7 +124,7 @@ pw.Page _buildThirdPage(StudentVisa studentVisa) {
           _BorderBox(
               title: 'Forces',
               height: pageHeight * 0.15,
-              child: PdfBulletPoints(
+              child: PdfTextBulletPoints(
                 elements: forces,
                 spacing: _bulletPointSpacing,
               )),
@@ -132,7 +132,7 @@ pw.Page _buildThirdPage(StudentVisa studentVisa) {
           _BorderBox(
               title: 'Défis à relever',
               height: pageHeight * 0.08,
-              child: PdfBulletPoints(
+              child: PdfTextBulletPoints(
                 elements: challenges,
                 spacing: _bulletPointSpacing,
               )),
@@ -140,7 +140,7 @@ pw.Page _buildThirdPage(StudentVisa studentVisa) {
           _BorderBox(
               title: 'Conditions de succès',
               height: pageHeight * 0.08,
-              child: PdfBulletPoints(
+              child: PdfTextBulletPoints(
                 elements: successConditions,
                 spacing: _bulletPointSpacing,
               )),
@@ -174,10 +174,9 @@ pw.Page _buildFourthPage(StudentVisa studentVisa) {
     return '${e.year} - $certificate';
   });
 
-  final references = (studentVisa.form.reference.toList()
-        ..removeWhere((r) => r.isNotSelected)
-        ..sort((a, b) => a.index.compareTo(b.index)))
-      .map((e) => e.text);
+  final references = (studentVisa.form.references.toList()
+    ..removeWhere((r) => r.isNotSelected)
+    ..sort((a, b) => a.index.compareTo(b.index)));
 
   return pw.Page(
     build: (pw.Context context) {
@@ -192,7 +191,7 @@ pw.Page _buildFourthPage(StudentVisa studentVisa) {
             title:
                 'Compétences spécifiques intégrées liées à des métiers semi-spécialisés',
             height: pageHeight * 0.20,
-            child: PdfBulletPoints(
+            child: PdfTextBulletPoints(
               elements: skills,
               spacing: _bulletPointSpacing,
             ),
@@ -201,9 +200,40 @@ pw.Page _buildFourthPage(StudentVisa studentVisa) {
           _BorderBox(
             title: 'Certificats',
             height: pageHeight * 0.20,
-            child: PdfBulletPoints(
+            child: PdfTextBulletPoints(
               elements: certificates,
               spacing: _bulletPointSpacing,
+            ),
+          ),
+          pw.SizedBox(height: 12),
+          _BorderBox(
+            title: 'Références',
+            height: pageHeight * 0.20,
+            child: PdfBulletPoints(
+              spacing: _bulletPointSpacing,
+              children: references.map((e) {
+                return pw.RichText(
+                  text: pw.TextSpan(children: [
+                    pw.TextSpan(
+                        text: e.referee,
+                        style: pw.TextStyle(fontStyle: pw.FontStyle.italic)),
+                    pw.TextSpan(text: ', '),
+                    pw.TextSpan(
+                        text: e.enterprise,
+                        style: pw.TextStyle(
+                            fontStyle: pw.FontStyle.normal,
+                            fontWeight: pw.FontWeight.bold)),
+                    pw.TextSpan(text: '. '),
+                    pw.TextSpan(
+                        text: e.phoneNumber.toString(),
+                        style: pw.TextStyle(fontStyle: pw.FontStyle.normal)),
+                    pw.TextSpan(text: '; '),
+                    pw.TextSpan(
+                        text: e.email,
+                        style: pw.TextStyle(fontStyle: pw.FontStyle.normal)),
+                  ]),
+                );
+              }),
             ),
           ),
         ],
@@ -263,6 +293,7 @@ class _BorderBox extends pw.StatelessWidget {
               padding: const pw.EdgeInsets.only(bottom: 8),
               child: _Subtitle(title!)),
         pw.Container(
+          width: double.infinity,
           height: height,
           padding: const pw.EdgeInsets.all(8),
           decoration: pw.BoxDecoration(

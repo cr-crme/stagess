@@ -172,12 +172,6 @@ class StagessApp extends StatelessWidget {
 }
 
 Future<bool> _disconnect(BuildContext context) async {
-  if (!AuthProvider.of(context, listen: false).isFullySignedIn) {
-    return true;
-  }
-  await AuthProviderExtension.disconnectAll(
-    context,
-    showConfirmDialog: false,
-  );
+  await AuthProviderExtension.disconnectAll(context, showConfirmDialog: false);
   return true;
 }

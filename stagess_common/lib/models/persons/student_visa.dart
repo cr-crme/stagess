@@ -1,5 +1,6 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
+import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/selectable_text_items.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 
@@ -232,35 +233,36 @@ class Skill extends SelectableTextItem {
 }
 
 class Reference extends SelectableTextItem {
-  final String person;
+  final String referee;
   final String enterprise;
-  final String phoneNumber;
+  final PhoneNumber phoneNumber;
   final String email;
+  @override
+  String get text => '$referee - $enterprise';
 
   Reference({
     super.id,
     required super.index,
-    required super.text,
     required super.isSelected,
-    required this.person,
+    required this.referee,
     required this.enterprise,
     required this.phoneNumber,
     required this.email,
   });
 
   Reference.fromSerialized(super.map)
-      : person = StringExt.from(map?['person']) ?? '',
+      : referee = StringExt.from(map?['referee']) ?? '',
         enterprise = StringExt.from(map?['enterprise']) ?? '',
-        phoneNumber = StringExt.from(map?['phone_number']) ?? '',
+        phoneNumber = PhoneNumber.fromString(map?['phone_number']),
         email = StringExt.from(map?['email']) ?? '',
         super.fromSerialized();
 
   @override
   Map<String, dynamic> serializedMap() => super.serializedMap()
     ..addAll({
-      'person': person.serialize(),
+      'referee': referee.serialize(),
       'enterprise': enterprise.serialize(),
-      'phone_number': phoneNumber.serialize(),
+      'phone_number': phoneNumber.toString(),
       'email': email.serialize(),
     });
 
@@ -269,24 +271,24 @@ class Reference extends SelectableTextItem {
 
   @override
   Reference copyWith({
-    String? text,
     int? index,
+    String? text,
     bool? isSelected,
-    String? person,
+    String? referee,
     String? enterprise,
-    String? phoneNumber,
+    PhoneNumber? phoneNumber,
     String? email,
-  }) =>
-      Reference(
-        id: id,
-        index: index ?? this.index,
-        text: text ?? this.text,
-        isSelected: isSelected ?? this.isSelected,
-        person: person ?? this.person,
-        enterprise: enterprise ?? this.enterprise,
-        phoneNumber: phoneNumber ?? this.phoneNumber,
-        email: email ?? this.email,
-      );
+  }) {
+    return Reference(
+      id: id,
+      index: index ?? this.index,
+      isSelected: isSelected ?? this.isSelected,
+      referee: referee ?? this.referee,
+      enterprise: enterprise ?? this.enterprise,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      email: email ?? this.email,
+    );
+  }
 }
 
 class Attitude extends SelectableTextItem {

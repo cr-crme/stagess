@@ -533,16 +533,7 @@ Future<void> _addDummyStudents(
                         .activitySectors[2].specializations[0].skills[1].id,
                     isSelected: true),
               ],
-              references: [
-                Reference(
-                    index: 0,
-                    text: 'Référence 1 - Entreprise ABC - 514 123 4567',
-                    isSelected: true),
-                Reference(
-                    index: 1,
-                    text: 'Référence 2 - Entreprise XYZ - 514 987 6543',
-                    isSelected: false),
-              ],
+              references: [],
               forces: [
                 Attitude(
                     index: 0,
@@ -857,7 +848,24 @@ Future<void> _addDummyStudents(
                         .activitySectors[2].specializations[1].skills[0].id,
                     isSelected: false)
               ],
-              reference: 'La référence de Jeanne',
+              references: [
+                Reference(
+                  index: 0,
+                  isSelected: false,
+                  referee: 'Jean Doe',
+                  enterprise: 'Entreprise A',
+                  email: 'jean.doe@entreprise_a.com',
+                  phoneNumber: PhoneNumber.fromString('555-123-1234'),
+                ),
+                Reference(
+                  index: 1,
+                  isSelected: true,
+                  referee: 'Jeanne Doe',
+                  enterprise: 'Entreprise B',
+                  email: 'jeanne.doe@entreprise_b.com',
+                  phoneNumber: PhoneNumber.fromString('555-321-4321'),
+                ),
+              ],
               forces: [
                 Attitude(
                     index: 2,

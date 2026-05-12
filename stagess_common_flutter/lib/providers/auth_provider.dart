@@ -73,7 +73,11 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
-    await _firebaseAuth.signOut();
+    try {
+      await _firebaseAuth.signOut();
+    } on Exception {
+      // Do nothing
+    }
     teacherId = null;
     schoolId = null;
     schoolBoardId = null;

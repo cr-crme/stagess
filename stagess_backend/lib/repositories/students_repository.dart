@@ -330,6 +330,21 @@ class MySqlStudentsRepository extends StudentsRepository {
                   idNameToDataTable: 'visa_form_id',
                 ),
                 sqlInterface.selectSubquery(
+                  dataTableName: 'student_visa_references_items',
+                  asName: 'student_references',
+                  fieldsToFetch: [
+                    'id',
+                    'idx',
+                    'visa_form_id',
+                    'is_selected',
+                    'referee',
+                    'enterprise',
+                    'phone_number',
+                    'email',
+                  ],
+                  idNameToDataTable: 'visa_form_id',
+                ),
+                sqlInterface.selectSubquery(
                   dataTableName: 'student_visa_forces_items',
                   asName: 'forces',
                   fieldsToFetch: ['id', 'idx', 'text', 'is_selected'],
@@ -365,6 +380,10 @@ class MySqlStudentsRepository extends StudentsRepository {
           element['index'] = element['idx'];
         }
         for (final element in visaForm['skills'] ?? []) {
+          element['index'] = element['idx'];
+        }
+        visaForm['references'] = visaForm['student_references'];
+        for (final element in visaForm['references'] ?? []) {
           element['index'] = element['idx'];
         }
         for (final element in visaForm['forces'] ?? []) {
@@ -493,7 +512,6 @@ class MySqlStudentsRepository extends StudentsRepository {
         'form_id': visa.id.serialize(),
         'is_gateway_to_fms_available':
             visa.form.isGatewayToFmsAvailable.serialize(),
-        'reference': visa.form.reference.serialize(),
       });
 
       final toWait = <Future>[];
@@ -563,6 +581,23 @@ class MySqlStudentsRepository extends StudentsRepository {
               'visa_form_id': visa.form.id,
               'text': element.text.serialize(),
               'is_selected': element.isSelected.serialize(),
+            },
+          ),
+        );
+      }
+      for (final element in visa.form.references) {
+        toWait.add(
+          sqlInterface.performInsertQuery(
+            tableName: 'student_visa_references_items',
+            data: {
+              'id': element.id.serialize(),
+              'idx': element.index.serialize(),
+              'visa_form_id': visa.form.id,
+              'is_selected': element.isSelected.serialize(),
+              'referee': element.referee.serialize(),
+              'enterprise': element.enterprise.serialize(),
+              'phone_number': element.phoneNumber.toString(),
+              'email': element.email.toString(),
             },
           ),
         );

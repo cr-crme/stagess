@@ -11,6 +11,7 @@ class EmailListTile extends StatefulWidget {
     this.initialValue,
     this.icon = Icons.mail,
     this.onSaved,
+    this.onChanged,
     this.isMandatory = false,
     this.enabled = false,
     this.canMail = true,
@@ -23,6 +24,7 @@ class EmailListTile extends StatefulWidget {
   final String? initialValue;
   final IconData icon;
   final Function(String?)? onSaved;
+  final Function(String?)? onChanged;
   final bool isMandatory;
   final bool enabled;
   final TextEditingController? controller;
@@ -99,6 +101,7 @@ class _EmailListTileState extends State<EmailListTile> {
               },
               enabled: widget.enabled,
               onSaved: widget.onSaved,
+              onChanged: widget.onChanged,
               keyboardType: TextInputType.emailAddress,
             ),
             Padding(

@@ -20,8 +20,10 @@ DROP TABLE IF EXISTS student_visa_attestations_and_mentions_items;
 DROP TABLE IF EXISTS student_visa_sst_training_items;
 DROP TABLE IF EXISTS student_visa_certificate_items;
 DROP TABLE IF EXISTS student_visa_skill_items;
+DROP TABLE IF EXISTS student_visa_references_items;
 DROP TABLE IF EXISTS student_visa_forces_items;
 DROP TABLE IF EXISTS student_visa_challenges_items;
+DROP TABLE IF EXISTS student_visa_success_conditions_items;
 
 DROP TABLE IF EXISTS teaching_groups;
 DROP TABLE IF EXISTS teacher_itineraries;
@@ -209,7 +211,6 @@ CREATE TABLE student_visa_forms (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     form_id VARCHAR(36) NOT NULL,
     is_gateway_to_fms_available BOOLEAN NOT NULL,
-    reference VARCHAR(500) NOT NULL,
     FOREIGN KEY (form_id) REFERENCES student_visa(id) ON DELETE CASCADE
 );
 
@@ -258,6 +259,18 @@ CREATE TABLE student_visa_skill_items (
     visa_form_id VARCHAR(36) NOT NULL,
     text VARCHAR(36) NOT NULL,
     is_selected BOOLEAN NOT NULL,
+    FOREIGN KEY (visa_form_id) REFERENCES student_visa_forms(id) ON DELETE CASCADE
+);
+
+CREATE TABLE student_visa_references_items (
+    id VARCHAR(36) NOT NULL PRIMARY KEY,
+    idx INT NOT NULL,
+    visa_form_id VARCHAR(36) NOT NULL,
+    is_selected BOOLEAN NOT NULL,
+    referee VARCHAR(100) NOT NULL,
+    enterprise VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(36) NOT NULL,
+    email VARCHAR(200) NOT NULL,
     FOREIGN KEY (visa_form_id) REFERENCES student_visa_forms(id) ON DELETE CASCADE
 );
 

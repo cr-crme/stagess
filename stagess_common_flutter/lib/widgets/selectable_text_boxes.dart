@@ -230,3 +230,140 @@ class _SelectableTextBoxesState extends State<SelectableTextBoxes> {
     );
   }
 }
+
+class SelectableBoxes extends StatefulWidget {
+  const SelectableBoxes(
+      {super.key,
+      required this.controller,
+      this.enabled = true,
+      this.maxOptions,
+      this.maxSelectedOptions,
+      required this.newItemBuilder,
+      required this.widgetBuilder});
+
+  final SelectableTextItemsController? controller;
+  final bool enabled;
+  final int? maxOptions;
+  final int? maxSelectedOptions;
+  final SelectableTextItem Function(int index) newItemBuilder;
+  final Widget Function(
+      BuildContext context,
+      int index,
+      SelectableTextItem item,
+      TextEditingController textController,
+      void Function(SelectableTextItem newItem) onUpdated) widgetBuilder;
+
+  @override
+  State<SelectableBoxes> createState() => _SelectableBoxesState();
+}
+
+class _SelectableBoxesState extends State<SelectableBoxes> {
+  late final _shouldDisposeController = widget.controller == null;
+  late final SelectableTextItemsController _controller =
+      widget.controller ?? SelectableTextItemsController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller._setStateCallback = setState;
+    if (_controller.options.isEmpty) {
+      _controller.insert(0, widget.newItemBuilder(0));
+    }
+  }
+
+  @override
+  void dispose() {
+    if (_shouldDisposeController) _controller.dispose();
+
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        for (int i = 0; i < _controller.options.length; i++)
+          Padding(
+            padding: EdgeInsets.only(top: i == 0 ? 0.0 : 12.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Checkbox(
+                  value: _controller.options[i].isSelected,
+                  onChanged: widget.enabled &&
+                          (widget.maxSelectedOptions == null ||
+                              _controller.options[i].isSelected ||
+                              _controller.selectedCount <
+                                  widget.maxSelectedOptions!)
+                      ? (value) => _controller.updateOption(i,
+                          _controller.options[i].copyWith(isSelected: value!))
+                      : null,
+                ),
+                const SizedBox(width: 8.0),
+                widget.widgetBuilder(
+                  context,
+                  i,
+                  _controller.options[i],
+                  _controller._optionControllers[i],
+                  (newItem) {
+                    _controller.updateOption(i, newItem);
+                  },
+                ),
+                Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    InkWell(
+                      onTap: widget.enabled &&
+                              (widget.maxOptions == null ||
+                                  _controller.options.length <
+                                      widget.maxOptions!)
+                          ? () => _controller.insert(
+                                i + 1,
+                                widget.newItemBuilder(i),
+                              )
+                          : null,
+                      borderRadius: BorderRadius.circular(25.0),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Icon(
+                          Icons.add,
+                          color: widget.enabled &&
+                                  (widget.maxOptions == null ||
+                                      _controller.options.length <
+                                          widget.maxOptions!)
+                              ? Colors.green
+                              : Colors.grey,
+                          size: 28,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 12.0),
+                      child: InkWell(
+                        onTap: widget.enabled && _controller.options.length > 1
+                            ? () => _controller.remove(i)
+                            : null,
+                        borderRadius: BorderRadius.circular(25.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: Icon(
+                            Icons.remove,
+                            color:
+                                widget.enabled && _controller.options.length > 1
+                                    ? Colors.red
+                                    : Colors.grey,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+}

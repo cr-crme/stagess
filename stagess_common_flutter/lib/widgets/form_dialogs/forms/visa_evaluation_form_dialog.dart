@@ -1,12 +1,14 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/models/persons/student_visa.dart';
 import 'package:stagess_common/services/job_data_file_service.dart'
     as job_service;
+import 'package:stagess_common_flutter/helpers/form_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/helpers/internships_helpers.dart';
 import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
@@ -15,8 +17,10 @@ import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/dialogs/show_pdf_dialog.dart';
+import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/visa_pdf_template.dart';
 import 'package:stagess_common_flutter/widgets/numbered_text.dart';
+import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/selectable_text_boxes.dart';
 import 'package:stagess_common_flutter/widgets/sub_title.dart';
 
@@ -279,7 +283,13 @@ class VisaFormController {
     for (final item in visa.form.references) {
       _referencesController.add(
         Reference(
-            index: item.index, text: item.text, isSelected: item.isSelected),
+          index: item.index,
+          isSelected: item.isSelected,
+          referee: item.referee,
+          enterprise: item.enterprise,
+          phoneNumber: item.phoneNumber,
+          email: item.email,
+        ),
       );
     }
 
@@ -957,7 +967,7 @@ class _EmployabilityProfileSection extends StatelessWidget {
         elevation: 0.0,
         header: (context, isExpanded) => Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text('Référence',
+              child: Text('Références',
                   style: Theme.of(context).textTheme.titleMedium),
             ),
         child: Padding(
@@ -967,22 +977,139 @@ class _EmployabilityProfileSection extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                  'Inscrire la référence, le nom de l\'entreprise si c\'est le milieu '
+                  'Inscrire les références, soit le nom de l\'entreprise si c\'est le milieu '
                   'de stage ou un employeur ainsi que le numéro de téléphone, à afficher dans le VISA en PDF.'),
               SizedBox(height: 8.0),
-              // TODO Change reference box to something more structured with separate fields for name, company and phone number
-              SelectableTextBoxes(
+              SelectableBoxes(
                 controller: controller._referencesController,
                 enabled: controller.canModify,
                 maxSelectedOptions: 5,
-                newItemBuilder: (index) =>
-                    Reference(index: index, text: '', isSelected: false),
-                maxLength: 200,
+                newItemBuilder: (index) => Reference(
+                  index: index,
+                  isSelected: false,
+                  referee: '',
+                  enterprise: '',
+                  phoneNumber: PhoneNumber.empty,
+                  email: '',
+                ),
+                widgetBuilder: (context, index, item, textController,
+                        onUpdated) =>
+                    _referenceListTile(context,
+                        index: index,
+                        enabled: controller.canModify,
+                        reference: item as Reference,
+                        controller: textController,
+                        onUpdated: ({referee, enteprise, phoneNumber, email}) =>
+                            onUpdated(item.copyWith(
+                              referee: referee,
+                              enterprise: enteprise,
+                              phoneNumber: phoneNumber,
+                              email: email,
+                            ))),
               ),
             ],
           ),
         ));
   }
+}
+
+Widget _referenceListTile(
+  BuildContext context, {
+  required bool enabled,
+  required int index,
+  required Reference reference,
+  required TextEditingController controller,
+  required Function({
+    String? referee,
+    String? enteprise,
+    PhoneNumber? phoneNumber,
+    String? email,
+  }) onUpdated,
+}) {
+  return Expanded(
+    child: Padding(
+      padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 8.0),
+      child: AnimatedExpandingCard(
+        canChangeExpandedState: enabled,
+        header: (context, isExpanded) => Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Référence ${index + 1}',
+                  style: Theme.of(context).textTheme.titleMedium),
+              Flexible(
+                child: RichText(
+                  text: TextSpan(children: [
+                    TextSpan(
+                        text: reference.referee,
+                        style: TextStyle(fontStyle: FontStyle.italic)),
+                    TextSpan(text: ', '),
+                    TextSpan(
+                        text: reference.enterprise,
+                        style: TextStyle(
+                            fontStyle: FontStyle.normal,
+                            fontWeight: FontWeight.bold)),
+                    TextSpan(text: '. '),
+                    TextSpan(
+                        text: reference.phoneNumber.toString().isEmpty
+                            ? 'Téléphone non valide'
+                            : reference.phoneNumber.toString(),
+                        style: TextStyle(fontStyle: FontStyle.normal)),
+                    TextSpan(text: '; '),
+                    TextSpan(
+                        text: reference.email.isEmpty
+                            ? 'Courriel non valide'
+                            : reference.email,
+                        style: TextStyle(fontStyle: FontStyle.normal)),
+                  ]),
+                ),
+              )
+            ],
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextFormField(
+                initialValue: reference.referee,
+                onChanged: (value) => onUpdated(referee: value),
+                maxLength: 100,
+              ),
+              TextFormField(
+                initialValue: reference.enterprise,
+                onChanged: (value) => onUpdated(enteprise: value),
+                maxLength: 100,
+              ),
+              PhoneListTile(
+                isMandatory: false,
+                enabled: true,
+                initialValue: reference.phoneNumber,
+                onChanged: (value) =>
+                    onUpdated(phoneNumber: PhoneNumber.fromString(value ?? '')),
+              ),
+              EmailListTile(
+                  isMandatory: false,
+                  enabled: true,
+                  initialValue: reference.email,
+                  onChanged: (value) {
+                    // TODO: Changed for on field submitted?
+                    if (FormService.emailValidator(value) == null) {
+                      onUpdated(email: value);
+                    } else {
+                      onUpdated(email: '');
+                    }
+                  }),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 class _ForcesAndChallengesSection extends StatelessWidget {
