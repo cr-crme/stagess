@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
-import 'package:stagess/common/widgets/search.dart';
 import 'package:stagess/screens/ref_sst/incident_history/models/incidents_by_enterprise.dart';
 import 'package:stagess/screens/ref_sst/incident_history/widgets/incident_list_tile.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
@@ -10,6 +9,7 @@ import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/helpers/enterprise_extension.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
+import 'package:stagess_common_flutter/widgets/search.dart';
 
 final _logger = Logger('IncidentHistoryScreen');
 

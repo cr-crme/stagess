@@ -12,11 +12,13 @@ class SchoolTeachersCard extends StatelessWidget {
     required this.schoolId,
     required this.teachers,
     required this.schoolBoard,
+    required this.filteredTeacherIds,
   });
 
   final String schoolId;
   final List<Teacher> teachers;
   final SchoolBoard schoolBoard;
+  final List<String>? filteredTeacherIds;
 
   @override
   Widget build(BuildContext context) {
@@ -38,11 +40,15 @@ class SchoolTeachersCard extends StatelessWidget {
         if (teachers.isEmpty)
           Center(child: Text('Aucun enseignant·e inscrit·e')),
         if (teachers.isNotEmpty)
-          ...teachers.map((Teacher teacher) {
+          ...teachers
+              .where((teacher) =>
+                  filteredTeacherIds == null ||
+                  filteredTeacherIds!.contains(teacher.id))
+              .map((Teacher teacher) {
             final canEdit =
                 authProvider.databaseAccessLevel >= AccessLevel.admin ||
-                (authProvider.databaseAccessLevel == AccessLevel.teacher &&
-                    authProvider.teacherId == teacher.id);
+                    (authProvider.databaseAccessLevel == AccessLevel.teacher &&
+                        authProvider.teacherId == teacher.id);
             final canDelete =
                 authProvider.databaseAccessLevel >= AccessLevel.admin;
 

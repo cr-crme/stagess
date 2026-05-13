@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
-import 'package:stagess/common/widgets/search.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess/screens/students_list/widgets/student_card.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
+import 'package:stagess_common_flutter/widgets/search.dart';
 
 final _logger = Logger('StudentsListScreen');
 
@@ -22,8 +22,9 @@ class StudentsListScreen extends StatefulWidget {
 }
 
 class _StudentsListScreenState extends State<StudentsListScreen> {
-  final _searchController = TextEditingController();
   bool _showSearchBar = false;
+  late final _searchController = TextEditingController()
+    ..addListener(() => setState(() {}));
 
   List<Student> _filterSelectedStudents(List<Student> students) {
     final textToSearch = _searchController.text.toLowerCase().trim();
@@ -37,12 +38,6 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
 
       return false;
     }).sorted((a, b) => a.lastName.compareTo(b.lastName));
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _searchController.addListener(() => setState(() {}));
   }
 
   @override

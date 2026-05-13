@@ -11,12 +11,38 @@ import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
+import 'package:stagess_common_flutter/widgets/search.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
-class EnterprisesListScreen extends StatelessWidget {
+class EnterprisesListScreen extends StatefulWidget {
   const EnterprisesListScreen({super.key});
 
   static const route = '/enterprises_list';
+
+  @override
+  State<EnterprisesListScreen> createState() => _EnterprisesListScreenState();
+}
+
+class _EnterprisesListScreenState extends State<EnterprisesListScreen> {
+  bool _showSearchBar = false;
+  late final _searchController = TextEditingController()
+    ..addListener(() => setState(() {}));
+
+  List<String>? _filterEnterpriseIds(
+      Map<SchoolBoard, List<Enterprise>> schoolBoards) {
+    final textToSearch = _searchController.text.toLowerCase().trim();
+    if (!_showSearchBar || textToSearch.isEmpty) return null;
+
+    final matchingEnterpriseIds = <String>{};
+    for (final enterprises in schoolBoards.values) {
+      for (final enterprise in enterprises) {
+        if (enterprise.name.toLowerCase().contains(textToSearch)) {
+          matchingEnterpriseIds.add(enterprise.id);
+        }
+      }
+    }
+    return matchingEnterpriseIds.toList();
+  }
 
   Map<SchoolBoard, List<Enterprise>> _getEnterprises(BuildContext context) {
     final schoolBoards = SchoolBoardsProvider.of(context, listen: true);
@@ -64,7 +90,8 @@ class EnterprisesListScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final schoolBoards = _getEnterprises(context);
+    final schoolBoardEnterprises = _getEnterprises(context);
+    final filteredEnterpriseIds = _filterEnterpriseIds(schoolBoardEnterprises);
 
     return ResponsiveService.scaffoldOf(
       context,
@@ -72,10 +99,15 @@ class EnterprisesListScreen extends StatelessWidget {
         title: const Text('Liste des entreprises'),
         actions: [
           IconButton(
+            onPressed: () => setState(() => _showSearchBar = !_showSearchBar),
+            icon: const Icon(Icons.search),
+          ),
+          IconButton(
             onPressed: () => _showAddEnterpriseDialog(context),
             icon: Icon(Icons.add),
           ),
         ],
+        bottom: _showSearchBar ? Search(controller: _searchController) : null,
       ),
       smallDrawer: MainDrawer.small,
       mediumDrawer: MainDrawer.medium,
@@ -84,7 +116,8 @@ class EnterprisesListScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ..._buildTiles(context, schoolBoards),
+            ..._buildTiles(
+                context, schoolBoardEnterprises, filteredEnterpriseIds),
             SizedBox(height: MediaQuery.of(context).size.height * 0.5),
           ],
         ),
@@ -95,6 +128,7 @@ class EnterprisesListScreen extends StatelessWidget {
   List<Widget> _buildTiles(
     BuildContext context,
     Map<SchoolBoard, List<Enterprise>> schoolBoardEnterprises,
+    List<String>? filteredEnterpriseIds,
   ) {
     final authProvider = AuthProvider.of(context, listen: true);
 
@@ -104,6 +138,9 @@ class EnterprisesListScreen extends StatelessWidget {
 
     return switch (authProvider.databaseAccessLevel) {
       AccessLevel.superAdmin => schoolBoardEnterprises.entries
+          .where((entry) => entry.value.any((enterprise) =>
+              filteredEnterpriseIds == null ||
+              filteredEnterpriseIds.contains(enterprise.id)))
           .map(
             (schoolBoardEntry) => Padding(
               padding: const EdgeInsets.all(8.0),
@@ -118,12 +155,16 @@ class EnterprisesListScreen extends StatelessWidget {
                 initialExpandedState: true,
                 child: Column(
                   children: [
-                    ...schoolBoardEntry.value.map(
-                      (enterprise) => EnterpriseListTile(
-                        key: ValueKey(enterprise.id),
-                        enterprise: enterprise,
-                      ),
-                    ),
+                    ...schoolBoardEntry.value
+                        .where((enterprise) =>
+                            filteredEnterpriseIds == null ||
+                            filteredEnterpriseIds.contains(enterprise.id))
+                        .map(
+                          (enterprise) => EnterpriseListTile(
+                            key: ValueKey(enterprise.id),
+                            enterprise: enterprise,
+                          ),
+                        ),
                   ],
                 ),
               ),
@@ -134,7 +175,10 @@ class EnterprisesListScreen extends StatelessWidget {
       AccessLevel.teacher ||
       AccessLevel.invalid =>
         schoolBoardEnterprises.values.firstOrNull
-                ?.map(
+                ?.where((enterprise) =>
+                    filteredEnterpriseIds == null ||
+                    filteredEnterpriseIds.contains(enterprise.id))
+                .map(
                   (enterprise) => EnterpriseListTile(
                     key: ValueKey(enterprise.id),
                     enterprise: enterprise,

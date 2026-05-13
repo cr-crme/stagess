@@ -24,11 +24,13 @@ class SchoolBoardListTile extends StatefulWidget {
     required this.schoolBoard,
     this.forceEditingMode = false,
     double? elevation,
+    this.filteredSchoolIds,
   }) : elevation = elevation ?? 5.0;
 
   final bool forceEditingMode;
   final SchoolBoard schoolBoard;
   final double elevation;
+  final List<String>? filteredSchoolIds;
 
   @override
   State<SchoolBoardListTile> createState() => SchoolBoardListTileState();
@@ -507,18 +509,22 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ...schools.map(
-                      (school) => Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: SchoolListTile(
-                          school: school,
-                          schoolBoard: widget.schoolBoard,
-                          elevation: 0,
-                          canEdit: _canEdit,
-                          canDelete: _canDelete,
+                    ...schools
+                        .where((element) =>
+                            widget.filteredSchoolIds == null ||
+                            widget.filteredSchoolIds!.contains(element.id))
+                        .map(
+                          (school) => Padding(
+                            padding: const EdgeInsets.only(top: 4),
+                            child: SchoolListTile(
+                              school: school,
+                              schoolBoard: widget.schoolBoard,
+                              elevation: 0,
+                              canEdit: _canEdit,
+                              canDelete: _canDelete,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
                   ],
                 ),
           if (_canEdit && !widget.forceEditingMode)

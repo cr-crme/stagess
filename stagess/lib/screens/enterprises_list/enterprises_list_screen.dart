@@ -3,7 +3,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
-import 'package:stagess/common/widgets/search.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess/screens/add_enterprise/add_enterprise_screen.dart';
 import 'package:stagess/screens/enterprises_list/widgets/enterprise_card.dart';
@@ -19,6 +18,7 @@ import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/widgets/cached_flutter_map.dart';
+import 'package:stagess_common_flutter/widgets/search.dart';
 
 final _logger = Logger('EnterprisesListScreen');
 

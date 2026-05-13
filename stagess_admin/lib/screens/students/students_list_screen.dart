@@ -11,13 +11,67 @@ import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
+import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
+import 'package:stagess_common_flutter/widgets/search.dart';
 
-// TODO Add search bar to filter students by name, school, group, etc.
-class StudentsListScreen extends StatelessWidget {
+class StudentsListScreen extends StatefulWidget {
   const StudentsListScreen({super.key});
 
   static const route = '/students_list';
+
+  @override
+  State<StudentsListScreen> createState() => _StudentsListScreenState();
+}
+
+class _StudentsListScreenState extends State<StudentsListScreen> {
+  bool _showSearchBar = false;
+  late final _searchController = TextEditingController()
+    ..addListener(() => setState(() {}));
+
+  List<String>? _filterStudentIds(
+      Map<SchoolBoard, Map<School, Map<String, List<Student>>>> schoolBoards) {
+    final textToSearch = _searchController.text.toLowerCase().trim();
+    if (!_showSearchBar || textToSearch.isEmpty) return null;
+
+    final teachers = TeachersProvider.of(context, listen: false);
+
+    final matchingStudentIds = <String>{};
+    for (final studentsBySchool in schoolBoards.values) {
+      for (final studentsByGroupsEntry in studentsBySchool.entries) {
+        final school = studentsByGroupsEntry.key;
+        final studentsByGroups = studentsByGroupsEntry.value;
+
+        if (school.name.toLowerCase().contains(textToSearch)) {
+          for (final students in studentsByGroups.values) {
+            matchingStudentIds.addAll(students.map((s) => s.id));
+          }
+          continue;
+        }
+
+        for (final studentsEntry in studentsByGroups.entries) {
+          final group = studentsEntry.key.toLowerCase();
+          final students = studentsEntry.value;
+
+          if (group.contains(textToSearch) ||
+              teachers.any((teacher) =>
+                  teacher.groups.contains(group) &&
+                  teacher.fullName.toLowerCase().contains(textToSearch))) {
+            matchingStudentIds.addAll(students.map((s) => s.id));
+            continue;
+          }
+
+          for (final student in students) {
+            final fullName = student.fullName.toLowerCase();
+            if (fullName.contains(textToSearch)) {
+              matchingStudentIds.add(student.id);
+            }
+          }
+        }
+      }
+    }
+    return matchingStudentIds.toList();
+  }
 
   ///
   /// This complicate structure is basically separating the students by
@@ -80,19 +134,24 @@ class StudentsListScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = AuthProvider.of(context, listen: true);
     final schoolBoardStudents = _getStudents(context);
+    final filteredStudentIds = _filterStudentIds(schoolBoardStudents);
 
     return ResponsiveService.scaffoldOf(
       context,
       appBar: AppBar(
         title: const Text('Liste des élèves'),
-        actions: authProvider.databaseAccessLevel >= AccessLevel.admin
-            ? [
-                IconButton(
-                  onPressed: () => _showAddStudentDialog(context),
-                  icon: Icon(Icons.add),
-                ),
-              ]
-            : null,
+        actions: [
+          IconButton(
+            onPressed: () => setState(() => _showSearchBar = !_showSearchBar),
+            icon: const Icon(Icons.search),
+          ),
+          if (authProvider.databaseAccessLevel >= AccessLevel.admin)
+            IconButton(
+              onPressed: () => _showAddStudentDialog(context),
+              icon: Icon(Icons.add),
+            ),
+        ],
+        bottom: _showSearchBar ? Search(controller: _searchController) : null,
       ),
       smallDrawer: MainDrawer.small,
       mediumDrawer: MainDrawer.medium,
@@ -101,7 +160,7 @@ class StudentsListScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ..._buildTiles(context, schoolBoardStudents),
+            ..._buildTiles(context, schoolBoardStudents, filteredStudentIds),
             SizedBox(height: MediaQuery.of(context).size.height * 0.5),
           ],
         ),
@@ -113,6 +172,7 @@ class StudentsListScreen extends StatelessWidget {
     BuildContext context,
     Map<SchoolBoard, Map<School, Map<String, List<Student>>>>
         schoolBoardStudents,
+    List<String>? filteredStudentIds,
   ) {
     final authProvider = AuthProvider.of(context, listen: true);
 
@@ -122,6 +182,12 @@ class StudentsListScreen extends StatelessWidget {
 
     return switch (authProvider.databaseAccessLevel) {
       AccessLevel.superAdmin => schoolBoardStudents.entries
+          .where((schoolBoardEntry) {
+            if (filteredStudentIds == null) return true;
+            return schoolBoardEntry.value.values.any((studentsByGroups) =>
+                studentsByGroups.values.any((students) => students.any(
+                    (student) => filteredStudentIds.contains(student.id))));
+          })
           .map(
             (schoolBoardEntry) => Padding(
               padding: const EdgeInsets.all(8.0),
@@ -136,13 +202,19 @@ class StudentsListScreen extends StatelessWidget {
                 initialExpandedState: true,
                 child: Column(
                   children: [
-                    ...schoolBoardEntry.value.entries.map(
+                    ...schoolBoardEntry.value.entries.where((schoolEntry) {
+                      if (filteredStudentIds == null) return true;
+                      return schoolEntry.value.values.any((students) =>
+                          students.any((student) =>
+                              filteredStudentIds.contains(student.id)));
+                    }).map(
                       (schoolEntry) => Column(
                         children: [
                           SchoolStudentsCard(
                             schoolId: schoolEntry.key.id,
                             studentsByGroups: schoolEntry.value,
                             schoolBoard: schoolBoardEntry.key,
+                            filteredStudentIds: filteredStudentIds,
                           ),
                         ],
                       ),
@@ -157,6 +229,12 @@ class StudentsListScreen extends StatelessWidget {
       AccessLevel.teacher ||
       AccessLevel.invalid =>
         schoolBoardStudents.values.firstOrNull?.entries
+                .where((schoolEntry) {
+                  if (filteredStudentIds == null) return true;
+                  return schoolEntry.value.values.any((students) =>
+                      students.any((student) =>
+                          filteredStudentIds.contains(student.id)));
+                })
                 .map(
                   (schoolEntry) => Column(
                     children: [
@@ -165,6 +243,7 @@ class StudentsListScreen extends StatelessWidget {
                         studentsByGroups: schoolEntry.value,
                         schoolBoard: schoolBoardStudents.keys.firstOrNull ??
                             SchoolBoard.empty,
+                        filteredStudentIds: filteredStudentIds,
                       ),
                     ],
                   ),

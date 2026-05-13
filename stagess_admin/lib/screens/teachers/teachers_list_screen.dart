@@ -12,12 +12,39 @@ import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
+import 'package:stagess_common_flutter/widgets/search.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
-class TeachersListScreen extends StatelessWidget {
+class TeachersListScreen extends StatefulWidget {
   const TeachersListScreen({super.key});
 
   static const route = '/teachers_list';
+
+  @override
+  State<TeachersListScreen> createState() => _TeachersListScreenState();
+}
+
+class _TeachersListScreenState extends State<TeachersListScreen> {
+  bool _showSearchBar = false;
+  late final _searchController = TextEditingController()
+    ..addListener(() => setState(() {}));
+
+  List<String>? _filterTeacherIds(
+      Map<SchoolBoard, Map<School, List<Teacher>>> schoolBoards) {
+    final textToSearch = _searchController.text.toLowerCase().trim();
+    if (!_showSearchBar || textToSearch.isEmpty) return null;
+
+    final matchingTeacherIds = <String>{};
+    for (final teachersBySchool in schoolBoards.values) {
+      for (final teachers in teachersBySchool.values) {
+        matchingTeacherIds.addAll(teachers
+            .where((teacher) =>
+                teacher.fullName.toLowerCase().contains(textToSearch))
+            .map((t) => t.id));
+      }
+    }
+    return matchingTeacherIds.toList();
+  }
 
   Map<SchoolBoard, Map<School, List<Teacher>>> _getTeachers(
     BuildContext context,
@@ -75,19 +102,25 @@ class TeachersListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = AuthProvider.of(context, listen: true);
+    final schoolBoardTeachers = _getTeachers(context);
+    final filteredTeacherIds = _filterTeacherIds(schoolBoardTeachers);
 
     return ResponsiveService.scaffoldOf(
       context,
       appBar: AppBar(
         title: const Text('Liste des enseignant·e·s'),
-        actions: authProvider.databaseAccessLevel >= AccessLevel.admin
-            ? [
-                IconButton(
-                  onPressed: () => _showAddTeacherDialog(context),
-                  icon: Icon(Icons.add),
-                ),
-              ]
-            : null,
+        actions: [
+          IconButton(
+            onPressed: () => setState(() => _showSearchBar = !_showSearchBar),
+            icon: const Icon(Icons.search),
+          ),
+          if (authProvider.databaseAccessLevel >= AccessLevel.admin)
+            IconButton(
+              onPressed: () => _showAddTeacherDialog(context),
+              icon: Icon(Icons.add),
+            ),
+        ],
+        bottom: _showSearchBar ? Search(controller: _searchController) : null,
       ),
       smallDrawer: MainDrawer.small,
       mediumDrawer: MainDrawer.medium,
@@ -96,7 +129,7 @@ class TeachersListScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ..._buildTiles(context, _getTeachers(context)),
+            ..._buildTiles(context, schoolBoardTeachers, filteredTeacherIds),
             SizedBox(height: MediaQuery.of(context).size.height * 0.5),
           ],
         ),
@@ -107,6 +140,7 @@ class TeachersListScreen extends StatelessWidget {
   List<Widget> _buildTiles(
     BuildContext context,
     Map<SchoolBoard, Map<School, List<Teacher>>> schoolBoardTeachers,
+    List<String>? filteredTeacherIds,
   ) {
     final authProvider = AuthProvider.of(context, listen: true);
 
@@ -116,6 +150,10 @@ class TeachersListScreen extends StatelessWidget {
 
     return switch (authProvider.databaseAccessLevel) {
       AccessLevel.superAdmin => schoolBoardTeachers.entries
+          .where((element) => element.value.values.any((teachers) =>
+              filteredTeacherIds == null ||
+              teachers
+                  .any((teacher) => filteredTeacherIds.contains(teacher.id))))
           .map(
             (schoolBoardEntry) => Padding(
               padding: const EdgeInsets.all(8.0),
@@ -130,13 +168,19 @@ class TeachersListScreen extends StatelessWidget {
                 initialExpandedState: true,
                 child: Column(
                   children: [
-                    ...schoolBoardEntry.value.entries.map(
-                      (schoolEntry) => SchoolTeachersCard(
-                        schoolId: schoolEntry.key.id,
-                        teachers: schoolEntry.value,
-                        schoolBoard: schoolBoardEntry.key,
-                      ),
-                    ),
+                    ...schoolBoardEntry.value.entries
+                        .where((schoolEntry) => schoolEntry.value.any(
+                            (teacher) =>
+                                filteredTeacherIds == null ||
+                                filteredTeacherIds.contains(teacher.id)))
+                        .map(
+                          (schoolEntry) => SchoolTeachersCard(
+                            schoolId: schoolEntry.key.id,
+                            teachers: schoolEntry.value,
+                            schoolBoard: schoolBoardEntry.key,
+                            filteredTeacherIds: filteredTeacherIds,
+                          ),
+                        ),
                   ],
                 ),
               ),
@@ -147,12 +191,16 @@ class TeachersListScreen extends StatelessWidget {
       AccessLevel.teacher ||
       AccessLevel.invalid =>
         schoolBoardTeachers.values.firstOrNull?.entries
+                .where((schoolEntry) => schoolEntry.value.any((teacher) =>
+                    filteredTeacherIds == null ||
+                    filteredTeacherIds.contains(teacher.id))) // Filter schools
                 .map(
                   (schoolEntry) => SchoolTeachersCard(
                     schoolId: schoolEntry.key.id,
                     teachers: schoolEntry.value,
                     schoolBoard: schoolBoardTeachers.keys.firstOrNull ??
                         SchoolBoard.empty,
+                    filteredTeacherIds: filteredTeacherIds,
                   ),
                 )
                 .toList() ??

@@ -13,11 +13,13 @@ class SchoolStudentsCard extends StatelessWidget {
     required this.schoolId,
     required this.studentsByGroups,
     required this.schoolBoard,
+    required this.filteredStudentIds,
   });
 
   final String schoolId;
   final Map<String, List<Student>> studentsByGroups;
   final SchoolBoard schoolBoard;
+  final List<String>? filteredStudentIds;
 
   @override
   Widget build(BuildContext context) {
@@ -48,13 +50,19 @@ class SchoolStudentsCard extends StatelessWidget {
             padding: const EdgeInsets.only(left: 16.0, right: 12.0),
             child: Column(
               children: [
-                ...groups.map(
+                ...groups.where((group) {
+                  if (filteredStudentIds == null) return true;
+                  return studentsByGroups[group]?.any((student) =>
+                          filteredStudentIds!.contains(student.id)) ??
+                      false;
+                }).map(
                   (group) => Padding(
                     padding: const EdgeInsets.only(bottom: 12.0),
                     child: _GroupStudentsCard(
                       group: group,
                       students: studentsByGroups[group] ?? [],
                       schoolBoard: schoolBoard,
+                      filteredStudentIds: filteredStudentIds,
                     ),
                   ),
                 ),
@@ -71,20 +79,21 @@ class _GroupStudentsCard extends StatelessWidget {
     required this.group,
     required this.students,
     required this.schoolBoard,
+    required this.filteredStudentIds,
   });
 
   final String group;
   final List<Student> students;
   final SchoolBoard schoolBoard;
+  final List<String>? filteredStudentIds;
 
   @override
   Widget build(BuildContext context) {
     final authProvided = AuthProvider.of(context, listen: true);
     final teacherProvided = TeachersProvider.of(context, listen: false);
-    final teachers =
-        teacherProvided
-            .where((teacher) => teacher.groups.contains(group))
-            .toList();
+    final teachers = teacherProvided
+        .where((teacher) => teacher.groups.contains(group))
+        .toList();
     teachers.sort((a, b) {
       final teacherA = a.lastName.toLowerCase();
       final teacherB = b.lastName.toLowerCase();
@@ -106,7 +115,10 @@ class _GroupStudentsCard extends StatelessWidget {
         if (students.isEmpty)
           Center(child: Text('Aucun élève inscrit·e dans ce groupe')),
         if (students.isNotEmpty)
-          ...students.map(
+          ...students.where((student) {
+            if (filteredStudentIds == null) return true;
+            return filteredStudentIds!.contains(student.id);
+          }).map(
             (student) => StudentListTile(
               key: ValueKey(student.id),
               student: student,

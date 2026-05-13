@@ -13,14 +13,70 @@ import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
+import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
+import 'package:stagess_common_flutter/widgets/search.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
-class InternshipsListScreen extends StatelessWidget {
+class InternshipsListScreen extends StatefulWidget {
   const InternshipsListScreen({super.key});
 
   static const route = '/internships_list';
+
+  @override
+  State<InternshipsListScreen> createState() => _InternshipsListScreenState();
+}
+
+class _InternshipsListScreenState extends State<InternshipsListScreen> {
+  bool _showSearchBar = false;
+  late final _searchController = TextEditingController()
+    ..addListener(() => setState(() {}));
+
+  List<String>? _filterInternshipIds(
+      Map<SchoolBoard, Map<bool, Map<School, Map<Teacher, List<Internship>>>>>
+          internships) {
+    final textToSearch = _searchController.text.toLowerCase().trim();
+    if (!_showSearchBar || textToSearch.isEmpty) return null;
+
+    final students = StudentsProvider.of(context, listen: false);
+
+    final matchingInternshipIds = <String>{};
+    for (final internshipsBySchools in internships.values) {
+      for (final internshipsByTeachers in internshipsBySchools.values) {
+        for (final internshipsByTeacherEntry in internshipsByTeachers.entries) {
+          final school = internshipsByTeacherEntry.key;
+          final internshipsByTeacher = internshipsByTeacherEntry.value;
+
+          if (school.name.toLowerCase().contains(textToSearch)) {
+            for (var internshipList in internshipsByTeacher.values) {
+              matchingInternshipIds.addAll(internshipList.map((i) => i.id));
+            }
+            continue;
+          }
+
+          for (final internshipListEntry in internshipsByTeacher.entries) {
+            final teacher = internshipListEntry.key;
+            final internshipList = internshipListEntry.value;
+
+            if (teacher.fullName.toLowerCase().contains(textToSearch)) {
+              matchingInternshipIds.addAll(internshipList.map((i) => i.id));
+              continue;
+            }
+
+            for (final internship in internshipList) {
+              final student = students.fromIdOrNull(internship.studentId);
+              if (student != null &&
+                  student.fullName.toLowerCase().contains(textToSearch)) {
+                matchingInternshipIds.add(internship.id);
+              }
+            }
+          }
+        }
+      }
+    }
+    return matchingInternshipIds.toList();
+  }
 
   Map<SchoolBoard, Map<bool, Map<School, Map<Teacher, List<Internship>>>>>
       _getInternships(BuildContext context) {
@@ -99,6 +155,7 @@ class InternshipsListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final schoolBoardInternships = _getInternships(context);
+    final filteredInternshipIds = _filterInternshipIds(schoolBoardInternships);
 
     return ResponsiveService.scaffoldOf(
       context,
@@ -106,17 +163,23 @@ class InternshipsListScreen extends StatelessWidget {
         title: const Text('Liste des stages'),
         actions: [
           IconButton(
+            onPressed: () => setState(() => _showSearchBar = !_showSearchBar),
+            icon: const Icon(Icons.search),
+          ),
+          IconButton(
             onPressed: () => _showAddInternshipDialog(context),
             icon: Icon(Icons.add),
           ),
         ],
+        bottom: _showSearchBar ? Search(controller: _searchController) : null,
       ),
       smallDrawer: MainDrawer.small,
       mediumDrawer: MainDrawer.medium,
       largeDrawer: MainDrawer.large,
       body: SingleChildScrollView(
         child: Column(children: [
-          ..._buildTiles(context, schoolBoardInternships),
+          ..._buildTiles(
+              context, schoolBoardInternships, filteredInternshipIds),
           SizedBox(height: MediaQuery.of(context).size.height * 0.5),
         ]),
       ),
@@ -127,6 +190,7 @@ class InternshipsListScreen extends StatelessWidget {
     BuildContext context,
     Map<SchoolBoard, Map<bool, Map<School, Map<Teacher, List<Internship>>>>>
         schoolBoardInternships,
+    List<String>? filteredInternshipIds,
   ) {
     final authProvider = AuthProvider.of(context, listen: true);
 
@@ -136,6 +200,15 @@ class InternshipsListScreen extends StatelessWidget {
 
     return switch (authProvider.databaseAccessLevel) {
       AccessLevel.superAdmin => schoolBoardInternships.entries
+          .where(
+            (entry) => entry.value.values.any(
+              (internshipsBySchool) => internshipsBySchool.values.any(
+                (internshipsByTeacher) => internshipsByTeacher.values.any(
+                  (internshipList) => internshipList.isNotEmpty,
+                ),
+              ),
+            ),
+          )
           .map(
             (schoolBoardEntry) => AnimatedExpandingCard(
               header: (ctx, isExpanded) => Padding(
@@ -155,11 +228,13 @@ class InternshipsListScreen extends StatelessWidget {
                     key: const ValueKey('active_internships'),
                     areActive: true,
                     internships: schoolBoardEntry.value[true] ?? {},
+                    filteredInternshipIds: filteredInternshipIds,
                   ),
                   _InternshipsByStatus(
                     key: const ValueKey('closed_internships'),
                     areActive: false,
                     internships: schoolBoardEntry.value[false] ?? {},
+                    filteredInternshipIds: filteredInternshipIds,
                   ),
                 ],
               ),
@@ -171,12 +246,14 @@ class InternshipsListScreen extends StatelessWidget {
             key: const ValueKey('active_internships'),
             areActive: true,
             internships: schoolBoardInternships.values.firstOrNull?[true] ?? {},
+            filteredInternshipIds: filteredInternshipIds,
           ),
           _InternshipsByStatus(
             key: const ValueKey('closed_internships'),
             areActive: false,
             internships:
                 schoolBoardInternships.values.firstOrNull?[false] ?? {},
+            filteredInternshipIds: filteredInternshipIds,
           ),
         ],
     };
@@ -188,10 +265,12 @@ class _InternshipsByStatus extends StatelessWidget {
     super.key,
     required this.areActive,
     required this.internships,
+    required this.filteredInternshipIds,
   });
 
   final Map<School, Map<Teacher, List<Internship>>> internships;
   final bool areActive;
+  final List<String>? filteredInternshipIds;
 
   @override
   Widget build(BuildContext context) {
@@ -206,22 +285,38 @@ class _InternshipsByStatus extends StatelessWidget {
       initialExpandedState: areActive,
       child: Padding(
         padding: const EdgeInsets.only(left: 16.0),
-        child: _InternshipsBySchools(internships: internships),
+        child: _InternshipsBySchools(
+            internships: internships,
+            filteredInternshipIds: filteredInternshipIds),
       ),
     );
   }
 }
 
 class _InternshipsBySchools extends StatelessWidget {
-  const _InternshipsBySchools({required this.internships});
+  const _InternshipsBySchools({
+    required this.internships,
+    required this.filteredInternshipIds,
+  });
 
   final Map<School, Map<Teacher, List<Internship>>> internships;
+  final List<String>? filteredInternshipIds;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: internships.entries.map((entry) {
+      children: internships.entries
+          .where(
+        (entry) => entry.value.values.any(
+          (internshipList) => internshipList.any(
+            (internship) =>
+                filteredInternshipIds == null ||
+                filteredInternshipIds!.contains(internship.id),
+          ),
+        ),
+      )
+          .map((entry) {
         final school = entry.key;
         final teachers = entry.value;
 
@@ -233,7 +328,8 @@ class _InternshipsBySchools extends StatelessWidget {
           ),
           initialExpandedState: true,
           elevation: 0,
-          child: _InternshipsByTeachers(teachers: teachers),
+          child: _InternshipsByTeachers(
+              teachers: teachers, filteredInternshipIds: filteredInternshipIds),
         );
       }).toList(),
     );
@@ -241,9 +337,13 @@ class _InternshipsBySchools extends StatelessWidget {
 }
 
 class _InternshipsByTeachers extends StatelessWidget {
-  const _InternshipsByTeachers({required this.teachers});
+  const _InternshipsByTeachers({
+    required this.teachers,
+    required this.filteredInternshipIds,
+  });
 
   final Map<Teacher, List<Internship>> teachers;
+  final List<String>? filteredInternshipIds;
 
   @override
   Widget build(BuildContext context) {
@@ -253,7 +353,13 @@ class _InternshipsByTeachers extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ...teachers.entries.map((entry) {
+        ...teachers.entries
+            .where((entry) => entry.value.any(
+                  (internship) =>
+                      filteredInternshipIds == null ||
+                      filteredInternshipIds!.contains(internship.id),
+                ))
+            .map((entry) {
           final teacher = entry.key;
           final internshipsList = entry.value;
 
@@ -269,7 +375,11 @@ class _InternshipsByTeachers extends StatelessWidget {
               initialExpandedState: true,
               child: Column(
                 children: [
-                  ...internshipsList.map((internship) {
+                  ...internshipsList
+                      .where((internship) =>
+                          filteredInternshipIds == null ||
+                          filteredInternshipIds!.contains(internship.id))
+                      .map((internship) {
                     return InternshipListTile(
                       key: ValueKey(internship.id),
                       internship: internship,
