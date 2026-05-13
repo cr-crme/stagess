@@ -21,7 +21,7 @@ import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/visa_pdf_template.dart';
 import 'package:stagess_common_flutter/widgets/numbered_text.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
-import 'package:stagess_common_flutter/widgets/selectable_text_boxes.dart';
+import 'package:stagess_common_flutter/widgets/selectable_boxes.dart';
 import 'package:stagess_common_flutter/widgets/sub_title.dart';
 
 final _logger = Logger('VisaFormDialog');
@@ -62,19 +62,22 @@ class VisaFormController {
   final String? evaluationId;
   final bool canModify;
 
-  final _experiencesAndAptitudesController = SelectableTextItemsController();
-  final _attestationsAndMentionsController = SelectableTextItemsController();
-  final _sstTrainingsController = SelectableTextItemsController();
+  final _experiencesAndAptitudesController =
+      SelectableItemsController<ExperiencesAndAptitudes>();
+  final _attestationsAndMentionsController =
+      SelectableItemsController<AttestationsAndMentions>();
+  final _sstTrainingsController = SelectableItemsController<SstTraining>();
 
   bool _isGatewayToFmsAvailable = false;
-  final _sstCertificateController = SelectableTextItemsController();
-  final _specificSkillsController = SelectableTextItemsController();
-  final _referencesController = SelectableTextItemsController();
+  final _sstCertificateController = SelectableItemsController<Certificate>();
+  final _specificSkillsController = SelectableItemsController<Skill>();
+  final _referencesController = SelectableItemsController<Reference>();
 
-  final _forcesController = SelectableTextItemsController();
-  final _challengesController = SelectableTextItemsController();
+  final _forcesController = SelectableItemsController<Attitude>();
+  final _challengesController = SelectableItemsController<Attitude>();
 
-  final _successConditionsController = SelectableTextItemsController();
+  final _successConditionsController =
+      SelectableItemsController<SuccessConditions>();
 
   VisaFormController(
     BuildContext context, {
@@ -214,8 +217,8 @@ class VisaFormController {
     for (int i = 0; i < visa.form.sstTrainings.length; i++) {
       final previousSstTrainings = visa.form.sstTrainings[i];
 
-      final index = _sstTrainingsController.options.indexWhere((e) =>
-          (e as SstTraining).trainingId == previousSstTrainings.trainingId);
+      final index = _sstTrainingsController.options
+          .indexWhere((e) => e.trainingId == previousSstTrainings.trainingId);
       if (index < 0) {
         throw Exception(
             'The training id "${previousSstTrainings.trainingId}" is not in the list of available trainings. '
@@ -223,7 +226,7 @@ class VisaFormController {
       }
       _sstTrainingsController.updateOption(
         index,
-        (_sstTrainingsController.options[index] as SstTraining).copyWith(
+        _sstTrainingsController.options[index].copyWith(
             isSelected: previousSstTrainings.isSelected,
             isHidden: previousSstTrainings.isHidden),
       );
@@ -231,11 +234,9 @@ class VisaFormController {
 
     _isGatewayToFmsAvailable = visa.form.isGatewayToFmsAvailable;
     for (final item in visa.form.certificates) {
-      final index = _sstCertificateController.options.indexWhere((e) {
-        final formItem = e as Certificate;
-        return formItem.certificateType == item.certificateType &&
-            formItem.specializationId == item.specializationId;
-      });
+      final index = _sstCertificateController.options.indexWhere((e) =>
+          e.certificateType == item.certificateType &&
+          e.specializationId == item.specializationId);
       if (index < 0) {
         // This should not happen, but if the student was drastically modified
         // it is possible the previous certificates includes job that were since removed
@@ -252,7 +253,7 @@ class VisaFormController {
       } else {
         _sstCertificateController.updateOption(
           index,
-          (_sstCertificateController.options[index] as Certificate).copyWith(
+          _sstCertificateController.options[index].copyWith(
             isSelected: item.isSelected,
             year: item.year,
             specializationId: item.specializationId,
@@ -263,7 +264,7 @@ class VisaFormController {
 
     for (final item in visa.form.skills) {
       final index = _specificSkillsController.options
-          .indexWhere((e) => e.text == item.text);
+          .indexWhere((e) => e.skillId == item.skillId);
       if (index < 0) {
         _specificSkillsController.add(
           Skill(
@@ -275,7 +276,7 @@ class VisaFormController {
       } else {
         _specificSkillsController.updateOption(
             index,
-            (_specificSkillsController.options[index] as Skill)
+            _specificSkillsController.options[index]
                 .copyWith(isSelected: item.isSelected));
       }
     }
@@ -289,6 +290,7 @@ class VisaFormController {
           enterprise: item.enterprise,
           phoneNumber: item.phoneNumber,
           email: item.email,
+          supplementaryInfo: item.supplementaryInfo,
         ),
       );
     }
@@ -296,8 +298,8 @@ class VisaFormController {
     for (int i = 0; i < visa.form.forces.length; i++) {
       final previousForces = visa.form.forces[i];
 
-      final index = _forcesController.options.indexWhere(
-          (e) => (e as Attitude).attitudeId == previousForces.attitudeId);
+      final index = _forcesController.options
+          .indexWhere((e) => e.attitudeId == previousForces.attitudeId);
       if (index < 0) {
         throw Exception(
             'The attitude id "${previousForces.attitudeId}" is not in the list of available items. '
@@ -305,15 +307,15 @@ class VisaFormController {
       }
       _forcesController.updateOption(
         index,
-        (_forcesController.options[index] as Attitude)
+        _forcesController.options[index]
             .copyWith(isSelected: previousForces.isSelected),
       );
     }
     for (int i = 0; i < visa.form.challenges.length; i++) {
       final previousChallenges = visa.form.challenges[i];
 
-      final index = _challengesController.options.indexWhere(
-          (e) => (e as Attitude).attitudeId == previousChallenges.attitudeId);
+      final index = _challengesController.options
+          .indexWhere((e) => e.attitudeId == previousChallenges.attitudeId);
       if (index < 0) {
         throw Exception(
             'The attitude id "${previousChallenges.attitudeId}" is not in the list of available items. '
@@ -321,7 +323,7 @@ class VisaFormController {
       }
       _challengesController.updateOption(
         index,
-        (_challengesController.options[index] as Attitude)
+        _challengesController.options[index]
             .copyWith(isSelected: previousChallenges.isSelected),
       );
     }
@@ -550,12 +552,14 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
               'Cocher celles à afficher dans le VISA en PDF (maximum de 8 items).'
             ]),
             SizedBox(height: 8.0),
-            SelectableTextBoxes(
+            SelectableTextFormBoxes(
               controller: controller._experiencesAndAptitudesController,
               enabled: controller.canModify,
               maxSelectedOptions: 8,
               newItemBuilder: (index) => ExperiencesAndAptitudes(
                   index: index, text: '', isSelected: false),
+              updateItemBuilder: (item, text) => item.copyWith(text: text),
+              itemToText: (item) => item.text,
               maxLength: 200,
             ),
           ],
@@ -586,12 +590,14 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
               'Cocher celles à afficher dans le VISA en PDF (maximum de 5 items).'
             ]),
             SizedBox(height: 8.0),
-            SelectableTextBoxes(
+            SelectableTextFormBoxes(
               controller: controller._attestationsAndMentionsController,
               enabled: controller.canModify,
               maxSelectedOptions: 5,
               newItemBuilder: (index) => AttestationsAndMentions(
                   index: index, text: '', isSelected: false),
+              updateItemBuilder: (item, text) => item.copyWith(text: text),
+              itemToText: (item) => item.text,
               maxLength: 200,
             ),
           ],
@@ -633,7 +639,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
                 ),
               if (controller.canModify &&
                   controller._sstTrainingsController.options
-                      .any((e) => (e as SstTraining).isNotHidden))
+                      .any((e) => e.isNotHidden))
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Text(
@@ -645,11 +651,10 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
               ...controller._sstTrainingsController.options
                   .asMap()
                   .entries
-                  .where(
-                      (element) => (element.value as SstTraining).isNotHidden)
+                  .where((element) => element.value.isNotHidden)
                   .map((entry) {
                 final index = entry.key;
-                final item = entry.value as SstTraining;
+                final item = entry.value;
 
                 return CheckboxListTile(
                   key: ValueKey('sst_training_${item.id}'),
@@ -692,11 +697,9 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   SizedBox(height: 16.0),
-                  ...controller._sstTrainingsController.options.map((entry) {
+                  ...controller._sstTrainingsController.options.map((item) {
                     final index = controller._sstTrainingsController.options
-                        .indexWhere((element) =>
-                            element.id == (entry as SstTraining).id);
-                    final item = entry as SstTraining;
+                        .indexWhere((element) => element.id == item.id);
 
                     return CheckboxListTile(
                       enabled: controller.canModify,
@@ -808,13 +811,12 @@ class _EmployabilityProfileSection extends StatelessWidget {
               'Pour les élèves de FMS et de FPT-3, cocher les certificats à afficher dans le VISA',
               style: Theme.of(context).textTheme.titleSmall),
           ...controller._sstCertificateController.options.map(
-            (entry) {
+            (item) {
               final index = controller._sstCertificateController.options
                   .indexWhere((element) =>
-                      element.text == entry.text &&
-                      (element as Certificate).specializationId ==
-                          (entry as Certificate).specializationId);
-              final item = entry as Certificate;
+                      element.certificateType == item.certificateType &&
+                      element.specializationId == item.specializationId);
+
               final job = job_service.ActivitySectorsService.allSpecializations
                   .firstWhereOrNull((e) => e.id == item.specializationId);
 
@@ -933,12 +935,11 @@ class _EmployabilityProfileSection extends StatelessWidget {
                       Text(
                           'Cocher les compétences à afficher dans le VISA en PDF dans la liste des compétences réussies.'),
                       ...controller._specificSkillsController.options.map(
-                        (entry) {
+                        (item) {
                           final index = controller
                               ._specificSkillsController.options
-                              .indexWhere((element) =>
-                                  element.id == (entry as Skill).id);
-                          final item = entry as Skill;
+                              .indexWhere((element) => element.id == item.id);
+
                           return CheckboxListTile(
                             value: item.isSelected,
                             enabled: controller.canModify,
@@ -983,6 +984,7 @@ class _EmployabilityProfileSection extends StatelessWidget {
               SelectableBoxes(
                 controller: controller._referencesController,
                 enabled: controller.canModify,
+                minOptionCount: 0,
                 maxSelectedOptions: 5,
                 newItemBuilder: (index) => Reference(
                   index: index,
@@ -991,21 +993,16 @@ class _EmployabilityProfileSection extends StatelessWidget {
                   enterprise: '',
                   phoneNumber: PhoneNumber.empty,
                   email: '',
+                  supplementaryInfo: '',
                 ),
-                widgetBuilder: (context, index, item, textController,
-                        onUpdated) =>
-                    _referenceListTile(context,
-                        index: index,
-                        enabled: controller.canModify,
-                        reference: item as Reference,
-                        controller: textController,
-                        onUpdated: ({referee, enteprise, phoneNumber, email}) =>
-                            onUpdated(item.copyWith(
-                              referee: referee,
-                              enterprise: enteprise,
-                              phoneNumber: phoneNumber,
-                              email: email,
-                            ))),
+                widgetBuilder: (context, index, item, updateItem) =>
+                    _referenceListTile(
+                  context,
+                  index: index,
+                  enabled: controller.canModify,
+                  reference: item,
+                  updateItem: updateItem,
+                ),
               ),
             ],
           ),
@@ -1018,19 +1015,14 @@ Widget _referenceListTile(
   required bool enabled,
   required int index,
   required Reference reference,
-  required TextEditingController controller,
-  required Function({
-    String? referee,
-    String? enteprise,
-    PhoneNumber? phoneNumber,
-    String? email,
-  }) onUpdated,
+  required Function(Reference newItem) updateItem,
 }) {
   return Expanded(
     child: Padding(
       padding: const EdgeInsets.only(left: 12.0, right: 12.0, bottom: 8.0),
       child: AnimatedExpandingCard(
         canChangeExpandedState: enabled,
+        initialExpandedState: enabled ? false : true,
         header: (context, isExpanded) => Padding(
           padding: const EdgeInsets.all(12.0),
           child: Column(
@@ -1042,27 +1034,42 @@ Widget _referenceListTile(
               Flexible(
                 child: RichText(
                   text: TextSpan(children: [
-                    TextSpan(
+                    if (reference.referee.isEmpty &&
+                        reference.enterprise.isEmpty &&
+                        reference.phoneNumber.toString().isEmpty &&
+                        reference.email.isEmpty)
+                      const TextSpan(
+                          text: 'Aucune information renseignée',
+                          style: TextStyle(fontStyle: FontStyle.italic)),
+                    if (reference.referee.isNotEmpty) ...[
+                      TextSpan(
                         text: reference.referee,
-                        style: TextStyle(fontStyle: FontStyle.italic)),
-                    TextSpan(text: ', '),
-                    TextSpan(
+                        style: const TextStyle(fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                    if (reference.enterprise.isNotEmpty) ...[
+                      if (reference.referee.isNotEmpty) TextSpan(text: ', '),
+                      TextSpan(
                         text: reference.enterprise,
                         style: TextStyle(
-                            fontStyle: FontStyle.normal,
-                            fontWeight: FontWeight.bold)),
-                    TextSpan(text: '. '),
-                    TextSpan(
-                        text: reference.phoneNumber.toString().isEmpty
-                            ? 'Téléphone non valide'
-                            : reference.phoneNumber.toString(),
-                        style: TextStyle(fontStyle: FontStyle.normal)),
-                    TextSpan(text: '; '),
-                    TextSpan(
-                        text: reference.email.isEmpty
-                            ? 'Courriel non valide'
-                            : reference.email,
-                        style: TextStyle(fontStyle: FontStyle.normal)),
+                            fontStyle: reference.referee.isNotEmpty
+                                ? FontStyle.normal
+                                : FontStyle.italic),
+                      ),
+                    ],
+                    if (reference.phoneNumber.toString().isNotEmpty) ...[
+                      if (reference.referee.isNotEmpty ||
+                          reference.enterprise.isNotEmpty)
+                        TextSpan(text: ', '),
+                      TextSpan(text: reference.phoneNumber.toString()),
+                    ],
+                    if (reference.email.isNotEmpty) ...[
+                      if (reference.referee.isNotEmpty ||
+                          reference.enterprise.isNotEmpty ||
+                          reference.phoneNumber.toString().isNotEmpty)
+                        TextSpan(text: ', '),
+                      TextSpan(text: reference.email),
+                    ],
                   ]),
                 ),
               )
@@ -1075,35 +1082,53 @@ Widget _referenceListTile(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              TextFormField(
-                initialValue: reference.referee,
-                onChanged: (value) => onUpdated(referee: value),
-                maxLength: 100,
-              ),
-              TextFormField(
-                initialValue: reference.enterprise,
-                onChanged: (value) => onUpdated(enteprise: value),
-                maxLength: 100,
-              ),
-              PhoneListTile(
-                isMandatory: false,
-                enabled: true,
-                initialValue: reference.phoneNumber,
-                onChanged: (value) =>
-                    onUpdated(phoneNumber: PhoneNumber.fromString(value ?? '')),
-              ),
-              EmailListTile(
+              if (enabled)
+                TextFormField(
+                  decoration: InputDecoration(
+                      labelText: 'Prénom et nom de la référence'),
+                  initialValue: reference.referee,
+                  onChanged: (value) =>
+                      updateItem(reference.copyWith(referee: value)),
+                  maxLength: 100,
+                ),
+              if (enabled)
+                TextFormField(
+                  decoration:
+                      InputDecoration(labelText: 'Nom de l\'entreprise'),
+                  initialValue: reference.enterprise,
+                  onChanged: (value) =>
+                      updateItem(reference.copyWith(enterprise: value)),
+                  maxLength: 100,
+                ),
+              if (enabled)
+                PhoneListTile(
                   isMandatory: false,
                   enabled: true,
-                  initialValue: reference.email,
-                  onChanged: (value) {
-                    // TODO: Changed for on field submitted?
-                    if (FormService.emailValidator(value) == null) {
-                      onUpdated(email: value);
-                    } else {
-                      onUpdated(email: '');
-                    }
-                  }),
+                  initialValue: reference.phoneNumber,
+                  onChanged: (value) => updateItem(reference.copyWith(
+                      phoneNumber: PhoneNumber.fromString(value ?? ''))),
+                ),
+              if (enabled)
+                EmailListTile(
+                    isMandatory: false,
+                    enabled: true,
+                    initialValue: reference.email,
+                    onChanged: (value) => updateItem(reference.copyWith(
+                        email: FormService.emailValidator(value) == null
+                            ? value
+                            : ''))),
+              TextFormField(
+                decoration: InputDecoration(
+                    labelText: 'Informations supplémentaires',
+                    labelStyle: TextStyle(color: Colors.black)),
+                style: TextStyle(color: Colors.black),
+                initialValue: reference.supplementaryInfo,
+                enabled: enabled,
+                maxLines: 3,
+                onChanged: (value) =>
+                    updateItem(reference.copyWith(supplementaryInfo: value)),
+                maxLength: 200,
+              ),
             ],
           ),
         ),
@@ -1155,7 +1180,7 @@ class _ForcesAndChallengesSection extends StatelessWidget {
     required String title,
     required String definition,
     required bool enabled,
-    required SelectableTextItemsController controller,
+    required SelectableItemsController controller,
     required int maxSelectedOptions,
   }) {
     return AnimatedExpandingCard(
@@ -1220,12 +1245,14 @@ class _ForcesAndChallengesSection extends StatelessWidget {
                 'Lister toutes les adaptations, requises pour aider l\'élève à réussir, '
                 'à afficher dans le VISA en PDF.'),
             SizedBox(height: 8.0),
-            SelectableTextBoxes(
+            SelectableTextFormBoxes(
               controller: controller._successConditionsController,
               enabled: controller.canModify,
               maxSelectedOptions: 8,
               newItemBuilder: (index) =>
                   SuccessConditions(index: index, text: '', isSelected: false),
+              updateItemBuilder: (item, text) => item.copyWith(text: text),
+              itemToText: (item) => item.text,
               maxLength: 200,
             ),
           ],

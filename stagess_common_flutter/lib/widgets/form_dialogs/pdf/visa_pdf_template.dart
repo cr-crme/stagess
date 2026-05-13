@@ -212,26 +212,60 @@ pw.Page _buildFourthPage(StudentVisa studentVisa) {
             child: PdfBulletPoints(
               spacing: _bulletPointSpacing,
               children: references.map((e) {
-                return pw.RichText(
-                  text: pw.TextSpan(children: [
-                    pw.TextSpan(
-                        text: e.referee,
-                        style: pw.TextStyle(fontStyle: pw.FontStyle.italic)),
-                    pw.TextSpan(text: ', '),
-                    pw.TextSpan(
-                        text: e.enterprise,
-                        style: pw.TextStyle(
-                            fontStyle: pw.FontStyle.normal,
-                            fontWeight: pw.FontWeight.bold)),
-                    pw.TextSpan(text: '. '),
-                    pw.TextSpan(
-                        text: e.phoneNumber.toString(),
-                        style: pw.TextStyle(fontStyle: pw.FontStyle.normal)),
-                    pw.TextSpan(text: '; '),
-                    pw.TextSpan(
-                        text: e.email,
-                        style: pw.TextStyle(fontStyle: pw.FontStyle.normal)),
-                  ]),
+                final reference = e;
+                return pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.RichText(
+                      text: pw.TextSpan(children: [
+                        if (reference.referee.isEmpty &&
+                            reference.enterprise.isEmpty &&
+                            reference.phoneNumber.toString().isEmpty &&
+                            reference.email.isEmpty)
+                          pw.TextSpan(
+                              text: 'Aucune information renseignée',
+                              style:
+                                  pw.TextStyle(fontStyle: pw.FontStyle.italic)),
+                        if (reference.referee.isNotEmpty) ...[
+                          pw.TextSpan(
+                            text: reference.referee,
+                            style: pw.TextStyle(fontStyle: pw.FontStyle.italic),
+                          ),
+                        ],
+                        if (reference.enterprise.isNotEmpty) ...[
+                          if (reference.referee.isNotEmpty)
+                            pw.TextSpan(text: ', '),
+                          pw.TextSpan(
+                            text: reference.enterprise,
+                            style: pw.TextStyle(
+                                fontStyle: reference.referee.isNotEmpty
+                                    ? pw.FontStyle.normal
+                                    : pw.FontStyle.italic),
+                          ),
+                        ],
+                        if (reference.phoneNumber.toString().isNotEmpty) ...[
+                          if (reference.referee.isNotEmpty ||
+                              reference.enterprise.isNotEmpty)
+                            pw.TextSpan(text: ', '),
+                          pw.TextSpan(text: reference.phoneNumber.toString()),
+                        ],
+                        if (reference.email.isNotEmpty) ...[
+                          if (reference.referee.isNotEmpty ||
+                              reference.enterprise.isNotEmpty ||
+                              reference.phoneNumber.toString().isNotEmpty)
+                            pw.TextSpan(text: ', '),
+                          pw.TextSpan(text: reference.email),
+                        ],
+                      ]),
+                    ),
+                    if (reference.supplementaryInfo.isNotEmpty)
+                      pw.Padding(
+                        padding: const pw.EdgeInsets.only(top: 4.0),
+                        child: pw.Text(reference.supplementaryInfo,
+                            style:
+                                pw.TextStyle(fontStyle: pw.FontStyle.italic)),
+                      ),
+                  ],
                 );
               }),
             ),

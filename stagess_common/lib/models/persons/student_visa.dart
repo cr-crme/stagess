@@ -1,98 +1,115 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
-import 'package:stagess_common/models/generic/selectable_text_items.dart';
+import 'package:stagess_common/models/generic/selectable_items.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 
-export 'package:stagess_common/models/generic/selectable_text_items.dart';
+export 'package:stagess_common/models/generic/selectable_items.dart';
 
-class ExperiencesAndAptitudes extends SelectableTextItem {
+class ExperiencesAndAptitudes extends SelectableItem {
+  final String text;
+
   ExperiencesAndAptitudes({
     super.id,
     required super.index,
-    required super.text,
     required super.isSelected,
+    required this.text,
   });
 
-  ExperiencesAndAptitudes.fromSerialized(super.map) : super.fromSerialized();
+  ExperiencesAndAptitudes.fromSerialized(super.map)
+      : text = StringExt.from(map?['text']) ?? '',
+        super.fromSerialized();
 
   @override
-  Map<String, dynamic> serializedMap() => super.serializedMap()..addAll({});
+  Map<String, dynamic> serializedMap() =>
+      super.serializedMap()..addAll({'text': text.serialize()});
 
-  static FetchableFields get fetchableFields =>
-      SelectableTextItem.fetchableFields..addAll(FetchableFields.reference({}));
+  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+    ..addAll(FetchableFields.reference({
+      'text': FetchableFields.optional,
+    }));
 
   @override
   ExperiencesAndAptitudes copyWith({
-    String? text,
     int? index,
     bool? isSelected,
+    String? text,
   }) =>
       ExperiencesAndAptitudes(
         id: id,
         index: index ?? this.index,
-        text: text ?? this.text,
         isSelected: isSelected ?? this.isSelected,
+        text: text ?? this.text,
       );
 }
 
-class AttestationsAndMentions extends SelectableTextItem {
+class AttestationsAndMentions extends SelectableItem {
+  final String text;
+
   AttestationsAndMentions({
     super.id,
     required super.index,
-    required super.text,
     required super.isSelected,
+    required this.text,
   });
 
-  AttestationsAndMentions.fromSerialized(super.map) : super.fromSerialized();
+  AttestationsAndMentions.fromSerialized(super.map)
+      : text = StringExt.from(map?['text']) ?? '',
+        super.fromSerialized();
 
   @override
-  Map<String, dynamic> serializedMap() => super.serializedMap()..addAll({});
+  Map<String, dynamic> serializedMap() =>
+      super.serializedMap()..addAll({'text': text.serialize()});
 
-  static FetchableFields get fetchableFields =>
-      SelectableTextItem.fetchableFields..addAll(FetchableFields.reference({}));
+  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+    ..addAll(FetchableFields.reference({
+      'text': FetchableFields.optional,
+    }));
 
   @override
   AttestationsAndMentions copyWith({
-    String? text,
     int? index,
     bool? isSelected,
+    String? text,
   }) =>
       AttestationsAndMentions(
         id: id,
         index: index ?? this.index,
-        text: text ?? this.text,
         isSelected: isSelected ?? this.isSelected,
+        text: text ?? this.text,
       );
 }
 
-class SstTraining extends SelectableTextItem {
+class SstTraining extends SelectableItem {
+  final String trainingId;
   bool isHidden;
   bool get isNotHidden => !isHidden;
 
   SstTraining({
     super.id,
     required super.index,
-    required String trainingId,
     required super.isSelected,
+    required this.trainingId,
     required this.isHidden,
-  }) : super(text: trainingId);
+  });
 
   SstTraining.fromSerialized(super.map)
-      : isHidden = BoolExt.from(map?['is_hidden']) ?? false,
+      : trainingId = StringExt.from(map?['training_id']) ?? '',
+        isHidden = BoolExt.from(map?['is_hidden']) ?? false,
         super.fromSerialized();
 
   @override
   Map<String, dynamic> serializedMap() => super.serializedMap()
     ..addAll({
+      'training_id': trainingId.serialize(),
       'is_hidden': isHidden.serialize(),
     });
 
-  static FetchableFields get fetchableFields =>
-      SelectableTextItem.fetchableFields
-        ..addAll(FetchableFields.reference({
-          'hidden': FetchableFields.optional,
-        }));
+  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+    ..addAll(FetchableFields.reference({
+      'training_id': FetchableFields.optional,
+      'is_hidden': FetchableFields.optional,
+    }));
 
   static Map<String, String> get availableTrainings => {
         '0001': 'Manutention sécuritaire',
@@ -108,21 +125,19 @@ class SstTraining extends SelectableTextItem {
 
   @override
   SstTraining copyWith({
-    String? text,
     int? index,
     bool? isSelected,
+    String? trainingId,
     bool? isHidden,
   }) {
     return SstTraining(
       id: id,
       index: index ?? this.index,
-      trainingId: text ?? this.text,
       isSelected: isSelected ?? this.isSelected,
+      trainingId: trainingId ?? this.trainingId,
       isHidden: isHidden ?? this.isHidden,
     );
   }
-
-  String get trainingId => text;
 }
 
 enum CertificateType {
@@ -141,104 +156,104 @@ enum CertificateType {
       switch (this) { fpt => 'FPT', fms => 'FMS', none => '__NONE__' };
 }
 
-class Certificate extends SelectableTextItem {
+class Certificate extends SelectableItem {
+  final CertificateType certificateType;
   final int? year;
   final String? specializationId;
 
   Certificate({
     super.id,
     required super.index,
-    required CertificateType certificateType,
     required super.isSelected,
-    this.year,
+    required this.certificateType,
     this.specializationId,
-  }) : super(text: certificateType.name);
+    this.year,
+  });
 
   Certificate.fromSerialized(super.map)
-      : year = IntExt.from(map?['year']),
-        specializationId = StringExt.from(map?['specialization_id']),
+      : certificateType = CertificateType.fromString(
+            StringExt.from(map?['certificate_type']) ?? '__NONE__'),
+        specializationId = StringExt.from(map?['specialization_id']) ?? '',
+        year = IntExt.from(map?['year']),
         super.fromSerialized();
 
   @override
   Map<String, dynamic> serializedMap() => super.serializedMap()
     ..addAll({
-      'year': year?.serialize(),
+      'certificate_type': certificateType.name.serialize(),
       'specialization_id': specializationId?.serialize(),
+      'year': year?.serialize(),
     });
 
-  static FetchableFields get fetchableFields =>
-      SelectableTextItem.fetchableFields
-        ..addAll(FetchableFields.reference({
-          'year': FetchableFields.optional,
-          'specialization_id': FetchableFields.optional,
-        }));
+  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+    ..addAll(FetchableFields.reference({
+      'certificate_type': FetchableFields.optional,
+      'specialization_id': FetchableFields.optional,
+      'year': FetchableFields.optional,
+    }));
 
   @override
   Certificate copyWith({
-    String? text,
     int? index,
-    CertificateType? certificateType,
     bool? isSelected,
-    int? year,
+    CertificateType? certificateType,
     String? specializationId,
+    int? year,
   }) {
-    if (text != null && certificateType != null) {
-      throw Exception(
-          'Cannot provide both text and certificateType when copying Certificate.');
-    }
     return Certificate(
       id: id,
       index: index ?? this.index,
-      certificateType:
-          certificateType ?? CertificateType.fromString(text ?? this.text),
       isSelected: isSelected ?? this.isSelected,
-      year: year ?? this.year,
+      certificateType: certificateType ?? this.certificateType,
       specializationId: specializationId ?? this.specializationId,
+      year: year ?? this.year,
     );
   }
-
-  CertificateType get certificateType => CertificateType.fromString(text);
 }
 
-class Skill extends SelectableTextItem {
+class Skill extends SelectableItem {
+  final String skillId;
+
   Skill({
     super.id,
     required super.index,
-    required String skillId,
-    super.isSelected,
-  }) : super(text: skillId);
+    required super.isSelected,
+    required this.skillId,
+  });
 
-  Skill.fromSerialized(super.map) : super.fromSerialized();
+  Skill.fromSerialized(super.map)
+      : skillId = StringExt.from(map?['skill_id']) ?? '',
+        super.fromSerialized();
 
   @override
-  Map<String, dynamic> serializedMap() => super.serializedMap()..addAll({});
+  Map<String, dynamic> serializedMap() =>
+      super.serializedMap()..addAll({'skill_id': skillId.serialize()});
 
-  static FetchableFields get fetchableFields =>
-      SelectableTextItem.fetchableFields..addAll(FetchableFields.reference({}));
+  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+    ..addAll(FetchableFields.reference({
+      'skill_id': FetchableFields.optional,
+    }));
 
   @override
   Skill copyWith({
-    String? text,
     int? index,
     bool? isSelected,
+    String? skillId,
   }) =>
       Skill(
         id: id,
         index: index ?? this.index,
-        skillId: text ?? this.text,
         isSelected: isSelected ?? this.isSelected,
+        skillId: skillId ?? this.skillId,
       );
-
-  String get skillId => text;
 }
 
-class Reference extends SelectableTextItem {
+class Reference extends SelectableItem {
   final String referee;
   final String enterprise;
   final PhoneNumber phoneNumber;
   final String email;
-  @override
-  String get text => '$referee - $enterprise';
+  final String supplementaryInfo;
 
   Reference({
     super.id,
@@ -248,6 +263,7 @@ class Reference extends SelectableTextItem {
     required this.enterprise,
     required this.phoneNumber,
     required this.email,
+    required this.supplementaryInfo,
   });
 
   Reference.fromSerialized(super.map)
@@ -255,6 +271,7 @@ class Reference extends SelectableTextItem {
         enterprise = StringExt.from(map?['enterprise']) ?? '',
         phoneNumber = PhoneNumber.fromString(map?['phone_number']),
         email = StringExt.from(map?['email']) ?? '',
+        supplementaryInfo = StringExt.from(map?['supplementary_info']) ?? '',
         super.fromSerialized();
 
   @override
@@ -264,20 +281,27 @@ class Reference extends SelectableTextItem {
       'enterprise': enterprise.serialize(),
       'phone_number': phoneNumber.toString(),
       'email': email.serialize(),
+      'supplementary_info': supplementaryInfo.serialize(),
     });
 
-  static FetchableFields get fetchableFields =>
-      SelectableTextItem.fetchableFields..addAll(FetchableFields.reference({}));
+  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+    ..addAll(FetchableFields.reference({
+      'referee': FetchableFields.optional,
+      'enterprise': FetchableFields.optional,
+      'phone_number': FetchableFields.optional,
+      'email': FetchableFields.optional,
+      'supplementary_info': FetchableFields.optional,
+    }));
 
   @override
   Reference copyWith({
     int? index,
-    String? text,
     bool? isSelected,
     String? referee,
     String? enterprise,
     PhoneNumber? phoneNumber,
     String? email,
+    String? supplementaryInfo,
   }) {
     return Reference(
       id: id,
@@ -287,25 +311,33 @@ class Reference extends SelectableTextItem {
       enterprise: enterprise ?? this.enterprise,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       email: email ?? this.email,
+      supplementaryInfo: supplementaryInfo ?? this.supplementaryInfo,
     );
   }
 }
 
-class Attitude extends SelectableTextItem {
+class Attitude extends SelectableItem {
+  final String attitudeId;
+
   Attitude({
     super.id,
     required super.index,
-    required String attitudeId,
     required super.isSelected,
-  }) : super(text: attitudeId);
+    required this.attitudeId,
+  });
 
-  Attitude.fromSerialized(super.map) : super.fromSerialized();
+  Attitude.fromSerialized(super.map)
+      : attitudeId = StringExt.from(map?['attitude_id']) ?? '',
+        super.fromSerialized();
 
   @override
-  Map<String, dynamic> serializedMap() => super.serializedMap()..addAll({});
+  Map<String, dynamic> serializedMap() =>
+      super.serializedMap()..addAll({'attitude_id': attitudeId.serialize()});
 
-  static FetchableFields get fetchableFields =>
-      SelectableTextItem.fetchableFields..addAll(FetchableFields.reference({}));
+  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+    ..addAll(FetchableFields.reference({
+      'attitude_id': FetchableFields.optional,
+    }));
 
   static Map<String, String> get availableItems => {
         '0001': 'Ponctualité',
@@ -322,47 +354,52 @@ class Attitude extends SelectableTextItem {
 
   @override
   Attitude copyWith({
-    String? text,
     int? index,
     bool? isSelected,
+    String? attitudeId,
   }) =>
       Attitude(
         id: id,
         index: index ?? this.index,
-        attitudeId: text ?? this.text,
         isSelected: isSelected ?? this.isSelected,
+        attitudeId: attitudeId ?? this.attitudeId,
       );
-
-  String get attitudeId => text;
 }
 
-class SuccessConditions extends SelectableTextItem {
+class SuccessConditions extends SelectableItem {
+  final String text;
+
   SuccessConditions({
     super.id,
     required super.index,
-    required super.text,
     required super.isSelected,
+    required this.text,
   });
 
-  SuccessConditions.fromSerialized(super.map) : super.fromSerialized();
+  SuccessConditions.fromSerialized(super.map)
+      : text = StringExt.from(map?['text']) ?? '',
+        super.fromSerialized();
 
   @override
-  Map<String, dynamic> serializedMap() => super.serializedMap()..addAll({});
+  Map<String, dynamic> serializedMap() =>
+      super.serializedMap()..addAll({'text': text.serialize()});
 
-  static FetchableFields get fetchableFields =>
-      SelectableTextItem.fetchableFields..addAll(FetchableFields.reference({}));
+  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+    ..addAll(FetchableFields.reference({
+      'text': FetchableFields.optional,
+    }));
 
   @override
   SuccessConditions copyWith({
-    String? text,
     int? index,
     bool? isSelected,
+    String? text,
   }) =>
       SuccessConditions(
         id: id,
         index: index ?? this.index,
-        text: text ?? this.text,
         isSelected: isSelected ?? this.isSelected,
+        text: text ?? this.text,
       );
 }
 

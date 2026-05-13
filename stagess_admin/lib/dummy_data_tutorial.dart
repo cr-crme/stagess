@@ -856,6 +856,7 @@ Future<void> _addDummyStudents(
                   enterprise: 'Entreprise A',
                   email: 'jean.doe@entreprise_a.com',
                   phoneNumber: PhoneNumber.fromString('555-123-1234'),
+                  supplementaryInfo: 'Il se fera un plaisir de vous répondre',
                 ),
                 Reference(
                   index: 1,
@@ -864,6 +865,8 @@ Future<void> _addDummyStudents(
                   enterprise: 'Entreprise B',
                   email: 'jeanne.doe@entreprise_b.com',
                   phoneNumber: PhoneNumber.fromString('555-321-4321'),
+                  supplementaryInfo:
+                      'Je recommande fortement Jeanne pour ce poste',
                 ),
               ],
               forces: [

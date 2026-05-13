@@ -319,14 +319,17 @@ visa.StudentVisa dummyStudentVisa({
               enterprise: 'Enterprise A',
               phoneNumber: PhoneNumber.fromString('1231231234'),
               email: 'referee_a@enterprise_a.com',
+              supplementaryInfo: 'Il se fera un plaisir de vous répondre',
             ),
             visa.Reference(
-              index: 0,
+              index: 1,
               isSelected: false,
               referee: 'Referee B',
               enterprise: 'Enterprise B',
               phoneNumber: PhoneNumber.fromString('3213214321'),
               email: 'referee_b@enterprise_b.com',
+              supplementaryInfo:
+                  'Je recommande fortement l\'élève pour ce poste',
             ),
           ],
           forces: [

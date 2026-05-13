@@ -304,9 +304,9 @@ class MySqlStudentsRepository extends StudentsRepository {
                   fieldsToFetch: [
                     'id',
                     'idx',
-                    'text',
                     'is_selected',
-                    'is_hidden'
+                    'is_hidden',
+                    'training_id',
                   ],
                   idNameToDataTable: 'visa_form_id',
                 ),
@@ -316,8 +316,8 @@ class MySqlStudentsRepository extends StudentsRepository {
                   fieldsToFetch: [
                     'id',
                     'idx',
-                    'text',
                     'is_selected',
+                    'certificate_type',
                     'year',
                     'specialization_id'
                   ],
@@ -326,7 +326,12 @@ class MySqlStudentsRepository extends StudentsRepository {
                 sqlInterface.selectSubquery(
                   dataTableName: 'student_visa_skill_items',
                   asName: 'skills',
-                  fieldsToFetch: ['id', 'idx', 'text', 'is_selected'],
+                  fieldsToFetch: [
+                    'id',
+                    'idx',
+                    'is_selected',
+                    'skill_id',
+                  ],
                   idNameToDataTable: 'visa_form_id',
                 ),
                 sqlInterface.selectSubquery(
@@ -341,25 +346,41 @@ class MySqlStudentsRepository extends StudentsRepository {
                     'enterprise',
                     'phone_number',
                     'email',
+                    'supplementary_info',
                   ],
                   idNameToDataTable: 'visa_form_id',
                 ),
                 sqlInterface.selectSubquery(
                   dataTableName: 'student_visa_forces_items',
                   asName: 'forces',
-                  fieldsToFetch: ['id', 'idx', 'text', 'is_selected'],
+                  fieldsToFetch: [
+                    'id',
+                    'idx',
+                    'is_selected',
+                    'attitude_id',
+                  ],
                   idNameToDataTable: 'visa_form_id',
                 ),
                 sqlInterface.selectSubquery(
                   dataTableName: 'student_visa_challenges_items',
                   asName: 'challenges',
-                  fieldsToFetch: ['id', 'idx', 'text', 'is_selected'],
+                  fieldsToFetch: [
+                    'id',
+                    'idx',
+                    'is_selected',
+                    'attitude_id',
+                  ],
                   idNameToDataTable: 'visa_form_id',
                 ),
                 sqlInterface.selectSubquery(
                   dataTableName: 'student_visa_success_conditions_items',
                   asName: 'success_conditions',
-                  fieldsToFetch: ['id', 'idx', 'text', 'is_selected'],
+                  fieldsToFetch: [
+                    'id',
+                    'idx',
+                    'is_selected',
+                    'text',
+                  ],
                   idNameToDataTable: 'visa_form_id',
                 ),
               ],
@@ -550,8 +571,8 @@ class MySqlStudentsRepository extends StudentsRepository {
                 'id': element.id.serialize(),
                 'idx': element.index.serialize(),
                 'visa_form_id': visa.form.id,
-                'text': element.text.serialize(),
                 'is_selected': element.isSelected.serialize(),
+                'training_id': element.trainingId.serialize(),
                 'is_hidden': element.isHidden.serialize(),
               }),
         );
@@ -564,10 +585,10 @@ class MySqlStudentsRepository extends StudentsRepository {
                 'id': element.id.serialize(),
                 'idx': element.index.serialize(),
                 'visa_form_id': visa.form.id,
-                'text': element.text.serialize(),
                 'is_selected': element.isSelected.serialize(),
-                'year': element.year?.serialize(),
+                'certificate_type': element.certificateType.name.serialize(),
                 'specialization_id': element.specializationId?.serialize(),
+                'year': element.year?.serialize(),
               }),
         );
       }
@@ -579,8 +600,8 @@ class MySqlStudentsRepository extends StudentsRepository {
               'id': element.id.serialize(),
               'idx': element.index.serialize(),
               'visa_form_id': visa.form.id,
-              'text': element.text.serialize(),
               'is_selected': element.isSelected.serialize(),
+              'skill_id': element.skillId.serialize(),
             },
           ),
         );
@@ -598,6 +619,7 @@ class MySqlStudentsRepository extends StudentsRepository {
               'enterprise': element.enterprise.serialize(),
               'phone_number': element.phoneNumber.toString(),
               'email': element.email.toString(),
+              'supplementary_info': element.supplementaryInfo.serialize(),
             },
           ),
         );
@@ -610,8 +632,8 @@ class MySqlStudentsRepository extends StudentsRepository {
               'id': element.id.serialize(),
               'idx': element.index.serialize(),
               'visa_form_id': visa.form.id,
-              'text': element.text.serialize(),
               'is_selected': element.isSelected.serialize(),
+              'attitude_id': element.attitudeId.serialize(),
             },
           ),
         );
@@ -624,8 +646,8 @@ class MySqlStudentsRepository extends StudentsRepository {
               'id': element.id.serialize(),
               'idx': element.index.serialize(),
               'visa_form_id': visa.form.id,
-              'text': element.text.serialize(),
               'is_selected': element.isSelected.serialize(),
+              'attitude_id': element.attitudeId.serialize(),
             },
           ),
         );
@@ -638,8 +660,8 @@ class MySqlStudentsRepository extends StudentsRepository {
               'id': element.id.serialize(),
               'idx': element.index.serialize(),
               'visa_form_id': visa.form.id,
-              'text': element.text.serialize(),
               'is_selected': element.isSelected.serialize(),
+              'text': element.text.serialize(),
             },
           ),
         );

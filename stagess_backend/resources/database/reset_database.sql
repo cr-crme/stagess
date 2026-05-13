@@ -236,7 +236,7 @@ CREATE TABLE student_visa_sst_training_items (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     idx INT NOT NULL,
     visa_form_id VARCHAR(36) NOT NULL,
-    text VARCHAR(36) NOT NULL,
+    training_id VARCHAR(36) NOT NULL,
     is_selected BOOLEAN NOT NULL,
     is_hidden BOOLEAN NOT NULL,
     FOREIGN KEY (visa_form_id) REFERENCES student_visa_forms(id) ON DELETE CASCADE
@@ -246,7 +246,7 @@ CREATE TABLE student_visa_certificate_items (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     idx INT NOT NULL,
     visa_form_id VARCHAR(36) NOT NULL,
-    text VARCHAR(36) NOT NULL,
+    certificate_type VARCHAR(36) NOT NULL,
     is_selected BOOLEAN NOT NULL,
     year INT,
     specialization_id VARCHAR(36),
@@ -257,8 +257,8 @@ CREATE TABLE student_visa_skill_items (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     idx INT NOT NULL,
     visa_form_id VARCHAR(36) NOT NULL,
-    text VARCHAR(36) NOT NULL,
     is_selected BOOLEAN NOT NULL,
+    skill_id VARCHAR(36) NOT NULL,
     FOREIGN KEY (visa_form_id) REFERENCES student_visa_forms(id) ON DELETE CASCADE
 );
 
@@ -271,6 +271,7 @@ CREATE TABLE student_visa_references_items (
     enterprise VARCHAR(100) NOT NULL,
     phone_number VARCHAR(36) NOT NULL,
     email VARCHAR(200) NOT NULL,
+    supplementary_info VARCHAR(200) NOT NULL,
     FOREIGN KEY (visa_form_id) REFERENCES student_visa_forms(id) ON DELETE CASCADE
 );
 
@@ -278,8 +279,8 @@ CREATE TABLE student_visa_forces_items (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     idx INT NOT NULL,
     visa_form_id VARCHAR(36) NOT NULL,
-    text VARCHAR(36) NOT NULL,
     is_selected BOOLEAN NOT NULL,
+    attitude_id VARCHAR(36) NOT NULL,
     FOREIGN KEY (visa_form_id) REFERENCES student_visa_forms(id) ON DELETE CASCADE
 );
 
@@ -287,8 +288,8 @@ CREATE TABLE student_visa_challenges_items (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     idx INT NOT NULL,
     visa_form_id VARCHAR(36) NOT NULL,
-    text VARCHAR(36) NOT NULL,
     is_selected BOOLEAN NOT NULL,
+    attitude_id VARCHAR(36) NOT NULL,
     FOREIGN KEY (visa_form_id) REFERENCES student_visa_forms(id) ON DELETE CASCADE
 );
 
@@ -296,8 +297,8 @@ CREATE TABLE student_visa_success_conditions_items (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     idx INT NOT NULL,
     visa_form_id VARCHAR(36) NOT NULL,
-    text VARCHAR(200) NOT NULL,
     is_selected BOOLEAN NOT NULL,
+    text VARCHAR(200) NOT NULL,
     FOREIGN KEY (visa_form_id) REFERENCES student_visa_forms(id) ON DELETE CASCADE
 );
 

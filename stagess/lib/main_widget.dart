@@ -1,7 +1,7 @@
 import 'package:crcrme_material_theme/crcrme_material_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:stagess_common_flutter/widgets/selectable_text_boxes.dart';
+import 'package:stagess_common_flutter/widgets/selectable_boxes.dart';
 
 // coverage:ignore-start
 void main() async {
@@ -34,20 +34,24 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final controller = SelectableTextItemsController();
+    final controller = SelectableItemsController();
     return Scaffold(
       appBar: AppBar(title: const Text('Stagess - Main Page')),
       body: SingleChildScrollView(
           child: Column(
         children: [
-          SelectableTextBoxes(
+          SelectableTextFormBoxes(
             controller: controller,
-            newItemBuilder: (_) => SelectableTextItem(),
+            newItemBuilder: (_) => SelectableItem(),
+            updateItemBuilder: (item, text) =>
+                item.copyWith(isSelected: text.isNotEmpty),
+            itemToText: (item) => item.isSelected ? 'Selected' : 'Not Selected',
           ),
           ElevatedButton(
               onPressed: () {
                 for (final option in controller.options) {
-                  debugPrint('Option ${option.text}: ${option.isSelected}');
+                  debugPrint(
+                      'Option ${option.toString()}: ${option.isSelected}');
                 }
               },
               child: const Text('Submit'))
