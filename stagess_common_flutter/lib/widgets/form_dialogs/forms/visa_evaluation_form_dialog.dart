@@ -557,7 +557,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
               enabled: controller.canModify,
               maxSelectedOptions: 8,
               newItemBuilder: (index) => ExperiencesAndAptitudes(
-                  index: index, text: '', isSelected: false),
+                  index: index, text: '', isSelected: true),
               updateItemBuilder: (item, text) => item.copyWith(text: text),
               itemToText: (item) => item.text,
               maxLength: 200,
@@ -595,7 +595,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
               enabled: controller.canModify,
               maxSelectedOptions: 5,
               newItemBuilder: (index) => AttestationsAndMentions(
-                  index: index, text: '', isSelected: false),
+                  index: index, text: '', isSelected: true),
               updateItemBuilder: (item, text) => item.copyWith(text: text),
               itemToText: (item) => item.text,
               maxLength: 200,
@@ -988,7 +988,7 @@ class _EmployabilityProfileSection extends StatelessWidget {
                 maxSelectedOptions: 5,
                 newItemBuilder: (index) => Reference(
                   index: index,
-                  isSelected: false,
+                  isSelected: true,
                   referee: '',
                   enterprise: '',
                   phoneNumber: PhoneNumber.empty,
@@ -1250,7 +1250,7 @@ class _ForcesAndChallengesSection extends StatelessWidget {
               enabled: controller.canModify,
               maxSelectedOptions: 8,
               newItemBuilder: (index) =>
-                  SuccessConditions(index: index, text: '', isSelected: false),
+                  SuccessConditions(index: index, text: '', isSelected: true),
               updateItemBuilder: (item, text) => item.copyWith(text: text),
               itemToText: (item) => item.text,
               maxLength: 200,
