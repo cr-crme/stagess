@@ -3,11 +3,17 @@ import 'dart:js_interop';
 import 'package:flutter/material.dart';
 import 'package:web/web.dart' as web;
 
-class SingleInstanceManager extends StatefulWidget {
+import 'single_instance_manager_base.dart';
+
+class SingleInstanceManager extends StatefulWidget
+    implements SingleInstanceManagerBase {
   const SingleInstanceManager(
       {super.key, required this.child, required this.isNotAllowedChild});
 
+  @override
   final Widget child;
+
+  @override
   final Widget isNotAllowedChild;
 
   @override

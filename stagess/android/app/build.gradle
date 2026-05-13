@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "org.crcrme.stagess"
+    namespace = "qc.crcrme.stagess"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -23,10 +23,10 @@ android {
     }
 
     defaultConfig {
-        applicationId = "org.crcrme.stagess"
+        applicationId = "qc.crcrme.stagess"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 23
+        minSdkVersion = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
