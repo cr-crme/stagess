@@ -80,7 +80,7 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
         child: TextButton(
           onPressed: () async => await _showEvaluationDialog(
               evaluationId: _evaluations.lastOrNull?.id, canModify: true),
-          child: const Text('Modifier'),
+          child: Text(_evaluations.lastOrNull == null ? 'Ajouter' : 'Modifier'),
         ),
       ),
     );

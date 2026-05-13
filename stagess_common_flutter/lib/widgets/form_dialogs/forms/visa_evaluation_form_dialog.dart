@@ -476,31 +476,39 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
   Widget _controlBuilder() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (_controller.canModify)
-            OutlinedButton(
-              onPressed: _cancel,
-              child: const Text('Annuler'),
-            ),
-          const SizedBox(width: 20),
-          if (_controller.canModify)
-            OutlinedButton(
-              onPressed: () => showPdfDialog(context,
-                  pdfGeneratorCallback: (context, format) => generateVisaPdf(
-                      context, format,
-                      studentId: widget.studentId,
-                      studentVisa: _controller.toVisa())),
-              style: OutlinedButton.styleFrom(
-                backgroundColor: const Color(0xFFB8D8E6),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: OutlinedButton(
+                onPressed: () => showPdfDialog(context,
+                    pdfGeneratorCallback: (context, format) => generateVisaPdf(
+                        context, format,
+                        studentId: widget.studentId,
+                        studentVisa: _controller.toVisa())),
+                style: OutlinedButton.styleFrom(
+                  backgroundColor: const Color(0xFFB8D8E6),
+                ),
+                child:
+                    Text('Prévisualiser le PDF', textAlign: TextAlign.center),
               ),
-              child: Text('Prévisualiser le PDF', textAlign: TextAlign.center),
             ),
-          const SizedBox(width: 20),
-          TextButton(
-            onPressed: () async => await _submit(),
-            child: Text(_controller.canModify ? 'Enregistrer' : 'Fermer'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (_controller.canModify)
+                OutlinedButton(
+                  onPressed: _cancel,
+                  child: const Text('Annuler'),
+                ),
+              const SizedBox(width: 20),
+              TextButton(
+                onPressed: () async => await _submit(),
+                child: Text(_controller.canModify ? 'Enregistrer' : 'Fermer'),
+              ),
+            ],
           ),
         ],
       ),
