@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess/program_helpers.dart';
+import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/enterprises/job_comment.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
@@ -15,7 +15,11 @@ import '../utils.dart';
 void main() {
   group('Job and JobList', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(mockMe: true);
+    ProgramInitializer.initialize(
+      useActivitySectorsService: false,
+      useRiskDataFileService: false,
+      useQuestionFileService: false,
+    );
 
     testWidgets('can get evaluation of all enterprises', (tester) async {
       final context = await tester.contextWithNotifiers(withInternships: true);

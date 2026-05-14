@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess/program_helpers.dart';
+import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
@@ -35,7 +35,11 @@ void _initializeTeacher(BuildContext context) {
 void main() {
   group('SchoolsProvider', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(mockMe: true);
+    ProgramInitializer.initialize(
+      useActivitySectorsService: false,
+      useRiskDataFileService: false,
+      useQuestionFileService: false,
+    );
 
     test('deserializeItem works', () {
       final schoolBoards = SchoolBoardsProvider(

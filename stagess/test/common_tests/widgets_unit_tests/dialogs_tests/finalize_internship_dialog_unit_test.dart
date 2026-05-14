@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess/program_helpers.dart';
+import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 import 'package:stagess_common_flutter/widgets/dialogs/finalize_internship_dialog.dart';
 
 import '../../../utils.dart';
@@ -10,7 +10,11 @@ import '../utils.dart';
 void main() {
   group('FinalizeInternshipDialog', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(mockMe: true);
+    ProgramInitializer.initialize(
+      useActivitySectorsService: false,
+      useRiskDataFileService: false,
+      useQuestionFileService: false,
+    );
 
     testWidgets('renders a title', (tester) async {
       await tester.pumpWidgetWithNotifiers(

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess/program_helpers.dart';
+import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/persons/person.dart';
@@ -13,7 +13,11 @@ import '../utils.dart';
 void main() {
   group('Student', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(mockMe: true);
+    ProgramInitializer.initialize(
+      useActivitySectorsService: false,
+      useRiskDataFileService: false,
+      useQuestionFileService: false,
+    );
 
     test('"Program" is shown properly', () {
       expect(Program.values.length, 3);

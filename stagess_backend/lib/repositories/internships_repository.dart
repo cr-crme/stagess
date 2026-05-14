@@ -989,7 +989,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
           extraSpecializationIds: ['12345'],
           program: Program.fpt,
           dates: DateTimeRange(
-              start: DateTime(1990, 1, 1), end: DateTime(1990, 1, 31)),
+              start: DateTime(2011, 1, 1), end: DateTime(2011, 1, 31)),
           supervisor: Person(
               firstName: 'Mine',
               lastName: 'Yours',
@@ -1026,7 +1026,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
                   ]),
                 },
                 period: DateTimeRange(
-                    start: DateTime(1990, 1, 1), end: DateTime(1990, 1, 31)))
+                    start: DateTime(2011, 1, 1), end: DateTime(2011, 1, 31)))
           ],
           transportations:
               [Transportation.walk].map((e) => e.toString()).toList(),
@@ -1058,7 +1058,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
           extraSpecializationIds: ['54321', '09876'],
           program: Program.fpt,
           dates: DateTimeRange(
-              start: DateTime(1990, 2, 1), end: DateTime(1990, 2, 28)),
+              start: DateTime(2011, 2, 1), end: DateTime(2011, 2, 28)),
           supervisor: Person(
               firstName: 'Mine',
               lastName: 'Yours',
@@ -1089,7 +1089,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
                   ]),
                 },
                 period: DateTimeRange(
-                    start: DateTime(1990, 2, 1), end: DateTime(1990, 2, 28)))
+                    start: DateTime(2011, 2, 1), end: DateTime(2011, 2, 28)))
           ],
           transportations: [Transportation.walk, Transportation.publicTransport]
               .map((e) => e.toString())

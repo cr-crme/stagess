@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
-import 'package:stagess/program_helpers.dart';
+import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 
 import '../../utils.dart';
 import 'utils.dart';
@@ -20,7 +20,11 @@ Future<void> _initializedDrawer(WidgetTester tester) async {
 void main() {
   group('MainDrawer', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(mockMe: true);
+    ProgramInitializer.initialize(
+      useActivitySectorsService: false,
+      useRiskDataFileService: false,
+      useQuestionFileService: false,
+    );
 
     testWidgets('renders the proper title', (tester) async {
       await _initializedDrawer(tester);

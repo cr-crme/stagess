@@ -160,7 +160,8 @@ Incidents dummyIncidents({String? id}) => Incidents(
       ],
     );
 
-SstEvaluation dummySstEvaluation({String? id}) => SstEvaluation(
+SstEvaluation dummySstEvaluation({String id = 'sstEvaluationId'}) =>
+    SstEvaluation(
       id: id,
       presentAtEvaluation: ['Responsable en milieu de stage'],
       questions: {
@@ -176,7 +177,8 @@ SstEvaluation dummySstEvaluation({String? id}) => SstEvaluation(
       date: DateTime(2000, 1, 1),
     );
 
-PreInternshipRequests dummyPreInternshipRequests({String? id}) =>
+PreInternshipRequests dummyPreInternshipRequests(
+        {String id = 'preInternshipRequestsId'}) =>
     PreInternshipRequests(
       id: id,
       requests: [PreInternshipRequestTypes.judiciaryBackgroundCheck],
@@ -376,7 +378,7 @@ Internship dummyInternship({
     enterpriseEvaluations: [
       dummyPostInternshipEnterpriseEvaluation(internshipId: id)
     ],
-    sstEvaluations: [dummySstEvaluation(id: id)],
+    sstEvaluations: [dummySstEvaluation()],
     skillEvaluations: [dummyInternshipEvaluationSkill()],
     attitudeEvaluations: [dummyInternshipEvaluationAttitude()],
     teacherNotes: '',
@@ -472,7 +474,7 @@ attitude.InternshipEvaluationAttitude dummyInternshipEvaluationAttitude({
 }) =>
     attitude.InternshipEvaluationAttitude(
       id: id,
-      date: DateTime(1980, 5, 20),
+      date: DateTime(2014, 5, 20),
       presentAtEvaluation: ['Me', 'You'],
       attitude: dummyAttitudeEvaluation(),
       formVersion: '1.0.0',
@@ -499,7 +501,7 @@ InternshipEvaluationSkill dummyInternshipEvaluationSkill({
 }) =>
     InternshipEvaluationSkill(
       id: id,
-      date: DateTime(1980, 5, 20),
+      date: DateTime(2001, 5, 20),
       presentAtEvaluation: ['Me', 'You'],
       skillGranularity: SkillEvaluationGranularity.byTask,
       skills: [dummySkillEvaluation()],
@@ -515,7 +517,7 @@ InternshipContract dummyInternshipContract({
 }) =>
     InternshipContract(
       id: id,
-      date: date ?? DateTime(1980, 5, 20),
+      date: date ?? DateTime(2001, 5, 20),
       jobId: jobId,
       specializationId: specializationId,
       extraSpecializationIds: [

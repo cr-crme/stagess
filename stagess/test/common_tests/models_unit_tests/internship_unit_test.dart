@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stagess/common/extensions/internship_extension.dart';
-import 'package:stagess/program_helpers.dart';
+import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
@@ -13,7 +13,7 @@ import '../utils.dart';
 void main() {
   group('Intenship', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(mockMe: true);
+    ProgramInitializer.initialize();
 
     test('"isActive" and "isClosed" behave properly', () {
       final internship = dummyInternship();
@@ -206,7 +206,6 @@ void main() {
         'extra_supervising_teacher_ids': [],
         'enterprise_id': 'enterpriseId',
         'contracts': [dummyInternshipContract().serialize()],
-        'expected_duration': 135,
         'achieved_duration': 130,
         'teacher_notes': '',
         'end_date': DateTime(2034, 10, 28).millisecondsSinceEpoch,
@@ -277,15 +276,10 @@ void main() {
       expect(emptyDeserialized.endDate, DateTime(0));
       expect(emptyDeserialized.skillEvaluations.length, 0);
       expect(emptyDeserialized.attitudeEvaluations.length, 0);
-      expect(emptyDeserialized.sstEvaluations[0].id, isNotNull);
+      expect(emptyDeserialized.sstEvaluations.length, 0);
       expect(emptyDeserialized.enterpriseEvaluations.length, 0);
 
-      expect(() => emptyDeserialized.currentContract!.dates, throwsStateError);
-      expect(() => emptyDeserialized.currentContract!.weeklySchedules,
-          throwsStateError);
-      expect(() => emptyDeserialized.currentContract!.supervisor,
-          throwsStateError);
-      expect(emptyDeserialized.currentContract!.expectedDuration, -1);
+      expect(emptyDeserialized.currentContract, isNull);
     });
   });
 }

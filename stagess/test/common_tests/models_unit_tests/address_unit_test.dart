@@ -64,6 +64,8 @@ void main() {
         'street': address.street,
         'apartment': address.apartment,
         'city': address.city,
+        'latitude': null,
+        'longitude': null,
         'postal_code': address.postalCode
       });
 

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess/program_helpers.dart';
+import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
 import 'package:stagess_common/models/generic/address.dart';
@@ -14,7 +14,7 @@ import '../utils.dart';
 void main() {
   group('Enterprise', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(mockMe: true);
+    ProgramInitializer.initialize();
 
     test('"copyWith" changes the requested elements', () {
       final enterprise = dummyEnterprise(addJob: true);
@@ -242,12 +242,12 @@ void main() {
       expect(emptyDeserialized.jobs.length, 0);
       expect(emptyDeserialized.contact.firstName, '');
       expect(emptyDeserialized.contactFunction, '');
-      expect(emptyDeserialized.address, isNull);
-      expect(emptyDeserialized.phone, isNull);
-      expect(emptyDeserialized.fax, isNull);
-      expect(emptyDeserialized.website, isNull);
-      expect(emptyDeserialized.headquartersAddress, isNull);
-      expect(emptyDeserialized.neq, isNull);
+      expect(emptyDeserialized.address, Address.empty);
+      expect(emptyDeserialized.phone, PhoneNumber.empty);
+      expect(emptyDeserialized.fax, PhoneNumber.empty);
+      expect(emptyDeserialized.website, '');
+      expect(emptyDeserialized.headquartersAddress, Address.empty);
+      expect(emptyDeserialized.neq, '');
     });
   });
 }

@@ -1,11 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess/program_helpers.dart';
+import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 import 'package:stagess_common_flutter/services/question_file_service.dart';
 
 void main() {
   group('QuestionFileService', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(mockMe: true);
+    ProgramInitializer.initialize(
+      useQuestionFileService: true,
+    );
 
     test('questions are loaded properly', () async {
       await QuestionFileService.loadData();

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess/program_helpers.dart';
+import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
@@ -14,7 +14,11 @@ import '../utils.dart';
 void main() {
   group('EnterprisesProvider', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(mockMe: true);
+    ProgramInitializer.initialize(
+      useActivitySectorsService: false,
+      useRiskDataFileService: false,
+      useQuestionFileService: false,
+    );
 
     test('"replaceJob" works', () {
       final enterprises = EnterprisesProvider(

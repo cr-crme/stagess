@@ -152,6 +152,8 @@ extension DateTimeExt on DateTime {
       // We take an arbitrary small date to account for the rounding error
       // that are introduced when storing the date as an int. DateTime(2000)
       // is still way before any realistic useful date.
+      // NOTE: This is true only because the date are used for internships that
+      // are created recently and the birth dates of the students (and not anyone else)
       return date.isBefore(DateTime(2000)) ? DateTime(0) : date;
     } catch (e) {
       return null;

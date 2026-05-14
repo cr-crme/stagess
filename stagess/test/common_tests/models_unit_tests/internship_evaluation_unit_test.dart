@@ -58,7 +58,7 @@ void main() {
       });
 
       test('"Productivity" shows the right things', () {
-        expect(Productivity.notEvaluated.title, 'Productivité');
+        expect(Productivity.notEvaluated.title, 'Rendement et constance');
         expect(Productivity.veryHigh.name,
             'Offre toujours le rendement et le rythme de travail attendus');
         expect(Productivity.high.name,
@@ -76,7 +76,8 @@ void main() {
       });
 
       test('"TeamCommunication" shows the right things', () {
-        expect(TeamCommunication.notEvaluated.title, 'Communication en équipe');
+        expect(TeamCommunication.notEvaluated.title,
+            'Communication avec l\'équipe');
         expect(TeamCommunication.veryHigh.name,
             'Communique de façon claire, précise et adaptée au milieu');
         expect(TeamCommunication.high.name,
@@ -94,7 +95,8 @@ void main() {
       });
 
       test('"RespectOfAuthority" shows the right things', () {
-        expect(RespectOfAuthority.notEvaluated.title, 'Respect de l\'autorité');
+        expect(RespectOfAuthority.notEvaluated.title,
+            'Respect des personnes en autorité');
         expect(RespectOfAuthority.veryHigh.name,
             'Exprime ses besoins et démontre de l\'ouverture à recevoir la rétroaction');
         expect(RespectOfAuthority.high.name,
@@ -113,7 +115,7 @@ void main() {
 
       test('"CommunicationAboutSst" shows the right things', () {
         expect(CommunicationAboutSst.notEvaluated.title,
-            'Communication sur la SST');
+            'Communication au sujet de la santé et sécurité au travail');
         expect(CommunicationAboutSst.veryHigh.name,
             'Identifie toujours les risques et agit de manière préventive en adoptant un comportement sécuritaire');
         expect(CommunicationAboutSst.high.name,
@@ -131,7 +133,7 @@ void main() {
       });
 
       test('"SelfControl" shows the right things', () {
-        expect(SelfControl.notEvaluated.title, 'Rendement et constance');
+        expect(SelfControl.notEvaluated.title, 'Maîtrise de soi');
         expect(SelfControl.veryHigh.name,
             'Utilise toujours des stratégies efficaces pour gérer ses émotions');
         expect(SelfControl.high.name,
@@ -149,8 +151,7 @@ void main() {
       });
 
       test('"TakeInitiative" shows the right things', () {
-        expect(TakeInitiative.notEvaluated.title,
-            'Autonomie et sens de l\'initiative');
+        expect(TakeInitiative.notEvaluated.title, 'Prise d\'initiative');
         expect(TakeInitiative.veryHigh.name,
             'Prend très souvent des initiatives pertinentes selon les situations');
         expect(TakeInitiative.high.name,
@@ -168,8 +169,7 @@ void main() {
       });
 
       test('"Adaptability" shows the right things', () {
-        expect(Adaptability.notEvaluated.title,
-            'Respect des règles de santé et de sécurité du travail (SST)');
+        expect(Adaptability.notEvaluated.title, 'Adaptation aux changements');
         expect(Adaptability.veryHigh.name,
             'S\'ajuste en fonction des changements qui surviennent ou qui lui sont demandés');
         expect(Adaptability.high.name,
@@ -184,13 +184,6 @@ void main() {
         expect(Adaptability.insufficient.index, 3);
       });
 
-      test('"meetsRequirements" behaves properly', () {
-        final attitude = dummyAttitudeEvaluation();
-
-        expect(attitude.meetsRequirements.length, 4);
-        expect(attitude.doesNotMeetRequirements.length, 6);
-      });
-
       test('"Attitude" serialization and deserialization works', () {
         final attitude = dummyAttitudeEvaluation();
         final serialized = attitude.serialize();
@@ -200,28 +193,28 @@ void main() {
           'id': 'attitudeEvaluationId',
           'ponctuality': 1,
           'inattendance': 2,
-          'quality_of_work': 3,
-          'productivity': 1,
+          'quality_of_work': 1,
+          'productivity': 2,
           'team_communication': 2,
-          'respect_of_authority': 3,
-          'communication_about_sst': 1,
-          'self_control': 2,
-          'take_initiative': 3,
-          'adaptability': 1,
+          'respect_of_authority': 0,
+          'communication_about_sst': 3,
+          'self_control': 1,
+          'take_initiative': 2,
+          'adaptability': 0,
         });
 
         expect(deserialized.id, 'attitudeEvaluationId');
         expect(deserialized.ponctuality, Ponctuality.values[1]);
         expect(deserialized.inattendance, Inattendance.values[2]);
-        expect(deserialized.qualityOfWork, QualityOfWork.values[3]);
-        expect(deserialized.productivity, Productivity.values[1]);
+        expect(deserialized.qualityOfWork, QualityOfWork.values[1]);
+        expect(deserialized.productivity, Productivity.values[2]);
         expect(deserialized.teamCommunication, TeamCommunication.values[2]);
-        expect(deserialized.respectOfAuthority, RespectOfAuthority.values[3]);
+        expect(deserialized.respectOfAuthority, RespectOfAuthority.values[0]);
         expect(deserialized.communicationAboutSst,
-            CommunicationAboutSst.values[1]);
-        expect(deserialized.selfControl, SelfControl.values[2]);
-        expect(deserialized.takeInitiative, TakeInitiative.values[3]);
-        expect(deserialized.adaptability, Adaptability.values[1]);
+            CommunicationAboutSst.values[3]);
+        expect(deserialized.selfControl, SelfControl.values[1]);
+        expect(deserialized.takeInitiative, TakeInitiative.values[2]);
+        expect(deserialized.adaptability, Adaptability.values[0]);
 
         // Test for empty deserialize to make sure it doesn't crash
         final emptyDeserialized =

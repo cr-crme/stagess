@@ -15,18 +15,6 @@ class AttitudeEvaluation extends ItemSerializable {
   TakeInitiative takeInitiative;
   Adaptability adaptability;
 
-  List<String> _fromRequirements(int min, int max) {
-    List<String> out = [];
-    if (isBetween(ponctuality, min, max)) out.add(Ponctuality._(-1).title);
-    if (isBetween(inattendance, min, max)) out.add(Inattendance._(-1).title);
-    if (isBetween(qualityOfWork, min, max)) out.add(QualityOfWork._(-1).title);
-    if (isBetween(productivity, min, max)) out.add(Productivity._(-1).title);
-    return out;
-  }
-
-  List<String> get meetsRequirements => _fromRequirements(0, 1);
-  List<String> get doesNotMeetRequirements => _fromRequirements(2, 3);
-
   AttitudeEvaluation({
     super.id,
     required this.ponctuality,

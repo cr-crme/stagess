@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stagess/common/widgets/dialogs/job_creator_dialog.dart';
-import 'package:stagess/program_helpers.dart';
+import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 
 import '../../../utils.dart';
@@ -30,7 +30,11 @@ Future<void> _prepareDialog(WidgetTester tester) async {
 void main() {
   group('JobCreatorDialog', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(mockMe: true);
+    ProgramInitializer.initialize(
+      useActivitySectorsService: false,
+      useRiskDataFileService: false,
+      useQuestionFileService: false,
+    );
 
     testWidgets('renders a title', (tester) async {
       await _prepareDialog(tester);

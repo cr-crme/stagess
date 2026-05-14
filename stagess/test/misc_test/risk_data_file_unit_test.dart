@@ -1,11 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess/program_helpers.dart';
+import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 import 'package:stagess_common_flutter/services/risk_data_file_service.dart';
 
 void main() {
   group('RiskDataFileService', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(mockMe: true);
+    ProgramInitializer.initialize(
+      useRiskDataFileService: true,
+    );
 
     test('risks are loaded properly', () async {
       await RiskDataFileService.loadData();

@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:stagess/program_helpers.dart';
+import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 
 void main() {
   group('ActivitySectorsService', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(mockMe: true);
+    ProgramInitializer.initialize();
 
     test('sectors are loaded properly', () async {
       await ActivitySectorsService.initialize();
@@ -46,7 +46,11 @@ void main() {
 
   group('Serialization and deserialization', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(mockMe: true);
+    ProgramInitializer.initialize(
+      useActivitySectorsService: false,
+      useRiskDataFileService: false,
+      useQuestionFileService: false,
+    );
 
     test('ActivitySectorList can serialize and deserialize', () async {
       // This test effectively tests the full serialization and deserialization chain
