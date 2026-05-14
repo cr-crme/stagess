@@ -5,6 +5,7 @@ import 'package:stagess_backend/server/connexions.dart';
 import 'package:stagess_backend/utils/custom_web_socket.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_backend/utils/network_rate_limiter.dart';
+import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/services/backend_helpers.dart';
 
 final _logger = Logger('AnswerHttpRequest');
@@ -127,6 +128,15 @@ class HttpRequestHandler {
       } catch (e) {
         throw ConnexionRefusedException('WebSocket upgrade failed');
       }
+    } else if (request.uri.path == '/${BackendHelpers.versionEndpoint}') {
+      request.response.statusCode = HttpStatus.ok;
+      request.response.headers.contentType = ContentType.text;
+      request.response.headers
+          .set('Cache-Control', 'no-cache, no-store, must-revalidate');
+      request.response.headers.set('Access-Control-Allow-Origin', '*');
+      request.response.write(CommunicationProtocol.version);
+      await request.response.close();
+      return;
     } else {
       throw ConnexionRefusedException('Invalid endpoint');
     }

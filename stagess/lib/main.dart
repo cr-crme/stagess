@@ -4,10 +4,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess/common/extensions/auth_provider_extension.dart';
-import 'package:stagess/program_helpers.dart';
+import 'package:stagess/firebase_options.dart';
+import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess_common/communication_protocol.dart';
-import 'package:stagess_common/models/generic/map_providers.dart';
 import 'package:stagess_common/services/backend_helpers.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
@@ -16,16 +16,43 @@ import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/screens/in_maintenance_screen.dart';
+import 'package:stagess_common_flutter/screens/wrong_version_screen.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
 import 'package:stagess_common_flutter/widgets/single_instance_manager/single_instance_manager.dart';
+
+final _logger = Logger('');
 
 // coverage:ignore-start
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  ProgramInitializer.configureLogger(
+      showLogs:
+          const bool.fromEnvironment('STAGESS_SHOW_LOGS', defaultValue: false));
 
+  // Configuration
   final inMaintenanceMode = const bool.fromEnvironment(
       'STAGESS_MAINTENANCE_MODE',
       defaultValue: false);
+  const useDevDb =
+      bool.fromEnvironment('STAGESS_USE_DEV_DB', defaultValue: false);
+  const useMockers =
+      bool.fromEnvironment('STAGESS_USE_MOCKERS', defaultValue: false);
+  final backendUri = BackendHelpers.backendConnectUri(useDevDatabase: useDevDb);
+  final isBackendCompatible = await ProgramInitializer.isBackendCompatible();
+
+  // Say hello
+  _logger
+      .info('Bienvenue à Stagess, version ${CommunicationProtocol.version}!');
+  if (!isBackendCompatible) {
+    _logger.warning(
+        'Attention, cette version est incompatible avec celle du serveur. '
+        'Veuillez rafraichir la page pour mettre à jour votre application.');
+  }
+  _logger.info(
+    'Nous nous connectons à la base de données ${useDevDb ? 'de développement' : 'de production'} '
+    'située à "${BackendHelpers.backendIp}:${BackendHelpers.backendPort}", '
+    'en utilisant une connexion ${BackendHelpers.useSsl ? '' : 'non-'}sécurisée',
+  );
 
   if (inMaintenanceMode) {
     runApp(MaterialApp(
@@ -41,45 +68,32 @@ void main() async {
       supportedLocales: const [Locale('fr', 'CA')],
     ));
     return;
-  }
-
-  // Setup logger to INFO
-  const showLogs =
-      bool.fromEnvironment('STAGESS_SHOW_LOGS', defaultValue: false);
-  Logger.root.level = Level.INFO;
-  Logger.root.onRecord.listen((record) {
-    if (!showLogs) return;
-    // ignore: avoid_print
-    print(
-      '[${record.level.name}] ${record.time}: ${record.loggerName}: ${record.message}'
-      '${record.error != null ? ' Error: ${record.error}' : ''}'
-      '${record.stackTrace != null ? ' StackTrace: ${record.stackTrace}' : ''}',
+  } else if (!isBackendCompatible) {
+    runApp(MaterialApp(
+      debugShowCheckedModeBanner: false,
+      onGenerateTitle: (context) => 'Version incorrecte de Stagess',
+      theme: crcrmeMaterialTheme,
+      home: const WrongVersionScreen(),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('fr', 'CA')],
+    ));
+  } else {
+    // Normal app initialization
+    await ProgramInitializer.initialize(
+      firebaseOptions:
+          useMockers ? null : DefaultFirebaseOptions.currentPlatform,
+      useActivitySectorsService: true,
+      useRiskDataFileService: true,
+      useQuestionFileService: true,
+      useTileProvider: true,
+      useReverseGeocodingProvider: true,
     );
-  });
-
-  const useDevDb =
-      bool.fromEnvironment('STAGESS_USE_DEV_DB', defaultValue: false);
-  debugPrint('Welcome to Stagess, version ${CommunicationProtocol.version}!');
-  debugPrint(
-    'We are connecting to the ${useDevDb ? 'development' : 'production'} database '
-    'situated at "${BackendHelpers.backendIp}:${BackendHelpers.backendPort}", '
-    '${BackendHelpers.useSsl ? '' : 'not '}using a secured connection',
-  );
-
-  const showDebugElements = true;
-  const useMockers = false;
-  final backendUri = BackendHelpers.backendConnectUri(useDevDatabase: useDevDb);
-
-  await ProgramInitializer.initialize(
-    showDebugElements: showDebugElements,
-    mockMe: useMockers,
-  );
-
-  await TileProvider.instance.initialize(provider: MapTileProvider.googleMaps);
-  await ReverseGeocodingProvider.instance
-      .initialize(provider: MapReverseGeocodingProvider.googleMaps);
-
-  runApp(StagessApp(useMockers: useMockers, backendUri: backendUri));
+    runApp(StagessApp(useMockers: useMockers, backendUri: backendUri));
+  }
 }
 // coverage:ignore-end
 
