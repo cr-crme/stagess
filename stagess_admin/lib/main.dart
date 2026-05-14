@@ -1,7 +1,6 @@
 import 'package:crcrme_material_theme/crcrme_material_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess_admin/extensions/auth_provider_extension.dart';
 import 'package:stagess_admin/firebase_options.dart';
@@ -21,7 +20,6 @@ import 'package:stagess_common_flutter/screens/wrong_version_screen.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
 import 'package:stagess_common_flutter/widgets/single_instance_manager/single_instance_manager.dart';
 
-final _logger = Logger('');
 const useDevDb =
     bool.fromEnvironment('STAGESS_USE_DEV_DB', defaultValue: false);
 
@@ -41,14 +39,14 @@ void main() async {
   final isBackendCompatible = await ProgramInitializer.isBackendCompatible();
 
   // Say hello
-  _logger.info(
+  debugPrint(
       'Bienvenue à l\'administration de Stagess, version ${CommunicationProtocol.version}!');
   if (!isBackendCompatible) {
-    _logger.warning(
+    debugPrint(
         'Attention, cette version est incompatible avec celle du serveur. '
         'Veuillez rafraichir la page pour mettre à jour votre application.');
   }
-  _logger.info(
+  debugPrint(
     'Nous nous connectons à la base de données ${useDevDb ? 'de développement' : 'de production'} '
     'située à "${BackendHelpers.backendIp}:${BackendHelpers.backendPort}", '
     'en utilisant une connexion ${BackendHelpers.useSsl ? '' : 'non-'}sécurisée',

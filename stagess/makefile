@@ -16,7 +16,7 @@ build/%.zip: .FORCE
 	  echo "Error: STAGESS_GOOGLE_MAPS_API_KEY is not set in the environment."; \
 	  exit 1; \
 	fi
-	flutter      build web --base-href=/$*/ \
+	flutter      build web --base-href=/$*/ --pwa-strategy=none \
 		    	    --dart-define=STAGESS_USE_DEV_DB=$(USE_DEV_DB) \
                 	--dart-define=STAGESS_MAINTENANCE_MODE=$(MAINTENANCE_MODE) \
 					--dart-define=STAGESS_GOOGLE_MAPS_API_KEY=$${STAGESS_GOOGLE_MAPS_API_KEY}

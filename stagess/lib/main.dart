@@ -1,14 +1,13 @@
 import 'package:crcrme_material_theme/crcrme_material_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:stagess/common/extensions/auth_provider_extension.dart';
 import 'package:stagess/firebase_options.dart';
-import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/services/backend_helpers.dart';
+import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
@@ -19,8 +18,6 @@ import 'package:stagess_common_flutter/screens/in_maintenance_screen.dart';
 import 'package:stagess_common_flutter/screens/wrong_version_screen.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
 import 'package:stagess_common_flutter/widgets/single_instance_manager/single_instance_manager.dart';
-
-final _logger = Logger('');
 
 // coverage:ignore-start
 void main() async {
@@ -41,14 +38,13 @@ void main() async {
   final isBackendCompatible = await ProgramInitializer.isBackendCompatible();
 
   // Say hello
-  _logger
-      .info('Bienvenue à Stagess, version ${CommunicationProtocol.version}!');
+  debugPrint('Bienvenue à Stagess, version ${CommunicationProtocol.version}!');
   if (!isBackendCompatible) {
-    _logger.warning(
+    debugPrint(
         'Attention, cette version est incompatible avec celle du serveur. '
         'Veuillez rafraichir la page pour mettre à jour votre application.');
   }
-  _logger.info(
+  debugPrint(
     'Nous nous connectons à la base de données ${useDevDb ? 'de développement' : 'de production'} '
     'située à "${BackendHelpers.backendIp}:${BackendHelpers.backendPort}", '
     'en utilisant une connexion ${BackendHelpers.useSsl ? '' : 'non-'}sécurisée',
