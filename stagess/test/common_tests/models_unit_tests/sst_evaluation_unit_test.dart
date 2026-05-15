@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stagess_common/models/internships/sst_evaluation.dart';
 
@@ -12,8 +14,9 @@ void main() {
 
       expect(serialized, {
         'id': sstEvaluation.id,
-        'questions': sstEvaluation.questions,
         'date': DateTime(2000, 1, 1).millisecondsSinceEpoch,
+        'present_at_evaluation': sstEvaluation.presentAtEvaluation,
+        'questions': jsonEncode(sstEvaluation.questions),
       });
 
       expect(deserialized.id, sstEvaluation.id);
@@ -22,6 +25,7 @@ void main() {
       // Test for empty deserialize to make sure it doesn't crash
       final emptyDeserialized = SstEvaluation.fromSerialized({'id': 'emptyId'});
       expect(emptyDeserialized.id, 'emptyId');
+      expect(emptyDeserialized.presentAtEvaluation, []);
       expect(emptyDeserialized.questions, {});
       expect(emptyDeserialized.date.millisecondsSinceEpoch,
           DateTime(0).millisecondsSinceEpoch);

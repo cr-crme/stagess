@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:stagess_common_flutter/widgets/add_job_button.dart';
 
+import '../../utils.dart';
 import 'utils.dart';
 
 void main() {
@@ -28,12 +29,18 @@ void main() {
     testWidgets('renders a button with a custom onPressed callback',
         (tester) async {
       bool wasClicked = false;
-      await tester.pumpWidget(declareWidget(AddJobButton(
-        controllers: [],
-        onJobAdded: () {
-          wasClicked = true;
-        },
-      )));
+      await tester.pumpWidgetWithNotifiers(
+        declareWidget(
+          AddJobButton(
+            controllers: [],
+            onJobAdded: () {
+              wasClicked = true;
+            },
+          ),
+        ),
+        withStudents: true,
+        withInternships: true,
+      );
 
       await tester.tap(find.bySubtype<TextButton>());
       await tester.pumpAndSettle();

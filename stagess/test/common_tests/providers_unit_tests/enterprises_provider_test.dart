@@ -14,11 +14,7 @@ import '../utils.dart';
 void main() {
   group('EnterprisesProvider', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(
-      useActivitySectorsService: false,
-      useRiskDataFileService: false,
-      useQuestionFileService: false,
-    );
+    ProgramInitializer.initialize();
 
     test('"replaceJob" works', () {
       final enterprises = EnterprisesProvider(

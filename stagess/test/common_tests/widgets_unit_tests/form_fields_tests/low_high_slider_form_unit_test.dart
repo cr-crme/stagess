@@ -23,15 +23,17 @@ void main() {
 
     testWidgets('renders an error message if value is too small',
         (tester) async {
-      await tester
-          .pumpWidget(declareWidget(LowHighSliderFormField(initialValue: 0)));
+      await tester.pumpWidget(declareWidget(LowHighSliderFormField(
+        initialValue: 0,
+        fixed: true,
+      )));
 
       expect(find.text('Aucune donnée pour l\'instant.'), findsOneWidget);
     });
 
     testWidgets('renders an error message if value is too big', (tester) async {
-      await tester
-          .pumpWidget(declareWidget(LowHighSliderFormField(initialValue: 6)));
+      await tester.pumpWidget(
+          declareWidget(LowHighSliderFormField(initialValue: 6, fixed: true)));
 
       expect(find.text('Aucune donnée pour l\'instant.'), findsOneWidget);
     });

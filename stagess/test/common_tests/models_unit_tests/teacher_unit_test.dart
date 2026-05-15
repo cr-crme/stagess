@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
@@ -19,7 +20,7 @@ void main() {
       expect(teacherSame.email, teacher.email);
       expect(teacherSame.phone, teacher.phone);
 
-      expect(teacherSame.address, isNull);
+      expect(teacherSame.address, Address.empty);
       expect(teacherSame.dateBirth, isNull);
 
       expect(
@@ -103,7 +104,7 @@ void main() {
       expect(deserialized.email, teacher.email);
       expect(deserialized.phone.toString(), dummyPhoneNumber().toString());
       expect(deserialized.dateBirth, isNull);
-      expect(deserialized.address, isNull);
+      expect(deserialized.address, Address.empty);
       expect(deserialized.itineraries, []);
       expect(deserialized.visitingPriority('element1'), VisitingPriority.low);
       expect(deserialized.visitingPriority('element2'), VisitingPriority.high);
@@ -116,10 +117,10 @@ void main() {
       expect(emptyDeserialized.lastName, '');
       expect(emptyDeserialized.schoolId, '-1');
       expect(emptyDeserialized.groups, []);
-      expect(emptyDeserialized.email, isNull);
-      expect(emptyDeserialized.phone, isNull);
+      expect(emptyDeserialized.email, '');
+      expect(emptyDeserialized.phone, PhoneNumber.empty);
       expect(emptyDeserialized.dateBirth, isNull);
-      expect(emptyDeserialized.address, isNull);
+      expect(emptyDeserialized.address, Address.empty);
       expect(emptyDeserialized.itineraries, []);
       expect(emptyDeserialized.internshipsWithPriorities, isEmpty);
     });

@@ -20,11 +20,7 @@ Future<void> _initializedDrawer(WidgetTester tester) async {
 void main() {
   group('MainDrawer', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(
-      useActivitySectorsService: false,
-      useRiskDataFileService: false,
-      useQuestionFileService: false,
-    );
+    ProgramInitializer.initialize();
 
     testWidgets('renders the proper title', (tester) async {
       await _initializedDrawer(tester);

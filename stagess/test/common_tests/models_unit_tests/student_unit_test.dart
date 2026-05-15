@@ -13,11 +13,7 @@ import '../utils.dart';
 void main() {
   group('Student', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(
-      useActivitySectorsService: false,
-      useRiskDataFileService: false,
-      useQuestionFileService: false,
-    );
+    ProgramInitializer.initialize();
 
     test('"Program" is shown properly', () {
       expect(Program.values.length, 3);
@@ -62,7 +58,7 @@ void main() {
       expect(limitedInfo.contact.toString(), Person.empty.toString());
       expect(limitedInfo.contactLink, '');
       expect(limitedInfo.dateBirth, isNull);
-      expect(limitedInfo.email, isNull);
+      expect(limitedInfo.email, '');
       expect(limitedInfo.phone.toString(), PhoneNumber.empty.toString());
     });
 
@@ -159,9 +155,9 @@ void main() {
       expect(emptyDeserialized.firstName, '');
       expect(emptyDeserialized.lastName, '');
       expect(emptyDeserialized.dateBirth, isNull);
-      expect(emptyDeserialized.phone, isNull);
-      expect(emptyDeserialized.email, isNull);
-      expect(emptyDeserialized.address, isNull);
+      expect(emptyDeserialized.phone, PhoneNumber.empty);
+      expect(emptyDeserialized.email, '');
+      expect(emptyDeserialized.address, Address.empty);
       expect(int.parse(emptyDeserialized.photo), greaterThanOrEqualTo(0));
       expect(int.parse(emptyDeserialized.photo), lessThanOrEqualTo(0xFFFFFF));
       expect(emptyDeserialized.program, Program.undefined);

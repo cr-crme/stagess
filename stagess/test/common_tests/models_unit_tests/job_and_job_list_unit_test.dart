@@ -15,11 +15,7 @@ import '../utils.dart';
 void main() {
   group('Job and JobList', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(
-      useActivitySectorsService: false,
-      useRiskDataFileService: false,
-      useQuestionFileService: false,
-    );
+    ProgramInitializer.initialize();
 
     testWidgets('can get evaluation of all enterprises', (tester) async {
       final context = await tester.contextWithNotifiers(withInternships: true);

@@ -8,11 +8,7 @@ import '../../utils.dart';
 void main() {
   group('AuthProvider', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(
-      useActivitySectorsService: false,
-      useRiskDataFileService: false,
-      useQuestionFileService: false,
-    );
+    ProgramInitializer.initialize();
 
     test('can sign in and out', () async {
       final authProvider = AuthProvider(

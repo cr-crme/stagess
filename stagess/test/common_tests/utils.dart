@@ -273,20 +273,37 @@ visa.StudentVisa dummyStudentVisa({
           id: 'visaEvaluationId',
           experiencesAndAptitudes: [
             visa.ExperiencesAndAptitudes(
-                index: 0, text: 'Value1', isSelected: true),
+                id: 'experienceAndAptitudeId1',
+                index: 0,
+                text: 'Value1',
+                isSelected: true),
             visa.ExperiencesAndAptitudes(
-                index: 1, text: 'Value2', isSelected: false),
+                id: 'experienceAndAptitudeId2',
+                index: 1,
+                text: 'Value2',
+                isSelected: false),
           ],
           attestationsAndMentions: [
             visa.AttestationsAndMentions(
-                index: 0, text: 'Value3', isSelected: true),
+                id: 'attestationsAndMentionsId1',
+                index: 0,
+                text: 'Value3',
+                isSelected: true),
             visa.AttestationsAndMentions(
-                index: 1, text: 'Value4', isSelected: false),
+                id: 'attestationsAndMentionsId2',
+                index: 1,
+                text: 'Value4',
+                isSelected: false),
           ],
           sstTrainings: [
             visa.SstTraining(
-                index: 0, trainingId: '0001', isSelected: true, isHidden: true),
+                id: 'sstTrainingId1',
+                index: 0,
+                trainingId: '0001',
+                isSelected: true,
+                isHidden: true),
             visa.SstTraining(
+                id: 'sstTrainingId2',
                 index: 1,
                 trainingId: '0002',
                 isSelected: false,
@@ -295,6 +312,7 @@ visa.StudentVisa dummyStudentVisa({
           isGatewayToFmsAvailable: false,
           certificates: [
             visa.Certificate(
+              id: 'certificateId1',
               index: 0,
               certificateType: visa.CertificateType.fpt,
               isSelected: true,
@@ -302,6 +320,7 @@ visa.StudentVisa dummyStudentVisa({
               year: 2020,
             ),
             visa.Certificate(
+              id: 'certificateId2',
               index: 1,
               certificateType: visa.CertificateType.fms,
               isSelected: false,
@@ -310,11 +329,14 @@ visa.StudentVisa dummyStudentVisa({
             ),
           ],
           skills: [
-            visa.Skill(index: 0, skillId: '834301', isSelected: true),
-            visa.Skill(index: 1, skillId: '834303', isSelected: false),
+            visa.Skill(
+                id: 'skillId1', index: 0, skillId: '834301', isSelected: true),
+            visa.Skill(
+                id: 'skillId2', index: 1, skillId: '834303', isSelected: false),
           ],
           references: [
             visa.Reference(
+              id: 'referenceId1',
               index: 0,
               isSelected: true,
               referee: 'Referee A',
@@ -324,6 +346,7 @@ visa.StudentVisa dummyStudentVisa({
               supplementaryInfo: 'Il se fera un plaisir de vous répondre',
             ),
             visa.Reference(
+              id: 'referenceId2',
               index: 1,
               isSelected: false,
               referee: 'Referee B',
@@ -335,18 +358,40 @@ visa.StudentVisa dummyStudentVisa({
             ),
           ],
           forces: [
-            visa.Attitude(index: 0, attitudeId: '0001', isSelected: true),
-            visa.Attitude(index: 1, attitudeId: '0002', isSelected: false),
+            visa.Attitude(
+                id: 'attitudeId1',
+                index: 0,
+                attitudeId: '0001',
+                isSelected: true),
+            visa.Attitude(
+                id: 'attitudeId2',
+                index: 1,
+                attitudeId: '0002',
+                isSelected: false),
           ],
           challenges: [
-            visa.Attitude(index: 0, attitudeId: '0003', isSelected: true),
-            visa.Attitude(index: 1, attitudeId: '0004', isSelected: false),
+            visa.Attitude(
+                id: 'attitudeId3',
+                index: 0,
+                attitudeId: '0003',
+                isSelected: true),
+            visa.Attitude(
+                id: 'attitudeId4',
+                index: 1,
+                attitudeId: '0004',
+                isSelected: false),
           ],
           successConditions: [
             visa.SuccessConditions(
-                index: 0, text: 'Condition1', isSelected: true),
+                id: 'successConditionId1',
+                index: 0,
+                text: 'Condition1',
+                isSelected: true),
             visa.SuccessConditions(
-                index: 1, text: 'Condition2', isSelected: false),
+                id: 'successConditionId2',
+                index: 1,
+                text: 'Condition2',
+                isSelected: false),
           ]),
     );
 

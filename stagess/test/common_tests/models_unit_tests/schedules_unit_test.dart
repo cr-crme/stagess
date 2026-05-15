@@ -60,16 +60,15 @@ void main() {
 
       expect(serialized, {
         'id': dailySchedule.id,
-        'blocks':
-            dailySchedule.blocks
-                .map(
-                  (e) => {
-                    'id': e.id,
-                    'start': [e.start.hour, e.start.minute],
-                    'end': [e.end.hour, e.end.minute],
-                  },
-                )
-                .toList(),
+        'blocks': dailySchedule.blocks
+            .map(
+              (e) => {
+                'id': e.id,
+                'start': [e.start.hour, e.start.minute],
+                'end': [e.end.hour, e.end.minute],
+              },
+            )
+            .toList(),
       });
 
       expect(deserialized.id, dailySchedule.id);
@@ -143,10 +142,7 @@ void main() {
       expect(emptyDeserialized.schedule.length, 0);
       expect(
         emptyDeserialized.period,
-        DateTimeRange(
-          start: DateTime.fromMillisecondsSinceEpoch(0),
-          end: DateTime.fromMillisecondsSinceEpoch(0),
-        ),
+        DateTimeRange(start: DateTime(0), end: DateTime(0)),
       );
     });
   });

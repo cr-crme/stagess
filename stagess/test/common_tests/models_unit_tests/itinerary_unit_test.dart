@@ -76,8 +76,6 @@ void main() {
           'id': 'waypointId',
           'title': 'Waypoint',
           'subtitle': 'Subtitle',
-          'latitude': 40.0,
-          'longitude': 50.0,
           'address': itinerary[0].address.serialize(),
           'priority': 3
         },
@@ -85,8 +83,6 @@ void main() {
           'id': 'waypointId2',
           'title': 'Waypoint',
           'subtitle': 'Subtitle',
-          'latitude': 30.0,
-          'longitude': 30.5,
           'address': itinerary[1].address.serialize(),
           'priority': 3
         }

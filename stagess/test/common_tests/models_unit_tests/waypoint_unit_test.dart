@@ -23,8 +23,8 @@ void main() {
       expect(waypoint.id, isNotEmpty);
       expect(waypoint.title, 'My wonderful place');
       expect(waypoint.subtitle, isNull);
-      expect(waypoint.address.latitude, 0.0);
-      expect(waypoint.address.longitude, 0.0);
+      expect(waypoint.address.latitude, isNull);
+      expect(waypoint.address.longitude, isNull);
       expect(waypoint.address.toString(), Address().toString());
       expect(waypoint.priority, VisitingPriority.notApplicable);
       expect(waypoint.showTitle, isTrue);
@@ -91,8 +91,8 @@ void main() {
       expect(emptyDeserialized.title, '');
       expect(emptyDeserialized.subtitle, '');
       expect(emptyDeserialized.address.toString(), Address().toString());
-      expect(emptyDeserialized.address.latitude, 0.0);
-      expect(emptyDeserialized.address.longitude, 0.0);
+      expect(emptyDeserialized.address.latitude, isNull);
+      expect(emptyDeserialized.address.longitude, isNull);
       expect(emptyDeserialized.priority, VisitingPriority.notApplicable);
       expect(emptyDeserialized.showTitle, isTrue);
     });

@@ -30,11 +30,7 @@ Future<void> _prepareDialog(WidgetTester tester) async {
 void main() {
   group('JobCreatorDialog', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(
-      useActivitySectorsService: false,
-      useRiskDataFileService: false,
-      useQuestionFileService: false,
-    );
+    ProgramInitializer.initialize();
 
     testWidgets('renders a title', (tester) async {
       await _prepareDialog(tester);

@@ -10,11 +10,7 @@ import '../utils.dart';
 void main() {
   group('FinalizeInternshipDialog', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(
-      useActivitySectorsService: false,
-      useRiskDataFileService: false,
-      useQuestionFileService: false,
-    );
+    ProgramInitializer.initialize();
 
     testWidgets('renders a title', (tester) async {
       await tester.pumpWidgetWithNotifiers(
@@ -127,25 +123,22 @@ void main() {
       expect(find.text('Entrer une valeur'), findsOneWidget);
     });
 
-    testWidgets('confirming is refused if an invalid time is entered',
-        (tester) async {
+    testWidgets('Cannot enter non integer values', (tester) async {
       await tester.pumpWidgetWithNotifiers(
           declareWidget(
               const FinalizeInternshipDialog(internshipId: 'internshipId')),
           withInternships: true,
           dummyInternship: dummyInternship(achievedLength: -1));
 
-      await tester.enterText(find.byType(TextFormField), '100.1');
+      final textFormField = find.byType(TextFormField);
+      await tester.enterText(textFormField, '100.1');
       await tester.pump();
+      expect(
+          tester.widget<TextFormField>(textFormField).controller!.text, '1001');
 
-      await tester.tap(find.text('Oui'));
-      await tester.pumpAndSettle();
-
-      // The dialog should still be open
-      expect(find.byType(FinalizeInternshipDialog), findsOneWidget);
-
-      // An error message should be displayed
-      expect(find.text('Entrer une valeur'), findsOneWidget);
+      await tester.enterText(textFormField, '-1');
+      await tester.pump();
+      expect(tester.widget<TextFormField>(textFormField).controller!.text, '1');
     });
 
     testWidgets('confirming is accepted if a valid time is entered',

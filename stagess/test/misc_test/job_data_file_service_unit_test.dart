@@ -46,11 +46,7 @@ void main() {
 
   group('Serialization and deserialization', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(
-      useActivitySectorsService: false,
-      useRiskDataFileService: false,
-      useQuestionFileService: false,
-    );
+    ProgramInitializer.initialize();
 
     test('ActivitySectorList can serialize and deserialize', () async {
       // This test effectively tests the full serialization and deserialization chain

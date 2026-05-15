@@ -35,11 +35,7 @@ void _initializeTeacher(BuildContext context) {
 void main() {
   group('SchoolsProvider', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(
-      useActivitySectorsService: false,
-      useRiskDataFileService: false,
-      useQuestionFileService: false,
-    );
+    ProgramInitializer.initialize();
 
     test('deserializeItem works', () {
       final schoolBoards = SchoolBoardsProvider(

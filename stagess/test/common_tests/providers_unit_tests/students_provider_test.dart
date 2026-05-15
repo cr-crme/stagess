@@ -21,11 +21,7 @@ void _prepareProviders(BuildContext context) {
 void main() {
   group('StudentsProvider', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(
-      useActivitySectorsService: false,
-      useRiskDataFileService: false,
-      useQuestionFileService: false,
-    );
+    ProgramInitializer.initialize();
 
     testWidgets('"studentsInMyGroups" works', (tester) async {
       // Prepare the StudentsProvider

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/persons/person.dart';
@@ -12,9 +13,9 @@ void main() {
       expect(person.firstName, '');
       expect(person.lastName, '');
       expect(person.dateBirth, isNull);
-      expect(person.phone, isNull);
-      expect(person.email, isNull);
-      expect(person.address, isNull);
+      expect(person.phone, PhoneNumber.empty);
+      expect(person.email, '');
+      expect(person.address, Address.empty);
 
       expect(person.toString(), Person.empty.toString());
       expect(person.fullName, '');
@@ -22,7 +23,7 @@ void main() {
 
     test('is shown properly', () {
       final person = dummyPerson();
-      expect(person.toString(), 'Jeanne Kathlin Doe');
+      expect(person.toString(), 'Jeanne Doe');
       expect(person.fullName, 'Jeanne Doe');
     });
 
@@ -83,9 +84,9 @@ void main() {
       expect(emptyDeserialized.firstName, '');
       expect(emptyDeserialized.lastName, '');
       expect(emptyDeserialized.dateBirth, isNull);
-      expect(emptyDeserialized.phone, isNull);
-      expect(emptyDeserialized.email, isNull);
-      expect(emptyDeserialized.address, isNull);
+      expect(emptyDeserialized.phone, PhoneNumber.empty);
+      expect(emptyDeserialized.email, '');
+      expect(emptyDeserialized.address, Address.empty);
     });
   });
 }

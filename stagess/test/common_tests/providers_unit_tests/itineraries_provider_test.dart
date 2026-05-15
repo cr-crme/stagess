@@ -8,11 +8,7 @@ import '../utils.dart';
 void main() {
   group('ItinerariesProvider', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(
-      useActivitySectorsService: false,
-      useRiskDataFileService: false,
-      useQuestionFileService: false,
-    );
+    ProgramInitializer.initialize();
 
     test('"add" works', () async {
       final teachers = TeachersProvider(

@@ -10,13 +10,13 @@ void main() {
       expect(PhoneNumber.isValid('800.555.5555'), isTrue);
       expect(PhoneNumber.isValid('(800) 555-5555'), isTrue);
       expect(PhoneNumber.isValid('(800) 555-5555 poste 1234'), isTrue);
-      expect(PhoneNumber.isValid('8005555555 poste 123456'), isTrue);
+      expect(PhoneNumber.isValid('8005555555 poste 12345678'), isTrue);
     });
 
     test('is invalid', () {
       expect(PhoneNumber.isValid('800-555-555'), isFalse);
       expect(PhoneNumber.isValid('800-555-55555'), isFalse);
-      expect(PhoneNumber.isValid('800-555-5555 poste 1234567'), isFalse);
+      expect(PhoneNumber.isValid('800-555-5555 poste 123456789'), isFalse);
     });
 
     test('is shown properly', () {

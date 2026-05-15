@@ -9,11 +9,7 @@ import '../utils.dart';
 void main() {
   group('TeachersProvider', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(
-      useActivitySectorsService: false,
-      useRiskDataFileService: false,
-      useQuestionFileService: false,
-    );
+    ProgramInitializer.initialize();
 
     test('"currentTeacherId" works', () {
       final teachers = TeachersProvider(

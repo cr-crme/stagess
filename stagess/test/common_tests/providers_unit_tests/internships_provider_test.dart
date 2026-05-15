@@ -8,11 +8,7 @@ import '../utils.dart';
 void main() {
   group('InternshipsProvider', () {
     TestWidgetsFlutterBinding.ensureInitialized();
-    ProgramInitializer.initialize(
-      useActivitySectorsService: false,
-      useRiskDataFileService: false,
-      useQuestionFileService: false,
-    );
+    ProgramInitializer.initialize();
 
     test('"byStudentId" return the right student', () {
       final internships = InternshipsProvider(
