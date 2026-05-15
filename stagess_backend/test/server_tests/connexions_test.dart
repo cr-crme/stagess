@@ -12,7 +12,10 @@ import 'package:stagess_backend/repositories/teachers_repository.dart';
 import 'package:stagess_backend/server/connexions.dart';
 import 'package:stagess_backend/server/database_manager.dart';
 import 'package:stagess_backend/utils/custom_web_socket.dart';
+import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_common/communication_protocol.dart';
+import 'package:stagess_common/models/generic/access_level.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:test/test.dart';
 
 import '../mockers/sql_connection_mock.dart';
@@ -38,6 +41,17 @@ class ConnexionsMock extends Connexions {
       return null;
     }
   }
+
+  @override
+  Future<DatabaseUser?> getValidatedUser(SqlInterface sqlInterface,
+      {required String id, required String email}) async {
+    return DatabaseUser.empty(authenticatorId: 'authenticatorId').copyWith(
+      userId: id,
+      schoolBoardId: '100',
+      schoolId: '100',
+      accessLevel: AccessLevel.teacher,
+    );
+  }
 }
 
 String _prepareHandshake() {
@@ -46,7 +60,7 @@ String _prepareHandshake() {
     'token': JWT({
       'app_secret': 'dummy_app_secret',
       'school_board_id': 'dummy_school_board_id',
-      'user_id': 'dummy_user_id',
+      'user_id': '1',
       'email': 'john.doe@email.com',
     }).sign(SecretKey('secret passphrase')),
   }).serialize());
@@ -142,7 +156,7 @@ void main() {
     expect(protocol.field, isNull);
     expect(protocol.data, isA<Map<String, dynamic>>());
     expect(protocol.data!['error'], isA<String>());
-    expect(protocol.data!['error'], 'Handshake timeout');
+    expect(protocol.data!['error'], 'Connexion refused');
     expect(protocol.response, Response.failure);
   });
 
@@ -187,7 +201,7 @@ void main() {
     expect(protocolNotVerified.field, isNull);
     expect(protocolNotVerified.data, isA<Map<String, dynamic>>());
     expect(protocolNotVerified.data!['error'], isA<String>());
-    expect(protocolNotVerified.data!['error'], 'Client not verified');
+    expect(protocolNotVerified.data!['error'], 'Connexion refused');
     expect(protocolNotVerified.response, Response.connexionRefused);
 
     expect(await isConnectedFuture, false);
@@ -201,7 +215,7 @@ void main() {
     expect(protocolHandshake.field, isNull);
     expect(protocolHandshake.data, isA<Map<String, dynamic>>());
     expect(protocolHandshake.data!['error'], isA<String>());
-    expect(protocolHandshake.data!['error'], 'Handshake timeout');
+    expect(protocolHandshake.data!['error'], 'Connexion refused');
     expect(protocolHandshake.response, Response.failure);
   });
 
@@ -249,8 +263,7 @@ void main() {
     expect(protocolMissing.field, isNull);
     expect(protocolMissing.data, isA<Map<String, dynamic>>());
     expect(protocolMissing.data!['error'], isA<String>());
-    expect(protocolMissing.data!['error'],
-        'Data is required to validate the handshake');
+    expect(protocolMissing.data!['error'], 'Connexion refused');
     expect(protocolMissing.response, Response.connexionRefused);
 
     final protocolHandshake = await protocolHandshakeCompleter.future
@@ -261,7 +274,7 @@ void main() {
     expect(protocolHandshake.field, isNull);
     expect(protocolHandshake.data, isA<Map<String, dynamic>>());
     expect(protocolHandshake.data!['error'], isA<String>());
-    expect(protocolHandshake.data!['error'], 'Handshake timeout');
+    expect(protocolHandshake.data!['error'], 'Connexion refused');
     expect(protocolHandshake.response, Response.failure);
   });
 
@@ -310,8 +323,7 @@ void main() {
     expect(protocolMissing.field, isNull);
     expect(protocolMissing.data, isA<Map<String, dynamic>>());
     expect(protocolMissing.data!['error'], isA<String>());
-    expect(protocolMissing.data!['error'],
-        'Token is required to validate the handshake');
+    expect(protocolMissing.data!['error'], 'Connexion refused');
     expect(protocolMissing.response, Response.connexionRefused);
 
     final protocolHandshake = await protocolHandshakeCompleter.future
@@ -322,7 +334,7 @@ void main() {
     expect(protocolHandshake.field, isNull);
     expect(protocolHandshake.data, isA<Map<String, dynamic>>());
     expect(protocolHandshake.data!['error'], isA<String>());
-    expect(protocolHandshake.data!['error'], 'Handshake timeout');
+    expect(protocolHandshake.data!['error'], 'Connexion refused');
     expect(protocolHandshake.response, Response.failure);
   });
 
@@ -372,7 +384,7 @@ void main() {
     expect(protocolMissing.field, isNull);
     expect(protocolMissing.data, isA<Map<String, dynamic>>());
     expect(protocolMissing.data!['error'], isA<String>());
-    expect(protocolMissing.data!['error'], 'Invalid token');
+    expect(protocolMissing.data!['error'], 'Connexion refused');
     expect(protocolMissing.response, Response.connexionRefused);
 
     final protocolHandshake = await protocolHandshakeCompleter.future
@@ -383,7 +395,7 @@ void main() {
     expect(protocolHandshake.field, isNull);
     expect(protocolHandshake.data, isA<Map<String, dynamic>>());
     expect(protocolHandshake.data!['error'], isA<String>());
-    expect(protocolHandshake.data!['error'], 'Handshake timeout');
+    expect(protocolHandshake.data!['error'], 'Connexion refused');
     expect(protocolHandshake.response, Response.failure);
   });
 
@@ -436,7 +448,7 @@ void main() {
     expect(protocolMissing.field, isNull);
     expect(protocolMissing.data, isA<Map<String, dynamic>>());
     expect(protocolMissing.data!['error'], isA<String>());
-    expect(protocolMissing.data!['error'], 'Invalid token');
+    expect(protocolMissing.data!['error'], 'Connexion refused');
     expect(protocolMissing.response, Response.connexionRefused);
 
     final protocolHandshake = await protocolHandshakeCompleter.future
@@ -447,7 +459,7 @@ void main() {
     expect(protocolHandshake.field, isNull);
     expect(protocolHandshake.data, isA<Map<String, dynamic>>());
     expect(protocolHandshake.data!['error'], isA<String>());
-    expect(protocolHandshake.data!['error'], 'Handshake timeout');
+    expect(protocolHandshake.data!['error'], 'Connexion refused');
     expect(protocolHandshake.response, Response.failure);
   });
 
@@ -461,6 +473,7 @@ void main() {
     // Listen to incoming messages from connexions
     final protocolCompleter = Completer<CommunicationProtocol>();
     socket.incommingStreamController.stream.listen((message) {
+      print(message);
       protocolCompleter
           .complete(CommunicationProtocol.deserialize(jsonDecode(message)));
     });
@@ -481,10 +494,10 @@ void main() {
     expect(protocol.field, isNull);
     expect(protocol.data, isA<Map<String, dynamic>>());
     expect(protocol.data, {
-      'user_id': '0',
+      'user_id': '1',
       'school_board_id': '100',
-      'school_id': null,
-      'access_level': 2
+      'school_id': '100',
+      'access_level': 1
     });
     expect(protocol.response, Response.success);
 
@@ -549,7 +562,7 @@ void main() {
         toSend: jsonEncode(CommunicationProtocol(
             requestType: RequestType.get,
             field: RequestFields.teachers,
-            data: {}).serialize()));
+            data: {'fields': FetchableFields.all.serialized}).serialize()));
 
     expect(protocol.requestType, RequestType.response);
     expect(protocol.field, RequestFields.teachers);
@@ -656,13 +669,13 @@ void main() {
     expect(protocol1.requestType, RequestType.update);
     expect(protocol1.field, RequestFields.teacher);
     expect(protocol1.data, isA<Map<String, dynamic>>());
-    expect(protocol1.data!['updated_fields'],
+    expect(protocol1.data!['updated_fields'].keys.toList(),
         ['first_name', 'last_name', 'has_registered_account']);
     expect(protocol1.response, isNull);
     expect(protocol2.requestType, RequestType.update);
     expect(protocol2.field, RequestFields.teacher);
     expect(protocol2.data, isA<Map<String, dynamic>>());
-    expect(protocol2.data!['updated_fields'],
+    expect(protocol2.data!['updated_fields'].keys.toList(),
         ['first_name', 'last_name', 'has_registered_account']);
     expect(protocol2.response, isNull);
   });

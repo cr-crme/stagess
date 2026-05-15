@@ -9,6 +9,7 @@ import 'package:stagess_backend/server/database_manager.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:test/test.dart';
 
 import '../mockers/sql_connection_mock.dart';
@@ -24,6 +25,30 @@ InternshipsRepository get _mockedDatabaseInternships =>
     InternshipsRepositoryMock();
 
 void main() {
+  test('Get teachers fields field is required', () async {
+    final database = DatabaseManager(
+      sqlInterface: await MySqlInterface.connect(
+          connectToDatabase: () async => DummyMySqlConnection()),
+      schoolBoardsDatabase: _mockedDatabaseSchoolBoards,
+      adminsDatabase: _mockedAdminsDatabase,
+      teachersDatabase: _mockedDatabaseTeachers,
+      studentsDatabase: _mockedDatabaseStudents,
+      enterprisesDatabase: _mockedDatabaseEnterprises,
+      internshipsDatabase: _mockedDatabaseInternships,
+    );
+
+    expect(
+      () async => await database.get(
+        RequestFields.teacher,
+        data: {'id': '1'},
+        user: DatabaseUserMock(),
+      ),
+      throwsA(predicate((e) =>
+          e is MissingFieldException &&
+          e.toString() == 'Fields are required to get data')),
+    );
+  });
+
   test('Get teachers from DatabaseManagers', () async {
     final database = DatabaseManager(
       sqlInterface: await MySqlInterface.connect(
@@ -37,7 +62,7 @@ void main() {
     );
     final teachers = await database.get(
       RequestFields.teachers,
-      data: null,
+      data: {'fields': FetchableFields.all.serialized},
       user: DatabaseUserMock(),
     );
     expect(teachers.data, isA<Map<String, dynamic>>());
@@ -63,7 +88,7 @@ void main() {
     );
     final teacher = await database.get(
       RequestFields.teacher,
-      data: {'id': '0'},
+      data: {'id': '0', 'fields': FetchableFields.all.serialized},
       user: DatabaseUserMock(),
     );
     expect(teacher.data, isA<Map<String, dynamic>>());
@@ -85,7 +110,7 @@ void main() {
     expect(
       () async => await database.get(
         RequestFields.teacher,
-        data: {'id': '2'},
+        data: {'id': '2', 'fields': FetchableFields.all.serialized},
         user: DatabaseUserMock(),
       ),
       throwsA(predicate((e) =>
@@ -107,7 +132,7 @@ void main() {
     expect(
       () async => await database.get(
         RequestFields.teacher,
-        data: null,
+        data: {'fields': FetchableFields.all.serialized},
         user: DatabaseUserMock(),
       ),
       throwsA(predicate((e) =>
@@ -180,7 +205,7 @@ void main() {
     );
     final updatedTeacher = await database.get(
       RequestFields.teacher,
-      data: {'id': '0'},
+      data: {'id': '0', 'fields': FetchableFields.all.serialized},
       user: DatabaseUserMock(),
     );
     expect(updatedTeacher.data!['first_name'], 'John');
@@ -210,7 +235,7 @@ void main() {
     );
     final newTeacher = await database.get(
       RequestFields.teacher,
-      data: {'id': '3'},
+      data: {'id': '3', 'fields': FetchableFields.all.serialized},
       user: DatabaseUserMock(),
     );
     expect(newTeacher.data!['first_name'], 'Agent');

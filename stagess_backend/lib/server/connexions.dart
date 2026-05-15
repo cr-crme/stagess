@@ -513,7 +513,7 @@ class Connexions {
     }
 
     // Get the user information from the database to first verify its identity
-    final user = await _getValidatedUser(_database.sqlInterface,
+    final user = await getValidatedUser(_database.sqlInterface,
         id: authenticatorId, email: email);
     if (user == null) throw ConnexionRefusedException('Invalid token payload');
     _clients[client] = user;
@@ -592,58 +592,58 @@ class Connexions {
       return null;
     }
   }
-}
 
-Future<DatabaseUser?> _getValidatedUser(SqlInterface sqlInterface,
-    {required String id, required String email}) async {
-  // There are 3 possible cases:
-  // 1. The user has previously connected so they will be in the 'users' table.
-  //    We can retrieve their information from there and return it.
-  // 2. The user has never connected before, but was added to the teachers database.
-  //    We can retrieve their information from the 'teachers' table and provide
-  //    them with an AccessLevel of 'user', register them in the 'users' table
-  //    and return the user.
-  // 3. The user has never connected before, and is not in the teachers database.
-  //    This is probably someone who is not supposed to be using the app, so we
-  //    return null to indicate that the user is not valid.
+  Future<DatabaseUser?> getValidatedUser(SqlInterface sqlInterface,
+      {required String id, required String email}) async {
+    // There are 3 possible cases:
+    // 1. The user has previously connected so they will be in the 'users' table.
+    //    We can retrieve their information from there and return it.
+    // 2. The user has never connected before, but was added to the teachers database.
+    //    We can retrieve their information from the 'teachers' table and provide
+    //    them with an AccessLevel of 'user', register them in the 'users' table
+    //    and return the user.
+    // 3. The user has never connected before, and is not in the teachers database.
+    //    This is probably someone who is not supposed to be using the app, so we
+    //    return null to indicate that the user is not valid.
 
-  // Slowly build the user object as we go through the cases
-  var user = DatabaseUser.empty(authenticatorId: id);
+    // Slowly build the user object as we go through the cases
+    var user = DatabaseUser.empty(authenticatorId: id);
 
-  // At this point, we know the JWT is valid and secure. So we can safely use the email
-  // to fetch the user information.
-  // First, try to login via the 'users' table
-  var users = await _getAdminFromDatabase(
-      user: user, sqlInterface: sqlInterface, email: email);
+    // At this point, we know the JWT is valid and secure. So we can safely use the email
+    // to fetch the user information.
+    // First, try to login via the 'users' table
+    var users = await _getAdminFromDatabase(
+        user: user, sqlInterface: sqlInterface, email: email);
 
-  user = user.copyWith(
-    userId: users?['id'],
-    schoolBoardId: users?['school_board_id'],
-    schoolId: (users?['teachers'] as List?)?.firstOrNull?['school_id'],
-    accessLevel: AccessLevel.fromSerialized(users?['access_level']),
-  );
-  // This will be true if the user is an admin or a super admin
-  if (user.isVerified) return user;
+    user = user.copyWith(
+      userId: users?['id'],
+      schoolBoardId: users?['school_board_id'],
+      schoolId: (users?['teachers'] as List?)?.firstOrNull?['school_id'],
+      accessLevel: AccessLevel.fromSerialized(users?['access_level']),
+    );
+    // This will be true if the user is an admin or a super admin
+    if (user.isVerified) return user;
 
-  // If there is information missing in the user structure, then we are not admin (case 1)
-  // We therefore try to log using the information from the 'teachers' table
-  final teacher = await _getTeacherFromDatabase(
-      user: user, sqlInterface: sqlInterface, email: email);
-  // If there is no teacher with that email, the user is not valid (case 3)
-  if (teacher == null) return null;
-  (teacher as Map).addAll((teacher['teachers'] as List).firstOrNull);
+    // If there is information missing in the user structure, then we are not admin (case 1)
+    // We therefore try to log using the information from the 'teachers' table
+    final teacher = await _getTeacherFromDatabase(
+        user: user, sqlInterface: sqlInterface, email: email);
+    // If there is no teacher with that email, the user is not valid (case 3)
+    if (teacher == null) return null;
+    (teacher as Map).addAll((teacher['teachers'] as List).firstOrNull);
 
-  // Otherwise, we probably are logging in a teacher (case 2
-  user = user.copyWith(
-    userId: teacher['id'],
-    schoolBoardId: teacher['school_board_id'],
-    schoolId: teacher['school_id'],
-    accessLevel: AccessLevel.teacher,
-  );
+    // Otherwise, we probably are logging in a teacher (case 2
+    user = user.copyWith(
+      userId: teacher['id'],
+      schoolBoardId: teacher['school_board_id'],
+      schoolId: teacher['school_id'],
+      accessLevel: AccessLevel.teacher,
+    );
 
-  // Just make sure, even though at this point it should always be verified
-  if (user.isNotVerified) return null;
-  return user;
+    // Just make sure, even though at this point it should always be verified
+    if (user.isNotVerified) return null;
+    return user;
+  }
 }
 
 Future<Map<String, dynamic>?> _getTeacherFromDatabase(

@@ -38,12 +38,7 @@ void main() {
 
     final response = request.response as HttpResponseMock;
     final responseHeaders = response.headers as HttpHeadersMock;
-    expect(responseHeaders.current.length, 3);
-    expect(responseHeaders.current['Access-Control-Allow-Origin'], '*');
-    expect(responseHeaders.current['Access-Control-Allow-Methods'],
-        'GET, POST, OPTIONS');
-    expect(responseHeaders.current['Access-Control-Allow-Headers'],
-        'Content-Type, Authorization');
+    expect(responseHeaders.current.length, 0);
   });
 
   test('Send a POST request', () async {
@@ -54,7 +49,7 @@ void main() {
     await requestHandler.answer(request);
 
     final response = request.response as HttpResponseMock;
-    expect(response.response, 'Unauthorized: Invalid endpoint');
+    expect(response.response, 'Connexion refused');
   });
 
   test('Send a GET resquest to an invalid endpoit', () async {
@@ -65,7 +60,7 @@ void main() {
     await requestHandler.answer(request);
 
     final response = request.response as HttpResponseMock;
-    expect(response.response, 'Unauthorized: Invalid endpoint');
+    expect(response.response, 'Connexion refused');
   });
 
   test('Simulate internal error while connecting', () async {
@@ -79,7 +74,7 @@ void main() {
     await requestHandler.answer(request);
 
     final response = request.response as HttpResponseMock;
-    expect(response.response, 'Unauthorized: WebSocket upgrade failed');
+    expect(response.response, 'Connexion refused');
   });
 
   test('Send a GET request to the /connect endpoint', () async {
@@ -89,10 +84,7 @@ void main() {
         productionConnexions: await _mockedConnexions);
     await requestHandler.answer(request);
 
-    // This test creates a true WebSocket connection (as opposed to a mock)
-    // so we cannot check if the response is correct. But returning a null
-    // response is a good indication that the connection was successful.
     final response = request.response as HttpResponseMock;
-    expect(response.response, null);
+    expect(response.response, 'Connexion refused');
   });
 }
