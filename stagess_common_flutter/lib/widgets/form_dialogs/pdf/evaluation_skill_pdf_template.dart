@@ -18,6 +18,8 @@ import 'package:stagess_common_flutter/widgets/pdf_widgets/pdf_were_present.dart
 
 final _logger = Logger('GenerateSkillEvaluationPdf');
 
+// TODO: Interprete __NOT_APPLICABLE__ properly
+
 Future<Uint8List> generateSkillEvaluationPdf(
     BuildContext context, PdfPageFormat format,
     {required String internshipId, required String evaluationId}) async {

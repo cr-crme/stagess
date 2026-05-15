@@ -241,6 +241,7 @@ class Connexions {
     // Register the user in Firebase
     try {
       await app.auth().createUser(email: email, emailVerified: false);
+      // TODO Remove automatic sending of password
       await _sendPasswordResetEmail(email, _firebaseApiKey);
     } on FirebaseAuthError catch (e) {
       if (e.code == 'auth/email-already-exists') {
