@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/teachers/teacher_list_tile.dart';
-import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
-import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 class AddTeacherDialog extends StatefulWidget {
@@ -40,35 +38,6 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
             child: Text(
                 'Impossible d\'ajouter l\'enseignant·e. Assurez-vous que toutes les '
                 'informations sont correctes et que le courriel est valide et unique.'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (!mounted) return;
-    final admins = AdminsProvider.of(context, listen: false);
-    final isSuccess = await admins.addUserToDatabase(
-      email: newTeacher.email,
-      userType: AccessLevel.teacher,
-    );
-
-    if (!mounted) return;
-    if (!isSuccess) {
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Échec de l\'envoi du courriel de création de compte'),
-          content: SizedBox(
-            width: ResponsiveService.maxBodyWidth * 0.6,
-            child: Text('L\'enseignant·e a été ajouté·e à la base de données, '
-                'mais l\'envoi du courriel de création de compte a échoué. '
-                'Veuillez contacter le support pour résoudre ce problème.'),
           ),
           actions: [
             TextButton(

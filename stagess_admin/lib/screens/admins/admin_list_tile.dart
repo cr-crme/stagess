@@ -319,7 +319,7 @@ class AdminListTileState extends State<AdminListTile> {
                   Column(
                     children: [
                       const SizedBox(height: 8),
-                      _buildCreateUserButton(),
+                      _sendResetEmailButton(),
                     ],
                   ),
                 const SizedBox(height: 4),
@@ -405,7 +405,11 @@ class AdminListTileState extends State<AdminListTile> {
     );
   }
 
-  Widget _buildCreateUserButton() {
+  Widget _sendResetEmailButton() {
+    final emailType = widget.admin.hasNotRegisteredAccount
+        ? 'courriel d\'invitation'
+        : 'courriel de réinitialisation du mot de passe';
+
     return Center(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -423,12 +427,12 @@ class AdminListTileState extends State<AdminListTile> {
               showSnackBar(
                 context,
                 message: isSuccess
-                    ? 'Compte utilisateur créé avec succès.'
-                    : 'Échec de la création du compte utilisateur.',
+                    ? 'Un $emailType a été envoyé à ${_emailController.text}.'
+                    : 'Échec de l\'envoi du $emailType.',
               );
             },
             child: Text(
-              'Envoyer un courriel de réinitialisation de mot de passe',
+              'Envoyer un $emailType',
               textAlign: TextAlign.center,
             ),
           ),
