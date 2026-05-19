@@ -451,7 +451,7 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
       children: [
         const SizedBox(height: 8),
         ReorderableListView.builder(
-          onReorder: (oldIndex, newIndex) {
+          onReorderItem: (oldIndex, newIndex) {
             _routingController.move(oldIndex, newIndex);
             setState(() {});
           },
