@@ -14,6 +14,7 @@ import 'package:stagess_common/utils.dart';
 // AccessLevel in this repository is discarded as all operations are currently
 // available to all users
 
+// TODO Fix cannot connect with a schoolAdmin account
 abstract class AdminsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
@@ -124,8 +125,14 @@ abstract class AdminsRepository extends RepositoryAbstract {
       throw InvalidRequestException(
           'You do not have permission to put administrators');
     }
+    if (user.accessLevel <= (previous?.accessLevel ?? AccessLevel.invalid) &&
+        user.userId != newAdmin.id) {
+      // Users can only create/update administrators with a lower access level than themselves
+      throw InvalidRequestException(
+          'You cannot create or update an administrator with an access level equal to or higher than yours');
+    }
 
-    await _putAdmin(admin: newAdmin, previous: previous);
+    await _putAdmin(admin: newAdmin, previous: previous, user: user);
     return RepositoryResponse(updatedData: {
       RequestFields.admin: {
         newAdmin.id:
@@ -179,6 +186,10 @@ abstract class AdminsRepository extends RepositoryAbstract {
       throw InvalidRequestException(
           'You do not have permission to delete that administrator');
     }
+    if (user.accessLevel <= admin.accessLevel) {
+      throw InvalidRequestException(
+          'You cannot delete an administrator with an access level equal to or higher than yours');
+    }
 
     final removedId = await _deleteAdmin(id: id);
     if (removedId == null) {
@@ -199,7 +210,11 @@ abstract class AdminsRepository extends RepositoryAbstract {
     required DatabaseUser user,
   });
 
-  Future<void> _putAdmin({required Admin admin, required Admin? previous});
+  Future<void> _putAdmin({
+    required Admin admin,
+    required Admin? previous,
+    required DatabaseUser user,
+  });
 
   Future<String?> _deleteAdmin({required String id});
 }
@@ -276,7 +291,7 @@ class MySqlAdminsRepository extends AdminsRepository {
   }) async =>
       (await _getAllAdmins(adminId: id, user: user))[id];
 
-  Future<void> _insertToAdmins(Admin admin) async {
+  Future<void> _insertToAdmins(Admin admin, DatabaseUser user) async {
     final entity = (await sqlInterface.performSelectQuery(
             tableName: 'entities',
             filters: {'shared_id': admin.id},
@@ -294,6 +309,11 @@ class MySqlAdminsRepository extends AdminsRepository {
       throw InvalidRequestException(
           'Only school board administrators can be created without a school');
     }
+    if (admin.accessLevel >= user.accessLevel) {
+      // School board admins can only create administrators of their school board
+      throw InvalidRequestException(
+          'You cannot create an administrator with an access level equal to or higher than yours');
+    }
 
     await sqlInterface.performInsertPerson(
         person: admin, skipAddingEntity: entity != null);
@@ -307,7 +327,8 @@ class MySqlAdminsRepository extends AdminsRepository {
     });
   }
 
-  Future<void> _updateToAdmins(Admin admin, Admin previous) async {
+  Future<void> _updateToAdmins(
+      Admin admin, Admin previous, DatabaseUser user) async {
     final differences = admin.getDifference(previous);
     if (differences.contains('authentication_id')) {
       throw InvalidRequestException(
@@ -323,6 +344,11 @@ class MySqlAdminsRepository extends AdminsRepository {
         admin.schoolId.isEmpty) {
       throw InvalidRequestException(
           'Only school board administrators can be created without a school');
+    }
+    if (admin.accessLevel >= user.accessLevel) {
+      // School board admins can only update administrators of their school board
+      throw InvalidRequestException(
+          'You cannot update an administrator to have an access level equal to or higher than yours');
     }
 
     final toUpdate = <String, dynamic>{};
@@ -349,15 +375,18 @@ class MySqlAdminsRepository extends AdminsRepository {
   }
 
   @override
-  Future<void> _putAdmin(
-      {required Admin admin, required Admin? previous}) async {
+  Future<void> _putAdmin({
+    required Admin admin,
+    required Admin? previous,
+    required DatabaseUser user,
+  }) async {
     try {
       await sqlInterface.beginTransaction();
 
       if (previous == null) {
-        await _insertToAdmins(admin);
+        await _insertToAdmins(admin, user);
       } else {
-        await _updateToAdmins(admin, previous);
+        await _updateToAdmins(admin, previous, user);
       }
 
       await sqlInterface.commitTransaction();
@@ -431,7 +460,9 @@ class AdminsRepositoryMock extends AdminsRepository {
 
   @override
   Future<void> _putAdmin(
-          {required Admin admin, required Admin? previous}) async =>
+          {required Admin admin,
+          required Admin? previous,
+          required DatabaseUser user}) async =>
       _dummyDatabase[admin.id] = admin;
 
   @override

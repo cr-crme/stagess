@@ -10,7 +10,6 @@ import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
-import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
@@ -72,6 +71,7 @@ class AdminListTileState extends State<AdminListTile> {
       TextEditingController(text: widget.admin.phone.toString());
   late final _emailController = TextEditingController(text: widget.admin.email);
 
+  // TODO Remove edit/remove icons when not permitted
   Admin get editedAdmin => widget.admin.copyWith(
         schoolBoardId: widget.admin.schoolBoardId,
         schoolId: _selectedSchoolId,
@@ -231,8 +231,6 @@ class AdminListTileState extends State<AdminListTile> {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = AuthProvider.of(context, listen: true);
-
     return widget.forceEditingMode
         ? _buildEditingForm()
         : AnimatedExpandingCard(
@@ -256,38 +254,42 @@ class AdminListTileState extends State<AdminListTile> {
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
-                if (_isExpanded &&
-                    authProvider.databaseAccessLevel >= AccessLevel.superAdmin)
+                if (_isExpanded)
                   FutureBuilder(
                     future: _fetchFullDataCompleter.future,
-                    builder: (context, snapshot) => snapshot.connectionState ==
-                            ConnectionState.done
-                        ? Row(
-                            children: [
-                              IconButton(
-                                icon: Icon(
-                                  Icons.delete,
-                                  color:
-                                      _forceDisabled ? Colors.grey : Colors.red,
-                                ),
-                                onPressed:
-                                    _forceDisabled ? null : _onClickedDeleting,
-                              ),
-                              IconButton(
-                                icon: Icon(
-                                  _isEditing ? Icons.save : Icons.edit,
-                                  color: _forceDisabled
-                                      ? Colors.grey
-                                      : Theme.of(
-                                          context,
-                                        ).primaryColor,
-                                ),
-                                onPressed:
-                                    _forceDisabled ? null : _onClickedEditing,
-                              ),
-                            ],
-                          )
-                        : SizedBox.shrink(),
+                    builder: (context, snapshot) =>
+                        snapshot.connectionState == ConnectionState.done
+                            ? Row(
+                                children: [
+                                  if (widget.canDelete)
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.delete,
+                                        color: _forceDisabled
+                                            ? Colors.grey
+                                            : Colors.red,
+                                      ),
+                                      onPressed: _forceDisabled
+                                          ? null
+                                          : _onClickedDeleting,
+                                    ),
+                                  if (widget.canEdit)
+                                    IconButton(
+                                      icon: Icon(
+                                        _isEditing ? Icons.save : Icons.edit,
+                                        color: _forceDisabled
+                                            ? Colors.grey
+                                            : Theme.of(
+                                                context,
+                                              ).primaryColor,
+                                      ),
+                                      onPressed: _forceDisabled
+                                          ? null
+                                          : _onClickedEditing,
+                                    ),
+                                ],
+                              )
+                            : SizedBox.shrink(),
                   ),
               ],
             ),
