@@ -121,6 +121,7 @@ CREATE TABLE phone_numbers (
 CREATE TABLE admins (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     school_board_id VARCHAR(36) NOT NULL,
+    school_id VARCHAR(36) NOT NULL,
     has_registered_account BOOLEAN NOT NULL DEFAULT FALSE,
     access_level INT NOT NULL,
     FOREIGN KEY (id) REFERENCES entities(shared_id) ON DELETE CASCADE

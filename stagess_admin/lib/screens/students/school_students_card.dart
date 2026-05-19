@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/students/student_list_tile.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/persons/student.dart';
-import 'package:stagess_common/models/school_boards/school_board.dart';
-import 'package:stagess_common/utils.dart' as utils;
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
+import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 class SchoolStudentsCard extends StatelessWidget {
@@ -12,13 +11,11 @@ class SchoolStudentsCard extends StatelessWidget {
     super.key,
     required this.schoolId,
     required this.studentsByGroups,
-    required this.schoolBoard,
     required this.filteredStudentIds,
   });
 
   final String schoolId;
   final Map<String, List<Student>> studentsByGroups;
-  final SchoolBoard schoolBoard;
   final List<String>? filteredStudentIds;
 
   @override
@@ -30,16 +27,16 @@ class SchoolStudentsCard extends StatelessWidget {
       return groupA.compareTo(groupB);
     });
 
+    final school =
+        SchoolBoardsProvider.of(context, listen: true).schoolFromId(schoolId);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 12.0, top: 8, bottom: 8),
           child: Text(
-            utils.IterableExtensions(
-                  schoolBoard.schools,
-                ).firstWhereOrNull((school) => school.id == schoolId)?.name ??
-                'École introuvable',
+            school?.name ?? 'École introuvable',
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
@@ -61,7 +58,6 @@ class SchoolStudentsCard extends StatelessWidget {
                     child: _GroupStudentsCard(
                       group: group,
                       students: studentsByGroups[group] ?? [],
-                      schoolBoard: schoolBoard,
                       filteredStudentIds: filteredStudentIds,
                     ),
                   ),
@@ -78,18 +74,16 @@ class _GroupStudentsCard extends StatelessWidget {
   const _GroupStudentsCard({
     required this.group,
     required this.students,
-    required this.schoolBoard,
     required this.filteredStudentIds,
   });
 
   final String group;
   final List<Student> students;
-  final SchoolBoard schoolBoard;
   final List<String>? filteredStudentIds;
 
   @override
   Widget build(BuildContext context) {
-    final authProvided = AuthProvider.of(context, listen: true);
+    final authProvider = AuthProvider.of(context, listen: true);
     final teacherProvided = TeachersProvider.of(context, listen: false);
     final teachers = teacherProvided
         .where((teacher) => teacher.groups.contains(group))
@@ -119,15 +113,23 @@ class _GroupStudentsCard extends StatelessWidget {
             if (filteredStudentIds == null) return true;
             return filteredStudentIds!.contains(student.id);
           }).map(
-            (student) => StudentListTile(
-              key: ValueKey(student.id),
-              student: student,
-              schoolBoard: schoolBoard,
-              canEdit:
-                  authProvided.databaseAccessLevel >= AccessLevel.schoolAdmin,
-              canDelete:
-                  authProvided.databaseAccessLevel >= AccessLevel.schoolAdmin,
-            ),
+            (student) {
+              final canDelete = authProvider.databaseAccessLevel >
+                      AccessLevel.schoolBoardAdmin ||
+                  (authProvider.databaseAccessLevel > AccessLevel.schoolAdmin &&
+                      authProvider.schoolBoardId == student.schoolBoardId) ||
+                  (authProvider.databaseAccessLevel > AccessLevel.teacher &&
+                      authProvider.schoolBoardId == student.schoolBoardId &&
+                      authProvider.schoolId == student.schoolId);
+              final canEdit = canDelete;
+
+              return StudentListTile(
+                key: ValueKey(student.id),
+                student: student,
+                canEdit: canEdit,
+                canDelete: canDelete,
+              );
+            },
           ),
       ],
     );

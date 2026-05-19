@@ -123,7 +123,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
     final answer = await showDialog(
       barrierDismissible: false,
       context: context,
-      builder: (context) => AddStudentDialog(schoolBoard: schoolBoard),
+      builder: (context) => AddStudentDialog(schoolBoardId: schoolBoard.id),
     );
     if (answer is! Student || !context.mounted) return;
 
@@ -213,7 +213,6 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                           SchoolStudentsCard(
                             schoolId: schoolEntry.key.id,
                             studentsByGroups: schoolEntry.value,
-                            schoolBoard: schoolBoardEntry.key,
                             filteredStudentIds: filteredStudentIds,
                           ),
                         ],
@@ -242,8 +241,6 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                       SchoolStudentsCard(
                         schoolId: schoolEntry.key.id,
                         studentsByGroups: schoolEntry.value,
-                        schoolBoard: schoolBoardStudents.keys.firstOrNull ??
-                            SchoolBoard.empty,
                         filteredStudentIds: filteredStudentIds,
                       ),
                     ],

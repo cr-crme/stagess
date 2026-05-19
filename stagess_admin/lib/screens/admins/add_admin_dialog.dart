@@ -5,7 +5,9 @@ import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
 
 class AddAdminDialog extends StatefulWidget {
-  const AddAdminDialog({super.key});
+  const AddAdminDialog({super.key, required this.schoolBoardId});
+
+  final String schoolBoardId;
 
   @override
   State<AddAdminDialog> createState() => _AddAdminDialogState();
@@ -76,8 +78,11 @@ class _AddAdminDialogState extends State<AddAdminDialog> {
               const SizedBox(height: 8),
               AdminListTile(
                 key: _editingKey,
-                admin: Admin.empty,
+                admin:
+                    Admin.empty.copyWith(schoolBoardId: widget.schoolBoardId),
                 forceEditingMode: true,
+                canEdit: false,
+                canDelete: false,
               ),
             ],
           ),

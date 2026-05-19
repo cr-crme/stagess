@@ -185,7 +185,7 @@ Future<void> _addDummySchoolBoards(SchoolBoardsProvider schoolBoards) async {
   ];
   schoolBoards.add(
     SchoolBoard(
-      name: 'Mon centre de services scolaire',
+      name: 'Mon centre de service scolaire',
       logo: null,
       schools: schools.toList(),
       cnesstNumber: '1234567890',
@@ -202,7 +202,7 @@ Future<void> _addDummyAdmins(
   dev.log('Adding dummy admins');
 
   final schoolBoard = schoolBoards.firstWhere(
-    (schoolBoard) => schoolBoard.name == 'Mon centre de services scolaire',
+    (schoolBoard) => schoolBoard.name == 'Mon centre de service scolaire',
   );
 
   final schoolBoardId = schoolBoard.id;
@@ -218,7 +218,7 @@ Future<void> _addDummyAdmins(
       hasRegisteredAccount: false,
       email: 'admin@moncentre.qc',
       accessLevel: AccessLevel.schoolBoardAdmin,
-      phone: PhoneNumber.empty,
+      phone: PhoneNumber.fromString('555 987 6543'),
       address: Address.empty,
     ),
   );
@@ -230,9 +230,9 @@ Future<void> _addDummyAdmins(
       schoolBoardId: schoolBoardId,
       schoolId: schoolId,
       hasRegisteredAccount: false,
-      email: 'school_admin@moncentre.qc',
+      email: 'admin_ecole@moncentre.qc',
       accessLevel: AccessLevel.schoolAdmin,
-      phone: PhoneNumber.empty,
+      phone: PhoneNumber.fromString('555 987 1234'),
       address: Address.empty,
     ),
   );
@@ -247,7 +247,7 @@ Future<void> _addDummyTeachers(
   dev.log('Adding dummy teachers');
 
   final schoolBoard = schoolBoards.firstWhere(
-    (schoolBoard) => schoolBoard.name == 'Mon centre de services scolaire',
+    (schoolBoard) => schoolBoard.name == 'Mon centre de service scolaire',
   );
   final schoolBoardId = schoolBoard.id;
   final schoolAId =
@@ -433,7 +433,7 @@ Future<void> _addDummyStudents(
   dev.log('Adding dummy students');
 
   final schoolBoard = schoolBoards.firstWhere(
-    (schoolBoard) => schoolBoard.name == 'Mon centre de services scolaire',
+    (schoolBoard) => schoolBoard.name == 'Mon centre de service scolaire',
   );
   final schoolBoardId = schoolBoard.id;
   final schoolAId =
@@ -1381,7 +1381,7 @@ Future<void> _addDummyEnterprises(
   dev.log('Adding dummy enterprises');
 
   final schoolBoard = schoolBoards.firstWhere(
-    (schoolBoard) => schoolBoard.name == 'Mon centre de services scolaire',
+    (schoolBoard) => schoolBoard.name == 'Mon centre de service scolaire',
   );
   final schoolBoardId = schoolBoard.id;
   final schoolAId =
@@ -2101,7 +2101,7 @@ Future<void> _addDummyInternships(
   dev.log('Adding dummy internships');
 
   final schoolBoard = schoolBoards.firstWhere(
-    (schoolBoard) => schoolBoard.name == 'Mon centre de services scolaire',
+    (schoolBoard) => schoolBoard.name == 'Mon centre de service scolaire',
   );
   final schoolBoardId = schoolBoard.id;
 

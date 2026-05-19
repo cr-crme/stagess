@@ -88,7 +88,7 @@ class _TeachersListScreenState extends State<TeachersListScreen> {
     final isConfirmed = await showDialog<bool>(
           barrierDismissible: false,
           context: context,
-          builder: (context) => AddTeacherDialog(schoolBoard: schoolBoard),
+          builder: (context) => AddTeacherDialog(schoolBoardId: schoolBoard.id),
         ) ??
         false;
     if (!context.mounted) return;
@@ -114,7 +114,7 @@ class _TeachersListScreenState extends State<TeachersListScreen> {
             onPressed: () => setState(() => _showSearchBar = !_showSearchBar),
             icon: const Icon(Icons.search),
           ),
-          if (authProvider.databaseAccessLevel >= AccessLevel.admin)
+          if (authProvider.databaseAccessLevel >= AccessLevel.schoolAdmin)
             IconButton(
               onPressed: () => _showAddTeacherDialog(context),
               icon: Icon(Icons.add),
@@ -177,7 +177,6 @@ class _TeachersListScreenState extends State<TeachersListScreen> {
                           (schoolEntry) => SchoolTeachersCard(
                             schoolId: schoolEntry.key.id,
                             teachers: schoolEntry.value,
-                            schoolBoard: schoolBoardEntry.key,
                             filteredTeacherIds: filteredTeacherIds,
                           ),
                         ),
@@ -187,7 +186,8 @@ class _TeachersListScreenState extends State<TeachersListScreen> {
             ),
           )
           .toList(),
-      AccessLevel.admin ||
+      AccessLevel.schoolBoardAdmin ||
+      AccessLevel.schoolAdmin ||
       AccessLevel.teacher ||
       AccessLevel.invalid =>
         schoolBoardTeachers.values.firstOrNull?.entries
@@ -198,8 +198,6 @@ class _TeachersListScreenState extends State<TeachersListScreen> {
                   (schoolEntry) => SchoolTeachersCard(
                     schoolId: schoolEntry.key.id,
                     teachers: schoolEntry.value,
-                    schoolBoard: schoolBoardTeachers.keys.firstOrNull ??
-                        SchoolBoard.empty,
                     filteredTeacherIds: filteredTeacherIds,
                   ),
                 )

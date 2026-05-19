@@ -22,10 +22,14 @@ class AdminListTile extends StatefulWidget {
     super.key,
     required this.admin,
     this.forceEditingMode = false,
+    required this.canEdit,
+    required this.canDelete,
   });
 
   final Admin admin;
   final bool forceEditingMode;
+  final bool canEdit;
+  final bool canDelete;
 
   @override
   State<AdminListTile> createState() => AdminListTileState();
@@ -37,7 +41,9 @@ class AdminListTileState extends State<AdminListTile> {
   Future<bool> validate() async {
     // We do both like so, so all the fields get validated even if one is not valid
     bool isValid = _formKey.currentState?.validate() ?? false;
-    isValid = (_radioKey.currentState?.validate() ?? false) && isValid;
+    isValid = (_radioKey.currentState?.validate() ??
+            (widget.admin.schoolBoardId.isEmpty ? true : false)) &&
+        isValid;
     return isValid;
   }
 
@@ -55,7 +61,7 @@ class AdminListTileState extends State<AdminListTile> {
   bool _isExpanded = false;
   bool _isEditing = false;
 
-  late String _selectedSchoolId = widget.admin.schoolBoardId;
+  late String _selectedSchoolId = widget.admin.schoolId;
   late final _firstNameController = TextEditingController(
     text: widget.admin.firstName,
   );
@@ -67,12 +73,18 @@ class AdminListTileState extends State<AdminListTile> {
   late final _emailController = TextEditingController(text: widget.admin.email);
 
   Admin get editedAdmin => widget.admin.copyWith(
-        schoolBoardId: _selectedSchoolId,
+        schoolBoardId: widget.admin.schoolBoardId,
+        schoolId: _selectedSchoolId,
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
         phone: PhoneNumber.fromString(_phoneController.text,
             id: widget.admin.phone.id),
         email: _emailController.text,
+        accessLevel: widget.admin.schoolBoardId.isEmpty
+            ? AccessLevel.superAdmin
+            : _selectedSchoolId.isEmpty
+                ? AccessLevel.schoolBoardAdmin
+                : AccessLevel.schoolAdmin,
       );
 
   @override
@@ -97,7 +109,7 @@ class AdminListTileState extends State<AdminListTile> {
         showSnackBar(
           context,
           message:
-              'Impossible de supprimer cet administrateur, car il est en cours de modification par un autre utilisateur.',
+              'Impossible de supprimer cet administrateur·trice, car il est en cours de modification par un autre utilisateur·trice.',
         );
       }
       setState(() {
@@ -124,9 +136,9 @@ class AdminListTileState extends State<AdminListTile> {
       showSnackBar(
         context,
         message: isSuccess
-            ? 'L\'administrateur a été supprimé avec succès. Attention uniquement les données ont été supprimées. '
-                'Pour supprimer complètement l\'administrateur, il faut aussi supprimer son compte utilisateur associé via la console de Firebase.'
-            : 'Une erreur est survenue lors de la suppression de l\'administrateur.',
+            ? 'L\'administrateur·trice a été supprimé·e avec succès. Attention uniquement les données ont été supprimées. '
+                'Pour supprimer complètement l\'administrateur·trice, il faut aussi supprimer son compte utilisateur associé via la console de Firebase.'
+            : 'Une erreur est survenue lors de la suppression de l\'administrateur·trice.',
       );
     }
     await admins.releaseLockForItem(widget.admin);
@@ -159,8 +171,8 @@ class AdminListTileState extends State<AdminListTile> {
           showSnackBar(
             context,
             message: isSuccess
-                ? 'L\'administrateur a été modifié avec succès.'
-                : 'Une erreur est survenue lors de la modification de l\'administrateur.',
+                ? 'L\'administrateur·trice a été modifié·e avec succès.'
+                : 'Une erreur est survenue lors de la modification de l\'administrateur·trice.',
           );
         }
       }
@@ -172,7 +184,7 @@ class AdminListTileState extends State<AdminListTile> {
           showSnackBar(
             context,
             message:
-                'Impossible de modifier cet administrateur, car il est en cours de modification par un autre utilisateur.',
+                'Impossible de modifier cet administrateur·trice, car il est en cours de modification par un autre utilisateur·trice.',
           );
         }
         setState(() {
@@ -332,29 +344,28 @@ class AdminListTileState extends State<AdminListTile> {
   }
 
   Widget _buildSchoolBoardSelection() {
-    final schoolBoards = SchoolBoardsProvider.of(context, listen: true);
+    // TODO Listen true?
+    final schoolBoard = SchoolBoardsProvider.of(context, listen: false)
+        .firstWhereOrNull((e) => e.id == widget.admin.schoolBoardId);
+
+    if (schoolBoard == null) return SizedBox.shrink();
 
     return _isEditing
         ? FormBuilderRadioGroup(
             key: _radioKey,
-            initialValue: widget.admin.schoolBoardId,
-            name: 'School board selection',
+            initialValue: widget.admin.schoolId,
+            name: 'School selection',
             orientation: OptionsOrientation.vertical,
             decoration: InputDecoration(
-              labelText: 'Assigner à un centre de services scolaire',
+              labelText: 'Assigner à une école',
             ),
             onChanged: (value) =>
-                setState(() => _selectedSchoolId = value ?? '-1'),
-            validator: (_) {
-              return _selectedSchoolId == '-1'
-                  ? 'Sélectionner un centre de services scolaire'
-                  : null;
-            },
-            options: schoolBoards
+                setState(() => _selectedSchoolId = value ?? ''),
+            options: [null, ...schoolBoard.schools]
                 .map(
                   (e) => FormBuilderFieldOption(
-                    value: e.id,
-                    child: Text(e.name),
+                    value: e?.id ?? '',
+                    child: Text(e?.name ?? 'Centre de service scolaire'),
                   ),
                 )
                 .toList(),
@@ -420,7 +431,9 @@ class AdminListTileState extends State<AdminListTile> {
               final admins = AdminsProvider.of(context, listen: false);
               final isSuccess = await admins.addUserToDatabase(
                 email: _emailController.text,
-                userType: AccessLevel.admin,
+                userType: widget.admin.schoolBoardId.isEmpty
+                    ? AccessLevel.schoolBoardAdmin
+                    : AccessLevel.schoolAdmin,
               );
               if (!mounted) return;
 

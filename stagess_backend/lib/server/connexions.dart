@@ -715,13 +715,10 @@ Future<Map<String, dynamic>?> _getAdminFromDatabase(
           idNameToDataTable: 'id',
           fieldsToFetch: [
             'school_board_id',
+            'school_id',
             'has_registered_account',
             'access_level'
           ]),
-      sqlInterface.selectSubquery(
-          dataTableName: 'teachers',
-          idNameToDataTable: 'id',
-          fieldsToFetch: ['school_id'])
     ],
   ) as List)
       .firstOrNull as Map<String, dynamic>?;

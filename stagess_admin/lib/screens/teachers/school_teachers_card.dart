@@ -2,27 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/teachers/teacher_list_tile.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
-import 'package:stagess_common/models/school_boards/school_board.dart';
-import 'package:stagess_common/utils.dart' as utils;
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
+import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 
 class SchoolTeachersCard extends StatelessWidget {
   const SchoolTeachersCard({
     super.key,
     required this.schoolId,
     required this.teachers,
-    required this.schoolBoard,
     required this.filteredTeacherIds,
   });
 
   final String schoolId;
   final List<Teacher> teachers;
-  final SchoolBoard schoolBoard;
   final List<String>? filteredTeacherIds;
 
   @override
   Widget build(BuildContext context) {
     final authProvider = AuthProvider.of(context, listen: true);
+    final school =
+        SchoolBoardsProvider.of(context, listen: true).schoolFromId(schoolId);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,10 +29,7 @@ class SchoolTeachersCard extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 12.0, top: 8, bottom: 8),
           child: Text(
-            schoolBoard.schools
-                    .firstWhereOrNull((school) => school.id == schoolId)
-                    ?.name ??
-                'École introuvable',
+            school?.name ?? 'École introuvable',
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),
@@ -44,18 +40,19 @@ class SchoolTeachersCard extends StatelessWidget {
               .where((teacher) =>
                   filteredTeacherIds == null ||
                   filteredTeacherIds!.contains(teacher.id))
-              .map((Teacher teacher) {
-            final canEdit =
-                authProvider.databaseAccessLevel >= AccessLevel.admin ||
-                    (authProvider.databaseAccessLevel == AccessLevel.teacher &&
-                        authProvider.teacherId == teacher.id);
-            final canDelete =
-                authProvider.databaseAccessLevel >= AccessLevel.admin;
+              .map((teacher) {
+            final canDelete = authProvider.databaseAccessLevel >
+                    AccessLevel.schoolBoardAdmin ||
+                (authProvider.databaseAccessLevel > AccessLevel.schoolAdmin &&
+                    authProvider.schoolBoardId == teacher.schoolBoardId) ||
+                (authProvider.databaseAccessLevel > AccessLevel.teacher &&
+                    authProvider.schoolBoardId == teacher.schoolBoardId &&
+                    authProvider.schoolId == teacher.schoolId);
+            final canEdit = canDelete || (authProvider.teacherId == teacher.id);
 
             return TeacherListTile(
               key: ValueKey(teacher.id),
               teacher: teacher,
-              schoolBoard: schoolBoard,
               canEdit: canEdit,
               canDelete: canDelete,
             );

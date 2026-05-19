@@ -8,10 +8,10 @@ import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
-import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
+import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
@@ -22,14 +22,12 @@ class TeacherListTile extends StatefulWidget {
   const TeacherListTile({
     super.key,
     required this.teacher,
-    required this.schoolBoard,
     this.forceEditingMode = false,
     required this.canEdit,
     required this.canDelete,
   });
 
   final Teacher teacher;
-  final SchoolBoard schoolBoard;
   final bool forceEditingMode;
   final bool canEdit;
   final bool canDelete;
@@ -93,8 +91,8 @@ class TeacherListTileState extends State<TeacherListTile> {
   );
 
   Teacher get editedTeacher => widget.teacher.copyWith(
+        schoolBoardId: widget.teacher.schoolBoardId,
         schoolId: _selectedSchoolId,
-        schoolBoardId: widget.schoolBoard.id,
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
         address: widget.teacher.address,
@@ -130,7 +128,7 @@ class TeacherListTileState extends State<TeacherListTile> {
         showSnackBar(
           context,
           message:
-              'Impossible de supprimer cet enseignant, car il est en cours de modification par un autre utilisateur',
+              'Impossible de supprimer cet enseignant·e, car il est en cours de modification par un autre utilisateur·trice.',
         );
       }
       setState(() {
@@ -157,8 +155,9 @@ class TeacherListTileState extends State<TeacherListTile> {
       showSnackBar(
         context,
         message: isSuccess
-            ? 'Enseignant supprimé avec succès'
-            : 'Échec de la suppression de l\'enseignant',
+            ? 'L\'enseignant·e a été supprimé·e avec succès. Attention uniquement les données ont été supprimées. '
+                'Pour supprimer complètement l\'enseignant·e, il faut aussi supprimer son compte utilisateur associé via la console de Firebase.'
+            : 'Une erreur est survenue lors de la suppression de l\'enseignant·e.',
       );
     }
     await teachers.releaseLockForItem(widget.teacher);
@@ -193,8 +192,8 @@ class TeacherListTileState extends State<TeacherListTile> {
           showSnackBar(
             context,
             message: isSuccess
-                ? 'Enseignant modifié avec succès'
-                : 'Échec de la modification de l\'enseignant',
+                ? 'L\'enseignant·e a été modifié·e avec succès.'
+                : 'Une erreur est survenue lors de la modification de l\'enseignant·e.',
           );
         }
       }
@@ -206,7 +205,7 @@ class TeacherListTileState extends State<TeacherListTile> {
           showSnackBar(
             context,
             message:
-                'Impossible de modifier cet enseignant, car il est en cours de modification par un autre utilisateur.',
+                'Impossible de modifier cet enseignant·e, car il est en cours de modification par un autre utilisateur·trice.',
           );
         }
         setState(() {
@@ -379,6 +378,17 @@ class TeacherListTileState extends State<TeacherListTile> {
   }
 
   Widget _buildSchoolSelection() {
+    // TODO Listen true?
+    final schoolBoard = SchoolBoardsProvider.of(context, listen: false)
+        .firstWhereOrNull((e) => e.id == widget.teacher.schoolBoardId);
+
+    if (schoolBoard == null) {
+      return Text(
+        'Centre de service scolaire introuvable',
+        style: TextStyle(color: Colors.red),
+      );
+    }
+
     return _isEditing
         ? FormBuilderRadioGroup(
             key: _radioKey,
@@ -393,7 +403,7 @@ class TeacherListTileState extends State<TeacherListTile> {
                   ? 'Sélectionner une école'
                   : null;
             },
-            options: widget.schoolBoard.schools
+            options: schoolBoard.schools
                 .map(
                   (e) => FormBuilderFieldOption(
                     value: e.id,

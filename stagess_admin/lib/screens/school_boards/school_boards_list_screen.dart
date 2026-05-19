@@ -67,8 +67,8 @@ class _SchoolBoardsListScreenState extends State<SchoolBoardsListScreen> {
     showSnackBar(
       context,
       message: isSuccess
-          ? 'Centre de services scolaire ajoutée avec succès'
-          : 'Échec de l\'ajout de la centre de services scolaire',
+          ? 'Centre de service scolaire ajoutée avec succès'
+          : 'Échec de l\'ajout du centre de service scolaire',
     );
   }
 
@@ -83,7 +83,7 @@ class _SchoolBoardsListScreenState extends State<SchoolBoardsListScreen> {
       appBar: AppBar(
         title: Text(
           authProvider.databaseAccessLevel == AccessLevel.superAdmin
-              ? 'Liste des centres de services scolaires'
+              ? 'Liste des centres de service scolaire'
               : 'Liste des écoles',
         ),
         actions: [
@@ -121,7 +121,7 @@ class _SchoolBoardsListScreenState extends State<SchoolBoardsListScreen> {
   ) {
     if (schoolBoards.isEmpty) {
       return [
-        const Center(child: Text('Aucun centre de services scolaire inscrit')),
+        const Center(child: Text('Aucun centre de service scolaire inscrit')),
       ];
     }
 

@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/students/student_list_tile.dart';
 import 'package:stagess_common/models/persons/student.dart';
-import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 
 class AddStudentDialog extends StatefulWidget {
-  const AddStudentDialog({super.key, required this.schoolBoard});
+  const AddStudentDialog({super.key, required this.schoolBoardId});
 
-  final SchoolBoard schoolBoard;
+  final String schoolBoardId;
 
   @override
   State<AddStudentDialog> createState() => _AddStudentDialogState();
@@ -45,14 +44,13 @@ class _AddStudentDialogState extends State<AddStudentDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-
               const SizedBox(height: 12),
               Text('Compléter les informations personnelles'),
               const SizedBox(height: 8),
               StudentListTile(
                 key: _editingKey,
-                student: Student.empty,
-                schoolBoard: widget.schoolBoard,
+                student:
+                    Student.empty.copyWith(schoolBoardId: widget.schoolBoardId),
                 forceEditingMode: true,
                 canEdit: false,
                 canDelete: false,

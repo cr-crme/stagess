@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/admins/add_admin_dialog.dart';
-import 'package:stagess_admin/screens/admins/admin_list_tile.dart';
+import 'package:stagess_admin/screens/admins/school_admins_card.dart';
 import 'package:stagess_admin/screens/drawer/main_drawer.dart';
+import 'package:stagess_admin/widgets/select_school_board_dialog.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/persons/admin.dart';
+import 'package:stagess_common/models/school_boards/school.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
@@ -27,20 +29,25 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
   late final _searchController = TextEditingController()
     ..addListener(() => setState(() {}));
 
-  List<String>? _filterAdminIds(Map<SchoolBoard?, List<Admin>> schoolBoards) {
+  List<String>? _filterAdminIds(
+      Map<SchoolBoard?, Map<School?, List<Admin>>> schoolBoards) {
     final textToSearch = _searchController.text.toLowerCase().trim();
     if (!_showSearchBar || textToSearch.isEmpty) return null;
 
     final matchingAdminIds = <String>{};
-    for (final admins in schoolBoards.values) {
-      matchingAdminIds.addAll(admins
-          .where((admin) => admin.fullName.toLowerCase().contains(textToSearch))
-          .map((a) => a.id));
+    for (final adminsBySchool in schoolBoards.values) {
+      for (final admins in adminsBySchool.values) {
+        matchingAdminIds.addAll(admins
+            .where(
+                (admin) => admin.fullName.toLowerCase().contains(textToSearch))
+            .map((a) => a.id));
+      }
     }
     return matchingAdminIds.toList();
   }
 
-  Map<SchoolBoard?, List<Admin>> _getAdmins(BuildContext context) {
+  Map<SchoolBoard?, Map<School?, List<Admin>>> _getAdmins(
+      BuildContext context) {
     final allAdmins = [...AdminsProvider.of(context, listen: true)];
     allAdmins.sort((a, b) {
       final lastNameA = a.lastName.toLowerCase();
@@ -55,16 +62,22 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
 
     final schoolBoards = SchoolBoardsProvider.of(context);
 
-    final admins = <SchoolBoard?, List<Admin>>{};
+    final admins = <SchoolBoard?, Map<School?, List<Admin>>>{};
     for (final schoolBoard in schoolBoards) {
-      admins[schoolBoard] = allAdmins
-          .where((admin) => admin.schoolBoardId == schoolBoard.id)
-          .toList();
+      admins[schoolBoard] = {};
+      for (final school in [null, ...schoolBoard.schools]) {
+        admins[schoolBoard]![school] = allAdmins
+            .where((admin) =>
+                admin.schoolBoardId == schoolBoard.id &&
+                admin.schoolId == (school?.id ?? ''))
+            .toList();
+      }
     }
 
     if (AuthProvider.of(context, listen: false).databaseAccessLevel >=
         AccessLevel.superAdmin) {
-      admins[null] =
+      admins[null] = {};
+      admins[null]![null] =
           allAdmins.where((admin) => admin.schoolBoardId == '').toList();
     }
 
@@ -72,10 +85,13 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
   }
 
   Future<void> _showAddAdminDialog(BuildContext context) async {
+    final schoolBoard = await showSelectSchoolBoardDialog(context);
+    if (schoolBoard == null || !context.mounted) return;
+
     final isConfirmed = await showDialog<bool>(
           barrierDismissible: false,
           context: context,
-          builder: (context) => AddAdminDialog(),
+          builder: (context) => AddAdminDialog(schoolBoardId: schoolBoard.id),
         ) ??
         false;
     if (!context.mounted) return;
@@ -103,7 +119,7 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
             onPressed: () => setState(() => _showSearchBar = !_showSearchBar),
             icon: const Icon(Icons.search),
           ),
-          if (authProvider.databaseAccessLevel >= AccessLevel.superAdmin)
+          if (authProvider.databaseAccessLevel >= AccessLevel.schoolBoardAdmin)
             IconButton(
               onPressed: () => _showAddAdminDialog(context),
               icon: Icon(Icons.add),
@@ -118,8 +134,7 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ..._buildTiles(
-                context, authProvider, schoolBoardAdmins, filteredAdminIds),
+            ..._buildTiles(context, schoolBoardAdmins, filteredAdminIds),
             SizedBox(height: MediaQuery.of(context).size.height * 0.5),
           ],
         ),
@@ -129,22 +144,22 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
 
   List<Widget> _buildTiles(
     BuildContext context,
-    AuthProvider authProvider,
-    Map<SchoolBoard?, List<Admin>> schoolBoardAdmins,
+    Map<SchoolBoard?, Map<School?, List<Admin>>> schoolBoardAdmins,
     List<String>? filteredAdminIds,
   ) {
+    final authProvider = AuthProvider.of(context, listen: true);
+
     if (schoolBoardAdmins.isEmpty) {
       return [
-        const Center(
-          child: Text('Aucun centre de services scolaire inscrit'),
-        )
+        const Center(child: Text('Aucun administrateur·trice inscrit·e'))
       ];
     }
 
     return switch (authProvider.databaseAccessLevel) {
       AccessLevel.superAdmin => schoolBoardAdmins.entries
-          .where((entry) => entry.value.any((admin) =>
-              filteredAdminIds == null || filteredAdminIds.contains(admin.id)))
+          .where((element) => element.value.values.any((admins) =>
+              filteredAdminIds == null ||
+              admins.any((admin) => filteredAdminIds.contains(admin.id))))
           .map(
             (schoolBoardEntry) => Padding(
               padding: const EdgeInsets.all(8.0),
@@ -159,14 +174,15 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
                 initialExpandedState: true,
                 child: Column(
                   children: [
-                    ...schoolBoardEntry.value
-                        .where((admin) =>
+                    ...schoolBoardEntry.value.entries
+                        .where((schoolEntry) => schoolEntry.value.any((admin) =>
                             filteredAdminIds == null ||
-                            filteredAdminIds.contains(admin.id))
+                            filteredAdminIds.contains(admin.id)))
                         .map(
-                          (adminEntry) => AdminListTile(
-                            key: ValueKey(adminEntry.id),
-                            admin: adminEntry,
+                          (schoolEntry) => SchoolAdminsCard(
+                            schoolId: schoolEntry.key?.id,
+                            admins: schoolEntry.value,
+                            filteredAdminIds: filteredAdminIds,
                           ),
                         ),
                   ],
@@ -175,16 +191,18 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
             ),
           )
           .toList(),
-      AccessLevel.admin ||
+      AccessLevel.schoolBoardAdmin ||
+      AccessLevel.schoolAdmin ||
       AccessLevel.teacher ||
       AccessLevel.invalid =>
-        schoolBoardAdmins.values.firstOrNull
-                ?.where((admin) =>
+        schoolBoardAdmins.values.firstOrNull?.entries
+                .where((schoolEntry) => schoolEntry.value.any((admin) =>
                     filteredAdminIds == null ||
-                    filteredAdminIds.contains(admin.id))
-                .map((adminEntry) => AdminListTile(
-                      key: ValueKey(adminEntry.id),
-                      admin: adminEntry,
+                    filteredAdminIds.contains(admin.id))) // Filter schools
+                .map((adminEntry) => SchoolAdminsCard(
+                      schoolId: adminEntry.key?.id,
+                      admins: adminEntry.value,
+                      filteredAdminIds: filteredAdminIds,
                     ))
                 .toList() ??
             [],

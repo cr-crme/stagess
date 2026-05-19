@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/teachers/teacher_list_tile.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
-import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 class AddTeacherDialog extends StatefulWidget {
-  const AddTeacherDialog({super.key, required this.schoolBoard});
+  const AddTeacherDialog({super.key, required this.schoolBoardId});
 
-  final SchoolBoard schoolBoard;
+  final String schoolBoardId;
 
   @override
   State<AddTeacherDialog> createState() => _AddTeacherDialogState();
@@ -79,9 +78,9 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
               const SizedBox(height: 8),
               TeacherListTile(
                 key: _editingKey,
-                teacher: Teacher.empty,
+                teacher:
+                    Teacher.empty.copyWith(schoolBoardId: widget.schoolBoardId),
                 forceEditingMode: true,
-                schoolBoard: widget.schoolBoard,
                 canEdit: false,
                 canDelete: false,
               ),

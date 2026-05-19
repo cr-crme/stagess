@@ -284,14 +284,26 @@ class MySqlAdminsRepository extends AdminsRepository {
                 .copyWith(accessLevel: AccessLevel.superAdmin)) as List)
         .firstOrNull;
 
+    if (admin.accessLevel < AccessLevel.superAdmin &&
+        admin.schoolBoardId.isEmpty) {
+      throw InvalidRequestException(
+          'Only super administrators can be created without a school board');
+    }
+    if (admin.accessLevel < AccessLevel.schoolBoardAdmin &&
+        admin.schoolId.isEmpty) {
+      throw InvalidRequestException(
+          'Only school board administrators can be created without a school');
+    }
+
     await sqlInterface.performInsertPerson(
         person: admin, skipAddingEntity: entity != null);
     await sqlInterface.performInsertUser(id: admin.id, email: admin.email);
     await sqlInterface.performInsertQuery(tableName: 'admins', data: {
       'id': admin.id.serialize(),
       'school_board_id': admin.schoolBoardId.serialize(),
+      'school_id': admin.schoolId.serialize(),
       'has_registered_account': admin.hasRegisteredAccount,
-      'access_level': admin.accessLevel.serialize(), // TODO Confirm this
+      'access_level': admin.accessLevel.serialize(),
     });
   }
 
@@ -302,12 +314,29 @@ class MySqlAdminsRepository extends AdminsRepository {
           'You cannot change the authentication ID of an administrator');
     }
 
+    if (admin.accessLevel < AccessLevel.superAdmin &&
+        admin.schoolBoardId.isEmpty) {
+      throw InvalidRequestException(
+          'Only super administrators can be created without a school board');
+    }
+    if (admin.accessLevel < AccessLevel.schoolBoardAdmin &&
+        admin.schoolId.isEmpty) {
+      throw InvalidRequestException(
+          'Only school board administrators can be created without a school');
+    }
+
     final toUpdate = <String, dynamic>{};
     if (differences.contains('school_board_id')) {
       toUpdate['school_board_id'] = admin.schoolBoardId.serialize();
     }
+    if (differences.contains('school_id')) {
+      toUpdate['school_id'] = admin.schoolId.serialize();
+    }
     if (differences.contains('has_registered_account')) {
       toUpdate['has_registered_account'] = admin.hasRegisteredAccount;
+    }
+    if (differences.contains('access_level')) {
+      toUpdate['access_level'] = admin.accessLevel.serialize();
     }
 
     if (toUpdate.isNotEmpty) {

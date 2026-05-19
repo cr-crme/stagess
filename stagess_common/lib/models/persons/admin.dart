@@ -122,7 +122,9 @@ class Admin extends Person {
       hasRegisteredAccount:
           BoolExt.from(data['has_registered_account']) ?? hasRegisteredAccount,
       email: StringExt.from(data['email']) ?? email,
-      accessLevel: AccessLevel.fromSerialized(data['access_level']),
+      accessLevel: data['access_level'] == null
+          ? accessLevel
+          : AccessLevel.fromSerialized(data['access_level']),
       phone: PhoneNumber.from(data['phone']) ?? phone,
       address: Address.from(data['address']) ?? address,
     );

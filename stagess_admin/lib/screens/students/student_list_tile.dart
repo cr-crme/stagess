@@ -11,9 +11,9 @@ import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/persons/student.dart';
-import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
+import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/address_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
@@ -31,7 +31,6 @@ class StudentListTile extends StatefulWidget {
   const StudentListTile({
     super.key,
     required this.student,
-    required this.schoolBoard,
     this.forceEditingMode = false,
     required this.canEdit,
     required this.canDelete,
@@ -39,7 +38,6 @@ class StudentListTile extends StatefulWidget {
 
   final Student student;
   final bool forceEditingMode;
-  final SchoolBoard schoolBoard;
   final bool canEdit;
   final bool canDelete;
 
@@ -131,7 +129,7 @@ class StudentListTileState extends State<StudentListTile> {
   );
 
   Student get editedStudent => widget.student.copyWith(
-        schoolBoardId: widget.schoolBoard.id,
+        schoolBoardId: widget.student.schoolBoardId,
         schoolId: _selectedSchoolId,
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
@@ -437,6 +435,16 @@ class StudentListTileState extends State<StudentListTile> {
   }
 
   Widget _buildSchoolSelection() {
+    // TODO Listen true?
+    final schoolBoard = SchoolBoardsProvider.of(context, listen: false)
+        .firstWhereOrNull((e) => e.id == widget.student.schoolBoardId);
+    if (schoolBoard == null) {
+      return Text(
+        'Centre de service scolaire introuvable',
+        style: TextStyle(color: Colors.red),
+      );
+    }
+
     return _isEditing
         ? FormBuilderRadioGroup(
             key: _schoolRadioKey,
@@ -451,7 +459,7 @@ class StudentListTileState extends State<StudentListTile> {
                   ? 'Sélectionner une école'
                   : null;
             },
-            options: widget.schoolBoard.schools
+            options: schoolBoard.schools
                 .map(
                   (e) => FormBuilderFieldOption(
                     value: e.id,

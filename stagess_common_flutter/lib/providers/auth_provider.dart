@@ -94,6 +94,7 @@ class AuthProvider extends ChangeNotifier {
     return _firebaseAuth.currentUser != null;
   }
 
+  // TODO Rename to currentId
   String? _teacherId;
   String? get teacherId => _teacherId;
   set teacherId(String? id) {
