@@ -241,7 +241,11 @@ class _InternshipsListScreenState extends State<InternshipsListScreen> {
             ),
           )
           .toList(),
-      AccessLevel.admin || AccessLevel.teacher || AccessLevel.invalid => [
+      AccessLevel.schoolBoardAdmin ||
+      AccessLevel.schoolAdmin ||
+      AccessLevel.teacher ||
+      AccessLevel.invalid =>
+        [
           _InternshipsByStatus(
             key: const ValueKey('active_internships'),
             areActive: true,
@@ -348,7 +352,8 @@ class _InternshipsByTeachers extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authProvider = AuthProvider.of(context, listen: true);
-    final canDelete = authProvider.databaseAccessLevel >= AccessLevel.admin;
+    final canDelete =
+        authProvider.databaseAccessLevel >= AccessLevel.schoolAdmin;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -26,7 +26,8 @@ class AdminsProvider extends BackendListProvided<Admin> {
   FetchableFields get referenceFetchableFields => Admin.fetchableFields;
 
   void initializeAuth(AuthProvider auth) {
-    if (!auth.isFullySignedIn || auth.databaseAccessLevel < AccessLevel.admin) {
+    if (!auth.isFullySignedIn ||
+        auth.databaseAccessLevel < AccessLevel.schoolAdmin) {
       return;
     }
 
@@ -42,6 +43,7 @@ class AdminsProvider extends BackendListProvided<Admin> {
       final response = await sendMessageWithResponse(
         message: CommunicationProtocol(
           requestType: RequestType.registerUser,
+          // TODO Add admins too?
           field: RequestFields.teacher,
           data: {'email': email, 'user_type': userType.serialize()},
         ),

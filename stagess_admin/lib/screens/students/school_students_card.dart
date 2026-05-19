@@ -123,8 +123,10 @@ class _GroupStudentsCard extends StatelessWidget {
               key: ValueKey(student.id),
               student: student,
               schoolBoard: schoolBoard,
-              canEdit: authProvided.databaseAccessLevel >= AccessLevel.admin,
-              canDelete: authProvided.databaseAccessLevel >= AccessLevel.admin,
+              canEdit:
+                  authProvided.databaseAccessLevel >= AccessLevel.schoolAdmin,
+              canDelete:
+                  authProvided.databaseAccessLevel >= AccessLevel.schoolAdmin,
             ),
           ),
       ],

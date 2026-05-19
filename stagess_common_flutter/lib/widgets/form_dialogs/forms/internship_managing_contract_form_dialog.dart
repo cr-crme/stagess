@@ -535,9 +535,9 @@ class _MainJob extends StatelessWidget {
     _logger.finer(
       'Building _MainJob with controller job: ${controller._primaryJobController.job.id}',
     );
-    final currentSchool = AuthProvider.of(context, listen: false).isAdmin
-        ? null
-        : SchoolBoardsProvider.of(context, listen: false).currentSchool!;
+    // TODO Validate this
+    final currentSchool =
+        SchoolBoardsProvider.of(context, listen: false).currentSchool;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -583,9 +583,9 @@ class _ExtraSpecialization extends StatelessWidget {
   final Function(void Function()) setState;
 
   Widget _extraJobTileBuilder(BuildContext context, int index) {
-    final currentSchool = AuthProvider.of(context, listen: false).isAdmin
-        ? null
-        : SchoolBoardsProvider.of(context, listen: false).currentSchool!;
+    // TODO Validate this
+    final currentSchool =
+        SchoolBoardsProvider.of(context, listen: false).currentSchool;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

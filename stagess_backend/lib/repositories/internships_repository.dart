@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
+import 'package:stagess_backend/repositories/students_repository.dart';
 import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_common/communication_protocol.dart';
@@ -36,7 +37,7 @@ abstract class InternshipsRepository extends RepositoryAbstract {
 
     // Filter internships based on user access level (this should already be done, but just in case)
     internships.removeWhere((key, value) =>
-        user.accessLevel <= AccessLevel.admin &&
+        user.accessLevel < AccessLevel.superAdmin &&
         value.schoolBoardId != user.schoolBoardId);
 
     return RepositoryResponse(
@@ -59,7 +60,7 @@ abstract class InternshipsRepository extends RepositoryAbstract {
     if (internship == null) throw MissingDataException('Internship not found');
 
     // Prevent from getting an enterprise that the user does not have access to (this should already be done, but just in case)
-    if (user.accessLevel <= AccessLevel.admin &&
+    if (user.accessLevel < AccessLevel.superAdmin &&
         internship.schoolBoardId != user.schoolBoardId) {
       throw MissingDataException('Internship not found');
     }
@@ -96,7 +97,7 @@ abstract class InternshipsRepository extends RepositoryAbstract {
     final newInternship = previous?.copyWithData(data) ??
         Internship.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
 
-    if (user.accessLevel <= AccessLevel.admin &&
+    if (user.accessLevel < AccessLevel.superAdmin &&
         newInternship.schoolBoardId != user.schoolBoardId) {
       throw InvalidRequestException(
           'You do not have permission to put this internship');
@@ -116,18 +117,22 @@ abstract class InternshipsRepository extends RepositoryAbstract {
   Future<RepositoryResponse> deleteById({
     required String id,
     required DatabaseUser user,
+    StudentsRepository? studentsRepository,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified || user.accessLevel < AccessLevel.admin) {
-      throw InvalidRequestException(
-          'You do not have permission to delete internships');
+    if (studentsRepository == null) {
+      throw ArgumentError(
+          'studentsRepository is required to delete internships');
     }
 
-    if (user.accessLevel <= AccessLevel.admin &&
-        (await _getInternshipById(id: id, user: user))?.schoolBoardId !=
-            user.schoolBoardId) {
+    if (user.isNotVerified) {
       throw InvalidRequestException(
-          'You do not have permission to delete this internship');
+          'You do not have permission to get administrators');
+    }
+
+    if (user.accessLevel < AccessLevel.schoolAdmin) {
+      throw InvalidRequestException(
+          'You do not have permission to delete internships');
     }
 
     if (!canEdit(user: user, id: id)) {
@@ -136,10 +141,36 @@ abstract class InternshipsRepository extends RepositoryAbstract {
         throw InvalidRequestException(
             'You must acquire a lock before deleting this internship');
       }
-      final response =
-          await deleteById(id: id, user: user, tryRequestingLock: false);
-      await releaseLock(user: user, id: id);
-      return response;
+      try {
+        // TODO Apply this finally everywhere
+        final response = await deleteById(
+            id: id,
+            user: user,
+            studentsRepository: studentsRepository,
+            tryRequestingLock: false);
+        return response;
+      } finally {
+        await releaseLock(user: user, id: id);
+      }
+    }
+
+    final internship = await _getInternshipById(id: id, user: user);
+    if (internship == null) {
+      throw MissingDataException('Internship not found');
+    }
+    if (user.accessLevel < AccessLevel.superAdmin &&
+        user.schoolBoardId != internship.schoolBoardId) {
+      throw InvalidRequestException(
+          'You do not have permission to delete this internship');
+    }
+    if (user.accessLevel < AccessLevel.schoolBoardAdmin) {
+      // TODO Validate this
+      final student = await studentsRepository.getById(
+          id: internship.studentId, user: user, fields: FetchableFields.all);
+      if (student.data == null || user.schoolId != student.data!['school_id']) {
+        throw InvalidRequestException(
+            'You do not have permission to delete this internship');
+      }
     }
 
     final removedId = await _deleteInternship(id: id, user: user);

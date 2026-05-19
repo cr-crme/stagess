@@ -84,18 +84,18 @@ class TeacherPickerTile extends StatelessWidget {
         return teachers.where(
           (teacher) =>
               teacher.fullName.toLowerCase().contains(
-                textEditingValue.text.toLowerCase(),
-              ) &&
+                    textEditingValue.text.toLowerCase(),
+                  ) &&
               teacher.fullName.toLowerCase() !=
                   textEditingValue.text.toLowerCase(),
         );
       },
-      optionsViewBuilder:
-          (context, onSelected, options) => OptionsBuilderForAutocomplete(
-            onSelected: onSelected,
-            options: options,
-            optionToString: (Teacher e) => e.fullName,
-          ),
+      optionsViewBuilder: (context, onSelected, options) =>
+          OptionsBuilderForAutocomplete(
+        onSelected: onSelected,
+        options: options,
+        optionToString: (Teacher e) => e.fullName,
+      ),
       onSelected: (item) => controller.teacher = item,
       fieldViewBuilder: (_, textController, focusNode, onSubmitted) {
         controller._textController = textController;

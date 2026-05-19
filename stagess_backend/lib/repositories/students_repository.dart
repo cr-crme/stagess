@@ -1,4 +1,3 @@
-import 'package:logging/logging.dart';
 import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/utils/database_user.dart';
@@ -13,11 +12,10 @@ import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/utils.dart';
 
-final _logger = Logger('StudentsRepository');
-
 // AccessLevel in this repository is discarded as all operations are currently
 // available to all users
 
+// TODO Validate changes in rules
 abstract class StudentsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
@@ -33,8 +31,11 @@ abstract class StudentsRepository extends RepositoryAbstract {
 
     // Filter students based on user access level (this should already be done, but just in case)
     students.removeWhere((key, value) =>
-        user.accessLevel <= AccessLevel.admin &&
-        value.schoolBoardId != user.schoolBoardId);
+        user.accessLevel < AccessLevel.superAdmin &&
+        user.schoolBoardId != value.schoolBoardId);
+    students.removeWhere((key, value) =>
+        user.accessLevel < AccessLevel.schoolBoardAdmin &&
+        user.schoolId != value.schoolId);
 
     return RepositoryResponse(
         data: students.map(
@@ -56,8 +57,12 @@ abstract class StudentsRepository extends RepositoryAbstract {
     if (student == null) throw MissingDataException('Student not found');
 
     // Prevent from getting a student that the user does not have access to (this should already be done, but just in case)
-    if (user.accessLevel <= AccessLevel.admin &&
+    if (user.accessLevel < AccessLevel.superAdmin &&
         student.schoolBoardId != user.schoolBoardId) {
+      throw MissingDataException('Student not found');
+    }
+    if (user.accessLevel < AccessLevel.schoolBoardAdmin &&
+        student.schoolId != user.schoolId) {
       throw MissingDataException('Student not found');
     }
 
@@ -93,13 +98,21 @@ abstract class StudentsRepository extends RepositoryAbstract {
     final newStudent = previous?.copyWithData(data) ??
         Student.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
 
+    if (user.accessLevel < AccessLevel.superAdmin &&
+        newStudent.schoolBoardId != user.schoolBoardId) {
+      throw InvalidRequestException(
+          'You do not have permission to put this student');
+    }
+    if (user.accessLevel < AccessLevel.schoolBoardAdmin &&
+        newStudent.schoolId != user.schoolId) {
+      throw InvalidRequestException(
+          'You do not have permission to put this student');
+    }
+
     // Teachers are only allowed to change the internships
     final differences = newStudent.getDifference(previous);
-    if (user.accessLevel != AccessLevel.superAdmin &&
-        (newStudent.schoolBoardId != user.schoolBoardId ||
-            (user.accessLevel == AccessLevel.teacher &&
-                (differences.length > 1 ||
-                    !differences.contains('all_visa'))))) {
+    if (user.accessLevel < AccessLevel.schoolAdmin &&
+        (differences.length > 1 || !differences.contains('all_visa'))) {
       throw InvalidRequestException(
           'You do not have permission to put this student');
     }
@@ -119,16 +132,14 @@ abstract class StudentsRepository extends RepositoryAbstract {
     required DatabaseUser user,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified || user.accessLevel < AccessLevel.admin) {
+    if (user.isNotVerified) {
       throw InvalidRequestException(
           'You do not have permission to delete students');
     }
 
-    if (user.accessLevel <= AccessLevel.admin &&
-        (await _getStudentById(id: id, user: user))?.schoolBoardId !=
-            user.schoolBoardId) {
+    if (user.accessLevel < AccessLevel.schoolAdmin) {
       throw InvalidRequestException(
-          'You do not have permission to delete this student');
+          'You do not have permission to delete students');
     }
 
     if (!canEdit(user: user, id: id)) {
@@ -141,6 +152,18 @@ abstract class StudentsRepository extends RepositoryAbstract {
           await deleteById(id: id, user: user, tryRequestingLock: false);
       await releaseLock(user: user, id: id);
       return response;
+    }
+
+    final student = await _getStudentById(id: id, user: user);
+    if (user.accessLevel < AccessLevel.superAdmin &&
+        user.schoolBoardId != student?.schoolBoardId) {
+      throw InvalidRequestException(
+          'You do not have permission to delete this student');
+    }
+    if (user.accessLevel < AccessLevel.schoolBoardAdmin &&
+        user.schoolId != student?.schoolId) {
+      throw InvalidRequestException(
+          'You do not have permission to delete this student');
     }
 
     final removedId = await _deleteStudent(id: id, user: user);
@@ -450,23 +473,15 @@ class MySqlStudentsRepository extends StudentsRepository {
   Future<void> _updateToStudents(
       Student student, Student previous, DatabaseUser user) async {
     final differences = student.getDifference(previous);
-    if (user.accessLevel < AccessLevel.admin) return;
-
     if (differences.contains('school_board_id')) {
       throw InvalidRequestException(
           'Cannot update school_board_id for the students');
     }
     if (differences.contains('school_id')) {
-      if (user.accessLevel < AccessLevel.admin) {
-        _logger.warning(
-            'User ${user.userId} tried to change the school (${student.schoolId}) of '
-            'student (${student.id}) but does not have permission, skipping');
-      } else {
-        await sqlInterface.performUpdateQuery(
-            tableName: 'students',
-            filters: {'id': student.id},
-            data: {'school_id': student.schoolId});
-      }
+      await sqlInterface.performUpdateQuery(
+          tableName: 'students',
+          filters: {'id': student.id},
+          data: {'school_id': student.schoolId});
     }
 
     // Update the persons table if needed
@@ -503,8 +518,6 @@ class MySqlStudentsRepository extends StudentsRepository {
     required Student previous,
     required DatabaseUser user,
   }) async {
-    if (user.accessLevel < AccessLevel.admin) return;
-
     final differences = student.getDifference(previous);
     if (differences.contains('contact')) {
       await sqlInterface.performUpdatePerson(

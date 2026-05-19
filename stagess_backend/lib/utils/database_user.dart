@@ -8,10 +8,16 @@ class DatabaseUser {
         return false;
       case AccessLevel.superAdmin:
         return _authenticatorId.isNotEmpty;
-      case AccessLevel.admin:
+      case AccessLevel.schoolBoardAdmin:
         return _authenticatorId.isNotEmpty &&
             schoolBoardId != null &&
             schoolBoardId!.isNotEmpty;
+      case AccessLevel.schoolAdmin:
+        return _authenticatorId.isNotEmpty &&
+            schoolBoardId != null &&
+            schoolBoardId!.isNotEmpty &&
+            schoolId != null &&
+            schoolId!.isNotEmpty;
       case AccessLevel.teacher:
         return _authenticatorId.isNotEmpty &&
             userId != null &&

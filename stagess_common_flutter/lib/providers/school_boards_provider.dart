@@ -33,6 +33,15 @@ class SchoolBoardsProvider extends BackendListProvided<SchoolBoard> {
     return schoolBoard;
   }
 
+  School? schoolFromId(String schoolId) {
+    for (final schoolBoard in this) {
+      final school =
+          schoolBoard.schools.firstWhereOrNull((s) => s.id == schoolId);
+      if (school != null) return school;
+    }
+    return null;
+  }
+
   School? get currentSchool {
     final schoolBoard = currentSchoolBoard;
     if (schoolBoard == null) return null;

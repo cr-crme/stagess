@@ -171,7 +171,8 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen> {
             ),
           )
           .toList(),
-      AccessLevel.admin ||
+      AccessLevel.schoolBoardAdmin ||
+      AccessLevel.schoolAdmin ||
       AccessLevel.teacher ||
       AccessLevel.invalid =>
         schoolBoardEnterprises.values.firstOrNull

@@ -94,12 +94,12 @@ class EntityPickerTile extends StatelessWidget {
               e.toLowerCase() != textEditingValue.text.toLowerCase(),
         );
       },
-      optionsViewBuilder:
-          (context, onSelected, options) => OptionsBuilderForAutocomplete(
-            onSelected: onSelected,
-            options: options,
-            optionToString: (String e) => e,
-          ),
+      optionsViewBuilder: (context, onSelected, options) =>
+          OptionsBuilderForAutocomplete(
+        onSelected: onSelected,
+        options: options,
+        optionToString: (String e) => e,
+      ),
       onSelected: (item) => controller.selection = item.isEmpty ? null : item,
       fieldViewBuilder: (_, textController, focusNode, onSubmitted) {
         controller._textController = textController;
@@ -117,18 +117,17 @@ class EntityPickerTile extends StatelessWidget {
             labelText: title ?? 'Sélectionner dans la liste',
             labelStyle: const TextStyle(color: Colors.black),
             errorText: state.errorText,
-            suffixIcon:
-                editMode
-                    ? IconButton(
-                      onPressed: () {
-                        if (focusNode.hasFocus) focusNode.previousFocus();
-                        controller.selection = null;
-                        textController.clear();
-                        state.didChange(null);
-                      },
-                      icon: const Icon(Icons.clear),
-                    )
-                    : null,
+            suffixIcon: editMode
+                ? IconButton(
+                    onPressed: () {
+                      if (focusNode.hasFocus) focusNode.previousFocus();
+                      controller.selection = null;
+                      textController.clear();
+                      state.didChange(null);
+                    },
+                    icon: const Icon(Icons.clear),
+                  )
+                : null,
           ),
         );
       },

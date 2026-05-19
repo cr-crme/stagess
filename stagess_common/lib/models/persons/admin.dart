@@ -8,6 +8,7 @@ import 'package:stagess_common/models/persons/person.dart';
 
 class Admin extends Person {
   final String schoolBoardId;
+  final String schoolId;
   final bool hasRegisteredAccount;
   bool get hasNotRegisteredAccount => !hasRegisteredAccount;
   final AccessLevel accessLevel;
@@ -17,6 +18,7 @@ class Admin extends Person {
     required super.firstName,
     required super.lastName,
     required this.schoolBoardId,
+    required this.schoolId,
     required this.hasRegisteredAccount,
     required super.email,
     required super.phone,
@@ -27,7 +29,8 @@ class Admin extends Person {
   static Admin get empty => Admin(
         firstName: '',
         lastName: '',
-        schoolBoardId: '-1',
+        schoolBoardId: '',
+        schoolId: '',
         hasRegisteredAccount: false,
         email: '',
         phone: PhoneNumber.empty,
@@ -38,7 +41,8 @@ class Admin extends Person {
   bool get isEmpty => firstName.isEmpty && lastName.isEmpty;
 
   Admin.fromSerialized(super.map)
-      : schoolBoardId = StringExt.from(map?['school_board_id']) ?? '-1',
+      : schoolBoardId = StringExt.from(map?['school_board_id']) ?? '',
+        schoolId = StringExt.from(map?['school_id']) ?? '',
         hasRegisteredAccount =
             BoolExt.from(map?['has_registered_account']) ?? false,
         accessLevel = AccessLevel.fromSerialized(map?['access_level']),
@@ -48,6 +52,7 @@ class Admin extends Person {
   Map<String, dynamic> serializedMap() => super.serializedMap()
     ..addAll({
       'school_board_id': schoolBoardId.serialize(),
+      'school_id': schoolId.serialize(),
       'has_registered_account': hasRegisteredAccount.serialize(),
       'access_level': accessLevel.serialize(),
     });
@@ -55,6 +60,7 @@ class Admin extends Person {
   static FetchableFields get fetchableFields => Person.fetchableFields
     ..addAll(FetchableFields.reference({
       'school_board_id': FetchableFields.mandatory,
+      'school_id': FetchableFields.mandatory,
       'email': FetchableFields.mandatory,
       'has_registered_account': FetchableFields.mandatory,
       'access_level': FetchableFields.mandatory,
@@ -66,6 +72,7 @@ class Admin extends Person {
     String? firstName,
     String? lastName,
     String? schoolBoardId,
+    String? schoolId,
     bool? hasRegisteredAccount,
     String? email,
     PhoneNumber? phone,
@@ -78,6 +85,7 @@ class Admin extends Person {
         firstName: firstName ?? this.firstName,
         lastName: lastName ?? this.lastName,
         schoolBoardId: schoolBoardId ?? this.schoolBoardId,
+        schoolId: schoolId ?? this.schoolId,
         hasRegisteredAccount: hasRegisteredAccount ?? this.hasRegisteredAccount,
         email: email ?? this.email,
         phone: phone ?? this.phone,
@@ -93,6 +101,7 @@ class Admin extends Person {
     if (data.keys.any((key) => ![
           'id',
           'school_board_id',
+          'school_id',
           'has_registered_account',
           'first_name',
           'last_name',
@@ -109,6 +118,7 @@ class Admin extends Person {
       firstName: StringExt.from(data['first_name']) ?? firstName,
       lastName: StringExt.from(data['last_name']) ?? lastName,
       schoolBoardId: StringExt.from(data['school_board_id']) ?? schoolBoardId,
+      schoolId: StringExt.from(data['school_id']) ?? schoolId,
       hasRegisteredAccount:
           BoolExt.from(data['has_registered_account']) ?? hasRegisteredAccount,
       email: StringExt.from(data['email']) ?? email,
@@ -120,6 +130,6 @@ class Admin extends Person {
 
   @override
   String toString() {
-    return 'Teacher{${super.toString()}, schoolBoardId: $schoolBoardId}';
+    return 'Admin{${super.toString()}, schoolBoardId: $schoolBoardId, schoolId: $schoolId}';
   }
 }

@@ -71,7 +71,7 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
       AuthProvider.of(context, listen: false).databaseAccessLevel >=
               AccessLevel.superAdmin ||
           (AuthProvider.of(context, listen: false).databaseAccessLevel ==
-                  AccessLevel.admin &&
+                  AccessLevel.schoolBoardAdmin &&
               widget.schoolBoard.id ==
                   AuthProvider.of(context, listen: false).schoolBoardId);
   late final bool _canDelete =

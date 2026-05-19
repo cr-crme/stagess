@@ -207,7 +207,7 @@ class Connexions {
     late Map<String, dynamic>? user;
     switch (userType) {
       case AccessLevel.teacher:
-        if (myAccessLevel < AccessLevel.admin) {
+        if (myAccessLevel < AccessLevel.schoolAdmin) {
           throw ConnexionRefusedException(
               'Client is not authorized to register user');
         }
@@ -216,7 +216,17 @@ class Connexions {
             sqlInterface: _database.sqlInterface,
             email: email);
         break;
-      case AccessLevel.admin:
+      case AccessLevel.schoolAdmin:
+        if (myAccessLevel < AccessLevel.schoolBoardAdmin) {
+          throw ConnexionRefusedException(
+              'Client is not authorized to register user');
+        }
+        user = await _getAdminFromDatabase(
+            user: _clients[client]!,
+            sqlInterface: _database.sqlInterface,
+            email: email);
+        break;
+      case AccessLevel.schoolBoardAdmin:
         if (myAccessLevel < AccessLevel.superAdmin) {
           throw ConnexionRefusedException(
               'Client is not authorized to register user');
@@ -264,7 +274,9 @@ class Connexions {
     // Add the confirmation to the database
     final field = switch (userType) {
       AccessLevel.teacher => RequestFields.teacher,
-      AccessLevel.admin => RequestFields.admin,
+      AccessLevel.schoolAdmin ||
+      AccessLevel.schoolBoardAdmin =>
+        RequestFields.admin,
       AccessLevel.superAdmin ||
       AccessLevel.invalid =>
         throw 'Client is not authorized to register user.',
@@ -329,7 +341,7 @@ class Connexions {
     late Map<String, dynamic>? user;
     switch (userType) {
       case AccessLevel.teacher:
-        if (myAccessLevel < AccessLevel.admin) {
+        if (myAccessLevel < AccessLevel.schoolAdmin) {
           throw ConnexionRefusedException(
               'Client is not authorized to register user');
         }
@@ -338,7 +350,17 @@ class Connexions {
             sqlInterface: _database.sqlInterface,
             email: email);
         break;
-      case AccessLevel.admin:
+      case AccessLevel.schoolAdmin:
+        if (myAccessLevel < AccessLevel.schoolBoardAdmin) {
+          throw ConnexionRefusedException(
+              'Client is not authorized to register user');
+        }
+        user = await _getAdminFromDatabase(
+            user: _clients[client]!,
+            sqlInterface: _database.sqlInterface,
+            email: email);
+        break;
+      case AccessLevel.schoolBoardAdmin:
         if (myAccessLevel < AccessLevel.superAdmin) {
           throw ConnexionRefusedException(
               'Client is not authorized to register user');
@@ -358,7 +380,9 @@ class Connexions {
       // Remove the confirmation from the database
       final field = switch (userType) {
         AccessLevel.teacher => RequestFields.teacher,
-        AccessLevel.admin => RequestFields.admin,
+        AccessLevel.schoolAdmin ||
+        AccessLevel.schoolBoardAdmin =>
+          RequestFields.admin,
         AccessLevel.invalid ||
         AccessLevel.superAdmin =>
           throw 'Client is not authorized to register user.',

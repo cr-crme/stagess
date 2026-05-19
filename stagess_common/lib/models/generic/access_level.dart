@@ -1,9 +1,8 @@
-// TODO schoolAdmins and change admin to schoolBoardAdmin
-// TODO Adjust access levels to be more granular (e.g. teacher, schoolAdmin, districtAdmin, superAdmin)
 enum AccessLevel {
   invalid,
   teacher,
-  admin,
+  schoolAdmin,
+  schoolBoardAdmin,
   superAdmin;
 
   bool operator >=(AccessLevel other) {

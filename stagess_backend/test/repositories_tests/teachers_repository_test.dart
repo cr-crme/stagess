@@ -34,19 +34,39 @@ void main() {
         teachersFromTeacherWithSchoolBoard.data, isA<Map<String, dynamic>>());
     expect(teachersFromTeacherWithSchoolBoard.data!.length, 2);
 
-    final teachersFromAdminNoSchoolBoard = await _mockedDatabaseTeachers.getAll(
-        user:
-            DatabaseUserMock(accessLevel: AccessLevel.admin, schoolBoardId: ''),
-        fields: FetchableFields.all);
-    expect(teachersFromAdminNoSchoolBoard.data, isA<Map<String, dynamic>>());
-    expect(teachersFromAdminNoSchoolBoard.data!.length, 0);
-
-    final teachersFromAdminWithSchoolBoard =
+    final teachersFromSchoolAdminNoSchool =
         await _mockedDatabaseTeachers.getAll(
-            user: DatabaseUserMock(accessLevel: AccessLevel.admin),
+            user: DatabaseUserMock(
+                accessLevel: AccessLevel.schoolAdmin, schoolId: ''),
             fields: FetchableFields.all);
-    expect(teachersFromAdminWithSchoolBoard.data, isA<Map<String, dynamic>>());
-    expect(teachersFromAdminWithSchoolBoard.data!.length, 2);
+    expect(teachersFromSchoolAdminNoSchool.data, isA<Map<String, dynamic>>());
+    expect(teachersFromSchoolAdminNoSchool.data!.length, 0);
+
+    final teachersFromSchoolAdminNoSchoolBoard =
+        await _mockedDatabaseTeachers.getAll(
+            user: DatabaseUserMock(
+                accessLevel: AccessLevel.schoolAdmin, schoolBoardId: ''),
+            fields: FetchableFields.all);
+    expect(
+        teachersFromSchoolAdminNoSchoolBoard.data, isA<Map<String, dynamic>>());
+    expect(teachersFromSchoolAdminNoSchoolBoard.data!.length, 0);
+
+    final teachersFromSchoolBoardAdminNoSchoolBoard =
+        await _mockedDatabaseTeachers.getAll(
+            user: DatabaseUserMock(
+                accessLevel: AccessLevel.schoolBoardAdmin, schoolBoardId: ''),
+            fields: FetchableFields.all);
+    expect(teachersFromSchoolBoardAdminNoSchoolBoard.data,
+        isA<Map<String, dynamic>>());
+    expect(teachersFromSchoolBoardAdminNoSchoolBoard.data!.length, 0);
+
+    final teachersFromSchoolBoardAdminWithSchoolBoard =
+        await _mockedDatabaseTeachers.getAll(
+            user: DatabaseUserMock(accessLevel: AccessLevel.schoolBoardAdmin),
+            fields: FetchableFields.all);
+    expect(teachersFromSchoolBoardAdminWithSchoolBoard.data,
+        isA<Map<String, dynamic>>());
+    expect(teachersFromSchoolBoardAdminWithSchoolBoard.data!.length, 2);
 
     final teachersFromSuperAdmin = await _mockedDatabaseTeachers.getAll(
         user: DatabaseUserMock(accessLevel: AccessLevel.superAdmin),
@@ -115,13 +135,24 @@ void main() {
             ),
         throwsA(isA<InvalidRequestException>()));
 
+    // With wrong school
+    await expectLater(
+        () async => _mockedDatabaseTeachers.putById(
+              id: '0',
+              data: {'first_name': 'John', 'last_name': 'Smith'},
+              user: DatabaseUserMock(
+                  accessLevel: AccessLevel.schoolAdmin, schoolId: '300'),
+            ),
+        throwsA(isA<InvalidRequestException>()));
+
     // With wrong school board
     await expectLater(
         () async => _mockedDatabaseTeachers.putById(
               id: '0',
               data: {'first_name': 'John', 'last_name': 'Smith'},
               user: DatabaseUserMock(
-                  accessLevel: AccessLevel.admin, schoolBoardId: '200'),
+                  accessLevel: AccessLevel.schoolBoardAdmin,
+                  schoolBoardId: '200'),
             ),
         throwsA(isA<InvalidRequestException>()));
 
@@ -129,14 +160,26 @@ void main() {
     await mockedDatabase.putById(
       id: '0',
       data: {'first_name': 'John', 'last_name': 'Smith'},
-      user: DatabaseUserMock(accessLevel: AccessLevel.admin),
+      user: DatabaseUserMock(accessLevel: AccessLevel.schoolAdmin),
     );
-    final updatedTeacher = await mockedDatabase.getById(
+    final updatedTeacher1 = await mockedDatabase.getById(
         id: '0',
-        user: DatabaseUserMock(accessLevel: AccessLevel.admin),
+        user: DatabaseUserMock(accessLevel: AccessLevel.schoolAdmin),
         fields: FetchableFields.all);
-    expect(updatedTeacher.data!['first_name'], 'John');
-    expect(updatedTeacher.data!['last_name'], 'Smith');
+    expect(updatedTeacher1.data!['first_name'], 'John');
+    expect(updatedTeacher1.data!['last_name'], 'Smith');
+
+    await mockedDatabase.putById(
+      id: '0',
+      data: {'first_name': 'Jonathan', 'last_name': 'Smithy'},
+      user: DatabaseUserMock(accessLevel: AccessLevel.schoolAdmin),
+    );
+    final updatedTeacher2 = await mockedDatabase.getById(
+        id: '0',
+        user: DatabaseUserMock(accessLevel: AccessLevel.schoolAdmin),
+        fields: FetchableFields.all);
+    expect(updatedTeacher2.data!['first_name'], 'Jonathan');
+    expect(updatedTeacher2.data!['last_name'], 'Smithy');
   });
 
   test('Set new teacher to DatabaseTeachers', () async {
@@ -148,13 +191,25 @@ void main() {
               user: DatabaseUserMock(accessLevel: AccessLevel.teacher),
             ),
         throwsA(isA<InvalidRequestException>()));
+
+    // With wrong school
+    await expectLater(
+        () async => _mockedDatabaseTeachers.putById(
+              id: '2',
+              data: {'first_name': 'Agent', 'last_name': 'Smith'},
+              user: DatabaseUserMock(
+                  accessLevel: AccessLevel.schoolAdmin, schoolId: '300'),
+            ),
+        throwsA(isA<InvalidRequestException>()));
+
     // With wrong school board
     await expectLater(
         () async => _mockedDatabaseTeachers.putById(
               id: '2',
               data: {'first_name': 'Agent', 'last_name': 'Smith'},
               user: DatabaseUserMock(
-                  accessLevel: AccessLevel.admin, schoolBoardId: '200'),
+                  accessLevel: AccessLevel.schoolBoardAdmin,
+                  schoolBoardId: '200'),
             ),
         throwsA(isA<InvalidRequestException>()));
 
@@ -164,14 +219,31 @@ void main() {
         data: {
           'first_name': 'Agent',
           'last_name': 'Smith',
-          'school_board_id': '100'
+          'school_board_id': '100',
+          'school_id': '200'
         },
-        user: DatabaseUserMock(accessLevel: AccessLevel.admin));
-    final newTeacher = await mockedDatabase.getById(
+        user: DatabaseUserMock(accessLevel: AccessLevel.schoolAdmin));
+    final newTeacher1 = await mockedDatabase.getById(
         id: '2',
-        user: DatabaseUserMock(accessLevel: AccessLevel.admin),
+        user: DatabaseUserMock(accessLevel: AccessLevel.schoolAdmin),
         fields: FetchableFields.all);
-    expect(newTeacher.data!['first_name'], 'Agent');
-    expect(newTeacher.data!['last_name'], 'Smith');
+    expect(newTeacher1.data!['first_name'], 'Agent');
+    expect(newTeacher1.data!['last_name'], 'Smith');
+
+    await mockedDatabase.putById(
+        id: '3',
+        data: {
+          'first_name': 'Agente',
+          'last_name': 'Smithy',
+          'school_board_id': '100',
+          'school_id': '200'
+        },
+        user: DatabaseUserMock(accessLevel: AccessLevel.schoolBoardAdmin));
+    final newTeacher2 = await mockedDatabase.getById(
+        id: '3',
+        user: DatabaseUserMock(accessLevel: AccessLevel.schoolBoardAdmin),
+        fields: FetchableFields.all);
+    expect(newTeacher2.data!['first_name'], 'Agente');
+    expect(newTeacher2.data!['last_name'], 'Smithy');
   });
 }

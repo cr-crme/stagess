@@ -115,14 +115,16 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  bool get isAdmin => databaseAccessLevel >= AccessLevel.admin;
+  bool get isAdmin => databaseAccessLevel >= AccessLevel.schoolAdmin;
   AccessLevel? _databaseAccessLevel;
   AccessLevel get databaseAccessLevel =>
       _databaseAccessLevel ?? AccessLevel.invalid;
   set databaseAccessLevel(AccessLevel? level) {
     _databaseAccessLevel = level;
 
-    if (level != null && requiredAdminAccess && level < AccessLevel.admin) {
+    if (level != null &&
+        requiredAdminAccess &&
+        level < AccessLevel.schoolAdmin) {
       signOut();
       throw Exception(
         'You must have admin access to perform this action. Current access level: $level',

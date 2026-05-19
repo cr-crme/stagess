@@ -48,12 +48,11 @@ class _LoginScreenState extends State<LoginScreen> {
   void _navigateIfConnected() {
     final authProvider = AuthProvider.of(context, listen: false);
     if (authProvider.isFullySignedIn) {
-      if (authProvider.databaseAccessLevel < AccessLevel.admin) {
+      if (authProvider.databaseAccessLevel < AccessLevel.schoolAdmin) {
         WidgetsBinding.instance.addPostFrameCallback(
           (_) => showSnackBar(
             context,
-            message:
-                'Vous n\'êtes pas un administrateur de Stagess.\n'
+            message: 'Vous n\'êtes pas un administrateur de Stagess.\n'
                 'Connectez-vous sur le site web client pour accéder à votre compte.',
           ),
         );
@@ -137,70 +136,69 @@ class _LoginScreenState extends State<LoginScreen> {
           child: SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child:
-                  authProvider.isAuthenticatorSignedIn
-                      ? Center(
-                        child: Text(
-                          schoolBoardsProvider.hasProblemConnecting
-                              ? 'Impossible de se connecter à la base de données, \n'
-                                  'vérifiez votre connexion internet.'
-                              : schoolBoardsProvider.connexionRefused
-                              ? 'Connexion refusée, \n'
-                                  'veuillez contacter votre administrateur'
-                              : 'Connexion en cours...',
+              child: authProvider.isAuthenticatorSignedIn
+                  ? Center(
+                      child: Text(
+                        schoolBoardsProvider.hasProblemConnecting
+                            ? 'Impossible de se connecter à la base de données, \n'
+                                'vérifiez votre connexion internet.'
+                            : schoolBoardsProvider.connexionRefused
+                                ? 'Connexion refusée, \n'
+                                    'veuillez contacter votre administrateur'
+                                : 'Connexion en cours...',
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    )
+                  : Column(
+                      children: [
+                        Text(
+                          'Connectez-vous à votre compte avant de poursuivre.',
                           textAlign: TextAlign.center,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
-                      )
-                      : Column(
-                        children: [
-                          Text(
-                            'Connectez-vous à votre compte avant de poursuivre.',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.titleMedium,
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            icon: Icon(Icons.mail),
+                            labelText: 'Courriel',
                           ),
-                          const SizedBox(height: 8),
-                          TextFormField(
-                            decoration: const InputDecoration(
-                              icon: Icon(Icons.mail),
-                              labelText: 'Courriel',
-                            ),
-                            validator: FormService.emailValidator,
-                            keyboardType: TextInputType.emailAddress,
-                            onChanged: (email) => _email = email,
-                            onFieldSubmitted: (_) => _signIn(),
+                          validator: FormService.emailValidator,
+                          keyboardType: TextInputType.emailAddress,
+                          onChanged: (email) => _email = email,
+                          onFieldSubmitted: (_) => _signIn(),
+                        ),
+                        const SizedBox(height: 8),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            icon: Icon(Icons.lock),
+                            labelText: 'Mot de passe',
                           ),
-                          const SizedBox(height: 8),
-                          TextFormField(
-                            decoration: const InputDecoration(
-                              icon: Icon(Icons.lock),
-                              labelText: 'Mot de passe',
-                            ),
-                            validator: FormService.passwordValidator,
-                            keyboardType: TextInputType.visiblePassword,
-                            obscureText: true,
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            onSaved: (password) => _password = password,
-                            onFieldSubmitted: (_) => _signIn(),
+                          validator: FormService.passwordValidator,
+                          keyboardType: TextInputType.visiblePassword,
+                          obscureText: true,
+                          enableSuggestions: false,
+                          autocorrect: false,
+                          onSaved: (password) => _password = password,
+                          onFieldSubmitted: (_) => _signIn(),
+                        ),
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: _signIn,
+                          child: const Text('Se connecter'),
+                        ),
+                        const SizedBox(height: 8),
+                        MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () {
+                              _showForgotPasswordDialog();
+                            },
+                            child: Text('Mot de passe oublié ?'),
                           ),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: _signIn,
-                            child: const Text('Se connecter'),
-                          ),
-                          const SizedBox(height: 8),
-                          MouseRegion(
-                            cursor: SystemMouseCursors.click,
-                            child: GestureDetector(
-                              onTap: () {
-                                _showForgotPasswordDialog();
-                              },
-                              child: Text('Mot de passe oublié ?'),
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
+                    ),
             ),
           ),
         ),

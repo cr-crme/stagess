@@ -201,7 +201,7 @@ void main() {
     await database.put(
       RequestFields.teacher,
       data: {'id': '0', 'first_name': 'John', 'last_name': 'Smith'},
-      user: DatabaseUserMock(accessLevel: AccessLevel.admin),
+      user: DatabaseUserMock(accessLevel: AccessLevel.schoolBoardAdmin),
     );
     final updatedTeacher = await database.get(
       RequestFields.teacher,
@@ -231,7 +231,7 @@ void main() {
         'last_name': 'Smith',
         'school_board_id': '100'
       },
-      user: DatabaseUserMock(accessLevel: AccessLevel.admin),
+      user: DatabaseUserMock(accessLevel: AccessLevel.schoolBoardAdmin),
     );
     final newTeacher = await database.get(
       RequestFields.teacher,

@@ -201,20 +201,37 @@ Future<void> _addDummyAdmins(
 }) async {
   dev.log('Adding dummy admins');
 
-  final schoolBoardId = schoolBoards
-      .firstWhere(
-        (schoolBoard) => schoolBoard.name == 'Mon centre de services scolaire',
-      )
-      .id;
+  final schoolBoard = schoolBoards.firstWhere(
+    (schoolBoard) => schoolBoard.name == 'Mon centre de services scolaire',
+  );
+
+  final schoolBoardId = schoolBoard.id;
+  final schoolId =
+      schoolBoard.schools.firstWhere((school) => school.name == 'École A').id;
+
+  admins.add(
+    Admin(
+      firstName: 'Jeannette',
+      lastName: 'Duponte',
+      schoolBoardId: schoolBoardId,
+      schoolId: '',
+      hasRegisteredAccount: false,
+      email: 'admin@moncentre.qc',
+      accessLevel: AccessLevel.schoolBoardAdmin,
+      phone: PhoneNumber.empty,
+      address: Address.empty,
+    ),
+  );
 
   admins.add(
     Admin(
       firstName: 'Jean',
       lastName: 'Dupont',
       schoolBoardId: schoolBoardId,
+      schoolId: schoolId,
       hasRegisteredAccount: false,
-      email: 'admin@moncentre.qc',
-      accessLevel: AccessLevel.admin,
+      email: 'school_admin@moncentre.qc',
+      accessLevel: AccessLevel.schoolAdmin,
       phone: PhoneNumber.empty,
       address: Address.empty,
     ),

@@ -12,19 +12,25 @@ import 'package:stagess_common/models/generic/fetchable_fields.dart';
 class DatabaseUserMock extends DatabaseUser {
   final bool _isVerified;
   final String _schoolBoardId;
+  final String _schoolId;
   final AccessLevel _accessLevel;
 
   DatabaseUserMock({
     bool isVerified = true,
     String schoolBoardId = '100',
+    String schoolId = '200',
     AccessLevel accessLevel = AccessLevel.teacher,
   })  : _isVerified = isVerified,
         _schoolBoardId = schoolBoardId,
+        _schoolId = schoolId,
         _accessLevel = accessLevel,
         super.empty();
 
   @override
   String get schoolBoardId => _schoolBoardId;
+
+  @override
+  String get schoolId => _schoolId;
 
   @override
   AccessLevel get accessLevel => _accessLevel;

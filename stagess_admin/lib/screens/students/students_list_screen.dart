@@ -145,7 +145,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
             onPressed: () => setState(() => _showSearchBar = !_showSearchBar),
             icon: const Icon(Icons.search),
           ),
-          if (authProvider.databaseAccessLevel >= AccessLevel.admin)
+          if (authProvider.databaseAccessLevel >= AccessLevel.schoolAdmin)
             IconButton(
               onPressed: () => _showAddStudentDialog(context),
               icon: Icon(Icons.add),
@@ -225,7 +225,8 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
             ),
           )
           .toList(),
-      AccessLevel.admin ||
+      AccessLevel.schoolBoardAdmin ||
+      AccessLevel.schoolAdmin ||
       AccessLevel.teacher ||
       AccessLevel.invalid =>
         schoolBoardStudents.values.firstOrNull?.entries

@@ -41,7 +41,7 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
 
     // Filter enterprises based on user access level (this should already be done, but just in case)
     enterprises.removeWhere((key, value) =>
-        user.accessLevel <= AccessLevel.admin &&
+        user.accessLevel < AccessLevel.superAdmin &&
         value.schoolBoardId != user.schoolBoardId);
 
     return RepositoryResponse(
@@ -64,7 +64,7 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     if (enterprise == null) throw MissingDataException('Enterprise not found');
 
     // Prevent from getting an enterprise that the user does not have access to (this should already be done, but just in case)
-    if (user.accessLevel <= AccessLevel.admin &&
+    if (user.accessLevel < AccessLevel.superAdmin &&
         enterprise.schoolBoardId != user.schoolBoardId) {
       throw MissingDataException('Enterprise not found');
     }
@@ -111,7 +111,7 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     final newEnterprise = previous?.copyWithData(data) ??
         Enterprise.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
 
-    if (user.accessLevel <= AccessLevel.admin &&
+    if (user.accessLevel < AccessLevel.superAdmin &&
         newEnterprise.schoolBoardId != user.schoolBoardId) {
       throw InvalidRequestException(
           'You do not have permission to put this enterprise');
@@ -146,7 +146,12 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     InternshipsRepository? internshipsRepository,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified || user.accessLevel < AccessLevel.admin) {
+    if (user.isNotVerified) {
+      throw InvalidRequestException(
+          'You do not have permission to get administrators');
+    }
+
+    if (user.accessLevel < AccessLevel.schoolAdmin) {
       throw InvalidRequestException(
           'You do not have permission to delete enterprises');
     }
@@ -166,9 +171,10 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
       return response;
     }
 
-    if (user.accessLevel <= AccessLevel.admin &&
-        (await _getEnterpriseById(id: id, user: user))?.schoolBoardId !=
-            user.schoolBoardId) {
+    final enterprise = await _getEnterpriseById(id: id, user: user);
+
+    if (user.accessLevel < AccessLevel.superAdmin &&
+        user.schoolBoardId != enterprise?.schoolBoardId) {
       throw InvalidRequestException(
           'You do not have permission to delete this enterprise');
     }
@@ -675,7 +681,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     // Prevent from removing a job from an enterprise
     for (final job in previous.jobs) {
       if (!enterprise.jobs.map((e) => e.id).contains(job.id)) {
-        if (user.accessLevel < AccessLevel.admin) {
+        if (user.accessLevel < AccessLevel.schoolAdmin) {
           _logger.warning(
               'User ${user.userId} tried to remove job (${job.id}) from enterprise '
               '(${enterprise.id}) but does not have permission, skipping');
@@ -716,7 +722,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
 
       final toUpdate = <String, dynamic>{};
       if (differences.contains('specialization_id')) {
-        if (user.accessLevel < AccessLevel.admin) {
+        if (user.accessLevel < AccessLevel.schoolAdmin) {
           _logger.warning(
               'User ${user.userId} tried to update "specialization_id" of job (${job.id}) '
               'of enterprise (${enterprise.id}) but does not have permission, skipping');
@@ -729,7 +735,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
         toUpdate['minimum_age'] = job.minimumAge.serialize();
       }
       if (differences.contains('reserved_for_id')) {
-        if (user.accessLevel < AccessLevel.admin) {
+        if (user.accessLevel < AccessLevel.schoolAdmin) {
           _logger.warning(
               'User ${user.userId} tried to update "reserved_for_id" of job (${job.id}) '
               'of enterprise (${enterprise.id}) but does not have permission, skipping');
@@ -759,8 +765,8 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
         ));
 
         late final Map<String, int> newPositionsOffered;
-        if (user.accessLevel < AccessLevel.admin) {
-          // Only admins can modify all positions offered, others can only
+        if (user.accessLevel < AccessLevel.schoolBoardAdmin) {
+          // Only school admins can modify all positions offered, others can only
           // modify their own school positions offered
           newPositionsOffered =
               previousJob.positionsOffered.map((k, v) => MapEntry(k, v));
@@ -783,7 +789,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       if (differences.contains('comments')) {
         // Make sure the user has the permission to update the comments
         // i.e. it is an admin or the teacher has supervised at least one internship in this enterprise
-        if (user.accessLevel < AccessLevel.admin) {
+        if (user.accessLevel < AccessLevel.schoolAdmin) {
           final internships = (await internshipsRepository.getAll(
               user: user,
               fields: FetchableFields({

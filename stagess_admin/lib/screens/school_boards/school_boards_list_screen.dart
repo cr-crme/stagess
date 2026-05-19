@@ -126,34 +126,37 @@ class _SchoolBoardsListScreenState extends State<SchoolBoardsListScreen> {
     }
 
     return switch (authProvider.databaseAccessLevel) {
-      AccessLevel.superAdmin || AccessLevel.admin => schoolBoards
+      AccessLevel.superAdmin || AccessLevel.schoolBoardAdmin => schoolBoards
           .map(
             (schoolBoard) => SchoolBoardListTile(
               key: ValueKey(schoolBoard.id),
               schoolBoard: schoolBoard,
-              elevation: authProvider.databaseAccessLevel == AccessLevel.admin
+              elevation: authProvider.databaseAccessLevel ==
+                      AccessLevel.schoolBoardAdmin
                   ? 0
                   : null,
               filteredSchoolIds: filteredSchoolIds,
             ),
           )
           .toList(),
-      AccessLevel.teacher || AccessLevel.invalid => schoolBoards
-              .firstOrNull?.schools
-              .where((school) =>
-                  filteredSchoolIds == null ||
-                  filteredSchoolIds.contains(school.id))
-              .map(
-                (school) => SchoolListTile(
-                  key: ValueKey(school.id),
-                  school: school,
-                  schoolBoard: schoolBoards.firstOrNull ?? SchoolBoard.empty,
-                  canEdit: false,
-                  canDelete: false,
-                ),
-              )
-              .toList() ??
-          [],
+      AccessLevel.schoolAdmin ||
+      AccessLevel.teacher ||
+      AccessLevel.invalid =>
+        schoolBoards.firstOrNull?.schools
+                .where((school) =>
+                    filteredSchoolIds == null ||
+                    filteredSchoolIds.contains(school.id))
+                .map(
+                  (school) => SchoolListTile(
+                    key: ValueKey(school.id),
+                    school: school,
+                    schoolBoard: schoolBoards.firstOrNull ?? SchoolBoard.empty,
+                    canEdit: false,
+                    canDelete: false,
+                  ),
+                )
+                .toList() ??
+            [],
     };
   }
 }

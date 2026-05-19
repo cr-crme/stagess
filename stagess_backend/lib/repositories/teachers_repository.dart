@@ -32,8 +32,11 @@ abstract class TeachersRepository extends RepositoryAbstract {
 
     // Filter teachers based on user access level (this should already be done, but just in case)
     teachers.removeWhere((key, value) =>
-        user.accessLevel <= AccessLevel.admin &&
+        user.accessLevel < AccessLevel.superAdmin &&
         value.schoolBoardId != user.schoolBoardId);
+    teachers.removeWhere((key, value) =>
+        user.accessLevel < AccessLevel.schoolAdmin &&
+        value.schoolId != user.schoolId);
 
     return RepositoryResponse(
         data: teachers.map(
@@ -55,8 +58,12 @@ abstract class TeachersRepository extends RepositoryAbstract {
     if (teacher == null) throw MissingDataException('Teacher not found');
 
     // Prevent from getting a teacher that the user does not have access to (this should already be done, but just in case)
-    if (user.accessLevel <= AccessLevel.admin &&
+    if (user.accessLevel < AccessLevel.superAdmin &&
         teacher.schoolBoardId != user.schoolBoardId) {
+      throw MissingDataException('Teacher not found');
+    }
+    if (user.accessLevel < AccessLevel.schoolAdmin &&
+        teacher.schoolId != user.schoolId) {
       throw MissingDataException('Teacher not found');
     }
 
@@ -93,18 +100,21 @@ abstract class TeachersRepository extends RepositoryAbstract {
         Teacher.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
 
     // If the user is not at least an admin, they cannot insert new teachers
-    if (user.accessLevel == AccessLevel.admin &&
+    if (user.accessLevel < AccessLevel.superAdmin &&
         newTeacher.schoolBoardId != user.schoolBoardId) {
       throw InvalidRequestException(
           'You do not have permission to put this teacher');
-    } else if (user.accessLevel < AccessLevel.admin) {
-      if (previous == null) {
-        throw InvalidRequestException(
-            'You do not have permission to insert teachers');
-      } else if (previous.id != user.userId) {
-        throw InvalidRequestException(
-            'You do not have permission to update teachers');
-      }
+    }
+    if (user.accessLevel < AccessLevel.schoolBoardAdmin &&
+        newTeacher.schoolId != user.schoolId) {
+      throw InvalidRequestException(
+          'You do not have permission to put this teacher');
+    }
+    if (user.accessLevel < AccessLevel.schoolAdmin &&
+        (previous == null || newTeacher.id != user.userId)) {
+      // Teacher are only allowed to update themselves, but not insert new teachers including themselves
+      throw InvalidRequestException(
+          'You do not have permission to put this teacher');
     }
 
     await _putTeacher(teacher: newTeacher, previous: previous, user: user);
@@ -122,16 +132,14 @@ abstract class TeachersRepository extends RepositoryAbstract {
     required DatabaseUser user,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified || user.accessLevel < AccessLevel.admin) {
+    if (user.isNotVerified) {
       throw InvalidRequestException(
           'You do not have permission to delete teachers');
     }
 
-    if (user.accessLevel <= AccessLevel.admin &&
-        (await _getTeacherById(id: id, user: user))?.schoolBoardId !=
-            user.schoolBoardId) {
+    if (user.accessLevel < AccessLevel.schoolAdmin) {
       throw InvalidRequestException(
-          'You do not have permission to delete this teacher');
+          'You do not have permission to delete teachers');
     }
 
     if (!canEdit(user: user, id: id)) {
@@ -144,6 +152,22 @@ abstract class TeachersRepository extends RepositoryAbstract {
           await deleteById(id: id, user: user, tryRequestingLock: false);
       await releaseLock(user: user, id: id);
       return response;
+    }
+
+    final teacher = await _getTeacherById(id: id, user: user);
+    if (teacher == null) {
+      throw MissingDataException('Teacher not found');
+    }
+
+    if (user.accessLevel < AccessLevel.superAdmin &&
+        user.schoolBoardId != teacher.schoolBoardId) {
+      throw InvalidRequestException(
+          'You do not have permission to delete this teacher');
+    }
+    if (user.accessLevel < AccessLevel.schoolBoardAdmin &&
+        user.schoolId != teacher.schoolId) {
+      throw InvalidRequestException(
+          'You do not have permission to delete this teacher');
     }
 
     final removedId = await _deleteTeacher(id: id);
@@ -328,7 +352,7 @@ class MySqlTeachersRepository extends TeachersRepository {
           'Cannot update school_board_id for the teachers');
     }
     if (differences.contains('school_id')) {
-      if (user.accessLevel < AccessLevel.admin) {
+      if (user.accessLevel < AccessLevel.schoolBoardAdmin) {
         _logger.warning(
             'User ${user.userId} tried to change the school (${teacher.schoolId}) '
             'of teacher (${teacher.id}) but does not have permission, skipping');
@@ -342,7 +366,7 @@ class MySqlTeachersRepository extends TeachersRepository {
     }
     if (toUpdate.isNotEmpty) {
       // These modifications are only allowed to admins
-      if (user.accessLevel < AccessLevel.admin) {
+      if (user.accessLevel < AccessLevel.schoolAdmin) {
         throw InvalidRequestException(
             'You do not have permission to insert teachers');
       }
@@ -372,7 +396,7 @@ class MySqlTeachersRepository extends TeachersRepository {
     if (!differences.contains('groups')) return;
 
     // These modifications are only allowed to admins
-    if (user.accessLevel < AccessLevel.admin) {
+    if (user.accessLevel < AccessLevel.schoolAdmin) {
       throw InvalidRequestException(
           'You do not have permission to insert teachers');
     }

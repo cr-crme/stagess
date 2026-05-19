@@ -14,6 +14,7 @@ import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/services/image_helpers.dart';
 import 'package:stagess_common/utils.dart';
 
+// TODO Validate the changes to rules
 abstract class SchoolBoardsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
@@ -57,7 +58,12 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
     required DatabaseUser user,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified || user.accessLevel < AccessLevel.admin) {
+    if (user.isNotVerified) {
+      throw InvalidRequestException(
+          'You do not have permission to put school boards');
+    }
+
+    if (user.accessLevel < AccessLevel.schoolBoardAdmin) {
       throw InvalidRequestException(
           'You do not have permission to put school boards');
     }
@@ -76,9 +82,14 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
 
     // Update if exists, insert if not
     final previous = await _getSchoolBoardById(id: id, user: user);
-
     final newSchoolBoard = previous?.copyWithData(data) ??
         SchoolBoard.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
+
+    if (user.accessLevel < AccessLevel.superAdmin &&
+        user.schoolBoardId != newSchoolBoard.id) {
+      throw InvalidRequestException(
+          'You do not have permission to put that school board');
+    }
 
     await _putSchoolBoard(
         schoolBoard: newSchoolBoard, previous: previous, user: user);
@@ -96,7 +107,12 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
     required DatabaseUser user,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified || user.accessLevel < AccessLevel.superAdmin) {
+    if (user.isNotVerified) {
+      throw InvalidRequestException(
+          'You do not have permission to delete school boards');
+    }
+
+    if (user.accessLevel < AccessLevel.superAdmin) {
       throw InvalidRequestException(
           'You do not have permission to delete school boards');
     }
@@ -238,14 +254,7 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
     required DatabaseUser user,
   }) async {
     final differences = schoolBoard.getDifference(previous);
-    final isOkay = differences.isEmpty ||
-        user.accessLevel >= AccessLevel.superAdmin ||
-        (user.accessLevel == AccessLevel.admin &&
-            schoolBoard.id == user.schoolBoardId);
-    if (!isOkay) {
-      throw InvalidRequestException(
-          'You must be an admin to update a school board');
-    }
+    if (differences.isEmpty) return;
 
     final toUpdate = <String, dynamic>{};
     if (differences.contains('name')) {
@@ -272,13 +281,6 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
 
   Future<void> _insertToSchools(School school, SchoolBoard schoolBoard,
       {required DatabaseUser user}) async {
-    final isOkay = user.accessLevel >= AccessLevel.superAdmin ||
-        (user.accessLevel == AccessLevel.admin &&
-            schoolBoard.id == user.schoolBoardId);
-    if (!isOkay) {
-      throw InvalidRequestException('You must be a admin to create a school');
-    }
-
     await sqlInterface.performInsertQuery(
         tableName: 'entities', data: {'shared_id': school.id});
     await sqlInterface.performInsertQuery(tableName: 'schools', data: {
@@ -297,14 +299,7 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
   Future<void> _updateToSchools(School school, School previous,
       {required SchoolBoard schoolBoard, required DatabaseUser user}) async {
     final toUpdate = school.getDifference(previous);
-    final isOkay = toUpdate.isEmpty ||
-        user.accessLevel >= AccessLevel.superAdmin ||
-        (user.accessLevel == AccessLevel.admin &&
-            schoolBoard.id == user.schoolBoardId);
-    if (!isOkay) {
-      throw InvalidRequestException(
-          'You must be a valid admin to update a school');
-    }
+    if (toUpdate.isEmpty) return;
 
     if (toUpdate.contains('name')) {
       await sqlInterface.performUpdateQuery(

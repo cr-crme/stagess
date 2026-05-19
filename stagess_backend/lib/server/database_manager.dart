@@ -224,6 +224,7 @@ class DatabaseManager {
       RequestFields.internship => await internshipsDatabase.deleteById(
           id: _getId(data,
               messageOnNull: 'An "id" is required to delete an internship'),
+          studentsRepository: studentsDatabase,
           user: user,
         ),
     };
