@@ -220,7 +220,6 @@ class Enterprise extends ExtendedItemSerializable {
         'neq': FetchableFields.optional,
       });
 
-  @override
   Enterprise.fromSerialized(super.map)
       : schoolBoardId = StringExt.from(map?['school_board_id']) ?? '-1',
         name = StringExt.from(map?['name']) ?? 'Unnamed enterprise',

@@ -5,6 +5,5 @@ abstract class ExtendedItemSerializable<T> extends ItemSerializable {
 
   ExtendedItemSerializable({super.id});
 
-  @override
   ExtendedItemSerializable.fromSerialized(super.map) : super.fromSerialized();
 }
