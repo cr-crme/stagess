@@ -5,19 +5,26 @@ import 'package:stagess_common_flutter/widgets/pdf_widgets/pdf_theme.dart';
 
 class PdfCheckBoxes extends pw.StatelessWidget {
   PdfCheckBoxes({
-    required this.options,
+    required Map<String, bool> options,
+    this.includeNotApplicable = false,
     this.includeOthers = false,
     this.otherValue,
     this.textStyle,
-  });
+  }) : options = Map.of(options);
 
   final Map<String, bool> options;
+  final bool includeNotApplicable;
   final bool includeOthers;
-  final String? otherValue;
+  String? otherValue;
   final pw.TextStyle? textStyle;
 
   @override
   pw.Widget build(pw.Context context) {
+    if (includeNotApplicable) {
+      options['Ne s\'applique pas'] =
+          otherValue == '__NOT_APPLICABLE_INTERNAL__';
+      otherValue = '';
+    }
     if (includeOthers) {
       if (otherValue == null) {
         throw ArgumentError(

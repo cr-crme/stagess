@@ -145,6 +145,7 @@ pw.Widget _buildQuestion(
                             (a) => !(question.choices?.contains(a) ?? false))
                         .join(', ') ??
                     '',
+                includeNotApplicable: true,
                 includeOthers: true,
               ),
             ),
