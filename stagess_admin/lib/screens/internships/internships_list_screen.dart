@@ -226,12 +226,14 @@ class _InternshipsListScreenState extends State<InternshipsListScreen> {
                 children: [
                   _InternshipsByStatus(
                     key: const ValueKey('active_internships'),
+                    schoolBoardId: schoolBoardEntry.key.id,
                     areActive: true,
                     internships: schoolBoardEntry.value[true] ?? {},
                     filteredInternshipIds: filteredInternshipIds,
                   ),
                   _InternshipsByStatus(
                     key: const ValueKey('closed_internships'),
+                    schoolBoardId: schoolBoardEntry.key.id,
                     areActive: false,
                     internships: schoolBoardEntry.value[false] ?? {},
                     filteredInternshipIds: filteredInternshipIds,
@@ -243,23 +245,26 @@ class _InternshipsListScreenState extends State<InternshipsListScreen> {
           .toList(),
       AccessLevel.schoolBoardAdmin ||
       AccessLevel.schoolAdmin ||
-      AccessLevel.teacher ||
-      AccessLevel.invalid =>
+      AccessLevel.teacher =>
         [
           _InternshipsByStatus(
             key: const ValueKey('active_internships'),
+            schoolBoardId: authProvider.schoolBoardId!,
             areActive: true,
             internships: schoolBoardInternships.values.firstOrNull?[true] ?? {},
             filteredInternshipIds: filteredInternshipIds,
           ),
           _InternshipsByStatus(
             key: const ValueKey('closed_internships'),
+            schoolBoardId: authProvider.schoolBoardId!,
             areActive: false,
             internships:
                 schoolBoardInternships.values.firstOrNull?[false] ?? {},
             filteredInternshipIds: filteredInternshipIds,
           ),
         ],
+      AccessLevel.self || AccessLevel.invalid => throw Exception(
+          'Wrong access level: ${authProvider.databaseAccessLevel}'),
     };
   }
 }
@@ -267,11 +272,13 @@ class _InternshipsListScreenState extends State<InternshipsListScreen> {
 class _InternshipsByStatus extends StatelessWidget {
   const _InternshipsByStatus({
     super.key,
+    required this.schoolBoardId,
     required this.areActive,
     required this.internships,
     required this.filteredInternshipIds,
   });
 
+  final String schoolBoardId;
   final Map<School, Map<Teacher, List<Internship>>> internships;
   final bool areActive;
   final List<String>? filteredInternshipIds;
@@ -290,6 +297,7 @@ class _InternshipsByStatus extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.only(left: 16.0),
         child: _InternshipsBySchools(
+            schoolBoardId: schoolBoardId,
             internships: internships,
             filteredInternshipIds: filteredInternshipIds),
       ),
@@ -299,10 +307,12 @@ class _InternshipsByStatus extends StatelessWidget {
 
 class _InternshipsBySchools extends StatelessWidget {
   const _InternshipsBySchools({
+    required this.schoolBoardId,
     required this.internships,
     required this.filteredInternshipIds,
   });
 
+  final String schoolBoardId;
   final Map<School, Map<Teacher, List<Internship>>> internships;
   final List<String>? filteredInternshipIds;
 
@@ -333,7 +343,9 @@ class _InternshipsBySchools extends StatelessWidget {
           initialExpandedState: true,
           elevation: 0,
           child: _InternshipsByTeachers(
-              teachers: teachers, filteredInternshipIds: filteredInternshipIds),
+              schoolBoardId: schoolBoardId,
+              teachers: teachers,
+              filteredInternshipIds: filteredInternshipIds),
         );
       }).toList(),
     );
@@ -342,10 +354,12 @@ class _InternshipsBySchools extends StatelessWidget {
 
 class _InternshipsByTeachers extends StatelessWidget {
   const _InternshipsByTeachers({
+    required this.schoolBoardId,
     required this.teachers,
     required this.filteredInternshipIds,
   });
 
+  final String schoolBoardId;
   final Map<Teacher, List<Internship>> teachers;
   final List<String>? filteredInternshipIds;
 
@@ -387,6 +401,7 @@ class _InternshipsByTeachers extends StatelessWidget {
                       .map((internship) {
                     return InternshipListTile(
                       key: ValueKey(internship.id),
+                      schoolBoardId: schoolBoardId,
                       internship: internship,
                       canEdit: true,
                       canDelete: canDelete,

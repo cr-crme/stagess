@@ -6,6 +6,7 @@ import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/persons/person.dart';
+import 'package:stagess_common/models/persons/school_member.dart';
 import 'package:stagess_common/models/persons/student_visa.dart';
 
 enum Program {
@@ -44,11 +45,14 @@ enum Program {
   }
 }
 
-class Student extends Person {
+class Student extends Person with SchoolMember {
   static final _currentVersion = '1.0.0';
   static String get currentVersion => _currentVersion;
 
+  @override
   final String schoolBoardId;
+
+  @override
   final String schoolId;
 
   final String photo;

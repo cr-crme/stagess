@@ -470,16 +470,14 @@ CREATE TABLE enterprise_job_incidents(
 
 CREATE TABLE internships (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
-    school_board_id VARCHAR(36) NOT NULL,
     student_id VARCHAR(36) NOT NULL,
     enterprise_id VARCHAR(36) NOT NULL,
     achieved_duration BIGINT NOT NULL,
     teacher_notes VARCHAR(2000) NOT NULL,
     end_date BIGINT,
-    FOREIGN KEY (student_id) REFERENCES students(id), 
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE, 
     FOREIGN KEY (enterprise_id) REFERENCES enterprises(id),
-    FOREIGN KEY (id) REFERENCES entities(shared_id) ON DELETE CASCADE, 
-    FOREIGN KEY (school_board_id) REFERENCES school_boards(id) ON DELETE CASCADE
+    FOREIGN KEY (id) REFERENCES entities(shared_id) ON DELETE CASCADE
 );
 
 CREATE TABLE internship_supervising_teachers (

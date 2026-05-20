@@ -5,6 +5,7 @@ class DatabaseUser {
     if (_authenticatorId.isEmpty) return false;
     switch (accessLevel) {
       case AccessLevel.invalid:
+      case AccessLevel.self:
         return false;
       case AccessLevel.superAdmin:
         return _authenticatorId.isNotEmpty;

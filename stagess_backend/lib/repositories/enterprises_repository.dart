@@ -5,6 +5,7 @@ import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
+import 'package:stagess_backend/utils/security_policies.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
@@ -32,17 +33,13 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     required FetchableFields fields,
     required DatabaseUser user,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to get enterprises');
-    }
-
     final enterprises = await _getAllEnterprises(user: user);
 
-    // Filter enterprises based on user access level (this should already be done, but just in case)
-    enterprises.removeWhere((key, value) =>
-        user.accessLevel < AccessLevel.superAdmin &&
-        value.schoolBoardId != user.schoolBoardId);
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      ...enterprises.values
+          .map((e) => UserIsFromSameSchoolBoard(user: user, item: e)),
+    ]).validate();
 
     return RepositoryResponse(
         data: enterprises.map(
@@ -55,21 +52,15 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     required FetchableFields fields,
     required DatabaseUser user,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to get enterprises');
-    }
-
     final enterprise = await _getEnterpriseById(id: id, user: user);
-    if (enterprise == null) throw MissingDataException('Enterprise not found');
 
-    // Prevent from getting an enterprise that the user does not have access to (this should already be done, but just in case)
-    if (user.accessLevel < AccessLevel.superAdmin &&
-        enterprise.schoolBoardId != user.schoolBoardId) {
-      throw MissingDataException('Enterprise not found');
-    }
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasData(item: enterprise),
+      UserIsFromSameSchoolBoard(user: user, item: enterprise),
+    ]).validate();
 
-    return RepositoryResponse(data: enterprise.serializeWithFields(fields));
+    return RepositoryResponse(data: enterprise!.serializeWithFields(fields));
   }
 
   @override
@@ -80,30 +71,28 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     InternshipsRepository? internshipsRepository,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to put new enterprises');
-    }
-
     if (internshipsRepository == null) {
       throw InvalidRequestException(
           'Internships repository is required for this operation');
     }
 
     if (!canEdit(user: user, id: id)) {
-      if (!tryRequestingLock ||
-          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+      if (!tryRequestingLock) {
         throw InvalidRequestException(
             'You must acquire a lock before editing this enterprise');
       }
-      final response = await putById(
+      return await requestLockAndPerformTask(
           id: id,
-          data: data,
           user: user,
-          internshipsRepository: internshipsRepository,
-          tryRequestingLock: false);
-      await releaseLock(user: user, id: id);
-      return response;
+          task: () {
+            return putById(
+              id: id,
+              data: data,
+              user: user,
+              internshipsRepository: internshipsRepository,
+              tryRequestingLock: false,
+            );
+          });
     }
 
     // Update if exists, insert if not
@@ -111,16 +100,103 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     final newEnterprise = previous?.copyWithData(data) ??
         Enterprise.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
 
-    if (user.accessLevel < AccessLevel.superAdmin &&
-        newEnterprise.schoolBoardId != user.schoolBoardId) {
-      throw InvalidRequestException(
-          'You do not have permission to put this enterprise');
-    }
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasData(item: newEnterprise),
+      UserIsFromSameSchoolBoard(user: user, item: newEnterprise),
+      ModificationsAreValid(
+        user: user,
+        item: newEnterprise,
+        previous: previous,
+        allowedToCreate: [
+          AccessLevel.schoolAdmin,
+          AccessLevel.schoolBoardAdmin,
+          AccessLevel.superAdmin,
+        ],
+        allowedToModify: [
+          AccessLevel.self,
+          AccessLevel.schoolAdmin,
+          AccessLevel.schoolBoardAdmin,
+          AccessLevel.superAdmin,
+        ],
+        whiteList: {
+          AccessLevel.self: [
+            'first_name',
+            'last_name',
+            'date_birth',
+            'phone',
+            'address',
+            'itineraries',
+            'visiting_priorities',
+          ],
+        },
+        blackList: {
+          AccessLevel.schoolAdmin: ['id', 'school_board_id', 'school_id'],
+          AccessLevel.schoolBoardAdmin: ['id', 'school_board_id'],
+          AccessLevel.superAdmin: ['id', 'school_board_id'],
+        },
+        itemValidator: (user, item, previousItem) async {
+          // TODO validate these
+          if (previousItem?.contact.id != null &&
+              (item.contact.id != previousItem?.contact.id)) {
+            throw InvalidRequestException(
+                'Cannot update the contact id of an enterprise');
+          }
 
-    if (newEnterprise.jobs.any((job) => job.photos.length > 3)) {
-      throw InvalidRequestException(
-          'You cannot upload more than 3 photos per job');
-    }
+          for (final job in item.jobs) {
+            if (job.photos.length > 3) {
+              throw InvalidRequestException(
+                  'You cannot upload more than 3 photos per job');
+            }
+
+            final previousJob =
+                previousItem?.jobs.firstWhereOrNull((e) => e.id == job.id);
+            if (previousJob == null) continue; // Dealt with above
+
+            final differences = job.getDifference(previousJob);
+            if (differences.isEmpty) continue;
+
+            if (differences.contains('id')) {
+              throw InvalidRequestException('Cannot update the id of a job');
+            }
+            if (differences.contains('enterprise_id')) {
+              throw InvalidRequestException(
+                  'Cannot update the enterprise id of a job');
+            }
+
+            if (differences.contains('comments')) {
+              // Make sure the user has the permission to update the comments
+              // i.e. it is an admin or the teacher has supervised at least one internship in this enterprise
+              if (user.accessLevel < AccessLevel.schoolAdmin) {
+                final internships = (await internshipsRepository.getAll(
+                    user: user,
+                    fields: FetchableFields({
+                      'enterprise_id': FetchableFields.mandatory,
+                      'signatory_teacher_id': FetchableFields.mandatory,
+                      'extra_supervising_teacher_ids':
+                          FetchableFields.mandatory,
+                    })));
+                final teacherHasSupervizedInThisEnterprise = internships
+                        .data?.values
+                        .where((internship) =>
+                            internship['enterprise_id'] == item.id &&
+                            (internship['signatory_teacher_id'] ==
+                                    user.userId ||
+                                (internship['extra_supervising_teacher_ids']
+                                        as List)
+                                    .contains(user.userId)))
+                        .isNotEmpty ??
+                    false;
+                if (!teacherHasSupervizedInThisEnterprise) {
+                  throw InvalidRequestException(
+                      'You do not have permission to update this enterprise');
+                }
+              }
+            }
+          }
+        },
+      ),
+    ]).validate();
 
     // Put enterprise can remove internships if a job is removed
     await _putEnterprise(
@@ -146,53 +222,53 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     InternshipsRepository? internshipsRepository,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified) {
+    if (internshipsRepository == null) {
       throw InvalidRequestException(
-          'You do not have permission to get administrators');
-    }
-
-    if (user.accessLevel < AccessLevel.schoolAdmin) {
-      throw InvalidRequestException(
-          'You do not have permission to delete enterprises');
+          'Internships repository is required for this operation');
     }
 
     if (!canEdit(user: user, id: id)) {
-      if (!tryRequestingLock ||
-          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+      if (!tryRequestingLock) {
         throw InvalidRequestException(
             'You must acquire a lock before deleting this enterprise');
       }
-      final response = await deleteById(
+      return await requestLockAndPerformTask(
           id: id,
           user: user,
-          internshipsRepository: internshipsRepository,
-          tryRequestingLock: false);
-      await releaseLock(user: user, id: id);
-      return response;
+          task: () {
+            return deleteById(
+              id: id,
+              user: user,
+              internshipsRepository: internshipsRepository,
+              tryRequestingLock: false,
+            );
+          });
     }
 
     final enterprise = await _getEnterpriseById(id: id, user: user);
 
-    if (user.accessLevel < AccessLevel.superAdmin &&
-        user.schoolBoardId != enterprise?.schoolBoardId) {
-      throw InvalidRequestException(
-          'You do not have permission to delete this enterprise');
-    }
-
-    // Prevent from deleting an enterprise that has at least one internship
-    if (user.accessLevel < AccessLevel.superAdmin) {
-      final internships = (await internshipsRepository?.getAll(
-                  user: user,
-                  fields: FetchableFields(
-                      {'enterprise_id': FetchableFields.mandatory})))
-              ?.data ??
-          {};
-      if (internships.values
-          .any((internship) => internship['enterprise_id'] == id)) {
-        throw InvalidRequestException(
-            'You cannot delete this enterprise because it has active internships');
-      }
-    }
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasData(item: enterprise),
+      HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.schoolAdmin),
+      UserIsFromSameSchoolBoard(user: user, item: enterprise),
+      GenericPolicy(validationFunction: () async {
+        // Prevent from deleting an enterprise that has at least one internship
+        if (user.accessLevel < AccessLevel.superAdmin) {
+          final internships = (await internshipsRepository.getAll(
+                      user: user,
+                      fields: FetchableFields(
+                          {'enterprise_id': FetchableFields.mandatory})))
+                  .data ??
+              {};
+          if (internships.values
+              .any((internship) => internship['enterprise_id'] == id)) {
+            throw InvalidRequestException(
+                'You cannot delete this enterprise because it has active internships');
+          }
+        }
+      }),
+    ]).validate();
 
     final response = await _deleteEnterprise(
         id: id, user: user, internshipsRepository: internshipsRepository);
@@ -238,13 +314,18 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     String? enterpriseId,
     required DatabaseUser user,
   }) async {
+    final schoolFilters = ({
+      'school_board_id': user.accessLevel < AccessLevel.superAdmin
+          ? user.schoolBoardId!
+          : null,
+    }..removeWhere((key, value) => value == null))
+        .cast<String, String>();
+
     final enterprises = await sqlInterface.performSelectQuery(
       user: user,
       tableName: 'enterprises',
       filters: (enterpriseId == null ? {} : {'id': enterpriseId})
-        ..addAll(user.accessLevel == AccessLevel.superAdmin
-            ? {}
-            : {'school_board_id': user.schoolBoardId ?? ''}),
+        ..addAll(schoolFilters),
       subqueries: [
         sqlInterface.joinSubquery(
             dataTableName: 'persons',
@@ -487,14 +568,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       Enterprise enterprise, Enterprise previous) async {
     final differences = enterprise.getDifference(previous);
 
-    if (differences.contains('id')) {
-      throw InvalidRequestException('Cannot update the id of an enterprise');
-    }
-    if (differences.contains('school_board_id')) {
-      throw InvalidRequestException(
-          'Cannot update the school board id of an enterprise. Please delete and re-create the enterprise');
-    }
-
     final toUpdate = <String, dynamic>{};
     if (differences.contains('name')) {
       toUpdate['name'] = enterprise.name.serialize();
@@ -710,16 +783,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       if (previousJob == null) continue; // Dealt with above
 
       final differences = job.getDifference(previousJob);
-      if (differences.isEmpty) continue;
-
-      if (differences.contains('id')) {
-        throw InvalidRequestException('Cannot update the id of a job');
-      }
-      if (differences.contains('enterprise_id')) {
-        throw InvalidRequestException(
-            'Cannot update the enterprise id of a job');
-      }
-
       final toUpdate = <String, dynamic>{};
       if (differences.contains('specialization_id')) {
         if (user.accessLevel < AccessLevel.schoolAdmin) {
@@ -787,29 +850,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       }
 
       if (differences.contains('comments')) {
-        // Make sure the user has the permission to update the comments
-        // i.e. it is an admin or the teacher has supervised at least one internship in this enterprise
-        if (user.accessLevel < AccessLevel.schoolAdmin) {
-          final internships = (await internshipsRepository.getAll(
-              user: user,
-              fields: FetchableFields({
-                'enterprise_id': FetchableFields.mandatory,
-                'signatory_teacher_id': FetchableFields.mandatory,
-                'extra_supervising_teacher_ids': FetchableFields.mandatory,
-              })));
-          final teacherHasSupervizedInThisEnterprise = internships.data?.values
-                  .where((internship) =>
-                      internship['enterprise_id'] == enterprise.id &&
-                      (internship['signatory_teacher_id'] == user.userId ||
-                          (internship['extra_supervising_teacher_ids'] as List)
-                              .contains(user.userId)))
-                  .isNotEmpty ??
-              false;
-          if (!teacherHasSupervizedInThisEnterprise) {
-            throw InvalidRequestException(
-                'You do not have permission to update this enterprise');
-          }
-        }
         toWaitDeleted.add(sqlInterface.performDeleteQuery(
             tableName: 'enterprise_job_comments', filters: {'job_id': job.id}));
         toWait.add(_insertJobComments(job.comments, job.id.serialize()));
@@ -855,11 +895,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       Enterprise enterprise, Enterprise previous) async {
     final toUpdate = enterprise.getDifference(previous);
     if (!toUpdate.contains('contact')) return;
-
-    if (enterprise.contact.id != previous.contact.id) {
-      throw InvalidRequestException(
-          'Cannot update the contact id of an enterprise');
-    }
 
     await sqlInterface.performUpdatePerson(
         person: enterprise.contact, previous: previous.contact);

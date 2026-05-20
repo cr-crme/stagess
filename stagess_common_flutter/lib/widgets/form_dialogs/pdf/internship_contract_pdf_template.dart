@@ -50,10 +50,11 @@ Future<Uint8List> generateInternshipContractPdf(
 
   final internship =
       InternshipsProvider.of(mainContext, listen: false).fromId(internshipId);
-  final schoolBoard = SchoolBoardsProvider.of(mainContext, listen: false)
-      .fromId(internship.schoolBoardId);
   final student = StudentsProvider.of(mainContext, listen: false)
       .fromId(internship.studentId);
+
+  final schoolBoard = SchoolBoardsProvider.of(mainContext, listen: false)
+      .fromId(student.schoolBoardId);
   final school =
       schoolBoard.schools.firstWhere((school) => school.id == student.schoolId);
   final teacher = TeachersProvider.of(mainContext, listen: false)

@@ -11,6 +11,13 @@ ALTER TABLE admins
 /* TODO: Change value of access_level */
 
 
+/*******************/
+/*** INTERNSHIPS SECTION ***/
+/***************************/
+ALTER TABLE internships
+    DROP COLUMN school_board_id;
+/* TODO ADD ON DELETE CASCADE for student_id to internships table */
+
 /* Terminate the transaction */
 COMMIT;
 

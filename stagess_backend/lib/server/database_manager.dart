@@ -84,13 +84,14 @@ class DatabaseManager {
               messageOnNull: 'An "id" is required to get an enterprise'),
           fields: fields,
           user: user),
-      RequestFields.internships =>
-        await internshipsDatabase.getAll(fields: fields, user: user),
+      RequestFields.internships => await internshipsDatabase.getAll(
+          fields: fields, user: user, studentsRepository: studentsDatabase),
       RequestFields.internship => await internshipsDatabase.getById(
           id: _getId(data,
               messageOnNull: 'An "id" is required to get an internship'),
           fields: fields,
-          user: user),
+          user: user,
+          studentsRepository: studentsDatabase),
     };
 
     if (response.data == null) {
@@ -165,6 +166,7 @@ class DatabaseManager {
               messageOnNull: 'An "id" is required to put an internship'),
           data: data,
           user: user,
+          studentsRepository: studentsDatabase,
         ),
     };
 
@@ -210,6 +212,7 @@ class DatabaseManager {
           id: _getId(data,
               messageOnNull: 'An "id" is required to delete a student'),
           user: user,
+          internshipsRepository: internshipsDatabase,
         ),
       RequestFields.enterprises => throw InvalidRequestException(
           'Enterprises must be deleted individually'),

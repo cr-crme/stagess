@@ -1,5 +1,6 @@
 enum AccessLevel {
   invalid,
+  self,
   teacher,
   schoolAdmin,
   schoolBoardAdmin,
@@ -19,6 +20,13 @@ enum AccessLevel {
 
   bool operator <(AccessLevel other) {
     return index < other.index;
+  }
+
+  AccessLevel get nextHigher {
+    if (this == AccessLevel.superAdmin) {
+      throw StateError('No higher access level than superAdmin');
+    }
+    return AccessLevel.values[index + 1];
   }
 
   int serialize() {

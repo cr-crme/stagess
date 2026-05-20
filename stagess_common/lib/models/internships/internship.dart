@@ -14,8 +14,6 @@ class Internship extends ExtendedItemSerializable {
   static final String _currentVersion = '1.0.0';
   static String get currentVersion => _currentVersion;
 
-  // Elements fixed across versions of the same stage
-  final String schoolBoardId;
   final String studentId;
   final String signatoryTeacherId;
   final List<String> extraSupervisingTeacherIds;
@@ -61,7 +59,6 @@ class Internship extends ExtendedItemSerializable {
 
   Internship({
     super.id,
-    required this.schoolBoardId,
     required this.studentId,
     required this.signatoryTeacherId,
     required this.extraSupervisingTeacherIds,
@@ -79,7 +76,6 @@ class Internship extends ExtendedItemSerializable {
   }
 
   static Internship get empty => Internship(
-        schoolBoardId: '-1',
         studentId: '',
         signatoryTeacherId: '',
         extraSupervisingTeacherIds: [],
@@ -95,8 +91,7 @@ class Internship extends ExtendedItemSerializable {
       );
 
   Internship.fromSerialized(super.map)
-      : schoolBoardId = StringExt.from(map?['school_board_id']) ?? '-1',
-        studentId = StringExt.from(map?['student_id']) ?? '',
+      : studentId = StringExt.from(map?['student_id']) ?? '',
         signatoryTeacherId = StringExt.from(map?['signatory_teacher_id']) ?? '',
         extraSupervisingTeacherIds = ListExt.from(
                 map?['extra_supervising_teacher_ids'],
@@ -130,7 +125,6 @@ class Internship extends ExtendedItemSerializable {
 
   @override
   Map<String, dynamic> serializedMap() => {
-        'school_board_id': schoolBoardId.serialize(),
         'version': _currentVersion.serialize(),
         'student_id': studentId.serialize(),
         'signatory_teacher_id': signatoryTeacherId.serialize(),
@@ -191,7 +185,6 @@ class Internship extends ExtendedItemSerializable {
   }) {
     return Internship(
       id: id ?? this.id,
-      schoolBoardId: schoolBoardId ?? this.schoolBoardId,
       studentId: studentId ?? this.studentId,
       signatoryTeacherId: signatoryTeacherId ?? this.signatoryTeacherId,
       extraSupervisingTeacherIds:
@@ -245,7 +238,6 @@ class Internship extends ExtendedItemSerializable {
 
     return Internship(
       id: StringExt.from(data['id']) ?? id,
-      schoolBoardId: StringExt.from(data['school_board_id']) ?? schoolBoardId,
       studentId: StringExt.from(data['student_id']) ?? studentId,
       signatoryTeacherId:
           StringExt.from(data['signatory_teacher_id']) ?? signatoryTeacherId,

@@ -397,7 +397,6 @@ visa.StudentVisa dummyStudentVisa({
 
 Internship dummyInternship({
   String id = 'internshipId',
-  String schoolBoardId = 'schoolBoardId',
   String jobId = 'jobId',
   String specializationId = 'specializationId',
   DateTime? versionDate,
@@ -409,7 +408,6 @@ Internship dummyInternship({
 }) {
   return Internship(
     id: id,
-    schoolBoardId: schoolBoardId,
     studentId: studentId,
     signatoryTeacherId: teacherId,
     extraSupervisingTeacherIds: [],

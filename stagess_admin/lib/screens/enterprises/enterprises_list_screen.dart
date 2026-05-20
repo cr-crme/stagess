@@ -173,8 +173,7 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen> {
           .toList(),
       AccessLevel.schoolBoardAdmin ||
       AccessLevel.schoolAdmin ||
-      AccessLevel.teacher ||
-      AccessLevel.invalid =>
+      AccessLevel.teacher =>
         schoolBoardEnterprises.values.firstOrNull
                 ?.where((enterprise) =>
                     filteredEnterpriseIds == null ||
@@ -187,6 +186,8 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen> {
                 )
                 .toList() ??
             [],
+      AccessLevel.self || AccessLevel.invalid => throw Exception(
+          'Wrong access level: ${authProvider.databaseAccessLevel}'),
     };
   }
 }

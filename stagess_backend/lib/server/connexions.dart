@@ -237,6 +237,7 @@ class Connexions {
             email: email);
         break;
       case AccessLevel.superAdmin:
+      case AccessLevel.self:
       case AccessLevel.invalid:
         throw ConnexionRefusedException(
             'Client is not authorized to register user.');
@@ -278,6 +279,7 @@ class Connexions {
       AccessLevel.schoolBoardAdmin =>
         RequestFields.admin,
       AccessLevel.superAdmin ||
+      AccessLevel.self ||
       AccessLevel.invalid =>
         throw 'Client is not authorized to register user.',
     };
@@ -371,6 +373,7 @@ class Connexions {
             email: email);
         break;
       case AccessLevel.superAdmin:
+      case AccessLevel.self:
       case AccessLevel.invalid:
         throw ConnexionRefusedException(
             'Client is not authorized to register user.');
@@ -383,8 +386,9 @@ class Connexions {
         AccessLevel.schoolAdmin ||
         AccessLevel.schoolBoardAdmin =>
           RequestFields.admin,
-        AccessLevel.invalid ||
-        AccessLevel.superAdmin =>
+        AccessLevel.superAdmin ||
+        AccessLevel.self ||
+        AccessLevel.invalid =>
           throw 'Client is not authorized to register user.',
       };
 

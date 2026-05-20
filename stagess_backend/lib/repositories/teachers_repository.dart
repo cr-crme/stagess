@@ -1,8 +1,8 @@
-import 'package:logging/logging.dart';
 import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
+import 'package:stagess_backend/utils/security_policies.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
@@ -12,31 +12,20 @@ import 'package:stagess_common/models/itineraries/itinerary.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/utils.dart';
 
-final _logger = Logger('TeachersRepository');
-
-// AccessLevel in this repository is discarded as all operations are currently
-// available to all users
-
 abstract class TeachersRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
     required FetchableFields fields,
     required DatabaseUser user,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to get teachers');
-    }
-
     final teachers = await _getAllTeachers(user: user);
 
-    // Filter teachers based on user access level (this should already be done, but just in case)
-    teachers.removeWhere((key, value) =>
-        user.accessLevel < AccessLevel.superAdmin &&
-        value.schoolBoardId != user.schoolBoardId);
-    teachers.removeWhere((key, value) =>
-        user.accessLevel < AccessLevel.schoolAdmin &&
-        value.schoolId != user.schoolId);
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      ...teachers.values
+          .map((e) => UserIsFromSameSchoolBoard(user: user, item: e)),
+      ...teachers.values.map((e) => UserIsFromSameSchool(user: user, item: e)),
+    ]).validate();
 
     return RepositoryResponse(
         data: teachers.map(
@@ -49,25 +38,16 @@ abstract class TeachersRepository extends RepositoryAbstract {
     required FetchableFields fields,
     required DatabaseUser user,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to get teachers');
-    }
-
     final teacher = await _getTeacherById(id: id, user: user);
-    if (teacher == null) throw MissingDataException('Teacher not found');
 
-    // Prevent from getting a teacher that the user does not have access to (this should already be done, but just in case)
-    if (user.accessLevel < AccessLevel.superAdmin &&
-        teacher.schoolBoardId != user.schoolBoardId) {
-      throw MissingDataException('Teacher not found');
-    }
-    if (user.accessLevel < AccessLevel.schoolAdmin &&
-        teacher.schoolId != user.schoolId) {
-      throw MissingDataException('Teacher not found');
-    }
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasData(item: teacher),
+      UserIsFromSameSchoolBoard(user: user, item: teacher),
+      UserIsFromSameSchool(user: user, item: teacher),
+    ]).validate();
 
-    return RepositoryResponse(data: teacher.serializeWithFields(fields));
+    return RepositoryResponse(data: teacher!.serializeWithFields(fields));
   }
 
   @override
@@ -77,21 +57,16 @@ abstract class TeachersRepository extends RepositoryAbstract {
     required DatabaseUser user,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to put teachers');
-    }
-
     if (!canEdit(user: user, id: id)) {
-      if (!tryRequestingLock ||
-          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+      if (!tryRequestingLock) {
         throw InvalidRequestException(
             'You must acquire a lock before editing this teacher');
       }
-      final response = await putById(
-          id: id, data: data, user: user, tryRequestingLock: false);
-      await releaseLock(user: user, id: id);
-      return response;
+      return await requestLockAndPerformTask(
+          id: id,
+          user: user,
+          task: () => putById(
+              id: id, data: data, user: user, tryRequestingLock: false));
     }
 
     // Update if exists, insert if not
@@ -99,23 +74,49 @@ abstract class TeachersRepository extends RepositoryAbstract {
     final newTeacher = previous?.copyWithData(data) ??
         Teacher.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
 
-    // If the user is not at least an admin, they cannot insert new teachers
-    if (user.accessLevel < AccessLevel.superAdmin &&
-        newTeacher.schoolBoardId != user.schoolBoardId) {
-      throw InvalidRequestException(
-          'You do not have permission to put this teacher');
-    }
-    if (user.accessLevel < AccessLevel.schoolBoardAdmin &&
-        newTeacher.schoolId != user.schoolId) {
-      throw InvalidRequestException(
-          'You do not have permission to put this teacher');
-    }
-    if (user.accessLevel < AccessLevel.schoolAdmin &&
-        (previous == null || newTeacher.id != user.userId)) {
-      // Teacher are only allowed to update themselves, but not insert new teachers including themselves
-      throw InvalidRequestException(
-          'You do not have permission to put this teacher');
-    }
+    // TODO Test these policies
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasData(item: newTeacher),
+      UserIsFromSameSchoolBoard(user: user, item: newTeacher),
+      UserIsFromSameSchool(user: user, item: newTeacher),
+      ModificationsAreValid(
+        user: user,
+        item: newTeacher,
+        previous: previous,
+        allowedToCreate: [
+          AccessLevel.schoolAdmin,
+          AccessLevel.schoolBoardAdmin,
+          AccessLevel.superAdmin,
+        ],
+        allowedToModify: [
+          AccessLevel.self,
+          AccessLevel.schoolAdmin,
+          AccessLevel.schoolBoardAdmin,
+          AccessLevel.superAdmin,
+        ],
+        whiteList: {
+          AccessLevel.self: [
+            'first_name',
+            'last_name',
+            'date_birth',
+            'phone',
+            'address',
+            'itineraries',
+            'visiting_priorities',
+          ],
+        },
+        blackList: {
+          AccessLevel.schoolAdmin: ['id', 'school_board_id', 'school_id'],
+          AccessLevel.schoolBoardAdmin: ['id', 'school_board_id'],
+          AccessLevel.superAdmin: ['id', 'school_board_id'],
+        },
+        itemValidator: (user, item, previousItem) {
+          // No specific validation
+          return Future.value();
+        },
+      ),
+    ]).validate();
 
     await _putTeacher(teacher: newTeacher, previous: previous, user: user);
     return RepositoryResponse(updatedData: {
@@ -132,47 +133,31 @@ abstract class TeachersRepository extends RepositoryAbstract {
     required DatabaseUser user,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to delete teachers');
-    }
-
-    if (user.accessLevel < AccessLevel.schoolAdmin) {
-      throw InvalidRequestException(
-          'You do not have permission to delete teachers');
-    }
-
     if (!canEdit(user: user, id: id)) {
-      if (!tryRequestingLock ||
-          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+      if (!tryRequestingLock) {
         throw InvalidRequestException(
             'You must acquire a lock before deleting this teacher');
       }
-      final response =
-          await deleteById(id: id, user: user, tryRequestingLock: false);
-      await releaseLock(user: user, id: id);
-      return response;
+      return await requestLockAndPerformTask(
+          id: id,
+          user: user,
+          task: () => deleteById(id: id, user: user, tryRequestingLock: false));
     }
 
     final teacher = await _getTeacherById(id: id, user: user);
-    if (teacher == null) {
-      throw MissingDataException('Teacher not found');
-    }
 
-    if (user.accessLevel < AccessLevel.superAdmin &&
-        user.schoolBoardId != teacher.schoolBoardId) {
-      throw InvalidRequestException(
-          'You do not have permission to delete this teacher');
-    }
-    if (user.accessLevel < AccessLevel.schoolBoardAdmin &&
-        user.schoolId != teacher.schoolId) {
-      throw InvalidRequestException(
-          'You do not have permission to delete this teacher');
-    }
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasData(item: teacher),
+      HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.schoolAdmin),
+      UserIsFromSameSchoolBoard(user: user, item: teacher),
+      UserIsFromSameSchool(user: user, item: teacher),
+    ]).validate();
 
-    final removedId = await _deleteTeacher(id: id);
+    final removedId = await _deleteTeacher(id: teacher!.id);
     if (removedId == null) {
-      throw DatabaseFailureException('Failed to delete teacher with id $id');
+      throw DatabaseFailureException(
+          'Failed to delete teacher with id ${teacher.id}');
     }
     return RepositoryResponse(deletedData: {
       RequestFields.teacher: {removedId: FetchableFields.all}
@@ -206,13 +191,21 @@ class MySqlTeachersRepository extends TeachersRepository {
     String? teacherId,
     required DatabaseUser user,
   }) async {
+    final schoolFilters = ({
+      'school_board_id': user.accessLevel < AccessLevel.superAdmin
+          ? user.schoolBoardId!
+          : null,
+      'school_id': user.accessLevel < AccessLevel.schoolBoardAdmin
+          ? user.schoolId!
+          : null,
+    }..removeWhere((key, value) => value == null))
+        .cast<String, String>();
+
     final teachers = await sqlInterface.performSelectQuery(
         user: user,
         tableName: 'teachers',
         filters: (teacherId == null ? {} : {'id': teacherId})
-          ..addAll(user.accessLevel == AccessLevel.superAdmin
-              ? {}
-              : {'school_board_id': user.schoolBoardId ?? ''}),
+          ..addAll(schoolFilters),
         subqueries: [
           sqlInterface.selectSubquery(
             dataTableName: 'users',
@@ -347,30 +340,14 @@ class MySqlTeachersRepository extends TeachersRepository {
     final differences = teacher.getDifference(previous);
 
     final toUpdate = <String, dynamic>{};
-    if (differences.contains('school_board_id')) {
-      throw InvalidRequestException(
-          'Cannot update school_board_id for the teachers');
-    }
     if (differences.contains('school_id')) {
-      if (user.accessLevel < AccessLevel.schoolBoardAdmin) {
-        _logger.warning(
-            'User ${user.userId} tried to change the school (${teacher.schoolId}) '
-            'of teacher (${teacher.id}) but does not have permission, skipping');
-      } else {
-        toUpdate['school_id'] = teacher.schoolId;
-      }
+      toUpdate['school_id'] = teacher.schoolId;
     }
 
     if (differences.contains('has_registered_account')) {
       toUpdate['has_registered_account'] = teacher.hasRegisteredAccount;
     }
     if (toUpdate.isNotEmpty) {
-      // These modifications are only allowed to admins
-      if (user.accessLevel < AccessLevel.schoolAdmin) {
-        throw InvalidRequestException(
-            'You do not have permission to insert teachers');
-      }
-
       await sqlInterface.performUpdateQuery(
           tableName: 'teachers', filters: {'id': teacher.id}, data: toUpdate);
     }
@@ -394,12 +371,6 @@ class MySqlTeachersRepository extends TeachersRepository {
       Teacher teacher, Teacher previous, DatabaseUser user) async {
     final differences = teacher.getDifference(previous);
     if (!differences.contains('groups')) return;
-
-    // These modifications are only allowed to admins
-    if (user.accessLevel < AccessLevel.schoolAdmin) {
-      throw InvalidRequestException(
-          'You do not have permission to insert teachers');
-    }
 
     // This is a bit tricky to update the groups, so we delete the old ones
     // and reinsert the new ones

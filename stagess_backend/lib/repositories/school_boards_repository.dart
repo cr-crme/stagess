@@ -5,6 +5,7 @@ import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
+import 'package:stagess_backend/utils/security_policies.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
@@ -21,12 +22,13 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
     required FetchableFields fields,
     required DatabaseUser user,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to get school boards');
-    }
-
     final schoolBoards = await _getAllSchoolBoards(user: user);
+
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.superAdmin),
+    ]).validate();
+
     return RepositoryResponse(
         data: schoolBoards.map(
             (key, value) => MapEntry(key, value.serializeWithFields(fields))));
@@ -38,17 +40,18 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
     required FetchableFields fields,
     required DatabaseUser user,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to get school boards');
-    }
-
     final schoolBoard = await _getSchoolBoardById(id: id, user: user);
-    if (schoolBoard == null) {
-      throw MissingDataException('School board not found');
-    }
 
-    return RepositoryResponse(data: schoolBoard.serializeWithFields(fields));
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasData(item: schoolBoard),
+      OrPolicy([
+        HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.superAdmin),
+        ItemIsOwnedByUser(user: user, item: schoolBoard),
+      ]),
+    ]).validate();
+
+    return RepositoryResponse(data: schoolBoard!.serializeWithFields(fields));
   }
 
   @override
@@ -58,26 +61,16 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
     required DatabaseUser user,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to put school boards');
-    }
-
-    if (user.accessLevel < AccessLevel.schoolBoardAdmin) {
-      throw InvalidRequestException(
-          'You do not have permission to put school boards');
-    }
-
     if (!canEdit(user: user, id: id)) {
-      if (!tryRequestingLock ||
-          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+      if (!tryRequestingLock) {
         throw InvalidRequestException(
             'You must acquire a lock before editing this school board');
       }
-      final response = await putById(
-          id: id, data: data, user: user, tryRequestingLock: false);
-      await releaseLock(user: user, id: id);
-      return response;
+      return await requestLockAndPerformTask(
+          user: user,
+          id: id,
+          task: () => putById(
+              id: id, data: data, user: user, tryRequestingLock: false));
     }
 
     // Update if exists, insert if not
@@ -85,11 +78,46 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
     final newSchoolBoard = previous?.copyWithData(data) ??
         SchoolBoard.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
 
-    if (user.accessLevel < AccessLevel.superAdmin &&
-        user.schoolBoardId != newSchoolBoard.id) {
-      throw InvalidRequestException(
-          'You do not have permission to put that school board');
-    }
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasData(item: newSchoolBoard),
+      ModificationsAreValid(
+        user: user,
+        item: newSchoolBoard,
+        previous: previous,
+        allowedToCreate: [
+          AccessLevel.superAdmin,
+        ],
+        allowedToModify: [
+          AccessLevel.self,
+          AccessLevel.superAdmin,
+        ],
+        whiteList: {
+          AccessLevel.self: ['logo', 'schools', 'cnesst_number'],
+        },
+        blackList: {
+          AccessLevel.superAdmin: ['id'],
+        },
+        itemValidator: (user, item, previousItem) {
+          if (user.accessLevel < AccessLevel.schoolBoardAdmin) {
+            // We need this because all users are self in the case of school boards
+            throw InvalidRequestException(
+                'You do not have permission to put school boards');
+          }
+
+          if (user.accessLevel < AccessLevel.schoolBoardAdmin) {
+            for (final school in previousItem?.schools ?? []) {
+              if (!item.schools.any((s) => s.id == school.id)) {
+                throw InvalidRequestException(
+                    'You cannot delete schools from the school board');
+              }
+            }
+          }
+
+          return Future.value();
+        },
+      ),
+    ]).validate();
 
     await _putSchoolBoard(
         schoolBoard: newSchoolBoard, previous: previous, user: user);
@@ -107,27 +135,28 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
     required DatabaseUser user,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to delete school boards');
-    }
-
-    if (user.accessLevel < AccessLevel.superAdmin) {
-      throw InvalidRequestException(
-          'You do not have permission to delete school boards');
-    }
-
     if (!canEdit(user: user, id: id)) {
-      if (!tryRequestingLock ||
-          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+      if (!tryRequestingLock) {
         throw InvalidRequestException(
             'You must acquire a lock before deleting this school board');
       }
-      final response =
-          await deleteById(id: id, user: user, tryRequestingLock: false);
-      await releaseLock(user: user, id: id);
-      return response;
+      return await requestLockAndPerformTask(
+          user: user,
+          id: id,
+          task: () => deleteById(
+                id: id,
+                user: user,
+                tryRequestingLock: false,
+              ));
     }
+
+    final schoolBoard = await _getSchoolBoardById(id: id, user: user);
+
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasData(item: schoolBoard),
+      HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.superAdmin),
+    ]).validate();
 
     final removedId = await _deleteSchoolBoard(id: id, user: user);
     if (removedId == null) {
@@ -170,15 +199,6 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
     String? schoolBoardId,
     required DatabaseUser user,
   }) async {
-    if (user.accessLevel < AccessLevel.superAdmin) {
-      // Only super admins can access all school boards
-      schoolBoardId ??= user.schoolBoardId;
-      if (schoolBoardId != user.schoolBoardId) {
-        throw InvalidRequestException(
-            'You must be a super admin to access the requested school board');
-      }
-    }
-
     final schoolBoards = await sqlInterface.performSelectQuery(
       user: user,
       tableName: 'school_boards',
@@ -229,11 +249,6 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
 
   Future<void> _insertToSchoolBoards(SchoolBoard schoolBoard,
       {required DatabaseUser user}) async {
-    if (user.accessLevel < AccessLevel.superAdmin) {
-      throw InvalidRequestException(
-          'You must be a super admin to create a school board');
-    }
-
     // Insert the school board
     await sqlInterface.performInsertQuery(
         tableName: 'entities', data: {'shared_id': schoolBoard.id});
@@ -368,11 +383,6 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
 
   Future<void> _deleteFromSchools(String schoolId,
       {required DatabaseUser user}) async {
-    if (user.accessLevel < AccessLevel.superAdmin) {
-      throw InvalidRequestException(
-          'You must be a super admin to delete a school');
-    }
-
     await sqlInterface.performDeleteQuery(
       tableName: 'entities',
       filters: {'shared_id': schoolId},
@@ -384,11 +394,6 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
     required String id,
     required DatabaseUser user,
   }) async {
-    if (user.accessLevel < AccessLevel.superAdmin) {
-      throw InvalidRequestException(
-          'You must be a super admin to delete a school board');
-    }
-
     try {
       await sqlInterface.beginTransaction();
 

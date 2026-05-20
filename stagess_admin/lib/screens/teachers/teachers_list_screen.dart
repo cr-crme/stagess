@@ -188,8 +188,7 @@ class _TeachersListScreenState extends State<TeachersListScreen> {
           .toList(),
       AccessLevel.schoolBoardAdmin ||
       AccessLevel.schoolAdmin ||
-      AccessLevel.teacher ||
-      AccessLevel.invalid =>
+      AccessLevel.teacher =>
         schoolBoardTeachers.values.firstOrNull?.entries
                 .where((schoolEntry) => schoolEntry.value.any((teacher) =>
                     filteredTeacherIds == null ||
@@ -203,6 +202,8 @@ class _TeachersListScreenState extends State<TeachersListScreen> {
                 )
                 .toList() ??
             [],
+      AccessLevel.self || AccessLevel.invalid => throw Exception(
+          'Wrong access level: ${authProvider.databaseAccessLevel}'),
     };
   }
 }

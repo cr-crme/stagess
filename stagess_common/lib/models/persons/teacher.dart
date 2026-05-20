@@ -6,10 +6,14 @@ import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/itineraries/itinerary.dart';
 import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/persons/person.dart';
+import 'package:stagess_common/models/persons/school_member.dart';
 
-class Teacher extends Person {
+class Teacher extends Person with SchoolMember {
+  @override
   final String schoolBoardId;
+  @override
   final String schoolId;
+
   final bool hasRegisteredAccount;
   bool get hasNotRegisteredAccount => !hasRegisteredAccount;
   final List<String> groups;

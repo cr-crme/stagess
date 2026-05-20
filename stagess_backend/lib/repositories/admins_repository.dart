@@ -2,6 +2,7 @@ import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
+import 'package:stagess_backend/utils/security_policies.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
@@ -11,9 +12,6 @@ import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common/utils.dart';
 
-// AccessLevel in this repository is discarded as all operations are currently
-// available to all users
-
 // TODO Fix cannot connect with a schoolAdmin account
 abstract class AdminsRepository extends RepositoryAbstract {
   @override
@@ -21,26 +19,15 @@ abstract class AdminsRepository extends RepositoryAbstract {
     required FetchableFields fields,
     required DatabaseUser user,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to get administrators');
-    }
-
-    if (user.accessLevel < AccessLevel.schoolAdmin) {
-      throw InvalidRequestException(
-          'You do not have permission to get administrators');
-    }
-
     final admins = await _getAllAdmins(user: user);
 
-    // Filter administrators based on user access level (this should already be done, but just in case)
-    if (user.accessLevel < AccessLevel.superAdmin) {
-      admins.removeWhere(
-          (key, value) => value.schoolBoardId != user.schoolBoardId);
-    }
-    if (user.accessLevel < AccessLevel.schoolBoardAdmin) {
-      admins.removeWhere((key, value) => value.schoolId != user.schoolId);
-    }
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.schoolAdmin),
+      ...admins.values
+          .map((e) => UserIsFromSameSchoolBoard(user: user, item: e)),
+      ...admins.values.map((e) => UserIsFromSameSchool(user: user, item: e)),
+    ]).validate();
 
     return RepositoryResponse(
         data: admins.map(
@@ -53,30 +40,17 @@ abstract class AdminsRepository extends RepositoryAbstract {
     required FetchableFields fields,
     required DatabaseUser user,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to get administrators');
-    }
-
-    if (user.accessLevel < AccessLevel.schoolAdmin) {
-      throw InvalidRequestException(
-          'You do not have permission to get administrators');
-    }
-
     final admin = await _getAdminById(id: id, user: user);
-    if (admin == null) throw MissingDataException('Administrator not found');
 
-    // Prevent from getting an administrator that the user does not have access to (this should already be done, but just in case)
-    if (user.accessLevel < AccessLevel.superAdmin &&
-        admin.schoolBoardId != user.schoolBoardId) {
-      throw MissingDataException('Administrator not found');
-    }
-    if (user.accessLevel < AccessLevel.schoolBoardAdmin &&
-        admin.schoolId != user.schoolId) {
-      throw MissingDataException('Administrator not found');
-    }
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.schoolAdmin),
+      HasData(item: admin),
+      UserIsFromSameSchoolBoard(user: user, item: admin),
+      UserIsFromSameSchool(user: user, item: admin),
+    ]).validate();
 
-    return RepositoryResponse(data: admin.serializeWithFields(fields));
+    return RepositoryResponse(data: admin!.serializeWithFields(fields));
   }
 
   @override
@@ -86,26 +60,18 @@ abstract class AdminsRepository extends RepositoryAbstract {
     required DatabaseUser user,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to get administrators');
-    }
-
-    if (user.accessLevel < AccessLevel.schoolAdmin) {
-      throw InvalidRequestException(
-          'You do not have permission to put administrators');
-    }
-
     if (!canEdit(user: user, id: id)) {
-      if (!tryRequestingLock ||
-          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+      if (!tryRequestingLock) {
         throw InvalidRequestException(
             'You must acquire a lock before editing this administrator');
       }
-      final response = await putById(
-          id: id, data: data, user: user, tryRequestingLock: false);
-      await releaseLock(user: user, id: id);
-      return response;
+      return await requestLockAndPerformTask(
+          id: id,
+          user: user,
+          task: () {
+            return putById(
+                id: id, data: data, user: user, tryRequestingLock: false);
+          });
     }
 
     // Update if exists, insert if not
@@ -113,24 +79,68 @@ abstract class AdminsRepository extends RepositoryAbstract {
     final newAdmin = previous?.copyWithData(data) ??
         Admin.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
 
-    if (user.accessLevel < AccessLevel.superAdmin &&
-        user.schoolBoardId != newAdmin.schoolBoardId) {
-      // School board admins can only edit administrators of their school board
-      throw InvalidRequestException(
-          'You do not have permission to put administrators');
-    }
-    if (user.accessLevel < AccessLevel.schoolBoardAdmin &&
-        user.userId != newAdmin.id) {
-      // School admins can only edit themselves
-      throw InvalidRequestException(
-          'You do not have permission to put administrators');
-    }
-    if (user.accessLevel <= (previous?.accessLevel ?? AccessLevel.invalid) &&
-        user.userId != newAdmin.id) {
-      // Users can only create/update administrators with a lower access level than themselves
-      throw InvalidRequestException(
-          'You cannot create or update an administrator with an access level equal to or higher than yours');
-    }
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasData(item: newAdmin),
+      UserIsFromSameSchoolBoard(user: user, item: newAdmin),
+      UserIsFromSameSchool(user: user, item: newAdmin),
+      OrPolicy([
+        ItemIsOwnedByUser(user: user, item: newAdmin),
+        AndPolicy([
+          HasMinimumAccessLevel(
+              user: user, minimumLevel: newAdmin.accessLevel.nextHigher),
+          if (previous != null)
+            HasMinimumAccessLevel(
+                user: user, minimumLevel: previous.accessLevel.nextHigher),
+        ]),
+      ]),
+      ModificationsAreValid(
+          user: user,
+          item: newAdmin,
+          previous: previous,
+          allowedToCreate: [
+            AccessLevel.schoolAdmin,
+            AccessLevel.schoolBoardAdmin,
+            AccessLevel.superAdmin,
+          ],
+          allowedToModify: [
+            AccessLevel.self,
+            AccessLevel.schoolAdmin,
+            AccessLevel.schoolBoardAdmin,
+            AccessLevel.superAdmin,
+          ],
+          whiteList: {
+            AccessLevel.self: [
+              'first_name',
+              'last_name',
+              'date_birth',
+              'phone',
+              'address',
+            ],
+          },
+          blackList: {
+            AccessLevel.schoolAdmin: ['id', 'school_board_id', 'school_id'],
+            AccessLevel.schoolBoardAdmin: ['id', 'school_board_id'],
+            AccessLevel.superAdmin: ['id', 'school_board_id'],
+          },
+          itemValidator: (user, item, previousItem) {
+            if (item.accessLevel < AccessLevel.superAdmin &&
+                item.schoolBoardId.isEmpty) {
+              throw SecurityPolicyException(
+                  'Only super administrators can be created without a school board');
+            }
+            if (item.accessLevel < AccessLevel.schoolBoardAdmin &&
+                item.schoolId.isEmpty) {
+              throw SecurityPolicyException(
+                  'Only school board administrators can be created without a school');
+            }
+            if (item.accessLevel < AccessLevel.schoolAdmin) {
+              throw SecurityPolicyException(
+                  'Only school administrators and above can be created');
+            }
+            return Future.value();
+          }),
+    ]).validate();
 
     await _putAdmin(admin: newAdmin, previous: previous, user: user);
     return RepositoryResponse(updatedData: {
@@ -147,49 +157,27 @@ abstract class AdminsRepository extends RepositoryAbstract {
     required DatabaseUser user,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to get administrators');
-    }
-
-    if (user.accessLevel < AccessLevel.schoolAdmin) {
-      throw InvalidRequestException(
-          'You do not have permission to delete administrators');
-    }
-
     if (!canEdit(user: user, id: id)) {
-      if (!tryRequestingLock ||
-          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+      if (!tryRequestingLock) {
         throw InvalidRequestException(
             'You must acquire a lock before deleting this administrator');
       }
-      final response =
-          await deleteById(id: id, user: user, tryRequestingLock: false);
-      await releaseLock(user: user, id: id);
-      return response;
+      return await requestLockAndPerformTask(
+          id: id,
+          user: user,
+          task: () => deleteById(id: id, user: user, tryRequestingLock: false));
     }
 
     final admin = await _getAdminById(id: id, user: user);
-    if (admin == null) {
-      throw MissingDataException('Administrator not found');
-    }
-    if (admin.accessLevel >= AccessLevel.superAdmin) {
-      throw InvalidRequestException('You cannot delete a super administrator');
-    }
-    if (user.accessLevel < AccessLevel.superAdmin &&
-        user.schoolBoardId != admin.schoolBoardId) {
-      throw InvalidRequestException(
-          'You do not have permission to delete that administrator');
-    }
-    if (user.accessLevel < AccessLevel.schoolBoardAdmin &&
-        user.schoolId != admin.schoolId) {
-      throw InvalidRequestException(
-          'You do not have permission to delete that administrator');
-    }
-    if (user.accessLevel <= admin.accessLevel) {
-      throw InvalidRequestException(
-          'You cannot delete an administrator with an access level equal to or higher than yours');
-    }
+
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasData(item: admin),
+      HasMinimumAccessLevel(
+          user: user, minimumLevel: admin!.accessLevel.nextHigher),
+      UserIsFromSameSchoolBoard(user: user, item: admin),
+      UserIsFromSameSchool(user: user, item: admin),
+    ]).validate();
 
     final removedId = await _deleteAdmin(id: id);
     if (removedId == null) {
@@ -230,10 +218,20 @@ class MySqlAdminsRepository extends AdminsRepository {
     String? adminId,
     required DatabaseUser user,
   }) async {
+    final schoolFilters = ({
+      'school_board_id': user.accessLevel < AccessLevel.superAdmin
+          ? user.schoolBoardId!
+          : null,
+      'school_id': user.accessLevel < AccessLevel.schoolBoardAdmin
+          ? user.schoolId!
+          : null,
+    }..removeWhere((key, value) => value == null))
+        .cast<String, String>();
+
     final admins = await sqlInterface.performSelectQuery(
       user: user,
       tableName: 'admins',
-      filters: (adminId == null ? {} : {'id': adminId}),
+      filters: (adminId == null ? {} : {'id': adminId})..addAll(schoolFilters),
       subqueries: [
         sqlInterface.selectSubquery(
           dataTableName: 'users',
@@ -299,22 +297,6 @@ class MySqlAdminsRepository extends AdminsRepository {
                 .copyWith(accessLevel: AccessLevel.superAdmin)) as List)
         .firstOrNull;
 
-    if (admin.accessLevel < AccessLevel.superAdmin &&
-        admin.schoolBoardId.isEmpty) {
-      throw InvalidRequestException(
-          'Only super administrators can be created without a school board');
-    }
-    if (admin.accessLevel < AccessLevel.schoolBoardAdmin &&
-        admin.schoolId.isEmpty) {
-      throw InvalidRequestException(
-          'Only school board administrators can be created without a school');
-    }
-    if (admin.accessLevel >= user.accessLevel) {
-      // School board admins can only create administrators of their school board
-      throw InvalidRequestException(
-          'You cannot create an administrator with an access level equal to or higher than yours');
-    }
-
     await sqlInterface.performInsertPerson(
         person: admin, skipAddingEntity: entity != null);
     await sqlInterface.performInsertUser(id: admin.id, email: admin.email);
@@ -330,26 +312,6 @@ class MySqlAdminsRepository extends AdminsRepository {
   Future<void> _updateToAdmins(
       Admin admin, Admin previous, DatabaseUser user) async {
     final differences = admin.getDifference(previous);
-    if (differences.contains('authentication_id')) {
-      throw InvalidRequestException(
-          'You cannot change the authentication ID of an administrator');
-    }
-
-    if (admin.accessLevel < AccessLevel.superAdmin &&
-        admin.schoolBoardId.isEmpty) {
-      throw InvalidRequestException(
-          'Only super administrators can be created without a school board');
-    }
-    if (admin.accessLevel < AccessLevel.schoolBoardAdmin &&
-        admin.schoolId.isEmpty) {
-      throw InvalidRequestException(
-          'Only school board administrators can be created without a school');
-    }
-    if (admin.accessLevel >= user.accessLevel) {
-      // School board admins can only update administrators of their school board
-      throw InvalidRequestException(
-          'You cannot update an administrator to have an access level equal to or higher than yours');
-    }
 
     final toUpdate = <String, dynamic>{};
     if (differences.contains('school_board_id')) {

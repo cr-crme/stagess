@@ -70,6 +70,23 @@ abstract class RepositoryAbstract {
     return true;
   }
 
+  Future<RepositoryResponse> requestLockAndPerformTask({
+    required String id,
+    required DatabaseUser user,
+    required Future<RepositoryResponse> Function() task,
+  }) async {
+    if ((await requestLock(user: user, id: id)).data?['locked'] != true) {
+      throw InvalidRequestException(
+          'You must acquire a lock before performing this action');
+    }
+    try {
+      final response = await task();
+      return response;
+    } finally {
+      await releaseLock(user: user, id: id);
+    }
+  }
+
   ///
   /// Request a lock on the data related to the given field and [id].
   /// If the data is already locked by another user, false will be returned, true otherwise.

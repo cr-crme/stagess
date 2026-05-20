@@ -51,12 +51,14 @@ import 'package:stagess_common_flutter/widgets/student_picker_tile.dart';
 class InternshipListTile extends StatefulWidget {
   const InternshipListTile({
     super.key,
+    required this.schoolBoardId,
     required this.internship,
     this.forceEditingMode = false,
     required this.canEdit,
     required this.canDelete,
   });
 
+  final String schoolBoardId;
   final Internship internship;
   final bool forceEditingMode;
   final bool canEdit;
@@ -97,7 +99,7 @@ class InternshipListTileState extends State<InternshipListTile> {
   bool _isEditing = false;
 
   late final _studentPickerController = StudentPickerController(
-    schoolBoardId: widget.internship.schoolBoardId,
+    schoolBoardId: widget.schoolBoardId,
     initial: StudentsProvider.of(
       context,
       listen: false,
@@ -576,7 +578,7 @@ class InternshipListTileState extends State<InternshipListTile> {
       padding: const EdgeInsets.only(right: 12.0),
       child: EnterprisePickerTile(
         title: 'Entreprise',
-        schoolBoardId: widget.internship.schoolBoardId,
+        schoolBoardId: widget.schoolBoardId,
         controller: _enterprisePickerController,
         editMode: _isEditing,
       ),
@@ -594,7 +596,7 @@ class InternshipListTileState extends State<InternshipListTile> {
       padding: const EdgeInsets.only(right: 12.0),
       child: TeacherPickerTile(
         title: 'Enseignant·e responsable',
-        schoolBoardId: widget.internship.schoolBoardId,
+        schoolBoardId: widget.schoolBoardId,
         controller: _teacherPickerController,
         editMode: _isEditing,
         isMandatory: true,

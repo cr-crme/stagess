@@ -5,6 +5,7 @@ import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/repositories/students_repository.dart';
 import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
+import 'package:stagess_backend/utils/security_policies.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
@@ -27,18 +28,28 @@ abstract class InternshipsRepository extends RepositoryAbstract {
   Future<RepositoryResponse> getAll({
     required FetchableFields fields,
     required DatabaseUser user,
+    StudentsRepository? studentsRepository,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to get internships');
+    if (studentsRepository == null) {
+      throw ArgumentError(
+          'studentsRepository is required to get internships with access control');
     }
 
-    final internships = await _getAllInternships(user: user);
+    final students = (await studentsRepository.getAll(
+                fields: FetchableFields({'id': FetchableFields.all}),
+                user: user))
+            .data
+            ?.keys
+            .toList() ??
+        [];
 
-    // Filter internships based on user access level (this should already be done, but just in case)
-    internships.removeWhere((key, value) =>
-        user.accessLevel < AccessLevel.superAdmin &&
-        value.schoolBoardId != user.schoolBoardId);
+    final internships =
+        await _getAllInternships(user: user, students: students);
+
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      // Access control were valided when fetching students
+    ]).validate();
 
     return RepositoryResponse(
         data: internships.map(
@@ -50,22 +61,26 @@ abstract class InternshipsRepository extends RepositoryAbstract {
     required String id,
     required FetchableFields fields,
     required DatabaseUser user,
+    StudentsRepository? studentsRepository,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to get internships');
+    if (studentsRepository == null) {
+      throw ArgumentError(
+          'studentsRepository is required to get internships with access control');
     }
 
     final internship = await _getInternshipById(id: id, user: user);
-    if (internship == null) throw MissingDataException('Internship not found');
+    await studentsRepository.getById(
+        id: internship?.studentId ?? '-1',
+        fields: FetchableFields({'id': FetchableFields.all}),
+        user: user);
 
-    // Prevent from getting an enterprise that the user does not have access to (this should already be done, but just in case)
-    if (user.accessLevel < AccessLevel.superAdmin &&
-        internship.schoolBoardId != user.schoolBoardId) {
-      throw MissingDataException('Internship not found');
-    }
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasData(item: internship),
+      // Access control were valided when fetching students
+    ]).validate();
 
-    return RepositoryResponse(data: internship.serializeWithFields(fields));
+    return RepositoryResponse(data: internship!.serializeWithFields(fields));
   }
 
   @override
@@ -73,35 +88,92 @@ abstract class InternshipsRepository extends RepositoryAbstract {
     required String id,
     required Map<String, dynamic> data,
     required DatabaseUser user,
+    StudentsRepository? studentsRepository,
     bool tryRequestingLock = true,
   }) async {
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to put internships');
+    if (studentsRepository == null) {
+      throw ArgumentError(
+          'studentsRepository is required to put internships with access control');
     }
 
     if (!canEdit(user: user, id: id)) {
-      if (!tryRequestingLock ||
-          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+      if (!tryRequestingLock) {
         throw InvalidRequestException(
             'You must acquire a lock before editing this internship');
       }
-      final response = await putById(
-          id: id, data: data, user: user, tryRequestingLock: false);
-      await releaseLock(user: user, id: id);
-      return response;
+      return await requestLockAndPerformTask(
+          id: id,
+          user: user,
+          task: () => putById(
+              id: id,
+              data: data,
+              user: user,
+              studentsRepository: studentsRepository,
+              tryRequestingLock: false));
     }
 
     // Update if exists, insert if not
     final previous = await _getInternshipById(id: id, user: user);
     final newInternship = previous?.copyWithData(data) ??
         Internship.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
+    await studentsRepository.getById(
+        id: newInternship.studentId,
+        fields: FetchableFields({'id': FetchableFields.all}),
+        user: user);
 
-    if (user.accessLevel < AccessLevel.superAdmin &&
-        newInternship.schoolBoardId != user.schoolBoardId) {
-      throw InvalidRequestException(
-          'You do not have permission to put this internship');
-    }
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasData(item: newInternship),
+      // Access control were valided when fetching students
+      ModificationsAreValid(
+        user: user,
+        item: newInternship,
+        previous: previous,
+        allowedToCreate: [
+          AccessLevel.teacher,
+          AccessLevel.schoolAdmin,
+          AccessLevel.schoolBoardAdmin,
+          AccessLevel.superAdmin,
+        ],
+        allowedToModify: [
+          AccessLevel.teacher,
+          AccessLevel.schoolAdmin,
+          AccessLevel.schoolBoardAdmin,
+          AccessLevel.superAdmin,
+        ],
+        whiteList: {},
+        blackList: {
+          AccessLevel.teacher: [
+            'id',
+            'school_board_id',
+            'student_id',
+            'enterprise_id'
+          ],
+          AccessLevel.schoolAdmin: [
+            'id',
+            'school_board_id',
+            'student_id',
+            'enterprise_id'
+          ],
+          AccessLevel.schoolBoardAdmin: [
+            'id',
+            'school_board_id',
+            'student_id',
+            'enterprise_id'
+          ],
+          AccessLevel.superAdmin: [
+            'id',
+            'school_board_id',
+            'student_id',
+            'enterprise_id'
+          ],
+        },
+        itemValidator: (user, item, previousItem) {
+          // No validation required
+          return Future.value();
+        },
+      ),
+    ]).validate();
 
     await _putInternship(
         internship: newInternship, previous: previous, user: user);
@@ -125,53 +197,33 @@ abstract class InternshipsRepository extends RepositoryAbstract {
           'studentsRepository is required to delete internships');
     }
 
-    if (user.isNotVerified) {
-      throw InvalidRequestException(
-          'You do not have permission to get administrators');
-    }
-
-    if (user.accessLevel < AccessLevel.schoolAdmin) {
-      throw InvalidRequestException(
-          'You do not have permission to delete internships');
-    }
-
     if (!canEdit(user: user, id: id)) {
-      if (!tryRequestingLock ||
-          (await requestLock(user: user, id: id)).data?['locked'] != true) {
+      if (!tryRequestingLock) {
         throw InvalidRequestException(
             'You must acquire a lock before deleting this internship');
       }
-      try {
-        // TODO Apply this finally everywhere
-        final response = await deleteById(
-            id: id,
-            user: user,
-            studentsRepository: studentsRepository,
-            tryRequestingLock: false);
-        return response;
-      } finally {
-        await releaseLock(user: user, id: id);
-      }
+      return await requestLockAndPerformTask(
+          id: id,
+          user: user,
+          task: () => deleteById(
+              id: id,
+              user: user,
+              studentsRepository: studentsRepository,
+              tryRequestingLock: false));
     }
 
     final internship = await _getInternshipById(id: id, user: user);
-    if (internship == null) {
-      throw MissingDataException('Internship not found');
-    }
-    if (user.accessLevel < AccessLevel.superAdmin &&
-        user.schoolBoardId != internship.schoolBoardId) {
-      throw InvalidRequestException(
-          'You do not have permission to delete this internship');
-    }
-    if (user.accessLevel < AccessLevel.schoolBoardAdmin) {
-      // TODO Validate this
-      final student = await studentsRepository.getById(
-          id: internship.studentId, user: user, fields: FetchableFields.all);
-      if (student.data == null || user.schoolId != student.data!['school_id']) {
-        throw InvalidRequestException(
-            'You do not have permission to delete this internship');
-      }
-    }
+    await studentsRepository.getById(
+        id: internship?.studentId ?? '-1',
+        fields: FetchableFields({'id': FetchableFields.all}),
+        user: user);
+
+    await SecurityPolicies([
+      UserIsVerified(user: user),
+      HasData(item: internship),
+      HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.schoolAdmin),
+      // Access control were valided when fetching students
+    ]).validate();
 
     final removedId = await _deleteInternship(id: id, user: user);
     if (removedId == null) {
@@ -184,6 +236,7 @@ abstract class InternshipsRepository extends RepositoryAbstract {
 
   Future<Map<String, Internship>> _getAllInternships({
     required DatabaseUser user,
+    required List<String> students,
   });
 
   Future<Internship?> _getInternshipById({
@@ -212,14 +265,18 @@ class MySqlInternshipsRepository extends InternshipsRepository {
   Future<Map<String, Internship>> _getAllInternships({
     String? internshipId,
     required DatabaseUser user,
+    required List<String> students,
   }) async {
+    final studentFilters = ({
+      'student_id': user.accessLevel < AccessLevel.superAdmin ? students : null,
+    }..removeWhere((key, value) => value == null))
+        .cast<String, String>();
+
     final internships = await sqlInterface.performSelectQuery(
         user: user,
         tableName: 'internships',
         filters: (internshipId == null ? {} : {'id': internshipId})
-          ..addAll(user.accessLevel == AccessLevel.superAdmin
-              ? {}
-              : {'school_board_id': user.schoolBoardId ?? ''}),
+          ..addAll(studentFilters),
         subqueries: [
           sqlInterface.selectSubquery(
             dataTableName: 'internship_supervising_teachers',
@@ -556,8 +613,10 @@ class MySqlInternshipsRepository extends InternshipsRepository {
   Future<Internship?> _getInternshipById({
     required String id,
     required DatabaseUser user,
-  }) async =>
-      (await _getAllInternships(internshipId: id, user: user))[id];
+  }) async {
+    return (await _getAllInternships(
+        internshipId: id, user: user, students: []))[id];
+  }
 
   Future<void> _insertToInternships(Internship internship) async {
     // Insert the internship
@@ -565,7 +624,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
         tableName: 'entities', data: {'shared_id': internship.id});
     await sqlInterface.performInsertQuery(tableName: 'internships', data: {
       'id': internship.id,
-      'school_board_id': internship.schoolBoardId.serialize(),
       'student_id': internship.studentId.serialize(),
       'enterprise_id': internship.enterpriseId.serialize(),
       'achieved_duration': internship.achievedDuration.serialize(),
@@ -578,15 +636,6 @@ class MySqlInternshipsRepository extends InternshipsRepository {
       Internship internship, Internship previous) async {
     // Update the internship
     final differences = internship.getDifference(previous);
-    if (differences.contains('school_board_id')) {
-      throw InvalidRequestException('School board id cannot be changed');
-    }
-    if (differences.contains('student_id')) {
-      throw InvalidRequestException('Student id cannot be changed');
-    }
-    if (differences.contains('enterprise_id')) {
-      throw InvalidRequestException('Enterprise id cannot be changed');
-    }
 
     final toUpdate = <String, dynamic>{};
     if (differences.contains('achieved_duration')) {
@@ -1005,7 +1054,6 @@ class InternshipsRepositoryMock extends InternshipsRepository {
   final _dummyDatabase = {
     '0': Internship(
       id: '0',
-      schoolBoardId: '0',
       studentId: '12345',
       signatoryTeacherId: '67890',
       extraSupervisingTeacherIds: [],
@@ -1074,7 +1122,6 @@ class InternshipsRepositoryMock extends InternshipsRepository {
     ),
     '1': Internship(
       id: '1',
-      schoolBoardId: '0',
       studentId: '54321',
       signatoryTeacherId: '09876',
       extraSupervisingTeacherIds: ['54321'],
@@ -1141,6 +1188,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
   @override
   Future<Map<String, Internship>> _getAllInternships({
     required DatabaseUser user,
+    List<String>? students,
   }) async =>
       _dummyDatabase;
 

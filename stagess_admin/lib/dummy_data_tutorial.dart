@@ -2100,11 +2100,6 @@ Future<void> _addDummyInternships(
 }) async {
   dev.log('Adding dummy internships');
 
-  final schoolBoard = schoolBoards.firstWhere(
-    (schoolBoard) => schoolBoard.name == 'Mon centre de service scolaire',
-  );
-  final schoolBoardId = schoolBoard.id;
-
   final teacherA1Id =
       teachers.firstWhere((teacher) => teacher.email == 'a1@moncentre.qc').id;
   final teacherA2Id =
@@ -2122,7 +2117,6 @@ Future<void> _addDummyInternships(
   );
   internships.add(
     Internship(
-      schoolBoardId: schoolBoardId,
       studentId: students.firstWhere((e) => e.fullName == 'Cedric Masson').id,
       signatoryTeacherId: teacherA1Id,
       extraSupervisingTeacherIds: [],
@@ -2268,7 +2262,6 @@ Future<void> _addDummyInternships(
   );
   internships.add(
     Internship(
-        schoolBoardId: schoolBoardId,
         studentId: students.firstWhere((e) => e.fullName == 'Thomas Caron').id,
         signatoryTeacherId: teacherA1Id,
         extraSupervisingTeacherIds: [],
@@ -2407,7 +2400,6 @@ Future<void> _addDummyInternships(
     end: startingPeriod.add(Duration(days: 180)),
   );
   var internship = Internship(
-    schoolBoardId: schoolBoardId,
     studentId: students.firstWhere((e) => e.fullName == 'Melissa Poulain').id,
     signatoryTeacherId: teacherA1Id,
     extraSupervisingTeacherIds: [],
@@ -2528,7 +2520,6 @@ Future<void> _addDummyInternships(
   );
   internships.add(
     Internship(
-      schoolBoardId: schoolBoardId,
       studentId: students.firstWhere((e) => e.fullName == 'Vincent Picard').id,
       signatoryTeacherId: teacherA2Id,
       extraSupervisingTeacherIds: [],
@@ -2623,7 +2614,6 @@ Future<void> _addDummyInternships(
   );
   internships.add(
     Internship(
-      schoolBoardId: schoolBoardId,
       studentId: students.firstWhere((e) => e.fullName == 'Simon Gingras').id,
       // This is a Roméo Montaigu's student
       signatoryTeacherId: teacherB1Id,
@@ -2737,7 +2727,6 @@ Future<void> _addDummyInternships(
       .specialization;
   internships.add(
     Internship(
-      schoolBoardId: schoolBoardId,
       studentId: students.firstWhere((e) => e.fullName == 'Jeanne Tremblay').id,
       signatoryTeacherId: teacherA1Id,
       extraSupervisingTeacherIds: [],
@@ -2974,7 +2963,6 @@ Future<void> _addDummyInternships(
   );
   internships.add(
     Internship(
-      schoolBoardId: schoolBoardId,
       studentId: students.firstWhere((e) => e.fullName == 'Diego Vargas').id,
       signatoryTeacherId: teacherB1Id,
       extraSupervisingTeacherIds: [teacherB1Id],
@@ -3093,7 +3081,6 @@ Future<void> _addDummyInternships(
   );
   internships.add(
     Internship(
-      schoolBoardId: schoolBoardId,
       studentId: students.firstWhere((e) => e.fullName == 'Vanessa Monette').id,
       signatoryTeacherId: teacherA1Id,
       extraSupervisingTeacherIds: [],
@@ -3190,7 +3177,6 @@ Future<void> _addDummyInternships(
   );
   internships.add(
     Internship(
-      schoolBoardId: schoolBoardId,
       studentId: students.firstWhere((e) => e.fullName == 'Vanessa Monette').id,
       signatoryTeacherId: teacherA1Id,
       extraSupervisingTeacherIds: [],
@@ -3272,7 +3258,6 @@ Future<void> _addDummyInternships(
   );
   internships.add(
     Internship(
-      schoolBoardId: schoolBoardId,
       studentId:
           students.firstWhere((e) => e.fullName == 'Sébastien Desmarais').id,
       signatoryTeacherId: teacherC1Id,

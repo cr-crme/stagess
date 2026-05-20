@@ -8,14 +8,20 @@ import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/persons/person.dart';
+import 'package:stagess_common/models/persons/school_member.dart';
 
 part 'package:stagess_common/models/enterprises/activity_types.dart';
 
-class Enterprise extends ExtendedItemSerializable {
+class Enterprise extends ExtendedItemSerializable with SchoolMember {
   static final String _currentVersion = '1.0.0';
   static String get currentVersion => _currentVersion;
 
+  @override
   final String schoolBoardId;
+
+  @override
+  String get schoolId =>
+      throw UnsupportedError('Enterprise does not have a schoolId');
 
   final String name;
   final EnterpriseStatus status;

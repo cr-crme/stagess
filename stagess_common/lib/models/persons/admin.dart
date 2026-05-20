@@ -5,10 +5,15 @@ import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/persons/person.dart';
+import 'package:stagess_common/models/persons/school_member.dart';
 
-class Admin extends Person {
+class Admin extends Person with SchoolMember {
+  @override
   final String schoolBoardId;
+
+  @override
   final String schoolId;
+
   final bool hasRegisteredAccount;
   bool get hasNotRegisteredAccount => !hasRegisteredAccount;
   final AccessLevel accessLevel;

@@ -45,15 +45,13 @@ class _AddInternshipDialogState extends State<AddInternshipDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-
               const SizedBox(height: 12),
               Text('Compléter les informations'),
               const SizedBox(height: 8),
               InternshipListTile(
                 key: _editingKey,
-                internship: Internship.empty.copyWith(
-                  schoolBoardId: widget.schoolBoard.id,
-                ),
+                schoolBoardId: widget.schoolBoard.id,
+                internship: Internship.empty,
                 forceEditingMode: true,
                 canEdit: false,
                 canDelete: false,

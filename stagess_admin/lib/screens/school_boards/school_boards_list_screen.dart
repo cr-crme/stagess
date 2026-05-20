@@ -139,24 +139,24 @@ class _SchoolBoardsListScreenState extends State<SchoolBoardsListScreen> {
             ),
           )
           .toList(),
-      AccessLevel.schoolAdmin ||
-      AccessLevel.teacher ||
-      AccessLevel.invalid =>
-        schoolBoards.firstOrNull?.schools
-                .where((school) =>
-                    filteredSchoolIds == null ||
-                    filteredSchoolIds.contains(school.id))
-                .map(
-                  (school) => SchoolListTile(
-                    key: ValueKey(school.id),
-                    school: school,
-                    schoolBoard: schoolBoards.firstOrNull ?? SchoolBoard.empty,
-                    canEdit: false,
-                    canDelete: false,
-                  ),
-                )
-                .toList() ??
-            [],
+      AccessLevel.schoolAdmin || AccessLevel.teacher => schoolBoards
+              .firstOrNull?.schools
+              .where((school) =>
+                  filteredSchoolIds == null ||
+                  filteredSchoolIds.contains(school.id))
+              .map(
+                (school) => SchoolListTile(
+                  key: ValueKey(school.id),
+                  school: school,
+                  schoolBoard: schoolBoards.firstOrNull ?? SchoolBoard.empty,
+                  canEdit: false,
+                  canDelete: false,
+                ),
+              )
+              .toList() ??
+          [],
+      AccessLevel.self || AccessLevel.invalid => throw Exception(
+          'Wrong access level: ${authProvider.databaseAccessLevel}'),
     };
   }
 }
