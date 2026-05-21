@@ -228,12 +228,13 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
       AccessLevel.schoolAdmin ||
       AccessLevel.teacher =>
         schoolBoardStudents.values.firstOrNull?.entries
-                .where((schoolEntry) {
-                  if (filteredStudentIds == null) return true;
-                  return schoolEntry.value.values.any((students) =>
-                      students.any((student) =>
-                          filteredStudentIds.contains(student.id)));
-                })
+                .where((schoolEntry) =>
+                    authProvider.databaseAccessLevel >
+                        AccessLevel.schoolAdmin ||
+                    schoolEntry.value.values.any((students) => students.any(
+                        (student) =>
+                            filteredStudentIds == null ||
+                            filteredStudentIds.contains(student.id))))
                 .map(
                   (schoolEntry) => Column(
                     children: [

@@ -7,12 +7,14 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:stagess_admin/screens/students/confirm_delete_student_dialog.dart';
 import 'package:stagess_admin/widgets/section_divider.dart';
+import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/address_list_tile.dart';
@@ -56,7 +58,11 @@ class StudentListTileState extends State<StudentListTile> {
       _contactAddressController.waitForValidation(),
     ]);
     bool isValid = _formKey.currentState?.validate() ?? false;
-    isValid = (_schoolRadioKey.currentState?.validate() ?? false) && isValid;
+
+    isValid = (_showSchoolSelection
+            ? _schoolRadioKey.currentState!.validate()
+            : true) &&
+        isValid;
     isValid = (_programRadioKey.currentState?.validate() ?? false) && isValid;
     isValid = _addressController.isValid && isValid;
     isValid = _contactAddressController.isValid && isValid;
@@ -85,6 +91,9 @@ class StudentListTileState extends State<StudentListTile> {
   bool _forceDisabled = false;
   bool _isExpanded = false;
   bool _isEditing = false;
+  bool get _showSchoolSelection =>
+      AuthProvider.of(context, listen: false).databaseAccessLevel >=
+      AccessLevel.schoolBoardAdmin;
 
   late String _selectedSchoolId = widget.student.schoolId;
   late final _firstNameController = TextEditingController(
@@ -435,7 +444,10 @@ class StudentListTileState extends State<StudentListTile> {
   }
 
   Widget _buildSchoolSelection() {
-    // TODO Listen true?
+    if (!_showSchoolSelection) {
+      return SizedBox.shrink();
+    }
+
     final schoolBoard = SchoolBoardsProvider.of(context, listen: false)
         .firstWhereOrNull((e) => e.id == widget.student.schoolBoardId);
     if (schoolBoard == null) {

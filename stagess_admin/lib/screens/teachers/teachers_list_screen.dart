@@ -190,9 +190,13 @@ class _TeachersListScreenState extends State<TeachersListScreen> {
       AccessLevel.schoolAdmin ||
       AccessLevel.teacher =>
         schoolBoardTeachers.values.firstOrNull?.entries
-                .where((schoolEntry) => schoolEntry.value.any((teacher) =>
-                    filteredTeacherIds == null ||
-                    filteredTeacherIds.contains(teacher.id))) // Filter schools
+                .where((schoolEntry) =>
+                    authProvider.databaseAccessLevel >
+                        AccessLevel.schoolAdmin ||
+                    schoolEntry.value.any((teacher) =>
+                        filteredTeacherIds == null ||
+                        filteredTeacherIds
+                            .contains(teacher.id))) // Filter schools
                 .map(
                   (schoolEntry) => SchoolTeachersCard(
                     schoolId: schoolEntry.key.id,

@@ -14,7 +14,6 @@ import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/utils.dart';
 
-// TODO Validate changes in rules
 abstract class StudentsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
@@ -159,9 +158,11 @@ abstract class StudentsRepository extends RepositoryAbstract {
         // Prevent from deleting a student that has at least one internship
         if (user.accessLevel < AccessLevel.superAdmin) {
           final internships = (await internshipsRepository.getAll(
-                      user: user,
-                      fields: FetchableFields(
-                          {'student_id': FetchableFields.mandatory})))
+                user: user,
+                fields:
+                    FetchableFields({'student_id': FetchableFields.mandatory}),
+                studentsRepository: this,
+              ))
                   .data ??
               {};
           if (internships.values
