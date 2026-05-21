@@ -24,19 +24,23 @@ void main() {
   test('MySql query crafter element in table', () async {
     final sqlInterface = await MySqlInterface.connect(
         connectToDatabase: () async => DummyMySqlConnection());
-    final query = _cleanQuery(sqlInterface
-        .craftSelectQuery(tableName: 'my_table', filters: {'id': 'my_id'}));
+    final query = _cleanQuery(
+        sqlInterface.craftSelectQuery(tableName: 'my_table', filters: {
+      'id': ['my_id']
+    }));
 
-    expect(query, 'SELECT t.* FROM my_table t WHERE t.id = ?');
+    expect(query, 'SELECT t.* FROM my_table t WHERE t.id IN ?');
   });
 
   test('MySql query crafter element in table with specific id', () async {
     final sqlInterface = await MySqlInterface.connect(
         connectToDatabase: () async => DummyMySqlConnection());
-    final query = _cleanQuery(sqlInterface.craftSelectQuery(
-        tableName: 'my_table', filters: {'my_named_id': 'my_id'}));
+    final query = _cleanQuery(
+        sqlInterface.craftSelectQuery(tableName: 'my_table', filters: {
+      'my_named_id': ['my_id']
+    }));
 
-    expect(query, 'SELECT t.* FROM my_table t WHERE t.my_named_id = ?');
+    expect(query, 'SELECT t.* FROM my_table t WHERE t.my_named_id IN ?');
   });
 
   test('MySql query crafter with table', () async {
@@ -63,7 +67,7 @@ void main() {
         connectToDatabase: () async => DummyMySqlConnection());
     final query = _cleanQuery(
         sqlInterface.craftSelectQuery(tableName: 'my_table', filters: {
-      'my_named_id': 'my_id'
+      'my_named_id': ['my_id']
     }, sublists: [
       sqlInterface.joinSubquery(
         dataTableName: 'subtable_name',
@@ -81,7 +85,7 @@ void main() {
         'SELECT t.*, IFNULL(( SELECT JSON_ARRAYAGG( JSON_OBJECT( \'field1\', st.field1, \'field2\', st.field2 ) ) '
         'FROM my_relation_table_name idt JOIN subtable_name st ON idt.to_subtable_id = st.subtable_id '
         'WHERE idt.to_main_table_id = t.main_id ), JSON_ARRAY()) AS subtable_name '
-        'FROM my_table t WHERE t.my_named_id = ?');
+        'FROM my_table t WHERE t.my_named_id IN ?');
   });
 
   test('MySql query crafter insert element', () async {

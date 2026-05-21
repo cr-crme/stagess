@@ -270,7 +270,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     final studentFilters = ({
       'student_id': user.accessLevel < AccessLevel.superAdmin ? students : null,
     }..removeWhere((key, value) => value == null))
-        .cast<String, String>();
+        .cast<String, List<String>>();
 
     final internships = await sqlInterface.performSelectQuery(
         user: user,

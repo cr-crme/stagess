@@ -16,7 +16,6 @@ final _protectedTables = [
   'students',
   'teachers',
   'enterprises',
-  'internships',
 ];
 
 abstract class SqlInterface {
@@ -49,7 +48,7 @@ abstract class SqlInterface {
     required DatabaseUser user,
     required String tableName,
     List<String>? fieldsToFetch,
-    Map<String, String>? filters,
+    Map<String, dynamic>? filters,
     List<MySqlTableAccessor>? subqueries,
   });
 
@@ -228,7 +227,7 @@ class MySqlInterface implements SqlInterface {
     required DatabaseUser user,
     required String tableName,
     List<String>? fieldsToFetch,
-    Map<String, String>? filters,
+    Map<String, dynamic>? filters,
     List<MySqlTableAccessor>? subqueries,
   }) async {
     if (_protectedTables.contains(tableName) &&
@@ -240,13 +239,23 @@ class MySqlInterface implements SqlInterface {
       }
     }
 
+    final filtersAsStrings = (filters?.map((key, value) => MapEntry(
+            key,
+            switch (value) {
+              String e => [e],
+              List<String> e => e,
+              _ => throw InvalidRequestException(
+                  'Invalid filters value for $key: $value. It must be a string a list of strings.')
+            })) ??
+        {});
+
     final results = await tryQuery(
         craftSelectQuery(
             tableName: tableName,
             fieldsToFetch: fieldsToFetch,
-            filters: filters,
+            filters: filtersAsStrings,
             sublists: subqueries),
-        [...(filters?.values ?? Iterable.empty())]);
+        [...(filtersAsStrings.values)]);
 
     final List<Map<String, dynamic>> list = [];
     for (final row in results) {
@@ -271,12 +280,12 @@ class MySqlInterface implements SqlInterface {
   String craftSelectQuery({
     required String tableName,
     List<String>? fieldsToFetch,
-    Map<String, String>? filters,
+    Map<String, List<String>>? filters,
     List<MySqlTableAccessor>? sublists,
   }) {
     final filtersAsString = (filters == null || filters.isEmpty)
         ? ''
-        : 'WHERE ${filters.keys.map((e) => 't.$e = ?').join(' AND ')}';
+        : 'WHERE ${filters.keys.map((e) => 't.$e IN ?').join(' AND ')}';
     final fieldsToFetchAsString = fieldsToFetch == null || fieldsToFetch.isEmpty
         ? 't.*'
         : 't.${fieldsToFetch.join(', t.')}';

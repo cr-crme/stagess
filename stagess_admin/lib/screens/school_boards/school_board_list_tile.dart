@@ -544,7 +544,6 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
 }
 
 List<School> _getSchools(SchoolBoard schoolBoard) {
-  // TODO Add fetch school when clicking on school
   final schools = schoolBoard.schools;
 
   schools.sort((a, b) {

@@ -540,9 +540,14 @@ class Connexions {
     }
 
     // Get the user information from the database to first verify its identity
-    final user = await getValidatedUser(_database.sqlInterface,
-        id: authenticatorId, email: email);
-    if (user == null) throw ConnexionRefusedException('Invalid token payload');
+    late final DatabaseUser? user;
+    try {
+      user = await getValidatedUser(_database.sqlInterface,
+          id: authenticatorId, email: email);
+    } catch (e) {
+      user = null;
+    }
+    if (user == null) throw ConnexionRefusedException('Invalid user');
     _clients[client] = user;
 
     // Success, send the handshake to the client
@@ -645,7 +650,7 @@ class Connexions {
     user = user.copyWith(
       userId: users?['id'],
       schoolBoardId: users?['school_board_id'],
-      schoolId: (users?['teachers'] as List?)?.firstOrNull?['school_id'],
+      schoolId: users?['school_id'],
       accessLevel: AccessLevel.fromSerialized(users?['access_level']),
     );
     // This will be true if the user is an admin or a super admin

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/drawer/main_drawer.dart';
 import 'package:stagess_admin/screens/school_boards/add_school_board_dialog.dart';
 import 'package:stagess_admin/screens/school_boards/school_board_list_tile.dart';
-import 'package:stagess_admin/screens/school_boards/school_list_tile.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
@@ -126,35 +125,23 @@ class _SchoolBoardsListScreenState extends State<SchoolBoardsListScreen> {
     }
 
     return switch (authProvider.databaseAccessLevel) {
-      AccessLevel.superAdmin || AccessLevel.schoolBoardAdmin => schoolBoards
-          .map(
-            (schoolBoard) => SchoolBoardListTile(
-              key: ValueKey(schoolBoard.id),
-              schoolBoard: schoolBoard,
-              elevation: authProvider.databaseAccessLevel ==
-                      AccessLevel.schoolBoardAdmin
-                  ? 0
-                  : null,
-              filteredSchoolIds: filteredSchoolIds,
-            ),
-          )
-          .toList(),
-      AccessLevel.schoolAdmin || AccessLevel.teacher => schoolBoards
-              .firstOrNull?.schools
-              .where((school) =>
-                  filteredSchoolIds == null ||
-                  filteredSchoolIds.contains(school.id))
-              .map(
-                (school) => SchoolListTile(
-                  key: ValueKey(school.id),
-                  school: school,
-                  schoolBoard: schoolBoards.firstOrNull ?? SchoolBoard.empty,
-                  canEdit: false,
-                  canDelete: false,
-                ),
-              )
-              .toList() ??
-          [],
+      AccessLevel.superAdmin ||
+      AccessLevel.schoolBoardAdmin ||
+      AccessLevel.schoolAdmin ||
+      AccessLevel.teacher =>
+        schoolBoards
+            .map(
+              (schoolBoard) => SchoolBoardListTile(
+                key: ValueKey(schoolBoard.id),
+                schoolBoard: schoolBoard,
+                elevation:
+                    authProvider.databaseAccessLevel >= AccessLevel.superAdmin
+                        ? null
+                        : 0,
+                filteredSchoolIds: filteredSchoolIds,
+              ),
+            )
+            .toList(),
       AccessLevel.self || AccessLevel.invalid => throw Exception(
           'Wrong access level: ${authProvider.databaseAccessLevel}'),
     };

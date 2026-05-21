@@ -4,14 +4,21 @@ import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/generic/extended_item_serializable.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
+import 'package:stagess_common/models/persons/school_member.dart';
 import 'package:stagess_common/models/school_boards/school.dart';
 
-class SchoolBoard extends ExtendedItemSerializable {
+class SchoolBoard extends ExtendedItemSerializable with SchoolMember {
   static final String _currentVersion = '1.0.0';
   final String name;
   final Uint8List logo;
   final List<School> schools;
   final String cnesstNumber;
+
+  @override
+  String get schoolBoardId => id;
+
+  @override
+  String get schoolId => throw 'SchoolBoard does not have a schoolId';
 
   SchoolBoard({
     super.id,

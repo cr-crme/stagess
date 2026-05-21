@@ -15,7 +15,6 @@ import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/services/image_helpers.dart';
 import 'package:stagess_common/utils.dart';
 
-// TODO Validate the changes to rules
 abstract class SchoolBoardsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
@@ -26,7 +25,8 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
 
     await SecurityPolicies([
       UserIsVerified(user: user),
-      HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.superAdmin),
+      HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.teacher),
+      UserIsFromSameSchoolBoard(user: user, item: schoolBoards.values.first),
     ]).validate();
 
     return RepositoryResponse(
@@ -45,10 +45,8 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
     await SecurityPolicies([
       UserIsVerified(user: user),
       HasData(item: schoolBoard),
-      OrPolicy([
-        HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.superAdmin),
-        ItemIsOwnedByUser(user: user, item: schoolBoard),
-      ]),
+      HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.teacher),
+      UserIsFromSameSchoolBoard(user: user, item: schoolBoard),
     ]).validate();
 
     return RepositoryResponse(data: schoolBoard!.serializeWithFields(fields));
@@ -89,23 +87,17 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
           AccessLevel.superAdmin,
         ],
         allowedToModify: [
-          AccessLevel.self,
+          AccessLevel.schoolBoardAdmin,
           AccessLevel.superAdmin,
         ],
         whiteList: {
-          AccessLevel.self: ['logo', 'schools', 'cnesst_number'],
+          AccessLevel.schoolBoardAdmin: ['logo', 'schools', 'cnesst_number'],
         },
         blackList: {
           AccessLevel.superAdmin: ['id'],
         },
         itemValidator: (user, item, previousItem) {
-          if (user.accessLevel < AccessLevel.schoolBoardAdmin) {
-            // We need this because all users are self in the case of school boards
-            throw InvalidRequestException(
-                'You do not have permission to put school boards');
-          }
-
-          if (user.accessLevel < AccessLevel.schoolBoardAdmin) {
+          if (user.accessLevel < AccessLevel.superAdmin) {
             for (final school in previousItem?.schools ?? []) {
               if (!item.schools.any((s) => s.id == school.id)) {
                 throw InvalidRequestException(
