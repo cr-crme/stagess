@@ -10,6 +10,7 @@ import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
@@ -40,9 +41,9 @@ class AdminListTileState extends State<AdminListTile> {
   Future<bool> validate() async {
     // We do both like so, so all the fields get validated even if one is not valid
     bool isValid = _formKey.currentState?.validate() ?? false;
-    isValid = (_radioKey.currentState?.validate() ??
-            (widget.admin.schoolBoardId.isEmpty ? true : false)) &&
-        isValid;
+    isValid =
+        (_showSchoolSelection ? _radioKey.currentState!.validate() : true) &&
+            isValid;
     return isValid;
   }
 
@@ -59,6 +60,13 @@ class AdminListTileState extends State<AdminListTile> {
   bool _forceDisabled = false;
   bool _isExpanded = false;
   bool _isEditing = false;
+
+  bool get _showSchoolSelection =>
+      (widget.admin.accessLevel < AccessLevel.schoolBoardAdmin &&
+          AuthProvider.of(context, listen: false).databaseAccessLevel >
+              AccessLevel.schoolAdmin) ||
+      (AuthProvider.of(context, listen: false).databaseAccessLevel >=
+          AccessLevel.superAdmin);
 
   late String _selectedSchoolId = widget.admin.schoolId;
   late final _firstNameController = TextEditingController(
@@ -346,7 +354,10 @@ class AdminListTileState extends State<AdminListTile> {
   }
 
   Widget _buildSchoolBoardSelection() {
-    // TODO Listen true?
+    if (!_showSchoolSelection) {
+      return SizedBox.shrink();
+    }
+
     final schoolBoard = SchoolBoardsProvider.of(context, listen: false)
         .firstWhereOrNull((e) => e.id == widget.admin.schoolBoardId);
 
@@ -363,7 +374,13 @@ class AdminListTileState extends State<AdminListTile> {
             ),
             onChanged: (value) =>
                 setState(() => _selectedSchoolId = value ?? ''),
-            options: [null, ...schoolBoard.schools]
+            options: [
+              ...(AuthProvider.of(context, listen: false).databaseAccessLevel >=
+                      AccessLevel.superAdmin
+                  ? [null]
+                  : []),
+              ...schoolBoard.schools
+            ]
                 .map(
                   (e) => FormBuilderFieldOption(
                     value: e?.id ?? '',

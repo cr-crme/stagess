@@ -46,6 +46,7 @@ class _AddAdminDialogState extends State<AddAdminDialog> {
           ],
         ),
       );
+      return;
     }
 
     if (!mounted) return;

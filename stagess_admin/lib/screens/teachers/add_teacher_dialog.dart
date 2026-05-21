@@ -46,6 +46,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
           ],
         ),
       );
+      return;
     }
 
     if (!mounted) return;
