@@ -124,8 +124,8 @@ class InternshipContractFormController {
     required this.contractId,
   })  : _studentController =
             _studentPickerControllerOf(context, internship: internship),
-        _primaryJobController =
-            _jobListControllerOf(context, internship: internship),
+        _primaryJobController = _jobListControllerOf(context,
+            internship: internship, isEditing: isNewContract),
         _extraJobControllers = (contractId == null
                     ? (internship.currentContract)
                     : internship.contracts
@@ -535,7 +535,6 @@ class _MainJob extends StatelessWidget {
     _logger.finer(
       'Building _MainJob with controller job: ${controller._primaryJobController.job.id}',
     );
-    // TODO Validate this
     final currentSchool =
         SchoolBoardsProvider.of(context, listen: false).currentSchool;
 
@@ -583,7 +582,6 @@ class _ExtraSpecialization extends StatelessWidget {
   final Function(void Function()) setState;
 
   Widget _extraJobTileBuilder(BuildContext context, int index) {
-    // TODO Validate this
     final currentSchool =
         SchoolBoardsProvider.of(context, listen: false).currentSchool;
 
@@ -1099,11 +1097,11 @@ StudentPickerController _studentPickerControllerOf(BuildContext context,
 }
 
 EnterpriseJobListController _jobListControllerOf(BuildContext context,
-    {required Internship internship}) {
+    {required Internship internship, required bool isEditing}) {
   final enterprise = EnterprisesProvider.of(context, listen: false)
       .fromIdOrNull(internship.enterpriseId);
 
-  final jobs = AuthProvider.of(context, listen: false).isAdmin
+  final jobs = !isEditing || AuthProvider.of(context, listen: false).isAdmin
       ? enterprise?.jobs
       : enterprise?.jobsWithRemainingPositions(
           context,

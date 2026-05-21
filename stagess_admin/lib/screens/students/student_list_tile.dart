@@ -431,10 +431,16 @@ class StudentListTileState extends State<StudentListTile> {
                 _buildProgramSelection(),
                 const SizedBox(height: 8),
                 _buildContact(),
-                SectionDivider(),
-                _buildProgression(),
-                SectionDivider(),
-                _buildVisa(),
+                if (!widget.forceEditingMode)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SectionDivider(),
+                      _buildProgression(),
+                      SectionDivider(),
+                      _buildVisa(),
+                    ],
+                  )
               ],
             ),
           ),

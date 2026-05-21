@@ -147,7 +147,8 @@ abstract class InternshipsRepository extends RepositoryAbstract {
             'id',
             'school_board_id',
             'student_id',
-            'enterprise_id'
+            'enterprise_id',
+            'signatory_teacher_id',
           ],
           AccessLevel.schoolAdmin: [
             'id',
@@ -169,7 +170,18 @@ abstract class InternshipsRepository extends RepositoryAbstract {
           ],
         },
         itemValidator: (user, item, previousItem) {
-          // No validation required
+          if (item.signatoryTeacherId.isEmpty) {
+            throw InvalidRequestException(
+                'An internship must have a signatory teacher');
+          }
+          if (user.accessLevel < AccessLevel.schoolAdmin &&
+              item.signatoryTeacherId != user.userId) {
+            throw InvalidRequestException(
+                'You must be the signatory teacher to create or modify this internship');
+          }
+
+          // TODO Refuse if program is not set?
+
           return Future.value();
         },
       ),
@@ -268,7 +280,10 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     required List<String> students,
   }) async {
     final studentFilters = ({
-      'student_id': user.accessLevel < AccessLevel.superAdmin ? students : null,
+      'student_id':
+          user.accessLevel < AccessLevel.superAdmin && internshipId == null
+              ? students
+              : null,
     }..removeWhere((key, value) => value == null))
         .cast<String, List<String>>();
 

@@ -132,23 +132,17 @@ class _InternshipsListScreenState extends State<InternshipsListScreen> {
     final schoolBoard = await showSelectSchoolBoardDialog(context);
     if (schoolBoard == null || !context.mounted) return;
 
-    final answer = await showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => AddInternshipDialog(schoolBoard: schoolBoard),
-    );
-    if (answer is! Internship || !context.mounted) return;
-
-    final isSuccess = await InternshipsProvider.of(
-      context,
-      listen: false,
-    ).addWithConfirmation(answer);
+    final isConfirmed = await showDialog<bool>(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) => AddInternshipDialog(schoolBoard: schoolBoard),
+        ) ??
+        false;
     if (!context.mounted) return;
 
     showSnackBar(
       context,
-      message:
-          isSuccess ? 'Stage ajouté avec succès' : 'Échec de l\'ajout du stage',
+      message: isConfirmed ? 'Stage ajouté avec succès' : 'Aucun stage ajouté',
     );
   }
 

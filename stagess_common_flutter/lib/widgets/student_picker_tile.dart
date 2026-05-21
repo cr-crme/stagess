@@ -47,7 +47,7 @@ class StudentPickerTile extends StatelessWidget {
   final String? title;
   final bool editMode;
   final bool isMandatory;
-  final Function(Student)? onSelected;
+  final Function(Student?)? onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -89,8 +89,8 @@ class StudentPickerTile extends StatelessWidget {
                 textEditingValue.text.toLowerCase(),
           );
           if (selectedStudent != null) controller._selection = selectedStudent;
-          if (onSelected != null) onSelected!(controller._selection!);
         }
+        if (onSelected != null) onSelected!(controller._selection);
 
         // We show everything if there is no text. Otherwise, we show only if
         // the names containing that approach the text.

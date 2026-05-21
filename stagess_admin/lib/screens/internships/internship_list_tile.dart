@@ -9,7 +9,6 @@ import 'package:stagess_admin/screens/internships/schedule_list_tile.dart';
 import 'package:stagess_admin/widgets/enterprise_picker_tile.dart';
 import 'package:stagess_admin/widgets/section_divider.dart';
 import 'package:stagess_admin/widgets/teacher_picker_tile.dart';
-import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
@@ -19,13 +18,15 @@ import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/transportation.dart';
 import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/models/persons/student.dart';
-import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/widgets/add_job_button.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
@@ -43,6 +44,7 @@ import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/evaluation_enter
 import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/evaluation_skill_pdf_template.dart';
 import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/evaluation_sst_pdf_template.dart';
 import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/internship_contract_pdf_template.dart';
+import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/enterprise_job_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/schedule_selector.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
@@ -100,15 +102,22 @@ class InternshipListTileState extends State<InternshipListTile> {
 
   late final _studentPickerController = StudentPickerController(
     schoolBoardId: widget.schoolBoardId,
-    initial: StudentsProvider.of(
-      context,
-      listen: false,
-    ).firstWhereOrNull((student) => student.id == widget.internship.studentId),
+    initial: context.mounted
+        ? StudentsProvider.of(
+            context,
+            listen: false,
+          ).firstWhereOrNull(
+            (student) => student.id == widget.internship.studentId)
+        : null,
   );
   late final _teacherPickerController = TeacherPickerController(
     initial: context.mounted
         ? TeachersProvider.of(context, listen: false).firstWhereOrNull(
-            (teacher) => teacher.id == widget.internship.signatoryTeacherId,
+            (teacher) =>
+                teacher.id ==
+                (widget.forceEditingMode
+                    ? AuthProvider.of(context).teacherId
+                    : widget.internship.signatoryTeacherId),
           )
         : null,
   );
@@ -120,6 +129,8 @@ class InternshipListTileState extends State<InternshipListTile> {
       (enterprise) => enterprise.id == widget.internship.enterpriseId,
     ),
   );
+
+  final List<EnterpriseJobListController> _extraJobControllers = [];
   late final _contactFirstNameController = TextEditingController(
     text: widget.internship.currentContract?.supervisor.firstName ?? '',
   );
@@ -186,7 +197,9 @@ class InternshipListTileState extends State<InternshipListTile> {
     if (schedulesHasChanged ||
         transportationsChanged ||
         visitFrequenciesChanged ||
-        previousSupervisor.getDifference(supervisor).isNotEmpty) {
+        previousSupervisor.getDifference(supervisor).isNotEmpty ||
+        _teacherPickerController.teacher?.id !=
+            widget.internship.signatoryTeacherId) {
       return widget.internship.copyWith(
         studentId: _studentPickerController.student?.id,
         signatoryTeacherId: _teacherPickerController.teacher?.id ?? '',
@@ -200,13 +213,22 @@ class InternshipListTileState extends State<InternshipListTile> {
           ...widget.internship.contracts,
           InternshipContract(
             date: DateTime.now(),
-            jobId: widget.internship.currentContract?.jobId ?? '',
-            specializationId:
-                widget.internship.currentContract?.specializationId ?? '',
-            extraSpecializationIds:
-                widget.internship.currentContract?.extraSpecializationIds ?? [],
-            program:
-                widget.internship.currentContract?.program ?? Program.undefined,
+            jobId: widget.forceEditingMode
+                ? _enterprisePickerController.job.id
+                : (widget.internship.currentContract?.jobId ?? ''),
+            specializationId: widget.forceEditingMode
+                ? _enterprisePickerController.job.specialization.id
+                : (widget.internship.currentContract?.specializationId ?? ''),
+            extraSpecializationIds: widget.forceEditingMode
+                ? _extraJobControllers
+                    .map((controller) => controller.job.specialization.id)
+                    .toList()
+                : (widget.internship.currentContract?.extraSpecializationIds ??
+                    []),
+            program: (widget.forceEditingMode
+                    ? _studentPickerController.student?.program
+                    : widget.internship.currentContract?.program) ??
+                Program.undefined,
             supervisor: supervisor,
             dates: _weeklySchedulesController.dateRange!,
             weeklySchedules: InternshipHelpers.copySchedules(
@@ -520,6 +542,8 @@ class InternshipListTileState extends State<InternshipListTile> {
                       const SizedBox(height: 8),
                       _buildEnterprise(),
                       const SizedBox(height: 8),
+                      _buildExtraJob(),
+                      const SizedBox(height: 32),
                     ],
                   ),
                 _buildSupervisorContact(),
@@ -532,16 +556,22 @@ class InternshipListTileState extends State<InternshipListTile> {
                 const SizedBox(height: 8.0),
                 _buildVisitFrequencies(),
                 const SizedBox(height: 8.0),
-                _buildEndDate(),
-                const SizedBox(height: 8.0),
-                _buildAchievedDuration(),
-                const SizedBox(height: 8),
-                _buildTeacherNotes(),
-                SectionDivider(),
-                _buildActions(),
-                SectionDivider(),
-                _buildDocumentsSection(),
-                const SizedBox(height: 8),
+                if (!widget.forceEditingMode)
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildEndDate(),
+                      const SizedBox(height: 8.0),
+                      _buildAchievedDuration(),
+                      const SizedBox(height: 8),
+                      _buildTeacherNotes(),
+                      SectionDivider(),
+                      _buildActions(),
+                      SectionDivider(),
+                      _buildDocumentsSection(),
+                      const SizedBox(height: 8),
+                    ],
+                  ),
               ],
             ),
           ),
@@ -551,29 +581,23 @@ class InternshipListTileState extends State<InternshipListTile> {
   }
 
   Widget _buildStudent() {
-    _studentPickerController.student =
-        StudentsProvider.of(context, listen: true).firstWhereOrNull(
-              (student) => student.id == widget.internship.studentId,
-            ) ??
-            Student.empty;
-
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
       child: StudentPickerTile(
         title: 'Élève',
         controller: _studentPickerController,
         editMode: _isEditing,
+        onSelected: (_) {
+          if (_studentPickerController.student?.program != Program.fpt) {
+            _extraJobControllers.clear();
+          }
+          setState(() {});
+        },
       ),
     );
   }
 
   Widget _buildEnterprise() {
-    _enterprisePickerController.enterprise =
-        EnterprisesProvider.of(context, listen: true).firstWhereOrNull(
-              (enterprise) => enterprise.id == widget.internship.enterpriseId,
-            ) ??
-            Enterprise.empty;
-
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
       child: EnterprisePickerTile(
@@ -585,13 +609,51 @@ class InternshipListTileState extends State<InternshipListTile> {
     );
   }
 
-  Widget _buildSupervisingTeacher() {
-    _teacherPickerController.teacher =
-        TeachersProvider.of(context, listen: true).firstWhereOrNull(
-              (teacher) => teacher.id == widget.internship.signatoryTeacherId,
-            ) ??
-            Teacher.empty;
+  Widget _buildExtraJob() {
+    if (_studentPickerController.student?.program != Program.fpt) {
+      return SizedBox.shrink();
+    }
 
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      AddJobButton(
+        controllers: _extraJobControllers,
+        onJobAdded: () => setState(() {}),
+        style: Theme.of(context).textButtonTheme.style!.copyWith(
+              backgroundColor:
+                  Theme.of(context).elevatedButtonTheme.style!.backgroundColor,
+            ),
+      ),
+      ..._extraJobControllers.asMap().keys.map((index) => Row(
+            children: [
+              Expanded(
+                child: EnterpriseJobListTile(
+                  key: ValueKey(_extraJobControllers[index].hashCode),
+                  controller: _extraJobControllers[index],
+                  schools: [...SchoolBoardsProvider.of(context, listen: false)]
+                      .map((e) => e.schools)
+                      .flattened
+                      .toList(),
+                  editMode: _isEditing,
+                  specializationOnly: true,
+                  canChangeExpandedState: false,
+                  initialExpandedState: true,
+                  elevation: 0.0,
+                  jobPickerPadding:
+                      const EdgeInsets.only(left: 8, top: 12, right: 24),
+                  showHeader: false,
+                ),
+              ),
+              IconButton(
+                  onPressed: () => setState(() {
+                        _extraJobControllers.removeAt(index);
+                      }),
+                  icon: Icon(Icons.delete, color: Colors.red)),
+            ],
+          ))
+    ]);
+  }
+
+  Widget _buildSupervisingTeacher() {
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
       child: TeacherPickerTile(
@@ -624,7 +686,8 @@ class InternshipListTileState extends State<InternshipListTile> {
                     Expanded(
                       child: TextFormField(
                         controller: _contactFirstNameController,
-                        decoration: const InputDecoration(labelText: 'Prénom'),
+                        decoration:
+                            const InputDecoration(labelText: '* Prénom'),
                         maxLength: 50,
                         validator: (value) {
                           if (value?.isEmpty == true) {
@@ -639,7 +702,7 @@ class InternshipListTileState extends State<InternshipListTile> {
                       child: TextFormField(
                         controller: _contactLastNameController,
                         decoration: const InputDecoration(
-                          labelText: 'Nom de famille',
+                          labelText: '* Nom de famille',
                         ),
                         maxLength: 50,
                         validator: (value) {
