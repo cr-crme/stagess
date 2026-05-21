@@ -79,7 +79,6 @@ class AdminListTileState extends State<AdminListTile> {
       TextEditingController(text: widget.admin.phone.toString());
   late final _emailController = TextEditingController(text: widget.admin.email);
 
-  // TODO Remove edit/remove icons when not permitted
   Admin get editedAdmin => widget.admin.copyWith(
         schoolBoardId: widget.admin.schoolBoardId,
         schoolId: _selectedSchoolId,

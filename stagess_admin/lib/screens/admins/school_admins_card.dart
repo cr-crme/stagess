@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/admins/admin_list_tile.dart';
-import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';

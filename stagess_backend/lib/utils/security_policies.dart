@@ -341,6 +341,23 @@ class HasData<T> implements SecurityPolicy {
   }
 }
 
+class HasSchool<T extends SchoolMember> implements SecurityPolicy {
+  final T? item;
+
+  HasSchool({required this.item});
+
+  @override
+  Future<void> validate() {
+    if (item == null) {
+      throw SecurityPolicyException('Item not found');
+    }
+    if (item!.schoolId.isEmpty) {
+      throw SecurityPolicyException('Item does not belong to a school');
+    }
+    return Future.value();
+  }
+}
+
 class GenericPolicy implements SecurityPolicy {
   final Future<void> Function() validationFunction;
 

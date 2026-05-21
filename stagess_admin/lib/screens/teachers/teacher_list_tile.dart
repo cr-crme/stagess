@@ -11,6 +11,7 @@ import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
@@ -42,7 +43,9 @@ class TeacherListTileState extends State<TeacherListTile> {
   Future<bool> validate() async {
     // We do both like so, so all the fields get validated even if one is not valid
     bool isValid = _formKey.currentState?.validate() ?? false;
-    isValid = (_radioKey.currentState?.validate() ?? false) && isValid;
+    isValid =
+        (_showSchoolSelection ? _radioKey.currentState!.validate() : true) &&
+            isValid;
     return isValid;
   }
 
@@ -67,6 +70,9 @@ class TeacherListTileState extends State<TeacherListTile> {
   bool _forceDisabled = false;
   bool _isExpanded = false;
   bool _isEditing = false;
+  bool get _showSchoolSelection =>
+      AuthProvider.of(context, listen: false).databaseAccessLevel >=
+      AccessLevel.schoolBoardAdmin;
 
   late String _selectedSchoolId = widget.teacher.schoolId;
   late final _firstNameController = TextEditingController(
@@ -378,7 +384,10 @@ class TeacherListTileState extends State<TeacherListTile> {
   }
 
   Widget _buildSchoolSelection() {
-    // TODO Listen true?
+    if (!_showSchoolSelection) {
+      return SizedBox.shrink();
+    }
+
     final schoolBoard = SchoolBoardsProvider.of(context, listen: false)
         .firstWhereOrNull((e) => e.id == widget.teacher.schoolBoardId);
 

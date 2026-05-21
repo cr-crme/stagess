@@ -12,7 +12,6 @@ import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common/utils.dart';
 
-// TODO Fix cannot connect with a schoolAdmin account
 abstract class AdminsRepository extends RepositoryAbstract {
   @override
   Future<RepositoryResponse> getAll({
@@ -23,10 +22,13 @@ abstract class AdminsRepository extends RepositoryAbstract {
 
     await SecurityPolicies([
       UserIsVerified(user: user),
-      HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.schoolAdmin),
+      HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.teacher),
       ...admins.values
           .map((e) => UserIsFromSameSchoolBoard(user: user, item: e)),
-      ...admins.values.map((e) => UserIsFromSameSchool(user: user, item: e)),
+      ...admins.values.map((e) => OrPolicy([
+            UserIsFromSameSchool(user: user, item: e),
+            NotPolicy(HasSchool(item: e)),
+          ])),
     ]).validate();
 
     return RepositoryResponse(
@@ -44,7 +46,7 @@ abstract class AdminsRepository extends RepositoryAbstract {
 
     await SecurityPolicies([
       UserIsVerified(user: user),
-      HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.schoolAdmin),
+      HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.teacher),
       HasData(item: admin),
       UserIsFromSameSchoolBoard(user: user, item: admin),
       UserIsFromSameSchool(user: user, item: admin),
@@ -220,13 +222,13 @@ class MySqlAdminsRepository extends AdminsRepository {
   }) async {
     final schoolFilters = ({
       'school_board_id': user.accessLevel < AccessLevel.superAdmin
-          ? user.schoolBoardId!
+          ? [user.schoolBoardId!]
           : null,
       'school_id': user.accessLevel < AccessLevel.schoolBoardAdmin
-          ? user.schoolId!
+          ? ['', user.schoolId!]
           : null,
     }..removeWhere((key, value) => value == null))
-        .cast<String, String>();
+        .cast<String, List<String>>();
 
     final admins = await sqlInterface.performSelectQuery(
       user: user,

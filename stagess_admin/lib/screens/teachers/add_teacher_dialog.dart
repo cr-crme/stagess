@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/teachers/teacher_list_tile.dart';
+import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
 class AddTeacherDialog extends StatefulWidget {
@@ -59,6 +61,8 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = AuthProvider.of(context, listen: false);
+
     return AlertDialog(
       content: SizedBox(
         width: ResponsiveService.maxBodyWidth,
@@ -79,8 +83,12 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
               const SizedBox(height: 8),
               TeacherListTile(
                 key: _editingKey,
-                teacher:
-                    Teacher.empty.copyWith(schoolBoardId: widget.schoolBoardId),
+                teacher: Teacher.empty.copyWith(
+                    schoolBoardId: widget.schoolBoardId,
+                    schoolId: authProvider.databaseAccessLevel <
+                            AccessLevel.schoolBoardAdmin
+                        ? authProvider.schoolId
+                        : null),
                 forceEditingMode: true,
                 canEdit: false,
                 canDelete: false,
