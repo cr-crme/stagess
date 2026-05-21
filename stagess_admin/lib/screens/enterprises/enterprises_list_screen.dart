@@ -67,24 +67,19 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen> {
     final schoolBoard = await showSelectSchoolBoardDialog(context);
     if (schoolBoard == null || !context.mounted) return;
 
-    final answer = await showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) => AddEnterpriseDialog(schoolBoard: schoolBoard),
-    );
-    if (answer is! Enterprise || !context.mounted) return;
-
-    final isSuccess = await EnterprisesProvider.of(
-      context,
-      listen: false,
-    ).addWithConfirmation(answer);
+    final isConfirmed = await showDialog<bool>(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) => AddEnterpriseDialog(schoolBoard: schoolBoard),
+        ) ??
+        false;
     if (!context.mounted) return;
 
     showSnackBar(
       context,
-      message: isSuccess
+      message: isConfirmed
           ? 'Entreprise ajoutée avec succès'
-          : 'Échec de l\'ajout du l\'entreprise',
+          : 'Aucune entreprise n\'a été ajoutée',
     );
   }
 

@@ -158,6 +158,7 @@ class DatabaseManager {
           data: data,
           user: user,
           internshipsRepository: internshipsDatabase,
+          studentsRepository: studentsDatabase,
         ),
       RequestFields.internships => throw InvalidRequestException(
           'Internships must be created individually'),
@@ -221,6 +222,7 @@ class DatabaseManager {
               messageOnNull: 'An "id" is required to delete an enterprise'),
           user: user,
           internshipsRepository: internshipsDatabase,
+          studentsRepository: studentsDatabase,
         ),
       RequestFields.internships => throw InvalidRequestException(
           'Internships must be deleted individually'),

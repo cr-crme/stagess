@@ -3,6 +3,7 @@ import 'package:stagess_admin/screens/enterprises/enterprise_list_tile.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
+import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 
 class AddEnterpriseDialog extends StatefulWidget {
   const AddEnterpriseDialog({super.key, required this.schoolBoard});
@@ -20,8 +21,38 @@ class _AddEnterpriseDialogState extends State<AddEnterpriseDialog> {
     final state = _editingKey.currentState as EnterpriseListTileState;
 
     // Validate the form
-    if (!(await state.validate()) || !mounted) return;
-    Navigator.of(context).pop(state.editedEnterprise);
+    final isValid = await state.validate();
+    if (!isValid || !mounted) return;
+
+    final isSuccess = await EnterprisesProvider.of(
+      context,
+      listen: false,
+    ).addWithConfirmation(state.editedEnterprise);
+    if (!mounted) return;
+
+    if (!isSuccess) {
+      await showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Échec de l\'ajout de l\'entreprise'),
+          content: SizedBox(
+            width: ResponsiveService.maxBodyWidth * 0.6,
+            child: Text(
+                'Impossible d\'ajouter l\'entreprise. Assurez-vous que toutes les informations '
+                'sont correctes et que vous avez le droit de faire cette action.'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    Navigator.of(context).pop(isSuccess);
   }
 
   void _onClickedCancel() {

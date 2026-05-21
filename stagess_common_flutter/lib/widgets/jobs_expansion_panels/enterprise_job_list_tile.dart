@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/school_boards/school.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
@@ -199,10 +201,15 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = AuthProvider.of(context, listen: false);
+
     final schools = widget.schools?.where(
           (school) =>
-              widget.controller._reservedForSchoolId == null ||
-              widget.controller._reservedForSchoolId == school.id,
+              (authProvider.databaseAccessLevel <
+                      AccessLevel.schoolBoardAdmin &&
+                  school.id == authProvider.schoolId) &&
+              (widget.controller._reservedForSchoolId == null ||
+                  widget.controller._reservedForSchoolId == school.id),
         ) ??
         [];
 

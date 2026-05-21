@@ -10,9 +10,9 @@ import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/enterprises/job_comment.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
+import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
-import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
@@ -53,7 +53,7 @@ class EnterpriseListTile extends StatefulWidget {
 class EnterpriseListTileState extends State<EnterpriseListTile> {
   final _formKey = GlobalKey<FormState>();
   Future<bool> validate() async {
-    if (!_wasDetailsExpanded) return true;
+    if (!widget.forceEditingMode && !_wasDetailsExpanded) return true;
 
     // We do both like so, so all the fields get validated even if one is not valid
     await Future.wait([
@@ -432,7 +432,10 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                         snapshot.connectionState == ConnectionState.done
                             ? Row(
                                 children: [
-                                  if (!hasInternship)
+                                  if (!hasInternship &&
+                                      AuthProvider.of(context, listen: false)
+                                              .databaseAccessLevel >=
+                                          AccessLevel.schoolAdmin)
                                     IconButton(
                                       icon: Icon(
                                         Icons.delete,
@@ -572,7 +575,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                       : null,
                   maxLength: 50,
                   decoration: const InputDecoration(
-                    labelText: 'Nom de l\'entreprise',
+                    labelText: '* Nom de l\'entreprise',
                   ),
                 ),
               ],
@@ -667,7 +670,10 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                       initialExpandedState:
                           _jobControllers[jobId]!.specialization?.idWithName ==
                               null,
-                      showExtended: !widget.forceEditingMode,
+                      showExtended: !widget.forceEditingMode &&
+                          widget.enterprise.jobs.any(
+                            (job) => job.id == jobId,
+                          ),
                       addSstEvent: _isEditing ? null : _addSstEvent,
                       addComment: _isEditing ? null : _addComment,
                       removeImage: _isEditing ? null : _removeImageFromJob,
@@ -843,9 +849,8 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   Widget _buildRecruiter() {
     _teacherPickerController.teacher =
         TeachersProvider.of(context, listen: false).firstWhereOrNull(
-              (teacher) => teacher.id == widget.enterprise.recruiterId,
-            ) ??
-            Teacher.empty;
+      (teacher) => teacher.id == widget.enterprise.recruiterId,
+    );
 
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
