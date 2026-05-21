@@ -27,7 +27,7 @@ class AdminsProvider extends BackendListProvided<Admin> {
 
   void initializeAuth(AuthProvider auth) {
     if (!auth.isFullySignedIn ||
-        auth.databaseAccessLevel < AccessLevel.schoolAdmin) {
+        auth.databaseAccessLevel < AccessLevel.teacher) {
       return;
     }
 

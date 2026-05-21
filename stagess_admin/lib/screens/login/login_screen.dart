@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:stagess_admin/screens/drawer/main_drawer.dart';
 import 'package:stagess_admin/screens/router.dart';
-import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common_flutter/helpers/form_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
@@ -48,20 +47,9 @@ class _LoginScreenState extends State<LoginScreen> {
   void _navigateIfConnected() {
     final authProvider = AuthProvider.of(context, listen: false);
     if (authProvider.isFullySignedIn) {
-      if (authProvider.databaseAccessLevel < AccessLevel.schoolAdmin) {
-        WidgetsBinding.instance.addPostFrameCallback(
-          (_) => showSnackBar(
-            context,
-            message: 'Vous n\'êtes pas un administrateur de Stagess.\n'
-                'Connectez-vous sur le site web client pour accéder à votre compte.',
-          ),
-        );
-        return;
-      } else {
-        WidgetsBinding.instance.addPostFrameCallback(
-          (_) => GoRouter.of(context).goNamed(Screens.home),
-        );
-      }
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => GoRouter.of(context).goNamed(Screens.home),
+      );
     }
   }
 

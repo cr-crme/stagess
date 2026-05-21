@@ -74,7 +74,6 @@ abstract class TeachersRepository extends RepositoryAbstract {
     final newTeacher = previous?.copyWithData(data) ??
         Teacher.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
 
-    // TODO Test these policies
     await SecurityPolicies([
       UserIsVerified(user: user),
       HasData(item: newTeacher),
