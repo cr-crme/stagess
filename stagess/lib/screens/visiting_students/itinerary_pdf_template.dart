@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:stagess/screens/visiting_students/widgets/routing_map.dart';
+import 'package:stagess_common/models/itineraries/waypoint.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/pdf_widgets/pdf_theme.dart';
@@ -112,16 +113,17 @@ pw.Widget _buildItineraryDetails({required RoutingController controller}) {
         final startingPoint = controller.itinerary[index];
         final endingPoint = controller.itinerary[index + 1];
 
-        return pw.Padding(
+        return pw.Container(
+          decoration: pw.BoxDecoration(
+              border: pw.Border(
+                  bottom:
+                      pw.BorderSide(width: 0.25, color: PdfColors.grey300))),
           padding: const pw.EdgeInsets.symmetric(vertical: 2.0),
           child: pw.Row(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Expanded(
-                child: PdfTheme.bodyMedium(startingPoint.title),
-              ),
-              pw.Expanded(
-                child: PdfTheme.bodyMedium(endingPoint.title),
-              ),
+              _placeTile(startingPoint),
+              _placeTile(endingPoint),
               pw.Expanded(
                 child: PdfTheme.bodyMedium(
                     '${(distance / 1000).toStringAsFixed(1)} km'),
@@ -131,5 +133,18 @@ pw.Widget _buildItineraryDetails({required RoutingController controller}) {
         );
       }),
     ],
+  );
+}
+
+pw.Widget _placeTile(Waypoint place) {
+  return pw.Expanded(
+    child: pw.Column(
+      crossAxisAlignment: pw.CrossAxisAlignment.start,
+      children: [
+        PdfTheme.titleSmall(place.title,
+            padding: const pw.EdgeInsets.only(bottom: 2.0)),
+        PdfTheme.bodyMedium(place.address.toParagraph()),
+      ],
+    ),
   );
 }

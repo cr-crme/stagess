@@ -150,6 +150,12 @@ class Address extends ItemSerializable {
         : '';
   }
 
+  String toParagraph() {
+    return isValid
+        ? '$civicNumber $street${apartment == null ? '' : ' #$apartment'}\n$city\n$postalCode'
+        : '';
+  }
+
   @override
   int get hashCode =>
       civicNumber.hashCode ^

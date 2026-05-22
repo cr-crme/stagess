@@ -90,7 +90,7 @@ class PrerequisitesExpansionPanelState
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Prérequis et équipements'),
+            const Text('Prérequis'),
             Visibility(
               visible: isExpanded,
               maintainSize: true,
