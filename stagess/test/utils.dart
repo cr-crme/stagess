@@ -15,10 +15,9 @@ import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 /// Overlay are required for widgets such as Tootip
 Widget addOverlay(Widget child) {
   return MaterialApp(
-    builder:
-        (context, ch) => Overlay(
-          initialEntries: [OverlayEntry(builder: (context) => child)],
-        ),
+    builder: (context, ch) => Overlay(
+      initialEntries: [OverlayEntry(builder: (context) => child)],
+    ),
   );
 }
 
@@ -110,13 +109,12 @@ extension StageSsWidgetTester on WidgetTester {
     if (authProvided != null) {
       authProvided.schoolBoardId = 'MockedSchoolBoardId';
       authProvided.schoolId = 'MockedSchoolId';
-      authProvided.teacherId = 'MockedTeacherId';
+      authProvided.currentId = 'MockedCurrentId';
     }
 
-    final schoolBoardsProvided =
-        withSchools
-            ? SchoolBoardsProvider(uri: backendUri, mockMe: true)
-            : null;
+    final schoolBoardsProvided = withSchools
+        ? SchoolBoardsProvider(uri: backendUri, mockMe: true)
+        : null;
     if (schoolBoardsProvided != null) {
       if (authProvided != null) {
         schoolBoardsProvided.initializeAuth(authProvided);
@@ -126,10 +124,9 @@ extension StageSsWidgetTester on WidgetTester {
       }
     }
 
-    final enterprisesProvided =
-        withEnterprises
-            ? EnterprisesProvider(uri: backendUri, mockMe: true)
-            : null;
+    final enterprisesProvided = withEnterprises
+        ? EnterprisesProvider(uri: backendUri, mockMe: true)
+        : null;
     if (enterprisesProvided != null) {
       if (authProvided != null) {
         enterprisesProvided.initializeAuth(authProvided);
@@ -155,10 +152,9 @@ extension StageSsWidgetTester on WidgetTester {
       }
     }
 
-    final internshipsProvided =
-        withInternships
-            ? InternshipsProvider(uri: backendUri, mockMe: true)
-            : null;
+    final internshipsProvided = withInternships
+        ? InternshipsProvider(uri: backendUri, mockMe: true)
+        : null;
     if (internshipsProvided != null) {
       if (authProvided != null) {
         internshipsProvided.initializeAuth(authProvided);
@@ -171,8 +167,7 @@ extension StageSsWidgetTester on WidgetTester {
     await pumpWidget(
       MaterialApp(
         routes: {
-          '/':
-              (context) => MultiProvider(
+          '/': (context) => MultiProvider(
                 providers: [
                   if (authProvided != null)
                     ChangeNotifierProvider(create: (context) => authProvided),

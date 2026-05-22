@@ -25,7 +25,7 @@ void _initializeTeacher(BuildContext context) {
   final teachers = TeachersProvider.of(context, listen: false);
   teachers.add(
     dummyTeacher(
-      id: 'MockedTeacherId',
+      id: 'MockedCurrentId',
       schoolBoardId: authProvided.schoolBoardId!,
       schoolId: authProvided.schoolId!,
     ),

@@ -596,7 +596,7 @@ Future<void> _incomingMessage(
         {
           authProvider.schoolBoardId = protocol.data!['school_board_id'] ?? '';
           authProvider.schoolId = protocol.data!['school_id'] ?? '';
-          authProvider.teacherId = protocol.data!['user_id'] ?? '';
+          authProvider.currentId = protocol.data!['user_id'] ?? '';
           authProvider.databaseAccessLevel = AccessLevel.fromSerialized(
             protocol.data!['access_level'],
           );

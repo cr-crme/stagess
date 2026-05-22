@@ -318,7 +318,7 @@ class _InternshipDetailsScreenState extends State<_InternshipDetailsScreen> {
           SchoolBoardsProvider.of(context, listen: false).currentSchoolBoard;
       final school = schoolBoard?.schools
           .firstWhereOrNull((s) => s.id == student?.schoolId);
-      final teacherId = AuthProvider.of(context).teacherId;
+      final teacherId = AuthProvider.of(context).currentId;
 
       if (student == null || teacherId == null || school == null) {
         _logger.severe(

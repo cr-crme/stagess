@@ -23,7 +23,7 @@ class AuthProvider extends ChangeNotifier {
           email: 'email@email.com',
           password: '123123123',
         );
-        teacherId = 'mockTeacherId';
+        currentId = 'mockCurrentId';
       }
     }
   }
@@ -78,7 +78,7 @@ class AuthProvider extends ChangeNotifier {
     } on Exception {
       // Do nothing
     }
-    teacherId = null;
+    currentId = null;
     schoolId = null;
     schoolBoardId = null;
     databaseAccessLevel = null;
@@ -94,11 +94,10 @@ class AuthProvider extends ChangeNotifier {
     return _firebaseAuth.currentUser != null;
   }
 
-  // TODO Rename to currentId
-  String? _teacherId;
-  String? get teacherId => _teacherId;
-  set teacherId(String? id) {
-    _teacherId = id;
+  String? _currentId;
+  String? get currentId => _currentId;
+  set currentId(String? id) {
+    _currentId = id;
     notifyListeners();
   }
 
@@ -127,7 +126,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   bool get isBackendConnected {
-    return (teacherId != null && teacherId!.isNotEmpty) ||
+    return (currentId != null && currentId!.isNotEmpty) ||
         _databaseAccessLevel == AccessLevel.superAdmin;
   }
 

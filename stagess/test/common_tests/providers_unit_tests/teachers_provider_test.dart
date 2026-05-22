@@ -20,8 +20,8 @@ void main() {
 
       final auth = AuthProvider(mockMe: true);
       teachers.initializeAuth(auth);
-      teachers.add(dummyTeacher(id: auth.teacherId!));
-      expect(teachers.currentTeacher?.id, auth.teacherId);
+      teachers.add(dummyTeacher(id: auth.currentId!));
+      expect(teachers.currentTeacher?.id, auth.currentId);
     });
 
     test('"getCurrentTeacher" works', () {
@@ -36,7 +36,7 @@ void main() {
       teachers.add(dummyTeacher());
       expect(teachers.currentTeacher?.firstName, isNull);
 
-      teachers.add(dummyTeacher(id: auth.teacherId!));
+      teachers.add(dummyTeacher(id: auth.currentId!));
       expect(teachers.currentTeacher?.firstName, 'Pierre');
     });
 

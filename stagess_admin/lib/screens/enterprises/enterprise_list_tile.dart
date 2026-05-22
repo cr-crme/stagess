@@ -694,7 +694,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     });
 
     final enterprises = EnterprisesProvider.of(context, listen: false);
-    final userId = AuthProvider.of(context, listen: false).teacherId;
+    final userId = AuthProvider.of(context, listen: false).currentId;
     if (userId == null) return;
 
     final hasLock = await enterprises.getLockForItem(widget.enterprise);
@@ -757,9 +757,9 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     });
 
     _logger.finer('Adding comment to job: ${job.specialization.name}');
-    final userId = AuthProvider.of(context, listen: false).teacherId;
+    final userId = AuthProvider.of(context, listen: false).currentId;
     if (userId == null) {
-      _logger.warning('No teacher ID found when adding comment to job.');
+      _logger.warning('No ID found when adding comment to job.');
       showSnackBar(
         context,
         message: 'Vous devez être connecté pour ajouter un commentaire.',

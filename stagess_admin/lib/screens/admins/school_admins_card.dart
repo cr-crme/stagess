@@ -44,7 +44,7 @@ class SchoolAdminsCard extends StatelessWidget {
               .map((Admin admin) {
             final canDelete =
                 authProvider.databaseAccessLevel > admin.accessLevel;
-            final canEdit = canDelete || (authProvider.teacherId == admin.id);
+            final canEdit = canDelete || (authProvider.currentId == admin.id);
 
             return AdminListTile(
               key: ValueKey(admin.id),

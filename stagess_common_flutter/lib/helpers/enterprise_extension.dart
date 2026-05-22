@@ -14,8 +14,8 @@ extension EnterprisesProviderExtension on EnterprisesProvider {
   }) {
     final authProvider = AuthProvider.of(context, listen: false);
     final currentSchoolId = authProvider.schoolId;
-    final currentTeacherId = authProvider.teacherId;
-    if (currentSchoolId == null || currentTeacherId == null) {
+    final currentUserId = authProvider.currentId;
+    if (currentSchoolId == null || currentUserId == null) {
       return [];
     }
 
@@ -35,12 +35,12 @@ extension EnterpriseExtension on Enterprise {
     // Remove the jobs which are visible to certain users only
     final authProvider = AuthProvider.of(context, listen: false);
     final currentSchoolId = authProvider.schoolId!;
-    final currentTeacherId = authProvider.teacherId!;
+    final currentUserId = authProvider.currentId!;
     return [...jobs]..removeWhere(
         (job) =>
             job.reservedForId.isNotEmpty &&
             job.reservedForId != currentSchoolId &&
-            job.reservedForId != currentTeacherId,
+            job.reservedForId != currentUserId,
       );
   }
 

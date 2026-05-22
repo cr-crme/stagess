@@ -119,7 +119,7 @@ class InternshipListTileState extends State<InternshipListTile> {
             (teacher) =>
                 teacher.id ==
                 (widget.forceEditingMode
-                    ? AuthProvider.of(context).teacherId
+                    ? AuthProvider.of(context).currentId
                     : widget.internship.signatoryTeacherId),
           )
         : null,

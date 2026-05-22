@@ -27,15 +27,15 @@ void main() {
       expect(authProvider.databaseAccessLevel, AccessLevel.invalid);
       expect(authProvider.schoolBoardId, isNull);
       expect(authProvider.schoolId, isNull);
-      expect(authProvider.teacherId, isNull);
+      expect(authProvider.currentId, isNull);
       expect(authProvider.isFullySignedIn, isFalse);
 
-      authProvider.teacherId = 'teacherId';
+      authProvider.currentId = 'currentId';
       authProvider.schoolId = 'schoolId';
       authProvider.schoolBoardId = 'schoolBoardId';
       expect(authProvider.schoolBoardId, 'schoolBoardId');
       expect(authProvider.schoolId, 'schoolId');
-      expect(authProvider.teacherId, 'teacherId');
+      expect(authProvider.currentId, 'currentId');
       expect(authProvider.isFullySignedIn, isTrue);
 
       await authProvider.signOut();
@@ -44,7 +44,7 @@ void main() {
       expect(authProvider.databaseAccessLevel, AccessLevel.invalid);
       expect(authProvider.schoolBoardId, isNull);
       expect(authProvider.schoolId, isNull);
-      expect(authProvider.teacherId, isNull);
+      expect(authProvider.currentId, isNull);
     });
 
     testWidgets('can get "of" context', (tester) async {

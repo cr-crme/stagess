@@ -18,7 +18,7 @@ class MyAccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authProvider = AuthProvider.of(context, listen: false);
 
-    final currentId = authProvider.teacherId;
+    final currentId = authProvider.currentId;
     if (currentId == null) {
       return ResponsiveService.scaffoldOf(
         context,

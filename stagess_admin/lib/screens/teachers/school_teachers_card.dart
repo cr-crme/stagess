@@ -48,7 +48,7 @@ class SchoolTeachersCard extends StatelessWidget {
                 (authProvider.databaseAccessLevel > AccessLevel.teacher &&
                     authProvider.schoolBoardId == teacher.schoolBoardId &&
                     authProvider.schoolId == teacher.schoolId);
-            final canEdit = canDelete || (authProvider.teacherId == teacher.id);
+            final canEdit = canDelete || (authProvider.currentId == teacher.id);
 
             return TeacherListTile(
               key: ValueKey(teacher.id),

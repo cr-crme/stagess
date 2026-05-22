@@ -22,9 +22,9 @@ class TeachersProvider extends BackendListProvided<Teacher> {
   }
 
   Teacher? get currentTeacher =>
-      _authProvider?.teacherId == null || !hasId(_authProvider!.teacherId ?? '')
+      _authProvider?.currentId == null || !hasId(_authProvider!.currentId ?? '')
           ? null
-          : this[_authProvider!.teacherId];
+          : this[_authProvider!.currentId];
 
   @override
   FetchableFields get referenceFetchableFields => Teacher.fetchableFields;

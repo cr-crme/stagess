@@ -15,7 +15,7 @@ void _prepareProviders(BuildContext context) {
   final auth = AuthProvider.of(context, listen: false);
 
   final teachers = TeachersProvider.of(context, listen: false);
-  teachers.add(dummyTeacher(id: auth.teacherId!));
+  teachers.add(dummyTeacher(id: auth.currentId!));
 }
 
 void main() {
