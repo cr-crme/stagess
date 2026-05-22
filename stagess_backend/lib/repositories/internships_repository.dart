@@ -184,29 +184,79 @@ abstract class InternshipsRepository extends RepositoryAbstract {
             throw InvalidRequestException(
                 'An internship must be associated with a student');
           }
-          if (user.accessLevel < AccessLevel.schoolBoardAdmin) {
+          if (user.accessLevel < AccessLevel.schoolAdmin) {
             final student = await studentsRepository.getById(
                 id: newInternship.studentId,
                 fields: FetchableFields(
                     {'id': FetchableFields.all, 'group': FetchableFields.all}),
                 user: user);
-            final teacher = await teachersRepository.getById(
-                id: newInternship.signatoryTeacherId,
-                fields: FetchableFields({'id': FetchableFields.all}),
-                user: user);
+            final studentGroup = student.data!['group'];
+            if (studentGroup == null ||
+                studentGroup is! String ||
+                studentGroup.isEmpty) {
+              throw InvalidRequestException(
+                  'The student associated with this internship must be in a group');
+            }
 
-            // item.signatoryTeacherId != user.userId)
-            throw InvalidRequestException(
-                'You must be the signatory teacher to create or modify this internship');
+            final teacher = await teachersRepository.getById(
+                id: user.userId ?? '-1',
+                fields: FetchableFields(
+                    {'id': FetchableFields.all, 'groups': FetchableFields.all}),
+                user: user);
+            final teacherId = teacher.data?['id'];
+            if (teacherId == null ||
+                teacherId is! String ||
+                teacherId.isEmpty) {
+              throw InvalidRequestException(
+                  'The teacher id could not be found');
+            }
+            final teacherGroups = teacher.data?['groups'];
+            if (teacherGroups == null || teacherGroups is! List) {
+              throw InvalidRequestException(
+                  'The signatory teacher associated with this internship must be in a group');
+            }
+
+            if (!teacherGroups.contains(studentGroup)) {
+              throw InvalidRequestException(
+                  'The signatory teacher must be in the same group as the student for this internship');
+            }
+            if (item.signatoryTeacherId != teacherId) {
+              final newExtraTeachers = [...item.extraSupervisingTeacherIds]
+                ..remove(teacherId);
+              final oldExtraTeachers = [
+                ...?previousItem?.extraSupervisingTeacherIds
+              ]..remove(teacherId);
+              if (!areListsEqual(newExtraTeachers, oldExtraTeachers)) {
+                throw InvalidRequestException(
+                    'You cannot change the supervising status of another teacher');
+              }
+            }
+            if (!item.supervisingTeacherIds.contains(teacherId) &&
+                !(previousItem?.supervisingTeacherIds.contains(teacherId) ??
+                    false)) {
+              throw InvalidRequestException(
+                  'The signatory teacher must be a supervising teacher for this internship');
+            }
+
+            if (!item.supervisingTeacherIds.contains(teacherId)) {
+              // If the teacher removed themselves, this is the only modification they are allowed to do
+              final differences = item.getDifference(previousItem,
+                  ignoreKeys: ['id', 'extra_supervising_teacher_ids']);
+              if (differences.isNotEmpty) {
+                throw InvalidRequestException(
+                    'You cannot modify this internship if you remove yourself from the supervising teachers');
+              }
+            }
           }
+
+          // Make sure current contract is valid
           if (item.currentContract == null) {
             throw InvalidRequestException(
                 'An internship must have a current contract');
           }
-
           if (item.currentContract!.jobId.isEmpty) {
             throw InvalidRequestException(
-                'An internship contract must have a specialization');
+                'An internship contract must have a job');
           }
           if (item.currentContract!.specializationId.isEmpty) {
             throw InvalidRequestException(
@@ -217,20 +267,39 @@ abstract class InternshipsRepository extends RepositoryAbstract {
                 'An internship contract must have a program');
           }
 
-          final contractDifferences = (previousItem?.currentContract == null
+          final contractDifferences = (previousItem == null
                   ? null
                   : item.currentContract
-                      ?.getDifference(previousItem!.currentContract)) ??
+                      ?.getDifference(previousItem.currentContract)) ??
               [];
           if (contractDifferences.contains('specialization_id') ||
               contractDifferences.contains('extra_specialization_ids') ||
-              contractDifferences.contains('job_id')) {
+              contractDifferences.contains('job_id') ||
+              contractDifferences.contains('program')) {
             throw InvalidRequestException(
-                'You cannot change the specialization of an internship contract');
+                'You cannot change the fundamentals of an internship contract');
           }
-          if (contractDifferences.contains('program')) {
-            throw InvalidRequestException(
-                'You cannot change the program of an internship contract');
+
+          // Previous contracts are not allowed to be modified
+          if (previousItem != null) {
+            if (item.contracts.length < previousItem.contracts.length) {
+              throw InvalidRequestException(
+                  'You cannot delete internship contracts');
+            }
+            for (int i = 0; i < previousItem.contracts.length; i++) {
+              final contract = item.contracts[i];
+              final previousContract = previousItem.contracts[i];
+              if (contract.id != previousContract.id) {
+                throw InvalidRequestException(
+                    'You cannot reorder internship contracts');
+              }
+              final differences =
+                  contract.getDifference(previousContract, ignoreKeys: ['id']);
+              if (differences.isNotEmpty) {
+                throw InvalidRequestException(
+                    'You cannot change the fundamentals of an internship contract');
+              }
+            }
           }
 
           return Future.value();

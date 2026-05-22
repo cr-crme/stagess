@@ -124,6 +124,16 @@ class InternshipListTileState extends State<InternshipListTile> {
           )
         : null,
   );
+  late final _extraTeachersPickerController = widget
+      .internship.extraSupervisingTeacherIds
+      .map((teacherId) => TeacherPickerController(
+            initial: context.mounted
+                ? TeachersProvider.of(context, listen: false).firstWhereOrNull(
+                    (teacher) => teacher.id == teacherId,
+                  )
+                : null,
+          ))
+      .toList();
   late final _enterprisePickerController = EnterprisePickerController(
     initialEnterprise: EnterprisesProvider.of(
       context,
@@ -227,6 +237,10 @@ class InternshipListTileState extends State<InternshipListTile> {
     return widget.internship.copyWith(
       studentId: _studentPickerController.student?.id,
       signatoryTeacherId: _teacherPickerController.teacher?.id ?? '',
+      extraSupervisingTeacherIds: _extraTeachersPickerController
+          .map((controller) => controller.teacher!.id)
+          .toSet()
+          .toList(),
       enterpriseId: _enterprisePickerController.enterprise.id,
       teacherNotes: _teacherNotesController.text,
       achievedDuration: int.tryParse(_achievedDurationController.text) ?? -1,
@@ -521,6 +535,8 @@ class InternshipListTileState extends State<InternshipListTile> {
               children: [
                 _buildSupervisingTeacher(),
                 const SizedBox(height: 8),
+                _buildExtraSupervisingTeachers(),
+                const SizedBox(height: 16),
                 if (widget.forceEditingMode)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -662,6 +678,49 @@ class InternshipListTileState extends State<InternshipListTile> {
         editMode: widget.forceEditingMode,
         isMandatory: true,
       ),
+    );
+  }
+
+  Widget _buildExtraSupervisingTeachers() {
+    return Column(
+      children: [
+        ..._extraTeachersPickerController.map((controller) => Row(
+              children: [
+                Expanded(
+                  child: TeacherPickerTile(
+                    key: ValueKey(controller.hashCode),
+                    title:
+                        '${_isEditing ? '* ' : ''}Enseignant·e responsable supplémentaire',
+                    schoolBoardId: widget.schoolBoardId,
+                    controller: controller,
+                    editMode: _isEditing,
+                    isMandatory: true,
+                  ),
+                ),
+                if (_isEditing)
+                  IconButton(
+                      onPressed: () => setState(() {
+                            _extraTeachersPickerController.remove(controller);
+                          }),
+                      icon: Icon(Icons.delete, color: Colors.red)),
+              ],
+            )),
+        if (_isEditing)
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 12.0),
+              child: TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _extraTeachersPickerController
+                          .add(TeacherPickerController());
+                    });
+                  },
+                  child: Text('Ajouter un·e enseignant·e responsable',
+                      textAlign: TextAlign.center)),
+            ),
+          )
+      ],
     );
   }
 

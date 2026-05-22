@@ -15,7 +15,7 @@ class TeacherPickerController {
     _formKey.currentState?.didChange(value?.fullName ?? '');
   }
 
-  TeacherPickerController({required Teacher? initial}) {
+  TeacherPickerController({Teacher? initial}) {
     teacher = initial;
   }
 

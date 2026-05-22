@@ -132,9 +132,11 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     ),
   );
   late final _teacherPickerController = TeacherPickerController(
-    initial: TeachersProvider.of(context, listen: false).firstWhereOrNull(
-      (teacher) => teacher.id == widget.enterprise.recruiterId,
-    ),
+    initial: context.mounted
+        ? TeachersProvider.of(context, listen: false).firstWhereOrNull(
+            (teacher) => teacher.id == widget.enterprise.recruiterId,
+          )
+        : null,
   );
   late final _phoneController = TextEditingController(
     text: widget.enterprise.phone.toString(),

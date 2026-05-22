@@ -764,13 +764,13 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
               ),
               PhoneListTile(
                 controller: widget.controller._supervisorPhoneController,
-                isMandatory: true,
+                isMandatory: false,
                 canCall: false,
                 enabled: !_useContactInfo && widget.controller.canModify,
               ),
               EmailListTile(
                 controller: widget.controller._supervisorEmailController,
-                isMandatory: true,
+                isMandatory: false,
                 enabled: !_useContactInfo && widget.controller.canModify,
                 canMail: false,
               ),
