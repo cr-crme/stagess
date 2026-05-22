@@ -320,17 +320,13 @@ class _InternshipDetailsScreenState extends State<_InternshipDetailsScreen> {
           .firstWhereOrNull((s) => s.id == student?.schoolId);
       final teacherId = AuthProvider.of(context).teacherId;
 
-      if (student == null ||
-          teacherId == null ||
-          schoolBoard == null ||
-          school == null) {
+      if (student == null || teacherId == null || school == null) {
         _logger.severe(
             'Cannot create internship with missing student, teacher, or school information');
         Navigator.of(widget.rootContext).pop(null);
         return;
       }
       newInternship = newInternship.copyWith(
-        schoolBoardId: schoolBoard.id,
         studentId: student.id,
         signatoryTeacherId: teacherId,
         enterpriseId: enterprise.id,

@@ -142,7 +142,9 @@ class _InternshipsListScreenState extends State<InternshipsListScreen> {
 
     showSnackBar(
       context,
-      message: isConfirmed ? 'Stage ajouté avec succès' : 'Aucun stage ajouté',
+      message: isConfirmed
+          ? 'Stage ajouté avec succès'
+          : 'Aucun stage n\'a été ajouté',
     );
   }
 

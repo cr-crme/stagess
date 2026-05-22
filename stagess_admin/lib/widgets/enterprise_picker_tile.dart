@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/widgets/autocomplete_options_builder.dart';
@@ -20,9 +21,30 @@ class EnterprisePickerController {
 
   Job? _job;
   Job get job => _job ?? Job.empty;
+  void setJob(Specialization? specialization) {
+    if (specialization == null) {
+      _job = null;
+      _jobFormKey.currentState?.didChange(Job.empty);
+      return;
+    }
+    _job = _selectedEnterprise.jobs
+        .firstWhereOrNull((job) => job.specialization.id == specialization.id);
+  }
 
-  EnterprisePickerController({required Enterprise? initialEnterprise})
-    : _selectedEnterprise = initialEnterprise ?? Enterprise.empty;
+  EnterprisePickerController({
+    required Enterprise? initialEnterprise,
+    required String? initialSelectedSpecializationId,
+  }) : _selectedEnterprise = initialEnterprise ?? Enterprise.empty {
+    enterprise = _selectedEnterprise;
+    setJob(initialSelectedSpecializationId != null
+        ? _selectedEnterprise.jobs
+            .firstWhereOrNull((job) =>
+                job.specialization.id == initialSelectedSpecializationId)
+            ?.specialization
+        : (_selectedEnterprise.jobs.length == 1
+            ? _selectedEnterprise.jobs.first.specialization
+            : null));
+  }
 
   final _enterpriseFormKey = GlobalKey<FormFieldState<Enterprise>>();
   final _jobFormKey = GlobalKey<FormFieldState<Job>>();
@@ -40,12 +62,14 @@ class EnterprisePickerTile extends StatelessWidget {
     required this.schoolBoardId,
     required this.controller,
     required this.editMode,
+    this.onChanged,
   });
 
   final String? title;
   final String schoolBoardId;
   final EnterprisePickerController controller;
   final bool editMode;
+  final Function(Enterprise?)? onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +108,8 @@ class EnterprisePickerTile extends StatelessWidget {
         // current selection.
         if (textEditingValue.text.isEmpty) {
           controller._selectedEnterprise = Enterprise.empty;
+          controller.setJob(null);
+          if (onChanged != null) onChanged!(null);
         } else {
           final selectedEnterprise = enterprises.firstWhereOrNull(
             (enterprise) =>
@@ -92,6 +118,14 @@ class EnterprisePickerTile extends StatelessWidget {
           );
           if (selectedEnterprise != null) {
             controller._selectedEnterprise = selectedEnterprise;
+            if (controller._selectedEnterprise.jobs.length == 1) {
+              controller.setJob(
+                  controller._selectedEnterprise.jobs.first.specialization);
+            } else {
+              controller.setJob(null);
+            }
+
+            if (onChanged != null) onChanged!(selectedEnterprise);
           }
         }
 
@@ -101,19 +135,27 @@ class EnterprisePickerTile extends StatelessWidget {
         return enterprises.where(
           (enterprise) =>
               enterprise.name.toLowerCase().contains(
-                textEditingValue.text.toLowerCase(),
-              ) &&
+                    textEditingValue.text.toLowerCase(),
+                  ) &&
               enterprise.name.toLowerCase() !=
                   textEditingValue.text.toLowerCase(),
         );
       },
-      optionsViewBuilder:
-          (context, onSelected, options) => OptionsBuilderForAutocomplete(
-            onSelected: onSelected,
-            options: options,
-            optionToString: (Enterprise e) => e.name,
-          ),
-      onSelected: (item) => controller.enterprise = item,
+      optionsViewBuilder: (context, onSelected, options) =>
+          OptionsBuilderForAutocomplete(
+        onSelected: onSelected,
+        options: options,
+        optionToString: (Enterprise e) => e.name,
+      ),
+      onSelected: (item) {
+        controller.enterprise = item;
+        if (controller.enterprise.jobs.length == 1) {
+          controller.setJob(controller.enterprise.jobs.first.specialization);
+        } else {
+          controller.setJob(null);
+        }
+        if (onChanged != null) onChanged!(item);
+      },
       fieldViewBuilder: (_, textController, focusNode, onSubmitted) {
         controller._enterpriseTextController = textController;
 
@@ -146,23 +188,25 @@ class EnterprisePickerTile extends StatelessWidget {
     return controller._selectedEnterprise.jobs.isEmpty
         ? Container()
         : FormBuilderRadioGroup(
-          name: 'job',
-          validator: (value) => value == null ? 'Sélectionner un métier' : null,
-          initialValue:
-              controller._selectedEnterprise.jobs.length == 1
-                  ? controller._selectedEnterprise.jobs.first
-                  : null,
-          onChanged:
-              (value) =>
-                  controller._job = controller._selectedEnterprise.jobs
-                      .firstWhere((job) => job.specialization.name == value),
-          options:
-              controller._selectedEnterprise.jobs
-                  .map(
-                    (job) =>
-                        FormBuilderFieldOption(value: job.specialization.name),
-                  )
-                  .toList(),
-        );
+            name: 'job',
+            validator: (value) =>
+                value == null ? 'Sélectionner un métier' : null,
+            initialValue: controller._job?.specialization.name ??
+                (controller._selectedEnterprise.jobs.length == 1
+                    ? controller
+                        ._selectedEnterprise.jobs.first.specialization.name
+                    : null),
+            enabled: editMode,
+            onChanged: (value) => controller.setJob(controller
+                ._selectedEnterprise.jobs
+                .firstWhere((job) => job.specialization.name == value)
+                .specialization),
+            options: controller._selectedEnterprise.jobs
+                .map(
+                  (job) =>
+                      FormBuilderFieldOption(value: job.specialization.name),
+                )
+                .toList(),
+          );
   }
 }

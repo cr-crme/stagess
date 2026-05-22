@@ -142,7 +142,6 @@ class Internship extends ExtendedItemSerializable {
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
-        'school_board_id': FetchableFields.mandatory,
         'student_id': FetchableFields.mandatory,
         'signatory_teacher_id': FetchableFields.mandatory,
         'enterprise_id': FetchableFields.mandatory,
@@ -169,7 +168,6 @@ class Internship extends ExtendedItemSerializable {
 
   Internship copyWith({
     String? id,
-    String? schoolBoardId,
     String? studentId,
     String? signatoryTeacherId,
     List<String>? extraSupervisingTeacherIds,
@@ -210,7 +208,6 @@ class Internship extends ExtendedItemSerializable {
     final availableFields = [
       'version',
       'id',
-      'school_board_id',
       'student_id',
       'signatory_teacher_id',
       'extra_supervising_teacher_ids',

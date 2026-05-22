@@ -96,6 +96,7 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
               data: data,
               user: user,
               internshipsRepository: internshipsRepository,
+              studentsRepository: studentsRepository,
               tryRequestingLock: false,
             );
           });
@@ -257,6 +258,7 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
               id: id,
               user: user,
               internshipsRepository: internshipsRepository,
+              studentsRepository: studentsRepository,
               tryRequestingLock: false,
             );
           });

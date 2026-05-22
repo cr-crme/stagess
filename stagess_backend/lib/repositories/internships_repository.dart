@@ -145,42 +145,80 @@ abstract class InternshipsRepository extends RepositoryAbstract {
         blackList: {
           AccessLevel.teacher: [
             'id',
-            'school_board_id',
-            'student_id',
             'enterprise_id',
             'signatory_teacher_id',
+            'student_id',
           ],
           AccessLevel.schoolAdmin: [
             'id',
-            'school_board_id',
+            'enterprise_id',
+            'signatory_teacher_id',
             'student_id',
-            'enterprise_id'
           ],
           AccessLevel.schoolBoardAdmin: [
             'id',
-            'school_board_id',
+            'enterprise_id',
+            'signatory_teacher_id',
             'student_id',
-            'enterprise_id'
           ],
           AccessLevel.superAdmin: [
             'id',
-            'school_board_id',
+            'enterprise_id',
+            'signatory_teacher_id',
             'student_id',
-            'enterprise_id'
           ],
         },
         itemValidator: (user, item, previousItem) {
+          if (item.enterpriseId.isEmpty) {
+            throw InvalidRequestException(
+                'An internship must be associated with an enterprise');
+          }
           if (item.signatoryTeacherId.isEmpty) {
             throw InvalidRequestException(
                 'An internship must have a signatory teacher');
+          }
+          if (item.studentId.isEmpty) {
+            throw InvalidRequestException(
+                'An internship must be associated with a student');
           }
           if (user.accessLevel < AccessLevel.schoolAdmin &&
               item.signatoryTeacherId != user.userId) {
             throw InvalidRequestException(
                 'You must be the signatory teacher to create or modify this internship');
           }
+          if (item.currentContract == null) {
+            throw InvalidRequestException(
+                'An internship must have a current contract');
+          }
 
-          // TODO Refuse if program is not set?
+          if (item.currentContract!.jobId.isEmpty) {
+            throw InvalidRequestException(
+                'An internship contract must have a specialization');
+          }
+          if (item.currentContract!.specializationId.isEmpty) {
+            throw InvalidRequestException(
+                'An internship contract must have a specialization');
+          }
+          if (item.currentContract!.program == Program.undefined) {
+            throw InvalidRequestException(
+                'An internship contract must have a program');
+          }
+
+          final contractDifferences = (previousItem?.currentContract == null
+                  ? null
+                  : item.currentContract
+                      ?.getDifference(previousItem!.currentContract)) ??
+              [];
+          if (contractDifferences.contains('specialization_id') ||
+              contractDifferences.contains('extra_specialization_ids') ||
+              contractDifferences.contains('job_id')) {
+            throw InvalidRequestException(
+                'You cannot change the specialization of an internship contract');
+          }
+          if (contractDifferences.contains('program')) {
+            throw InvalidRequestException(
+                'You cannot change the program of an internship contract');
+          }
 
           return Future.value();
         },

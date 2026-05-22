@@ -9,6 +9,8 @@ import 'package:stagess_admin/screens/internships/schedule_list_tile.dart';
 import 'package:stagess_admin/widgets/enterprise_picker_tile.dart';
 import 'package:stagess_admin/widgets/section_divider.dart';
 import 'package:stagess_admin/widgets/teacher_picker_tile.dart';
+import 'package:stagess_common/models/enterprises/enterprise_status.dart';
+import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
@@ -18,6 +20,7 @@ import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/transportation.dart';
 import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
@@ -128,9 +131,21 @@ class InternshipListTileState extends State<InternshipListTile> {
     ).firstWhereOrNull(
       (enterprise) => enterprise.id == widget.internship.enterpriseId,
     ),
+    initialSelectedSpecializationId:
+        widget.internship.currentContract?.specializationId,
   );
 
-  final List<EnterpriseJobListController> _extraJobControllers = [];
+  late final List<EnterpriseJobListController> _extraJobControllers = widget
+          .internship.currentContract?.extraSpecializationIds
+          .map((specializationId) => EnterpriseJobListController(
+              context: context,
+              enterpriseStatus: EnterpriseStatus.active,
+              job: Job.empty.copyWith(
+                  specialization: ActivitySectorsService.specializationOrNull(
+                      specializationId)!)))
+          .toList() ??
+      [];
+
   late final _contactFirstNameController = TextEditingController(
     text: widget.internship.currentContract?.supervisor.firstName ?? '',
   );
@@ -143,6 +158,7 @@ class InternshipListTileState extends State<InternshipListTile> {
   late final _contactEmailController = TextEditingController(
     text: widget.internship.currentContract?.supervisor.email ?? '',
   );
+
   late final _weeklySchedulesController = WeeklySchedulesController(
     dateRange: widget.internship.currentContract?.dates,
     weeklySchedules: widget.internship.currentContract?.weeklySchedules,
@@ -173,79 +189,50 @@ class InternshipListTileState extends State<InternshipListTile> {
   );
 
   Internship get editedInternship {
-    final schedulesHasChanged =
-        !widget.internship.hasContract || _weeklySchedulesController.hasChanged;
-
-    final transportationsChanged = areListsNotEqual(
-      widget.internship.currentContract?.transportations ?? [],
-      _transportations.values,
+    final lastContract =
+        widget.internship.currentContract ?? InternshipContract.empty;
+    final newContract = InternshipContract(
+      date: DateTime.now(),
+      jobId: _enterprisePickerController.job.id,
+      specializationId: _enterprisePickerController.job.specialization.id,
+      extraSpecializationIds: _extraJobControllers
+          .map((controller) => controller.job.specialization.id)
+          .toList(),
+      program: _studentPickerController.student?.program ?? Program.undefined,
+      supervisor: Person.empty.copyWith(
+        firstName: _contactFirstNameController.text,
+        lastName: _contactLastNameController.text,
+        phone: _contactPhoneController.text.isEmpty
+            ? PhoneNumber.empty
+            : PhoneNumber.fromString(_contactPhoneController.text),
+        email: _contactEmailController.text,
+      ),
+      dates: _weeklySchedulesController.dateRange!,
+      weeklySchedules: InternshipHelpers.copySchedules(
+        _weeklySchedulesController.weeklySchedules,
+        keepId: false,
+      ),
+      transportations: _transportations.values,
+      visitFrequencies: _visitFrequenciesController.text,
+      expectedDuration: int.tryParse(_expectedDurationController.text) ?? 0,
+      formVersion: InternshipContract.currentVersion,
     );
-    final visitFrequenciesChanged =
-        (widget.internship.currentContract?.visitFrequencies ?? '') !=
-            _visitFrequenciesController.text;
 
-    final previousSupervisor =
-        widget.internship.currentContract?.supervisor ?? Person.empty;
-    final supervisor = previousSupervisor.copyWith(
-      firstName: _contactFirstNameController.text,
-      lastName: _contactLastNameController.text,
-      phone: PhoneNumber.fromString(_contactPhoneController.text,
-          id: previousSupervisor.phone.id),
-      email: _contactEmailController.text,
-    );
-
-    if (schedulesHasChanged ||
-        transportationsChanged ||
-        visitFrequenciesChanged ||
-        previousSupervisor.getDifference(supervisor).isNotEmpty ||
-        _teacherPickerController.teacher?.id !=
-            widget.internship.signatoryTeacherId) {
-      return widget.internship.copyWith(
-        studentId: _studentPickerController.student?.id,
-        signatoryTeacherId: _teacherPickerController.teacher?.id ?? '',
-        enterpriseId: widget.forceEditingMode
-            ? _enterprisePickerController.enterprise.id
-            : null,
-        teacherNotes: _teacherNotesController.text,
-        achievedDuration: int.tryParse(_achievedDurationController.text) ?? -1,
-        endDate: _endDate,
-        contracts: [
-          ...widget.internship.contracts,
-          InternshipContract(
-            date: DateTime.now(),
-            jobId: widget.forceEditingMode
-                ? _enterprisePickerController.job.id
-                : (widget.internship.currentContract?.jobId ?? ''),
-            specializationId: widget.forceEditingMode
-                ? _enterprisePickerController.job.specialization.id
-                : (widget.internship.currentContract?.specializationId ?? ''),
-            extraSpecializationIds: widget.forceEditingMode
-                ? _extraJobControllers
-                    .map((controller) => controller.job.specialization.id)
-                    .toList()
-                : (widget.internship.currentContract?.extraSpecializationIds ??
-                    []),
-            program: (widget.forceEditingMode
-                    ? _studentPickerController.student?.program
-                    : widget.internship.currentContract?.program) ??
-                Program.undefined,
-            supervisor: supervisor,
-            dates: _weeklySchedulesController.dateRange!,
-            weeklySchedules: InternshipHelpers.copySchedules(
-              _weeklySchedulesController.weeklySchedules,
-              keepId: false,
-            ),
-            transportations: _transportations.values,
-            visitFrequencies: _visitFrequenciesController.text,
-            expectedDuration:
-                int.tryParse(_expectedDurationController.text) ?? 0,
-            formVersion: InternshipContract.currentVersion,
-          )
-        ],
-      );
-    } else {
-      return widget.internship;
+    final contracts = [...widget.internship.contracts];
+    if (newContract
+        .getDifference(lastContract, ignoreKeys: ['id', 'date']).isNotEmpty) {
+      contracts.add(newContract);
     }
+
+    return widget.internship.copyWith(
+      studentId: _studentPickerController.student?.id,
+      signatoryTeacherId: _teacherPickerController.teacher?.id ?? '',
+      enterpriseId: _enterprisePickerController.enterprise.id,
+      teacherNotes: _teacherNotesController.text,
+      achievedDuration: int.tryParse(_achievedDurationController.text) ?? -1,
+      endDate: _endDate,
+      contracts: contracts,
+    );
   }
 
   @override
@@ -540,12 +527,12 @@ class InternshipListTileState extends State<InternshipListTile> {
                     children: [
                       _buildStudent(),
                       const SizedBox(height: 8),
-                      _buildEnterprise(),
-                      const SizedBox(height: 8),
-                      _buildExtraJob(),
-                      const SizedBox(height: 32),
                     ],
                   ),
+                _buildEnterprise(),
+                const SizedBox(height: 8),
+                _buildExtraJob(),
+                const SizedBox(height: 32),
                 _buildSupervisorContact(),
                 const SizedBox(height: 8),
                 _buildWeeklySchedule(),
@@ -556,7 +543,7 @@ class InternshipListTileState extends State<InternshipListTile> {
                 const SizedBox(height: 8.0),
                 _buildVisitFrequencies(),
                 const SizedBox(height: 8.0),
-                if (!widget.forceEditingMode)
+                if (!_isEditing)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -584,7 +571,7 @@ class InternshipListTileState extends State<InternshipListTile> {
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
       child: StudentPickerTile(
-        title: 'Élève',
+        title: '${_isEditing ? '* ' : ''}Élève',
         controller: _studentPickerController,
         editMode: _isEditing,
         onSelected: (_) {
@@ -601,10 +588,18 @@ class InternshipListTileState extends State<InternshipListTile> {
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
       child: EnterprisePickerTile(
-        title: 'Entreprise',
+        title: '${_isEditing ? '* ' : ''}Entreprise',
         schoolBoardId: widget.schoolBoardId,
         controller: _enterprisePickerController,
-        editMode: _isEditing,
+        editMode: widget.forceEditingMode,
+        onChanged: (enterprise) {
+          _contactFirstNameController.text =
+              enterprise?.contact.firstName ?? '';
+          _contactLastNameController.text = enterprise?.contact.lastName ?? '';
+          _contactPhoneController.text =
+              enterprise?.contact.phone.toString() ?? '';
+          _contactEmailController.text = enterprise?.contact.email ?? '';
+        },
       ),
     );
   }
@@ -615,14 +610,17 @@ class InternshipListTileState extends State<InternshipListTile> {
     }
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      AddJobButton(
-        controllers: _extraJobControllers,
-        onJobAdded: () => setState(() {}),
-        style: Theme.of(context).textButtonTheme.style!.copyWith(
-              backgroundColor:
-                  Theme.of(context).elevatedButtonTheme.style!.backgroundColor,
-            ),
-      ),
+      if (widget.forceEditingMode)
+        AddJobButton(
+          controllers: _extraJobControllers,
+          onJobAdded: () => setState(() {}),
+          style: Theme.of(context).textButtonTheme.style!.copyWith(
+                backgroundColor: Theme.of(context)
+                    .elevatedButtonTheme
+                    .style!
+                    .backgroundColor,
+              ),
+        ),
       ..._extraJobControllers.asMap().keys.map((index) => Row(
             children: [
               Expanded(
@@ -633,7 +631,7 @@ class InternshipListTileState extends State<InternshipListTile> {
                       .map((e) => e.schools)
                       .flattened
                       .toList(),
-                  editMode: _isEditing,
+                  editMode: widget.forceEditingMode,
                   specializationOnly: true,
                   canChangeExpandedState: false,
                   initialExpandedState: true,
@@ -643,11 +641,12 @@ class InternshipListTileState extends State<InternshipListTile> {
                   showHeader: false,
                 ),
               ),
-              IconButton(
-                  onPressed: () => setState(() {
-                        _extraJobControllers.removeAt(index);
-                      }),
-                  icon: Icon(Icons.delete, color: Colors.red)),
+              if (widget.forceEditingMode)
+                IconButton(
+                    onPressed: () => setState(() {
+                          _extraJobControllers.removeAt(index);
+                        }),
+                    icon: Icon(Icons.delete, color: Colors.red)),
             ],
           ))
     ]);
@@ -657,10 +656,10 @@ class InternshipListTileState extends State<InternshipListTile> {
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
       child: TeacherPickerTile(
-        title: 'Enseignant·e responsable',
+        title: '${_isEditing ? '* ' : ''}Enseignant·e responsable',
         schoolBoardId: widget.schoolBoardId,
         controller: _teacherPickerController,
-        editMode: _isEditing,
+        editMode: widget.forceEditingMode,
         isMandatory: true,
       ),
     );
