@@ -2,34 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
-import 'package:stagess_common/models/persons/admin.dart';
+import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/form_service.dart';
-import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
+import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/itemized_text.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
-final _logger = Logger('ProfileListTile');
+final _logger = Logger('TeacherProfileListTile');
 
-class ProfileListTile extends StatefulWidget {
-  const ProfileListTile({
+class TeacherProfileListTile extends StatefulWidget {
+  const TeacherProfileListTile({
     super.key,
-    required this.admin,
+    required this.teacher,
     this.forceEditingMode = false,
   });
 
-  final Admin admin;
+  final Teacher teacher;
   final bool forceEditingMode;
 
   @override
-  State<ProfileListTile> createState() => _ProfileListTileState();
+  State<TeacherProfileListTile> createState() => TeacherProfileListTileState();
 }
 
-class _ProfileListTileState extends State<ProfileListTile> {
+class TeacherProfileListTileState extends State<TeacherProfileListTile> {
   final _formKey = GlobalKey<FormState>();
   Future<bool> validate() async {
     // We do both like so, so all the fields get validated even if one is not valid
@@ -43,6 +43,9 @@ class _ProfileListTileState extends State<ProfileListTile> {
     _lastNameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
+    for (var controller in _currentGroups) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -50,25 +53,32 @@ class _ProfileListTileState extends State<ProfileListTile> {
   bool _isEditing = false;
 
   late final _firstNameController = TextEditingController(
-    text: widget.admin.firstName,
+    text: widget.teacher.firstName,
   );
   late final _lastNameController = TextEditingController(
-    text: widget.admin.lastName,
+    text: widget.teacher.lastName,
   );
+  late final List<TextEditingController> _currentGroups = [
+    for (var group in widget.teacher.groups) TextEditingController(text: group),
+  ];
   late final _phoneController = TextEditingController(
-    text: widget.admin.phone.toString(),
+    text: widget.teacher.phone.toString(),
   );
   late final _emailController = TextEditingController(
-    text: widget.admin.email,
+    text: widget.teacher.email,
   );
 
-  Admin get editedAdmin => widget.admin.copyWith(
+  Teacher get editedTeacher => widget.teacher.copyWith(
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
-        address: Address.empty.copyWith(id: widget.admin.address.id),
+        address: Address.empty.copyWith(id: widget.teacher.address.id),
         phone: PhoneNumber.fromString(_phoneController.text,
-            id: widget.admin.phone.id),
+            id: widget.teacher.phone.id),
         email: _emailController.text,
+        groups: _currentGroups
+            .map((e) => e.text)
+            .where((e) => e.isNotEmpty)
+            .toList(),
       );
 
   @override
@@ -83,10 +93,10 @@ class _ProfileListTileState extends State<ProfileListTile> {
       _forceDisabled = true;
     });
 
-    final admins = AdminsProvider.of(context, listen: false);
+    final teachers = TeachersProvider.of(context, listen: false);
 
     if (_isEditing) {
-      _logger.info('Finishing editing for admin ${widget.admin.id}');
+      _logger.info('Finishing editing for teacher ${widget.teacher.id}');
       // Validate the form
       if (!(await validate()) || !mounted) {
         setState(() {
@@ -96,29 +106,29 @@ class _ProfileListTileState extends State<ProfileListTile> {
       }
 
       // Finish editing
-      final newAdmin = editedAdmin;
-      if (newAdmin.getDifference(widget.admin).isNotEmpty) {
-        await admins.replaceWithConfirmation(newAdmin);
+      final newTeacher = editedTeacher;
+      if (newTeacher.getDifference(widget.teacher).isNotEmpty) {
+        await teachers.replaceWithConfirmation(newTeacher);
 
-        _logger.fine('Admin ${widget.admin.id} updated');
+        _logger.fine('Teacher ${widget.teacher.id} updated');
       }
-      await admins.releaseLockForItem(widget.admin);
+      await teachers.releaseLockForItem(widget.teacher);
       if (!mounted) {
         setState(() {
           _forceDisabled = false;
         });
         return;
       }
-      showSnackBar(context, message: 'Admininistrateur·trice mis à jour');
+      showSnackBar(context, message: 'Enseignant·e mis à jour');
     } else {
-      final hasLock = await admins.getLockForItem(widget.admin);
+      final hasLock = await teachers.getLockForItem(widget.teacher);
       if (!hasLock || !mounted) {
-        _logger.warning('Could not get lock for admin ${widget.admin.id}');
+        _logger.warning('Could not get lock for teacher ${widget.teacher.id}');
         if (mounted) {
           showSnackBar(
             context,
             message:
-                'Impossible de modifier cet·te administrateur·trice, car iel est en cours de modification par un autre utilisateur.',
+                'Impossible de modifier cet·te enseignant·e, car iel est en cours de modification par un autre utilisateur.',
           );
         }
         setState(() {
@@ -135,14 +145,14 @@ class _ProfileListTileState extends State<ProfileListTile> {
   }
 
   @override
-  void didUpdateWidget(covariant ProfileListTile oldWidget) {
+  void didUpdateWidget(covariant TeacherProfileListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.admin.getDifference(editedAdmin).isEmpty) return;
+    if (widget.teacher.getDifference(editedTeacher).isEmpty) return;
 
-    _firstNameController.text = widget.admin.firstName;
-    _lastNameController.text = widget.admin.lastName;
-    _phoneController.text = widget.admin.phone.toString();
-    _emailController.text = widget.admin.email;
+    _firstNameController.text = widget.teacher.firstName;
+    _lastNameController.text = widget.teacher.lastName;
+    _phoneController.text = widget.teacher.phone.toString();
+    _emailController.text = widget.teacher.email;
   }
 
   @override
@@ -158,7 +168,7 @@ class _ProfileListTileState extends State<ProfileListTile> {
           Padding(
             padding: const EdgeInsets.only(left: 12.0, top: 8, bottom: 8),
             child: Text(
-              '${widget.admin.firstName} ${widget.admin.lastName}',
+              '${widget.teacher.firstName} ${widget.teacher.lastName}',
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
@@ -195,6 +205,8 @@ class _ProfileListTileState extends State<ProfileListTile> {
             const SizedBox(height: 8),
             _buildEmail(),
             const SizedBox(height: 8),
+            _buildGroups(),
+            const SizedBox(height: 8),
             _buildChangePasswordButton(),
           ],
         ),
@@ -226,6 +238,14 @@ class _ProfileListTileState extends State<ProfileListTile> {
         : Container();
   }
 
+  Widget _buildGroups() {
+    return Text(
+      widget.teacher.groups.isEmpty
+          ? 'Aucun groupe ne vous est assigné'
+          : 'Groupes : ${widget.teacher.groups.join(', ')}',
+    );
+  }
+
   Widget _buildPhone() {
     return PhoneListTile(
       controller: _phoneController,
@@ -246,7 +266,7 @@ class _ProfileListTileState extends State<ProfileListTile> {
 
   Future<void> _changePasswordDialog() async {
     _logger.info(
-      'Change password dialog opened for admin ${widget.admin.id}',
+      'Change password dialog opened for teacher ${widget.teacher.id}',
     );
 
     final formKey = GlobalKey<FormState>();
@@ -331,7 +351,7 @@ class _ProfileListTileState extends State<ProfileListTile> {
                 // Reconnected
                 try {
                   await authProvider.signInWithEmailAndPassword(
-                    email: widget.admin.email,
+                    email: widget.teacher.email,
                     password: oldPasswordController.text,
                   );
                 } catch (_) {
@@ -368,7 +388,7 @@ class _ProfileListTileState extends State<ProfileListTile> {
     );
     if (response == null || !mounted) return;
 
-    _logger.info('Changing password for admin ${widget.admin.id}');
+    _logger.info('Changing password for teacher ${widget.teacher.id}');
   }
 
   Widget _buildChangePasswordButton() {

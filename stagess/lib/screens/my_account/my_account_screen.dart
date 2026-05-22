@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
-import 'package:stagess/screens/my_account/widgets/teacher_list_tile.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/widgets/profiles/teacher_profile_list_tile.dart';
 
 final _logger = Logger('MyAccountScreen');
 
@@ -71,7 +71,7 @@ class _MyAccountScreenInternal extends StatelessWidget {
               : SingleChildScrollView(
                   child: Column(
                     children: [
-                      TeacherListTile(teacher: currentTeacher),
+                      TeacherProfileListTile(teacher: currentTeacher),
                       SizedBox(
                           height: MediaQuery.of(context).size.height * 0.5),
                     ],

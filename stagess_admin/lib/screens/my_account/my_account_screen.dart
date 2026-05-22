@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/drawer/main_drawer.dart';
-import 'package:stagess_admin/screens/my_account/profile_list_tile.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
+import 'package:stagess_common/models/persons/admin.dart';
+import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
+import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/widgets/profiles/admin_profile_list_tile.dart';
+import 'package:stagess_common_flutter/widgets/profiles/teacher_profile_list_tile.dart';
 
 class MyAccountScreen extends StatelessWidget {
   const MyAccountScreen({super.key});
@@ -12,7 +16,9 @@ class MyAccountScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentId = AuthProvider.of(context, listen: false).teacherId;
+    final authProvider = AuthProvider.of(context, listen: false);
+
+    final currentId = authProvider.teacherId;
     if (currentId == null) {
       return ResponsiveService.scaffoldOf(
         context,
@@ -30,11 +36,14 @@ class MyAccountScreen extends StatelessWidget {
       );
     }
 
-    final coucou = AdminsProvider.of(context, listen: false)
-        .fetchData(id: currentId, fields: FetchableFields.all);
+    final user = authProvider.isAdmin
+        ? AdminsProvider.of(context, listen: false)
+            .fetchData(id: currentId, fields: FetchableFields.all)
+        : TeachersProvider.of(context, listen: false)
+            .fetchData(id: currentId, fields: FetchableFields.all);
 
     return FutureBuilder(
-        future: coucou,
+        future: user,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return ResponsiveService.scaffoldOf(
@@ -50,9 +59,13 @@ class MyAccountScreen extends StatelessWidget {
             );
           }
 
-          final currentUser = AdminsProvider.of(context, listen: true)
-              .where((admin) => admin.id == currentId)
-              .firstOrNull;
+          final currentUser = authProvider.isAdmin
+              ? AdminsProvider.of(context, listen: true)
+                  .where((admin) => admin.id == currentId)
+                  .firstOrNull
+              : TeachersProvider.of(context, listen: true)
+                  .where((teacher) => teacher.id == currentId)
+                  .firstOrNull;
 
           return ResponsiveService.scaffoldOf(
             context,
@@ -67,7 +80,9 @@ class MyAccountScreen extends StatelessWidget {
                 ? Center(
                     child: Text(
                         'Aucun·e utilisateur·trice trouvé·e, assurez-vous d\'être connecté·e.'))
-                : ProfileListTile(admin: currentUser)),
+                : authProvider.isAdmin
+                    ? AdminProfileListTile(admin: currentUser as Admin)
+                    : TeacherProfileListTile(teacher: currentUser as Teacher)),
           );
         });
   }

@@ -24,7 +24,7 @@ enum AccessLevel {
 
   AccessLevel get nextHigher {
     if (this == AccessLevel.superAdmin) {
-      throw StateError('No higher access level than superAdmin');
+      return AccessLevel.superAdmin;
     }
     return AccessLevel.values[index + 1];
   }
