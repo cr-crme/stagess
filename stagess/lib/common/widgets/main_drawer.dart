@@ -32,27 +32,25 @@ class MainDrawer extends StatelessWidget {
 
     return Drawer(
       width: iconOnly ? 120.0 : null,
-      shape:
-          roundedCorners
-              ? null
-              : RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(0.0),
-              ),
+      shape: roundedCorners
+          ? null
+          : RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(0.0),
+            ),
       child: Scaffold(
-        appBar:
-            showTitle
-                ? AppBar(
-                  title: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Icon(Icons.menu),
-                      SizedBox(width: 8.0),
-                      if (!iconOnly) const Text('Menu'),
-                    ],
-                  ),
-                  automaticallyImplyLeading: false,
-                )
-                : null,
+        appBar: showTitle
+            ? AppBar(
+                title: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Icon(Icons.menu),
+                    SizedBox(width: 8.0),
+                    if (!iconOnly) const Text('Menu'),
+                  ],
+                ),
+                automaticallyImplyLeading: false,
+              )
+            : null,
         body: SingleChildScrollView(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -117,11 +115,10 @@ class MainDrawer extends StatelessWidget {
                     _DrawerItem(
                       titleText: 'Se déconnecter',
                       icon: Icons.logout,
-                      onTap:
-                          () => AuthProviderExtension.disconnectAll(
-                            context,
-                            showConfirmDialog: authProvider.isFullySignedIn,
-                          ),
+                      onTap: () => AuthProviderExtension.disconnectAll(
+                        context,
+                        showConfirmDialog: authProvider.isFullySignedIn,
+                      ),
                       iconOnly: iconOnly,
                       canPop: canPop,
                     ),
@@ -145,9 +142,9 @@ class _DrawerItem extends StatelessWidget {
     required this.iconOnly,
     required this.canPop,
   }) : assert(
-         (route != null || onTap != null) && (route == null || onTap == null),
-         'One parameter has to be null while the other one is not.',
-       );
+          (route != null || onTap != null) && (route == null || onTap == null),
+          'One parameter has to be null while the other one is not.',
+        );
 
   final String? route;
   final IconData icon;
@@ -162,8 +159,7 @@ class _DrawerItem extends StatelessWidget {
     final isCurrentlySelectedTile =
         ModalRoute.of(context)!.settings.name == route;
 
-    final onPressed =
-        onTap ??
+    final onPressed = onTap ??
         () {
           if (isCurrentlySelectedTile && canPop) Navigator.pop(context);
           GoRouter.of(context).goNamed(route!);
@@ -171,31 +167,27 @@ class _DrawerItem extends StatelessWidget {
 
     final leadingIcon = Icon(
       icon,
-      color:
-          isCurrentlySelectedTile
-              ? Theme.of(context).primaryColor
-              : Colors.black54,
+      color: isCurrentlySelectedTile
+          ? Theme.of(context).primaryColor
+          : Colors.black54,
     );
 
     return Card(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.0),
-          color:
-              isCurrentlySelectedTile
-                  ? Theme.of(context).primaryColor.withAlpha(40)
-                  : null,
-        ),
+      child: Material(
+        borderRadius: BorderRadius.circular(12.0),
+        clipBehavior: Clip.antiAlias,
         child: ListTile(
           onTap: onPressed,
+          tileColor: isCurrentlySelectedTile
+              ? Theme.of(context).primaryColor.withAlpha(40)
+              : null,
           leading: leadingIcon,
-          title:
-              iconOnly
-                  ? null
-                  : Text(
-                    titleText,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
+          title: iconOnly
+              ? null
+              : Text(
+                  titleText,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
           trailing: trailing,
         ),
       ),

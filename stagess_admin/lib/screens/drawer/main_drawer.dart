@@ -229,16 +229,15 @@ class _DrawerItem extends StatelessWidget {
     );
 
     return Card(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12.0),
-          color: tileColor ??
+      child: Material(
+        borderRadius: BorderRadius.circular(12.0),
+        clipBehavior: Clip.antiAlias,
+        child: ListTile(
+          onTap: onPressed,
+          tileColor: tileColor ??
               (isCurrentlySelectedTile
                   ? Theme.of(context).primaryColor.withAlpha(40)
                   : null),
-        ),
-        child: ListTile(
-          onTap: onPressed,
           leading: leadingIcon,
           title: iconOnly
               ? null
