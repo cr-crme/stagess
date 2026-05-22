@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/repositories/students_repository.dart';
+import 'package:stagess_backend/repositories/teachers_repository.dart';
 import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_backend/utils/security_policies.dart';
@@ -89,11 +90,16 @@ abstract class InternshipsRepository extends RepositoryAbstract {
     required Map<String, dynamic> data,
     required DatabaseUser user,
     StudentsRepository? studentsRepository,
+    TeachersRepository? teachersRepository,
     bool tryRequestingLock = true,
   }) async {
     if (studentsRepository == null) {
       throw ArgumentError(
           'studentsRepository is required to put internships with access control');
+    }
+    if (teachersRepository == null) {
+      throw ArgumentError(
+          'teachersRepository is required to put internships with access control');
     }
 
     if (!canEdit(user: user, id: id)) {
@@ -109,6 +115,7 @@ abstract class InternshipsRepository extends RepositoryAbstract {
               data: data,
               user: user,
               studentsRepository: studentsRepository,
+              teachersRepository: teachersRepository,
               tryRequestingLock: false));
     }
 
@@ -116,10 +123,6 @@ abstract class InternshipsRepository extends RepositoryAbstract {
     final previous = await _getInternshipById(id: id, user: user);
     final newInternship = previous?.copyWithData(data) ??
         Internship.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
-    await studentsRepository.getById(
-        id: newInternship.studentId,
-        fields: FetchableFields({'id': FetchableFields.all}),
-        user: user);
 
     await SecurityPolicies([
       UserIsVerified(user: user),
@@ -168,7 +171,7 @@ abstract class InternshipsRepository extends RepositoryAbstract {
             'student_id',
           ],
         },
-        itemValidator: (user, item, previousItem) {
+        itemValidator: (user, item, previousItem) async {
           if (item.enterpriseId.isEmpty) {
             throw InvalidRequestException(
                 'An internship must be associated with an enterprise');
@@ -181,8 +184,18 @@ abstract class InternshipsRepository extends RepositoryAbstract {
             throw InvalidRequestException(
                 'An internship must be associated with a student');
           }
-          if (user.accessLevel < AccessLevel.schoolAdmin &&
-              item.signatoryTeacherId != user.userId) {
+          if (user.accessLevel < AccessLevel.schoolBoardAdmin) {
+            final student = await studentsRepository.getById(
+                id: newInternship.studentId,
+                fields: FetchableFields(
+                    {'id': FetchableFields.all, 'group': FetchableFields.all}),
+                user: user);
+            final teacher = await teachersRepository.getById(
+                id: newInternship.signatoryTeacherId,
+                fields: FetchableFields({'id': FetchableFields.all}),
+                user: user);
+
+            // item.signatoryTeacherId != user.userId)
             throw InvalidRequestException(
                 'You must be the signatory teacher to create or modify this internship');
           }

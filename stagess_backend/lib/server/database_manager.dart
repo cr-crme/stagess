@@ -168,6 +168,7 @@ class DatabaseManager {
           data: data,
           user: user,
           studentsRepository: studentsDatabase,
+          teachersRepository: teachersDatabase,
         ),
     };
 
