@@ -49,10 +49,11 @@ abstract class AdminsRepository extends RepositoryAbstract {
       HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.teacher),
       HasData(item: admin),
       UserIsFromSameSchoolBoard(user: user, item: admin),
-      UserIsFromSameSchool(user: user, item: admin),
+      if (admin!.schoolId.isNotEmpty)
+        UserIsFromSameSchool(user: user, item: admin),
     ]).validate();
 
-    return RepositoryResponse(data: admin!.serializeWithFields(fields));
+    return RepositoryResponse(data: admin.serializeWithFields(fields));
   }
 
   @override
