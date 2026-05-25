@@ -746,6 +746,7 @@ class InternshipListTileState extends State<InternshipListTile> {
                         controller: _contactFirstNameController,
                         decoration:
                             const InputDecoration(labelText: '* Prénom'),
+                        // TODO Add button to empty the field
                         maxLength: 50,
                         validator: (value) {
                           if (value?.isEmpty == true) {

@@ -108,7 +108,7 @@ class AboutPageState extends State<AboutPage> {
               ),
               SizedBox(height: 16),
               const SubTitle('Entreprise représentée par', left: 0, top: 0),
-              // TODO Add info: "Contact dans l'entreprise"
+              // TODO Add info: "Remplir les coordonnées de votre personne contact dans l\'entreprise"
               TextFormField(
                 decoration: const InputDecoration(labelText: '* Prénom'),
                 validator: (text) => text!.isEmpty

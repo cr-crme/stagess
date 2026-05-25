@@ -435,6 +435,7 @@ class AdminListTileState extends State<AdminListTile> {
   }
 
   Widget _sendResetEmailButton() {
+    // TODO Remove when teacher
     final emailType = widget.admin.hasNotRegisteredAccount
         ? 'courriel d\'invitation'
         : 'courriel de réinitialisation du mot de passe';

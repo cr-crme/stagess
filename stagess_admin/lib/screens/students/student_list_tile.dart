@@ -753,6 +753,7 @@ class StudentListTileState extends State<StudentListTile> {
               ).toList(),
             ),
           ),
+          // TODO Remove if edit
           Padding(
             padding: const EdgeInsets.only(top: 8.0, right: 12.0),
             child: Align(
@@ -764,6 +765,7 @@ class StudentListTileState extends State<StudentListTile> {
                     evaluationId: widget.student.allVisa.lastOrNull?.id,
                     canModify: true,
                     showEvaluationDialog: showVisaEvaluationFormDialog),
+                // TODO Do not allow modifying visa if not teacher
                 child: const Text('Modifier le visa'),
               ),
             ),

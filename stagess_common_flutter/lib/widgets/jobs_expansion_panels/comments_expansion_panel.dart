@@ -29,6 +29,7 @@ class CommentsExpansionPanel extends StatelessWidget {
       elevation: 0.0,
       header: (context, isExpanded) =>
           const ListTile(title: Text('Commentaires')),
+      // TODO put the real name of admin when they comment
       child: SizedBox(
         width: Size.infinite.width,
         child: Padding(
