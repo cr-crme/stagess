@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
@@ -106,10 +107,16 @@ class EnterprisePickerTile extends StatelessWidget {
         // We kind of hijack this builder to test the current status of the text.
         // If it fits a enterprise, or if it is empty, we set that value to the
         // current selection.
+        bool isNew = false;
         if (textEditingValue.text.isEmpty) {
+          if (controller._selectedEnterprise
+              .getDifference(Enterprise.empty, ignoreKeys: ['id']).isNotEmpty) {
+            isNew = true;
+          }
+
           controller._selectedEnterprise = Enterprise.empty;
           controller.setJob(null);
-          if (onChanged != null) onChanged!(null);
+          if (isNew && onChanged != null) onChanged!(null);
         } else {
           final selectedEnterprise = enterprises.firstWhereOrNull(
             (enterprise) =>
@@ -117,6 +124,10 @@ class EnterprisePickerTile extends StatelessWidget {
                 textEditingValue.text.toLowerCase(),
           );
           if (selectedEnterprise != null) {
+            if (controller._selectedEnterprise.id != selectedEnterprise.id) {
+              isNew = true;
+            }
+
             controller._selectedEnterprise = selectedEnterprise;
             if (controller._selectedEnterprise.jobs.length == 1) {
               controller.setJob(
@@ -125,7 +136,7 @@ class EnterprisePickerTile extends StatelessWidget {
               controller.setJob(null);
             }
 
-            if (onChanged != null) onChanged!(selectedEnterprise);
+            if (isNew && onChanged != null) onChanged!(selectedEnterprise);
           }
         }
 
@@ -147,14 +158,21 @@ class EnterprisePickerTile extends StatelessWidget {
         options: options,
         optionToString: (Enterprise e) => e.name,
       ),
-      onSelected: (item) {
-        controller.enterprise = item;
+      onSelected: (item) async {
+        await EnterprisesProvider.of(context, listen: false).fetchData(
+          id: item.id,
+          fields: FetchableFields.all,
+        );
+        if (!context.mounted) return;
+        controller.enterprise =
+            EnterprisesProvider.of(context, listen: false).fromId(item.id);
+
         if (controller.enterprise.jobs.length == 1) {
           controller.setJob(controller.enterprise.jobs.first.specialization);
         } else {
           controller.setJob(null);
         }
-        if (onChanged != null) onChanged!(item);
+        if (onChanged != null) onChanged!(controller.enterprise);
       },
       fieldViewBuilder: (_, textController, focusNode, onSubmitted) {
         controller._enterpriseTextController = textController;

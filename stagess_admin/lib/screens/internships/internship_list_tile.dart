@@ -9,6 +9,7 @@ import 'package:stagess_admin/screens/internships/schedule_list_tile.dart';
 import 'package:stagess_admin/widgets/enterprise_picker_tile.dart';
 import 'package:stagess_admin/widgets/section_divider.dart';
 import 'package:stagess_admin/widgets/teacher_picker_tile.dart';
+import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
@@ -169,9 +170,7 @@ class InternshipListTileState extends State<InternshipListTile> {
     text: widget.internship.currentContract?.supervisor.email ?? '',
   );
   late bool _useContactInfo = _editedSupervisor.getDifference(
-      EnterprisesProvider.of(context, listen: false)
-          .fromId(widget.internship.enterpriseId)
-          .contact,
+      _enterprisePickerController.enterprise.contact,
       ignoreKeys: ['id', 'address']).isEmpty;
 
   late final _weeklySchedulesController = WeeklySchedulesController(
@@ -435,10 +434,14 @@ class InternshipListTileState extends State<InternshipListTile> {
       if (!mounted) return;
 
       if (!widget.forceEditingMode) {
-        await EnterprisesProvider.of(context, listen: false).fetchData(
+        final enterpriseProvider =
+            EnterprisesProvider.of(context, listen: false);
+        await enterpriseProvider.fetchData(
           id: widget.internship.enterpriseId,
           fields: FetchableFields.all,
         );
+        _enterprisePickerController.enterprise =
+            enterpriseProvider.fromId(widget.internship.enterpriseId);
       }
 
       _fetchFullDataCompleter.complete();
@@ -502,6 +505,7 @@ class InternshipListTileState extends State<InternshipListTile> {
                                   if (widget.canEdit)
                                     IconButton(
                                       icon: Icon(
+                                        // TODO Do not show edit icon if not allowed to edit
                                         _isEditing ? Icons.save : Icons.edit,
                                         color: _forceDisabled
                                             ? Colors.grey
@@ -623,13 +627,8 @@ class InternshipListTileState extends State<InternshipListTile> {
         schoolBoardId: widget.schoolBoardId,
         controller: _enterprisePickerController,
         editMode: widget.forceEditingMode,
-        onChanged: (enterprise) {
-          _contactFirstNameController.text =
-              enterprise?.contact.firstName ?? '';
-          _contactLastNameController.text = enterprise?.contact.lastName ?? '';
-          _contactPhoneController.text =
-              enterprise?.contact.phone.toString() ?? '';
-          _contactEmailController.text = enterprise?.contact.email ?? '';
+        onChanged: (enterprise) async {
+          _toggleUseContactInfo(true, enterprise: enterprise);
         },
       ),
     );
@@ -739,12 +738,9 @@ class InternshipListTileState extends State<InternshipListTile> {
     );
   }
 
-  void _toggleUseContactInfo() {
-    final enterprise = EnterprisesProvider.of(context, listen: false)
-        .fromId(widget.internship.enterpriseId);
-
-    _useContactInfo = !_useContactInfo;
-    if (_useContactInfo) {
+  void _toggleUseContactInfo(bool value, {required Enterprise? enterprise}) {
+    _useContactInfo = value;
+    if (_useContactInfo && enterprise != null) {
       _contactFirstNameController.text = enterprise.contact.firstName;
       _contactLastNameController.text = enterprise.contact.lastName;
       _contactPhoneController.text = enterprise.contact.phone.toString();
@@ -775,7 +771,8 @@ class InternshipListTileState extends State<InternshipListTile> {
             ),
             if (_isEditing)
               Switch(
-                onChanged: (newValue) => _toggleUseContactInfo(),
+                onChanged: (newValue) => _toggleUseContactInfo(newValue,
+                    enterprise: _enterprisePickerController.enterprise),
                 value: _useContactInfo,
               ),
           ],
