@@ -8,6 +8,7 @@ import 'package:stagess/router.dart';
 import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/services/backend_helpers.dart';
 import 'package:stagess_common_flutter/helpers/program_helpers.dart';
+import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
@@ -113,6 +114,11 @@ class StagessApp extends StatelessWidget {
         ChangeNotifierProxyProvider<AuthProvider, SchoolBoardsProvider>(
           create: (context) =>
               SchoolBoardsProvider(uri: backendUri, mockMe: useMockers),
+          update: (context, auth, previous) => previous!..initializeAuth(auth),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, AdminsProvider>(
+          create: (context) =>
+              AdminsProvider(uri: backendUri, mockMe: useMockers),
           update: (context, auth, previous) => previous!..initializeAuth(auth),
         ),
         ChangeNotifierProxyProvider<AuthProvider, EnterprisesProvider>(

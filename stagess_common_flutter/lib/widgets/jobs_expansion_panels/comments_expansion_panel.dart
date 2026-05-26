@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/itemized_text.dart';
@@ -24,12 +25,12 @@ class CommentsExpansionPanel extends StatelessWidget {
         'Building CommentsExpansionPanel for job: ${job.specialization.name}');
 
     final teachers = TeachersProvider.of(context);
+    final admins = AdminsProvider.of(context);
 
     return AnimatedExpandingCard(
       elevation: 0.0,
       header: (context, isExpanded) =>
           const ListTile(title: Text('Commentaires')),
-      // TODO put the real name of admin when they comment
       child: SizedBox(
         width: Size.infinite.width,
         child: Padding(
@@ -43,13 +44,16 @@ class CommentsExpansionPanel extends StatelessWidget {
               job.comments.isEmpty
                   ? const Text('Il n\'y a présentement aucun commentaire.')
                   : ItemizedText(
-                      job.comments
-                          .map(
-                            (e) =>
-                                '${teachers.fromIdOrNull(e.userId)?.fullName ?? 'Un·e administrateur·trice'} (${DateFormat.yMMMEd('fr_CA').format(e.date)}) - '
-                                '${e.comment}',
-                          )
-                          .toList(),
+                      job.comments.map(
+                        (e) {
+                          final writer =
+                              teachers.fromIdOrNull(e.userId)?.fullName ??
+                                  admins.fromIdOrNull(e.userId)?.fullName ??
+                                  'Un·e personne inconnue';
+                          return '$writer (${DateFormat.yMMMEd('fr_CA').format(e.date)}) - '
+                              '${e.comment}';
+                        },
+                      ).toList(),
                       interline: 8),
               if (addComment != null)
                 Center(

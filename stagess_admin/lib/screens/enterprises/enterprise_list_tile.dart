@@ -803,10 +803,17 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     job.comments.add(
       JobComment(comment: newComment, userId: userId, date: DateTime.now()),
     );
-    await enterprises.replaceWithConfirmation(widget.enterprise);
+    final isSuccess =
+        await enterprises.replaceWithConfirmation(widget.enterprise);
+    if (!isSuccess) {
+      job.comments.removeLast();
+    }
     await enterprises.releaseLockForItem(widget.enterprise);
     if (mounted) {
-      showSnackBar(context, message: 'Le commentaire a été ajouté');
+      showSnackBar(context,
+          message: isSuccess
+              ? 'Le commentaire a été ajouté'
+              : 'Échec de l\'ajout du commentaire. Vous devez avoir supervisé au moins un stage dans ce métier pour pouvoir commenter.');
     }
     setState(() {
       _forceDisabled = false;
