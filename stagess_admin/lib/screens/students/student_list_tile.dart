@@ -431,7 +431,7 @@ class StudentListTileState extends State<StudentListTile> {
                 _buildProgramSelection(),
                 const SizedBox(height: 8),
                 _buildContact(),
-                if (!widget.forceEditingMode)
+                if (!_isEditing)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -710,7 +710,10 @@ class StudentListTileState extends State<StudentListTile> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (orderedEvaluations.isNotEmpty)
+          if (orderedEvaluations.isEmpty)
+            Text('Aucune version du VISA n\'a encore été créée',
+                style: Theme.of(context).textTheme.titleMedium)
+          else
             Text('Voir les versions du VISA',
                 style: Theme.of(context).textTheme.titleMedium),
           Padding(
@@ -753,7 +756,6 @@ class StudentListTileState extends State<StudentListTile> {
               ).toList(),
             ),
           ),
-          // TODO Remove if edit
           Padding(
             padding: const EdgeInsets.only(top: 8.0, right: 12.0),
             child: Align(

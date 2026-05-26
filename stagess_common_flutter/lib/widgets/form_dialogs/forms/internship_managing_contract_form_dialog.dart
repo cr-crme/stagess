@@ -692,6 +692,11 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
           enterprise.contact.phone.toString();
       widget.controller._supervisorEmailController.text =
           enterprise.contact.email;
+    } else {
+      widget.controller._superviserFirstNameController.text = '';
+      widget.controller._supervisorLastNameController.text = '';
+      widget.controller._supervisorPhoneController.text = '';
+      widget.controller._supervisorEmailController.text = '';
     }
     setState(() {});
   }

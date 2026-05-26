@@ -672,7 +672,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                       initialExpandedState:
                           _jobControllers[jobId]!.specialization?.idWithName ==
                               null,
-                      showExtended: !widget.forceEditingMode &&
+                      showExtended: !_isEditing &&
                           widget.enterprise.jobs.any(
                             (job) => job.id == jobId,
                           ),

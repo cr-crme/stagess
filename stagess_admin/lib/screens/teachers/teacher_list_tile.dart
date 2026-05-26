@@ -521,6 +521,11 @@ class TeacherListTileState extends State<TeacherListTile> {
   }
 
   Widget _sendResetEmailButton() {
+    final authProvider = AuthProvider.of(context, listen: false);
+    if (authProvider.databaseAccessLevel <= AccessLevel.schoolAdmin) {
+      return SizedBox.shrink();
+    }
+
     final emailType = widget.teacher.hasNotRegisteredAccount
         ? 'courriel d\'invitation'
         : 'courriel de réinitialisation du mot de passe';

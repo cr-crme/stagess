@@ -168,6 +168,11 @@ class InternshipListTileState extends State<InternshipListTile> {
   late final _contactEmailController = TextEditingController(
     text: widget.internship.currentContract?.supervisor.email ?? '',
   );
+  late bool _useContactInfo = _editedSupervisor.getDifference(
+      EnterprisesProvider.of(context, listen: false)
+          .fromId(widget.internship.enterpriseId)
+          .contact,
+      ignoreKeys: ['id', 'address']).isEmpty;
 
   late final _weeklySchedulesController = WeeklySchedulesController(
     dateRange: widget.internship.currentContract?.dates,
@@ -209,14 +214,7 @@ class InternshipListTileState extends State<InternshipListTile> {
           .map((controller) => controller.job.specialization.id)
           .toList(),
       program: _studentPickerController.student?.program ?? Program.undefined,
-      supervisor: Person.empty.copyWith(
-        firstName: _contactFirstNameController.text,
-        lastName: _contactLastNameController.text,
-        phone: _contactPhoneController.text.isEmpty
-            ? PhoneNumber.empty
-            : PhoneNumber.fromString(_contactPhoneController.text),
-        email: _contactEmailController.text,
-      ),
+      supervisor: _editedSupervisor,
       dates: _weeklySchedulesController.dateRange!,
       weeklySchedules: InternshipHelpers.copySchedules(
         _weeklySchedulesController.weeklySchedules,
@@ -248,6 +246,15 @@ class InternshipListTileState extends State<InternshipListTile> {
       contracts: contracts,
     );
   }
+
+  Person get _editedSupervisor => Person.empty.copyWith(
+        firstName: _contactFirstNameController.text,
+        lastName: _contactLastNameController.text,
+        phone: _contactPhoneController.text.isEmpty
+            ? PhoneNumber.empty
+            : PhoneNumber.fromString(_contactPhoneController.text),
+        email: _contactEmailController.text,
+      );
 
   @override
   void initState() {
@@ -425,6 +432,14 @@ class InternshipListTileState extends State<InternshipListTile> {
 
       await StudentsProvider.of(context, listen: false).fetchData(
           id: widget.internship.studentId, fields: FetchableFields.all);
+      if (!mounted) return;
+
+      if (!widget.forceEditingMode) {
+        await EnterprisesProvider.of(context, listen: false).fetchData(
+          id: widget.internship.enterpriseId,
+          fields: FetchableFields.all,
+        );
+      }
 
       _fetchFullDataCompleter.complete();
     } else {
@@ -724,15 +739,47 @@ class InternshipListTileState extends State<InternshipListTile> {
     );
   }
 
+  void _toggleUseContactInfo() {
+    final enterprise = EnterprisesProvider.of(context, listen: false)
+        .fromId(widget.internship.enterpriseId);
+
+    _useContactInfo = !_useContactInfo;
+    if (_useContactInfo) {
+      _contactFirstNameController.text = enterprise.contact.firstName;
+      _contactLastNameController.text = enterprise.contact.lastName;
+      _contactPhoneController.text = enterprise.contact.phone.toString();
+      _contactEmailController.text = enterprise.contact.email;
+    } else {
+      _contactFirstNameController.text = '';
+      _contactLastNameController.text = '';
+      _contactPhoneController.text = '';
+      _contactEmailController.text = '';
+    }
+    setState(() {});
+  }
+
   Widget _buildSupervisorContact() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _isEditing && _isActive
-            ? Text('Contact')
-            : Text(
-                'Contact : ${widget.internship.currentContract?.supervisor.toString() ?? ''}',
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Flexible(
+              child: _isEditing && _isActive
+                  ? Text('Contact')
+                  : Text(
+                      'Contact : ${widget.internship.currentContract?.supervisor.toString() ?? ''}',
+                    ),
+            ),
+            if (_isEditing)
+              Switch(
+                onChanged: (newValue) => _toggleUseContactInfo(),
+                value: _useContactInfo,
               ),
+          ],
+        ),
         Padding(
           padding: const EdgeInsets.only(left: 16.0),
           child: Column(
@@ -744,10 +791,12 @@ class InternshipListTileState extends State<InternshipListTile> {
                     Expanded(
                       child: TextFormField(
                         controller: _contactFirstNameController,
-                        decoration:
-                            const InputDecoration(labelText: '* Prénom'),
-                        // TODO Add button to empty the field
+                        decoration: const InputDecoration(
+                            labelText: '* Prénom',
+                            labelStyle: TextStyle(color: Colors.black)),
+                        style: const TextStyle(color: Colors.black),
                         maxLength: 50,
+                        enabled: !_useContactInfo,
                         validator: (value) {
                           if (value?.isEmpty == true) {
                             return 'Le prénom du contact est requis';
@@ -762,8 +811,11 @@ class InternshipListTileState extends State<InternshipListTile> {
                         controller: _contactLastNameController,
                         decoration: const InputDecoration(
                           labelText: '* Nom de famille',
+                          labelStyle: TextStyle(color: Colors.black),
                         ),
+                        style: const TextStyle(color: Colors.black),
                         maxLength: 50,
+                        enabled: !_useContactInfo,
                         validator: (value) {
                           if (value?.isEmpty == true) {
                             return 'Le nom du contact est requis';
@@ -778,13 +830,13 @@ class InternshipListTileState extends State<InternshipListTile> {
               PhoneListTile(
                 controller: _contactPhoneController,
                 isMandatory: false,
-                enabled: _isEditing && _isActive,
+                enabled: _isEditing && _isActive && !_useContactInfo,
               ),
               const SizedBox(height: 4),
               EmailListTile(
                 controller: _contactEmailController,
                 isMandatory: false,
-                enabled: _isEditing && _isActive,
+                enabled: _isEditing && _isActive && !_useContactInfo,
               ),
             ],
           ),
