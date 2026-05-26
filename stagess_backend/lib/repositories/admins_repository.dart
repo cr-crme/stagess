@@ -180,6 +180,13 @@ abstract class AdminsRepository extends RepositoryAbstract {
           user: user, minimumLevel: admin!.accessLevel.nextHigher),
       UserIsFromSameSchoolBoard(user: user, item: admin),
       UserIsFromSameSchool(user: user, item: admin),
+      GenericPolicy(validationFunction: () {
+        if (admin.accessLevel == AccessLevel.superAdmin) {
+          throw SecurityPolicyException(
+              'Super administrators cannot be deleted');
+        }
+        return Future.value();
+      })
     ]).validate();
 
     final removedId = await _deleteAdmin(id: id);
