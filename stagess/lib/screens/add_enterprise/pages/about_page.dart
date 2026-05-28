@@ -107,8 +107,18 @@ class AboutPageState extends State<AboutPage> {
                 enabled: true,
               ),
               SizedBox(height: 16),
-              const SubTitle('Entreprise représentée par', left: 0, top: 0),
-              // TODO Add info: "Remplir les coordonnées de votre personne contact dans l\'entreprise"
+              Row(
+                children: [
+                  const SubTitle('Entreprise représentée par', left: 0, top: 0),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 12.0),
+                    child: IconButton(
+                        onPressed: _showHelpOnContact,
+                        icon: Icon(Icons.info,
+                            color: Theme.of(context).primaryColor)),
+                  ),
+                ],
+              ),
               TextFormField(
                 decoration: const InputDecoration(labelText: '* Prénom'),
                 validator: (text) => text!.isEmpty
@@ -164,6 +174,23 @@ class AboutPageState extends State<AboutPage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  void _showHelpOnContact() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => AlertDialog(
+        title: const Text('Entreprise représentée par'),
+        content: Text(
+            'Remplir les coordonnées de votre personne contact dans l\'entreprise'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, 'OK'),
+            child: const Text('OK'),
+          ),
+        ],
       ),
     );
   }
