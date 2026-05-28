@@ -46,9 +46,12 @@ Future<void> showInternshipEvaluationFormDialog(
     return;
   }
 
-  await internships.replaceWithConfirmation(newInternship);
+  final isSuccess = await internships.replaceWithConfirmation(newInternship);
   if (context.mounted) {
-    showSnackBar(context, message: 'Le stage a été mis à jour');
+    showSnackBar(context,
+        message: isSuccess
+            ? 'Le stage a été mis à jour'
+            : 'Échec de la mise à jour du stage.');
   }
   await internships.releaseLockForItem(internship);
 }
@@ -101,9 +104,12 @@ Future<void> showStudentEvaluationFormDialog(
     return;
   }
 
-  await students.replaceWithConfirmation(newStudent);
+  final isSuccess = await students.replaceWithConfirmation(newStudent);
   if (context.mounted) {
-    showSnackBar(context, message: 'L\'étudiant a été mis à jour');
+    showSnackBar(context,
+        message: isSuccess
+            ? 'L\'étudiant a été mis à jour'
+            : 'Échec de la mise à jour de l\'étudiant.');
   }
   await students.releaseLockForItem(student);
 }

@@ -100,8 +100,13 @@ abstract class StudentsRepository extends RepositoryAbstract {
           AccessLevel.teacher: ['all_visa'],
         },
         blackList: {
-          AccessLevel.schoolAdmin: ['id', 'school_board_id', 'school_id'],
-          AccessLevel.schoolBoardAdmin: ['id', 'school_board_id'],
+          AccessLevel.schoolAdmin: [
+            'id',
+            'school_board_id',
+            'school_id',
+            'all_visa'
+          ],
+          AccessLevel.schoolBoardAdmin: ['id', 'school_board_id', 'all_visa'],
           AccessLevel.superAdmin: ['id', 'school_board_id'],
         },
         itemValidator: (user, item, previousItem) {

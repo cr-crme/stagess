@@ -702,6 +702,7 @@ class StudentListTileState extends State<StudentListTile> {
   }
 
   Widget _buildVisa() {
+    final authProvider = AuthProvider.of(context, listen: false);
     final orderedEvaluations =
         widget.student.allVisa.sortedBy((e) => e.date).reversed;
 
@@ -757,22 +758,22 @@ class StudentListTileState extends State<StudentListTile> {
               ).toList(),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.only(top: 8.0, right: 12.0),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () async => await showStudentEvaluationFormDialog(
-                    context,
-                    studentId: widget.student.id,
-                    evaluationId: widget.student.allVisa.lastOrNull?.id,
-                    canModify: true,
-                    showEvaluationDialog: showVisaEvaluationFormDialog),
-                // TODO Do not allow modifying visa if not teacher
-                child: const Text('Modifier le visa'),
+          if (authProvider.databaseAccessLevel <= AccessLevel.teacher)
+            Padding(
+              padding: const EdgeInsets.only(top: 8.0, right: 12.0),
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () async => await showStudentEvaluationFormDialog(
+                      context,
+                      studentId: widget.student.id,
+                      evaluationId: widget.student.allVisa.lastOrNull?.id,
+                      canModify: true,
+                      showEvaluationDialog: showVisaEvaluationFormDialog),
+                  child: const Text('Modifier le visa'),
+                ),
               ),
-            ),
-          )
+            )
         ],
       ),
     );
