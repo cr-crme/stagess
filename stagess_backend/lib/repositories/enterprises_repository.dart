@@ -165,6 +165,8 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
             if (previousJob == null) continue; // Dealt with above
 
             final differences = job.getDifference(previousJob);
+            final differencesNoId =
+                job.getDifference(previousJob, ignoreKeys: ['id']);
             if (differences.isEmpty) continue;
 
             if (differences.contains('id')) {
@@ -175,7 +177,7 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
                   'Cannot update the enterprise id of a job');
             }
 
-            if (differences.contains('comments')) {
+            if (differencesNoId.contains('comments')) {
               // Make sure the user has the permission to update the comments
               // i.e. it is an admin or the teacher has supervised at least one internship in this enterprise
               if (user.accessLevel < AccessLevel.schoolAdmin) {

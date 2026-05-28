@@ -1,7 +1,13 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common/models/generic/photo.dart';
+import 'package:stagess_common/services/image_helpers.dart';
+import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
@@ -10,14 +16,14 @@ final _logger = Logger('PhotoExpansionPanel');
 class PhotoExpansionPanel extends StatefulWidget {
   const PhotoExpansionPanel({
     super.key,
+    required this.enterpriseId,
     required this.job,
-    required this.addImage,
-    required this.removeImage,
+    this.onChangingImage,
   });
 
+  final String? enterpriseId;
   final Job job;
-  final void Function(Job job, ImageSource source)? addImage;
-  final void Function(Job job, int index)? removeImage;
+  final Function(bool isDone)? onChangingImage;
 
   @override
   State<PhotoExpansionPanel> createState() => _PhotoExpansionPanelState();
@@ -55,13 +61,11 @@ class _PhotoExpansionPanelState extends State<PhotoExpansionPanel> {
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: InkWell(
-                  onTap: widget.removeImage != null
-                      ? () {
-                          widget.removeImage!(widget.job, index);
-                          setState(() {});
-                          Navigator.of(context).pop();
-                        }
-                      : null,
+                  onTap: () {
+                    _removeImage(widget.job, index);
+                    setState(() {});
+                    Navigator.of(context).pop();
+                  },
                   borderRadius: BorderRadius.circular(25),
                   child: const Icon(Icons.delete, color: Colors.red),
                 ),
@@ -88,7 +92,8 @@ class _PhotoExpansionPanelState extends State<PhotoExpansionPanel> {
                 _scrollController.position.maxScrollExtent ||
             (widget.job.photos.length > 2 && _scrollController.offset == 0));
 
-    final canAddPhotos = widget.addImage != null;
+    final canAddPhotos =
+        widget.enterpriseId != null && widget.job.photos.isEmpty;
 
     return AnimatedExpandingCard(
       elevation: 0.0,
@@ -167,8 +172,7 @@ class _PhotoExpansionPanelState extends State<PhotoExpansionPanel> {
                 children: [
                   IconButton(
                     onPressed: canAddPhotos
-                        ? () =>
-                            widget.addImage!(widget.job, ImageSource.gallery)
+                        ? () => _addImage(widget.job, ImageSource.gallery)
                         : null,
                     icon: Icon(
                       Icons.image,
@@ -181,7 +185,7 @@ class _PhotoExpansionPanelState extends State<PhotoExpansionPanel> {
                   const SizedBox(width: 12),
                   IconButton(
                     onPressed: canAddPhotos
-                        ? () => widget.addImage!(widget.job, ImageSource.camera)
+                        ? () => _addImage(widget.job, ImageSource.camera)
                         : null,
                     icon: Icon(
                       Icons.camera_alt,
@@ -198,6 +202,94 @@ class _PhotoExpansionPanelState extends State<PhotoExpansionPanel> {
         ),
       ),
     );
+  }
+
+  void _addImage(Job job, ImageSource source) async {
+    if (widget.onChangingImage != null) widget.onChangingImage!(false);
+
+    _logger.finer('Adding image to job: ${job.specialization.name}');
+    final enterprises = EnterprisesProvider.of(context, listen: false);
+    final enterprise =
+        enterprises.firstWhere((e) => e.id == widget.enterpriseId);
+
+    final hasLock = await enterprises.getLockForItem(enterprise);
+    if (!hasLock || !mounted) {
+      if (mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible d\'ajouter une image, car l\'entreprise est en cours de modification par un autre utilisateur.',
+        );
+      }
+      if (widget.onChangingImage != null) widget.onChangingImage!(true);
+      return;
+    }
+
+    late List<XFile?> images;
+    if (source == ImageSource.camera) {
+      images = [(await ImagePicker().pickImage(source: ImageSource.camera))];
+    } else {
+      images = await ImagePicker().pickMultiImage();
+    }
+    if (images.isEmpty) {
+      await enterprises.releaseLockForItem(enterprise);
+      if (widget.onChangingImage != null) widget.onChangingImage!(true);
+      return;
+    }
+
+    for (XFile? file in images) {
+      if (file == null) continue;
+      final Uint8List bytes = ImageHelpers.resizeImage(
+        await (kIsWeb ? file.readAsBytes() : File(file.path).readAsBytes()),
+        width: null,
+        height: 350,
+      );
+
+      job.photos.add(Photo(bytes: bytes));
+    }
+
+    final isSuccess = await enterprises.replaceWithConfirmation(enterprise);
+    await enterprises.releaseLockForItem(enterprise);
+    if (mounted) {
+      showSnackBar(context,
+          message: isSuccess
+              ? 'L\'image a été ajoutée'
+              : 'Une erreur est survenue lors de l\'ajout de l\'image');
+    }
+
+    if (widget.onChangingImage != null) widget.onChangingImage!(true);
+    _logger.finer('Image(s) added to job: ${job.specialization.name}');
+  }
+
+  void _removeImage(Job job, int index) async {
+    if (widget.onChangingImage != null) widget.onChangingImage!(false);
+    _logger.finer('Removing image from job: ${job.specialization.name}');
+
+    final enterprises = EnterprisesProvider.of(context, listen: false);
+    final enterprise =
+        enterprises.firstWhere((e) => e.id == widget.enterpriseId);
+    final hasLock = await enterprises.getLockForItem(enterprise);
+    if (!hasLock || !mounted) {
+      if (mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible de supprimer l\'image, car l\'entreprise est en cours de modification par un autre utilisateur.',
+        );
+      }
+      if (widget.onChangingImage != null) widget.onChangingImage!(true);
+      return;
+    }
+
+    job.photos.removeAt(index);
+    await enterprises.replaceWithConfirmation(enterprise);
+    await enterprises.releaseLockForItem(enterprise);
+    if (mounted) {
+      showSnackBar(context, message: 'L\'image a été supprimée');
+    }
+
+    if (widget.onChangingImage != null) widget.onChangingImage!(true);
+    _logger.finer('Image removed from job: ${job.specialization.name}');
   }
 }
 

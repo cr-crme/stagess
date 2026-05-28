@@ -21,6 +21,7 @@ import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/supervision
 class EnterpriseJobListController {
   BuildContext context;
 
+  String? enterpriseId;
   EnterpriseStatus enterpriseStatus;
 
   late Specialization? _specialization = _job.specializationOrNull;
@@ -72,6 +73,7 @@ class EnterpriseJobListController {
   EnterpriseJobListController({
     required this.context,
     required this.enterpriseStatus,
+    this.enterpriseId,
     required Job? job,
     List<Specialization>? specializationWhiteList,
     List<Specialization>? specializationBlackList,
@@ -130,7 +132,7 @@ class EnterpriseJobListTile extends StatefulWidget {
     this.showExtended = false,
     this.addSstEvent,
     this.addComment,
-    this.removeImage,
+    this.onChangingImage,
   });
 
   final EnterpriseJobListController controller;
@@ -147,7 +149,7 @@ class EnterpriseJobListTile extends StatefulWidget {
   final bool showExtended;
   final void Function(Job job)? addSstEvent;
   final void Function(Job job)? addComment;
-  final void Function(Job job, int index)? removeImage;
+  final void Function(bool isDone)? onChangingImage;
 
   @override
   State<EnterpriseJobListTile> createState() => _EnterpriseJobListTileState();
@@ -588,7 +590,10 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
         SupervisionExpansionPanel(job: job),
         const SizedBox(height: 12),
         PhotoExpansionPanel(
-            job: job, addImage: null, removeImage: widget.removeImage),
+          enterpriseId: widget.controller.enterpriseId,
+          job: job,
+          onChangingImage: widget.onChangingImage,
+        ),
         const SizedBox(height: 12),
         CommentsExpansionPanel(job: job, addComment: widget.addComment)
       ],

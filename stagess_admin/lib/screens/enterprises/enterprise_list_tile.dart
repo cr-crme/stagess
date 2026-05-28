@@ -114,6 +114,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   }) {
     return EnterpriseJobListController(
       context: context,
+      enterpriseId: widget.enterprise.id,
       enterpriseStatus:
           _enterpriseStatusController.value ?? EnterpriseStatus.active,
       job: job.copyWith(),
@@ -615,6 +616,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     setState(
       () => _jobControllers[job.id] = EnterpriseJobListController(
         context: context,
+        enterpriseId: widget.enterprise.id,
         enterpriseStatus: _enterpriseStatusController.value!,
         job: job,
         reservedForPickerController: EntityPickerController(
@@ -679,7 +681,8 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                           ),
                       addSstEvent: _isEditing ? null : _addSstEvent,
                       addComment: _isEditing ? null : _addComment,
-                      removeImage: _isEditing ? null : _removeImageFromJob,
+                      onChangingImage: (isDone) =>
+                          isDone ? _unlockUI() : _lockUI(),
                     );
                   }),
                 ],
@@ -822,38 +825,17 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
     _logger.finer('Comment added to job: ${job.specialization.name}');
   }
 
-  void _removeImageFromJob(Job job, int index) async {
+  void _lockUI() async {
     if (_forceDisabled) return;
     setState(() {
       _forceDisabled = true;
     });
+  }
 
-    final enterprises = EnterprisesProvider.of(context, listen: false);
-    final hasLock = await enterprises.getLockForItem(widget.enterprise);
-    if (!hasLock || !mounted) {
-      if (mounted) {
-        showSnackBar(
-          context,
-          message:
-              'Impossible de supprimer l\'image, car l\'entreprise est en cours de modification par un autre utilisateur.',
-        );
-      }
-      setState(() {
-        _forceDisabled = false;
-      });
-      return;
-    }
-
-    job.photos.removeAt(index);
-    await enterprises.replaceWithConfirmation(widget.enterprise);
-    await enterprises.releaseLockForItem(widget.enterprise);
-    if (mounted) {
-      showSnackBar(context, message: 'L\'image a été supprimée');
-    }
+  void _unlockUI() async {
     setState(() {
       _forceDisabled = false;
     });
-    _logger.finer('Image removed from job: ${job.specialization.name}');
   }
 
   Widget _buildRecruiter() {

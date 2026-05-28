@@ -1,8 +1,4 @@
-import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess/common/extensions/availability_status.dart';
 import 'package:stagess/common/widgets/dialogs/job_creator_dialog.dart';
@@ -11,9 +7,8 @@ import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/enterprises/job_comment.dart';
-import 'package:stagess_common/models/generic/photo.dart';
+import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
-import 'package:stagess_common/services/image_helpers.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/enterprise_extension.dart';
@@ -132,103 +127,17 @@ class JobsPageState extends State<JobsPage> {
     return isSuccess;
   }
 
-  void _addImage(Job job, ImageSource source) async {
+  void _lockUI() async {
     if (_forceDisabled) return;
     setState(() {
       _forceDisabled = true;
     });
-    _logger.finer('Adding image to job: ${job.specialization.name}');
-    final enterprises = EnterprisesProvider.of(context, listen: false);
-
-    final hasLock = await enterprises.getLockForItem(widget.enterprise);
-    if (!hasLock || !mounted) {
-      if (mounted) {
-        showSnackBar(
-          context,
-          message:
-              'Impossible d\'ajouter une image, car l\'entreprise est en cours de modification par un autre utilisateur.',
-        );
-      }
-      setState(() {
-        _forceDisabled = false;
-      });
-      return;
-    }
-
-    late List<XFile?> images;
-    if (source == ImageSource.camera) {
-      images = [(await ImagePicker().pickImage(source: ImageSource.camera))];
-    } else {
-      images = await ImagePicker().pickMultiImage();
-    }
-    if (images.isEmpty) {
-      await enterprises.releaseLockForItem(widget.enterprise);
-      setState(() {
-        _forceDisabled = false;
-      });
-      return;
-    }
-
-    for (XFile? file in images) {
-      if (file == null) continue;
-      final Uint8List bytes = ImageHelpers.resizeImage(
-        await (kIsWeb ? file.readAsBytes() : File(file.path).readAsBytes()),
-        width: null,
-        height: 350,
-      );
-
-      job.photos.add(Photo(bytes: bytes));
-    }
-
-    final isSuccess =
-        await enterprises.replaceWithConfirmation(widget.enterprise);
-    await enterprises.releaseLockForItem(widget.enterprise);
-    if (mounted) {
-      showSnackBar(context,
-          message: isSuccess
-              ? 'L\'image a été ajoutée'
-              : 'Une erreur est survenue lors de l\'ajout de l\'image');
-    }
-    setState(() {
-      _forceDisabled = false;
-    });
-    _logger.finer('Image(s) added to job: ${job.specialization.name}');
   }
 
-  void _removeImage(Job job, int index) async {
-    if (_forceDisabled) return;
-    setState(() {
-      _forceDisabled = true;
-    });
-    _logger.finer('Removing image from job: ${job.specialization.name}');
-    final enterprises = EnterprisesProvider.of(context, listen: false);
-
-    final hasLock = await enterprises.getLockForItem(widget.enterprise);
-    if (!hasLock || !mounted) {
-      if (mounted) {
-        showSnackBar(
-          context,
-          message:
-              'Impossible de supprimer une image, car l\'entreprise est en cours de modification par un autre utilisateur.',
-        );
-      }
-      setState(() {
-        _forceDisabled = false;
-      });
-      return;
-    }
-
-    job.photos.removeAt(index);
-
-    await enterprises.replaceWithConfirmation(widget.enterprise);
-    await enterprises.releaseLockForItem(widget.enterprise);
-    if (mounted) {
-      showSnackBar(context, message: 'L\'image a été supprimée');
-    }
+  void _unlockUI() async {
     setState(() {
       _forceDisabled = false;
     });
-    _logger.finer('Image removed from job: ${job.specialization.name}');
   }
 
   void _addSstEvent(Job job) async {
@@ -302,9 +211,10 @@ class JobsPageState extends State<JobsPage> {
       _forceDisabled = true;
     });
 
+    final authProvider = AuthProvider.of(context, listen: false);
+
     _logger.finer('Adding comment to job: ${job.specialization.name}');
-    final userId =
-        TeachersProvider.of(context, listen: false).currentTeacher?.id;
+    final userId = authProvider.currentId;
     if (userId == null) {
       _logger.warning('No teacher ID found when adding comment to job.');
       showSnackBar(
@@ -322,7 +232,8 @@ class JobsPageState extends State<JobsPage> {
           internship.enterpriseId == widget.enterprise.id &&
           internship.supervisingTeacherIds.contains(userId),
     );
-    if (internship.isEmpty) {
+    if (authProvider.databaseAccessLevel < AccessLevel.schoolAdmin &&
+        internship.isEmpty) {
       _logger.warning(
         'No internship found for teacher ID when adding comment to job: $userId',
       );
@@ -614,9 +525,10 @@ class JobsPageState extends State<JobsPage> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 4.0),
                         child: PhotoExpansionPanel(
+                          enterpriseId: widget.enterprise.id,
                           job: job,
-                          addImage: job.photos.length > 1 ? null : _addImage,
-                          removeImage: _removeImage,
+                          onChangingImage: (isDone) =>
+                              isDone ? _unlockUI() : _lockUI(),
                         ),
                       ),
                       Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
@@ -649,9 +561,12 @@ class _AvailablePlace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final schoolId = AuthProvider.of(context, listen: true).schoolId;
-    if (schoolId == null) {
+    final authProvider = AuthProvider.of(context, listen: true);
+    if (authProvider.schoolId == null) {
       return const Center(child: Text('Impossible de charger les stages.'));
+    }
+    if (authProvider.databaseAccessLevel >= AccessLevel.schoolBoardAdmin) {
+      return SizedBox.shrink();
     }
 
     final positionsRemaining = positionsOffered - positionsOccupied;
