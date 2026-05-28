@@ -309,6 +309,7 @@ class TeacherListTileState extends State<TeacherListTile> {
                                           ? null
                                           : _onClickedDeleting,
                                     ),
+                                  // TODO Add a cancel button
                                   if (widget.canEdit)
                                     IconButton(
                                       icon: Icon(

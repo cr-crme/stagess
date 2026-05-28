@@ -282,6 +282,7 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
                                           ? null
                                           : _onClickedDeleting,
                                     ),
+                                  // TODO Add a cancel button
                                   if (_canEdit)
                                     IconButton(
                                       icon: Icon(

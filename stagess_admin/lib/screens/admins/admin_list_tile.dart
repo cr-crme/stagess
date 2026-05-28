@@ -280,6 +280,7 @@ class AdminListTileState extends State<AdminListTile> {
                                           ? null
                                           : _onClickedDeleting,
                                     ),
+                                  // TODO Add a cancel button
                                   if (widget.canEdit)
                                     IconButton(
                                       icon: Icon(

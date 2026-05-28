@@ -12,6 +12,7 @@ import 'package:stagess_admin/widgets/teacher_picker_tile.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
@@ -337,6 +338,7 @@ class InternshipListTileState extends State<InternshipListTile> {
       // Finish editing
       final newInternship = editedInternship;
       if (newInternship.getDifference(widget.internship).isNotEmpty) {
+        final authProvider = AuthProvider.of(context, listen: false);
         final isSuccess =
             await internships.replaceWithConfirmation(newInternship);
         if (mounted) {
@@ -344,7 +346,8 @@ class InternshipListTileState extends State<InternshipListTile> {
             context,
             message: isSuccess
                 ? 'Stage modifié avec succès.'
-                : 'Échec de la modification du stage.',
+                : 'Échec de la modification du stage.'
+                    '${authProvider.databaseAccessLevel < AccessLevel.schoolAdmin ? ' Vous devez faire parti de la liste des enseignants responsables de ce stage pour pouvoir le modifier.' : ''}',
           );
         }
       }
@@ -505,7 +508,7 @@ class InternshipListTileState extends State<InternshipListTile> {
                                   if (widget.canEdit)
                                     IconButton(
                                       icon: Icon(
-                                        // TODO Do not show edit icon if not allowed to edit
+                                        // TODO Add a cancel button
                                         _isEditing ? Icons.save : Icons.edit,
                                         color: _forceDisabled
                                             ? Colors.grey

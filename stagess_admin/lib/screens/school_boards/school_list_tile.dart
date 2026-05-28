@@ -247,6 +247,7 @@ class SchoolListTileState extends State<SchoolListTile> {
                           ),
                           onPressed: _forceDisabled ? null : _onClickedDeleting,
                         ),
+                      // TODO Add a cancel button
                       if (widget.canEdit)
                         IconButton(
                           icon: Icon(

@@ -449,6 +449,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                                           ? null
                                           : _onClickedDeleting,
                                     ),
+                                  // TODO Add a cancel button
                                   IconButton(
                                     icon: Icon(
                                       _isEditing ? Icons.save : Icons.edit,
