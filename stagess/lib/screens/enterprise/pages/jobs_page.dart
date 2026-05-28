@@ -6,7 +6,6 @@ import 'package:stagess/common/widgets/disponibility_circle.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
-import 'package:stagess_common/models/enterprises/job_comment.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
@@ -15,14 +14,11 @@ import 'package:stagess_common_flutter/helpers/enterprise_extension.dart';
 import 'package:stagess_common_flutter/helpers/job_extension.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
-import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
-import 'package:stagess_common_flutter/widgets/dialogs/add_sst_event_dialog.dart';
-import 'package:stagess_common_flutter/widgets/dialogs/add_text_dialog.dart';
 import 'package:stagess_common_flutter/widgets/incidents_expansion_panel.dart';
 import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/comments_expansion_panel.dart';
 import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/photo_expansion_panel.dart';
@@ -138,157 +134,6 @@ class JobsPageState extends State<JobsPage> {
     setState(() {
       _forceDisabled = false;
     });
-  }
-
-  void _addSstEvent(Job job) async {
-    if (_forceDisabled) return;
-    setState(() {
-      _forceDisabled = true;
-    });
-
-    _logger.finer('Adding SST event to job: ${job.specialization.name}');
-    final enterprises = EnterprisesProvider.of(context, listen: false);
-    final userId =
-        TeachersProvider.of(context, listen: false).currentTeacher?.id;
-    if (userId == null) return;
-
-    final hasLock = await enterprises.getLockForItem(widget.enterprise);
-    if (!hasLock || !mounted) {
-      if (mounted) {
-        showSnackBar(
-          context,
-          message:
-              'Impossible d\'ajouter un événement SST, car l\'entreprise est en cours de modification par un autre utilisateur.',
-        );
-      }
-      setState(() {
-        _forceDisabled = false;
-      });
-      return;
-    }
-
-    final result = await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const AddSstEventDialog(),
-    );
-    if (result == null) {
-      await enterprises.releaseLockForItem(widget.enterprise);
-      setState(() {
-        _forceDisabled = false;
-      });
-      return;
-    }
-
-    final incident =
-        Incident(userId: userId, date: DateTime.now(), result['description']);
-    switch (result['eventType'] as SstEventType) {
-      case SstEventType.severe:
-        job.incidents.severeInjuries.add(incident);
-        break;
-      case SstEventType.verbal:
-        job.incidents.verbalAbuses.add(incident);
-        break;
-      case SstEventType.minor:
-        job.incidents.minorInjuries.add(incident);
-        break;
-    }
-    enterprises[widget.enterprise].jobs.replace(job);
-    await enterprises.replaceWithConfirmation(widget.enterprise);
-    await enterprises.releaseLockForItem(widget.enterprise);
-    if (mounted) {
-      showSnackBar(context, message: 'L\'événement SST a été ajouté');
-    }
-    setState(() {
-      _forceDisabled = false;
-    });
-    _logger.finer('SST event added to job: ${job.specialization.name}');
-  }
-
-  void _addComment(Job job) async {
-    if (_forceDisabled) return;
-    setState(() {
-      _forceDisabled = true;
-    });
-
-    final authProvider = AuthProvider.of(context, listen: false);
-
-    _logger.finer('Adding comment to job: ${job.specialization.name}');
-    final userId = authProvider.currentId;
-    if (userId == null) {
-      _logger.warning('No teacher ID found when adding comment to job.');
-      showSnackBar(
-        context,
-        message: 'Vous devez être connecté pour ajouter un commentaire.',
-      );
-      setState(() {
-        _forceDisabled = false;
-      });
-      return;
-    }
-    final enterprises = EnterprisesProvider.of(context, listen: false);
-    final internship = InternshipsProvider.of(context, listen: false).where(
-      (internship) =>
-          internship.enterpriseId == widget.enterprise.id &&
-          internship.supervisingTeacherIds.contains(userId),
-    );
-    if (authProvider.databaseAccessLevel < AccessLevel.schoolAdmin &&
-        internship.isEmpty) {
-      _logger.warning(
-        'No internship found for teacher ID when adding comment to job: $userId',
-      );
-      showSnackBar(
-        context,
-        message:
-            'Vous devez avoir supervisé au moins un stage dans cette entreprise pour y ajouter un commentaire.',
-      );
-      setState(() {
-        _forceDisabled = false;
-      });
-      return;
-    }
-
-    final hasLock = await enterprises.getLockForItem(widget.enterprise);
-    if (!hasLock || !mounted) {
-      if (mounted) {
-        showSnackBar(
-          context,
-          message:
-              'Impossible d\'ajouter un commentaire, car l\'entreprise est en cours de modification par un autre utilisateur.',
-        );
-      }
-      setState(() {
-        _forceDisabled = false;
-      });
-      return;
-    }
-
-    final newComment = await showDialog(
-      barrierDismissible: false,
-      context: context,
-      builder: (context) =>
-          const AddTextDialog(title: 'Ajouter un commentaire', maxLength: 2000),
-    );
-
-    if (newComment == null) {
-      await enterprises.releaseLockForItem(widget.enterprise);
-      setState(() {
-        _forceDisabled = false;
-      });
-      return;
-    }
-    job.comments.add(
-      JobComment(comment: newComment, userId: userId, date: DateTime.now()),
-    );
-    await enterprises.replaceWithConfirmation(widget.enterprise);
-    await enterprises.releaseLockForItem(widget.enterprise);
-    if (mounted) {
-      showSnackBar(context, message: 'Le commentaire a été ajouté');
-    }
-    setState(() {
-      _forceDisabled = false;
-    });
-    _logger.finer('Comment added to job: ${job.specialization.name}');
   }
 
   void _updateSectionsIfNeeded() {
@@ -514,7 +359,7 @@ class JobsPageState extends State<JobsPage> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 4.0),
                         child: IncidentsExpansionPanel(
-                            job: job, addSstEvent: _addSstEvent),
+                            enterpriseId: widget.enterprise.id, job: job),
                       ),
                       Divider(height: 4.0, indent: 4.0, endIndent: 24.0),
                       Padding(
@@ -535,9 +380,7 @@ class JobsPageState extends State<JobsPage> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 4.0),
                         child: CommentsExpansionPanel(
-                          job: job,
-                          addComment: _addComment,
-                        ),
+                            enterpriseId: widget.enterprise.id, job: job),
                       ),
                     ]),
                   ),

@@ -130,8 +130,6 @@ class EnterpriseJobListTile extends StatefulWidget {
     this.jobPickerPadding,
     this.availabilityIsMandatory = false,
     this.showExtended = false,
-    this.addSstEvent,
-    this.addComment,
     this.onChangingImage,
   });
 
@@ -147,8 +145,6 @@ class EnterpriseJobListTile extends StatefulWidget {
   final EdgeInsets? jobPickerPadding;
   final bool availabilityIsMandatory;
   final bool showExtended;
-  final void Function(Job job)? addSstEvent;
-  final void Function(Job job)? addComment;
   final void Function(bool isDone)? onChangingImage;
 
   @override
@@ -162,17 +158,6 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
   void initState() {
     super.initState();
     widget.controller._reservedForPickerController?.addListener(_refresh);
-
-    {
-      if (widget.showExtended && widget.addSstEvent == null) {
-        throw ArgumentError(
-            'addSstEvent must be provided if showExtended is true');
-      }
-      if (widget.showExtended && widget.addComment == null) {
-        throw ArgumentError(
-            'addComment must be provided if showExtended is true');
-      }
-    }
   }
 
   void _refresh() => setState(() {});
@@ -585,7 +570,8 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        IncidentsExpansionPanel(job: job, addSstEvent: widget.addSstEvent),
+        IncidentsExpansionPanel(
+            enterpriseId: widget.controller.enterpriseId, job: job),
         const SizedBox(height: 12),
         SupervisionExpansionPanel(job: job),
         const SizedBox(height: 12),
@@ -595,7 +581,8 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
           onChangingImage: widget.onChangingImage,
         ),
         const SizedBox(height: 12),
-        CommentsExpansionPanel(job: job, addComment: widget.addComment)
+        CommentsExpansionPanel(
+            enterpriseId: widget.controller.enterpriseId, job: job)
       ],
     );
   }

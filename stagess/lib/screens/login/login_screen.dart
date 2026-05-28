@@ -5,6 +5,7 @@ import 'package:stagess/common/widgets/main_drawer.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess_common_flutter/helpers/form_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
+import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
@@ -97,6 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Calling the provider jumps start the authentication process and ensures data arrival
     final schoolBoardsProvider = SchoolBoardsProvider.of(context, listen: true);
+    AdminsProvider.of(context, listen: false);
     EnterprisesProvider.of(context, listen: false);
     InternshipsProvider.of(context, listen: false);
     StudentsProvider.of(context, listen: false);

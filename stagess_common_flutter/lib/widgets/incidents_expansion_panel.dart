@@ -2,22 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
+import 'package:stagess_common_flutter/providers/admins_provider.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
+import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/add_sst_event_dialog.dart';
 import 'package:stagess_common_flutter/widgets/itemized_text.dart';
+import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('IncidentsExpansionPanel');
 
 class IncidentsExpansionPanel extends StatelessWidget {
   const IncidentsExpansionPanel({
     super.key,
+    required this.enterpriseId,
     required this.job,
-    required this.addSstEvent,
     this.isExpandable = true,
   });
 
+  final String? enterpriseId;
   final Job job;
-  final void Function(Job job)? addSstEvent;
   final bool isExpandable;
 
   @override
@@ -68,12 +73,12 @@ class IncidentsExpansionPanel extends StatelessWidget {
                 titleIfNotHasIncidents: 'Aucune blessure mineure',
                 titleIfHasIncidents: 'Blessures mineures d\'élèves',
                 incidents: job.incidents.minorInjuries),
-            if (addSstEvent != null)
+            if (enterpriseId != null)
               Center(
                 child: Padding(
                   padding: const EdgeInsets.only(top: 24.0),
                   child: ElevatedButton(
-                    onPressed: () => addSstEvent!(job),
+                    onPressed: () => _addSstEvent(context, job),
                     child: const Text('Signaler un incident'),
                   ),
                 ),
@@ -100,11 +105,67 @@ class IncidentsExpansionPanel extends StatelessWidget {
         ),
         if (incidents.isNotEmpty)
           ItemizedText(incidents.map((e) {
-            final teacher = TeachersProvider.of(context, listen: false)
-                .fromIdOrNull(e.userId);
-            return '${e.toString()}\nIncident rapporté par ${teacher?.fullName ?? 'un·e administrateur·trice'}, le ${DateFormat.yMMMEd('fr_CA').format(e.date)}';
+            final user = TeachersProvider.of(context, listen: false)
+                    .fromIdOrNull(e.userId)
+                    ?.fullName ??
+                AdminsProvider.of(context, listen: false)
+                    .fromIdOrNull(e.userId)
+                    ?.fullName ??
+                'Une personne inconnue';
+            return '${e.toString()}\nIncident rapporté par $user, le ${DateFormat.yMMMEd('fr_CA').format(e.date)}';
           }).toList()),
       ],
     );
+  }
+
+  void _addSstEvent(BuildContext context, Job job) async {
+    _logger.finer('Adding SST event to job: ${job.specialization.name}');
+    final enterprises = EnterprisesProvider.of(context, listen: false);
+    final enterprise = enterprises.fromId(enterpriseId!);
+    final userId = AuthProvider.of(context, listen: false).currentId;
+    if (userId == null) return;
+
+    final hasLock = await enterprises.getLockForItem(enterprise);
+    if (!hasLock || !context.mounted) {
+      if (context.mounted) {
+        showSnackBar(
+          context,
+          message:
+              'Impossible d\'ajouter un événement SST, car l\'entreprise est en cours de modification par un autre utilisateur.',
+        );
+      }
+      return;
+    }
+
+    final result = await showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const AddSstEventDialog(),
+    );
+    if (result == null) {
+      await enterprises.releaseLockForItem(enterprise);
+      return;
+    }
+
+    final incident =
+        Incident(userId: userId, date: DateTime.now(), result['description']);
+    switch (result['eventType'] as SstEventType) {
+      case SstEventType.severe:
+        job.incidents.severeInjuries.add(incident);
+        break;
+      case SstEventType.verbal:
+        job.incidents.verbalAbuses.add(incident);
+        break;
+      case SstEventType.minor:
+        job.incidents.minorInjuries.add(incident);
+        break;
+    }
+    enterprises[enterprise].jobs.replace(job);
+    await enterprises.replaceWithConfirmation(enterprise);
+    await enterprises.releaseLockForItem(enterprise);
+    if (context.mounted) {
+      showSnackBar(context, message: 'L\'événement SST a été ajouté');
+    }
+    _logger.finer('SST event added to job: ${job.specialization.name}');
   }
 }
