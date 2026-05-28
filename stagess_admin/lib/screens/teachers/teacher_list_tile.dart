@@ -233,20 +233,18 @@ class TeacherListTileState extends State<TeacherListTile> {
   void didUpdateWidget(covariant TeacherListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.teacher.getDifference(editedTeacher).isEmpty) return;
+    _resetForm();
+  }
 
+  void _resetForm() {
     _firstNameController.text = widget.teacher.firstName;
     _lastNameController.text = widget.teacher.lastName;
 
     _phoneController.text = widget.teacher.phone.toString();
     _emailController.text = widget.teacher.email.toString();
 
-    if (areListsNotEqual(
-      _currentGroups.map((e) => e.text).toList(),
-      widget.teacher.groups,
-    )) {
-      _disposeCurrentGroupsControllers();
-      _fillCurrentGroupsControllers();
-    }
+    _disposeCurrentGroupsControllers();
+    _fillCurrentGroupsControllers();
   }
 
   Future<void> _fetchData() async {
@@ -309,7 +307,25 @@ class TeacherListTileState extends State<TeacherListTile> {
                                           ? null
                                           : _onClickedDeleting,
                                     ),
-                                  // TODO Add a cancel button
+                                  if (_isEditing && !widget.forceEditingMode)
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.cancel,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                      onPressed: () async {
+                                        _resetForm();
+                                        setState(() {});
+
+                                        await TeachersProvider.of(context,
+                                                listen: false)
+                                            .releaseLockForItem(widget.teacher);
+
+                                        setState(() {
+                                          _isEditing = false;
+                                        });
+                                      },
+                                    ),
                                   if (widget.canEdit)
                                     IconButton(
                                       icon: Icon(

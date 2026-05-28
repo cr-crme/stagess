@@ -213,11 +213,18 @@ class AdminListTileState extends State<AdminListTile> {
   void didUpdateWidget(covariant AdminListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.admin.getDifference(editedAdmin).isEmpty) return;
+    _resetForm();
+  }
 
+  void _resetForm() {
     _firstNameController.text = widget.admin.firstName;
     _lastNameController.text = widget.admin.lastName;
     _phoneController.text = widget.admin.phone.toString();
     _emailController.text = widget.admin.email.toString();
+    if (_showSchoolSelection) {
+      _selectedSchoolId = widget.admin.schoolId;
+      _radioKey.currentState?.didChange(_selectedSchoolId);
+    }
   }
 
   Future<void> _fetchData() async {
@@ -280,7 +287,23 @@ class AdminListTileState extends State<AdminListTile> {
                                           ? null
                                           : _onClickedDeleting,
                                     ),
-                                  // TODO Add a cancel button
+                                  if (_isEditing && !widget.forceEditingMode)
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.cancel,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                      onPressed: () async {
+                                        _resetForm();
+
+                                        await AdminsProvider.of(context,
+                                                listen: false)
+                                            .releaseLockForItem(widget.admin);
+                                        setState(() {
+                                          _isEditing = false;
+                                        });
+                                      },
+                                    ),
                                   if (widget.canEdit)
                                     IconButton(
                                       icon: Icon(

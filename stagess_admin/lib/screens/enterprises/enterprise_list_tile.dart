@@ -345,6 +345,10 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   void didUpdateWidget(covariant EnterpriseListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.enterprise.getDifference(editedEnterprise).isEmpty) return;
+    _resetForm();
+  }
+
+  void _resetForm() {
     final teachers = TeachersProvider.of(context, listen: false);
 
     _enterpriseStatusController.forceSet(widget.enterprise.status);
@@ -425,42 +429,57 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                 if (_isExpanded)
                   FutureBuilder(
                     future: _fetchFullDataCompleter.future,
-                    builder: (context, snapshot) =>
-                        snapshot.connectionState == ConnectionState.done
-                            ? Row(
-                                children: [
-                                  if (!hasInternship &&
-                                      AuthProvider.of(context, listen: false)
-                                              .databaseAccessLevel >=
-                                          AccessLevel.schoolAdmin)
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.delete,
-                                        color: _forceDisabled
-                                            ? Colors.grey
-                                            : Colors.red,
-                                      ),
-                                      onPressed: _forceDisabled
-                                          ? null
-                                          : _onClickedDeleting,
-                                    ),
-                                  // TODO Add a cancel button
-                                  IconButton(
-                                    icon: Icon(
-                                      _isEditing ? Icons.save : Icons.edit,
-                                      color: _forceDisabled
-                                          ? Colors.grey
-                                          : Theme.of(
-                                              context,
-                                            ).primaryColor,
-                                    ),
-                                    onPressed: _forceDisabled
-                                        ? null
-                                        : _onClickedEditing,
+                    builder: (context, snapshot) => snapshot.connectionState ==
+                            ConnectionState.done
+                        ? Row(
+                            children: [
+                              if (!hasInternship &&
+                                  AuthProvider.of(context, listen: false)
+                                          .databaseAccessLevel >=
+                                      AccessLevel.schoolAdmin)
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: _forceDisabled
+                                        ? Colors.grey
+                                        : Colors.red,
                                   ),
-                                ],
-                              )
-                            : const SizedBox.shrink(),
+                                  onPressed: _forceDisabled
+                                      ? null
+                                      : _onClickedDeleting,
+                                ),
+                              if (_isEditing && !widget.forceEditingMode)
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.cancel,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                  onPressed: () async {
+                                    _resetForm();
+
+                                    await EnterprisesProvider.of(context,
+                                            listen: false)
+                                        .releaseLockForItem(widget.enterprise);
+                                    setState(() {
+                                      _isEditing = false;
+                                    });
+                                  },
+                                ),
+                              IconButton(
+                                icon: Icon(
+                                  _isEditing ? Icons.save : Icons.edit,
+                                  color: _forceDisabled
+                                      ? Colors.grey
+                                      : Theme.of(
+                                          context,
+                                        ).primaryColor,
+                                ),
+                                onPressed:
+                                    _forceDisabled ? null : _onClickedEditing,
+                              ),
+                            ],
+                          )
+                        : const SizedBox.shrink(),
                   ),
               ],
             ),

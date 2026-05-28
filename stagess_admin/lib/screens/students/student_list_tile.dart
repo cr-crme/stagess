@@ -282,7 +282,10 @@ class StudentListTileState extends State<StudentListTile> {
   void didUpdateWidget(covariant StudentListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.student.getDifference(editedStudent).isEmpty) return;
+    _resetForm();
+  }
 
+  void _resetForm() {
     _firstNameController.text = widget.student.firstName;
     _lastNameController.text = widget.student.lastName;
 
@@ -365,7 +368,24 @@ class StudentListTileState extends State<StudentListTile> {
                                           ? null
                                           : _onClickedDeleting,
                                     ),
-                                  // TODO Add a cancel button
+                                  if (_isEditing && !widget.forceEditingMode)
+                                    IconButton(
+                                      icon: Icon(
+                                        Icons.cancel,
+                                        color: Theme.of(context).primaryColor,
+                                      ),
+                                      onPressed: () async {
+                                        _resetForm();
+
+                                        await StudentsProvider.of(context,
+                                                listen: false)
+                                            .releaseLockForItem(widget.student);
+
+                                        setState(() {
+                                          _isEditing = false;
+                                        });
+                                      },
+                                    ),
                                   if (widget.canEdit)
                                     IconButton(
                                       icon: Icon(

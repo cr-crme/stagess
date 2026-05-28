@@ -207,7 +207,10 @@ class SchoolListTileState extends State<SchoolListTile> {
   void didUpdateWidget(covariant SchoolListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.school.getDifference(editedSchool).isEmpty) return;
+    _resetForm();
+  }
 
+  void _resetForm() {
     _nameController.text = widget.school.name;
     _addressController.setAddress(widget.school.address,
         forceIsValid: widget.school.address.isNotEmpty);
@@ -247,7 +250,23 @@ class SchoolListTileState extends State<SchoolListTile> {
                           ),
                           onPressed: _forceDisabled ? null : _onClickedDeleting,
                         ),
-                      // TODO Add a cancel button
+                      if (_isEditing && !widget.forceEditingMode)
+                        IconButton(
+                          icon: Icon(
+                            Icons.cancel,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          onPressed: () async {
+                            _resetForm();
+
+                            await SchoolBoardsProvider.of(context,
+                                    listen: false)
+                                .releaseLockForItem(widget.schoolBoard);
+                            setState(() {
+                              _isEditing = false;
+                            });
+                          },
+                        ),
                       if (widget.canEdit)
                         IconButton(
                           icon: Icon(

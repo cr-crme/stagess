@@ -48,12 +48,13 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
   void didUpdateWidget(covariant SchoolBoardListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.schoolBoard.getDifference(editedSchoolBoard).isEmpty) return;
+    _resetForm();
+  }
 
+  void _resetForm() {
     _logoController = Uint8List.fromList([...widget.schoolBoard.logo]);
     _nameController.text = widget.schoolBoard.name;
     _cnesstController.text = widget.schoolBoard.cnesstNumber;
-
-    setState(() {});
   }
 
   @override
@@ -266,40 +267,55 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
                 if (_isExpanded)
                   FutureBuilder(
                     future: _fetchFullDataCompleter.future,
-                    builder: (context, snapshot) =>
-                        snapshot.connectionState == ConnectionState.done
-                            ? Row(
-                                children: [
-                                  if (_canDelete)
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.delete,
-                                        color: _forceDisabled
-                                            ? Colors.grey
-                                            : Colors.red,
-                                      ),
-                                      onPressed: _forceDisabled
-                                          ? null
-                                          : _onClickedDeleting,
-                                    ),
-                                  // TODO Add a cancel button
-                                  if (_canEdit)
-                                    IconButton(
-                                      icon: Icon(
-                                        _isEditing ? Icons.save : Icons.edit,
-                                        color: _forceDisabled
-                                            ? Colors.grey
-                                            : Theme.of(
-                                                context,
-                                              ).primaryColor,
-                                      ),
-                                      onPressed: _forceDisabled
-                                          ? null
-                                          : _onClickedEditing,
-                                    ),
-                                ],
-                              )
-                            : SizedBox.shrink(),
+                    builder: (context, snapshot) => snapshot.connectionState ==
+                            ConnectionState.done
+                        ? Row(
+                            children: [
+                              if (_canDelete)
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: _forceDisabled
+                                        ? Colors.grey
+                                        : Colors.red,
+                                  ),
+                                  onPressed: _forceDisabled
+                                      ? null
+                                      : _onClickedDeleting,
+                                ),
+                              if (_isEditing && !widget.forceEditingMode)
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.cancel,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                  onPressed: () async {
+                                    _resetForm();
+
+                                    await SchoolBoardsProvider.of(context,
+                                            listen: false)
+                                        .releaseLockForItem(widget.schoolBoard);
+                                    setState(() {
+                                      _isEditing = false;
+                                    });
+                                  },
+                                ),
+                              if (_canEdit)
+                                IconButton(
+                                  icon: Icon(
+                                    _isEditing ? Icons.save : Icons.edit,
+                                    color: _forceDisabled
+                                        ? Colors.grey
+                                        : Theme.of(
+                                            context,
+                                          ).primaryColor,
+                                  ),
+                                  onPressed:
+                                      _forceDisabled ? null : _onClickedEditing,
+                                ),
+                            ],
+                          )
+                        : SizedBox.shrink(),
                   ),
               ],
             ),

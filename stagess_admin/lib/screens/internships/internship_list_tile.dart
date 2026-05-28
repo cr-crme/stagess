@@ -383,7 +383,10 @@ class InternshipListTileState extends State<InternshipListTile> {
   void didUpdateWidget(covariant InternshipListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.internship.getDifference(editedInternship).isEmpty) return;
+    _resetForm();
+  }
 
+  void _resetForm() {
     _teacherPickerController.teacher = TeachersProvider.of(
       context,
       listen: false,
@@ -395,6 +398,9 @@ class InternshipListTileState extends State<InternshipListTile> {
     _contactLastNameController.text = supervisor.lastName;
     _contactPhoneController.text = supervisor.phone.toString();
     _contactEmailController.text = supervisor.email;
+    _useContactInfo = _editedSupervisor.getDifference(
+        _enterprisePickerController.enterprise.contact,
+        ignoreKeys: ['id', 'address']).isEmpty;
 
     _weeklySchedulesController.dateRange =
         widget.internship.currentContract?.dates;
@@ -489,40 +495,56 @@ class InternshipListTileState extends State<InternshipListTile> {
                 if (_isExpanded)
                   FutureBuilder(
                     future: _fetchFullDataCompleter.future,
-                    builder: (context, snapshot) =>
-                        snapshot.connectionState == ConnectionState.done
-                            ? Row(
-                                children: [
-                                  if (widget.canDelete)
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.delete,
-                                        color: _forceDisabled
-                                            ? Colors.grey
-                                            : Colors.red,
-                                      ),
-                                      onPressed: _forceDisabled
-                                          ? null
-                                          : _onClickedDeleting,
-                                    ),
-                                  if (widget.canEdit)
-                                    IconButton(
-                                      icon: Icon(
-                                        // TODO Add a cancel button
-                                        _isEditing ? Icons.save : Icons.edit,
-                                        color: _forceDisabled
-                                            ? Colors.grey
-                                            : Theme.of(
-                                                context,
-                                              ).primaryColor,
-                                      ),
-                                      onPressed: _forceDisabled
-                                          ? null
-                                          : _onClickedEditing,
-                                    ),
-                                ],
-                              )
-                            : SizedBox.shrink(),
+                    builder: (context, snapshot) => snapshot.connectionState ==
+                            ConnectionState.done
+                        ? Row(
+                            children: [
+                              if (widget.canDelete)
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: _forceDisabled
+                                        ? Colors.grey
+                                        : Colors.red,
+                                  ),
+                                  onPressed: _forceDisabled
+                                      ? null
+                                      : _onClickedDeleting,
+                                ),
+                              if (_isEditing && !widget.forceEditingMode)
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.cancel,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                  onPressed: () async {
+                                    _resetForm();
+
+                                    await InternshipsProvider.of(context,
+                                            listen: false)
+                                        .releaseLockForItem(widget.internship);
+
+                                    setState(() {
+                                      _isEditing = false;
+                                    });
+                                  },
+                                ),
+                              if (widget.canEdit)
+                                IconButton(
+                                  icon: Icon(
+                                    _isEditing ? Icons.save : Icons.edit,
+                                    color: _forceDisabled
+                                        ? Colors.grey
+                                        : Theme.of(
+                                            context,
+                                          ).primaryColor,
+                                  ),
+                                  onPressed:
+                                      _forceDisabled ? null : _onClickedEditing,
+                                ),
+                            ],
+                          )
+                        : SizedBox.shrink(),
                   ),
               ],
             ),
