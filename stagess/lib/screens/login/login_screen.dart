@@ -15,7 +15,6 @@ import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('LoginScreen');
 
-// TODO add login page for admin in teacher side
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 

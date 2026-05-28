@@ -1,87 +1,90 @@
 import 'package:flutter/material.dart';
-import 'package:logging/logging.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
+import 'package:stagess_common/models/persons/admin.dart';
+import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
+import 'package:stagess_common_flutter/providers/admins_provider.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/widgets/profiles/admin_profile_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/profiles/teacher_profile_list_tile.dart';
-
-final _logger = Logger('MyAccountScreen');
 
 class MyAccountScreen extends StatelessWidget {
   const MyAccountScreen({super.key});
   static const String route = '/my-account';
-  Future<void> _fetchTeacher(BuildContext context) async {
-    final teachers = TeachersProvider.of(context, listen: false);
-    await Future.wait([
-      teachers.fetchData(
-        id: teachers.currentTeacher?.id ?? '-1',
-        fields: FetchableFields.all,
-      ),
-    ]);
-    return;
-  }
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = AuthProvider.of(context, listen: false);
+
+    final currentId = authProvider.currentId;
+    if (currentId == null) {
+      return ResponsiveService.scaffoldOf(
+        context,
+        appBar: ResponsiveService.appBarOf(
+          context,
+          title: const Text('Mon compte'),
+        ),
+        smallDrawer: MainDrawer.small,
+        mediumDrawer: MainDrawer.medium,
+        largeDrawer: MainDrawer.large,
+        body: const Center(
+          child: Text(
+              'Aucun·e utilisateur·trice trouvé·e, assurez-vous d\'être connecté·e.'),
+        ),
+      );
+    }
+
+    final user = authProvider.isAdmin
+        ? AdminsProvider.of(context, listen: false)
+            .fetchData(id: currentId, fields: FetchableFields.all)
+        : TeachersProvider.of(context, listen: false)
+            .fetchData(id: currentId, fields: FetchableFields.all);
+
     return FutureBuilder(
-      future: _fetchTeacher(context),
+      future: user,
       builder: (context, snapshot) {
-        final teacher =
-            TeachersProvider.of(context, listen: false).currentTeacher;
-        if (teacher == null) {
-          return Center(
-            child: CircularProgressIndicator(
-              color: Theme.of(context).primaryColor,
+        if (snapshot.connectionState != ConnectionState.done) {
+          return ResponsiveService.scaffoldOf(
+            context,
+            appBar: ResponsiveService.appBarOf(
+              context,
+              title: const Text('Mon compte'),
             ),
+            smallDrawer: MainDrawer.small,
+            mediumDrawer: MainDrawer.medium,
+            largeDrawer: MainDrawer.large,
+            body: const Center(child: CircularProgressIndicator()),
           );
         }
 
-        final hasFullData = snapshot.connectionState == ConnectionState.done;
-        return _MyAccountScreenInternal(hasFullData: hasFullData);
+        final currentUser = authProvider.isAdmin
+            ? AdminsProvider.of(context, listen: true)
+                .where((admin) => admin.id == currentId)
+                .firstOrNull
+            : TeachersProvider.of(context, listen: true)
+                .where((teacher) => teacher.id == currentId)
+                .firstOrNull;
+
+        return ResponsiveService.scaffoldOf(
+          context,
+          appBar: ResponsiveService.appBarOf(
+            context,
+            title: const Text('Mon compte'),
+          ),
+          smallDrawer: MainDrawer.small,
+          mediumDrawer: MainDrawer.medium,
+          largeDrawer: MainDrawer.large,
+          body: (currentUser == null
+              ? Center(
+                  child: Text(
+                      'Aucun·e utilisateur·trice trouvé·e, assurez-vous d\'être connecté·e.'))
+              : authProvider.isAdmin
+                  ? AdminProfileListTile(admin: currentUser as Admin)
+                  : TeacherProfileListTile(teacher: currentUser as Teacher)),
+        );
       },
-    );
-  }
-}
-
-class _MyAccountScreenInternal extends StatelessWidget {
-  const _MyAccountScreenInternal({required this.hasFullData});
-
-  final bool hasFullData;
-
-  @override
-  Widget build(BuildContext context) {
-    _logger.finer('Building MyAccountScreen');
-
-    final currentTeacher =
-        TeachersProvider.of(context, listen: true).currentTeacher;
-
-    return ResponsiveService.scaffoldOf(
-      context,
-      appBar: ResponsiveService.appBarOf(
-        context,
-        title: const Text('Mon compte'),
-      ),
-      smallDrawer: MainDrawer.small,
-      mediumDrawer: MainDrawer.medium,
-      largeDrawer: MainDrawer.large,
-      body: hasFullData
-          ? (currentTeacher == null
-              ? Center(child: Text('Aucun enseignant trouvé'))
-              : SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      TeacherProfileListTile(teacher: currentTeacher),
-                      SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.5),
-                    ],
-                  ),
-                ))
-          : Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor,
-              ),
-            ),
     );
   }
 }
