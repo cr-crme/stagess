@@ -1,9 +1,9 @@
-import 'dart:typed_data';
-
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:stagess_common/models/persons/student_visa.dart';
 import 'package:stagess_common/services/job_data_file_service.dart'
     as job_service;
@@ -14,22 +14,94 @@ final _logger = Logger('GenerateVisaPdf');
 
 const _bulletPointSpacing = pw.EdgeInsets.only(bottom: 8);
 
+class _VisaPdfContext {
+  static Future<_VisaPdfContext> create(PdfPageFormat format,
+      {required StudentVisa studentVisa}) async {
+    final frontPageTheme = await _buildPageTheme(format,
+        'packages/stagess_common_flutter/assets/visa_background_front.svg');
+    final leftPageTheme = await _buildPageTheme(format,
+        'packages/stagess_common_flutter/assets/visa_background_left.svg');
+    final rightPageTheme = await _buildPageTheme(format,
+        'packages/stagess_common_flutter/assets/visa_background_right.svg');
+
+    final titleFont = await PdfGoogleFonts.alegreyaSCBold();
+    final subTitleFont = await PdfGoogleFonts.alegreyaSCRegular();
+
+    return _VisaPdfContext(
+      studentVisa: studentVisa,
+      frontPageTheme: frontPageTheme,
+      leftPageTheme: leftPageTheme.copyWith(margin: pageMargin),
+      rightPageTheme: rightPageTheme.copyWith(margin: pageMargin),
+      titleFont: titleFont,
+      subTitleFont: subTitleFont,
+    );
+  }
+
+  _VisaPdfContext({
+    required this.studentVisa,
+    required this.frontPageTheme,
+    required this.leftPageTheme,
+    required this.rightPageTheme,
+    required this.titleFont,
+    required this.subTitleFont,
+  });
+
+  final StudentVisa studentVisa;
+  final pw.PageTheme frontPageTheme;
+  final pw.PageTheme leftPageTheme;
+  final pw.PageTheme rightPageTheme;
+
+  final pw.Font titleFont;
+  final PdfColor titleColor = PdfColors.white;
+  static const pw.EdgeInsets pageMargin = pw.EdgeInsets.only(
+      left: PdfPageFormat.mm * 15.5,
+      right: PdfPageFormat.mm * 16.5,
+      top: PdfPageFormat.mm * 20,
+      bottom: PdfPageFormat.mm * 20);
+  final (double, double) titleBoxSize =
+      (PdfPageFormat.mm * 114.5, PdfPageFormat.mm * 33.5);
+  final (double, double) mainBoxSize =
+      (PdfPageFormat.mm * 184, PdfPageFormat.mm * 205);
+
+  final pw.Font subTitleFont;
+  final PdfColor subTitleColor = PdfColor.fromInt(0xff0085a4);
+
+  final PdfColor bulletColor = PdfColor.fromInt(0xffb9ddb2);
+}
+
 Future<Uint8List> generateVisaPdf(BuildContext context, PdfPageFormat format,
     {required String studentId, required StudentVisa studentVisa}) async {
   _logger.info('Generating visa PDF for student: $studentId');
 
   final document = pw.Document();
+  final pdfContext =
+      await _VisaPdfContext.create(format, studentVisa: studentVisa);
 
-  document.addPage(_buildFirstPage(studentVisa));
-  document.addPage(_buildSecondPage(studentVisa));
-  document.addPage(_buildThirdPage(studentVisa));
-  document.addPage(_buildFourthPage(studentVisa));
+  document.addPage(_buildFirstPage(pdfContext));
+  document.addPage(_buildSecondPage(pdfContext));
+  document.addPage(_buildThirdPage(pdfContext));
+  document.addPage(_buildFourthPage(pdfContext));
 
   return document.save();
 }
 
-pw.Page _buildFirstPage(StudentVisa studentVisa) {
+Future<pw.PageTheme> _buildPageTheme(
+  PdfPageFormat format,
+  String backgroundAssetPath,
+) async {
+  final backgroundSvg = await rootBundle.loadString(backgroundAssetPath);
+  return pw.PageTheme(
+    pageFormat: format,
+    buildBackground: (context) => pw.FullPage(
+      ignoreMargins: true,
+      child: pw.SvgImage(svg: backgroundSvg),
+    ),
+  );
+}
+
+pw.Page _buildFirstPage(_VisaPdfContext pdfContext) {
   return pw.Page(
+    pageTheme: pdfContext.frontPageTheme,
     build: (pw.Context context) => pw.Center(
       child: pw.Text(
         'VISA Destination emploi',
@@ -38,127 +110,156 @@ pw.Page _buildFirstPage(StudentVisa studentVisa) {
   );
 }
 
-pw.Page _buildSecondPage(StudentVisa studentVisa) {
-  final experiences = (studentVisa.form.experiencesAndAptitudes.toList()
-        ..removeWhere((e) => e.isNotSelected)
-        ..sort((a, b) => a.index.compareTo(b.index)))
-      .map((e) => e.text);
+pw.Page _buildSecondPage(_VisaPdfContext pdfContext) {
+  final experiences =
+      (pdfContext.studentVisa.form.experiencesAndAptitudes.toList()
+            ..removeWhere((e) => e.isNotSelected)
+            ..sort((a, b) => a.index.compareTo(b.index)))
+          .map((e) => e.text);
 
-  final attestations = (studentVisa.form.attestationsAndMentions.toList()
-        ..removeWhere((a) => a.isNotSelected)
-        ..sort((a, b) => a.index.compareTo(b.index)))
-      .map((e) => e.text);
+  final attestations =
+      (pdfContext.studentVisa.form.attestationsAndMentions.toList()
+            ..removeWhere((a) => a.isNotSelected)
+            ..sort((a, b) => a.index.compareTo(b.index)))
+          .map((e) => e.text);
 
-  final sstTrainings = (studentVisa.form.sstTrainings.toList()
+  final sstTrainings = (pdfContext.studentVisa.form.sstTrainings.toList()
         ..removeWhere((s) => s.isHidden || s.isNotSelected)
         ..sort((a, b) => a.index.compareTo(b.index)))
       .map((e) => SstTraining.availableTrainings[e.trainingId]!)
       .toList();
 
   return pw.Page(
+    pageTheme: pdfContext.leftPageTheme,
     build: (pw.Context context) {
-      final pageHeight = context.page.pageFormat.height;
+      final pageHeight = pdfContext.mainBoxSize.$2;
 
       return pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          _Title('Expériences et aptitudes complémentaires'),
-          pw.SizedBox(height: 10),
-          _BorderBox(
-              title:
-                  'Expériences et aptitudes personnelles et scolaires complémentaires au profil d\'employabilité',
-              height: pageHeight * 0.30,
-              child: PdfTextBulletPoints(
-                elements: experiences,
-                spacing: _bulletPointSpacing,
-              )),
-          pw.SizedBox(height: 12),
-          _BorderBox(
-              title: 'Attestations et mentions',
-              height: pageHeight * 0.20,
-              child: PdfTextBulletPoints(
-                elements: attestations,
-                spacing: _bulletPointSpacing,
-              )),
-          pw.SizedBox(height: 12),
-          _BorderBox(
-              title: 'Formations relatives à la SST',
-              height: pageHeight * 0.20,
-              child: PdfTextBulletPoints(
-                elements: sstTrainings,
-                spacing: _bulletPointSpacing,
-              )),
+          _TitleBox(
+            pdfContext,
+            text: 'Expériences et aptitudes complémentaires',
+          ),
+          _MainBox(
+            pdfContext,
+            child: pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.start,
+              children: [
+                _SubtitledBox(pdfContext,
+                    title:
+                        'Expériences et aptitudes personnelles et scolaires complémentaires au profil d\'employabilité',
+                    height: pageHeight * 0.29,
+                    child: PdfTextBulletPoints(
+                      elements: experiences,
+                      spacing: _bulletPointSpacing,
+                      bulletColor: pdfContext.bulletColor,
+                    )),
+                pw.SizedBox(height: 12),
+                _SubtitledBox(pdfContext,
+                    title: 'Attestations et mentions',
+                    height: pageHeight * 0.19,
+                    child: PdfTextBulletPoints(
+                      elements: attestations,
+                      spacing: _bulletPointSpacing,
+                      bulletColor: pdfContext.bulletColor,
+                    )),
+                pw.SizedBox(height: 12),
+                _SubtitledBox(pdfContext,
+                    title: 'Formations relatives à la SST',
+                    height: pageHeight * 0.19,
+                    child: PdfTextBulletPoints(
+                      elements: sstTrainings,
+                      spacing: _bulletPointSpacing,
+                      bulletColor: pdfContext.bulletColor,
+                    )),
+              ],
+            ),
+          ),
         ],
       );
     },
   );
 }
 
-pw.Page _buildThirdPage(StudentVisa studentVisa) {
-  final forces = (studentVisa.form.forces.toList()
+pw.Page _buildThirdPage(_VisaPdfContext pdfContext) {
+  final forces = (pdfContext.studentVisa.form.forces.toList()
         ..removeWhere((f) => f.isNotSelected)
         ..sort((a, b) => a.index.compareTo(b.index)))
       .map((e) => Attitude.availableItems[e.attitudeId]!);
 
-  final challenges = (studentVisa.form.challenges.toList()
+  final challenges = (pdfContext.studentVisa.form.challenges.toList()
         ..removeWhere((d) => d.isNotSelected)
         ..sort((a, b) => a.index.compareTo(b.index)))
       .map((e) => Attitude.availableItems[e.attitudeId]!);
 
-  final successConditions = (studentVisa.form.successConditions.toList()
-        ..removeWhere((a) => a.isNotSelected)
-        ..sort((a, b) => a.index.compareTo(b.index)))
-      .map((e) => e.text);
+  final successConditions =
+      (pdfContext.studentVisa.form.successConditions.toList()
+            ..removeWhere((a) => a.isNotSelected)
+            ..sort((a, b) => a.index.compareTo(b.index)))
+          .map((e) => e.text);
 
   return pw.Page(
+    pageTheme: pdfContext.rightPageTheme,
     build: (pw.Context context) {
-      final pageHeight = context.page.pageFormat.height;
+      final pageHeight = pdfContext.mainBoxSize.$2;
 
       return pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          _Title('Évaluation du rendement en milieu de stage'),
-          _Subtitle(
-              'Évaluation effectuée en partenariat entre l\'enseignant, le superviseur en milieu de stage et l\'élève'),
-          pw.SizedBox(height: 36),
-          _BorderBox(
-              title: 'Forces',
-              height: pageHeight * 0.15,
-              child: PdfTextBulletPoints(
-                elements: forces,
-                spacing: _bulletPointSpacing,
-              )),
-          pw.SizedBox(height: 24),
-          _BorderBox(
-              title: 'Défis à relever',
-              height: pageHeight * 0.08,
-              child: PdfTextBulletPoints(
-                elements: challenges,
-                spacing: _bulletPointSpacing,
-              )),
-          pw.SizedBox(height: 24),
-          _BorderBox(
-              title: 'Conditions de succès',
-              height: pageHeight * 0.08,
-              child: PdfTextBulletPoints(
-                elements: successConditions,
-                spacing: _bulletPointSpacing,
-              )),
+          pw.Align(
+            alignment: pw.Alignment.centerRight,
+            child: _TitleBox(pdfContext,
+                text: 'Évaluation du rendement en milieu de stage'),
+          ),
+          _MainBox(
+            pdfContext,
+            child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  _SubtitledBox(pdfContext,
+                      title: 'Forces',
+                      height: pageHeight * 0.15,
+                      child: PdfTextBulletPoints(
+                        elements: forces,
+                        spacing: _bulletPointSpacing,
+                        bulletColor: pdfContext.bulletColor,
+                      )),
+                  pw.SizedBox(height: 24),
+                  _SubtitledBox(pdfContext,
+                      title: 'Défis à relever',
+                      height: pageHeight * 0.08,
+                      child: PdfTextBulletPoints(
+                        elements: challenges,
+                        spacing: _bulletPointSpacing,
+                        bulletColor: pdfContext.bulletColor,
+                      )),
+                  pw.SizedBox(height: 24),
+                  _SubtitledBox(pdfContext,
+                      title: 'Conditions de succès',
+                      height: pageHeight * 0.08,
+                      child: PdfTextBulletPoints(
+                        elements: successConditions,
+                        spacing: _bulletPointSpacing,
+                        bulletColor: pdfContext.bulletColor,
+                      )),
+                ]),
+          )
         ],
       );
     },
   );
 }
 
-pw.Page _buildFourthPage(StudentVisa studentVisa) {
-  final skills = (studentVisa.form.skills.toList()
+pw.Page _buildFourthPage(_VisaPdfContext pdfContext) {
+  final skills = (pdfContext.studentVisa.form.skills.toList()
         ..removeWhere((e) => e.isNotSelected)
         ..sort((a, b) => a.index.compareTo(b.index)))
       .map((e) =>
           job_service.ActivitySectorsService.skillOrNull(e.skillId)?.name ??
           'Compétence non trouvée');
 
-  final certificates = (studentVisa.form.certificates.toList()
+  final certificates = (pdfContext.studentVisa.form.certificates.toList()
         ..removeWhere((c) => c.isNotSelected)
         ..sort((a, b) => (a.year ?? -1).compareTo(b.year ?? -1)))
       .reversed
@@ -174,145 +275,177 @@ pw.Page _buildFourthPage(StudentVisa studentVisa) {
     return '${e.year} - $certificate';
   });
 
-  final references = (studentVisa.form.references.toList()
+  final references = (pdfContext.studentVisa.form.references.toList()
     ..removeWhere((r) => r.isNotSelected)
     ..sort((a, b) => a.index.compareTo(b.index)));
 
   return pw.Page(
+    pageTheme: pdfContext.leftPageTheme,
     build: (pw.Context context) {
-      final pageHeight = context.page.pageFormat.height;
+      final pageHeight = pdfContext.mainBoxSize.$2;
 
       return pw.Column(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          _Title('Profil d\'employabilité'),
-          pw.SizedBox(height: 10),
-          _BorderBox(
-            title:
-                'Compétences spécifiques intégrées liées à des métiers semi-spécialisés',
-            height: pageHeight * 0.20,
-            child: PdfTextBulletPoints(
-              elements: skills,
-              spacing: _bulletPointSpacing,
-            ),
-          ),
-          pw.SizedBox(height: 12),
-          _BorderBox(
-            title: 'Certificats',
-            height: pageHeight * 0.20,
-            child: PdfTextBulletPoints(
-              elements: certificates,
-              spacing: _bulletPointSpacing,
-            ),
-          ),
-          pw.SizedBox(height: 12),
-          _BorderBox(
-            title: 'Références',
-            height: pageHeight * 0.20,
-            child: PdfBulletPoints(
-              spacing: _bulletPointSpacing,
-              children: references.map((e) {
-                final reference = e;
-                return pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.RichText(
-                      text: pw.TextSpan(children: [
-                        if (reference.referee.isEmpty &&
-                            reference.enterprise.isEmpty &&
-                            reference.phoneNumber.toString().isEmpty &&
-                            reference.email.isEmpty)
-                          pw.TextSpan(
-                              text: 'Aucune information renseignée',
-                              style:
-                                  pw.TextStyle(fontStyle: pw.FontStyle.italic)),
-                        if (reference.referee.isNotEmpty) ...[
-                          pw.TextSpan(
-                            text: reference.referee,
-                            style: pw.TextStyle(fontStyle: pw.FontStyle.italic),
-                          ),
-                        ],
-                        if (reference.enterprise.isNotEmpty) ...[
-                          if (reference.referee.isNotEmpty)
-                            pw.TextSpan(text: ', '),
-                          pw.TextSpan(
-                            text: reference.enterprise,
-                            style: pw.TextStyle(
-                                fontStyle: reference.referee.isNotEmpty
-                                    ? pw.FontStyle.normal
-                                    : pw.FontStyle.italic),
-                          ),
-                        ],
-                        if (reference.phoneNumber.toString().isNotEmpty) ...[
-                          if (reference.referee.isNotEmpty ||
-                              reference.enterprise.isNotEmpty)
-                            pw.TextSpan(text: ', '),
-                          pw.TextSpan(text: reference.phoneNumber.toString()),
-                        ],
-                        if (reference.email.isNotEmpty) ...[
-                          if (reference.referee.isNotEmpty ||
-                              reference.enterprise.isNotEmpty ||
-                              reference.phoneNumber.toString().isNotEmpty)
-                            pw.TextSpan(text: ', '),
-                          pw.TextSpan(text: reference.email),
-                        ],
-                      ]),
+          _TitleBox(pdfContext, text: 'Profil d\'employabilité'),
+          _MainBox(
+            pdfContext,
+            child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  _SubtitledBox(
+                    pdfContext,
+                    title:
+                        'Compétences spécifiques intégrées liées à des métiers semi-spécialisés',
+                    height: pageHeight * 0.20,
+                    child: PdfTextBulletPoints(
+                      elements: skills,
+                      spacing: _bulletPointSpacing,
+                      bulletColor: pdfContext.bulletColor,
                     ),
-                    if (reference.supplementaryInfo.isNotEmpty)
-                      pw.Padding(
-                        padding: const pw.EdgeInsets.only(top: 4.0),
-                        child: pw.Text(reference.supplementaryInfo,
-                            style:
-                                pw.TextStyle(fontStyle: pw.FontStyle.italic)),
-                      ),
-                  ],
-                );
-              }),
-            ),
-          ),
+                  ),
+                  pw.SizedBox(height: 12),
+                  _SubtitledBox(
+                    pdfContext,
+                    title: 'Certificats',
+                    height: pageHeight * 0.20,
+                    child: PdfTextBulletPoints(
+                      elements: certificates,
+                      spacing: _bulletPointSpacing,
+                      bulletColor: pdfContext.bulletColor,
+                    ),
+                  ),
+                  pw.SizedBox(height: 12),
+                  _SubtitledBox(
+                    pdfContext,
+                    title: 'Références',
+                    height: pageHeight * 0.20,
+                    child: PdfBulletPoints(
+                      spacing: _bulletPointSpacing,
+                      children: references.map((e) {
+                        final reference = e;
+                        return pw.Column(
+                          crossAxisAlignment: pw.CrossAxisAlignment.start,
+                          children: [
+                            pw.RichText(
+                              text: pw.TextSpan(children: [
+                                if (reference.referee.isEmpty &&
+                                    reference.enterprise.isEmpty &&
+                                    reference.phoneNumber.toString().isEmpty &&
+                                    reference.email.isEmpty)
+                                  pw.TextSpan(
+                                      text: 'Aucune information renseignée',
+                                      style: pw.TextStyle(
+                                          fontStyle: pw.FontStyle.italic)),
+                                if (reference.referee.isNotEmpty) ...[
+                                  pw.TextSpan(
+                                    text: reference.referee,
+                                    style: pw.TextStyle(
+                                        fontStyle: pw.FontStyle.italic),
+                                  ),
+                                ],
+                                if (reference.enterprise.isNotEmpty) ...[
+                                  if (reference.referee.isNotEmpty)
+                                    pw.TextSpan(text: ', '),
+                                  pw.TextSpan(
+                                    text: reference.enterprise,
+                                    style: pw.TextStyle(
+                                        fontStyle: reference.referee.isNotEmpty
+                                            ? pw.FontStyle.normal
+                                            : pw.FontStyle.italic),
+                                  ),
+                                ],
+                                if (reference.phoneNumber
+                                    .toString()
+                                    .isNotEmpty) ...[
+                                  if (reference.referee.isNotEmpty ||
+                                      reference.enterprise.isNotEmpty)
+                                    pw.TextSpan(text: ', '),
+                                  pw.TextSpan(
+                                      text: reference.phoneNumber.toString()),
+                                ],
+                                if (reference.email.isNotEmpty) ...[
+                                  if (reference.referee.isNotEmpty ||
+                                      reference.enterprise.isNotEmpty ||
+                                      reference.phoneNumber
+                                          .toString()
+                                          .isNotEmpty)
+                                    pw.TextSpan(text: ', '),
+                                  pw.TextSpan(text: reference.email),
+                                ],
+                              ]),
+                            ),
+                            if (reference.supplementaryInfo.isNotEmpty)
+                              pw.Padding(
+                                padding: const pw.EdgeInsets.only(top: 4.0),
+                                child: pw.Text(reference.supplementaryInfo,
+                                    style: pw.TextStyle(
+                                        fontStyle: pw.FontStyle.italic)),
+                              ),
+                          ],
+                        );
+                      }),
+                    ),
+                  ),
+                ]),
+          )
         ],
       );
     },
   );
 }
 
-class _Title extends pw.StatelessWidget {
-  _Title(this.text);
+class _TitleBox extends pw.StatelessWidget {
+  _TitleBox(this.pdfContext, {required this.text});
 
   final String text;
+  final _VisaPdfContext pdfContext;
 
   @override
   pw.Widget build(pw.Context context) {
-    return pw.Text(
-      text,
-      style: pw.TextStyle(
-        fontSize: 16,
-        fontWeight: pw.FontWeight.bold,
+    return pw.SizedBox(
+      width: pdfContext.titleBoxSize.$1,
+      height: pdfContext.titleBoxSize.$2,
+      child: pw.Padding(
+        padding: const pw.EdgeInsets.all(24.0),
+        child: pw.Center(
+          child: pw.Text(
+            text,
+            style: pw.TextStyle(
+                font: pdfContext.titleFont,
+                fontSize: 16,
+                color: pdfContext.titleColor),
+            textAlign: pw.TextAlign.center,
+          ),
+        ),
       ),
     );
   }
 }
 
-class _Subtitle extends pw.StatelessWidget {
-  _Subtitle(this.text);
+class _MainBox extends pw.StatelessWidget {
+  _MainBox(this.pdfContext, {required this.child});
 
-  final String text;
+  final _VisaPdfContext pdfContext;
+  final pw.Widget child;
 
   @override
   pw.Widget build(pw.Context context) {
-    return pw.Text(
-      text,
-      style: pw.TextStyle(
-        fontSize: 12,
-        fontWeight: pw.FontWeight.bold,
+    return pw.SizedBox(
+      child: pw.Padding(
+        padding:
+            const pw.EdgeInsets.symmetric(horizontal: 18.0, vertical: 12.0),
+        child: pw.Center(child: child),
       ),
     );
   }
 }
 
-class _BorderBox extends pw.StatelessWidget {
-  _BorderBox({this.title, this.height, required this.child});
+class _SubtitledBox extends pw.StatelessWidget {
+  _SubtitledBox(this.pdfContext,
+      {this.title, this.height, required this.child});
 
+  final _VisaPdfContext pdfContext;
   final String? title;
   final double? height;
   final pw.Widget child;
@@ -323,19 +456,24 @@ class _BorderBox extends pw.StatelessWidget {
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
         if (title != null)
-          pw.Padding(
-              padding: const pw.EdgeInsets.only(bottom: 8),
-              child: _Subtitle(title!)),
-        pw.Container(
-          width: double.infinity,
-          height: height,
-          padding: const pw.EdgeInsets.all(8),
-          decoration: pw.BoxDecoration(
-            border: pw.Border.all(color: PdfColors.grey),
-            borderRadius: pw.BorderRadius.circular(4),
+          pw.Column(
+            mainAxisSize: pw.MainAxisSize.min,
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                title!,
+                style: pw.TextStyle(
+                  font: pdfContext.subTitleFont,
+                  fontSize: 12,
+                  fontWeight: pw.FontWeight.bold,
+                  color: pdfContext.subTitleColor,
+                ),
+              ),
+              pw.Divider(color: pdfContext.bulletColor),
+              pw.SizedBox(height: 4),
+            ],
           ),
-          child: child,
-        )
+        pw.SizedBox(width: double.infinity, height: height, child: child)
       ],
     );
   }

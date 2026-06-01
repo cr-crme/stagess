@@ -53,3 +53,6 @@ flutter:
   assets:
     - assets/risks-data.json
     - assets/questions.json
+    - assets/visa_background_front.svg
+    - assets/visa_background_left.svg
+    - assets/visa_background_right.svg

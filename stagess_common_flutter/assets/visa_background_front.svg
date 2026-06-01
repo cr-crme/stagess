@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="8.5in"
+   height="11in"
+   viewBox="0 0 215.9 279.4"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   sodipodi:docname="visa_background_front.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:document-units="mm"
+     inkscape:zoom="0.5007929"
+     inkscape:cx="-122.80526"
+     inkscape:cy="518.17827"
+     inkscape:window-width="1920"
+     inkscape:window-height="991"
+     inkscape:window-x="-9"
+     inkscape:window-y="626"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs1">
+    <inkscape:path-effect
+       effect="powermask"
+       id="path-effect7"
+       is_visible="true"
+       lpeversion="1"
+       uri="#mask-powermask-path-effect7"
+       invert="false"
+       hide_mask="false"
+       background="true"
+       background_color="#ffffffff" />
+    <inkscape:path-effect
+       effect="powermask"
+       id="path-effect5"
+       is_visible="true"
+       lpeversion="1"
+       uri="#mask-powermask-path-effect5"
+       invert="false"
+       hide_mask="false"
+       background="true"
+       background_color="#ffffffff" />
+    <inkscape:path-effect
+       effect="powermask"
+       id="path-effect4"
+       is_visible="true"
+       lpeversion="1"
+       uri="#mask-powermask-path-effect4"
+       invert="false"
+       hide_mask="false"
+       background="true"
+       background_color="#ffffffff" />
+    <mask
+       maskUnits="userSpaceOnUse"
+       id="mask-powermask-path-effect5">
+      <rect
+         style="fill:#000002;fill-opacity:1;stroke:none;stroke-width:0.0749975"
+         id="rect5"
+         width="123.06648"
+         height="39.382862"
+         x="6.8167553"
+         y="14.097243" />
+    </mask>
+    <mask
+       maskUnits="userSpaceOnUse"
+       id="mask-powermask-path-effect5-4">
+      <path
+         id="mask-powermask-path-effect5_box"
+         style="fill:#ffffff;fill-opacity:1"
+         d="M 14.488752,19.154146 H 200.66408 V 259.49867 H 14.488752 Z" />
+      <rect
+         style="fill:#000002;fill-opacity:1;stroke:none;stroke-width:0.0749975"
+         id="rect5-1"
+         width="123.06648"
+         height="39.382862"
+         x="6.8167553"
+         y="14.097243"
+         d="M 6.8167553,14.097243 H 129.88324 V 53.480105 H 6.8167553 Z" />
+    </mask>
+    <inkscape:path-effect
+       effect="powermask"
+       id="path-effect5-7"
+       is_visible="true"
+       lpeversion="1"
+       uri="#mask-powermask-path-effect5-7"
+       invert="false"
+       hide_mask="false"
+       background="true"
+       background_color="#ffffffff" />
+    <filter
+       id="mask-powermask-path-effect5_inverse"
+       inkscape:label="filtermask-powermask-path-effect5"
+       style="color-interpolation-filters:sRGB"
+       height="100"
+       width="100"
+       x="-50"
+       y="-50">
+      <feColorMatrix
+         id="mask-powermask-path-effect5_primitive1"
+         values="1"
+         type="saturate"
+         result="fbSourceGraphic" />
+      <feColorMatrix
+         id="mask-powermask-path-effect5_primitive2"
+         values="-1 0 0 0 1 0 -1 0 0 1 0 0 -1 0 1 0 0 0 1 0 "
+         in="fbSourceGraphic" />
+    </filter>
+  </defs>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(55.980406,3.1475207)">
+    <rect
+       style="display:inline;fill:#0e324d;fill-opacity:1;stroke:#000000;stroke-width:0.264583"
+       id="rect2"
+       width="215.89999"
+       height="279.39999"
+       x="-55.848114"
+       y="-3.0152292" />
+    <rect
+       style="display:inline;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.225705"
+       id="rect1"
+       width="184.17532"
+       height="238.34453"
+       x="15.488752"
+       y="20.154146"
+       mask="none"
+       sodipodi:type="rect"
+       inkscape:label="rect1"
+       transform="translate(-55.474528,-2.6416442)" />
+  </g>
+</svg>

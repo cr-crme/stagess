@@ -33,6 +33,7 @@ void showPdfDialog(
                     canChangeOrientation: false,
                     canChangePageFormat: false,
                     canDebug: false,
+                    initialPageFormat: PdfPageFormat.letter,
                     build: (format) => pdfGeneratorCallback(context, format),
                   ),
                 ),
