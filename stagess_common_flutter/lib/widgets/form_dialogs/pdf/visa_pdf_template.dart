@@ -13,6 +13,13 @@ import 'package:stagess_common_flutter/widgets/pdf_widgets/pdf_bullet_points.dar
 final _logger = Logger('GenerateVisaPdf');
 
 const _bulletPointSpacing = pw.EdgeInsets.only(bottom: 8);
+final _bullets = pw.Container(
+  margin: const pw.EdgeInsets.only(top: 5, right: 6),
+  width: 4,
+  height: 4,
+  decoration: pw.BoxDecoration(
+      color: _VisaPdfContext.bulletColor, shape: pw.BoxShape.circle),
+);
 
 class _VisaPdfContext {
   static Future<_VisaPdfContext> create(PdfPageFormat format,
@@ -64,9 +71,9 @@ class _VisaPdfContext {
       (PdfPageFormat.mm * 184, PdfPageFormat.mm * 205);
 
   final pw.Font subTitleFont;
-  final PdfColor subTitleColor = PdfColor.fromInt(0xff0085a4);
+  static const PdfColor subTitleColor = PdfColor.fromInt(0xff0085a4);
 
-  final PdfColor bulletColor = PdfColor.fromInt(0xffb9ddb2);
+  static const PdfColor bulletColor = PdfColor.fromInt(0xffb9ddb2);
 }
 
 Future<Uint8List> generateVisaPdf(BuildContext context, PdfPageFormat format,
@@ -153,7 +160,7 @@ pw.Page _buildSecondPage(_VisaPdfContext pdfContext) {
                     child: PdfTextBulletPoints(
                       elements: experiences,
                       spacing: _bulletPointSpacing,
-                      bulletColor: pdfContext.bulletColor,
+                      bullet: _bullets,
                     )),
                 pw.SizedBox(height: 12),
                 _SubtitledBox(pdfContext,
@@ -162,7 +169,7 @@ pw.Page _buildSecondPage(_VisaPdfContext pdfContext) {
                     child: PdfTextBulletPoints(
                       elements: attestations,
                       spacing: _bulletPointSpacing,
-                      bulletColor: pdfContext.bulletColor,
+                      bullet: _bullets,
                     )),
                 pw.SizedBox(height: 12),
                 _SubtitledBox(pdfContext,
@@ -171,7 +178,7 @@ pw.Page _buildSecondPage(_VisaPdfContext pdfContext) {
                     child: PdfTextBulletPoints(
                       elements: sstTrainings,
                       spacing: _bulletPointSpacing,
-                      bulletColor: pdfContext.bulletColor,
+                      bullet: _bullets,
                     )),
               ],
             ),
@@ -223,7 +230,7 @@ pw.Page _buildThirdPage(_VisaPdfContext pdfContext) {
                       child: PdfTextBulletPoints(
                         elements: forces,
                         spacing: _bulletPointSpacing,
-                        bulletColor: pdfContext.bulletColor,
+                        bullet: _bullets,
                       )),
                   pw.SizedBox(height: 24),
                   _SubtitledBox(pdfContext,
@@ -232,7 +239,7 @@ pw.Page _buildThirdPage(_VisaPdfContext pdfContext) {
                       child: PdfTextBulletPoints(
                         elements: challenges,
                         spacing: _bulletPointSpacing,
-                        bulletColor: pdfContext.bulletColor,
+                        bullet: _bullets,
                       )),
                   pw.SizedBox(height: 24),
                   _SubtitledBox(pdfContext,
@@ -241,7 +248,7 @@ pw.Page _buildThirdPage(_VisaPdfContext pdfContext) {
                       child: PdfTextBulletPoints(
                         elements: successConditions,
                         spacing: _bulletPointSpacing,
-                        bulletColor: pdfContext.bulletColor,
+                        bullet: _bullets,
                       )),
                 ]),
           )
@@ -301,7 +308,7 @@ pw.Page _buildFourthPage(_VisaPdfContext pdfContext) {
                     child: PdfTextBulletPoints(
                       elements: skills,
                       spacing: _bulletPointSpacing,
-                      bulletColor: pdfContext.bulletColor,
+                      bullet: _bullets,
                     ),
                   ),
                   pw.SizedBox(height: 12),
@@ -312,7 +319,7 @@ pw.Page _buildFourthPage(_VisaPdfContext pdfContext) {
                     child: PdfTextBulletPoints(
                       elements: certificates,
                       spacing: _bulletPointSpacing,
-                      bulletColor: pdfContext.bulletColor,
+                      bullet: _bullets,
                     ),
                   ),
                   pw.SizedBox(height: 12),
@@ -466,10 +473,10 @@ class _SubtitledBox extends pw.StatelessWidget {
                   font: pdfContext.subTitleFont,
                   fontSize: 12,
                   fontWeight: pw.FontWeight.bold,
-                  color: pdfContext.subTitleColor,
+                  color: _VisaPdfContext.subTitleColor,
                 ),
               ),
-              pw.Divider(color: pdfContext.bulletColor),
+              pw.Divider(color: _VisaPdfContext.bulletColor),
               pw.SizedBox(height: 4),
             ],
           ),

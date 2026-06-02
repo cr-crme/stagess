@@ -1,24 +1,18 @@
-import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 
 class PdfTextBulletPoints extends pw.StatelessWidget {
-  PdfTextBulletPoints(
-      {required this.elements,
-      this.spacing,
-      this.bulletColor = PdfColors.black});
+  PdfTextBulletPoints({required this.elements, this.spacing, this.bullet});
 
   final Iterable<String> elements;
   final pw.EdgeInsets? spacing;
-  final PdfColor bulletColor;
+  final pw.Widget? bullet;
 
   @override
   pw.Widget build(pw.Context context) {
     return pw.Column(
       children: elements
           .map((element) => PdfBulletPoint(
-              child: pw.Text(element),
-              spacing: spacing,
-              bulletColor: bulletColor))
+              child: pw.Text(element), spacing: spacing, bullet: bullet))
           .toList(),
     );
   }
@@ -45,13 +39,13 @@ class PdfBulletPoint extends pw.StatelessWidget {
     required this.child,
     this.textStyle,
     this.spacing,
-    this.bulletColor = PdfColors.black,
+    this.bullet,
   });
 
   final pw.Widget child;
   final pw.TextStyle? textStyle;
   final pw.EdgeInsets? spacing;
-  final PdfColor bulletColor;
+  final pw.Widget? bullet;
 
   @override
   pw.Widget build(pw.Context context) {
@@ -59,13 +53,7 @@ class PdfBulletPoint extends pw.StatelessWidget {
       child: pw.Row(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Container(
-            margin: const pw.EdgeInsets.only(top: 5, right: 6),
-            width: 4,
-            height: 4,
-            decoration:
-                pw.BoxDecoration(color: bulletColor, shape: pw.BoxShape.circle),
-          ),
+          if (bullet == null) pw.Text('\u0097', style: textStyle) else bullet!,
           pw.SizedBox(width: 6.0),
           pw.Expanded(child: child),
         ],
