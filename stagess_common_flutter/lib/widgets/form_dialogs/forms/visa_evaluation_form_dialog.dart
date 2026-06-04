@@ -828,6 +828,7 @@ class _EmployabilityProfileSection extends StatelessWidget {
               final job = job_service.ActivitySectorsService.allSpecializations
                   .firstWhereOrNull((e) => e.id == item.specializationId);
 
+              // TODO this block appear twice when two jobs?
               final name = switch (item.certificateType) {
                 CertificateType.none => 'Aucun certificat',
                 CertificateType.fpt =>
