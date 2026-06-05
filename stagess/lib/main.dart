@@ -20,6 +20,9 @@ import 'package:stagess_common_flutter/screens/wrong_version_screen.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
 import 'package:stagess_common_flutter/widgets/single_instance_manager/single_instance_manager.dart';
 
+// TODO: Change rate limit to 1000
+// TODO: Stop flashing when two browsers connect
+
 // coverage:ignore-start
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
