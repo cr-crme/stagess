@@ -30,7 +30,7 @@ class SchoolAdminsCard extends StatelessWidget {
         Padding(
           padding: const EdgeInsets.only(left: 12.0, top: 8, bottom: 8),
           child: Text(
-            school?.name ?? 'Centre de service scolaire',
+            school?.name ?? 'Centre de services scolaire',
             style: Theme.of(context).textTheme.titleMedium,
           ),
         ),

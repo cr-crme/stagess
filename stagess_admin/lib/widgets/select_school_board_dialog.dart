@@ -22,7 +22,7 @@ Future<SchoolBoard?> showSelectSchoolBoardDialog(BuildContext context) async {
       showSnackBar(
         context,
         message:
-            'Aucun centre de service scolaire n\'est associé à votre compte.',
+            'Aucun Centre de services scolaire n\'est associé à votre compte.',
       );
       return null;
     }
@@ -32,7 +32,7 @@ Future<SchoolBoard?> showSelectSchoolBoardDialog(BuildContext context) async {
     context,
   ).firstWhereOrNull((e) => e.id == schoolBoardId);
   if (schoolBoard == null) {
-    showSnackBar(context, message: 'Centre de service scolaire introuvable.');
+    showSnackBar(context, message: 'Centre de services scolaire introuvable.');
     return null;
   }
 
@@ -75,13 +75,13 @@ class _SelectSchoolBoardDialogState extends State<SelectSchoolBoardDialog> {
           name: 'School board selection',
           orientation: OptionsOrientation.vertical,
           decoration: InputDecoration(
-            labelText: 'Sélectionner un centre de service scolaire',
+            labelText: 'Sélectionner un Centre de services scolaire',
           ),
           onChanged: (value) =>
               setState(() => _selectedSchoolBoardId = value ?? '-1'),
           validator: (_) {
             return _selectedSchoolBoardId == ''
-                ? 'Sélectionner un centre de service scolaire'
+                ? 'Sélectionner un Centre de services scolaire'
                 : null;
           },
           options: schoolBoards

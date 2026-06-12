@@ -22,6 +22,9 @@ import 'package:stagess_common_flutter/widgets/single_instance_manager/single_in
 
 // TODO: Change rate limit to 1000
 // TODO: Stop flashing when two browsers connect
+// TODO: Do not allow to update jobs of an existing interships
+// TODO: Add signatories of the internships
+// TODO: Add capability for swapping day names to day numbers
 
 // coverage:ignore-start
 void main() async {

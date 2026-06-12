@@ -119,7 +119,7 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
         showSnackBar(
           context,
           message:
-              'Impossible de supprimer le centre de service scolaire, car il est en cours de modification par un autre utilisateur.',
+              'Impossible de supprimer le Centre de services scolaire, car il est en cours de modification par un autre utilisateur.',
         );
       }
       setState(() {
@@ -149,8 +149,8 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
       showSnackBar(
         context,
         message: isSuccess
-            ? 'Centre de service scolaire supprimé avec succès'
-            : 'Échec de la suppression du centre de service scolaire',
+            ? 'Centre de services scolaire supprimé avec succès'
+            : 'Échec de la suppression du Centre de services scolaire',
       );
     }
     await schoolBoards.releaseLockForItem(widget.schoolBoard);
@@ -186,8 +186,8 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
           showSnackBar(
             context,
             message: isSuccess
-                ? 'Centre de service scolaire modifié avec succès'
-                : 'Échec de la modification du centre de service scolaire',
+                ? 'Centre de services scolaire modifié avec succès'
+                : 'Échec de la modification du Centre de services scolaire',
           );
         }
       }
@@ -199,7 +199,7 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
           showSnackBar(
             context,
             message:
-                'Impossible de modifier le centre de service scolaire, car il est en cours de modification par un autre utilisateur.',
+                'Impossible de modifier le Centre de services scolaire, car il est en cours de modification par un autre utilisateur.',
           );
         }
         setState(() {
@@ -370,11 +370,11 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
                 TextFormField(
                   controller: _nameController,
                   validator: (value) => value?.isEmpty == true
-                      ? 'Le nom du centre de service scolaire est obligatoire'
+                      ? 'Le nom du Centre de services scolaire est obligatoire'
                       : null,
                   maxLength: 200,
                   decoration: const InputDecoration(
-                    labelText: 'Nom du centre de service scolaire',
+                    labelText: 'Nom du Centre de services scolaire',
                   ),
                 ),
               ],
@@ -389,7 +389,7 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Logo du centre de service scolaire'),
+          Text('Logo du Centre de services scolaire'),
           _logoController.isEmpty
               ? Center(
                   child: Padding(

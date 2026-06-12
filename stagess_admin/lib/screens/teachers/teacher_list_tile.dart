@@ -410,7 +410,7 @@ class TeacherListTileState extends State<TeacherListTile> {
 
     if (schoolBoard == null) {
       return Text(
-        'Centre de service scolaire introuvable',
+        'Centre de services scolaire introuvable',
         style: TextStyle(color: Colors.red),
       );
     }

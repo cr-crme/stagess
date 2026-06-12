@@ -407,7 +407,7 @@ class AdminListTileState extends State<AdminListTile> {
                 .map(
                   (e) => FormBuilderFieldOption(
                     value: e?.id ?? '',
-                    child: Text(e?.name ?? 'Centre de service scolaire'),
+                    child: Text(e?.name ?? 'Centre de services scolaire'),
                   ),
                 )
                 .toList(),
