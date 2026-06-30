@@ -30,7 +30,6 @@ class InternshipsProvider extends BackendListProvided<Internship> {
   FetchableFields get referenceFetchableFields => Internship.fetchableFields;
 
   void initializeAuth(AuthProvider auth) {
-    initializeFetchingData(authProvider: auth);
     auth.addListener(() => initializeFetchingData(authProvider: auth));
   }
 

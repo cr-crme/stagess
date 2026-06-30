@@ -8,6 +8,8 @@ import 'package:stagess_common/models/generic/access_level.dart';
 final _logger = Logger('AuthProvider');
 
 class AuthProvider extends ChangeNotifier {
+  bool _isDisposed = false;
+
   AuthProvider({
     bool mockMe = false,
     bool automaticallySignInIfMocked = true,
@@ -131,4 +133,17 @@ class AuthProvider extends ChangeNotifier {
   }
 
   bool get isFullySignedIn => isAuthenticatorSignedIn && isBackendConnected;
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (!_isDisposed) {
+      super.notifyListeners();
+    }
+  }
 }

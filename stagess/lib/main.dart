@@ -46,10 +46,11 @@ void main() async {
 
   // Say hello
   debugPrint('Bienvenue à Stagess, version ${CommunicationProtocol.version}!');
-  if (!isBackendCompatible) {
-    debugPrint(
-        'Attention, cette version est incompatible avec celle du serveur. '
-        'Veuillez rafraichir la page pour mettre à jour votre application.');
+  if (isBackendCompatible != true) {
+    debugPrint(isBackendCompatible == null
+        ? 'Impossible de vérifier la compatibilité avec le serveur. Assurez-vous d\'être connecté à Internet.'
+        : 'Attention, cette version est incompatible avec celle du serveur. '
+            'Veuillez rafraichir la page pour mettre à jour votre application.');
   }
   debugPrint(
     'Nous nous connectons à la base de données ${useDevDb ? 'de développement' : 'de production'} '
@@ -71,7 +72,7 @@ void main() async {
       supportedLocales: const [Locale('fr', 'CA')],
     ));
     return;
-  } else if (!isBackendCompatible) {
+  } else if (isBackendCompatible != true) {
     runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
       onGenerateTitle: (context) => 'Version incorrecte de Stagess',

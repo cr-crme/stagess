@@ -10,11 +10,13 @@ import 'package:stagess_common/services/backend_helpers.dart';
 import 'package:stagess_common_flutter/helpers/program_helpers.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
+import 'package:stagess_common_flutter/providers/boot_loader_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/screens/connection_error_screen.dart';
 import 'package:stagess_common_flutter/screens/in_maintenance_screen.dart';
 import 'package:stagess_common_flutter/screens/wrong_version_screen.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
@@ -43,7 +45,10 @@ void main() async {
   // Say hello
   debugPrint(
       'Bienvenue à l\'administration de Stagess, version ${CommunicationProtocol.version}!');
-  if (!isBackendCompatible) {
+  if (isBackendCompatible == null) {
+    debugPrint(
+        'Impossible de vérifier la compatibilité avec le serveur. Assurez-vous d\'être connecté à Internet.');
+  } else if (!isBackendCompatible) {
     debugPrint(
         'Attention, cette version est incompatible avec celle du serveur. '
         'Veuillez rafraichir la page pour mettre à jour votre application.');
@@ -54,26 +59,22 @@ void main() async {
     'en utilisant une connexion ${BackendHelpers.useSsl ? '' : 'non-'}sécurisée',
   );
 
-  if (inMaintenanceMode) {
+  if (inMaintenanceMode ||
+      isBackendCompatible == null ||
+      !isBackendCompatible) {
     runApp(MaterialApp(
       debugShowCheckedModeBanner: false,
-      onGenerateTitle: (context) => 'Stagess en maintenance',
+      onGenerateTitle: (context) => inMaintenanceMode
+          ? 'Stagess en maintenance'
+          : (isBackendCompatible == null
+              ? 'Impossible de se connecter au serveur'
+              : 'Version incorrecte de Stagess'),
       theme: crcrmeMaterialTheme,
-      home: const InMaintenanceScreen(),
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [Locale('fr', 'CA')],
-    ));
-    return;
-  } else if (!isBackendCompatible) {
-    runApp(MaterialApp(
-      debugShowCheckedModeBanner: false,
-      onGenerateTitle: (context) => 'Version incorrecte de Stagess',
-      theme: crcrmeMaterialTheme,
-      home: const WrongVersionScreen(),
+      home: inMaintenanceMode
+          ? const InMaintenanceScreen()
+          : (isBackendCompatible == null
+              ? const ConnectionErrorScreen()
+              : const WrongVersionScreen()),
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
@@ -106,62 +107,74 @@ class StagessAdministrationApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) =>
-              AuthProvider(mockMe: useMockers, requiredAdminAccess: true),
-        ),
-        ChangeNotifierProxyProvider<AuthProvider, SchoolBoardsProvider>(
-          create: (context) =>
-              SchoolBoardsProvider(uri: backendUri, mockMe: useMockers),
-          update: (context, auth, previous) => previous!..initializeAuth(auth),
-        ),
-        ChangeNotifierProxyProvider<AuthProvider, AdminsProvider>(
-          create: (context) =>
-              AdminsProvider(uri: backendUri, mockMe: useMockers),
-          update: (context, auth, previous) => previous!..initializeAuth(auth),
-        ),
-        ChangeNotifierProxyProvider<AuthProvider, TeachersProvider>(
-          create: (context) =>
-              TeachersProvider(uri: backendUri, mockMe: useMockers),
-          update: (context, auth, previous) => previous!..initializeAuth(auth),
-        ),
-        ChangeNotifierProxyProvider<AuthProvider, StudentsProvider>(
-          create: (context) =>
-              StudentsProvider(uri: backendUri, mockMe: useMockers),
-          update: (context, auth, previous) => previous!..initializeAuth(auth),
-        ),
-        ChangeNotifierProxyProvider<AuthProvider, EnterprisesProvider>(
-          create: (context) =>
-              EnterprisesProvider(uri: backendUri, mockMe: useMockers),
-          update: (context, auth, previous) => previous!..initializeAuth(auth),
-        ),
-        ChangeNotifierProxyProvider<AuthProvider, InternshipsProvider>(
-          create: (context) =>
-              InternshipsProvider(uri: backendUri, mockMe: useMockers),
-          update: (context, auth, previous) => previous!..initializeAuth(auth),
-        ),
-      ],
-      child: SingleInstanceManager(
-        isNotAllowedChild: MaterialApp(
-          debugShowCheckedModeBanner: false,
-          onGenerateTitle: (context) => 'Stagess',
-          theme: crcrmeMaterialTheme,
-          home: Scaffold(
-            body: Center(
-              child: Text(
-                  'Une seule page de Stagess ne peut être ouverte à la fois.\n'
-                  'Veuillez fermer les autres onglets ou fenêtres et rafraîchir cette page.'),
-            ),
+    return SingleInstanceManager(
+      isNotAllowedChild: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        onGenerateTitle: (context) => 'Stagess',
+        theme: crcrmeMaterialTheme,
+        home: Scaffold(
+          body: Center(
+            child: Text(
+                'Une seule page de Stagess ne peut être ouverte à la fois.\n'
+                'Veuillez fermer les autres onglets ou fenêtres et rafraîchir cette page.'),
           ),
-          localizationsDelegates: const [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [Locale('fr', 'CA')],
         ),
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [Locale('fr', 'CA')],
+      ),
+      child: MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (context) =>
+                AuthProvider(mockMe: useMockers, requiredAdminAccess: true),
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, BootLoaderProvider>(
+            create: (context) =>
+                BootLoaderProvider(uri: backendUri, mockMe: useMockers),
+            update: (context, auth, previous) =>
+                previous!..initializeAuth(auth),
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, SchoolBoardsProvider>(
+            create: (context) =>
+                SchoolBoardsProvider(uri: backendUri, mockMe: useMockers),
+            update: (context, auth, previous) =>
+                previous!..initializeAuth(auth),
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, AdminsProvider>(
+            create: (context) =>
+                AdminsProvider(uri: backendUri, mockMe: useMockers),
+            update: (context, auth, previous) =>
+                previous!..initializeAuth(auth),
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, TeachersProvider>(
+            create: (context) =>
+                TeachersProvider(uri: backendUri, mockMe: useMockers),
+            update: (context, auth, previous) =>
+                previous!..initializeAuth(auth),
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, StudentsProvider>(
+            create: (context) =>
+                StudentsProvider(uri: backendUri, mockMe: useMockers),
+            update: (context, auth, previous) =>
+                previous!..initializeAuth(auth),
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, EnterprisesProvider>(
+            create: (context) =>
+                EnterprisesProvider(uri: backendUri, mockMe: useMockers),
+            update: (context, auth, previous) =>
+                previous!..initializeAuth(auth),
+          ),
+          ChangeNotifierProxyProvider<AuthProvider, InternshipsProvider>(
+            create: (context) =>
+                InternshipsProvider(uri: backendUri, mockMe: useMockers),
+            update: (context, auth, previous) =>
+                previous!..initializeAuth(auth),
+          ),
+        ],
         child: InactivityLayout(
           navigatorKey: rootNavigatorKey,
           timeout: const Duration(minutes: 10),

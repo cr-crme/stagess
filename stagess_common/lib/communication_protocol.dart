@@ -2,6 +2,7 @@ import 'package:stagess_common/exceptions.dart';
 import 'package:uuid/uuid.dart';
 
 enum RequestFields {
+  none,
   schoolBoard,
   schoolBoards,
   admin,

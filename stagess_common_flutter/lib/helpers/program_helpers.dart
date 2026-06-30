@@ -54,7 +54,7 @@ class ProgramInitializer {
     _initialized = true;
   }
 
-  static Future<bool> isBackendCompatible() async {
+  static Future<bool?> isBackendCompatible() async {
     try {
       final response = await http.get(BackendHelpers.versionUri);
       if (response.statusCode == 200) {
@@ -63,6 +63,6 @@ class ProgramInitializer {
     } catch (e) {
       // Ignore errors and consider the backend incompatible
     }
-    return false;
+    return null;
   }
 }

@@ -32,7 +32,6 @@ class TeachersProvider extends BackendListProvided<Teacher> {
   AuthProvider? _authProvider;
   void initializeAuth(AuthProvider auth) {
     _authProvider = auth;
-    initializeFetchingData(authProvider: auth);
     auth.addListener(() => initializeFetchingData(authProvider: auth));
   }
 }

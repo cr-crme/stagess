@@ -25,7 +25,6 @@ class EnterprisesProvider extends BackendListProvided<Enterprise> {
   FetchableFields get referenceFetchableFields => Enterprise.fetchableFields;
 
   void initializeAuth(AuthProvider auth) {
-    initializeFetchingData(authProvider: auth);
     auth.addListener(() => initializeFetchingData(authProvider: auth));
   }
 }

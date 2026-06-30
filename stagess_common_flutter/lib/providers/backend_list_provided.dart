@@ -11,6 +11,7 @@ import 'package:stagess_common/models/generic/extended_item_serializable.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/services/generic_listener.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
+import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:web_socket_client/web_socket_client.dart';
 
 final _logger = Logger('BackendListProvided');
@@ -49,6 +50,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
   bool get hasProblemConnecting => _hasProblemConnecting;
   bool _connexionRefused = false;
   bool get connexionRefused => _connexionRefused;
+  bool _isConnecting = false;
   bool get isConnected =>
       (_providerSelector[getField()] != null &&
           _socket != null &&
@@ -62,21 +64,36 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
   /// This method should be called after the user has logged on
   @override
   Future<void> initializeFetchingData({AuthProvider? authProvider}) async {
-    if (isConnected) return;
+    if (_isConnecting) return;
+    try {
+      _isConnecting = true;
+      await _initializeFetchingData(authProvider: authProvider);
+    } finally {
+      _isConnecting = false;
+    }
+  }
+
+  Future<void> _initializeFetchingData({AuthProvider? authProvider}) async {
+    if (isConnected || isDisposed) return;
     if (authProvider == null) {
       throw Exception('AuthProvider is required to initialize the connection');
     }
     _hasProblemConnecting = false;
     _connexionRefused = false;
+    print('coucou4 $runtimeType');
 
     // Get the JWT token
     String? token;
     while (true) {
       token = await authProvider.getAuthenticatorIdToken();
-      if (token != null) break;
+      if (token != null || isDisposed) break;
       await Future.delayed(const Duration(milliseconds: 100));
     }
 
+    if (isDisposed) {
+      print('coucou1');
+      return;
+    }
     // If the socket is already connected, it means another provider is already connected
     // Simply return now after having kept the reference to the deserializer function
     if (_socket == null && !mockMe) {
@@ -90,7 +107,10 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
         );
 
         _socket!.connection.listen((event) {
-          if (_socket == null) return;
+          if (_socket == null || isDisposed) {
+            print('coucou2');
+            return;
+          }
 
           if (event is Connected || event is Reconnected) {
             _sendMessage(
@@ -122,6 +142,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
                 protocol.response == Response.connexionRefused) {
               _connexionRefused = true;
               disconnect();
+              print('coucou5');
               return;
             }
           }
@@ -131,9 +152,10 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
 
         _startedConnectingAt = DateTime.now();
         while (true) {
-          if (_socket == null) {
+          if (_socket == null || isDisposed) {
             // If the socket is null, it means the connection failed
             _logger.severe('Connection to the server was canceled');
+            print('coucou6');
             return;
           }
           if (_handshakeReceived) {
@@ -160,6 +182,9 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
         disconnect();
       }
     }
+    if (runtimeType == SchoolBoardsProvider) {
+      print('coucou3');
+    }
 
     // There is no point in adding the same provider multiple times
     if (_providerSelector[getField(true)] != null) return;
@@ -185,7 +210,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     // Send a get request to the server for the list of items
     while (!_handshakeReceived) {
       await Future.delayed(const Duration(milliseconds: 100));
-      if (_socket == null) return;
+      if (_socket == null || isDisposed) return;
     }
 
     await _getFromBackend(

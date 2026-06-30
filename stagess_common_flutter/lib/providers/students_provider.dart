@@ -27,7 +27,6 @@ class StudentsProvider extends BackendListProvided<Student> {
   FetchableFields get referenceFetchableFields => Student.fetchableFields;
 
   Future<void> initializeAuth(AuthProvider auth) async {
-    initializeFetchingData(authProvider: auth);
     auth.addListener(() => initializeFetchingData(authProvider: auth));
   }
 }

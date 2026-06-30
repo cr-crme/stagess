@@ -83,7 +83,10 @@ class _InactivityLayoutState extends State<InactivityLayout> {
       return;
     }
 
-    if (_isShowingWaitForReconnexionDialog) return;
+    if (_isShowingWaitForReconnexionDialog ||
+        widget.navigatorKey.currentContext == null) {
+      return;
+    }
     _isShowingWaitForReconnexionDialog = true;
     await showDialog(
       context: widget.navigatorKey.currentContext!,
