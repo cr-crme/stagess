@@ -19,6 +19,7 @@ enum RequestFields {
 
 enum RequestType {
   handshake,
+  disconnectRequest,
   get,
   post,
   delete,

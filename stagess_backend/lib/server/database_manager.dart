@@ -49,6 +49,8 @@ class DatabaseManager {
     }
 
     final response = switch (field) {
+      RequestFields.none =>
+        throw MissingFieldException('Field is required to get data'),
       RequestFields.schoolBoards =>
         await schoolBoardsDatabase.getAll(fields: fields, user: user),
       RequestFields.schoolBoard => await schoolBoardsDatabase.getById(
@@ -118,6 +120,8 @@ class DatabaseManager {
     }
 
     final response = switch (field) {
+      RequestFields.none =>
+        throw MissingFieldException('Field is required to get data'),
       RequestFields.schoolBoards => throw InvalidRequestException(
           'School boards must be created individually'),
       RequestFields.schoolBoard => await schoolBoardsDatabase.putById(
@@ -187,6 +191,8 @@ class DatabaseManager {
     required DatabaseUser user,
   }) async {
     final response = switch (field) {
+      RequestFields.none =>
+        throw MissingFieldException('Field is required to get data'),
       RequestFields.schoolBoards => throw InvalidRequestException(
           'School boards must be deleted individually'),
       RequestFields.schoolBoard => await schoolBoardsDatabase.deleteById(
@@ -252,6 +258,8 @@ class DatabaseManager {
     required DatabaseUser user,
   }) async {
     final response = switch (field) {
+      RequestFields.none =>
+        throw MissingFieldException('Field is required to get data'),
       RequestFields.schoolBoards => throw InvalidRequestException(
           'School boards must be locked individually'),
       RequestFields.schoolBoard => await schoolBoardsDatabase.requestLock(
@@ -299,6 +307,8 @@ class DatabaseManager {
     required DatabaseUser user,
   }) async {
     final response = switch (field) {
+      RequestFields.none =>
+        throw MissingFieldException('Field is required to get data'),
       RequestFields.schoolBoards => throw InvalidRequestException(
           'School boards must be locked individually'),
       RequestFields.schoolBoard => await schoolBoardsDatabase.releaseLock(

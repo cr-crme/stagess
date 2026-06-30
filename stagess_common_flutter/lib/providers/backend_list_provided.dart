@@ -11,7 +11,6 @@ import 'package:stagess_common/models/generic/extended_item_serializable.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/services/generic_listener.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
-import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:web_socket_client/web_socket_client.dart';
 
 final _logger = Logger('BackendListProvided');
@@ -80,7 +79,6 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     }
     _hasProblemConnecting = false;
     _connexionRefused = false;
-    print('coucou4 $runtimeType');
 
     // Get the JWT token
     String? token;
@@ -90,13 +88,11 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       await Future.delayed(const Duration(milliseconds: 100));
     }
 
-    if (isDisposed) {
-      print('coucou1');
-      return;
-    }
+    if (isDisposed) return;
+
     // If the socket is already connected, it means another provider is already connected
     // Simply return now after having kept the reference to the deserializer function
-    if (_socket == null && !mockMe) {
+    if (getField(true) == RequestFields.none && (_socket == null && !mockMe)) {
       try {
         // Send a connexion request to the server
         _socket = WebSocket(
@@ -105,10 +101,13 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
           timeout: const Duration(seconds: 600),
           backoff: ConstantBackoff(Duration(seconds: 5)),
         );
+        _shouldReconnect = true;
 
         _socket!.connection.listen((event) {
-          if (_socket == null || isDisposed) {
-            print('coucou2');
+          if (_socket == null || isDisposed) return;
+
+          if (!_shouldReconnect) {
+            disconnect();
             return;
           }
 
@@ -141,8 +140,8 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
             if (protocol.requestType == RequestType.response &&
                 protocol.response == Response.connexionRefused) {
               _connexionRefused = true;
+              _shouldReconnect = false;
               disconnect();
-              print('coucou5');
               return;
             }
           }
@@ -155,7 +154,6 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
           if (_socket == null || isDisposed) {
             // If the socket is null, it means the connection failed
             _logger.severe('Connection to the server was canceled');
-            print('coucou6');
             return;
           }
           if (_handshakeReceived) {
@@ -182,12 +180,12 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
         disconnect();
       }
     }
-    if (runtimeType == SchoolBoardsProvider) {
-      print('coucou3');
-    }
 
     // There is no point in adding the same provider multiple times
-    if (_providerSelector[getField(true)] != null) return;
+    if (getField(true) == RequestFields.none ||
+        _providerSelector[getField(true)] != null) {
+      return;
+    }
 
     // Keep a reference to the deserializer function
     _providerSelector[getField()] = _Selector(
@@ -251,7 +249,6 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       _socket!.close();
       _socket = null;
       _socketId = null;
-      _handshakeReceived = false;
     }
 
     for (final selectorKey in _providerSelector.keys.toList()) {
@@ -259,6 +256,9 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     }
     _providerSelector.clear();
     _registeredFields.clear();
+
+    _handshakeReceived = false;
+    _shouldReconnect = false;
   }
 
   @override
@@ -533,6 +533,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
 /// connections to the backend, dropping the communications which are related
 /// to other providers.
 WebSocket? _socket;
+bool _shouldReconnect = false;
 int? _socketId;
 bool _handshakeReceived = false;
 Map<RequestFields, _Selector> _providerSelector = {};
@@ -632,6 +633,11 @@ Future<void> _incomingMessage(
             selector.notify();
           }
 
+          return;
+        }
+      case RequestType.disconnectRequest:
+        {
+          _shouldReconnect = false;
           return;
         }
       case RequestType.response:

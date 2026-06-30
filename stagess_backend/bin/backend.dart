@@ -119,8 +119,8 @@ void main() async {
   server.listen(
     (HttpRequest request) => requestHandler.answer(
       request,
-      //getRequestRateLimiter: getRequestRateLimiter,
-      // websocketRateLimiter: websocketRateLimiter,
+      getRequestRateLimiter: getRequestRateLimiter,
+      websocketRateLimiter: websocketRateLimiter,
       allowedOrigins: _allowedOrigins,
     ),
     onError: (error, stackTrace) =>

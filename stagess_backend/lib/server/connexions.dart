@@ -65,15 +65,29 @@ class Connexions {
 
       // Disconnect other connections the same user might have
       for (final otherClient in _clients.keys) {
-        final toWait = <Future>[];
         if (otherClient != client &&
             _clients[otherClient]?.userId == _clients[client]?.userId) {
           _logger.info(
               'Closing duplicate connexion of user ${_clients[client]?.userId}');
-          toWait.add(_onConnexionClosed(otherClient,
-              message: 'Closing duplicate connexion'));
+          try {
+            await _send(otherClient,
+                message: CommunicationProtocol(
+                    requestType: RequestType.disconnectRequest,
+                    field: null,
+                    data: {'error': 'Duplicate connexion'}));
+          } catch (e) {
+            _logger.warning(
+                'Failed to send disconnect request to duplicate connexion: $e');
+          }
+          try {
+            await _onConnexionClosed(otherClient,
+                message: 'Closing duplicate connexion');
+          } catch (e) {
+            _logger.warning(
+                'Failed to close duplicate connexion. Manually removing client from active connexions. Error: $e');
+            _clients.remove(otherClient);
+          }
         }
-        await Future.wait(toWait);
       }
     } catch (e) {
       await _refuseConnexion(client, e.toString());
@@ -136,6 +150,7 @@ class Connexions {
           await _handleUnregisterUser(client: client, protocol: protocol);
           break;
 
+        case RequestType.disconnectRequest:
         case RequestType.response:
         case RequestType.update:
           throw InvalidRequestTypeException(
@@ -449,6 +464,8 @@ class Connexions {
           ? 'id=${protocol.data!['id']}'
           : 'all elements';
       final field = switch (protocol.field!) {
+        RequestFields.none => throw MissingFieldException(
+            'Field is required to ${protocol.requestType.name} data'),
         RequestFields.schoolBoards ||
         RequestFields.schoolBoard =>
           'school boards',

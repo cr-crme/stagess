@@ -7,6 +7,7 @@ import 'package:stagess_common_flutter/helpers/form_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
+import 'package:stagess_common_flutter/providers/boot_loader_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
@@ -97,7 +98,8 @@ class _LoginScreenState extends State<LoginScreen> {
     _logger.finer('Building LoginScreen');
 
     // Calling the provider jumps start the authentication process and ensures data arrival
-    final schoolBoardsProvider = SchoolBoardsProvider.of(context, listen: true);
+    final loader = BootLoaderProvider.of(context, listen: true);
+    SchoolBoardsProvider.of(context, listen: false);
     AdminsProvider.of(context, listen: false);
     EnterprisesProvider.of(context, listen: false);
     InternshipsProvider.of(context, listen: false);
@@ -136,10 +138,10 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: authProvider.isAuthenticatorSignedIn
                       ? Center(
                           child: Text(
-                            schoolBoardsProvider.hasProblemConnecting
+                            loader.hasProblemConnecting
                                 ? 'Impossible de se connecter à la base de données, \n'
                                     'vérifiez votre connexion internet.'
-                                : schoolBoardsProvider.connexionRefused
+                                : loader.connexionRefused
                                     ? 'Connexion refusée, \n'
                                         'veuillez contacter votre administrateur'
                                     : 'Connexion en cours...',
