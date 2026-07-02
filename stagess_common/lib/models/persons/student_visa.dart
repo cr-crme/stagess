@@ -173,7 +173,7 @@ class Certificate extends SelectableItem {
   Certificate.fromSerialized(super.map)
       : certificateType = CertificateType.fromString(
             StringExt.from(map?['certificate_type']) ?? '__NONE__'),
-        specializationId = StringExt.from(map?['specialization_id']) ?? '',
+        specializationId = StringExt.from(map?['specialization_id']),
         year = IntExt.from(map?['year']),
         super.fromSerialized();
 
