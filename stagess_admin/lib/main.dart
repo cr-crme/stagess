@@ -21,8 +21,6 @@ import 'package:stagess_common_flutter/screens/in_maintenance_screen.dart';
 import 'package:stagess_common_flutter/screens/wrong_version_screen.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
 
-// TODO Fix reset link not appearing on admin
-
 const useDevDb =
     bool.fromEnvironment('STAGESS_USE_DEV_DB', defaultValue: false);
 
