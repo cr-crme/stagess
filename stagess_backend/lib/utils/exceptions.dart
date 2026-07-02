@@ -1,9 +1,9 @@
 import 'package:stagess_common/exceptions.dart';
 
-class ConnexionRefusedException implements InternshipBankException {
+class ConnectionRefusedException implements InternshipBankException {
   final String _message;
 
-  ConnexionRefusedException(String message) : _message = message;
+  ConnectionRefusedException(String message) : _message = message;
 
   @override
   String toString() => _message;

@@ -15,9 +15,9 @@ import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/utils.dart';
 
-final _logger = Logger('Connexions');
+final _logger = Logger('Connections');
 
-class Connexions {
+class Connections {
   final Map<CustomWebSocket, DatabaseUser> _clients = {};
   int get clientCount => _clients.length;
   final DatabaseManager _database;
@@ -27,7 +27,7 @@ class Connexions {
   final bool skipLog;
 
   // coverage:ignore-start
-  Connexions(
+  Connections(
       {Duration timeout = const Duration(seconds: 5),
       required DatabaseManager database,
       required String firebaseApiKey,
@@ -48,9 +48,9 @@ class Connexions {
           (message) => _incomingMessage(client,
               message: message, rateLimiter: rateLimiter),
           onDone: () =>
-              _onConnexionClosed(client, message: 'Client disconnected'),
+              _onConnectionClosed(client, message: 'Client disconnected'),
           onError: (error) =>
-              _onConnexionClosed(client, message: 'Connexion error $error'));
+              _onConnectionClosed(client, message: 'Connection error $error'));
 
       final startTime = DateTime.now();
       while (_clients[client]?.isNotVerified ?? true) {
@@ -59,38 +59,40 @@ class Connexions {
         // If client disconnected before the handshake was completed
         if (!_clients.containsKey(client)) return false;
         if (startTime.add(_timeout).isBefore(DateTime.now())) {
-          throw ConnexionRefusedException('Handshake timeout');
+          throw ConnectionRefusedException('Handshake timeout');
         }
       }
 
       // Disconnect other connections the same user might have
-      for (final otherClient in _clients.keys) {
-        if (otherClient != client &&
-            _clients[otherClient]?.userId == _clients[client]?.userId) {
-          _logger.info(
-              'Closing duplicate connexion of user ${_clients[client]?.userId}');
-          try {
-            await _send(otherClient,
-                message: CommunicationProtocol(
-                    requestType: RequestType.disconnectRequest,
-                    field: null,
-                    data: {'error': 'Duplicate connexion'}));
-          } catch (e) {
-            _logger.warning(
-                'Failed to send disconnect request to duplicate connexion: $e');
-          }
-          try {
-            await _onConnexionClosed(otherClient,
-                message: 'Closing duplicate connexion');
-          } catch (e) {
-            _logger.warning(
-                'Failed to close duplicate connexion. Manually removing client from active connexions. Error: $e');
-            _clients.remove(otherClient);
-          }
+      final currentId = _clients[client]!.userId;
+      final clientKeys = _clients.keys.toList();
+      for (final otherClient in clientKeys) {
+        final otherId = _clients[otherClient]?.userId;
+        if (otherClient == client || otherId != currentId) continue;
+
+        _logger.info('Closing duplicate connection of user $currentId');
+        try {
+          await _send(otherClient,
+              message: CommunicationProtocol(
+                  requestType: RequestType.disconnectRequest,
+                  field: null,
+                  data: {'error': 'Duplicate connection'}));
+        } catch (e) {
+          _logger.warning(
+              'Failed to send disconnect request to duplicate connection: $e');
+        }
+
+        try {
+          await _onConnectionClosed(otherClient,
+              message: 'Closing duplicate connection');
+        } catch (e) {
+          _logger.warning(
+              'Failed to close duplicate connection. Manually removing client from active connections. Error: $e');
+          _clients.remove(otherClient);
         }
       }
     } catch (e) {
-      await _refuseConnexion(client, e.toString());
+      await _refuseConnection(client, e.toString());
       return false;
     }
 
@@ -126,7 +128,7 @@ class Connexions {
       // Prevent unauthorized access to the database
       if ((_clients[client]?.isNotVerified ?? true) &&
           protocol.requestType != RequestType.handshake) {
-        throw ConnexionRefusedException('Client not verified');
+        throw ConnectionRefusedException('Client not verified');
       }
 
       switch (protocol.requestType) {
@@ -156,18 +158,18 @@ class Connexions {
           throw InvalidRequestTypeException(
               'Invalid request type: ${protocol.requestType}');
       }
-    } on ConnexionRefusedException catch (e) {
+    } on ConnectionRefusedException catch (e) {
       if (!skipLog) {
         _logger.info(
-            'Refusing connexion of client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $e');
+            'Refusing connection of client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $e');
       }
       await _send(client,
           message: CommunicationProtocol(
               id: protocol?.id,
               field: protocol?.field,
               requestType: RequestType.response,
-              data: {'error': 'Connexion refused'},
-              response: Response.connexionRefused));
+              data: {'error': 'Connection refused'},
+              response: Response.connectionRefused));
     } on InternshipBankException catch (e, st) {
       if (!skipLog) {
         _logger.severe(
@@ -209,12 +211,12 @@ class Connexions {
     final email = protocol.data?['email'] as String?;
     final userType = AccessLevel.fromSerialized(protocol.data?['user_type']);
     if (email == null || userType == AccessLevel.invalid) {
-      throw ConnexionRefusedException('Invalid request data.');
+      throw ConnectionRefusedException('Invalid request data.');
     }
 
     final app = FirebaseAdmin.instance.app();
     if (app == null) {
-      throw ConnexionRefusedException(
+      throw ConnectionRefusedException(
           'Firebase app is not initialized. Please check your configuration.');
     }
 
@@ -223,7 +225,7 @@ class Connexions {
     switch (userType) {
       case AccessLevel.teacher:
         if (myAccessLevel < AccessLevel.schoolAdmin) {
-          throw ConnexionRefusedException(
+          throw ConnectionRefusedException(
               'Client is not authorized to register user');
         }
         user = await _getTeacherFromDatabase(
@@ -233,7 +235,7 @@ class Connexions {
         break;
       case AccessLevel.schoolAdmin:
         if (myAccessLevel < AccessLevel.schoolBoardAdmin) {
-          throw ConnexionRefusedException(
+          throw ConnectionRefusedException(
               'Client is not authorized to register user');
         }
         user = await _getAdminFromDatabase(
@@ -243,7 +245,7 @@ class Connexions {
         break;
       case AccessLevel.schoolBoardAdmin:
         if (myAccessLevel < AccessLevel.superAdmin) {
-          throw ConnexionRefusedException(
+          throw ConnectionRefusedException(
               'Client is not authorized to register user');
         }
         user = await _getAdminFromDatabase(
@@ -254,13 +256,13 @@ class Connexions {
       case AccessLevel.superAdmin:
       case AccessLevel.self:
       case AccessLevel.invalid:
-        throw ConnexionRefusedException(
+        throw ConnectionRefusedException(
             'Client is not authorized to register user.');
     }
 
     // Make sure only previously added teachers can be registered
     if (user == null) {
-      throw ConnexionRefusedException(
+      throw ConnectionRefusedException(
           'No user found with email $email. Please add the user to the database before registering them.');
     }
 
@@ -326,12 +328,12 @@ class Connexions {
     final email = protocol.data?['email'] as String?;
     final userType = AccessLevel.fromSerialized(protocol.data?['user_type']);
     if (email == null || userType == AccessLevel.invalid) {
-      throw ConnexionRefusedException('Invalid request data.');
+      throw ConnectionRefusedException('Invalid request data.');
     }
 
     final app = FirebaseAdmin.instance.app();
     if (app == null) {
-      throw ConnexionRefusedException(
+      throw ConnectionRefusedException(
           'Firebase app is not initialized. Please check your configuration.');
     }
 
@@ -359,7 +361,7 @@ class Connexions {
     switch (userType) {
       case AccessLevel.teacher:
         if (myAccessLevel < AccessLevel.schoolAdmin) {
-          throw ConnexionRefusedException(
+          throw ConnectionRefusedException(
               'Client is not authorized to register user');
         }
         user = await _getTeacherFromDatabase(
@@ -369,7 +371,7 @@ class Connexions {
         break;
       case AccessLevel.schoolAdmin:
         if (myAccessLevel < AccessLevel.schoolBoardAdmin) {
-          throw ConnexionRefusedException(
+          throw ConnectionRefusedException(
               'Client is not authorized to register user');
         }
         user = await _getAdminFromDatabase(
@@ -379,7 +381,7 @@ class Connexions {
         break;
       case AccessLevel.schoolBoardAdmin:
         if (myAccessLevel < AccessLevel.superAdmin) {
-          throw ConnexionRefusedException(
+          throw ConnectionRefusedException(
               'Client is not authorized to register user');
         }
         user = await _getAdminFromDatabase(
@@ -390,7 +392,7 @@ class Connexions {
       case AccessLevel.superAdmin:
       case AccessLevel.self:
       case AccessLevel.invalid:
-        throw ConnexionRefusedException(
+        throw ConnectionRefusedException(
             'Client is not authorized to register user.');
     }
 
@@ -524,8 +526,8 @@ class Connexions {
           jsonEncode(message.copyWith(socketId: client.hashCode).serialize()));
     } catch (e) {
       // If we can't send the message, we can assume the client is disconnected
-      await _onConnexionClosed(client,
-          message: 'Connexion closed unexpectedly: $e');
+      await _onConnectionClosed(client,
+          message: 'Connection closed unexpectedly: $e');
     }
   }
 
@@ -538,22 +540,22 @@ class Connexions {
   Future<void> _handleHandshake(CustomWebSocket client,
       {required CommunicationProtocol protocol}) async {
     if (protocol.data == null) {
-      throw ConnexionRefusedException(
+      throw ConnectionRefusedException(
           'Data is required to validate the handshake');
     }
     if (protocol.data!['token'] == null) {
-      throw ConnexionRefusedException(
+      throw ConnectionRefusedException(
           'Token is required to validate the handshake');
     }
 
     final payload = await extractJwt(protocol.data!['token']);
     if (payload == null) {
-      throw ConnexionRefusedException('Invalid token');
+      throw ConnectionRefusedException('Invalid token');
     }
     final authenticatorId = payload['user_id'] as String?;
     final email = payload['email'] as String?;
     if (authenticatorId == null || email == null) {
-      throw ConnexionRefusedException('Invalid token payload');
+      throw ConnectionRefusedException('Invalid token payload');
     }
 
     // Get the user information from the database to first verify its identity
@@ -564,7 +566,7 @@ class Connexions {
     } catch (e) {
       user = null;
     }
-    if (user == null) throw ConnexionRefusedException('Invalid user');
+    if (user == null) throw ConnectionRefusedException('Invalid user');
     _clients[client] = user;
 
     // Success, send the handshake to the client
@@ -582,21 +584,21 @@ class Connexions {
             data: _clients[client]!.serialize()));
   }
 
-  Future<void> _refuseConnexion(CustomWebSocket client, String message) async {
+  Future<void> _refuseConnection(CustomWebSocket client, String message) async {
     await _send(client,
         message: CommunicationProtocol(
             requestType: RequestType.response,
             field: null,
-            data: {'error': 'Connexion refused'},
+            data: {'error': 'Connection refused'},
             response: Response.failure));
-    await _onConnexionClosed(client, message: message);
+    await _onConnectionClosed(client, message: message);
   }
 
-  Future<void> _onConnexionClosed(CustomWebSocket client,
+  Future<void> _onConnectionClosed(CustomWebSocket client,
       {required String message}) async {
     if (!skipLog) {
       _logger.info(
-          'Closing connexion of client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $message');
+          'Closing connection of client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $message');
     }
 
     await client.close();
@@ -772,6 +774,6 @@ Future<void> _sendPasswordResetEmail(String email, String apiKey) async {
   );
 
   if (response.statusCode != 200) {
-    throw ConnexionRefusedException('Failed to send password reset email');
+    throw ConnectionRefusedException('Failed to send password reset email');
   }
 }

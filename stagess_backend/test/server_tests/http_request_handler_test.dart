@@ -5,7 +5,7 @@ import 'package:stagess_backend/repositories/school_boards_repository.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/repositories/students_repository.dart';
 import 'package:stagess_backend/repositories/teachers_repository.dart';
-import 'package:stagess_backend/server/connexions.dart';
+import 'package:stagess_backend/server/connections.dart';
 import 'package:stagess_backend/server/database_manager.dart';
 import 'package:stagess_backend/server/http_request_handler.dart';
 import 'package:test/test.dart';
@@ -13,7 +13,7 @@ import 'package:test/test.dart';
 import '../mockers/http_request_mock.dart';
 import '../mockers/sql_connection_mock.dart';
 
-Future<Connexions> get _mockedConnexions async => Connexions(
+Future<Connections> get _mockedConnections async => Connections(
       database: DatabaseManager(
         sqlInterface: await MySqlInterface.connect(
             connectToDatabase: () async => DummyMySqlConnection()),
@@ -32,8 +32,8 @@ void main() {
   test('Send an a preflight request', () async {
     final request = HttpRequestMock(method: 'OPTIONS', uri: Uri.parse('/'));
     final requestHandler = HttpRequestHandler(
-        devConnexions: await _mockedConnexions,
-        productionConnexions: await _mockedConnexions);
+        devConnections: await _mockedConnections,
+        productionConnections: await _mockedConnections);
     await requestHandler.answer(request);
 
     final response = request.response as HttpResponseMock;
@@ -44,23 +44,23 @@ void main() {
   test('Send a POST request', () async {
     final request = HttpRequestMock(method: 'POST', uri: Uri.parse('/'));
     final requestHandler = HttpRequestHandler(
-        devConnexions: await _mockedConnexions,
-        productionConnexions: await _mockedConnexions);
+        devConnections: await _mockedConnections,
+        productionConnections: await _mockedConnections);
     await requestHandler.answer(request);
 
     final response = request.response as HttpResponseMock;
-    expect(response.response, 'Connexion refused');
+    expect(response.response, 'Connection refused');
   });
 
   test('Send a GET resquest to an invalid endpoit', () async {
     final request = HttpRequestMock(method: 'GET', uri: Uri.parse('/'));
     final requestHandler = HttpRequestHandler(
-        devConnexions: await _mockedConnexions,
-        productionConnexions: await _mockedConnexions);
+        devConnections: await _mockedConnections,
+        productionConnections: await _mockedConnections);
     await requestHandler.answer(request);
 
     final response = request.response as HttpResponseMock;
-    expect(response.response, 'Connexion refused');
+    expect(response.response, 'Connection refused');
   });
 
   test('Simulate internal error while connecting', () async {
@@ -69,22 +69,22 @@ void main() {
         uri: Uri.parse('/connect'),
         forceFailToUpgradeToWebSocket: true);
     final requestHandler = HttpRequestHandler(
-        devConnexions: await _mockedConnexions,
-        productionConnexions: await _mockedConnexions);
+        devConnections: await _mockedConnections,
+        productionConnections: await _mockedConnections);
     await requestHandler.answer(request);
 
     final response = request.response as HttpResponseMock;
-    expect(response.response, 'Connexion refused');
+    expect(response.response, 'Connection refused');
   });
 
   test('Send a GET request to the /connect endpoint', () async {
     final request = HttpRequestMock(method: 'GET', uri: Uri.parse('/connect'));
     final requestHandler = HttpRequestHandler(
-        devConnexions: await _mockedConnexions,
-        productionConnexions: await _mockedConnexions);
+        devConnections: await _mockedConnections,
+        productionConnections: await _mockedConnections);
     await requestHandler.answer(request);
 
     final response = request.response as HttpResponseMock;
-    expect(response.response, 'Connexion refused');
+    expect(response.response, 'Connection refused');
   });
 }

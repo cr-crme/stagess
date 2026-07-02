@@ -132,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         loader.hasProblemConnecting
                             ? 'Impossible de se connecter à la base de données, \n'
                                 'vérifiez votre connexion internet.'
-                            : loader.connexionRefused
+                            : loader.connectionRefused
                                 ? 'Connexion refusée, \n'
                                     'veuillez contacter votre administrateur'
                                 : 'Connexion en cours...',

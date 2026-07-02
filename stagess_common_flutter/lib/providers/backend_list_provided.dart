@@ -41,14 +41,14 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     extends DatabaseListProvided<T> {
   final Uri uri;
 
-  static final onConnexionStatusChanged =
+  static final onConnectionStatusChanged =
       GenericListener<Function(bool isConnected)>();
 
   DateTime? _startedConnectingAt;
   bool _hasProblemConnecting = false;
   bool get hasProblemConnecting => _hasProblemConnecting;
-  bool _connexionRefused = false;
-  bool get connexionRefused => _connexionRefused;
+  bool _connectionRefused = false;
+  bool get connectionRefused => _connectionRefused;
   bool _isConnecting = false;
   bool get isConnected =>
       (_providerSelector[getField()] != null &&
@@ -78,7 +78,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
       throw Exception('AuthProvider is required to initialize the connection');
     }
     _hasProblemConnecting = false;
-    _connexionRefused = false;
+    _connectionRefused = false;
 
     // Get the JWT token
     String? token;
@@ -94,7 +94,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     // Simply return now after having kept the reference to the deserializer function
     if (getField(true) == RequestFields.none && (_socket == null && !mockMe)) {
       try {
-        // Send a connexion request to the server
+        // Send a connection request to the server
         _socket = WebSocket(
           uri,
           headers: {HttpHeaders.contentTypeHeader: 'application/json'},
@@ -118,16 +118,16 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
                 data: {'token': token},
               ),
             );
-            onConnexionStatusChanged.notifyListeners(
+            onConnectionStatusChanged.notifyListeners(
               (callback) => callback(true),
             );
           } else if (event is Disconnected || event is Reconnecting) {
             // Setup the reconnection logic
             _startedConnectingAt = DateTime.now();
             _hasProblemConnecting = false;
-            _connexionRefused = false;
+            _connectionRefused = false;
             _handshakeReceived = false;
-            onConnexionStatusChanged.notifyListeners(
+            onConnectionStatusChanged.notifyListeners(
               (callback) => callback(false),
             );
           }
@@ -138,8 +138,8 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
 
           if (!isConnected) {
             if (protocol.requestType == RequestType.response &&
-                protocol.response == Response.connexionRefused) {
-              _connexionRefused = true;
+                protocol.response == Response.connectionRefused) {
+              _connectionRefused = true;
               _shouldReconnect = false;
               disconnect();
               return;
@@ -610,7 +610,7 @@ Future<void> _incomingMessage(
 }) async {
   try {
     // If we received an unsolicited message, it is probably due to previous
-    // connexions that did not get closed properly. Just ignore the message
+    // connections that did not get closed properly. Just ignore the message
     if (protocol.socketId != null &&
         protocol.socketId != _socketId &&
         protocol.requestType != RequestType.handshake) {

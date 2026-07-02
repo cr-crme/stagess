@@ -9,7 +9,7 @@ import 'package:stagess_backend/repositories/school_boards_repository.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/repositories/students_repository.dart';
 import 'package:stagess_backend/repositories/teachers_repository.dart';
-import 'package:stagess_backend/server/connexions.dart';
+import 'package:stagess_backend/server/connections.dart';
 import 'package:stagess_backend/server/database_manager.dart';
 import 'package:stagess_backend/utils/custom_web_socket.dart';
 import 'package:stagess_backend/utils/database_user.dart';
@@ -21,8 +21,8 @@ import 'package:test/test.dart';
 import '../mockers/sql_connection_mock.dart';
 import '../mockers/web_socket_mock.dart';
 
-class ConnexionsMock extends Connexions {
-  ConnexionsMock({
+class ConnectionsMock extends Connections {
+  ConnectionsMock({
     required super.database,
     required super.firebaseApiKey,
     super.timeout,
@@ -93,15 +93,15 @@ Future<DatabaseManager> get _mockedDatabase async {
 }
 
 Future<CommunicationProtocol> _sendAndReceive({required String toSend}) async {
-  final connexions = ConnexionsMock(
+  final connections = ConnectionsMock(
       database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
   final socket = WebSocketMock();
   final client =
       CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
-  connexions.add(client);
+  connections.add(client);
   socket.streamController.add(_prepareHandshake());
 
-  // Listen to incoming messages from connexions
+  // Listen to incoming messages from connections
   final handshakeCompleter = Completer<CommunicationProtocol>();
   final protocolCompleter = Completer<CommunicationProtocol>();
   socket.incommingStreamController.stream.listen((message) {
@@ -127,7 +127,7 @@ Future<CommunicationProtocol> _sendAndReceive({required String toSend}) async {
 
 void main() {
   test('Add new client with handshake timeout', () async {
-    final connexions = Connexions(
+    final connections = Connections(
         timeout: Duration(milliseconds: 200),
         database: await _mockedDatabase,
         firebaseApiKey: '',
@@ -135,7 +135,7 @@ void main() {
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
-    final isConnectedFuture = connexions.add(client);
+    final isConnectedFuture = connections.add(client);
 
     final protocolCompleter = Completer<CommunicationProtocol>();
     socket.incommingStreamController.stream.listen((message) {
@@ -156,12 +156,12 @@ void main() {
     expect(protocol.field, isNull);
     expect(protocol.data, isA<Map<String, dynamic>>());
     expect(protocol.data!['error'], isA<String>());
-    expect(protocol.data!['error'], 'Connexion refused');
+    expect(protocol.data!['error'], 'Connection refused');
     expect(protocol.response, Response.failure);
   });
 
   test('Request something without sending handshake', () async {
-    final connexions = Connexions(
+    final connections = Connections(
         timeout: Duration(milliseconds: 200),
         database: await _mockedDatabase,
         firebaseApiKey: '',
@@ -169,7 +169,7 @@ void main() {
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
-    final isConnectedFuture = connexions.add(client);
+    final isConnectedFuture = connections.add(client);
 
     final protocolNotVerifiedCompleter = Completer<CommunicationProtocol>();
     final protocolHandshakeCompleter = Completer<CommunicationProtocol>();
@@ -201,8 +201,8 @@ void main() {
     expect(protocolNotVerified.field, isNull);
     expect(protocolNotVerified.data, isA<Map<String, dynamic>>());
     expect(protocolNotVerified.data!['error'], isA<String>());
-    expect(protocolNotVerified.data!['error'], 'Connexion refused');
-    expect(protocolNotVerified.response, Response.connexionRefused);
+    expect(protocolNotVerified.data!['error'], 'Connection refused');
+    expect(protocolNotVerified.response, Response.connectionRefused);
 
     expect(await isConnectedFuture, false);
     expect(socket.isConnected, false);
@@ -215,12 +215,12 @@ void main() {
     expect(protocolHandshake.field, isNull);
     expect(protocolHandshake.data, isA<Map<String, dynamic>>());
     expect(protocolHandshake.data!['error'], isA<String>());
-    expect(protocolHandshake.data!['error'], 'Connexion refused');
+    expect(protocolHandshake.data!['error'], 'Connection refused');
     expect(protocolHandshake.response, Response.failure);
   });
 
   test('Add new client with missing handshake data request', () async {
-    final connexions = Connexions(
+    final connections = Connections(
         timeout: Duration(milliseconds: 200),
         database: await _mockedDatabase,
         firebaseApiKey: '',
@@ -228,7 +228,7 @@ void main() {
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
-    final isConnectedFuture = connexions.add(client);
+    final isConnectedFuture = connections.add(client);
 
     // Simulate an invalid handshake
     final protocolMissingCompleter = Completer<CommunicationProtocol>();
@@ -263,8 +263,8 @@ void main() {
     expect(protocolMissing.field, isNull);
     expect(protocolMissing.data, isA<Map<String, dynamic>>());
     expect(protocolMissing.data!['error'], isA<String>());
-    expect(protocolMissing.data!['error'], 'Connexion refused');
-    expect(protocolMissing.response, Response.connexionRefused);
+    expect(protocolMissing.data!['error'], 'Connection refused');
+    expect(protocolMissing.response, Response.connectionRefused);
 
     final protocolHandshake = await protocolHandshakeCompleter.future
         .timeout(Duration(seconds: 1), onTimeout: () {
@@ -274,12 +274,12 @@ void main() {
     expect(protocolHandshake.field, isNull);
     expect(protocolHandshake.data, isA<Map<String, dynamic>>());
     expect(protocolHandshake.data!['error'], isA<String>());
-    expect(protocolHandshake.data!['error'], 'Connexion refused');
+    expect(protocolHandshake.data!['error'], 'Connection refused');
     expect(protocolHandshake.response, Response.failure);
   });
 
   test('Add new client with missing token', () async {
-    final connexions = Connexions(
+    final connections = Connections(
         timeout: Duration(milliseconds: 200),
         database: await _mockedDatabase,
         firebaseApiKey: '',
@@ -287,7 +287,7 @@ void main() {
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
-    final isConnectedFuture = connexions.add(client);
+    final isConnectedFuture = connections.add(client);
 
     // Simulate an invalid handshake
     final protocolMissingCompleter = Completer<CommunicationProtocol>();
@@ -323,8 +323,8 @@ void main() {
     expect(protocolMissing.field, isNull);
     expect(protocolMissing.data, isA<Map<String, dynamic>>());
     expect(protocolMissing.data!['error'], isA<String>());
-    expect(protocolMissing.data!['error'], 'Connexion refused');
-    expect(protocolMissing.response, Response.connexionRefused);
+    expect(protocolMissing.data!['error'], 'Connection refused');
+    expect(protocolMissing.response, Response.connectionRefused);
 
     final protocolHandshake = await protocolHandshakeCompleter.future
         .timeout(Duration(seconds: 1), onTimeout: () {
@@ -334,12 +334,12 @@ void main() {
     expect(protocolHandshake.field, isNull);
     expect(protocolHandshake.data, isA<Map<String, dynamic>>());
     expect(protocolHandshake.data!['error'], isA<String>());
-    expect(protocolHandshake.data!['error'], 'Connexion refused');
+    expect(protocolHandshake.data!['error'], 'Connection refused');
     expect(protocolHandshake.response, Response.failure);
   });
 
   test('Add new client with invalid token', () async {
-    final connexions = Connexions(
+    final connections = Connections(
         timeout: Duration(milliseconds: 200),
         database: await _mockedDatabase,
         firebaseApiKey: '',
@@ -347,7 +347,7 @@ void main() {
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
-    final isConnectedFuture = connexions.add(client);
+    final isConnectedFuture = connections.add(client);
 
     // Simulate an invalid handshake
     final protocolMissingCompleter = Completer<CommunicationProtocol>();
@@ -384,8 +384,8 @@ void main() {
     expect(protocolMissing.field, isNull);
     expect(protocolMissing.data, isA<Map<String, dynamic>>());
     expect(protocolMissing.data!['error'], isA<String>());
-    expect(protocolMissing.data!['error'], 'Connexion refused');
-    expect(protocolMissing.response, Response.connexionRefused);
+    expect(protocolMissing.data!['error'], 'Connection refused');
+    expect(protocolMissing.response, Response.connectionRefused);
 
     final protocolHandshake = await protocolHandshakeCompleter.future
         .timeout(Duration(seconds: 1), onTimeout: () {
@@ -395,12 +395,12 @@ void main() {
     expect(protocolHandshake.field, isNull);
     expect(protocolHandshake.data, isA<Map<String, dynamic>>());
     expect(protocolHandshake.data!['error'], isA<String>());
-    expect(protocolHandshake.data!['error'], 'Connexion refused');
+    expect(protocolHandshake.data!['error'], 'Connection refused');
     expect(protocolHandshake.response, Response.failure);
   });
 
   test('Add new client with incomplete token', () async {
-    final connexions = Connexions(
+    final connections = Connections(
         timeout: Duration(milliseconds: 200),
         database: await _mockedDatabase,
         firebaseApiKey: '',
@@ -408,7 +408,7 @@ void main() {
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
-    final isConnectedFuture = connexions.add(client);
+    final isConnectedFuture = connections.add(client);
 
     // Simulate an invalid handshake
     final protocolMissingCompleter = Completer<CommunicationProtocol>();
@@ -448,8 +448,8 @@ void main() {
     expect(protocolMissing.field, isNull);
     expect(protocolMissing.data, isA<Map<String, dynamic>>());
     expect(protocolMissing.data!['error'], isA<String>());
-    expect(protocolMissing.data!['error'], 'Connexion refused');
-    expect(protocolMissing.response, Response.connexionRefused);
+    expect(protocolMissing.data!['error'], 'Connection refused');
+    expect(protocolMissing.response, Response.connectionRefused);
 
     final protocolHandshake = await protocolHandshakeCompleter.future
         .timeout(Duration(seconds: 1), onTimeout: () {
@@ -459,18 +459,18 @@ void main() {
     expect(protocolHandshake.field, isNull);
     expect(protocolHandshake.data, isA<Map<String, dynamic>>());
     expect(protocolHandshake.data!['error'], isA<String>());
-    expect(protocolHandshake.data!['error'], 'Connexion refused');
+    expect(protocolHandshake.data!['error'], 'Connection refused');
     expect(protocolHandshake.response, Response.failure);
   });
 
-  test('Add a new client to Connexions and disconnect', () async {
-    final connexions = ConnexionsMock(
+  test('Add a new client to Connections and disconnect', () async {
+    final connections = ConnectionsMock(
         database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
 
-    // Listen to incoming messages from connexions
+    // Listen to incoming messages from connections
     final protocolCompleter = Completer<CommunicationProtocol>();
     socket.incommingStreamController.stream.listen((message) {
       print(message);
@@ -480,12 +480,12 @@ void main() {
     addTearDown(() => socket.incommingStreamController.close());
 
     // Send the handshake message
-    final isConnectedFuture = connexions.add(client);
+    final isConnectedFuture = connections.add(client);
     socket.streamController.add(_prepareHandshake());
 
     expect(await isConnectedFuture, true);
     expect(socket.isConnected, true);
-    expect(connexions.clientCount, 1);
+    expect(connections.clientCount, 1);
     final protocol = await protocolCompleter.future
         .timeout(Duration(seconds: 1), onTimeout: () {
       fail('Timeout waiting for protocol update');
@@ -504,34 +504,34 @@ void main() {
     // Simulate a client disconnect
     await socket.close();
     await Future.delayed(Duration(milliseconds: 100));
-    expect(connexions.clientCount, 0);
+    expect(connections.clientCount, 0);
   });
 
-  test('Add a new client to Connexions and experience error', () async {
-    final connexions = Connexions(
+  test('Add a new client to Connections and experience error', () async {
+    final connections = Connections(
         database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
-    connexions.add(client);
+    connections.add(client);
 
     // Send the handshake message
     socket.streamController.add(_prepareHandshake());
-    expect(connexions.clientCount, 1);
+    expect(connections.clientCount, 1);
 
     // Simulate an error
     socket.streamController.addError('Simulated error');
     await Future.delayed(Duration(milliseconds: 100));
-    expect(connexions.clientCount, 0);
+    expect(connections.clientCount, 0);
   });
 
   test('New client disconnect during handshake', () async {
-    final connexions = Connexions(
+    final connections = Connections(
         database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
-    connexions.add(client);
+    connections.add(client);
 
     // The strategy is to send an invalid handshake message to immediately disconnect.
     socket.incommingStreamController.stream.listen((message) => socket.close());
@@ -541,7 +541,7 @@ void main() {
     // Simulate a client disconnect
     await Future.delayed(Duration(milliseconds: 100));
 
-    expect(connexions.clientCount, 0);
+    expect(connections.clientCount, 0);
   });
 
   test('Send a GET request with missing field', () async {
@@ -597,7 +597,7 @@ void main() {
   });
 
   test('Send a POST teacher request and receive the update', () async {
-    final connexions = ConnexionsMock(
+    final connections = ConnectionsMock(
         database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final socket1 = WebSocketMock();
     final client1 =
@@ -606,12 +606,12 @@ void main() {
     final client2 =
         CustomWebSocket(socket: socket2, ipAddress: '127.0.0.1', port: 8081);
 
-    connexions.add(client1);
-    connexions.add(client2);
+    connections.add(client1);
+    connections.add(client2);
     socket1.streamController.add(_prepareHandshake());
     socket2.streamController.add(_prepareHandshake());
 
-    // Listen to incoming messages from connexions
+    // Listen to incoming messages from connections
     final handshakeCompleter1 = Completer<CommunicationProtocol>();
     final handshakeCompleter2 = Completer<CommunicationProtocol>();
     final updateCompleter1 = Completer<CommunicationProtocol>();
@@ -664,7 +664,7 @@ void main() {
         .timeout(Duration(seconds: 1), onTimeout: () {
       fail('Timeout waiting for protocol2 update');
     });
-    expect(connexions.clientCount, 2);
+    expect(connections.clientCount, 2);
 
     expect(protocol1.requestType, RequestType.update);
     expect(protocol1.field, RequestFields.teacher);
@@ -716,15 +716,15 @@ void main() {
     expect(protocol.response, Response.failure);
   });
   test('Send invalid UPDATE request', () async {
-    final connexions = ConnexionsMock(
+    final connections = ConnectionsMock(
         database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
-    connexions.add(client);
+    connections.add(client);
     socket.streamController.add(_prepareHandshake());
 
-    // Listen to incoming messages from connexions
+    // Listen to incoming messages from connections
     final handshakeCompleter = Completer<CommunicationProtocol>();
     final protocolCompleter = Completer<CommunicationProtocol>();
     socket.incommingStreamController.stream.listen((message) {
@@ -760,12 +760,12 @@ void main() {
   });
 
   test('Send a message to a disconnected client', () async {
-    final connexions = Connexions(
+    final connections = Connections(
         database: await _mockedDatabase, firebaseApiKey: '', skipLog: true);
     final socket = WebSocketMock();
     final client =
         CustomWebSocket(socket: socket, ipAddress: '127.0.0.1', port: 8080);
-    connexions.add(client);
+    connections.add(client);
     socket.streamController.add(_prepareHandshake());
 
     // Simulate a POST request
@@ -779,6 +779,6 @@ void main() {
 
     // Wait for the update to be sent to both clients
     await Future.delayed(Duration(milliseconds: 100));
-    expect(connexions.clientCount, 0);
+    expect(connections.clientCount, 0);
   });
 }

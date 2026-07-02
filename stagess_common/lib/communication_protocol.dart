@@ -34,7 +34,7 @@ enum RequestType {
 enum Response {
   success,
   failure,
-  connexionRefused,
+  connectionRefused,
 }
 
 const String _currentVersion = '1.1.2';

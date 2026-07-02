@@ -11,7 +11,7 @@ import 'package:stagess_backend/repositories/school_boards_repository.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/repositories/students_repository.dart';
 import 'package:stagess_backend/repositories/teachers_repository.dart';
-import 'package:stagess_backend/server/connexions.dart';
+import 'package:stagess_backend/server/connections.dart';
 import 'package:stagess_backend/server/database_manager.dart';
 import 'package:stagess_backend/server/http_request_handler.dart';
 import 'package:stagess_backend/utils/network_rate_limiter.dart';
@@ -93,14 +93,14 @@ void main() async {
       'Server running on ${useSecure ? 'https' : 'http'}://${_backendIp.address}:$_backendPort/');
   _logger.info('Using database backend: ${_databaseBackend.name}');
 
-  final devConnexions = await _connectDatabase(
+  final devConnections = await _connectDatabase(
     databaseBackend: _databaseBackend,
     firebaseApiKey: firebaseApiKey,
     settings: _devSettings,
     skipLog: const bool.fromEnvironment('STAGESS_SKIP_LOG', defaultValue: true),
   );
 
-  final productionConnexions = await _connectDatabase(
+  final productionConnections = await _connectDatabase(
     databaseBackend: _databaseBackend,
     firebaseApiKey: firebaseApiKey,
     settings: _productionSettings,
@@ -109,7 +109,8 @@ void main() async {
 
   _logger.info('Server ready and waiting for requests...');
   final requestHandler = HttpRequestHandler(
-      devConnexions: devConnexions, productionConnexions: productionConnexions);
+      devConnections: devConnections,
+      productionConnections: productionConnections);
 
   final getRequestRateLimiter =
       NetworkRateLimiter(maxRequests: 50, duration: Duration(minutes: 1));
@@ -129,9 +130,9 @@ void main() async {
   );
 
   if (_databaseBackend == DatabaseBackend.mysql) {
-    await (devConnexions.database.sqlInterface.connection as MySqlConnection)
+    await (devConnections.database.sqlInterface.connection as MySqlConnection)
         .close();
-    await (productionConnexions.database.sqlInterface.connection
+    await (productionConnections.database.sqlInterface.connection
             as MySqlConnection)
         .close();
   }
@@ -167,7 +168,7 @@ Future<HttpServer> _bindServer({required bool useSecure}) async {
   }
 }
 
-Future<Connexions> _connectDatabase({
+Future<Connections> _connectDatabase({
   required DatabaseBackend databaseBackend,
   required String firebaseApiKey,
   required ConnectionSettings settings,
@@ -187,7 +188,7 @@ Future<Connexions> _connectDatabase({
   // Give a bit of time just in case
   await Future.delayed(Duration(milliseconds: 100));
 
-  final connexions = Connexions(
+  final connections = Connections(
       firebaseApiKey: firebaseApiKey,
       database: DatabaseManager(
         sqlInterface: sqlInterface!,
@@ -229,5 +230,5 @@ Future<Connexions> _connectDatabase({
         },
       ),
       skipLog: skipLog);
-  return connexions;
+  return connections;
 }

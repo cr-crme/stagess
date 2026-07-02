@@ -201,7 +201,7 @@ class ReverseProxyServer {
 
     // Setup the callbacks for handling all the communication protocols
     bool clientIsDisconnected = false;
-    void handleConnexionDone([err]) {
+    void handleConnectionDone([err]) {
       if (clientIsDisconnected) return;
       clientIsDisconnected = true;
 
@@ -209,17 +209,18 @@ class ReverseProxyServer {
       _closeSocketIfMounted(backendSocket);
     }
 
-    void handleBackendDone([e]) => handleConnexionDone(e);
+    void handleBackendDone([e]) => handleConnectionDone(e);
     void handleBackendError(e) {
-      _logger.severe('Error on backend socket: Killing all connexions.', e);
+      _logger.severe('Error on backend socket: Killing all connections.', e);
       _isReconnecting = true;
-      handleConnexionDone(e);
+      handleConnectionDone(e);
     }
 
-    void handleClientDone([e]) => handleConnexionDone(e);
+    void handleClientDone([e]) => handleConnectionDone(e);
     void handleClientError(e) {
-      _logger.severe('Error on client ($remote) socket: Closing connexion.', e);
-      handleConnexionDone(e);
+      _logger.severe(
+          'Error on client ($remote) socket: Closing connection.', e);
+      handleConnectionDone(e);
     }
 
     void forwardToBackend(Uint8List data) {

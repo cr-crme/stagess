@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:logging/logging.dart';
-import 'package:stagess_backend/server/connexions.dart';
+import 'package:stagess_backend/server/connections.dart';
 import 'package:stagess_backend/utils/custom_web_socket.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_backend/utils/network_rate_limiter.dart';
@@ -11,14 +11,14 @@ import 'package:stagess_common/services/backend_helpers.dart';
 final _logger = Logger('AnswerHttpRequest');
 
 class HttpRequestHandler {
-  final Connexions? _devConnexions;
-  final Connexions? _productionConnexions;
+  final Connections? _devConnections;
+  final Connections? _productionConnections;
 
   HttpRequestHandler(
-      {required Connexions? devConnexions,
-      required Connexions? productionConnexions})
-      : _devConnexions = devConnexions,
-        _productionConnexions = productionConnexions;
+      {required Connections? devConnections,
+      required Connections? productionConnections})
+      : _devConnections = devConnections,
+        _productionConnections = productionConnections;
 
   Future<void> answer(
     HttpRequest request, {
@@ -37,7 +37,7 @@ class HttpRequestHandler {
       // Control the size of incoming requests to prevent abuse and DoS attacks
       if (request.contentLength > 1 * 1024) {
         // 1 KB limit
-        throw ConnexionRefusedException('Request size exceeds limit');
+        throw ConnectionRefusedException('Request size exceeds limit');
       }
 
       // Handle the request based on its method and path
@@ -46,9 +46,9 @@ class HttpRequestHandler {
             allowedOrigins: allowedOrigins, rateLimiter: websocketRateLimiter);
       } else {
         // Handle other HTTP methods
-        throw ConnexionRefusedException('Unsupported method');
+        throw ConnectionRefusedException('Unsupported method');
       }
-    } on ConnexionRefusedException catch (e) {
+    } on ConnectionRefusedException catch (e) {
       await _sendFailedAndClose(request,
           statusCode: HttpStatus.unauthorized, message: 'Unauthorized: $e');
     } on RateLimitedException catch (e) {
@@ -74,7 +74,7 @@ class HttpRequestHandler {
       _logger.info(
           'Request from ${request.connectionInfo?.remoteAddress.address}:${request.connectionInfo?.remotePort} failed: $message');
       request.response.statusCode = statusCode;
-      request.response.write('Connexion refused');
+      request.response.write('Connection refused');
       await request.response.close();
     } catch (e, st) {
       //coverage:ignore-start
@@ -99,13 +99,13 @@ class HttpRequestHandler {
     final origin = Uri.parse(request.headers.value('Origin') ?? '');
     if (!allowedOrigins.any((allowed) =>
         allowed.scheme == origin.scheme && allowed.host == origin.host)) {
-      throw ConnexionRefusedException('Origin not allowed');
+      throw ConnectionRefusedException('Origin not allowed');
     }
 
     if (request.uri.path ==
         '/${BackendHelpers.connectEndpoint(useDevDatabase: false)}') {
       try {
-        _productionConnexions?.add(
+        _productionConnections?.add(
             CustomWebSocket(
                 socket: await WebSocketTransformer.upgrade(request),
                 ipAddress: ipAddress,
@@ -113,12 +113,12 @@ class HttpRequestHandler {
             rateLimiter: rateLimiter);
         return;
       } catch (e) {
-        throw ConnexionRefusedException('WebSocket upgrade failed');
+        throw ConnectionRefusedException('WebSocket upgrade failed');
       }
     } else if (request.uri.path ==
         '/${BackendHelpers.connectEndpoint(useDevDatabase: true)}') {
       try {
-        _devConnexions?.add(
+        _devConnections?.add(
             CustomWebSocket(
                 socket: await WebSocketTransformer.upgrade(request),
                 ipAddress: ipAddress,
@@ -126,7 +126,7 @@ class HttpRequestHandler {
             rateLimiter: rateLimiter);
         return;
       } catch (e) {
-        throw ConnexionRefusedException('WebSocket upgrade failed');
+        throw ConnectionRefusedException('WebSocket upgrade failed');
       }
     } else if (request.uri.path == '/${BackendHelpers.versionEndpoint}') {
       request.response.statusCode = HttpStatus.ok;
@@ -138,7 +138,7 @@ class HttpRequestHandler {
       await request.response.close();
       return;
     } else {
-      throw ConnexionRefusedException('Invalid endpoint');
+      throw ConnectionRefusedException('Invalid endpoint');
     }
   }
 }
