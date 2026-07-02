@@ -9,6 +9,7 @@ import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/internships/internship_contract.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/transportation.dart';
+import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/models/school_boards/school.dart';
@@ -27,6 +28,7 @@ final _logger = Logger('GenerateInternshipContractPdf');
 
 final _textStyle = pw.TextStyle(font: pw.Font.times());
 final _textStyleBold = pw.TextStyle(font: pw.Font.timesBold());
+final _textStyleItalic = pw.TextStyle(font: pw.Font.timesItalic());
 
 String _title(Program program) {
   switch (program) {
@@ -62,12 +64,12 @@ Future<Uint8List> generateInternshipContractPdf(
   final enterprise = EnterprisesProvider.of(mainContext, listen: false)
       .fromId(internship.enterpriseId);
   final contract = internship.contracts.firstWhere((c) => c.id == contractId);
-  final specialization = ActivitySectorsService.specializationOrNull(
-      internship.currentContract!.specializationId);
+  final specialization =
+      ActivitySectorsService.specializationOrNull(contract.specializationId);
 
   if (specialization == null) {
     _logger.warning(
-        'No specialization found for internship ${internship.id} with specialization id ${internship.currentContract?.specializationId}');
+        'No specialization found for internship ${internship.id} with specialization id ${contract.specializationId}');
     return Uint8List(0);
   }
 
@@ -113,8 +115,10 @@ Future<Uint8List> generateInternshipContractPdf(
             _contract(
               schoolBoard: schoolBoard,
               school: school,
+              teacher: teacher,
               student: student,
               enterprise: enterprise,
+              contract: contract,
             ),
             pw.NewPage(),
             _studentInformations(
@@ -364,7 +368,7 @@ pw.Widget _studentObligations({
         ),
       ),
       pw.SizedBox(height: 24),
-      _signature('Signature de l\'élève'),
+      _signature(person: student, role: 'Stagiaire'),
     ],
   );
 }
@@ -372,8 +376,10 @@ pw.Widget _studentObligations({
 pw.Widget _contract({
   required SchoolBoard schoolBoard,
   required School school,
+  required Teacher teacher,
   required Student student,
   required Enterprise enterprise,
+  required InternshipContract contract,
 }) {
   return pw.Column(
     crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -593,16 +599,17 @@ pw.Widget _contract({
       pw.Text('En foi de quoi, les parties ont signé la présente :',
           style: _textStyleBold),
       pw.SizedBox(height: 24),
-      _signature('Signature de l\'employeur'),
+      _signature(
+          person: contract.supervisor, role: 'Représentant de l\'employeur'),
       pw.SizedBox(height: 24),
-      _signature('Signature de l\'enseignant\nresponsable des stages'),
+      _signature(person: teacher, role: 'Enseignant responsable'),
       pw.SizedBox(height: 24),
-      _signature('Signature du stagiaire'),
+      _signature(person: student, role: 'Stagiaire'),
     ],
   );
 }
 
-pw.Widget _signature(String person) {
+pw.Widget _signature({required Person person, required String role}) {
   return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -610,7 +617,11 @@ pw.Widget _signature(String person) {
         pw.Column(children: [
           pw.Text('______________________________________________',
               style: _textStyleBold),
-          pw.Text(person, style: _textStyle, textAlign: pw.TextAlign.center),
+          pw.Row(children: [
+            pw.Text('Signature de ', style: _textStyle),
+            pw.Text(person.fullName, style: _textStyleItalic),
+          ]),
+          pw.Text(role, style: _textStyle),
         ]),
         pw.Column(children: [
           pw.Text('____________________________', style: _textStyleBold),
