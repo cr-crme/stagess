@@ -6,15 +6,52 @@ import '../utils.dart';
 
 void main() {
   group('DailySchedule', () {
-    test('"Day" is the right label', () {
-      expect(Day.values.length, 7);
-      expect(Day.monday.name, 'Lundi');
-      expect(Day.tuesday.name, 'Mardi');
-      expect(Day.wednesday.name, 'Mercredi');
-      expect(Day.thursday.name, 'Jeudi');
-      expect(Day.friday.name, 'Vendredi');
-      expect(Day.saturday.name, 'Samedi');
-      expect(Day.sunday.name, 'Dimanche');
+    test('DayCycle count', () {
+      expect(DayCycle.values.length, 3);
+    });
+
+    test('"WeekdaysCycle" is the right label', () {
+      final dayCycle = DayCycle.weekdaysCycle;
+
+      expect(dayCycle.dayCount, 7);
+      expect(dayCycle.dayAsString(0), 'Lundi');
+      expect(dayCycle.dayAsString(1), 'Mardi');
+      expect(dayCycle.dayAsString(2), 'Mercredi');
+      expect(dayCycle.dayAsString(3), 'Jeudi');
+      expect(dayCycle.dayAsString(4), 'Vendredi');
+      expect(dayCycle.dayAsString(5), 'Samedi');
+      expect(dayCycle.dayAsString(6), 'Dimanche');
+    });
+
+    test('"NineDaysCycle" is the right label', () {
+      final dayCycle = DayCycle.nineDaysCycle;
+
+      expect(dayCycle.dayCount, 9);
+      expect(dayCycle.dayAsString(0), 'Jour 0');
+      expect(dayCycle.dayAsString(1), 'Jour 1');
+      expect(dayCycle.dayAsString(2), 'Jour 2');
+      expect(dayCycle.dayAsString(3), 'Jour 3');
+      expect(dayCycle.dayAsString(4), 'Jour 4');
+      expect(dayCycle.dayAsString(5), 'Jour 5');
+      expect(dayCycle.dayAsString(6), 'Jour 6');
+      expect(dayCycle.dayAsString(7), 'Jour 7');
+      expect(dayCycle.dayAsString(8), 'Jour 8');
+    });
+
+    test('"TenDaysCycle" is the right label', () {
+      final dayCycle = DayCycle.tenDaysCycle;
+
+      expect(dayCycle.dayCount, 10);
+      expect(dayCycle.dayAsString(0), 'Jour 0');
+      expect(dayCycle.dayAsString(1), 'Jour 1');
+      expect(dayCycle.dayAsString(2), 'Jour 2');
+      expect(dayCycle.dayAsString(3), 'Jour 3');
+      expect(dayCycle.dayAsString(4), 'Jour 4');
+      expect(dayCycle.dayAsString(5), 'Jour 5');
+      expect(dayCycle.dayAsString(6), 'Jour 6');
+      expect(dayCycle.dayAsString(7), 'Jour 7');
+      expect(dayCycle.dayAsString(8), 'Jour 8');
+      expect(dayCycle.dayAsString(9), 'Jour 9');
     });
 
     test('"copyWith" behaves properly', () {

@@ -435,56 +435,56 @@ class _ScheduleSelector extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 16.0, top: 8.0),
                     child: Column(
                       children: [
-                        ...Day.values.asMap().keys.map(
-                              (dayIndex) => FormField(
-                                validator: (value) {
-                                  final schedule =
-                                      weeklySchedule.schedule[dayIndex];
-                                  for (final block
-                                      in schedule?.blocks ?? <TimeBlock>[]) {
-                                    if (block.end.isBefore(block.start)) {
-                                      return 'La fin du bloc horaire ne peut pas être avant le début.';
-                                    }
-                                  }
-                                  return null;
-                                },
-                                builder: (state) {
-                                  bool isEnabled = true;
-                                  if (useSameScheduleForAllDays &&
-                                      weeklySchedule.schedule[dayIndex] !=
-                                          null) {
-                                    if (referenceDayIndex == null ||
-                                        referenceDayIndex == dayIndex) {
-                                      referenceDayIndex = dayIndex;
-                                    } else {
-                                      isEnabled = false;
-                                    }
-                                  }
+                        ...List.generate(weeklySchedule.dayCycle.dayCount,
+                            (index) => index).map(
+                          (dayIndex) => FormField(
+                            validator: (value) {
+                              final schedule =
+                                  weeklySchedule.schedule[dayIndex];
+                              for (final block
+                                  in schedule?.blocks ?? <TimeBlock>[]) {
+                                if (block.end.isBefore(block.start)) {
+                                  return 'La fin du bloc horaire ne peut pas être avant le début.';
+                                }
+                              }
+                              return null;
+                            },
+                            builder: (state) {
+                              bool isEnabled = true;
+                              if (useSameScheduleForAllDays &&
+                                  weeklySchedule.schedule[dayIndex] != null) {
+                                if (referenceDayIndex == null ||
+                                    referenceDayIndex == dayIndex) {
+                                  referenceDayIndex = dayIndex;
+                                } else {
+                                  isEnabled = false;
+                                }
+                              }
 
-                                  return Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      _buildDailyScheduleTile(
-                                        context,
-                                        day: dayIndex,
-                                        canChangeTime: isEnabled,
-                                      ),
-                                      if (state.hasError && isEnabled)
-                                        Center(
-                                          child: Text(
-                                            state.errorText ?? '',
-                                            style: TextStyle(
-                                              color: Theme.of(
-                                                context,
-                                              ).colorScheme.error,
-                                            ),
-                                          ),
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _buildDailyScheduleTile(
+                                    context,
+                                    day: dayIndex,
+                                    canChangeTime: isEnabled,
+                                  ),
+                                  if (state.hasError && isEnabled)
+                                    Center(
+                                      child: Text(
+                                        state.errorText ?? '',
+                                        style: TextStyle(
+                                          color: Theme.of(
+                                            context,
+                                          ).colorScheme.error,
                                         ),
-                                    ],
-                                  );
-                                },
-                              ),
-                            ),
+                                      ),
+                                    ),
+                                ],
+                              );
+                            },
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -638,7 +638,7 @@ class _ScheduleSelector extends StatelessWidget {
                     },
                   ),
                 ),
-                Text(Day.values[day].name),
+                Text(DayCycle.weekdaysCycle.dayAsString(day)),
               ],
             ),
           ),

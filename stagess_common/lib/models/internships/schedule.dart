@@ -4,36 +4,38 @@ import 'package:stagess_common/models/generic/serializable_elements.dart';
 import 'package:stagess_common/models/internships/time_utils.dart';
 import 'package:stagess_common/utils.dart';
 
-enum Day {
-  monday,
-  tuesday,
-  wednesday,
-  thursday,
-  friday,
-  saturday,
-  sunday;
+enum DayCycle {
+  // TODO: Add cycles choices in a drop menu
+  weekdaysCycle,
+  nineDaysCycle,
+  tenDaysCycle;
 
-  String get name {
-    switch (this) {
-      case (Day.monday):
-        return 'Lundi';
-      case (Day.tuesday):
-        return 'Mardi';
-      case (Day.wednesday):
-        return 'Mercredi';
-      case (Day.thursday):
-        return 'Jeudi';
-      case (Day.friday):
-        return 'Vendredi';
-      case (Day.saturday):
-        return 'Samedi';
-      case (Day.sunday):
-        return 'Dimanche';
-    }
+  int get dayCount {
+    return switch (this) {
+      DayCycle.weekdaysCycle => 7,
+      DayCycle.nineDaysCycle => 9,
+      DayCycle.tenDaysCycle => 10,
+    };
   }
 
-  @override
-  String toString() => name;
+  String dayAsString(int day) {
+    switch (this) {
+      case DayCycle.weekdaysCycle:
+        return switch (day) {
+          0 => 'Lundi',
+          1 => 'Mardi',
+          2 => 'Mercredi',
+          3 => 'Jeudi',
+          4 => 'Vendredi',
+          5 => 'Samedi',
+          6 => 'Dimanche',
+          _ => 'Jour $day',
+        };
+      case DayCycle.nineDaysCycle:
+      case DayCycle.tenDaysCycle:
+        return 'Jour $day';
+    }
+  }
 }
 
 class TimeBlock extends ItemSerializable {
@@ -116,6 +118,7 @@ class WeeklySchedule extends ItemSerializable {
     _finalizeInitialization();
   }
 
+  final DayCycle dayCycle = DayCycle.weekdaysCycle;
   final Map<int, DailySchedule?> schedule;
   final DateTimeRange period;
 

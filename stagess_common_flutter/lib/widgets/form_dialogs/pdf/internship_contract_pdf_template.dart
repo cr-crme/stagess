@@ -825,7 +825,9 @@ pw.Widget _schedulesCell(
                                     final dayIndex = pair.key;
                                     final entry = pair.value;
                                     return pw.TableRow(children: [
-                                      pw.Text(Day.values[dayIndex].name,
+                                      pw.Text(
+                                          weeklySchedule.dayCycle
+                                              .dayAsString(dayIndex),
                                           style: style),
                                       pw.SizedBox(width: 20.0),
                                       pw.Text(
