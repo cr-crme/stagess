@@ -592,7 +592,7 @@ class _ExtraSpecialization extends StatelessWidget {
               'Métier supplémentaire ${index + 1}',
               style: Theme.of(context).textTheme.titleMedium,
             ),
-            if (controller.canModify)
+            if (controller.isNewContract)
               SizedBox(
                 width: 35,
                 height: 35,
@@ -608,7 +608,7 @@ class _ExtraSpecialization extends StatelessWidget {
         EnterpriseJobListTile(
           controller: controller._extraJobControllers[index],
           schools: currentSchool == null ? null : [currentSchool],
-          editMode: controller.isNewContract || controller.canModify,
+          editMode: controller.isNewContract,
           specializationOnly: true,
           canChangeExpandedState: false,
           initialExpandedState: true,
@@ -635,7 +635,7 @@ class _ExtraSpecialization extends StatelessWidget {
                 child: _extraJobTileBuilder(context, i),
               ),
             ),
-        controller.canModify
+        controller.isNewContract
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
