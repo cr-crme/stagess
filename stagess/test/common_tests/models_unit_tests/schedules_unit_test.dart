@@ -96,8 +96,8 @@ void main() {
       final scheduleDifferent = schedule.copyWith(
         id: 'newId',
         schedule: {
-          Day.monday: dummyDailySchedule(id: 'newDailyScheduleId'),
-          Day.tuesday: dummyDailySchedule(id: 'newDailyScheduleId2'),
+          0: dummyDailySchedule(id: 'newDailyScheduleId'),
+          1: dummyDailySchedule(id: 'newDailyScheduleId2'),
         },
         period: DateTimeRange(
           start: DateTime(2020, 2, 3),
@@ -107,9 +107,9 @@ void main() {
 
       expect(scheduleDifferent.id, 'newId');
       expect(scheduleDifferent.schedule.length, 2);
-      expect(scheduleDifferent.schedule[Day.monday]!.id, 'newDailyScheduleId');
+      expect(scheduleDifferent.schedule[0]!.id, 'newDailyScheduleId');
       expect(
-        scheduleDifferent.schedule[Day.tuesday]!.id,
+        scheduleDifferent.schedule[1]!.id,
         'newDailyScheduleId2',
       );
       expect(scheduleDifferent.period.start, DateTime(2020, 2, 3));
@@ -124,7 +124,7 @@ void main() {
       expect(serialized, {
         'id': weeklySchedule.id,
         'days': weeklySchedule.schedule.map(
-          (day, e) => MapEntry(day.index.toString(), e?.serialize()),
+          (day, e) => MapEntry(day, e?.serialize()),
         ),
         'start': weeklySchedule.period.start.millisecondsSinceEpoch,
         'end': weeklySchedule.period.end.millisecondsSinceEpoch,

@@ -6,7 +6,6 @@ import 'package:logging/logging.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/internships/internship.dart';
-import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/helpers/enterprise_extension.dart';
@@ -209,13 +208,12 @@ class _InternshipListState extends State<_InternshipList> {
 
               if (specialization == null || student == null) return Container();
 
-              var internshipDays = <Day>{};
+              var internshipDays = <int>{};
               for (final weeklySchedule in contract.weeklySchedules) {
                 internshipDays.addAll(weeklySchedule.schedule.keys);
               }
-              internshipDays = internshipDays
-                  .sorted((e, f) => e.index.compareTo(f.index))
-                  .toSet();
+              internshipDays =
+                  internshipDays.sorted((e, f) => e.compareTo(f)).toSet();
 
               return AnimatedExpandingCard(
                 initialExpandedState: _expanded[internship.id] ?? false,

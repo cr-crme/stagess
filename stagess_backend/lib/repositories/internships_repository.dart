@@ -879,7 +879,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
                 data: {
                   'id': schedule.id,
                   'weekly_schedule_id': weeklySchedule.id,
-                  'day': day.index,
+                  'day': day,
                   'block_index': blockIndex,
                   'starting_hour': schedule.blocks[blockIndex].start.hour,
                   'starting_minute': schedule.blocks[blockIndex].start.minute,
@@ -1214,7 +1214,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
           weeklySchedules: [
             WeeklySchedule(
                 schedule: {
-                  Day.monday: DailySchedule(blocks: [
+                  0: DailySchedule(blocks: [
                     TimeBlock(
                         start: TimeOfDay(hour: 8, minute: 0),
                         end: TimeOfDay(hour: 12, minute: 0)),
@@ -1222,7 +1222,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
                         start: TimeOfDay(hour: 13, minute: 0),
                         end: TimeOfDay(hour: 16, minute: 0))
                   ]),
-                  Day.wednesday: DailySchedule(blocks: [
+                  2: DailySchedule(blocks: [
                     TimeBlock(
                         start: TimeOfDay(hour: 8, minute: 0),
                         end: TimeOfDay(hour: 12, minute: 0)),
@@ -1230,7 +1230,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
                         start: TimeOfDay(hour: 13, minute: 0),
                         end: TimeOfDay(hour: 16, minute: 0))
                   ]),
-                  Day.friday: DailySchedule(blocks: [
+                  4: DailySchedule(blocks: [
                     TimeBlock(
                         start: TimeOfDay(hour: 8, minute: 0),
                         end: TimeOfDay(hour: 12, minute: 0)),
@@ -1282,7 +1282,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
           weeklySchedules: [
             WeeklySchedule(
                 schedule: {
-                  Day.tuesday: DailySchedule(
+                  1: DailySchedule(
                     blocks: [
                       TimeBlock(
                           start: TimeOfDay(hour: 9, minute: 0),
@@ -1292,7 +1292,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
                           end: TimeOfDay(hour: 17, minute: 0))
                     ],
                   ),
-                  Day.thursday: DailySchedule(blocks: [
+                  3: DailySchedule(blocks: [
                     TimeBlock(
                         start: TimeOfDay(hour: 9, minute: 0),
                         end: TimeOfDay(hour: 12, minute: 0)),

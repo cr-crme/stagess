@@ -94,7 +94,7 @@ class WeeklySchedulesController {
 
   void updateDailyScheduleTime(
     int weeklyIndex,
-    Day day, {
+    int day, {
     required DailySchedule schedule,
   }) {
     _logger.finer(
@@ -112,7 +112,7 @@ class WeeklySchedulesController {
     _hasChanged = true;
   }
 
-  void removeDailyScheduleTime(int weeklyIndex, Day day) {
+  void removeDailyScheduleTime(int weeklyIndex, int day) {
     _logger.finer(
       'Updating daily schedule (weekly index: $weeklyIndex, day: $day)',
     );
@@ -158,25 +158,20 @@ class WeeklySchedulesController {
   }
 
   void applySameScheduleForAllDays(int weeklyIndex) {
-    final schedules = _weeklySchedules[weeklyIndex].schedule;
-    if (schedules.isEmpty) return;
-
     // Reference day is the first day with a schedule
-    final referenceDay = Day.values.firstWhereOrNull(
-      (day) => schedules[day] != null,
-    );
-    if (referenceDay == null) return;
+    final schedules = _weeklySchedules[weeklyIndex].schedule;
+    final referenceDayIndex = schedules.keys.firstOrNull;
+    if (referenceDayIndex == null) return;
 
     schedules.forEach((day, schedule) {
-      if (day != referenceDay) {
-        schedules[day] = schedules[referenceDay]?.duplicate();
-      }
+      if (day == referenceDayIndex) return;
+      schedules[day] = schedules[referenceDayIndex]?.duplicate();
     });
     _hasChanged = true;
   }
 
   static WeeklySchedule fillNewScheduleList({
-    required Map<Day, DailySchedule?> schedule,
+    required Map<int, DailySchedule?> schedule,
     required time_utils.DateTimeRange periode,
   }) {
     return WeeklySchedule(
@@ -394,6 +389,9 @@ class _ScheduleSelector extends StatelessWidget {
               ],
             ),
           ),
+        //if (editMode)
+        //DropdownButton(items: Day, onChanged: onChanged),
+
         if (editMode)
           Align(
             alignment: Alignment.centerRight,
@@ -440,8 +438,8 @@ class _ScheduleSelector extends StatelessWidget {
                         ...Day.values.asMap().keys.map(
                               (dayIndex) => FormField(
                                 validator: (value) {
-                                  final day = Day.values[dayIndex];
-                                  final schedule = weeklySchedule.schedule[day];
+                                  final schedule =
+                                      weeklySchedule.schedule[dayIndex];
                                   for (final block
                                       in schedule?.blocks ?? <TimeBlock>[]) {
                                     if (block.end.isBefore(block.start)) {
@@ -451,11 +449,10 @@ class _ScheduleSelector extends StatelessWidget {
                                   return null;
                                 },
                                 builder: (state) {
-                                  final day = Day.values[dayIndex];
-
                                   bool isEnabled = true;
                                   if (useSameScheduleForAllDays &&
-                                      weeklySchedule.schedule[day] != null) {
+                                      weeklySchedule.schedule[dayIndex] !=
+                                          null) {
                                     if (referenceDayIndex == null ||
                                         referenceDayIndex == dayIndex) {
                                       referenceDayIndex = dayIndex;
@@ -469,7 +466,7 @@ class _ScheduleSelector extends StatelessWidget {
                                     children: [
                                       _buildDailyScheduleTile(
                                         context,
-                                        day: day,
+                                        day: dayIndex,
                                         canChangeTime: isEnabled,
                                       ),
                                       if (state.hasError && isEnabled)
@@ -556,7 +553,7 @@ class _ScheduleSelector extends StatelessWidget {
     BuildContext context, {
     required DailySchedule schedule,
     required int blockIndex,
-    required Day day,
+    required int day,
   }) async {
     final time = await _promptTime(
       context,
@@ -577,7 +574,7 @@ class _ScheduleSelector extends StatelessWidget {
     BuildContext context, {
     required DailySchedule schedule,
     required int blockIndex,
-    required Day day,
+    required int day,
   }) async {
     final time = await _promptTime(
       context,
@@ -596,7 +593,7 @@ class _ScheduleSelector extends StatelessWidget {
 
   Widget _buildDailyScheduleTile(
     BuildContext context, {
-    required Day day,
+    required int day,
     required bool canChangeTime,
   }) {
     final schedule = controller._weeklySchedules[weekIndex].schedule[day];
@@ -641,7 +638,7 @@ class _ScheduleSelector extends StatelessWidget {
                     },
                   ),
                 ),
-                Text(day.name),
+                Text(Day.values[day].name),
               ],
             ),
           ),

@@ -453,11 +453,11 @@ WeeklySchedule dummyWeeklySchedule({
   return WeeklySchedule(
     id: id,
     schedule: {
-      Day.monday: dummyDailySchedule(id: 'dailyScheduleId1'),
-      Day.tuesday: dummyDailySchedule(id: 'dailyScheduleId2'),
-      Day.wednesday: dummyDailySchedule(id: 'dailyScheduleId3'),
-      Day.thursday: dummyDailySchedule(id: 'dailyScheduleId4'),
-      Day.friday: dummyDailySchedule(id: 'dailyScheduleId5'),
+      0: dummyDailySchedule(id: 'dailyScheduleId1'),
+      1: dummyDailySchedule(id: 'dailyScheduleId2'),
+      2: dummyDailySchedule(id: 'dailyScheduleId3'),
+      3: dummyDailySchedule(id: 'dailyScheduleId4'),
+      4: dummyDailySchedule(id: 'dailyScheduleId5'),
     },
     period: period ??
         DateTimeRange(start: DateTime(2026, 1, 2), end: DateTime(2026, 1, 22)),

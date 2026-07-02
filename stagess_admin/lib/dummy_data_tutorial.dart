@@ -2153,7 +2153,7 @@ Future<void> _addDummyInternships(
           weeklySchedules: [
             WeeklySchedule(
               schedule: {
-                Day.monday: DailySchedule(
+                0: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2165,7 +2165,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.tuesday: DailySchedule(
+                1: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2177,7 +2177,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.wednesday: DailySchedule(
+                2: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2189,7 +2189,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.thursday: DailySchedule(
+                3: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2201,7 +2201,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.friday: DailySchedule(
+                4: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2297,7 +2297,7 @@ Future<void> _addDummyInternships(
             weeklySchedules: [
               WeeklySchedule(
                 schedule: {
-                  Day.monday: DailySchedule(
+                  0: DailySchedule(
                     blocks: [
                       TimeBlock(
                         start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2309,7 +2309,7 @@ Future<void> _addDummyInternships(
                       ),
                     ],
                   ),
-                  Day.tuesday: DailySchedule(
+                  1: DailySchedule(
                     blocks: [
                       TimeBlock(
                         start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2321,7 +2321,7 @@ Future<void> _addDummyInternships(
                       ),
                     ],
                   ),
-                  Day.wednesday: DailySchedule(
+                  2: DailySchedule(
                     blocks: [
                       TimeBlock(
                         start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2333,7 +2333,7 @@ Future<void> _addDummyInternships(
                       ),
                     ],
                   ),
-                  Day.thursday: DailySchedule(
+                  3: DailySchedule(
                     blocks: [
                       TimeBlock(
                         start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2345,7 +2345,7 @@ Future<void> _addDummyInternships(
                       ),
                     ],
                   ),
-                  Day.friday: DailySchedule(
+                  4: DailySchedule(
                     blocks: [
                       TimeBlock(
                         start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2430,7 +2430,7 @@ Future<void> _addDummyInternships(
         weeklySchedules: [
           WeeklySchedule(
             schedule: {
-              Day.monday: DailySchedule(
+              0: DailySchedule(
                 blocks: [
                   TimeBlock(
                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2442,7 +2442,7 @@ Future<void> _addDummyInternships(
                   ),
                 ],
               ),
-              Day.tuesday: DailySchedule(
+              1: DailySchedule(
                 blocks: [
                   TimeBlock(
                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2454,7 +2454,7 @@ Future<void> _addDummyInternships(
                   ),
                 ],
               ),
-              Day.wednesday: DailySchedule(
+              2: DailySchedule(
                 blocks: [
                   TimeBlock(
                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2466,7 +2466,7 @@ Future<void> _addDummyInternships(
                   ),
                 ],
               ),
-              Day.thursday: DailySchedule(
+              3: DailySchedule(
                 blocks: [
                   TimeBlock(
                     start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2551,7 +2551,7 @@ Future<void> _addDummyInternships(
           weeklySchedules: [
             WeeklySchedule(
               schedule: {
-                Day.monday: DailySchedule(
+                0: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2563,7 +2563,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.tuesday: DailySchedule(
+                1: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2575,7 +2575,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.wednesday: DailySchedule(
+                2: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2646,7 +2646,7 @@ Future<void> _addDummyInternships(
           weeklySchedules: [
             WeeklySchedule(
               schedule: {
-                Day.monday: DailySchedule(
+                0: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2658,7 +2658,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.wednesday: DailySchedule(
+                2: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2670,7 +2670,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.friday: DailySchedule(
+                4: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2761,7 +2761,7 @@ Future<void> _addDummyInternships(
           weeklySchedules: [
             WeeklySchedule(
               schedule: {
-                Day.monday: DailySchedule(
+                0: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2773,7 +2773,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.tuesday: DailySchedule(
+                1: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2785,7 +2785,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.wednesday: DailySchedule(
+                2: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2797,7 +2797,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.thursday: DailySchedule(
+                3: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2809,7 +2809,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.friday: DailySchedule(
+                4: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -2996,7 +2996,7 @@ Future<void> _addDummyInternships(
           weeklySchedules: [
             WeeklySchedule(
               schedule: {
-                Day.monday: DailySchedule(
+                0: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -3008,7 +3008,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.tuesday: DailySchedule(
+                1: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -3020,7 +3020,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.wednesday: DailySchedule(
+                2: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -3032,7 +3032,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.thursday: DailySchedule(
+                3: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -3044,7 +3044,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.friday: DailySchedule(
+                4: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -3115,7 +3115,7 @@ Future<void> _addDummyInternships(
             weeklySchedules: [
               WeeklySchedule(
                 schedule: {
-                  Day.monday: DailySchedule(
+                  0: DailySchedule(
                     blocks: [
                       TimeBlock(
                         start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -3127,7 +3127,7 @@ Future<void> _addDummyInternships(
                       ),
                     ],
                   ),
-                  Day.tuesday: DailySchedule(
+                  1: DailySchedule(
                     blocks: [
                       TimeBlock(
                         start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -3209,7 +3209,7 @@ Future<void> _addDummyInternships(
           weeklySchedules: [
             WeeklySchedule(
               schedule: {
-                Day.monday: DailySchedule(
+                0: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -3221,7 +3221,7 @@ Future<void> _addDummyInternships(
                     ),
                   ],
                 ),
-                Day.tuesday: DailySchedule(
+                1: DailySchedule(
                   blocks: [
                     TimeBlock(
                       start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -3290,7 +3290,7 @@ Future<void> _addDummyInternships(
             weeklySchedules: [
               WeeklySchedule(
                 schedule: {
-                  Day.monday: DailySchedule(
+                  0: DailySchedule(
                     blocks: [
                       TimeBlock(
                         start: const time_utils.TimeOfDay(hour: 9, minute: 00),
@@ -3302,7 +3302,7 @@ Future<void> _addDummyInternships(
                       ),
                     ],
                   ),
-                  Day.tuesday: DailySchedule(
+                  1: DailySchedule(
                     blocks: [
                       TimeBlock(
                         start: const time_utils.TimeOfDay(hour: 9, minute: 00),

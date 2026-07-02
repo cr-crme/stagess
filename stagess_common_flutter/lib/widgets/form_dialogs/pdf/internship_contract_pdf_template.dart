@@ -822,10 +822,11 @@ pw.Widget _schedulesCell(
                                 children: weeklySchedule.schedule.entries
                                     .map<pw.TableRow>(
                                   (pair) {
-                                    final day = pair.key;
+                                    final dayIndex = pair.key;
                                     final entry = pair.value;
                                     return pw.TableRow(children: [
-                                      pw.Text(day.name, style: style),
+                                      pw.Text(Day.values[dayIndex].name,
+                                          style: style),
                                       pw.SizedBox(width: 20.0),
                                       pw.Text(
                                           '${entry?.blocks.first.start.hour}:${entry?.blocks.first.start.minute.toString().padLeft(2, '0')}',

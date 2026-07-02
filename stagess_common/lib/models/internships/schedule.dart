@@ -32,13 +32,6 @@ enum Day {
     }
   }
 
-  static Day fromName(String name) {
-    return Day.values.firstWhere(
-      (element) => element.name.toLowerCase() == name.toLowerCase(),
-      orElse: () => Day.monday,
-    );
-  }
-
   @override
   String toString() => name;
 }
@@ -123,7 +116,7 @@ class WeeklySchedule extends ItemSerializable {
     _finalizeInitialization();
   }
 
-  final Map<Day, DailySchedule?> schedule;
+  final Map<int, DailySchedule?> schedule;
   final DateTimeRange period;
 
   void _finalizeInitialization() {
@@ -137,27 +130,28 @@ class WeeklySchedule extends ItemSerializable {
       if (a == null) return 1;
       if (b == null) return -1;
 
-      if (dayA.index < dayB.index) return -1;
-      if (dayA.index > dayB.index) return 1;
+      if (dayA < dayB) return -1;
+      if (dayA > dayB) return 1;
 
       return 0;
     });
   }
 
   WeeklySchedule.fromSerialized(super.map)
-      : schedule = (map?['days'] as Map?)?.map((day, e) => MapEntry(
-                Day.values[int.parse(day)], DailySchedule.fromSerialized(e))) ??
+      : schedule = (map?['days'] as Map?)?.map((day, e) =>
+                MapEntry(int.parse(day), DailySchedule.fromSerialized(e))) ??
             {},
         period = DateTimeRange(
-            start:DateTimeExt.from(map?['start']) ?? DateTime(0),
-            end: DateTimeExt.from(map?['end']) ?? DateTime(0),),
+          start: DateTimeExt.from(map?['start']) ?? DateTime(0),
+          end: DateTimeExt.from(map?['end']) ?? DateTime(0),
+        ),
         super.fromSerialized();
 
   @override
   Map<String, dynamic> serializedMap() => {
         'id': id,
-        'days': schedule
-            .map((day, e) => MapEntry(day.index.toString(), e?.serialize())),
+        'days':
+            schedule.map((day, e) => MapEntry(day.toString(), e?.serialize())),
         'start': period.start.serialize(),
         'end': period.end.serialize(),
       };
@@ -178,7 +172,7 @@ class WeeklySchedule extends ItemSerializable {
 
   WeeklySchedule copyWith({
     String? id,
-    Map<Day, DailySchedule>? schedule,
+    Map<int, DailySchedule>? schedule,
     DateTimeRange? period,
   }) =>
       WeeklySchedule(
