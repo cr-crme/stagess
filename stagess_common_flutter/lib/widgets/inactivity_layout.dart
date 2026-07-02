@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/backend_list_provided.dart';
 
 final _logger = Logger('InactivityLayout');
@@ -57,9 +58,9 @@ class _InactivityLayoutState extends State<InactivityLayout> {
       }
 
       // If the reconnecting dialog is showing, close it first
-      if (_isShowingWaitForReconnexionDialog) {
+      if (_isShowingDialog) {
         Navigator.of(context).pop();
-        _isShowingWaitForReconnexionDialog = false;
+        _isShowingDialog = false;
       }
 
       final restartTimer = await widget.onTimedOut(context);
@@ -73,44 +74,47 @@ class _InactivityLayoutState extends State<InactivityLayout> {
     _inactivityService.dispose();
   }
 
-  bool _isShowingWaitForReconnexionDialog = false;
-  void _onConnexionStatusChanged(bool isConnected) async {
+  bool _isShowingDialog = false;
+  void _onConnectionStatusChanged(bool isConnected, bool canReconnect) async {
+    final auth = AuthProvider.of(context, listen: false);
+    if (!auth.isFullySignedIn) return;
+
     if (isConnected) {
-      if (_isShowingWaitForReconnexionDialog) {
+      if (_isShowingDialog) {
         Navigator.of(widget.navigatorKey.currentContext!).pop();
       }
-      _isShowingWaitForReconnexionDialog = false;
-      return;
-    }
+      _isShowingDialog = false;
+    } else {
+      if (_isShowingDialog || widget.navigatorKey.currentContext == null) {
+        return;
+      }
 
-    if (_isShowingWaitForReconnexionDialog ||
-        widget.navigatorKey.currentContext == null) {
-      return;
-    }
-    _isShowingWaitForReconnexionDialog = true;
-    await showDialog(
-      context: widget.navigatorKey.currentContext!,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Text('Connexion perdue'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'La connexion au serveur a été perdue. Nous tentons de nous reconnecter.',
-            ),
-            SizedBox(height: 16),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                  onPressed: () => widget.onDisconnect(context),
-                  child: const Text('Annuler')),
-            ),
-          ],
+      _isShowingDialog = true;
+      await showDialog(
+        context: widget.navigatorKey.currentContext!,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: Text('Connexion perdue'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'La connexion au serveur a été perdue.\n'
+                '${canReconnect ? 'Nous tentons de nous reconnecter.' : 'Rafraîchissez la page pour rétablir la connexion.'}',
+              ),
+              SizedBox(height: 16),
+              if (canReconnect)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                      onPressed: () => widget.onDisconnect(context),
+                      child: const Text('Annuler')),
+                ),
+            ],
+          ),
         ),
-      ),
-    );
-    _isShowingWaitForReconnexionDialog = false;
+      );
+    }
   }
 
   @override
@@ -120,9 +124,8 @@ class _InactivityLayoutState extends State<InactivityLayout> {
       onPointerDown: (_) => _inactivityService.userHasInteracted(),
       child: Builder(
         builder: (context) {
-          BackendListProvided.onConnexionStatusChanged.listen(
-            _onConnexionStatusChanged,
-          );
+          BackendListProvided.onConnectionStatusChanged
+              .listen(_onConnectionStatusChanged);
 
           return widget.child;
         },

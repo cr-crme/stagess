@@ -42,7 +42,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
   final Uri uri;
 
   static final onConnectionStatusChanged =
-      GenericListener<Function(bool isConnected)>();
+      GenericListener<Function(bool isConnected, bool canReconnect)>();
 
   DateTime? _startedConnectingAt;
   bool _hasProblemConnecting = false;
@@ -101,12 +101,12 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
           timeout: const Duration(seconds: 600),
           backoff: ConstantBackoff(Duration(seconds: 5)),
         );
-        _shouldReconnect = true;
+        _canReconnect = true;
 
         _socket!.connection.listen((event) {
           if (_socket == null || isDisposed) return;
 
-          if (!_shouldReconnect) {
+          if (!_canReconnect) {
             disconnect();
             return;
           }
@@ -119,7 +119,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
               ),
             );
             onConnectionStatusChanged.notifyListeners(
-              (callback) => callback(true),
+              (callback) => callback(true, _canReconnect),
             );
           } else if (event is Disconnected || event is Reconnecting) {
             // Setup the reconnection logic
@@ -128,7 +128,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
             _connectionRefused = false;
             _handshakeReceived = false;
             onConnectionStatusChanged.notifyListeners(
-              (callback) => callback(false),
+              (callback) => callback(false, _canReconnect),
             );
           }
         });
@@ -140,7 +140,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
             if (protocol.requestType == RequestType.response &&
                 protocol.response == Response.connectionRefused) {
               _connectionRefused = true;
-              _shouldReconnect = false;
+              _canReconnect = false;
               disconnect();
               return;
             }
@@ -154,6 +154,8 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
           if (_socket == null || isDisposed) {
             // If the socket is null, it means the connection failed
             _logger.severe('Connection to the server was canceled');
+            onConnectionStatusChanged
+                .notifyListeners((callback) => callback(false, _canReconnect));
             return;
           }
           if (_handshakeReceived) {
@@ -258,7 +260,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     _registeredFields.clear();
 
     _handshakeReceived = false;
-    _shouldReconnect = false;
+    _canReconnect = false;
   }
 
   @override
@@ -533,7 +535,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
 /// connections to the backend, dropping the communications which are related
 /// to other providers.
 WebSocket? _socket;
-bool _shouldReconnect = false;
+bool _canReconnect = false;
 int? _socketId;
 bool _handshakeReceived = false;
 Map<RequestFields, _Selector> _providerSelector = {};
@@ -637,7 +639,7 @@ Future<void> _incomingMessage(
         }
       case RequestType.disconnectRequest:
         {
-          _shouldReconnect = false;
+          _canReconnect = false;
           return;
         }
       case RequestType.response:

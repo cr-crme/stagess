@@ -19,7 +19,6 @@ import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/screens/in_maintenance_screen.dart';
 import 'package:stagess_common_flutter/screens/wrong_version_screen.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
-import 'package:stagess_common_flutter/widgets/single_instance_manager/single_instance_manager.dart';
 
 // TODO: Do not allow to update jobs of an existing interships
 // TODO: Add signatories of the internships
@@ -112,93 +111,66 @@ class StagessApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleInstanceManager(
-      isNotAllowedChild: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        onGenerateTitle: (context) => 'Stagess',
-        theme: crcrmeMaterialTheme,
-        home: Scaffold(
-          body: Center(
-            child: Text(
-                'Une seule page de Stagess ne peut être ouverte à la fois.\n'
-                'Veuillez fermer les autres onglets ou fenêtres et rafraîchir cette page.'),
-          ),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => AuthProvider(mockMe: useMockers),
         ),
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [Locale('fr', 'CA')],
-      ),
-      child: MultiProvider(
-        providers: [
-          ChangeNotifierProvider(
-            create: (context) => AuthProvider(mockMe: useMockers),
-          ),
-          ChangeNotifierProxyProvider<AuthProvider, BootLoaderProvider>(
-            create: (context) =>
-                BootLoaderProvider(uri: backendUri, mockMe: useMockers),
-            update: (context, auth, previous) =>
-                previous!..initializeAuth(auth),
-          ),
-          ChangeNotifierProxyProvider<AuthProvider, SchoolBoardsProvider>(
-            create: (context) =>
-                SchoolBoardsProvider(uri: backendUri, mockMe: useMockers),
-            update: (context, auth, previous) =>
-                previous!..initializeAuth(auth),
-          ),
-          ChangeNotifierProxyProvider<AuthProvider, AdminsProvider>(
-            create: (context) =>
-                AdminsProvider(uri: backendUri, mockMe: useMockers),
-            update: (context, auth, previous) =>
-                previous!..initializeAuth(auth),
-          ),
-          ChangeNotifierProxyProvider<AuthProvider, EnterprisesProvider>(
-            create: (context) =>
-                EnterprisesProvider(uri: backendUri, mockMe: useMockers),
-            update: (context, auth, previous) =>
-                previous!..initializeAuth(auth),
-          ),
-          ChangeNotifierProxyProvider<AuthProvider, InternshipsProvider>(
-            create: (context) =>
-                InternshipsProvider(uri: backendUri, mockMe: useMockers),
-            update: (context, auth, previous) =>
-                previous!..initializeAuth(auth),
-          ),
-          ChangeNotifierProxyProvider<AuthProvider, TeachersProvider>(
-            create: (context) =>
-                TeachersProvider(uri: backendUri, mockMe: useMockers),
-            update: (context, auth, previous) =>
-                previous!..initializeAuth(auth),
-          ),
-          ChangeNotifierProxyProvider<AuthProvider, StudentsProvider>(
-            create: (context) =>
-                StudentsProvider(uri: backendUri, mockMe: useMockers),
-            update: (context, auth, previous) =>
-                previous!..initializeAuth(auth),
-          ),
-        ],
-        child: InactivityLayout(
-          navigatorKey: rootNavigatorKey,
-          timeout: const Duration(minutes: 10),
-          gracePeriod: const Duration(seconds: 60),
-          showGracePeriod: (context) async =>
-              AuthProvider.of(context, listen: false).isFullySignedIn,
-          onTimedOut: _disconnect,
-          onDisconnect: _disconnect,
-          child: MaterialApp.router(
-            debugShowCheckedModeBanner: false,
-            onGenerateTitle: (context) => 'Stagess',
-            theme: crcrmeMaterialTheme,
-            routerConfig: router,
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [Locale('fr', 'CA')],
-          ),
+        ChangeNotifierProxyProvider<AuthProvider, BootLoaderProvider>(
+          create: (context) =>
+              BootLoaderProvider(uri: backendUri, mockMe: useMockers),
+          update: (context, auth, previous) => previous!..initializeAuth(auth),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, SchoolBoardsProvider>(
+          create: (context) =>
+              SchoolBoardsProvider(uri: backendUri, mockMe: useMockers),
+          update: (context, auth, previous) => previous!..initializeAuth(auth),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, AdminsProvider>(
+          create: (context) =>
+              AdminsProvider(uri: backendUri, mockMe: useMockers),
+          update: (context, auth, previous) => previous!..initializeAuth(auth),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, EnterprisesProvider>(
+          create: (context) =>
+              EnterprisesProvider(uri: backendUri, mockMe: useMockers),
+          update: (context, auth, previous) => previous!..initializeAuth(auth),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, InternshipsProvider>(
+          create: (context) =>
+              InternshipsProvider(uri: backendUri, mockMe: useMockers),
+          update: (context, auth, previous) => previous!..initializeAuth(auth),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, TeachersProvider>(
+          create: (context) =>
+              TeachersProvider(uri: backendUri, mockMe: useMockers),
+          update: (context, auth, previous) => previous!..initializeAuth(auth),
+        ),
+        ChangeNotifierProxyProvider<AuthProvider, StudentsProvider>(
+          create: (context) =>
+              StudentsProvider(uri: backendUri, mockMe: useMockers),
+          update: (context, auth, previous) => previous!..initializeAuth(auth),
+        ),
+      ],
+      child: InactivityLayout(
+        navigatorKey: rootNavigatorKey,
+        timeout: const Duration(minutes: 10),
+        gracePeriod: const Duration(seconds: 60),
+        showGracePeriod: (context) async =>
+            AuthProvider.of(context, listen: false).isFullySignedIn,
+        onTimedOut: _disconnect,
+        onDisconnect: _disconnect,
+        child: MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          onGenerateTitle: (context) => 'Stagess',
+          theme: crcrmeMaterialTheme,
+          routerConfig: router,
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [Locale('fr', 'CA')],
         ),
       ),
     );
