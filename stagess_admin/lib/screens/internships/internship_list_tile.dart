@@ -176,9 +176,8 @@ class InternshipListTileState extends State<InternshipListTile> {
 
   late final _weeklySchedulesController = WeeklySchedulesController(
     dateRange: widget.internship.currentContract?.dates,
-    dayCycle: widget.internship.currentContract?.weeklySchedules.firstOrNull
-            ?.dayCycle ??
-        DayCycle.defaultValue,
+    dayCycle: widget
+        .internship.currentContract?.weeklySchedules.firstOrNull?.dayCycle,
     weeklySchedules: widget.internship.currentContract?.weeklySchedules,
     keepId: false,
   );

@@ -24,6 +24,9 @@ final _defaultDaily = DailySchedule(
   ],
 );
 
+// TODO Make default the last value
+final _currentDefaultDayCycle = DayCycle.weekdaysCycle;
+
 class WeeklySchedulesController {
   var _currentDefaultDaily = _defaultDaily.duplicate();
 
@@ -36,7 +39,7 @@ class WeeklySchedulesController {
   time_utils.DateTimeRange? get dateRange => _dateRange;
 
   DayCycle? _dayCycle;
-  DayCycle? get dayCycle => _dayCycle;
+  DayCycle get dayCycle => _dayCycle!;
 
   final List<bool> _useSameScheduleForAllDays = [];
   final List<WeeklySchedule> _weeklySchedules;
@@ -62,9 +65,8 @@ class WeeklySchedulesController {
         _dayCycle = dayCycle,
         _weeklySchedules = InternshipHelpers.copySchedules(weeklySchedules,
             dayCycle: dayCycle, keepId: keepId) {
-    if (dayCycle == null && _weeklySchedules.isNotEmpty) {
-      _dayCycle = _weeklySchedules.first.dayCycle;
-    }
+    _dayCycle ??=
+        _weeklySchedules.firstOrNull?.dayCycle ?? _currentDefaultDayCycle;
 
     for (var schedule in _weeklySchedules) {
       if (schedule.dayCycle != _dayCycle) {
@@ -248,6 +250,38 @@ class _ScheduleSelectorState extends State<ScheduleSelector> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (widget.title != null) widget.title!,
+        Padding(
+          padding: const EdgeInsets.only(left: 12.0, top: 8.0),
+          child: Text(
+            'Type de cycles hebdomadaires',
+            style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                  fontWeight: FontWeight.bold,
+                  fontSize: widget.periodTextSize,
+                ),
+          ),
+        ),
+        // TODO See why it needed a refresh to update
+        Padding(
+          padding: const EdgeInsets.only(left: 12.0, bottom: 4.0),
+          child: DropdownButton<DayCycle>(
+            value: widget.scheduleController.dayCycle,
+            onChanged: widget.editMode
+                ? (newCycle) {
+                    setState(
+                        () => widget.scheduleController.dayCycle = newCycle);
+                  }
+                : null,
+            items: DayCycle.values
+                .map((cycle) => DropdownMenuItem<DayCycle>(
+                    value: cycle,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                      child: Text(cycle.name,
+                          style: TextStyle(fontWeight: FontWeight.normal)),
+                    )))
+                .toList(),
+          ),
+        ),
         ...widget.scheduleController._weeklySchedules.asMap().keys.map<Widget>(
               (weekIndex) => _ScheduleSelector(
                 key: ValueKey(
@@ -274,7 +308,7 @@ class _ScheduleSelectorState extends State<ScheduleSelector> {
                 widget.scheduleController.addWeeklySchedule(
                   WeeklySchedulesController.fillNewScheduleList(
                     periode: widget.scheduleController.dateRange!,
-                    dayCycle: widget.scheduleController.dayCycle!,
+                    dayCycle: widget.scheduleController.dayCycle,
                     schedule: widget.scheduleController._weeklySchedules.isEmpty
                         ? {}
                         : widget

@@ -26,7 +26,7 @@ class _ScheduleListTileState extends State<ScheduleListTile> {
       widget.scheduleController.addWeeklySchedule(
         WeeklySchedulesController.fillNewScheduleList(
           periode: widget.scheduleController.dateRange!,
-          dayCycle: widget.scheduleController.dayCycle!,
+          dayCycle: widget.scheduleController.dayCycle,
           schedule: widget.scheduleController.weeklySchedules.isEmpty
               ? {}
               : widget.scheduleController.weeklySchedules.last.schedule,
