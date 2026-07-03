@@ -1,5 +1,5 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
-import 'package:stagess_common/utils.dart';
+import 'package:collection/collection.dart';
 
 extension ListExt on List {
   List serialize() {

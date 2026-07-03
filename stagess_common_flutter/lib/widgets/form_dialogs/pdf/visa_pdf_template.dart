@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
@@ -7,7 +8,6 @@ import 'package:printing/printing.dart';
 import 'package:stagess_common/models/persons/student_visa.dart';
 import 'package:stagess_common/services/job_data_file_service.dart'
     as job_service;
-import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/widgets/pdf_widgets/pdf_bullet_points.dart';
 
 final _logger = Logger('GenerateVisaPdf');

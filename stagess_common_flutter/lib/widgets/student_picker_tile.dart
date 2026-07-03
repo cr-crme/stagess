@@ -1,6 +1,6 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:stagess_common/models/persons/student.dart';
-import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/autocomplete_options_builder.dart';
 

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
 import 'package:stagess_backend/repositories/students_repository.dart';
@@ -532,12 +533,12 @@ class MySqlInternshipsRepository extends InternshipsRepository {
                 asName: 'daily_schedules',
                 fieldsToFetch: [
                   'id',
-                  'day',
-                  'block_index',
                   'starting_hour',
                   'starting_minute',
                   'ending_hour',
                   'ending_minute',
+                  'day',
+                  'block_index',
                 ],
                 idNameToDataTable: 'weekly_schedule_id',
               ),

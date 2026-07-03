@@ -86,21 +86,6 @@ bool areMapsNotEqual<T, U>(Map<T, U>? a, Map<T, U>? b,
   return !areMapsEqual(a, b, ignoreKeys: ignoreKeys);
 }
 
-extension IterableExtensions<T> on Iterable<T> {
-  T? get firstOrNull {
-    var iterator = this.iterator;
-    if (iterator.moveNext()) return iterator.current;
-    return null;
-  }
-
-  T? firstWhereOrNull(bool Function(T element) test) {
-    for (var element in this) {
-      if (test(element)) return element;
-    }
-    return null;
-  }
-}
-
 extension ItemSerializableExtension on ItemSerializable {
   /// Returns all the fields that contains a difference between the two objects.
   /// If the two objects are equal, an empty list is returned.

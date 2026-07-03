@@ -1,7 +1,7 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/models/school_boards/school.dart';
-import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/widgets/autocomplete_options_builder.dart';
 
 class EntityPickerController {
