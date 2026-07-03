@@ -2152,6 +2152,8 @@ Future<void> _addDummyInternships(
           dates: period,
           weeklySchedules: [
             WeeklySchedule(
+              period: period,
+              dayCycle: DayCycle.weekdaysCycle,
               schedule: {
                 0: DailySchedule(
                   blocks: [
@@ -2214,7 +2216,6 @@ Future<void> _addDummyInternships(
                   ],
                 ),
               },
-              period: period,
             ),
           ],
           transportations: [
@@ -2296,6 +2297,8 @@ Future<void> _addDummyInternships(
             dates: period,
             weeklySchedules: [
               WeeklySchedule(
+                period: period,
+                dayCycle: DayCycle.weekdaysCycle,
                 schedule: {
                   0: DailySchedule(
                     blocks: [
@@ -2358,7 +2361,6 @@ Future<void> _addDummyInternships(
                     ],
                   ),
                 },
-                period: period,
               ),
             ],
             transportations: [
@@ -2429,6 +2431,8 @@ Future<void> _addDummyInternships(
         dates: period,
         weeklySchedules: [
           WeeklySchedule(
+            period: period,
+            dayCycle: DayCycle.weekdaysCycle,
             schedule: {
               0: DailySchedule(
                 blocks: [
@@ -2479,7 +2483,6 @@ Future<void> _addDummyInternships(
                 ],
               ),
             },
-            period: period,
           ),
         ],
         transportations:
@@ -2550,6 +2553,8 @@ Future<void> _addDummyInternships(
           dates: period,
           weeklySchedules: [
             WeeklySchedule(
+              period: period,
+              dayCycle: DayCycle.weekdaysCycle,
               schedule: {
                 0: DailySchedule(
                   blocks: [
@@ -2588,7 +2593,6 @@ Future<void> _addDummyInternships(
                   ],
                 ),
               },
-              period: period,
             ),
           ],
           transportations: [Transportation.publicTransport]
@@ -2645,6 +2649,8 @@ Future<void> _addDummyInternships(
           dates: period,
           weeklySchedules: [
             WeeklySchedule(
+              period: period,
+              dayCycle: DayCycle.weekdaysCycle,
               schedule: {
                 0: DailySchedule(
                   blocks: [
@@ -2683,7 +2689,6 @@ Future<void> _addDummyInternships(
                   ],
                 ),
               },
-              period: period,
             ),
           ],
           transportations:
@@ -2760,6 +2765,8 @@ Future<void> _addDummyInternships(
           dates: period,
           weeklySchedules: [
             WeeklySchedule(
+              period: period,
+              dayCycle: DayCycle.weekdaysCycle,
               schedule: {
                 0: DailySchedule(
                   blocks: [
@@ -2822,7 +2829,6 @@ Future<void> _addDummyInternships(
                   ],
                 ),
               },
-              period: period,
             ),
           ],
           transportations:
@@ -2995,6 +3001,8 @@ Future<void> _addDummyInternships(
           dates: period,
           weeklySchedules: [
             WeeklySchedule(
+              period: period,
+              dayCycle: DayCycle.weekdaysCycle,
               schedule: {
                 0: DailySchedule(
                   blocks: [
@@ -3057,7 +3065,6 @@ Future<void> _addDummyInternships(
                   ],
                 ),
               },
-              period: period,
             ),
           ],
           transportations: [],
@@ -3114,6 +3121,8 @@ Future<void> _addDummyInternships(
             dates: period,
             weeklySchedules: [
               WeeklySchedule(
+                period: period,
+                dayCycle: DayCycle.weekdaysCycle,
                 schedule: {
                   0: DailySchedule(
                     blocks: [
@@ -3140,7 +3149,6 @@ Future<void> _addDummyInternships(
                     ],
                   ),
                 },
-                period: period,
               ),
             ],
             transportations:
@@ -3208,6 +3216,8 @@ Future<void> _addDummyInternships(
           dates: period,
           weeklySchedules: [
             WeeklySchedule(
+              period: period,
+              dayCycle: DayCycle.weekdaysCycle,
               schedule: {
                 0: DailySchedule(
                   blocks: [
@@ -3234,7 +3244,6 @@ Future<void> _addDummyInternships(
                   ],
                 ),
               },
-              period: period,
             ),
           ],
           transportations: ['Vélo'].map((e) => e.toString()).toList(),
@@ -3289,6 +3298,8 @@ Future<void> _addDummyInternships(
             dates: period,
             weeklySchedules: [
               WeeklySchedule(
+                period: period,
+                dayCycle: DayCycle.weekdaysCycle,
                 schedule: {
                   0: DailySchedule(
                     blocks: [
@@ -3315,7 +3326,6 @@ Future<void> _addDummyInternships(
                     ],
                   ),
                 },
-                period: period,
               ),
             ],
             transportations:

@@ -27,6 +27,17 @@ final _defaultDaily = DailySchedule(
 class WeeklySchedulesController {
   var _currentDefaultDaily = _defaultDaily.duplicate();
 
+  bool _hasChanged = false;
+  void changesWereDealtWith() {
+    _hasChanged = false;
+  }
+
+  time_utils.DateTimeRange? _dateRange;
+  time_utils.DateTimeRange? get dateRange => _dateRange;
+
+  DayCycle? _dayCycle;
+  DayCycle? get dayCycle => _dayCycle;
+
   final List<bool> _useSameScheduleForAllDays = [];
   final List<WeeklySchedule> _weeklySchedules;
   List<WeeklySchedule> get weeklySchedules => _weeklySchedules;
@@ -42,21 +53,28 @@ class WeeklySchedulesController {
     _hasChanged = true;
   }
 
-  time_utils.DateTimeRange? _dateRange;
-  time_utils.DateTimeRange? get dateRange => _dateRange;
-  bool _hasChanged = false;
-  void changesWereDealtWith() {
-    _hasChanged = false;
-  }
-
   WeeklySchedulesController({
-    List<WeeklySchedule>? weeklySchedules,
     time_utils.DateTimeRange? dateRange,
+    DayCycle? dayCycle,
+    List<WeeklySchedule>? weeklySchedules,
     bool keepId = true,
   })  : _dateRange = dateRange?.copy(),
-        _weeklySchedules =
-            InternshipHelpers.copySchedules(weeklySchedules, keepId: keepId) {
-    for (var _ in weeklySchedules ?? []) {
+        _dayCycle = dayCycle,
+        _weeklySchedules = InternshipHelpers.copySchedules(weeklySchedules,
+            dayCycle: dayCycle, keepId: keepId) {
+    if (dayCycle == null && _weeklySchedules.isNotEmpty) {
+      _dayCycle = _weeklySchedules.first.dayCycle;
+    }
+
+    for (var schedule in _weeklySchedules) {
+      if (schedule.dayCycle != _dayCycle) {
+        _logger.warning(
+          'Day cycles must be homogeneous across all weekly schedules.',
+        );
+        final index = _weeklySchedules.indexOf(schedule);
+        _weeklySchedules[index] = schedule.copyWith(dayCycle: _dayCycle);
+      }
+
       _useSameScheduleForAllDays.add(false);
     }
   }
@@ -68,6 +86,16 @@ class WeeklySchedulesController {
     _dateRange = newRange;
     if (_weeklySchedules.length == 1) {
       _weeklySchedules[0] = _weeklySchedules[0].copyWith(period: newRange);
+    }
+    _hasChanged = true;
+  }
+
+  set dayCycle(DayCycle? newDayCycle) {
+    if (_dayCycle == newDayCycle) return;
+
+    _dayCycle = newDayCycle;
+    for (var i = 0; i < _weeklySchedules.length; i++) {
+      _weeklySchedules[i] = _weeklySchedules[i].copyWith(dayCycle: newDayCycle);
     }
     _hasChanged = true;
   }
@@ -171,14 +199,16 @@ class WeeklySchedulesController {
   }
 
   static WeeklySchedule fillNewScheduleList({
-    required Map<int, DailySchedule?> schedule,
     required time_utils.DateTimeRange periode,
+    required DayCycle dayCycle,
+    required Map<int, DailySchedule?> schedule,
   }) {
     return WeeklySchedule(
+      period: periode,
+      dayCycle: dayCycle,
       schedule: {
         for (var key in schedule.keys) key: schedule[key]?.duplicate(),
       },
-      period: periode,
     );
   }
 
@@ -243,11 +273,12 @@ class _ScheduleSelectorState extends State<ScheduleSelector> {
               onPressed: () => setState(() {
                 widget.scheduleController.addWeeklySchedule(
                   WeeklySchedulesController.fillNewScheduleList(
+                    periode: widget.scheduleController.dateRange!,
+                    dayCycle: widget.scheduleController.dayCycle!,
                     schedule: widget.scheduleController._weeklySchedules.isEmpty
                         ? {}
                         : widget
                             .scheduleController._weeklySchedules.last.schedule,
-                    periode: widget.scheduleController.dateRange!,
                   ),
                 );
               }),
@@ -638,7 +669,7 @@ class _ScheduleSelector extends StatelessWidget {
                     },
                   ),
                 ),
-                Text(DayCycle.weekdaysCycle.dayAsString(day)),
+                Text(controller._dayCycle!.dayAsString(day)),
               ],
             ),
           ),

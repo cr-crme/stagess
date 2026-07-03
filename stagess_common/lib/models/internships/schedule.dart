@@ -10,6 +10,10 @@ enum DayCycle {
   nineDaysCycle,
   tenDaysCycle;
 
+// TODO Make default the last value
+
+  static DayCycle get defaultValue => DayCycle.weekdaysCycle;
+
   int get dayCount {
     return switch (this) {
       DayCycle.weekdaysCycle => 7,
@@ -33,8 +37,17 @@ enum DayCycle {
         };
       case DayCycle.nineDaysCycle:
       case DayCycle.tenDaysCycle:
-        return 'Jour $day';
+        return 'Jour ${day + 1}';
     }
+  }
+
+  int serialize() => index;
+
+  static DayCycle fromSerialized(int index) {
+    if (index < 0 || index >= DayCycle.values.length) {
+      return defaultValue;
+    }
+    return DayCycle.values[index];
   }
 }
 
@@ -112,15 +125,16 @@ class DailySchedule extends ItemSerializable {
 class WeeklySchedule extends ItemSerializable {
   WeeklySchedule({
     super.id,
-    required this.schedule,
     required this.period,
+    required this.dayCycle,
+    required this.schedule,
   }) {
     _finalizeInitialization();
   }
 
-  final DayCycle dayCycle = DayCycle.weekdaysCycle;
-  final Map<int, DailySchedule?> schedule;
   final DateTimeRange period;
+  final DayCycle dayCycle;
+  final Map<int, DailySchedule?> schedule;
 
   void _finalizeInitialization() {
     schedule.entries.toList().sort((pairA, pairB) {
@@ -141,47 +155,54 @@ class WeeklySchedule extends ItemSerializable {
   }
 
   WeeklySchedule.fromSerialized(super.map)
-      : schedule = (map?['days'] as Map?)?.map((day, e) =>
-                MapEntry(int.parse(day), DailySchedule.fromSerialized(e))) ??
-            {},
-        period = DateTimeRange(
+      : period = DateTimeRange(
           start: DateTimeExt.from(map?['start']) ?? DateTime(0),
           end: DateTimeExt.from(map?['end']) ?? DateTime(0),
         ),
+        dayCycle = DayCycle.fromSerialized(
+            map?['cycle'] ?? DayCycle.defaultValue.index),
+        schedule = (map?['days'] as Map?)?.map((day, e) =>
+                MapEntry(int.parse(day), DailySchedule.fromSerialized(e))) ??
+            {},
         super.fromSerialized();
 
   @override
   Map<String, dynamic> serializedMap() => {
         'id': id,
-        'days':
-            schedule.map((day, e) => MapEntry(day.toString(), e?.serialize())),
         'start': period.start.serialize(),
         'end': period.end.serialize(),
+        'cycle': dayCycle.serialize(),
+        'days':
+            schedule.map((day, e) => MapEntry(day.toString(), e?.serialize())),
       };
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
-        'days': FetchableFields.optional,
         'start': FetchableFields.optional,
         'end': FetchableFields.optional,
+        'cycle': FetchableFields.optional,
+        'days': FetchableFields.optional,
       });
 
   ///
   /// Similar to [copyWith], but enforce the change of id
   WeeklySchedule duplicate() => WeeklySchedule(
-        schedule: schedule.map((day, e) => MapEntry(day, e?.duplicate())),
         period: period,
+        dayCycle: dayCycle,
+        schedule: schedule.map((day, e) => MapEntry(day, e?.duplicate())),
       );
 
   WeeklySchedule copyWith({
     String? id,
-    Map<int, DailySchedule>? schedule,
     DateTimeRange? period,
+    DayCycle? dayCycle,
+    Map<int, DailySchedule>? schedule,
   }) =>
       WeeklySchedule(
         id: id ?? this.id,
-        schedule: schedule ?? this.schedule,
         period: period ?? this.period,
+        dayCycle: dayCycle ?? this.dayCycle,
+        schedule: schedule ?? this.schedule,
       );
 
   @override
@@ -193,6 +214,7 @@ class WeeklySchedule extends ItemSerializable {
 class InternshipHelpers {
   static List<WeeklySchedule> copySchedules(
     List<WeeklySchedule>? schedules, {
+    DayCycle? dayCycle,
     bool keepId = true,
   }) =>
       schedules
@@ -203,6 +225,7 @@ class InternshipHelpers {
                 start: schedule.period.start,
                 end: schedule.period.end,
               ),
+              dayCycle: dayCycle ?? schedule.dayCycle,
               schedule: schedule.schedule.map(
                 (day, entry) => MapEntry(
                   day,

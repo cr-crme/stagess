@@ -866,6 +866,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
               'contract_id': contract.id,
               'starting_date': weeklySchedule.period.start.serialize(),
               'ending_date': weeklySchedule.period.end.serialize(),
+              'cycle': weeklySchedule.dayCycle.serialize(),
             }));
 
         // Insert the daily schedules
@@ -1214,6 +1215,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
               email: ''),
           weeklySchedules: [
             WeeklySchedule(
+                dayCycle: DayCycle.weekdaysCycle,
                 schedule: {
                   0: DailySchedule(blocks: [
                     TimeBlock(
@@ -1282,6 +1284,7 @@ class InternshipsRepositoryMock extends InternshipsRepository {
               email: ''),
           weeklySchedules: [
             WeeklySchedule(
+                dayCycle: DayCycle.weekdaysCycle,
                 schedule: {
                   1: DailySchedule(
                     blocks: [

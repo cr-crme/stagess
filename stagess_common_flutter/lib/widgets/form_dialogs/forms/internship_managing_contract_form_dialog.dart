@@ -822,14 +822,16 @@ class _SchedulePickerState extends State<_SchedulePicker> {
   void onScheduleChanged() {
     if (widget.controller._weeklySchedulesController.dateRange != null) {
       widget.controller._weeklySchedulesController.addWeeklySchedule(
-          WeeklySchedulesController.fillNewScheduleList(
-              schedule: widget.controller._weeklySchedulesController
-                      .weeklySchedules.isEmpty
-                  ? {}
-                  : widget.controller._weeklySchedulesController.weeklySchedules
-                      .last.schedule,
-              periode:
-                  widget.controller._weeklySchedulesController.dateRange!));
+        WeeklySchedulesController.fillNewScheduleList(
+          periode: widget.controller._weeklySchedulesController.dateRange!,
+          dayCycle: widget.controller._weeklySchedulesController.dayCycle!,
+          schedule: widget
+                  .controller._weeklySchedulesController.weeklySchedules.isEmpty
+              ? {}
+              : widget.controller._weeklySchedulesController.weeklySchedules
+                  .last.schedule,
+        ),
+      );
     }
     setState(() {});
   }

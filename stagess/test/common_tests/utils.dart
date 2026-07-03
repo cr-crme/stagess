@@ -452,6 +452,9 @@ WeeklySchedule dummyWeeklySchedule({
 }) {
   return WeeklySchedule(
     id: id,
+    period: period ??
+        DateTimeRange(start: DateTime(2026, 1, 2), end: DateTime(2026, 1, 22)),
+    dayCycle: DayCycle.weekdaysCycle,
     schedule: {
       0: dummyDailySchedule(id: 'dailyScheduleId1'),
       1: dummyDailySchedule(id: 'dailyScheduleId2'),
@@ -459,8 +462,6 @@ WeeklySchedule dummyWeeklySchedule({
       3: dummyDailySchedule(id: 'dailyScheduleId4'),
       4: dummyDailySchedule(id: 'dailyScheduleId5'),
     },
-    period: period ??
-        DateTimeRange(start: DateTime(2026, 1, 2), end: DateTime(2026, 1, 22)),
   );
 }
 

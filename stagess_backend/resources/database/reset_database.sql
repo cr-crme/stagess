@@ -518,6 +518,7 @@ CREATE TABLE internship_weekly_schedules (
     contract_id VARCHAR(36) NOT NULL,
     starting_date BIGINT NOT NULL,
     ending_date BIGINT NOT NULL,
+    cycle INT NOT NULL,
     FOREIGN KEY (contract_id) REFERENCES internship_contracts(id) ON DELETE CASCADE
 );
 
