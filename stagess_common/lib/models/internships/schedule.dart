@@ -138,6 +138,14 @@ class WeeklySchedule extends ItemSerializable {
   final Map<int, DailySchedule?> schedule;
 
   void _finalizeInitialization() {
+    // Remove schedules that are outside the day cycle range
+    final daysToRemove =
+        schedule.keys.where((day) => day >= dayCycle.dayCount).toList();
+    for (final day in daysToRemove) {
+      schedule.remove(day);
+    }
+
+    // Sort them so they appear in numerical order
     schedule.entries.toList().sort((pairA, pairB) {
       final dayA = pairA.key;
       final dayB = pairB.key;
