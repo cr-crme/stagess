@@ -5,6 +5,7 @@ import 'package:logging/logging.dart';
 import 'package:stagess_common/models/internships/schedule.dart';
 import 'package:stagess_common/models/internships/time_utils.dart'
     as time_utils;
+import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/helpers/time_of_day_extension.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/custom_time_picker.dart';
@@ -23,9 +24,6 @@ final _defaultDaily = DailySchedule(
     ),
   ],
 );
-
-// TODO Make default the last value
-final _currentDefaultDayCycle = DayCycle.weekdaysCycle;
 
 class WeeklySchedulesController {
   var _currentDefaultDaily = _defaultDaily.duplicate();
@@ -65,8 +63,8 @@ class WeeklySchedulesController {
         _dayCycle = dayCycle,
         _weeklySchedules = InternshipHelpers.copySchedules(weeklySchedules,
             dayCycle: dayCycle, keepId: keepId) {
-    _dayCycle ??=
-        _weeklySchedules.firstOrNull?.dayCycle ?? _currentDefaultDayCycle;
+    _dayCycle ??= _weeklySchedules.firstOrNull?.dayCycle ??
+        ConfigurationService.dayCycleDefault;
 
     for (var schedule in _weeklySchedules) {
       if (schedule.dayCycle != _dayCycle) {
@@ -99,6 +97,7 @@ class WeeklySchedulesController {
     for (var i = 0; i < _weeklySchedules.length; i++) {
       _weeklySchedules[i] = _weeklySchedules[i].copyWith(dayCycle: newDayCycle);
     }
+    ConfigurationService.dayCycleDefault = newDayCycle!;
     _hasChanged = true;
   }
 

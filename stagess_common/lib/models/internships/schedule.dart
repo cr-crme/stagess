@@ -46,9 +46,10 @@ enum DayCycle {
 
   int serialize() => index;
 
-  static DayCycle fromSerialized(int index) {
-    return DayCycle.values[index];
-  }
+  static DayCycle fromSerialized(int index) => DayCycle.values[index];
+
+  static DayCycle fromName(String name) =>
+      DayCycle.values.firstWhere((cycle) => cycle.name == name);
 }
 
 class TimeBlock extends ItemSerializable {

@@ -6,6 +6,7 @@ import 'package:stagess_common/communication_protocol.dart';
 import 'package:stagess_common/models/generic/map_providers.dart';
 import 'package:stagess_common/services/backend_helpers.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
+import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/services/question_file_service.dart';
 import 'package:stagess_common_flutter/services/risk_data_file_service.dart';
 
@@ -49,6 +50,7 @@ class ProgramInitializer {
       if (useReverseGeocodingProvider)
         ReverseGeocodingProvider.instance
             .initialize(provider: MapReverseGeocodingProvider.googleMaps),
+      ConfigurationService.initializeServices(),
     ]);
 
     _initialized = true;

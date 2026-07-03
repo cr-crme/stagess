@@ -55,9 +55,6 @@ import 'package:stagess_common_flutter/widgets/schedule_selector.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 import 'package:stagess_common_flutter/widgets/student_picker_tile.dart';
 
-// TODO Default to last selected value
-DayCycle _currentDayCycleDefault = DayCycle.weekdaysCycle;
-
 class InternshipListTile extends StatefulWidget {
   const InternshipListTile({
     super.key,
@@ -392,10 +389,9 @@ class InternshipListTileState extends State<InternshipListTile> {
   }
 
   void _resetForm() {
-    _teacherPickerController.teacher = TeachersProvider.of(
-      context,
-      listen: false,
-    ).fromIdOrNull(widget.internship.signatoryTeacherId);
+    _teacherPickerController.teacher =
+        TeachersProvider.of(context, listen: false)
+            .fromIdOrNull(widget.internship.signatoryTeacherId);
 
     final supervisor =
         widget.internship.currentContract?.supervisor ?? Person.empty;
@@ -411,7 +407,7 @@ class InternshipListTileState extends State<InternshipListTile> {
         widget.internship.currentContract?.dates;
     _weeklySchedulesController.dayCycle = widget.internship.currentContract
             ?.weeklySchedules.firstOrNull?.dayCycle ??
-        _currentDayCycleDefault;
+        ConfigurationService.dayCycleDefault;
 
     _weeklySchedulesController.weeklySchedules =
         InternshipHelpers.copySchedules(
