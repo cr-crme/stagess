@@ -20,8 +20,6 @@ import 'package:stagess_common_flutter/screens/in_maintenance_screen.dart';
 import 'package:stagess_common_flutter/screens/wrong_version_screen.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
 
-// TODO: Add capability for swapping day names to day numbers
-
 // coverage:ignore-start
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

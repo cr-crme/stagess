@@ -260,7 +260,6 @@ class _ScheduleSelectorState extends State<ScheduleSelector> {
                 ),
           ),
         ),
-        // TODO See why it needed a refresh to update
         Padding(
           padding: const EdgeInsets.only(left: 12.0, bottom: 4.0),
           child: DropdownButton<DayCycle>(

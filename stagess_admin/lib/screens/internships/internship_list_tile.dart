@@ -55,6 +55,9 @@ import 'package:stagess_common_flutter/widgets/schedule_selector.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 import 'package:stagess_common_flutter/widgets/student_picker_tile.dart';
 
+// TODO Default to last selected value
+DayCycle _currentDayCycleDefault = DayCycle.weekdaysCycle;
+
 class InternshipListTile extends StatefulWidget {
   const InternshipListTile({
     super.key,
@@ -406,7 +409,9 @@ class InternshipListTileState extends State<InternshipListTile> {
 
     _weeklySchedulesController.dateRange =
         widget.internship.currentContract?.dates;
-    // TODO Add cycle?
+    _weeklySchedulesController.dayCycle = widget.internship.currentContract
+            ?.weeklySchedules.firstOrNull?.dayCycle ??
+        _currentDayCycleDefault;
 
     _weeklySchedulesController.weeklySchedules =
         InternshipHelpers.copySchedules(
