@@ -4,6 +4,8 @@ import 'package:logging/logging.dart';
 import 'package:stagess_common/models/enterprises/enterprise_evaluation_form_enums.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
+import 'package:stagess_common/models/internships/time_utils.dart'
+    as time_utils;
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common_flutter/helpers/job_extension.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
@@ -11,7 +13,6 @@ import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
 import 'package:stagess_common_flutter/widgets/form_fields/low_high_slider_form_field.dart';
 import 'package:stagess_common_flutter/widgets/itemized_text.dart';
-import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('SupervisionExpansionPanel');
 
@@ -27,20 +28,21 @@ class SupervisionExpansionPanel extends StatefulWidget {
 
 class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
   var _currentProgramToShow = Program.fms;
-  DateTimeRange? _dateFilter;
+
+  DateTimeRange _dateFilter = DateTimeRange(
+      start: DateTime.now().subtract(const Duration(days: 365 * 3)),
+      end: DateTime.now());
 
   List<PostInternshipEnterpriseEvaluation> _getFilteredEvaluations() {
     var evaluations =
         widget.job.mostRecentPostInternshipEnterpriseEvaluations(context);
 
     // Only keep evaluations after the date filter
-    if (_dateFilter != null) {
-      evaluations = evaluations
-          .where((eval) =>
-              eval.date.isAfter(_dateFilter!.start) &&
-              eval.date.isBefore(_dateFilter!.end.add(const Duration(days: 1))))
-          .toList();
-    }
+    evaluations = evaluations
+        .where((eval) =>
+            eval.date.isAfter(_dateFilter.start) &&
+            eval.date.isBefore(_dateFilter.end.add(const Duration(days: 1))))
+        .toList();
 
     // Only keep evaluations from the requested students
     return evaluations
@@ -121,8 +123,8 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Période : '
-                '${_dateFilter == null ? 'Toutes' : 'Du ${DateFormat.yMMMd('fr_CA').format(_dateFilter!.start)} au ${DateFormat.yMMMd('fr_CA').format(_dateFilter!.end)}'}'),
+            Text('Évaluation du : '
+                '${DateFormat.yMMMd('fr_CA').format(_dateFilter.start)} au ${DateFormat.yMMMd('fr_CA').format(_dateFilter.end)}'),
             IconButton(
               icon: const Icon(
                 Icons.calendar_month_outlined,
@@ -138,16 +140,18 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
 
   void _promptDate(BuildContext context) async {
     final newDate = await showCustomDateRangePicker(
-      helpText: 'Sélectionner la date',
+      helpText: 'Sélectionner la période à afficher',
       cancelText: 'Annuler',
       confirmText: 'Confirmer',
       context: context,
+      saveText: 'Confirmer',
       firstDate: DateTime(DateTime.now().year - 5),
       lastDate: DateTime.now(),
+      initialDateRange: time_utils.DateTimeRange(
+          start: _dateFilter.start, end: _dateFilter.end),
+      initialEntryMode: DatePickerEntryMode.input,
     );
-    if (newDate == null) {
-      _dateFilter = null;
-    } else {
+    if (newDate != null) {
       _dateFilter = DateTimeRange(start: newDate.start, end: newDate.end);
     }
 
