@@ -118,14 +118,15 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
           IconButton(
             onPressed: () => setState(() => _showSearchBar = !_showSearchBar),
             icon: const Icon(Icons.search),
+            tooltip: 'Rechercher un·e administrateur·trice',
           ),
           if (authProvider.databaseAccessLevel >= AccessLevel.schoolBoardAdmin)
             IconButton(
               onPressed: () => _showAddAdminDialog(context),
               icon: Icon(Icons.add),
+              tooltip: 'Ajouter un·e administrateur·trice',
             ),
         ],
-        bottom: _showSearchBar ? Search(controller: _searchController) : null,
       ),
       smallDrawer: MainDrawer.small,
       mediumDrawer: MainDrawer.medium,

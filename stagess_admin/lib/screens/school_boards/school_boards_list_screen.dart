@@ -89,14 +89,15 @@ class _SchoolBoardsListScreenState extends State<SchoolBoardsListScreen> {
           IconButton(
             onPressed: () => setState(() => _showSearchBar = !_showSearchBar),
             icon: const Icon(Icons.search),
+            tooltip: 'Rechercher un centre de services scolaire',
           ),
           if (authProvider.databaseAccessLevel >= AccessLevel.superAdmin)
             IconButton(
               onPressed: () => _showAddSchoolBoardDialog(context),
               icon: Icon(Icons.add),
+              tooltip: 'Ajouter un centre de services scolaire',
             ),
         ],
-        bottom: _showSearchBar ? Search(controller: _searchController) : null,
       ),
       smallDrawer: MainDrawer.small,
       mediumDrawer: MainDrawer.medium,

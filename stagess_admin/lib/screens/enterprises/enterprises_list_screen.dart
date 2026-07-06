@@ -96,10 +96,12 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen> {
           IconButton(
             onPressed: () => setState(() => _showSearchBar = !_showSearchBar),
             icon: const Icon(Icons.search),
+            tooltip: 'Rechercher une entreprise',
           ),
           IconButton(
             onPressed: () => _showAddEnterpriseDialog(context),
             icon: Icon(Icons.add),
+            tooltip: 'Ajouter une entreprise',
           ),
         ],
         bottom: _showSearchBar ? Search(controller: _searchController) : null,

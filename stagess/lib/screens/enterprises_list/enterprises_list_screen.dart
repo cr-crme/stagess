@@ -53,7 +53,10 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen>
       title: const Text('Entreprises'),
       actions: [
         if (_tabController.index == 0)
-          IconButton(onPressed: _search, icon: const Icon(Icons.search)),
+          IconButton(
+              onPressed: _search,
+              icon: const Icon(Icons.search),
+              tooltip: 'Rechercher une entreprise'),
         IconButton(
           onPressed: () {
             _withSearchBar = false;

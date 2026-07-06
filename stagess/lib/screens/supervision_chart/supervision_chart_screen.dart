@@ -448,6 +448,7 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
                     ? Colors.grey
                     : Colors.white,
               ),
+              tooltip: 'Modifier la liste des élèves',
             ),
         ],
         bottom: _buildBottomTabBar(context),
@@ -572,7 +573,7 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
       child: TextFormField(
         decoration: InputDecoration(
           prefixIcon: const Icon(Icons.search),
-          labelText: 'Rechercher un élève',
+          labelText: 'Rechercher un·e élève',
           suffixIcon: IconButton(
             onPressed: () => setState(() => _searchTextController.text = ''),
             icon: const Icon(Icons.clear),

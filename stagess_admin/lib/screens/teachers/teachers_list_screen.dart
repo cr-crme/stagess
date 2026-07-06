@@ -113,14 +113,15 @@ class _TeachersListScreenState extends State<TeachersListScreen> {
           IconButton(
             onPressed: () => setState(() => _showSearchBar = !_showSearchBar),
             icon: const Icon(Icons.search),
+            tooltip: 'Rechercher un·e enseignant·e',
           ),
           if (authProvider.databaseAccessLevel >= AccessLevel.schoolAdmin)
             IconButton(
               onPressed: () => _showAddTeacherDialog(context),
               icon: Icon(Icons.add),
+              tooltip: 'Ajouter un·e enseignant·e',
             ),
         ],
-        bottom: _showSearchBar ? Search(controller: _searchController) : null,
       ),
       smallDrawer: MainDrawer.small,
       mediumDrawer: MainDrawer.medium,

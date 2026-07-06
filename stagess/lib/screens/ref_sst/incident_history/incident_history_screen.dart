@@ -156,6 +156,7 @@ class _IncidentHistoryScreenInternalState
           IconButton(
             onPressed: () => setState(() => _showSearchBar = !_showSearchBar),
             icon: const Icon(Icons.search),
+            tooltip: 'Rechercher un métier',
           ),
         ],
         bottom: _showSearchBar ? Search(controller: _searchController) : null,

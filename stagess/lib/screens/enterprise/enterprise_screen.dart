@@ -131,6 +131,14 @@ class _EnterpriseScreenInternalState extends State<_EnterpriseScreenInternal>
     }
     _actionButton = IconButton(
       icon: icon,
+      tooltip: switch (_tabController.index) {
+        0 => 'Ajouter un métier',
+        1 => _aboutPageKey.currentState?.editing ?? false
+            ? 'Enregistrer les modifications'
+            : 'Modifier les informations',
+        2 => 'Ajouter un stage',
+        _ => throw Exception('Invalid tab index: ${_tabController.index}'),
+      },
       onPressed: () async {
         if (_tabController.index == 0) {
           if (_jobsPageKey.currentState!.isEditing) {

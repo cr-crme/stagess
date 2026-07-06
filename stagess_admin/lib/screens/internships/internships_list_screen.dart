@@ -161,10 +161,12 @@ class _InternshipsListScreenState extends State<InternshipsListScreen> {
           IconButton(
             onPressed: () => setState(() => _showSearchBar = !_showSearchBar),
             icon: const Icon(Icons.search),
+            tooltip: 'Rechercher un stage',
           ),
           IconButton(
             onPressed: () => _showAddInternshipDialog(context),
             icon: Icon(Icons.add),
+            tooltip: 'Ajouter un stage',
           ),
         ],
         bottom: _showSearchBar ? Search(controller: _searchController) : null,
