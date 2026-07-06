@@ -230,10 +230,26 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
             ),
             child: Search(controller: searchController),
           ),
-        SwitchListTile(
-          title: const Text('N\'afficher que les stages disponibles'),
-          value: _hideNotAvailable,
-          onChanged: (value) => setState(() => _hideNotAvailable = value),
+        Align(
+          alignment: Alignment.centerRight,
+          child: InkWell(
+            onTap: () => setState(() => _hideNotAvailable = !_hideNotAvailable),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                  child: const Text('N\'afficher que les stages disponibles',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                Switch(
+                  value: _hideNotAvailable,
+                  onChanged: (value) =>
+                      setState(() => _hideNotAvailable = value),
+                )
+              ],
+            ),
+          ),
         ),
         Expanded(
           child: ListView.builder(

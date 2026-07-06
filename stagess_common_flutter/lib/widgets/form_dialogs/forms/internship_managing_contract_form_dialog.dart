@@ -717,21 +717,28 @@ class _SupervisonInformationState extends State<_SupervisonInformation> {
       children: [
         const SubTitle('Responsable en milieu de stage', left: 0),
         if (widget.controller.canModify)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Flexible(
-                child: Text(
-                  'Même personne que le contact de l\'entreprise',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: InkWell(
+              onTap: _toggleUseContactInfo,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                    child: Text(
+                      'Même personne que le contact de l\'entreprise',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                  Switch(
+                    onChanged: (newValue) => _toggleUseContactInfo(),
+                    value: _useContactInfo,
+                  ),
+                ],
               ),
-              Switch(
-                onChanged: (newValue) => _toggleUseContactInfo(),
-                value: _useContactInfo,
-              ),
-            ],
+            ),
           ),
         Padding(
           padding: const EdgeInsets.only(left: 12.0),
