@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/sst_evaluation.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
+import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/form_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
@@ -44,6 +45,25 @@ Future<Internship?> showSstEvaluationFormDialog(
 
   final internship =
       InternshipsProvider.of(context, listen: false).fromId(internshipId);
+
+  final previousEvaluation = internship.sstEvaluations.isEmpty
+      ? null
+      : internship.sstEvaluations
+          .reduce((a, b) => a.date.isAfter(b.date) ? a : b);
+
+  final hasSameMetadata = previousEvaluation?.getDifference(newEvaluation,
+          ignoreKeys: ['id', 'date', 'questions']).isEmpty ??
+      false;
+  final newQuestions = Map.fromEntries(newEvaluation.questions.entries
+      .where((entry) => entry.value != null)
+      .toList());
+  final hasSameQuestions = const DeepCollectionEquality()
+      .equals(previousEvaluation?.questions, newQuestions);
+
+  if (hasSameMetadata && hasSameQuestions) {
+    return null;
+  }
+
   return Internship.fromSerialized(internship.serialize())
     ..sstEvaluations.add(newEvaluation);
 }
@@ -441,14 +461,11 @@ class _QuestionsStepState extends State<_QuestionsStep> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SubTitle('Personnes présentes lors de l\'évaluation'),
-        Padding(
-          padding: const EdgeInsets.only(left: 24.0),
-          child: CheckboxWithOther(
-            controller: widget.wereAtMeetingController,
-            enabled: widget.editMode,
-            otherMaxLength: 200,
-          ),
+        const SubTitle('Personnes présentes lors de l\'évaluation', left: 0),
+        CheckboxWithOther(
+          controller: widget.wereAtMeetingController,
+          enabled: widget.editMode,
+          otherMaxLength: 200,
         ),
       ],
     );

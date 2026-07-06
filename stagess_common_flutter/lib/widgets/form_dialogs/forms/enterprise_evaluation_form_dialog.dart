@@ -41,6 +41,18 @@ Future<Internship?> showEnterpriseEvaluationFormDialog(
 
   final internship =
       InternshipsProvider.of(context, listen: false).fromId(internshipId);
+
+  final previousEvaluation = internship.enterpriseEvaluations.isEmpty
+      ? null
+      : internship.enterpriseEvaluations
+          .reduce((a, b) => a.date.isAfter(b.date) ? a : b);
+
+  if (previousEvaluation
+          ?.getDifference(newEvaluation, ignoreKeys: ['id', 'date']).isEmpty ??
+      false) {
+    return null;
+  }
+
   return Internship.fromSerialized(internship.serialize())
     ..enterpriseEvaluations.add(newEvaluation);
 }

@@ -2,7 +2,7 @@
 {
 "id":"1",
 "idSummary":"3",
-"question":"*Est-ce que l\u2019\u00e9l\u00e8ve devra porter des boites de marchandises, des produits ou du mat\u00e9riel?",
+"question":"Est-ce que l\u2019\u00e9l\u00e8ve devra porter des boites de marchandises, des produits ou du mat\u00e9riel?",
 "summary":"Porter des charges (p. ex. boites, mat\u00e9riel)",
 "type":"Vrai ou Faux",
 "choices":[
@@ -14,7 +14,7 @@
 {
 "id":"2",
 "idSummary":"4",
-"question":"*Est-ce que l\u2019\u00e9l\u00e8ve sera amen\u00e9 \u00e0 porter les enfants?",
+"question":"Est-ce que l\u2019\u00e9l\u00e8ve sera amen\u00e9 \u00e0 porter les enfants?",
 "summary":"Porter des enfants ",
 "type":"Vrai ou Faux",
 "choices":[
@@ -26,7 +26,7 @@
 {
 "id":"3",
 "idSummary":"5",
-"question":"*Est-ce que l\u2019\u00e9l\u00e8ve devra utiliser un \u00e9quipement pour d\u00e9placer des marchandises ou du mat\u00e9riel?",
+"question":"Est-ce que l\u2019\u00e9l\u00e8ve devra utiliser un \u00e9quipement pour d\u00e9placer des marchandises ou du mat\u00e9riel?",
 "summary":"D\u00e9placer des marchandises avec",
 "type":"Choix de r\u00e9ponse",
 "choices":[
@@ -41,7 +41,7 @@
 {
 "id":"4",
 "idSummary":"6",
-"question":"*Est-ce que l\u2019\u00e9l\u00e8ve devra utiliser un \u00e9quipement pour travailler en hauteur?",
+"question":"Est-ce que l\u2019\u00e9l\u00e8ve devra utiliser un \u00e9quipement pour travailler en hauteur?",
 "summary":"Travailler en hauteur avec",
 "type":"Choix de r\u00e9ponse",
 "choices":[
@@ -55,7 +55,7 @@
 {
 "id":"5",
 "idSummary":"7",
-"question":"*Est-ce que l\u2019\u00e9l\u00e8ve devra utiliser des outils coupants?",
+"question":"Est-ce que l\u2019\u00e9l\u00e8ve devra utiliser des outils coupants?",
 "summary":"Utiliser des outils coupants",
 "type":"Choix de r\u00e9ponse",
 "choices":[
@@ -70,7 +70,7 @@
 {
 "id":"6",
 "idSummary":"8",
-"question":"*Est-ce que l'\u00e9l\u00e8ve devra utiliser des outils \u00e0 main \u00e9lectriques ou pneumatiques?",
+"question":"Est-ce que l'\u00e9l\u00e8ve devra utiliser des outils \u00e0 main \u00e9lectriques ou pneumatiques?",
 "summary":"Utiliser des outils \u00e0 main",
 "type":"Choix de r\u00e9ponse",
 "choices":[
@@ -83,7 +83,7 @@
 {
 "id":"7",
 "idSummary":"9",
-"question":"*Est-ce que l\u2019\u00e9l\u00e8ve travaillera avec des produits chimiques (ou \u00e0 proximit\u00e9 de ces produits)?",
+"question":"Est-ce que l\u2019\u00e9l\u00e8ve travaillera avec des produits chimiques (ou \u00e0 proximit\u00e9 de ces produits)?",
 "summary":"Exposition aux produits chimiques",
 "type":"Choix de r\u00e9ponse",
 "choices":[
@@ -97,7 +97,7 @@
 {
 "id":"8",
 "idSummary":"10",
-"question":"*Est-ce que l\u2019\u00e9l\u00e8ve travaillera avec des produits chimiques (ou \u00e0 proximit\u00e9 de ces produits)?",
+"question":"Est-ce que l\u2019\u00e9l\u00e8ve travaillera avec des produits chimiques (ou \u00e0 proximit\u00e9 de ces produits)?",
 "summary":"Exposition aux produits chimiques",
 "type":"Choix de r\u00e9ponse",
 "choices":[
@@ -113,7 +113,7 @@
 {
 "id":"9",
 "idSummary":"11",
-"question":"*Est-ce que l\u2019\u00e9l\u00e8ve travaillera avec des produits chimiques (ou \u00e0 proximit\u00e9 de ces produits)?",
+"question":"Est-ce que l\u2019\u00e9l\u00e8ve travaillera avec des produits chimiques (ou \u00e0 proximit\u00e9 de ces produits)?",
 "summary":"Exposition aux produits chimiques",
 "type":"Choix de r\u00e9ponse",
 "choices":[
@@ -135,14 +135,14 @@
 {
 "id":"11",
 "idSummary":"13",
-"question":"*Est-ce qu\u2019il y a une proc\u00e9dure particuli\u00e8re \u00e0 suivre par rapport \u00e0 la poussi\u00e8re ? Est-ce qu\u2019il y a des \u00e9quipements sp\u00e9cifiques \u00e0 utiliser?",
+"question":"Est-ce qu\u2019il y a une proc\u00e9dure particuli\u00e8re \u00e0 suivre par rapport \u00e0 la poussi\u00e8re ? Est-ce qu\u2019il y a des \u00e9quipements sp\u00e9cifiques \u00e0 utiliser?",
 "summary":"Exposition \u00e0 la poussi\u00e8re (proc\u00e9dure et \u00e9quipements \u00e0 utiliser)",
 "type":"Texte"
 },
 {
 "id":"12",
 "idSummary":"14",
-"question":"*Est-ce que l\u2019\u00e9l\u00e8ve devra travailler dans un environnement ?",
+"question":"Est-ce que l\u2019\u00e9l\u00e8ve devra travailler dans un environnement ?",
 "summary":"Environnement de travail",
 "type":"Choix de r\u00e9ponse",
 "choices":[
@@ -156,7 +156,7 @@
 {
 "id":"13",
 "idSummary":"15",
-"question":"*Est-ce que l'\u00e9l\u00e8ve sera amen\u00e9 \u00e0 ?",
+"question":"Est-ce que l'\u00e9l\u00e8ve sera amen\u00e9 \u00e0 ?",
 "summary":"T\u00e2ches li\u00e9es au travail dans une ferme",
 "type":"Choix de r\u00e9ponse",
 "choices":[
@@ -169,7 +169,7 @@
 {
 "id":"14",
 "idSummary":"16",
-"question":"*Est-ce que l'\u00e9l\u00e8ve sera amen\u00e9 \u00e0 ?",
+"question":"Est-ce que l'\u00e9l\u00e8ve sera amen\u00e9 \u00e0 ?",
 "summary":"T\u00e2ches li\u00e9es au travail avec des animaux",
 "type":"Choix de r\u00e9ponse",
 "choices":[
@@ -184,7 +184,7 @@
 {
 "id":"15",
 "idSummary":"17",
-"question":"*Est-ce que l\u2019\u00e9l\u00e8ve fera du service \u00e0 la client\u00e8le ?",
+"question":"Est-ce que l\u2019\u00e9l\u00e8ve fera du service \u00e0 la client\u00e8le ?",
 "type":"Vrai ou Faux",
 "choices":[
 "Oui",
@@ -196,21 +196,21 @@
 {
 "id":"16",
 "idSummary":"18",
-"question":"*Est-ce qu'il y a des d\u00e9lais sp\u00e9cifiques ou un niveau de productivit\u00e9 que mon \u00e9l\u00e8ve devra respecter?",
+"question":"Est-ce qu'il y a des d\u00e9lais sp\u00e9cifiques ou un niveau de productivit\u00e9 que mon \u00e9l\u00e8ve devra respecter?",
 "summary":"D\u00e9lais ou niveau de productivit\u00e9 \u00e0 respecter",
 "type":"Texte"
 },
 {
 "id":"17",
 "idSummary":"1",
-"question":"*Quelles sont les situations de travail qui pourraient \u00eatre dangereuses pour mon \u00e9l\u00e8ve? Comment faudrait-il l'y pr\u00e9parer?",
+"question":"Quelles sont les situations de travail qui pourraient \u00eatre dangereuses pour mon \u00e9l\u00e8ve? Comment faudrait-il l'y pr\u00e9parer?",
 "summary":"Situations \u00e0 risque et moyens d'y pr\u00e9parer l'\u00e9l\u00e8ve",
 "type":"Texte"
 },
 {
 "id":"18",
 "idSummary":"2",
-"question":"*Est-ce qu\u2019il y a d\u00e9j\u00e0 eu des incidents ou des accidents du travail au poste que l\u2019\u00e9l\u00e8ve occupera en stage?",
+"question":"Est-ce qu\u2019il y a d\u00e9j\u00e0 eu des incidents ou des accidents du travail au poste que l\u2019\u00e9l\u00e8ve occupera en stage?",
 "type":"Vrai ou Faux",
 "choices":[
 "Oui",
