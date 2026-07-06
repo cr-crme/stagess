@@ -170,7 +170,6 @@ class AboutPageState extends State<AboutPage> {
                 controller: _activityTypesController,
                 editMode: true,
               ),
-              SizedBox(height: MediaQuery.of(context).size.height * 0.5),
             ],
           ),
         ),

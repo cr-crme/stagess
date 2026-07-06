@@ -1083,7 +1083,8 @@ class _SkillEvaluationFormScreenState
                   child: const Text('Suivant'),
                 ),
               if (_currentStep == skills.length && widget.editMode)
-                TextButton(onPressed: _submit, child: const Text('Soumettre')),
+                TextButton(
+                    onPressed: _submit, child: const Text('Enregistrer')),
             ],
           ),
         ],

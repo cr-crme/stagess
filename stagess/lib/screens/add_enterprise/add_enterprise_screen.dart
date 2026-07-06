@@ -32,11 +32,7 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
   final _jobsKey = GlobalKey<JobsPageState>();
 
   int _currentStep = 0;
-  final List<StepState> _stepStatus = [
-    StepState.indexed,
-    StepState.indexed,
-    StepState.indexed,
-  ];
+  final List<StepState> _stepStatus = [StepState.indexed, StepState.indexed];
 
   void _showInvalidFieldsSnakBar([String? message]) {
     ScaffoldMessenger.of(context).clearSnackBars();
@@ -63,12 +59,9 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
     _updateEnterprise();
     if (_currentStep >= 0) {
       message = await _aboutKey.currentState!.validate();
-      valid = message == null;
+      valid = _jobsKey.currentState!.validate() && message == null;
+
       _stepStatus[0] = valid ? StepState.complete : StepState.error;
-    }
-    if (_currentStep >= 1) {
-      valid = _jobsKey.currentState!.validate();
-      _stepStatus[1] = valid ? StepState.complete : StepState.error;
     }
     setState(() {});
 
@@ -79,7 +72,7 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).clearSnackBars();
 
-    if (_currentStep == 2) {
+    if (_currentStep == 1) {
       return await _submit();
     } else {
       setState(() {
@@ -223,19 +216,20 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
               Step(
                 state: _stepStatus[0],
                 isActive: _currentStep == 0,
-                title: const Text('À propos'),
-                content: AboutPage(key: _aboutKey),
+                title: const Text('Détails'),
+                content: Column(
+                  children: [
+                    AboutPage(key: _aboutKey),
+                    SizedBox(height: 24.0),
+                    JobsPage(key: _jobsKey),
+                    SizedBox(height: MediaQuery.of(context).size.height * 0.5),
+                  ],
+                ),
               ),
               Step(
                 state: _stepStatus[1],
                 isActive: _currentStep == 1,
-                title: const Text('Métiers\nofferts'),
-                content: JobsPage(key: _jobsKey),
-              ),
-              Step(
-                state: _stepStatus[2],
-                isActive: _currentStep == 2,
-                title: const Text('Validation des\ninformations'),
+                title: const Text('Validation'),
                 content: ValidationPage(
                   enterprise: _currentEnterprise,
                   activityTypeController:
@@ -270,11 +264,7 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
               TextButton(
                 onPressed: details.onStepContinue,
                 child: Text(
-                  _currentStep == 2
-                      ? 'Valider'
-                      : _currentStep == 1
-                          ? 'Enregistrer'
-                          : 'Suivant',
+                  _currentStep == 1 ? 'Valider' : 'Suivant',
                 ),
               ),
             ],
