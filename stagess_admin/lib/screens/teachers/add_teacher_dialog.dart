@@ -99,7 +99,7 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
       ),
       actions: [
         OutlinedButton(onPressed: _onClickedCancel, child: Text('Annuler')),
-        TextButton(onPressed: _onClickedConfirm, child: Text('Confirmer')),
+        TextButton(onPressed: _onClickedConfirm, child: Text('Enregistrer')),
       ],
     );
   }

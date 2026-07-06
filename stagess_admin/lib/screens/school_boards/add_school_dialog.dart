@@ -45,7 +45,6 @@ class _AddSchoolDialogState extends State<AddSchoolDialog> {
                 ),
               ),
               const SizedBox(height: 16),
-
               const SizedBox(height: 12),
               Text('Compléter les informations'),
               const SizedBox(height: 8),
@@ -64,7 +63,7 @@ class _AddSchoolDialogState extends State<AddSchoolDialog> {
       ),
       actions: [
         OutlinedButton(onPressed: _onClickedCancel, child: Text('Annuler')),
-        TextButton(onPressed: _onClickedConfirm, child: Text('Confirmer')),
+        TextButton(onPressed: _onClickedConfirm, child: Text('Enregistrer')),
       ],
     );
   }

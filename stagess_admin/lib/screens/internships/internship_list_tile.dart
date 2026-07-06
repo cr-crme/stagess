@@ -34,7 +34,6 @@ import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/add_job_button.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
-import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/dialogs/finalize_internship_dialog.dart';
 import 'package:stagess_common_flutter/widgets/dialogs/show_pdf_dialog.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
@@ -903,24 +902,6 @@ class InternshipListTileState extends State<InternshipListTile> {
     );
   }
 
-  Future<void> _promptEndDate() async {
-    final date = await showCustomDatePicker(
-      helpText: 'Sélectionner la date de fin',
-      cancelText: 'Annuler',
-      confirmText: 'Confirmer',
-      context: context,
-      initialDate: _isActive ? DateTime.now() : _endDate,
-      initialEntryMode: DatePickerEntryMode.calendar,
-      firstDate: DateTime(widget.internship.currentContract?.dates.start.year ??
-          DateTime.now().year - 1),
-      lastDate: DateTime(widget.internship.currentContract?.dates.start.year ??
-          DateTime.now().year + 2),
-    );
-    if (date == null) return;
-    _endDate = date;
-    setState(() {});
-  }
-
   Widget _buildTransportation() {
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
@@ -976,23 +957,6 @@ class InternshipListTileState extends State<InternshipListTile> {
             style: const TextStyle(color: Colors.black),
           ),
         ),
-        if (_isEditing)
-          Row(
-            children: [
-              if (!_isActive)
-                IconButton(
-                  onPressed: () => setState(() => _endDate = DateTime(0)),
-                  icon: Icon(Icons.delete, color: Colors.red),
-                ),
-              IconButton(
-                icon: const Icon(
-                  Icons.calendar_month_outlined,
-                  color: Colors.blue,
-                ),
-                onPressed: _promptEndDate,
-              ),
-            ],
-          ),
       ],
     );
   }

@@ -93,7 +93,7 @@ class _AddInternshipDialogState extends State<AddInternshipDialog> {
       ),
       actions: [
         OutlinedButton(onPressed: _onClickedCancel, child: Text('Annuler')),
-        TextButton(onPressed: _onClickedConfirm, child: Text('Confirmer')),
+        TextButton(onPressed: _onClickedConfirm, child: Text('Enregistrer')),
       ],
     );
   }

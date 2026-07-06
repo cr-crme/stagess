@@ -91,7 +91,7 @@ class _AddAdminDialogState extends State<AddAdminDialog> {
       ),
       actions: [
         OutlinedButton(onPressed: _onClickedCancel, child: Text('Annuler')),
-        TextButton(onPressed: _onClickedConfirm, child: Text('Confirmer')),
+        TextButton(onPressed: _onClickedConfirm, child: Text('Enregistrer')),
       ],
     );
   }

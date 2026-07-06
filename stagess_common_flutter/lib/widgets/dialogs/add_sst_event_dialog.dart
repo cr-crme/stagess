@@ -104,7 +104,7 @@ class _AddSstEventDialogState extends State<AddSstEventDialog> {
       ),
       actions: [
         OutlinedButton(onPressed: _onCancel, child: const Text('Annuler')),
-        TextButton(onPressed: _onConfirm, child: const Text('Confirmer')),
+        TextButton(onPressed: _onConfirm, child: const Text('Enregistrer')),
       ],
     );
   }

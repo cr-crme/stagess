@@ -62,7 +62,7 @@ class _JobCreatorDialogState extends State<JobCreatorDialog> {
           ),
           actions: [
             OutlinedButton(onPressed: _onCancel, child: const Text('Annuler')),
-            TextButton(onPressed: _onConfirm, child: const Text('Confirmer')),
+            TextButton(onPressed: _onConfirm, child: const Text('Enregistrer')),
           ],
         ),
       ),
