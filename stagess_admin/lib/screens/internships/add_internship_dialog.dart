@@ -4,6 +4,7 @@ import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
 
 class AddInternshipDialog extends StatefulWidget {
   const AddInternshipDialog({super.key, required this.schoolBoard});
@@ -31,23 +32,12 @@ class _AddInternshipDialogState extends State<AddInternshipDialog> {
     if (!mounted) return;
 
     if (!isSuccess) {
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Échec de l\'ajout du stage'),
-          content: SizedBox(
-            width: ResponsiveService.maxBodyWidth * 0.6,
-            child: Text(
-                'Impossible d\'ajouter le stage. Assurez-vous que toutes les informations '
-                'sont correctes et que vous avez le droit de faire cette action.'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        ),
+      await showHelpDialog(
+        context,
+        title: 'Échec de l\'ajout du stage',
+        content: Text(
+            'Impossible d\'ajouter le stage. Assurez-vous que toutes les informations '
+            'sont correctes et que vous avez le droit de faire cette action.'),
       );
       return;
     }

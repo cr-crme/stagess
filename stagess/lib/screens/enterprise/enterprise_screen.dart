@@ -17,9 +17,9 @@ import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
 import 'package:stagess_common_flutter/widgets/form_dialogs/forms/internship_managing_contract_form_dialog.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
-import 'package:stagess_common_flutter/widgets/sub_title.dart';
 
 final _logger = Logger('EnterpriseScreen');
 
@@ -217,37 +217,29 @@ class _EnterpriseScreenInternalState extends State<_EnterpriseScreenInternal>
 
     final student = StudentsProvider.of(context, listen: false)
         .fromId(internship.studentId);
-    await showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const SubTitle('Inscription réussie', left: 0, bottom: 0),
-        content: RichText(
-          text: TextSpan(
-            children: [
-              TextSpan(
-                text: '${student.fullName} ',
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const TextSpan(
-                text: ' a bien été inscrit comme stagiaire chez ',
-              ),
-              TextSpan(
-                text: enterprise.name,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const TextSpan(
-                text:
-                    '.\n\nVous pouvez maintenant accéder au contrat de stage en cliquant sur "Détails du stage".',
-              ),
-            ],
-          ),
+    await showHelpDialog(
+      context,
+      title: 'Inscription réussie',
+      content: RichText(
+        text: TextSpan(
+          children: [
+            TextSpan(
+              text: '${student.fullName} ',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const TextSpan(
+              text: ' a bien été inscrit comme stagiaire chez ',
+            ),
+            TextSpan(
+              text: enterprise.name,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const TextSpan(
+              text:
+                  '.\n\nVous pouvez maintenant accéder au contrat de stage en cliquant sur "Détails du stage".',
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Ok'),
-          ),
-        ],
       ),
     );
     _logger.fine('Internship added for enterprise: ${enterprise.name}');

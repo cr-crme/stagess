@@ -3,6 +3,7 @@ import 'package:stagess_admin/screens/admins/admin_list_tile.dart';
 import 'package:stagess_common/models/persons/admin.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
 
 class AddAdminDialog extends StatefulWidget {
   const AddAdminDialog({super.key, required this.schoolBoardId});
@@ -28,24 +29,11 @@ class _AddAdminDialogState extends State<AddAdminDialog> {
     if (!mounted) return;
 
     if (!isConfirmed) {
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Échec de l\'ajout de l\'administrateur·trice'),
-          content: SizedBox(
-            width: ResponsiveService.maxBodyWidth * 0.6,
-            child: Text(
-                'Impossible d\'ajouter l\'administrateur·trice. Assurez-vous que toutes les '
-                'informations sont correctes et que le courriel est valide et unique.'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
+      await showHelpDialog(context,
+          title: 'Échec de l\'ajout de l\'administrateur·trice',
+          content: Text(
+              'Impossible d\'ajouter l\'administrateur·trice. Assurez-vous que toutes les '
+              'informations sont correctes et que le courriel est valide et unique.'));
       return;
     }
 

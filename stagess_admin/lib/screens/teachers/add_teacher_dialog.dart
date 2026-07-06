@@ -5,6 +5,7 @@ import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
 
 class AddTeacherDialog extends StatefulWidget {
   const AddTeacherDialog({super.key, required this.schoolBoardId});
@@ -30,23 +31,12 @@ class _AddTeacherDialogState extends State<AddTeacherDialog> {
     if (!mounted) return;
 
     if (!isConfirmed) {
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Échec de l\'ajout de l\'enseignant·e'),
-          content: SizedBox(
-            width: ResponsiveService.maxBodyWidth * 0.6,
-            child: Text(
-                'Impossible d\'ajouter l\'enseignant·e. Assurez-vous que toutes les '
-                'informations sont correctes et que le courriel est valide et unique.'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        ),
+      await showHelpDialog(
+        context,
+        title: 'Échec de l\'ajout de l\'enseignant·e',
+        content: Text(
+            'Impossible d\'ajouter l\'enseignant·e. Assurez-vous que toutes les '
+            'informations sont correctes et que le courriel est valide et unique.'),
       );
       return;
     }

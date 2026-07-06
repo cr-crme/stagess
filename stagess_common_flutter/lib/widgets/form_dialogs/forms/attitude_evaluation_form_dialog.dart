@@ -10,6 +10,7 @@ import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
 import 'package:stagess_common_flutter/widgets/sub_title.dart';
 
 final _logger = Logger('AttitudeEvaluationFormScreen');
@@ -512,13 +513,10 @@ class _AttitudeRadioChoicesState extends State<_AttitudeRadioChoices> {
                   onPressed: widget.groupValue.extraInformation == null
                       ? null
                       : () {
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
+                          showHelpDialog(context,
+                              title: widget.title,
                               content:
-                                  Text(widget.groupValue.extraInformation!),
-                            ),
-                          );
+                                  Text(widget.groupValue.extraInformation!));
                         },
                 ),
               ]),

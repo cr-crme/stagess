@@ -12,6 +12,7 @@ import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
 import 'package:stagess_common_flutter/widgets/radio_with_follow_up.dart';
 import 'package:stagess_common_flutter/widgets/scrollable_stepper.dart';
 import 'package:stagess_common_flutter/widgets/sub_title.dart';
@@ -722,42 +723,33 @@ class _JobToEvaluateState extends State<_JobToEvaluate> {
   }
 
   void _showHelpOnJobSelection() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Explication des sélections'),
-        content: Text.rich(
-          TextSpan(
-            children: [
-              const TextSpan(text: 'Sélectionner '),
-              WidgetSpan(
-                child: SizedBox(
-                  height: 19,
-                  width: 22,
-                  child: Checkbox(
-                    tristate: true,
-                    value: null,
-                    onChanged: null,
-                    fillColor: WidgetStateProperty.resolveWith(
-                      (states) => Theme.of(context).primaryColor,
-                    ),
+    showHelpDialog(
+      context,
+      title: 'Explication des sélections',
+      content: Text.rich(
+        TextSpan(
+          children: [
+            const TextSpan(text: 'Sélectionner '),
+            WidgetSpan(
+              child: SizedBox(
+                height: 19,
+                width: 22,
+                child: Checkbox(
+                  tristate: true,
+                  value: null,
+                  onChanged: null,
+                  fillColor: WidgetStateProperty.resolveWith(
+                    (states) => Theme.of(context).primaryColor,
                   ),
                 ),
               ),
-              const TextSpan(
-                text:
-                    ' pour masquer les compétences précédemment évaluées pour '
-                    'cette évaluation-ci (les résultats sont conservés).',
-              ),
-            ],
-          ),
+            ),
+            const TextSpan(
+              text: ' pour masquer les compétences précédemment évaluées pour '
+                  'cette évaluation-ci (les résultats sont conservés).',
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
-            child: const Text('OK'),
-          ),
-        ],
       ),
     );
   }
@@ -1343,21 +1335,13 @@ class _TaskEvaluationDetailed extends StatelessWidget {
       texts.add('${task.abbreviation()}: $task\n');
     }
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Explication des boutons'),
-        content: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: texts.map((e) => Text(e)).toList(),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
-            child: const Text('OK'),
-          ),
-        ],
+    showHelpDialog(
+      context,
+      title: 'Explication des boutons',
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: texts.map((e) => Text(e)).toList(),
       ),
     );
   }

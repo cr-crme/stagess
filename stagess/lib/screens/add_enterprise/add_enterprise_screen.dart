@@ -10,9 +10,9 @@ import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
 import 'package:stagess_common_flutter/widgets/scrollable_stepper.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
-import 'package:stagess_common_flutter/widgets/sub_title.dart';
 
 final _logger = Logger('AddEnterpriseScreen');
 
@@ -141,31 +141,23 @@ class _AddEnterpriseScreenState extends State<AddEnterpriseScreen> {
       return;
     }
 
-    await showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const SubTitle('Entreprise ajoutée', left: 0, bottom: 0),
-        content: RichText(
-          text: TextSpan(
-            children: [
-              const TextSpan(text: 'L\'entreprise '),
-              TextSpan(
-                text: _currentEnterprise.name,
-                style: const TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const TextSpan(
-                text: ' a bien été ajoutée à la liste des entreprises.\n\n'
-                    'Vous pouvez maintenant y inscrire des stagiaires.',
-              ),
-            ],
-          ),
+    await showHelpDialog(
+      context,
+      title: 'Entreprise ajoutée',
+      content: RichText(
+        text: TextSpan(
+          children: [
+            const TextSpan(text: 'L\'entreprise '),
+            TextSpan(
+              text: _currentEnterprise.name,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const TextSpan(
+              text: ' a bien été ajoutée à la liste des entreprises.\n\n'
+                  'Vous pouvez maintenant y inscrire des stagiaires.',
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Ok'),
-          ),
-        ],
       ),
     );
 

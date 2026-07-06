@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess_common_flutter/widgets/address_list_tile.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/enterprise_activity_type_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
@@ -178,19 +179,11 @@ class AboutPageState extends State<AboutPage> {
   }
 
   void _showHelpOnContact() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) => AlertDialog(
-        title: const Text('Personne contact'),
-        content: Text(
-            'Remplir les coordonnées de la personne signataire des contrats de stage'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
+    showHelpDialog(
+      context,
+      title: 'Personne contact',
+      content: Text(
+          'Remplir les coordonnées de la personne signataire des contrats de stage'),
     );
   }
 }

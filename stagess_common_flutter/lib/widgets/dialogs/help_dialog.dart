@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 
-// TODO Do that on all Info bubble
 Future<void> showHelpDialog(BuildContext context,
     {required String title, required Widget content}) async {
   return await showDialog(
