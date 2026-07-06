@@ -9,6 +9,7 @@ import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/post_internship_enterprise_evaluation.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
@@ -423,133 +424,162 @@ class _EnterpriseEvaluationScreenState
   }
 
   Widget _buildVariety() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '* Tâches données à l\'élève',
-              style: Theme.of(context).textTheme.titleSmall!,
-            ),
-            IconButton(
-              icon: Icon(Icons.info_rounded,
-                  color: Theme.of(context).primaryColor),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    content: Text(
-                        'Tâches incluses dans le répertoire des métiers semi-spécialisés'),
-                  ),
-                );
-              },
-            )
-          ],
-        ),
-        RadioGroup(
-          groupValue: _controller._taskVariety,
-          onChanged: (value) =>
-              setState(() => _controller._taskVariety = value!),
-          child: Column(
+    return FormField(
+      validator: (value) => _controller._taskVariety == TaskVariety.none
+          ? 'Sélectionner le niveau de variété.'
+          : null,
+      builder: (FormFieldState state) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              SizedBox(
-                width: 200,
-                child: RadioListTile<TaskVariety>(
-                  value: TaskVariety.low,
-                  enabled: _controller.canModify,
-                  dense: true,
-                  visualDensity: VisualDensity.compact,
-                  title: Text(
-                    TaskVariety.low.toString(),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
+              Text(
+                '* Tâches données à l\'élève',
+                style: Theme.of(context).textTheme.titleSmall!,
               ),
-              SizedBox(
-                width: 200,
-                child: RadioListTile<TaskVariety>(
-                  value: TaskVariety.mid,
-                  enabled: _controller.canModify,
-                  dense: true,
-                  visualDensity: VisualDensity.compact,
-                  title: Text(
-                    TaskVariety.mid.toString(),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 200,
-                child: RadioListTile<TaskVariety>(
-                  value: TaskVariety.high,
-                  enabled: _controller.canModify,
-                  dense: true,
-                  visualDensity: VisualDensity.compact,
-                  title: Text(
-                    TaskVariety.high.toString(),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-              ),
+              IconButton(
+                icon: Icon(Icons.info_rounded,
+                    color: Theme.of(context).primaryColor),
+                onPressed: () {
+                  showHelpDialog(
+                    context,
+                    title: 'Tâches données',
+                    content: const Text(
+                        'Tâches incluses dans le répertoire des métiers semi-spécialisés'),
+                  );
+                },
+              )
             ],
           ),
-        ),
-      ],
+          RadioGroup(
+            groupValue: _controller._taskVariety,
+            onChanged: (value) =>
+                setState(() => _controller._taskVariety = value!),
+            child: Column(
+              children: [
+                SizedBox(
+                  width: 200,
+                  child: RadioListTile<TaskVariety>(
+                    value: TaskVariety.low,
+                    enabled: _controller.canModify,
+                    dense: true,
+                    visualDensity: VisualDensity.compact,
+                    title: Text(
+                      TaskVariety.low.toString(),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 200,
+                  child: RadioListTile<TaskVariety>(
+                    value: TaskVariety.mid,
+                    enabled: _controller.canModify,
+                    dense: true,
+                    visualDensity: VisualDensity.compact,
+                    title: Text(
+                      TaskVariety.mid.toString(),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 200,
+                  child: RadioListTile<TaskVariety>(
+                    value: TaskVariety.high,
+                    enabled: _controller.canModify,
+                    dense: true,
+                    visualDensity: VisualDensity.compact,
+                    title: Text(
+                      TaskVariety.high.toString(),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (state.hasError)
+            Padding(
+              padding: const EdgeInsets.only(left: 0.0, top: 4.0),
+              child: Text(
+                state.errorText ?? '',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
   Widget _buildTrainingPlan() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          '* Respect du plan de formation',
-          style: Theme.of(context).textTheme.titleSmall!,
-        ),
-        Text(
-          'Possibilité d\'exercer toutes les tâches de toutes les compétences spécifiques '
-          'obligatoires d\'un métier semi-spécialisé',
-        ),
-        RadioGroup(
-          groupValue: _controller._trainingPlan,
-          onChanged: (value) =>
-              setState(() => _controller._trainingPlan = value!),
-          child: Column(
-            children: [
-              SizedBox(
-                width: 200,
-                child: RadioListTile<TrainingPlan>(
-                  value: TrainingPlan.followed,
-                  enabled: _controller.canModify,
-                  dense: true,
-                  visualDensity: VisualDensity.compact,
-                  title: Text(
-                    TrainingPlan.followed.toString(),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-              ),
-              SizedBox(
-                width: 200,
-                child: RadioListTile<TrainingPlan>(
-                  value: TrainingPlan.notFollowed,
-                  enabled: _controller.canModify,
-                  dense: true,
-                  visualDensity: VisualDensity.compact,
-                  title: Text(
-                    TrainingPlan.notFollowed.toString(),
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ),
-              ),
-            ],
+    return FormField(
+      validator: (value) => _controller._trainingPlan == TrainingPlan.none
+          ? 'Choisir une option.'
+          : null,
+      builder: (state) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '* Respect du plan de formation',
+            style: Theme.of(context).textTheme.titleSmall!,
           ),
-        ),
-      ],
+          Text(
+            'Possibilité d\'exercer toutes les tâches de toutes les compétences spécifiques '
+            'obligatoires d\'un métier semi-spécialisé',
+          ),
+          RadioGroup(
+            groupValue: _controller._trainingPlan,
+            onChanged: (value) =>
+                setState(() => _controller._trainingPlan = value!),
+            child: Column(
+              children: [
+                SizedBox(
+                  width: 200,
+                  child: RadioListTile<TrainingPlan>(
+                    value: TrainingPlan.followed,
+                    enabled: _controller.canModify,
+                    dense: true,
+                    visualDensity: VisualDensity.compact,
+                    title: Text(
+                      TrainingPlan.followed.toString(),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 200,
+                  child: RadioListTile<TrainingPlan>(
+                    value: TrainingPlan.notFollowed,
+                    enabled: _controller.canModify,
+                    dense: true,
+                    visualDensity: VisualDensity.compact,
+                    title: Text(
+                      TrainingPlan.notFollowed.toString(),
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (state.hasError)
+            Padding(
+              padding: const EdgeInsets.only(left: 0.0, top: 4.0),
+              child: Text(
+                state.errorText ?? '',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.error,
+                ),
+              ),
+            ),
+        ],
+      ),
     );
   }
 
