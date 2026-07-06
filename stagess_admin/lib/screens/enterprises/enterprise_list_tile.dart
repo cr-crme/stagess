@@ -542,7 +542,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                         const SizedBox(height: 8),
                         _buildRecruiter(),
                         const SizedBox(height: 16),
-                        Text('Entreprise représentée par',
+                        Text('Personne contact',
                             style: Theme.of(context).textTheme.titleSmall),
                         const SizedBox(height: 8),
                         _buildContact(),

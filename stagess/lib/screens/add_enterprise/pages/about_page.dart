@@ -109,7 +109,7 @@ class AboutPageState extends State<AboutPage> {
               SizedBox(height: 16),
               Row(
                 children: [
-                  const SubTitle('Entreprise représentée par', left: 0, top: 0),
+                  const SubTitle('Personne contact', left: 0, top: 0),
                   Padding(
                     padding: const EdgeInsets.only(left: 12.0),
                     child: IconButton(
@@ -182,9 +182,9 @@ class AboutPageState extends State<AboutPage> {
     showDialog(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text('Entreprise représentée par'),
+        title: const Text('Personne contact'),
         content: Text(
-            'Remplir les coordonnées de votre personne contact dans l\'entreprise'),
+            'Remplir les coordonnées de la personne signataire des contrats de stage'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, 'OK'),

@@ -51,7 +51,7 @@ class ValidationPage extends StatelessWidget {
                 : enterprise.phone.toString(),
           ),
           const SizedBox(height: 16),
-          const SubTitle('Entreprise représentée par', left: 0),
+          const SubTitle('Personne contact', left: 0),
           const SizedBox(height: 4),
           Text(
             'Nom de la personne représentant l\'entreprise',
