@@ -77,6 +77,7 @@ class JobsPageState extends State<JobsPage> {
                 ),
               ),
             ),
+            SizedBox(height: MediaQuery.of(context).size.height * 0.5),
           ],
         ),
       ),

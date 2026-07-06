@@ -97,7 +97,6 @@ class ValidationPage extends StatelessWidget {
                       '* Sélectionner les mots clefs illustrant les activités de l\'entreprise',
                   controller: activityTypeController!,
                   editMode: false,
-                  activityTabAtTop: false,
                 ),
           const SizedBox(height: 16),
           if (jobControllers != null)
@@ -126,6 +125,7 @@ class ValidationPage extends StatelessWidget {
                 controller: controller,
               ),
             ),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.5),
         ],
       ),
     );

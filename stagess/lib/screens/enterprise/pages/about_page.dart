@@ -599,7 +599,6 @@ class _ActivityType extends StatelessWidget {
               hideTitle: true,
               controller: controller.activityTypes,
               editMode: editMode,
-              activityTabAtTop: true,
               tilePadding: const EdgeInsets.all(0),
             ),
           ),
