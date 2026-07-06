@@ -12,7 +12,7 @@ dependencies:
   enhanced_containers_foundation:
   collection: ^1.16.0
   http: ^1.3.0
-  latlong2: ^0.9.1
+  latlong2: ^0.10.1
   routing_client_dart: ^1.0.7
   uuid: ^4.5.1
   image: ^4.5.4

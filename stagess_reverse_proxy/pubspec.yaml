@@ -9,13 +9,7 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
-  stagess_common:
-    path: ../stagess_common
   logging: ^1.3.0
-
-dependency_overrides:
-  enhanced_containers_foundation:
-    path: ../external/enhanced_containers/plugins/enhanced_containers_foundation
 
 dev_dependencies:
   lints: ^6.0.0
