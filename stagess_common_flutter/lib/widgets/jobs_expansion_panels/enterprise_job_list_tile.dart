@@ -31,7 +31,7 @@ class EnterpriseJobListController {
   final List<Specialization>? _specializationBlacklist;
 
   late final _minimumAgeController = TextEditingController(
-    text: _job.minimumAge.toString(),
+    text: _job.minimumAge == 0 ? '' : _job.minimumAge.toString(),
   );
   late final Map<String, int> _positionsOffered = _job.positionsOffered.map(
     (key, value) => MapEntry(key, value),
@@ -273,7 +273,10 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildMinimumAge(),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: _buildMinimumAge(),
+                  ),
                   const SizedBox(height: 8),
                   if (!widget.showHeader)
                     Column(
@@ -390,32 +393,22 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
   }
 
   Widget _buildMinimumAge() {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Expanded(
-          child: Text(
-            '* Âge minimum des stagiaires (ans)',
-            style: Theme.of(context).textTheme.bodyLarge,
-          ),
-        ),
-        SizedBox(
-          width: MediaQuery.of(context).size.width * 0.24,
-          child: TextFormField(
-            controller: widget.controller._minimumAgeController,
-            enabled: widget.editMode,
-            validator: (value) {
-              final current = int.tryParse(value!);
-              if (current == null) return 'Préciser';
-              if (current < 15 || current > 30) return 'Minimum 15 ans';
-              return null;
-            },
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            style: (widget.editMode ? null : TextStyle(color: Colors.black)),
-          ),
-        ),
-      ],
+    return TextFormField(
+      controller: widget.controller._minimumAgeController,
+      enabled: widget.editMode,
+      validator: (value) {
+        final current = int.tryParse(value!);
+        if (current == null) return 'Préciser';
+        if (current < 15 || current > 30) return 'Minimum 15 ans';
+        return null;
+      },
+      decoration: const InputDecoration(
+        labelText: '* Âge minimum des stagiaires (ans)',
+        labelStyle: TextStyle(color: Colors.black),
+      ),
+      keyboardType: TextInputType.number,
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+      style: (widget.editMode ? null : TextStyle(color: Colors.black)),
     );
   }
 

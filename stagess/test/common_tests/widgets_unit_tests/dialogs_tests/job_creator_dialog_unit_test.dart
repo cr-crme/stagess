@@ -35,7 +35,7 @@ void main() {
     testWidgets('renders a title', (tester) async {
       await _prepareDialog(tester);
 
-      expect(find.text('Ajouter un nouveau poste'), findsOneWidget);
+      expect(find.text('Ajouter un nouveau métier'), findsOneWidget);
     });
 
     testWidgets('should display a cancel button', (tester) async {

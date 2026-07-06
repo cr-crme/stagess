@@ -44,7 +44,7 @@ class _JobCreatorDialogState extends State<JobCreatorDialog> {
     return SingleChildScrollView(
       child: PopScope(
         child: AlertDialog(
-          title: const Text('Ajouter un nouveau poste'),
+          title: const Text('Ajouter un nouveau métier'),
           content: Form(
             key: _formKey,
             child: EnterpriseJobListTile(
