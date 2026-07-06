@@ -12,6 +12,7 @@ import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/services/question_file_service.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
 import 'package:stagess_common_flutter/widgets/form_fields/text_with_form.dart';
 import 'package:stagess_common_flutter/widgets/itemized_text.dart';
 import 'package:stagess_common_flutter/widgets/radio_with_follow_up.dart';
@@ -143,80 +144,72 @@ class _SstEvaluationFormScreenState extends State<_SstEvaluationFormScreen> {
     final scrollController = ScrollController();
 
     if (!mounted) return;
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('REPÈRES', textAlign: TextAlign.center),
-        content: RawScrollbar(
+    showHelpDialog(
+      context,
+      title: 'Recommandations',
+      content: RawScrollbar(
+        controller: scrollController,
+        thumbVisibility: true,
+        thickness: 7,
+        minThumbLength: 75,
+        thumbColor: Theme.of(context).primaryColor,
+        radius: const Radius.circular(20),
+        child: SingleChildScrollView(
           controller: scrollController,
-          thumbVisibility: true,
-          thickness: 7,
-          minThumbLength: 75,
-          thumbColor: Theme.of(context).primaryColor,
-          radius: const Radius.circular(20),
-          child: SingleChildScrollView(
-            controller: scrollController,
-            child: Container(
-              margin: const EdgeInsets.only(right: 12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'Objectifs du questionnaire',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  ItemizedText(const [
-                    'S\'informer sur les risques auxquels est exposé l\'élève à ce '
-                        'poste de travail.',
-                    'Susciter un dialogue avec l\'entreprise sur les mesures '
-                        'de prévention.\n'
-                        'Les différentes sous-questions visent spécifiquement à '
-                        'favoriser les échanges.',
-                  ], style: Theme.of(context).textTheme.bodyMedium),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Avec qui le remplir\u00a0?',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  Text(
-                    'La personne qui est en charge de former l\'élève sur le plancher\u00a0:',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  ItemizedText(const [
-                    'C\'est elle qui connait le mieux le poste de travail de l\'élève',
-                    'Il sera plus facile d\'aborder avec elle qu\'avec l\'employeur '
-                        'les questions relatives aux dangers et aux accidents',
-                  ], style: Theme.of(context).textTheme.bodyMedium),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Quand',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  ItemizedText(const [
-                    'La première semaine de stage',
-                    'Pendant (ou après) une visite du poste de travail de l\'élève',
-                  ], style: Theme.of(context).textTheme.bodyMedium),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Durée',
-                    style: Theme.of(context).textTheme.titleSmall,
-                  ),
-                  Text(
-                    '15 minutes',
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                ],
-              ),
+          child: Container(
+            margin: const EdgeInsets.only(right: 12.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Objectifs du questionnaire',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                ItemizedText(const [
+                  'S\'informer sur les risques auxquels est exposé l\'élève à ce '
+                      'poste de travail.',
+                  'Susciter un dialogue avec l\'entreprise sur les mesures '
+                      'de prévention.\n'
+                      'Les différentes sous-questions visent spécifiquement à '
+                      'favoriser les échanges.',
+                ], style: Theme.of(context).textTheme.bodyMedium),
+                const SizedBox(height: 12),
+                Text(
+                  'Avec qui le remplir\u00a0?',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                Text(
+                  'La personne qui est en charge de former l\'élève sur le plancher\u00a0:',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                ItemizedText(const [
+                  'C\'est elle qui connait le mieux le poste de travail de l\'élève',
+                  'Il sera plus facile d\'aborder avec elle qu\'avec l\'employeur '
+                      'les questions relatives aux dangers et aux accidents',
+                ], style: Theme.of(context).textTheme.bodyMedium),
+                const SizedBox(height: 12),
+                Text(
+                  'Quand',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                ItemizedText(const [
+                  'La première semaine de stage',
+                  'Pendant (ou après) une visite du poste de travail de l\'élève',
+                ], style: Theme.of(context).textTheme.bodyMedium),
+                const SizedBox(height: 12),
+                Text(
+                  'Durée',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                Text(
+                  '15 minutes',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ],
             ),
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, 'OK'),
-            child: const Text('OK'),
-          ),
-        ],
       ),
     );
 

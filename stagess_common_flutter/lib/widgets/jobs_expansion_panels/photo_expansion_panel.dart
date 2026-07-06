@@ -9,6 +9,7 @@ import 'package:stagess_common/models/generic/photo.dart';
 import 'package:stagess_common/services/image_helpers.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('PhotoExpansionPanel');
@@ -303,12 +304,13 @@ Widget _buildInfoButton(BuildContext context, {required bool isExpanded}) {
       alignment: Alignment.topRight,
       child: InkWell(
         borderRadius: BorderRadius.circular(25),
-        onTap: () => showSnackBar(
+        onTap: () => showHelpDialog(
           context,
-          message:
+          title: 'Photos du poste',
+          content: const Text(
               'Les photos doivent représenter un poste de travail vide, ou '
               'encore des travailleurs de dos.\n'
-              'Ne pas prendre des photos où on peut les reconnaitre.',
+              'Ne pas prendre des photos où on peut les reconnaitre.'),
         ),
         child: Padding(
           padding: const EdgeInsets.all(4.0),

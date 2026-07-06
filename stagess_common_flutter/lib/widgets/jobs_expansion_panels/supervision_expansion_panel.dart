@@ -8,6 +8,7 @@ import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common_flutter/helpers/job_extension.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
 import 'package:stagess_common_flutter/widgets/form_fields/low_high_slider_form_field.dart';
 import 'package:stagess_common_flutter/widgets/itemized_text.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
@@ -382,12 +383,13 @@ Widget _buildInfoButton(BuildContext context, {required bool isExpanded}) {
       alignment: Alignment.topRight,
       child: InkWell(
         borderRadius: BorderRadius.circular(25),
-        onTap: () => showSnackBar(context,
-            message: 'Les résultats sont le cumul des '
-                'évaluations des personnes ayant '
-                'supervisé des stagiaires dans cette entreprise. '
-                '\nIls sont différenciés entre stages '
-                'FMS et FPT.'),
+        onTap: () => showHelpDialog(context,
+            title: 'Évaluation des stagiaires',
+            content: const Text(
+                'Les résultats sont le cumul des évaluations des personnes ayant '
+                'supervisé des stagiaires dans cette entreprise.'
+                'Ils sont différenciés entre stages FMS et FPT.\n'
+                'Vous pouvez sélectionner les dates pour lesquelles vous voulez afficher les résultats.')),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Icon(

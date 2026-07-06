@@ -8,6 +8,7 @@ import 'package:stagess_common/models/ref_sst/risk.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/services/risk_data_file_service.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
 
 final _logger = Logger('SpecializationListScreen');
 
@@ -80,27 +81,17 @@ class SpecializationListScreen extends StatelessWidget {
 
     if (!context.mounted) return;
     _logger.info('Showing help dialog, force: $force');
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text(
-          'REPÈRES',
-          textAlign: TextAlign.center,
-        ),
-        content: const Text(
-            'L\'analyse indique le nombre de risques potentiellement présents '
-            'pour chaque compétence d\'un métier et inversement.\n'
-            '\n'
-            'Elle a été faite pour les 45 métiers les plus populaires du '
-            'répertoire du Ministère de l\'éducation.\n'
-            '\n'
-            'Elle ne tient pas compte du contexte de chaque milieu de stage.'),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, 'OK'),
-              child: const Text('OK'))
-        ],
-      ),
+    showHelpDialog(
+      context,
+      title: 'Analyse des risques par compétence',
+      content: const Text(
+          'L\'analyse indique le nombre de risques potentiellement présents '
+          'pour chaque compétence d\'un métier et inversement.\n'
+          '\n'
+          'Elle a été faite pour les 45 métiers les plus populaires du '
+          'répertoire du Ministère de l\'éducation.\n'
+          '\n'
+          'Elle ne tient pas compte du contexte de chaque milieu de stage.'),
     );
 
     final prefs = await SharedPreferences.getInstance();

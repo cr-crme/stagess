@@ -17,6 +17,7 @@ import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
 import 'package:stagess_common_flutter/widgets/form_fields/low_high_slider_form_field.dart';
 import 'package:stagess_common_flutter/widgets/sub_title.dart';
 
@@ -352,12 +353,10 @@ class _EnterpriseEvaluationScreenState
     }
 
     if (!(_formKey.currentState?.validate() ?? true)) {
-      await showDialog(
-        context: context,
-        builder: (BuildContext context) => const AlertDialog(
-          title: Text('Formulaire incomplet'),
-          content: Text('Répondre à toutes les questions.'),
-        ),
+      await showHelpDialog(
+        context,
+        title: 'Formulaire incomplet',
+        content: const Text('Répondre à toutes les questions.'),
       );
       return;
     }
@@ -594,13 +593,12 @@ class _EnterpriseEvaluationScreenState
               icon: Icon(Icons.info_rounded,
                   color: Theme.of(context).primaryColor),
               onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    content: Text(
-                        'Niveau d\'encadrement des mesures de sécurité et prévention '
-                        'des risques à la SST (formations, modélisation, accompagnement, etc.)'),
-                  ),
+                showHelpDialog(
+                  context,
+                  title: 'Encadrement à la SST',
+                  content: const Text(
+                      'Niveau d\'encadrement des mesures de sécurité et prévention '
+                      'des risques à la SST (formations, modélisation, accompagnement, etc.)'),
                 );
               },
             )
