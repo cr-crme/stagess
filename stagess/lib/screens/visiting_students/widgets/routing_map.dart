@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:hive/hive.dart';
@@ -17,13 +14,16 @@ import 'package:stagess_common/models/itineraries/itinerary.dart';
 import 'package:stagess_common/models/itineraries/waypoint.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/cached_flutter_map.dart';
+import 'package:uuid/uuid.dart';
 
 String _makeRouteKey(Itinerary points) {
   final s = points.map((e) {
     final tp = e.toLatLng();
     return '${tp.latitude},${tp.longitude}';
   }).join('|');
-  return sha1.convert(utf8.encode(s)).toString();
+
+  Uuid uuid = const Uuid();
+  return uuid.v5(Namespace.url.value, s);
 }
 
 dynamic _deepCast(dynamic value) {
