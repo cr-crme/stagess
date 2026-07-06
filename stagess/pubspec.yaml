@@ -45,10 +45,10 @@ dependencies:
     enhanced_containers:
     crcrme_material_theme:
         path: ../external/crcrme_material_theme
-    go_router: ^16.2.4
+    go_router: ^17.3.0
     url_launcher: ^6.1.10
     auto_size_text: ^3.0.0
-    pdf: ^3.10.1
+    pdf: ^3.13.0
     intl: ^0.20.2
     shared_preferences: ^2.2.0
     lorem_ipsum: ^0.0.3
@@ -73,7 +73,6 @@ dev_dependencies:
     flutter_test:
         sdk: flutter
     flutter_lints: ^6.0.0
-    flutter_gen:
 
 flutter:
     generate: true

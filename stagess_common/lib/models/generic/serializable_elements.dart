@@ -132,7 +132,7 @@ extension DoubleExt on double {
   static double? from(dynamic element) {
     if (element is double) {
       return element;
-    } else if (element is int) {
+    } else if (element is num) {
       return element.toDouble();
     } else if (element is String) {
       return double.tryParse(element);

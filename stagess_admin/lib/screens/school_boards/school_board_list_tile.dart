@@ -424,7 +424,7 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
                   children: [
                     IconButton(
                       onPressed: () async {
-                        final result = await FilePicker.platform.pickFiles();
+                        final result = await FilePicker.pickFiles();
                         if (result == null ||
                             result.files.first.bytes == null ||
                             !mounted) {
