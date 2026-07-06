@@ -61,15 +61,25 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
           IconButton(
             onPressed: () => setState(() => _showSearchBar = !_showSearchBar),
             icon: const Icon(Icons.search),
+            tooltip: 'Rechercher un·e élève',
           )
         ],
-        bottom: _showSearchBar ? Search(controller: _searchController) : null,
       ),
       smallDrawer: MainDrawer.small,
       mediumDrawer: MainDrawer.medium,
       largeDrawer: MainDrawer.large,
       body: Column(
         children: [
+          if (_showSearchBar)
+            Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(8),
+                ),
+              ),
+              child: Search(controller: _searchController),
+            ),
           Expanded(
             child: ListView.builder(
               shrinkWrap: true,

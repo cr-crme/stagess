@@ -130,6 +130,16 @@ class _TeachersListScreenState extends State<TeachersListScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (_showSearchBar)
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(8),
+                  ),
+                ),
+                child: Search(controller: _searchController),
+              ),
             ..._buildTiles(context, schoolBoardTeachers, filteredTeacherIds),
             SizedBox(height: MediaQuery.of(context).size.height * 0.5),
           ],

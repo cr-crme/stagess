@@ -104,7 +104,6 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen> {
             tooltip: 'Ajouter une entreprise',
           ),
         ],
-        bottom: _showSearchBar ? Search(controller: _searchController) : null,
       ),
       smallDrawer: MainDrawer.small,
       mediumDrawer: MainDrawer.medium,
@@ -113,6 +112,16 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (_showSearchBar)
+              Container(
+                decoration: BoxDecoration(
+                  color: Theme.of(context).primaryColor,
+                  borderRadius: const BorderRadius.vertical(
+                    bottom: Radius.circular(8),
+                  ),
+                ),
+                child: Search(controller: _searchController),
+              ),
             ..._buildTiles(
                 context, schoolBoardEnterprises, filteredEnterpriseIds),
             SizedBox(height: MediaQuery.of(context).size.height * 0.5),

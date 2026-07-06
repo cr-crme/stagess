@@ -159,7 +159,6 @@ class _IncidentHistoryScreenInternalState
             tooltip: 'Rechercher un métier',
           ),
         ],
-        bottom: _showSearchBar ? Search(controller: _searchController) : null,
       ),
       smallDrawer: null,
       mediumDrawer: MainDrawer.medium,
@@ -167,6 +166,16 @@ class _IncidentHistoryScreenInternalState
       body: widget.hasFullData
           ? Column(
               children: [
+                if (_showSearchBar)
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor,
+                      borderRadius: const BorderRadius.vertical(
+                        bottom: Radius.circular(8),
+                      ),
+                    ),
+                    child: Search(controller: _searchController),
+                  ),
                 Row(
                   children: [
                     Expanded(

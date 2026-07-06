@@ -222,7 +222,12 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
       children: [
         if (widget.withSearchBar)
           Container(
-            decoration: BoxDecoration(color: Theme.of(context).primaryColor),
+            decoration: BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(8),
+              ),
+            ),
             child: Search(controller: searchController),
           ),
         SwitchListTile(
