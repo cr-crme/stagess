@@ -92,6 +92,9 @@ class _PhoneListTileState extends State<PhoneListTile> {
                 labelStyle: widget.titleStyle ??
                     (widget.enabled ? null : TextStyle(color: Colors.black)),
                 disabledBorder: InputBorder.none,
+                helperText: widget.enabled
+                    ? 'Si besoin d\'ajouter un poste: (123) 123-1234 poste 12345'
+                    : null,
               ),
               maxLength: widget.enabled ? 50 : null,
               validator: (value) {
