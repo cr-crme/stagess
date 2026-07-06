@@ -208,12 +208,11 @@ class _InternshipListState extends State<_InternshipList> {
 
               if (specialization == null || student == null) return Container();
 
-              var internshipDays = <int>{};
+              var internshipDays = <String>{};
               for (final weeklySchedule in contract.weeklySchedules) {
-                internshipDays.addAll(weeklySchedule.schedule.keys);
+                internshipDays.addAll(weeklySchedule.schedule.keys
+                    .map((e) => weeklySchedule.dayCycle.dayAsString(e)));
               }
-              internshipDays =
-                  internshipDays.sorted((e, f) => e.compareTo(f)).toSet();
 
               return AnimatedExpandingCard(
                 initialExpandedState: _expanded[internship.id] ?? false,

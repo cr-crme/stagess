@@ -249,37 +249,36 @@ class _ScheduleSelectorState extends State<ScheduleSelector> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (widget.title != null) widget.title!,
-        Padding(
-          padding: const EdgeInsets.only(left: 12.0, top: 8.0),
-          child: Text(
-            'Type de cycles hebdomadaires',
-            style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  fontWeight: FontWeight.bold,
-                  fontSize: widget.periodTextSize,
-                ),
+        if (widget.editMode)
+          Padding(
+            padding: const EdgeInsets.only(top: 8.0),
+            child: Text(
+              'Type de cycles hebdomadaires',
+              style: Theme.of(context).textTheme.titleSmall!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: widget.periodTextSize,
+                  ),
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.only(left: 12.0, bottom: 4.0),
-          child: DropdownButton<DayCycle>(
-            value: widget.scheduleController.dayCycle,
-            onChanged: widget.editMode
-                ? (newCycle) {
-                    setState(
-                        () => widget.scheduleController.dayCycle = newCycle);
-                  }
-                : null,
-            items: DayCycle.values
-                .map((cycle) => DropdownMenuItem<DayCycle>(
-                    value: cycle,
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 12.0, right: 12.0),
-                      child: Text(cycle.name,
-                          style: TextStyle(fontWeight: FontWeight.normal)),
-                    )))
-                .toList(),
+        if (widget.editMode)
+          Padding(
+            padding: const EdgeInsets.only(left: 12.0, bottom: 4.0),
+            child: DropdownButton<DayCycle>(
+              value: widget.scheduleController.dayCycle,
+              onChanged: (newCycle) {
+                setState(() => widget.scheduleController.dayCycle = newCycle);
+              },
+              items: DayCycle.values
+                  .map((cycle) => DropdownMenuItem<DayCycle>(
+                      value: cycle,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 12.0, right: 12.0),
+                        child: Text(cycle.name,
+                            style: Theme.of(context).textTheme.bodyMedium!),
+                      )))
+                  .toList(),
+            ),
           ),
-        ),
         ...widget.scheduleController._weeklySchedules.asMap().keys.map<Widget>(
               (weekIndex) => _ScheduleSelector(
                 key: ValueKey(

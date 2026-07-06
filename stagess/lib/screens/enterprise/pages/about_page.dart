@@ -668,20 +668,29 @@ class _TaxesInfoState extends State<_TaxesInfo> {
           child: Column(
             children: [
               if (widget.editMode)
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        'Adresse du siège social identique à l\'adresse de l\'établissement',
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: InkWell(
+                    onTap: () =>
+                        widget.onChangedUseSame(!widget.useSameAddress),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                          child: Text(
+                            'Adresse du siège social identique\nà l\'adresse de l\'établissement',
+                            style: Theme.of(context).textTheme.titleMedium,
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        Switch(
+                          value: widget.useSameAddress,
+                          onChanged: widget.onChangedUseSame,
+                        ),
+                      ],
                     ),
-                    Switch(
-                      value: widget.useSameAddress,
-                      onChanged: widget.onChangedUseSame,
-                    ),
-                  ],
+                  ),
                 ),
               AddressListTile(
                 title: 'Adresse du siège social',
