@@ -485,11 +485,11 @@ class _SkillEvaluationMainScreenState
                                   editMode: _editMode,
                                 ),
                                 if (_editMode) _buildAutofillChooser(),
-                                _JobToEvaluate(
+                                _EvaluationTypeChoser(
                                   formController: _formController,
                                   editMode: _editMode,
                                 ),
-                                _EvaluationTypeChoser(
+                                _JobToEvaluate(
                                   formController: _formController,
                                   editMode: _editMode,
                                 ),
@@ -524,6 +524,7 @@ class _SkillEvaluationMainScreenState
               Padding(
                 padding: const EdgeInsets.only(left: 24.0),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Recommencer à partir de\u00a0: '),
                     DropdownButton<String?>(
@@ -544,11 +545,16 @@ class _SkillEvaluationMainScreenState
                           .map(
                             (evaluation) => DropdownMenuItem(
                               value: evaluation.id,
-                              child: Text(
-                                'Évaluation du ${DateFormat(
-                                  'dd MMMM yyyy',
-                                  'fr_CA',
-                                ).format(evaluation.date)}',
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Text(
+                                  'Évaluation du ${DateFormat(
+                                    'dd MMMM yyyy',
+                                    'fr_CA',
+                                  ).format(evaluation.date)}',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
                               ),
                             ),
                           )
@@ -556,7 +562,13 @@ class _SkillEvaluationMainScreenState
                         ..add(
                           DropdownMenuItem(
                               value: null,
-                              child: const Text('Nouveau formulaire vide')),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Text('Nouveau formulaire vide',
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium),
+                              )),
                         ),
                     ),
                   ],
@@ -777,6 +789,8 @@ class _EvaluationTypeChoserState extends State<_EvaluationTypeChoser> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // TODO: if "New" is selected, it should reuse the last selected evaluation
+        // TODO: if "Old" is selected, it should use that evaluation value
         const SubTitle('Type d\'évaluation'),
         Padding(
           padding: const EdgeInsets.only(left: 24.0),
