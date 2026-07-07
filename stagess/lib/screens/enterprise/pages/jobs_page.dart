@@ -318,9 +318,14 @@ class JobsPageState extends State<JobsPage> {
                                                           ).primaryColor,
                                                   ),
                                                 ),
-                                            child: const Text(
-                                              'Inscrire un\nstagiaire',
-                                              textAlign: TextAlign.center,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      vertical: 4.0),
+                                              child: const Text(
+                                                'Inscrire un\nstagiaire',
+                                                textAlign: TextAlign.center,
+                                              ),
                                             ),
                                           ),
                                         )

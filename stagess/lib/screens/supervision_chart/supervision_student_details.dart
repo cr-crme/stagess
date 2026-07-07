@@ -532,9 +532,12 @@ class _MoreInfoButton extends StatelessWidget {
       child: Center(
         child: TextButton(
           onPressed: onTap,
-          child: const Text(
-            'Plus de détails\nsur le stage',
-            textAlign: TextAlign.center,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 4.0),
+            child: const Text(
+              'Plus de détails\nsur le stage',
+              textAlign: TextAlign.center,
+            ),
           ),
         ),
       ),
