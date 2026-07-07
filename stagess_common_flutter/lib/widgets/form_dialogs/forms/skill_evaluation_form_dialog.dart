@@ -2,7 +2,6 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/models/internships/task_appreciation.dart';
@@ -14,6 +13,7 @@ import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 import 'package:stagess_common_flutter/widgets/custom_date_picker.dart';
 import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
+import 'package:stagess_common_flutter/widgets/itemized_text.dart';
 import 'package:stagess_common_flutter/widgets/radio_with_follow_up.dart';
 import 'package:stagess_common_flutter/widgets/scrollable_stepper.dart';
 import 'package:stagess_common_flutter/widgets/sub_title.dart';
@@ -459,7 +459,7 @@ class _SkillEvaluationMainScreenState
               Padding(
                 padding: const EdgeInsets.only(right: 8.0),
                 child: IconButton(
-                  onPressed: () => _showHelp(force: true),
+                  onPressed: _showHelp,
                   icon: const Icon(Icons.info),
                 ),
               ),
@@ -566,17 +566,8 @@ class _SkillEvaluationMainScreenState
           );
   }
 
-  void _showHelp({required bool force}) async {
+  void _showHelp() async {
     _logger.info('Showing help for SkillEvaluationFormScreen');
-
-    bool shouldShowHelp = force;
-    if (!shouldShowHelp) {
-      final prefs = await SharedPreferences.getInstance();
-      final wasShown = prefs.getBool('skillEvaluationFormHelpWasShown');
-      if (wasShown == null || !wasShown) shouldShowHelp = true;
-    }
-
-    if (!shouldShowHelp) return;
 
     final scrollController = ScrollController();
 
@@ -595,19 +586,74 @@ class _SkillEvaluationMainScreenState
           controller: scrollController,
           child: Container(
             margin: const EdgeInsets.only(right: 12.0),
-            child: Text(
-                'Veiller à bien sélectionner toutes les compétences que vous souhaitez évaluer.\n'
-                '\n'
-                'Si vous souhaitez modifier les compétences sélectionnées après avoir débuté, '
-                'vous devrez démarrer une nouvelle évaluation.',
-                style: Theme.of(context).textTheme.bodyMedium),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Pour toutes les évaluations',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                Text.rich(TextSpan(children: [
+                  TextSpan(text: 'Veiller à bien sélectionner avec '),
+                  WidgetSpan(
+                    child: SizedBox(
+                      height: 19,
+                      width: 22,
+                      child: Checkbox(
+                        tristate: true,
+                        value: true,
+                        onChanged: null,
+                        fillColor: WidgetStateProperty.resolveWith(
+                          (states) => Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                  TextSpan(
+                      text:
+                          ' pour toutes les compétences que vous souhaitez évaluer.\n'
+                          '\n'),
+                  TextSpan(
+                      text:
+                          'Si vous souhaitez modifier les compétences sélectionnées après avoir débuté, '
+                          'vous devrez démarrer une nouvelle évaluation.\n'),
+                ])),
+                Text(
+                  'Pour les réévaluations',
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
+                Text('Il est possible de :'),
+                ItemizedText([
+                  'poursuivre une évaluation faite précédemment, mais seulement s’il s’agit du même type d’évaluation (évaluation globale de la compétence ou évaluation tâche par tâche)',
+                  'recommencer une nouvelle évaluation à partir d’un formulaire vide.',
+                ]),
+                SizedBox(height: 8),
+                Text.rich(TextSpan(children: [
+                  TextSpan(
+                      text:
+                          'Pour masquer les compétences précédemment évaluées tout en '
+                          'gardant leur valeur, sélectionner '),
+                  WidgetSpan(
+                    child: SizedBox(
+                      height: 19,
+                      width: 22,
+                      child: Checkbox(
+                        tristate: true,
+                        value: null,
+                        onChanged: null,
+                        fillColor: WidgetStateProperty.resolveWith(
+                          (states) => Theme.of(context).primaryColor,
+                        ),
+                      ),
+                    ),
+                  ),
+                ])),
+              ],
+            ),
           ),
         ),
       ),
     );
-
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool('skillEvaluationFormHelpWasShown', true);
   }
 }
 
@@ -775,38 +821,6 @@ class _JobToEvaluateState extends State<_JobToEvaluate> {
         .toList();
   }
 
-  void _showHelpOnJobSelection() {
-    showHelpDialog(
-      context,
-      title: 'Explication des sélections',
-      content: Text.rich(
-        TextSpan(
-          children: [
-            const TextSpan(text: 'Sélectionner '),
-            WidgetSpan(
-              child: SizedBox(
-                height: 19,
-                width: 22,
-                child: Checkbox(
-                  tristate: true,
-                  value: null,
-                  onChanged: null,
-                  fillColor: WidgetStateProperty.resolveWith(
-                    (states) => Theme.of(context).primaryColor,
-                  ),
-                ),
-              ),
-            ),
-            const TextSpan(
-              text: ' pour masquer les compétences précédemment évaluées pour '
-                  'cette évaluation-ci (les résultats sont conservés).',
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildJobTile({
     required String title,
     required Specialization specialization,
@@ -876,24 +890,6 @@ class _JobToEvaluateState extends State<_JobToEvaluate> {
                   }),
                 ],
               ),
-              if (widget.editMode &&
-                  widget.formController.isFilledUsingPreviousEvaluation)
-                Align(
-                  alignment: Alignment.topRight,
-                  child: SizedBox(
-                    height: 45,
-                    width: 45,
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(25),
-                      onTap: _showHelpOnJobSelection,
-                      child: Icon(
-                        Icons.info,
-                        size: 30,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                  ),
-                ),
             ],
           ),
         ),

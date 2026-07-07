@@ -1,7 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
 import 'package:stagess/screens/ref_sst/specialization_list_risks_and_skills/widgets/tile_job_risk.dart';
 import 'package:stagess_common/models/ref_sst/risk.dart';
@@ -69,18 +68,9 @@ class SpecializationListScreen extends StatelessWidget {
     return out;
   }
 
-  void _showHelp(BuildContext context, {required bool force}) async {
-    bool shouldShowHelp = force;
-    if (!shouldShowHelp) {
-      final prefs = await SharedPreferences.getInstance();
-      final wasShown = prefs.getBool('SstHelpWasShown');
-      if (wasShown == null || !wasShown) shouldShowHelp = true;
-    }
-
-    if (!shouldShowHelp) return;
-
+  void _showHelp(BuildContext context) async {
     if (!context.mounted) return;
-    _logger.info('Showing help dialog, force: $force');
+    _logger.info('Showing help dialog');
     showHelpDialog(
       context,
       title: 'Analyse des risques par compétence',
@@ -93,16 +83,11 @@ class SpecializationListScreen extends StatelessWidget {
           '\n'
           'Elle ne tient pas compte du contexte de chaque milieu de stage.'),
     );
-
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool('SstHelpWasShown', true);
   }
 
   @override
   Widget build(BuildContext context) {
     _logger.finer('Building SpecializationListScreen for ID: $id');
-
-    _showHelp(context, force: false);
 
     final specialization = ActivitySectorsService.specialization(id);
 
@@ -134,14 +119,10 @@ class SpecializationListScreen extends StatelessWidget {
               child: AutoSizeText(specialization.name, maxLines: 2),
             ),
             actions: [
-              InkWell(
-                onTap: () => _showHelp(context, force: true),
-                borderRadius: BorderRadius.circular(25),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Icon(Icons.info),
-                ),
-              )
+              IconButton(
+                onPressed: () => _showHelp(context),
+                icon: const Icon(Icons.info),
+              ),
             ],
             bottom: const TabBar(tabs: [
               Padding(

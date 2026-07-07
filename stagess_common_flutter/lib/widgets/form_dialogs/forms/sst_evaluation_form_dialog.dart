@@ -1,7 +1,6 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/sst_evaluation.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
@@ -149,17 +148,8 @@ class _SstEvaluationFormScreenState extends State<_SstEvaluationFormScreen> {
     Navigator.of(widget.rootContext).pop(null);
   }
 
-  void _showHelp({required bool force}) async {
+  void _showHelp() async {
     _logger.info('Showing help for SstEvaluationFormScreen');
-
-    bool shouldShowHelp = force;
-    if (!shouldShowHelp) {
-      final prefs = await SharedPreferences.getInstance();
-      final wasShown = prefs.getBool('SstRiskFormHelpWasShown');
-      if (wasShown == null || !wasShown) shouldShowHelp = true;
-    }
-
-    if (!shouldShowHelp) return;
 
     final scrollController = ScrollController();
 
@@ -232,17 +222,12 @@ class _SstEvaluationFormScreenState extends State<_SstEvaluationFormScreen> {
         ),
       ),
     );
-
-    final prefs = await SharedPreferences.getInstance();
-    prefs.setBool('SstRiskFormHelpWasShown', true);
   }
 
   @override
   Widget build(BuildContext context) {
     _logger.finer(
         'Building SstEvaluationFormScreen for internshipId: ${widget.internshipId}');
-
-    _showHelp(force: false);
 
     final internship = InternshipsProvider.of(context, listen: false)
         .fromId(widget.internshipId);
@@ -260,7 +245,7 @@ class _SstEvaluationFormScreenState extends State<_SstEvaluationFormScreen> {
             Padding(
               padding: const EdgeInsets.only(right: 8.0),
               child: IconButton(
-                onPressed: () => _showHelp(force: true),
+                onPressed: _showHelp,
                 icon: const Icon(Icons.info),
               ),
             ),
