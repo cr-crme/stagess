@@ -31,9 +31,10 @@ class PdfTheme {
         child: pw.Text(text, style: textStyleBold.copyWith(fontSize: 12)),
       );
 
-  static pw.Widget bodyMedium(String text, {pw.EdgeInsets? padding}) =>
+  static pw.Widget bodyMedium(String text,
+          {pw.EdgeInsets? padding, pw.TextStyle? style}) =>
       pw.Padding(
         padding: padding ?? pw.EdgeInsets.all(0.0),
-        child: pw.Text(text, style: textStyleNormal),
+        child: pw.Text(text, style: style ?? textStyleNormal),
       );
 }

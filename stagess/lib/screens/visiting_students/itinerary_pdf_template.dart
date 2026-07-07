@@ -137,12 +137,20 @@ pw.Widget _buildItineraryDetails({required RoutingController controller}) {
 }
 
 pw.Widget _placeTile(Waypoint place) {
+  final studentName = place.title;
+  final enterpriseName = place.subtitle ?? '';
+
   return pw.Expanded(
     child: pw.Column(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [
-        PdfTheme.titleSmall(place.title,
+        PdfTheme.titleSmall(studentName,
             padding: const pw.EdgeInsets.only(bottom: 2.0)),
+        PdfTheme.bodyMedium(
+          enterpriseName,
+          style: PdfTheme.textStyleItalic,
+          padding: const pw.EdgeInsets.only(bottom: 2.0),
+        ),
         PdfTheme.bodyMedium(place.address.toParagraph()),
       ],
     ),
