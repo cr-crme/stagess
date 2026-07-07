@@ -314,7 +314,7 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
         showSnackBar(
           context,
           message:
-              'Impossible de modifier les priorités du tableau de supervision, car '
+              'Impossible de modifier les priorités du tableau des supervisions, car '
               'l\'enseignant\u00b7e est en cours de modification par un autre utilisateur.',
         );
       }
@@ -376,7 +376,7 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
         showSnackBar(
           context,
           message:
-              'Impossible de modifier le tableau de supervision, car au moins un '
+              'Impossible de modifier le tableau des supervisions, car au moins un '
               'stage est en cours de modification par un autre utilisateur.',
         );
       }

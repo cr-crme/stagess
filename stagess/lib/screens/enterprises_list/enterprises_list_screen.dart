@@ -9,6 +9,7 @@ import 'package:stagess/screens/enterprises_list/widgets/enterprise_card.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/itineraries/waypoint.dart';
 import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common_flutter/helpers/enterprise_extension.dart';
@@ -44,9 +45,30 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen>
 
   void _search() => setState(() => _withSearchBar = !_withSearchBar);
 
+  Future<void> _fetchSchool(BuildContext context) async {
+    final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
+    if (schoolBoards.currentSchool?.address.isNotEmpty ?? false) {
+      // No need to setState as we don't act on this information in the build method
+      return;
+    }
+
+    await Future.wait([
+      ...schoolBoards.map(
+        (e) => schoolBoards.fetchData(id: e.id, fields: FetchableFields.all),
+      )
+    ]);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     _logger.finer('Building EnterprisesListScreen');
+
+    // We must listen to the schoolBoards because EnterpriseListScreen is the first
+    // screen that is loaded after the login, but school resources may not be loaded
+    // yet in the provider.
+    SchoolBoardsProvider.of(context, listen: true);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _fetchSchool(context));
 
     final appBar = ResponsiveService.appBarOf(
       context,
@@ -357,19 +379,16 @@ class _EnterprisesByMap extends StatelessWidget {
     return out;
   }
 
-  Map<Enterprise, Waypoint> _fetchEnterprisesCoordinates(
-    BuildContext context,
-  ) {
+  Map<Enterprise, Waypoint> _fetchEnterprisesCoordinates(BuildContext context) {
     _logger.finer(
       'Fetching enterprises coordinates (enterprises: ${enterprises.length})',
     );
     final Map<Enterprise, Waypoint> out = {};
 
-    final schoolBoard =
-        SchoolBoardsProvider.of(context, listen: false).currentSchoolBoard;
+    final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
+    final schoolBoard = schoolBoards.currentSchoolBoard;
     if (schoolBoard == null) return out;
-    final school =
-        SchoolBoardsProvider.of(context, listen: false).currentSchool;
+    final school = schoolBoards.currentSchool;
     if (school == null) return out;
 
     final schoolAsEnterprise = Enterprise.empty.copyWith(
