@@ -16,16 +16,11 @@ build/%.zip: .FORCE
 	  echo "Error: STAGESS_GOOGLE_MAPS_API_KEY is not set in the environment."; \
 	  exit 1; \
 	fi
-	@if [ -z "$${STAGESS_OSM_UNBLOCK_STRING}" ]; then \
-	  echo "Error: STAGESS_OSM_UNBLOCK_STRING is not set in the environment."; \
-	  exit 1; \
-	fi
 	flutter      build web --base-href=/$*/ \
 					--wasm \
 				    --dart-define=STAGESS_USE_DEV_DB=$(USE_DEV_DB) \
 					--dart-define=STAGESS_MAINTENANCE_MODE=$(MAINTENANCE_MODE) \
-				    --dart-define=STAGESS_GOOGLE_MAPS_API_KEY=$${STAGESS_GOOGLE_MAPS_API_KEY} \
-					--dart-define=flutter.flutter_map.unblockOSM="$${STAGESS_OSM_UNBLOCK_STRING}"
+				    --dart-define=STAGESS_GOOGLE_MAPS_API_KEY=$${STAGESS_GOOGLE_MAPS_API_KEY}
 	$(MoveDir)   $(OUT_DIR)/web $(OUT_DIR)/$*
 	$(ChangeDir) $(OUT_DIR) && $(ZIP) $*.zip $*
 
