@@ -21,6 +21,8 @@ import 'package:stagess_common_flutter/screens/wrong_version_screen.dart';
 import 'package:stagess_common_flutter/widgets/inactivity_layout.dart';
 
 // TODO: Fix the pdf failing when resizing the page
+// TODO: Trajectories when multiple students at the same place
+// TODO: Fix filter enterprise with only active
 
 // coverage:ignore-start
 void main() async {

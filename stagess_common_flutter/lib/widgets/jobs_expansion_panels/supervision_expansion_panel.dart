@@ -123,7 +123,7 @@ class _SupervisionExpansionPanelState extends State<SupervisionExpansionPanel> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Évaluation du : '
+            Text('Évaluations du : '
                 '${DateFormat.yMMMd('fr_CA').format(_dateFilter.start)} au ${DateFormat.yMMMd('fr_CA').format(_dateFilter.end)}'),
             IconButton(
               icon: const Icon(
