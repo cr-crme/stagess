@@ -965,51 +965,13 @@ class _DateRangeState extends State<_DateRange> {
                         null,
                 child: Padding(
                   padding: const EdgeInsets.only(left: 12.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        width: 180,
-                        child: TextField(
-                          decoration: const InputDecoration(
-                              labelText: 'Date de début',
-                              labelStyle: TextStyle(color: Colors.black),
-                              border: InputBorder.none),
-                          style: TextStyle(color: Colors.black),
-                          controller: TextEditingController(
-                              text: widget.controller._weeklySchedulesController
-                                          .dateRange ==
-                                      null
-                                  ? null
-                                  : DateFormat.yMMMEd('fr_CA').format(widget
-                                      .controller
-                                      ._weeklySchedulesController
-                                      .dateRange!
-                                      .start)),
-                          enabled: false,
-                        ),
-                      ),
-                      SizedBox(
-                        width: 180,
-                        child: TextField(
-                          decoration: const InputDecoration(
-                              labelText: 'Date de fin',
-                              labelStyle: TextStyle(color: Colors.black),
-                              border: InputBorder.none),
-                          style: TextStyle(color: Colors.black),
-                          controller: TextEditingController(
-                              text: widget.controller._weeklySchedulesController
-                                          .dateRange ==
-                                      null
-                                  ? null
-                                  : DateFormat.yMMMEd('fr_CA').format(widget
-                                      .controller
-                                      ._weeklySchedulesController
-                                      .dateRange!
-                                      .end)),
-                          enabled: false,
-                        ),
-                      ),
+                      Text(
+                          'Date de début : ${widget.controller._weeklySchedulesController.dateRange != null ? DateFormat.yMMMEd('fr_CA').format(widget.controller._weeklySchedulesController.dateRange!.start) : ''}'),
+                      Text(
+                          'Date de fin : ${widget.controller._weeklySchedulesController.dateRange != null ? DateFormat.yMMMEd('fr_CA').format(widget.controller._weeklySchedulesController.dateRange!.end) : ''}'),
                     ],
                   ),
                 ),

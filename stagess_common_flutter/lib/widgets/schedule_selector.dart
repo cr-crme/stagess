@@ -387,67 +387,59 @@ class _ScheduleSelector extends StatelessWidget {
             ],
           ),
         if (editMode)
-          if (periodName == null)
-            Text(
-              '* Sélectionner les journées et heures du stage',
-              style: Theme.of(
-                context,
-              ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.bold),
-            )
-          else
-            Text(
-              '* Sélectionner les dates, journées et heures de la période de stage',
-              style: Theme.of(
-                context,
-              ).textTheme.titleSmall!.copyWith(fontWeight: FontWeight.bold),
-            ),
+          Row(
+            children: [
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 12.0),
+                  child: Text(
+                    periodName == null
+                        ? '* Sélectionner les journées et heures du stage'
+                        : '* Sélectionner les dates, journées et heures de la période de stage',
+                    style: Theme.of(
+                      context,
+                    )
+                        .textTheme
+                        .titleSmall!
+                        .copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(
+                  Icons.calendar_month_outlined,
+                  color: Colors.blue,
+                ),
+                onPressed: () {
+                  _promptChangeWeek(context);
+                  onShouldRefresh();
+                },
+              )
+            ],
+          ),
         if (periodName != null)
           Padding(
             padding: EdgeInsets.only(
-              top: 8.0,
-              left: 8.0,
+              left: 12.0,
               right: editMode ? 8.0 : 24.0,
               bottom: leftPadding ?? 12,
             ),
             child: Stack(
               alignment: Alignment.centerRight,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Column(
-                      children: [
-                        Text('${editMode ? '* ' : ''}Date de début'),
-                        Text(
-                          DateFormat.yMMMEd(
-                            'fr_CA',
-                          ).format(weeklySchedule.period.start),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Text('${editMode ? '* ' : ''}Date de fin'),
-                        Text(
-                          DateFormat.yMMMEd(
-                            'fr_CA',
-                          ).format(weeklySchedule.period.end),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                if (editMode)
-                  IconButton(
-                    icon: const Icon(
-                      Icons.calendar_month_outlined,
-                      color: Colors.blue,
-                    ),
-                    onPressed: () {
-                      _promptChangeWeek(context);
-                      onShouldRefresh();
-                    },
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                          'Date de début : ${DateFormat.yMMMEd('fr_CA').format(weeklySchedule.period.start)}'),
+                      Text('Date de fin : ${DateFormat.yMMMEd(
+                        'fr_CA',
+                      ).format(weeklySchedule.period.end)}'),
+                    ],
                   ),
+                ),
               ],
             ),
           ),
@@ -455,29 +447,29 @@ class _ScheduleSelector extends StatelessWidget {
         //DropdownButton(items: Day, onChanged: onChanged),
 
         if (editMode)
-          Align(
-            alignment: Alignment.centerRight,
-            child: Row(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                   child: Text(
                     'Appliquer le même horaire pour tous les jours du stage',
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
-                Switch(
-                  value: useSameScheduleForAllDays,
-                  onChanged: (value) {
-                    controller.switchApplyToAllDays(
-                      value: value,
-                      weeklyIndex: weekIndex,
-                    );
-                    onShouldRefresh();
-                  },
-                ),
-              ],
-            ),
+              ),
+              Switch(
+                value: useSameScheduleForAllDays,
+                onChanged: (value) {
+                  controller.switchApplyToAllDays(
+                    value: value,
+                    weeklyIndex: weekIndex,
+                  );
+                  onShouldRefresh();
+                },
+              ),
+            ],
           ),
         FormField(
           validator: (value) {
@@ -683,7 +675,7 @@ class _ScheduleSelector extends StatelessWidget {
         InkWell(
           onTap: checkboxCallback,
           child: SizedBox(
-            width: 150,
+            width: 140,
             child: Row(
               children: [
                 Visibility(
@@ -709,6 +701,7 @@ class _ScheduleSelector extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(bottom: 4.0, top: 8.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: (schedule?.blocks ?? []).asMap().keys.map((i) {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 4.0),
