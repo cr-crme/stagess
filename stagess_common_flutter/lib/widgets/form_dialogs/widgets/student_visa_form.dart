@@ -50,24 +50,40 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
           ),
         ),
       ),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 24.0, top: 8.0, right: 24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              _evaluations.isEmpty
-                  ? 'Aucune information renseignée.'
-                  : 'Des informations ont été ajoutées au VISA.\n'
-                      'Dernière modification le\u00a0: ${DateFormat.yMMMEd('fr_CA').format(evaluation!.date)}',
-            ),
-            SizedBox(height: 16.0),
-            _buildModifyFormButton(),
-            SizedBox(height: 16),
-            _buildSelectShowPreviousEvaluations(),
-            SizedBox(height: 16),
-          ],
-        ),
+      child: _buildToBeDone(),
+      //_buildCard(evaluation),
+    );
+  }
+
+  Widget _buildToBeDone() {
+    return Padding(
+      padding: const EdgeInsets.only(
+          left: 24.0, top: 8.0, right: 24.0, bottom: 24.0),
+      child: Text(
+        'Le VISA et les certifications sont en cours de développement.\n'
+        'Cette section sera bientôt disponible.',
+      ),
+    );
+  }
+
+  Widget _buildCard(StudentVisa? evaluation) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 24.0, top: 8.0, right: 24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            _evaluations.isEmpty
+                ? 'Aucune information renseignée.'
+                : 'Des informations ont été ajoutées au VISA.\n'
+                    'Dernière modification le\u00a0: ${DateFormat.yMMMEd('fr_CA').format(evaluation!.date)}',
+          ),
+          SizedBox(height: 16.0),
+          _buildModifyFormButton(),
+          SizedBox(height: 16),
+          _buildSelectShowPreviousEvaluations(),
+          SizedBox(height: 16),
+        ],
       ),
     );
   }

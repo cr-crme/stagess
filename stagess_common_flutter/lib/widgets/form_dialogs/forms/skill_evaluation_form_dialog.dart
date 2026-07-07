@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/models/internships/task_appreciation.dart';
@@ -446,15 +447,23 @@ class _SkillEvaluationMainScreenState
       width: ResponsiveService.maxBodyWidth,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            '${student == null ? 'En attente des informations' : 'Évaluation de ${student.fullName}'}\n'
-            'C1. Compétences spécifiques',
-          ),
-          leading: IconButton(
-            onPressed: _cancel,
-            icon: const Icon(Icons.arrow_back),
-          ),
-        ),
+            title: Text(
+              '${student == null ? 'En attente des informations' : 'Évaluation de ${student.fullName}'}\n'
+              'C1. Compétences spécifiques',
+            ),
+            leading: IconButton(
+              onPressed: _cancel,
+              icon: const Icon(Icons.arrow_back),
+            ),
+            actions: [
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: IconButton(
+                  onPressed: () => _showHelp(force: true),
+                  icon: const Icon(Icons.info),
+                ),
+              ),
+            ]),
         body: PopScope(
           child: student == null
               ? const Center(child: CircularProgressIndicator())
@@ -555,6 +564,50 @@ class _SkillEvaluationMainScreenState
               ),
             ],
           );
+  }
+
+  void _showHelp({required bool force}) async {
+    _logger.info('Showing help for SkillEvaluationFormScreen');
+
+    bool shouldShowHelp = force;
+    if (!shouldShowHelp) {
+      final prefs = await SharedPreferences.getInstance();
+      final wasShown = prefs.getBool('skillEvaluationFormHelpWasShown');
+      if (wasShown == null || !wasShown) shouldShowHelp = true;
+    }
+
+    if (!shouldShowHelp) return;
+
+    final scrollController = ScrollController();
+
+    if (!mounted) return;
+    showHelpDialog(
+      context,
+      title: 'Recommandations',
+      content: RawScrollbar(
+        controller: scrollController,
+        thumbVisibility: true,
+        thickness: 7,
+        minThumbLength: 75,
+        thumbColor: Theme.of(context).primaryColor,
+        radius: const Radius.circular(20),
+        child: SingleChildScrollView(
+          controller: scrollController,
+          child: Container(
+            margin: const EdgeInsets.only(right: 12.0),
+            child: Text(
+                'Veiller à bien sélectionner toutes les compétences que vous souhaitez évaluer.\n'
+                '\n'
+                'Si vous souhaitez modifier les compétences sélectionnées après avoir débuté, '
+                'vous devrez démarrer une nouvelle évaluation.',
+                style: Theme.of(context).textTheme.bodyMedium),
+          ),
+        ),
+      ),
+    );
+
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool('skillEvaluationFormHelpWasShown', true);
   }
 }
 

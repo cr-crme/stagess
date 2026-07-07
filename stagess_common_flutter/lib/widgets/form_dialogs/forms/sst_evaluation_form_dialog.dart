@@ -257,12 +257,11 @@ class _SstEvaluationFormScreenState extends State<_SstEvaluationFormScreen> {
             icon: const Icon(Icons.arrow_back),
           ),
           actions: [
-            InkWell(
-              onTap: () => _showHelp(force: true),
-              borderRadius: BorderRadius.circular(25),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: Icon(Icons.info),
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: IconButton(
+                onPressed: () => _showHelp(force: true),
+                icon: const Icon(Icons.info),
               ),
             ),
           ],
