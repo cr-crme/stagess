@@ -68,7 +68,7 @@ class _PdfViewerState extends State<_PdfViewer> {
     canChangePageFormat: false,
     canDebug: false,
     initialPageFormat: PdfPageFormat.letter,
-    build: (format) => Future.value(widget.pdfData),
+    build: (format) => Future.value(Uint8List.fromList(widget.pdfData)),
   );
 
   void _handleScreenSizeChange() {
