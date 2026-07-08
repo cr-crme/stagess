@@ -280,8 +280,8 @@ class _RoutingMapState extends State<RoutingMap> {
       final waypoint = widget.waypoints[i];
       const markerSize = 30.0;
 
-      double nameWidth = 160;
-      double nameHeight = 100;
+      // 13px per character (tested with "M")
+      double nameWidth = waypoint.title.length * 13.0;
 
       final previous = out.fold<double>(
         0.0,
@@ -295,43 +295,36 @@ class _RoutingMapState extends State<RoutingMap> {
       out.add(
         Marker(
           point: waypoint.toLatLng(),
-          alignment: Alignment(
-            0.8,
-            0.4 * previous,
-          ), // Centered almost at max right,
+          alignment: Alignment(1.0, 2.0 * previous),
           width: markerSize + nameWidth,
-          height: markerSize + nameHeight,
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: GestureDetector(
-              onTap: () => widget.controller.addToItinerary(i),
-              onLongPress: () => _toggleName(i),
-              child: Row(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(75),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
+          height: markerSize,
+          child: Container(
+            color: Colors.white.withAlpha(200),
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: GestureDetector(
+                onTap: () => widget.controller.addToItinerary(i),
+                onLongPress: () => _toggleName(i),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
                       waypoint.priority.icon,
                       color: waypoint.priority.color,
                       size: markerSize,
                     ),
-                  ),
-                  if (waypoint.showTitle)
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 5,
-                        vertical: 2,
+                    if (waypoint.showTitle)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 5,
+                          vertical: 2,
+                        ),
+                        child: Text(waypoint.title,
+                            style:
+                                const TextStyle(fontWeight: FontWeight.bold)),
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withAlpha(125),
-                        shape: BoxShape.rectangle,
-                      ),
-                      child: Text(waypoint.title),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
