@@ -26,7 +26,7 @@ EXCEL_SST_RISKS_HEADERS = {
     "b": "2. Risques Biologiques",
     "e": "3. Risques liés aux machines et aux équipements",
     "f": "4. Risques de chutes de hauteur et de plain-pied",
-    "of": "5. Risques liés aux chutes d’objets",
+    "of": "5. Risques liés aux chutes d'objets",
     "t": " 6. Risques liés aux déplacements",
     "p": " 7. Risques liés aux postures contraignantes",
     "mv": "8. Risques liés aux mouvements répétitifs, pressions de contact et chocs",

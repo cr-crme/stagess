@@ -6,6 +6,7 @@ import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/models/internships/task_appreciation.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
+import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
@@ -63,7 +64,7 @@ class SkillEvaluationFormController {
 
   final bool canModify;
   SkillEvaluationGranularity evaluationGranularity =
-      SkillEvaluationGranularity.global;
+      ConfigurationService.skillEvaluationGranularityDefault;
 
   final String internshipId;
   Internship internship(BuildContext context, {bool listen = true}) =>
@@ -346,7 +347,7 @@ class SkillEvaluationFormController {
   void _resetForm(BuildContext context) {
     evaluationDate = DateTime.now();
     _previousEvaluationId = null;
-    evaluationGranularity = SkillEvaluationGranularity.global;
+    // Do not update the evaluationGranularity, so it keeps the previous value
 
     wereAtMeeting.clear();
 
@@ -636,8 +637,8 @@ class _SkillEvaluationMainScreenState
                 ),
                 Text('Il est possible de :'),
                 ItemizedText([
-                  'poursuivre une évaluation faite précédemment, mais seulement s’il s’agit du même type d’évaluation (évaluation globale de la compétence ou évaluation tâche par tâche)',
-                  'recommencer une nouvelle évaluation à partir d’un formulaire vide.',
+                  'poursuivre une évaluation faite précédemment, mais seulement s\'il s\'agit du même type d\'évaluation (évaluation globale de la compétence ou évaluation tâche par tâche)',
+                  'recommencer une nouvelle évaluation à partir d\'un formulaire vide.',
                 ]),
                 SizedBox(height: 8),
                 Text.rich(TextSpan(children: [
@@ -777,8 +778,6 @@ class _EvaluationTypeChoserState extends State<_EvaluationTypeChoser> {
   @override
   void didUpdateWidget(covariant _EvaluationTypeChoser oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.editMode) return;
-
     if (_controller.value != widget.formController.evaluationGranularity) {
       _controller.forceSet(widget.formController.evaluationGranularity);
     }
@@ -789,8 +788,6 @@ class _EvaluationTypeChoserState extends State<_EvaluationTypeChoser> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // TODO: if "New" is selected, it should reuse the last selected evaluation
-        // TODO: if "Old" is selected, it should use that evaluation value
         const SubTitle('Type d\'évaluation'),
         Padding(
           padding: const EdgeInsets.only(left: 24.0),
@@ -799,6 +796,7 @@ class _EvaluationTypeChoserState extends State<_EvaluationTypeChoser> {
             elements: SkillEvaluationGranularity.values,
             onChanged: (value) {
               widget.formController.evaluationGranularity = value!;
+              ConfigurationService.skillEvaluationGranularityDefault = value;
             },
             enabled: !widget.formController.isFilledUsingPreviousEvaluation,
           ),
