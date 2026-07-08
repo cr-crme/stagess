@@ -10,7 +10,7 @@ class StudentsHelpers {
   ///
   /// This returns the students the teacher should have read/write access too.
   /// These are the students from the group the teacher teaches too (even though
-  /// they are not supervising them personnally)
+  /// they are not supervising them personally)
   static List<Student> studentsInMyGroups(BuildContext context,
       {bool listen = true}) {
     if (AuthProvider.of(context, listen: false).isAdmin) {
