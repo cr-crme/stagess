@@ -37,10 +37,6 @@ call dart pub get
 popd
 call flutter pub get
 popd
-pushd external\pdf_generation
-echo "Running pub get in external\pdf_generation directory..."
-call flutter pub get
-popd
 
 REM Pub get in the stagess_reverse_proxy directory
 pushd stagess_reverse_proxy
