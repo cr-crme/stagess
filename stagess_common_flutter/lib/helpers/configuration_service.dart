@@ -13,6 +13,10 @@ class ConfigurationService {
 
   static const expandingTileDuration = Duration(milliseconds: 300);
 
+  static const showDevelopmentFeatures = bool.fromEnvironment(
+      'STAGESS_SHOW_DEVELOPMENT_FEATURES',
+      defaultValue: false);
+
   ///
   /// Day cycle to use
   static late DayCycle _dayCycleDefault;

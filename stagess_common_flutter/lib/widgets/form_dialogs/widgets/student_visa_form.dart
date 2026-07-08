@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess_common/models/persons/student_visa.dart';
+import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/dialogs/show_pdf_dialog.dart';
@@ -50,8 +51,9 @@ class _StudentVisaFormState extends State<StudentVisaForm> {
           ),
         ),
       ),
-      child: _buildToBeDone(),
-      //_buildCard(evaluation),
+      child: ConfigurationService.showDevelopmentFeatures
+          ? _buildCard(evaluation)
+          : _buildToBeDone(),
     );
   }
 
