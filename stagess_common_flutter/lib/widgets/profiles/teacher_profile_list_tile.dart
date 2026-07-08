@@ -42,6 +42,7 @@ class TeacherProfileListTileState extends State<TeacherProfileListTile> {
     _firstNameController.dispose();
     _lastNameController.dispose();
     _phoneController.dispose();
+    _schoolPhoneController.dispose();
     _emailController.dispose();
     for (var controller in _currentGroups) {
       controller.dispose();
@@ -64,6 +65,9 @@ class TeacherProfileListTileState extends State<TeacherProfileListTile> {
   late final _phoneController = TextEditingController(
     text: widget.teacher.phone.toString(),
   );
+  late final _schoolPhoneController = TextEditingController(
+    text: widget.teacher.schoolPhone.toString(),
+  );
   late final _emailController = TextEditingController(
     text: widget.teacher.email,
   );
@@ -74,6 +78,8 @@ class TeacherProfileListTileState extends State<TeacherProfileListTile> {
         address: Address.empty.copyWith(id: widget.teacher.address.id),
         phone: PhoneNumber.fromString(_phoneController.text,
             id: widget.teacher.phone.id),
+        schoolPhone: PhoneNumber.fromString(_schoolPhoneController.text,
+            id: widget.teacher.schoolPhone.id),
         email: _emailController.text,
         groups: _currentGroups
             .map((e) => e.text)
@@ -152,6 +158,7 @@ class TeacherProfileListTileState extends State<TeacherProfileListTile> {
     _firstNameController.text = widget.teacher.firstName;
     _lastNameController.text = widget.teacher.lastName;
     _phoneController.text = widget.teacher.phone.toString();
+    _schoolPhoneController.text = widget.teacher.schoolPhone.toString();
     _emailController.text = widget.teacher.email;
   }
 
@@ -203,6 +210,8 @@ class TeacherProfileListTileState extends State<TeacherProfileListTile> {
             const SizedBox(height: 8),
             _buildPhone(),
             const SizedBox(height: 8),
+            _buildSchoolPhone(),
+            const SizedBox(height: 8),
             _buildEmail(),
             const SizedBox(height: 8),
             _buildGroups(),
@@ -252,6 +261,15 @@ class TeacherProfileListTileState extends State<TeacherProfileListTile> {
       isMandatory: false,
       enabled: _isEditing,
       title: 'Téléphone professionnel',
+    );
+  }
+
+  Widget _buildSchoolPhone() {
+    return PhoneListTile(
+      controller: _schoolPhoneController,
+      isMandatory: false,
+      enabled: _isEditing,
+      title: 'Téléphone de l\'école',
     );
   }
 

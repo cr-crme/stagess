@@ -233,6 +233,7 @@ class _InternshipListState extends State<_InternshipList> {
                           '${DateFormat.yMMMd('fr_CA').format(contract.dates.start)} - '
                           '${DateFormat.yMMMd('fr_CA').format(contract.dates.end)}',
                           style: Theme.of(context).textTheme.titleSmall),
+                      // TODO Add teacher phone here?
                       Flexible(
                           child: Text(
                               '${internshipDays.join(' - ')}${contract.weeklySchedules.length > 1 ? ' (sur ${contract.weeklySchedules.length} périodes)' : ''}')),

@@ -542,7 +542,7 @@ class TeacherListTileState extends State<TeacherListTile> {
       controller: _schoolPhoneController,
       isMandatory: false,
       enabled: _isEditing,
-      title: 'Téléphone scolaire',
+      title: 'Téléphone de l\'école',
     );
   }
 
