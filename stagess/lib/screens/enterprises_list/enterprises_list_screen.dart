@@ -189,15 +189,12 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
     return enterprises.where((enterprise) {
       // Remove if should not be shown by filter availability filter
       if (_hideNotAvailable &&
-          enterprise.availablejobs(context).every(
-                (job) =>
-                    job.positionsRemaining(
-                      context,
-                      schoolId: schoolId,
-                      listen: true,
-                    ) <=
-                    0,
-              )) {
+          (enterprise.status != EnterpriseStatus.active ||
+              enterprise.availablejobs(context).every((job) {
+                final positions = job.positionsRemaining(context,
+                    schoolId: schoolId, listen: true);
+                return positions <= 0;
+              }))) {
         return false;
       }
 
