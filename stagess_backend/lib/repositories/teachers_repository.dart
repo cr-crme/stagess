@@ -101,7 +101,6 @@ abstract class TeachersRepository extends RepositoryAbstract {
             'last_name',
             'date_birth',
             'phone',
-            'school_phone',
             'address',
             'itineraries',
             'visiting_priorities',
@@ -216,19 +215,9 @@ class MySqlTeachersRepository extends TeachersRepository {
             dataTableName: 'persons',
             fieldsToFetch: ['first_name', 'last_name'],
           ),
-          sqlInterface.joinSubquery(
+          sqlInterface.selectSubquery(
               dataTableName: 'phone_numbers',
-              asName: 'phone_number',
-              idNameToDataTable: 'phone_number_id',
-              idNameToMainTable: 'teacher_id',
-              relationTableName: 'teacher_professional_phone_numbers',
-              fieldsToFetch: ['id', 'phone_number']),
-          sqlInterface.joinSubquery(
-              dataTableName: 'phone_numbers',
-              asName: 'school_phone_number',
-              idNameToDataTable: 'phone_number_id',
-              idNameToMainTable: 'teacher_id',
-              relationTableName: 'teacher_school_phone_numbers',
+              idNameToDataTable: 'entity_id',
               fieldsToFetch: ['id', 'phone_number']),
           sqlInterface.selectSubquery(
               dataTableName: 'addresses',
@@ -275,9 +264,7 @@ class MySqlTeachersRepository extends TeachersRepository {
           teachingGroups?.map((map) => map['group_name'] as String).toList();
 
       teacher['phone'] =
-          (teacher['phone_number'] as List?)?.firstOrNull as Map? ?? {};
-      teacher['school_phone'] =
-          (teacher['school_phone_number'] as List?)?.firstOrNull as Map? ?? {};
+          (teacher['phone_numbers'] as List?)?.firstOrNull as Map? ?? {};
       teacher['address'] =
           (teacher['addresses'] as List?)?.firstOrNull as Map? ?? {};
 
@@ -339,22 +326,6 @@ class MySqlTeachersRepository extends TeachersRepository {
 
     await sqlInterface.performInsertPerson(
         person: teacher, skipAddingEntity: entity != null);
-
-    // Add the phone number to the junction table
-    await sqlInterface.performInsertQuery(
-        tableName: 'teacher_professional_phone_numbers',
-        data: {'teacher_id': teacher.id, 'phone_number_id': teacher.phone.id});
-
-    // Add the school phone number to the phone table and the junction table
-    await sqlInterface.performInsertPhoneNumber(
-        phoneNumber: teacher.schoolPhone, entityId: teacher.id);
-    await sqlInterface.performInsertQuery(
-        tableName: 'teacher_school_phone_numbers',
-        data: {
-          'teacher_id': teacher.id,
-          'phone_number_id': teacher.schoolPhone.id
-        });
-
     await sqlInterface.performInsertUser(id: teacher.id, email: teacher.email);
     await sqlInterface.performInsertQuery(tableName: 'teachers', data: {
       'id': teacher.id,
@@ -384,11 +355,6 @@ class MySqlTeachersRepository extends TeachersRepository {
     // Update the persons table if needed
     await sqlInterface.performUpdatePerson(
         person: teacher, previous: previous, canChangeEmail: false);
-
-    if (differences.contains('school_phone')) {
-      await sqlInterface.performUpdatePhoneNumber(
-          phoneNumber: teacher.schoolPhone, previous: previous.schoolPhone);
-    }
   }
 
   Future<void> _insertToGroups(Teacher teacher) async {
@@ -601,7 +567,6 @@ class TeachersRepositoryMock extends TeachersRepository {
       hasRegisteredAccount: true,
       groups: ['100', '101'],
       phone: PhoneNumber.fromString('098-765-4321'),
-      schoolPhone: PhoneNumber.fromString('123-456-7890'),
       email: 'john.doe@email.com',
       dateBirth: null,
       address: Address.empty,
@@ -617,7 +582,6 @@ class TeachersRepositoryMock extends TeachersRepository {
       hasRegisteredAccount: true,
       groups: ['100', '101'],
       phone: PhoneNumber.fromString('123-456-7890'),
-      schoolPhone: PhoneNumber.fromString('123-456-7890'),
       email: 'john.doe@email.com',
       dateBirth: null,
       address: Address.empty,
@@ -633,7 +597,6 @@ class TeachersRepositoryMock extends TeachersRepository {
       hasRegisteredAccount: true,
       groups: ['200', '201'],
       phone: PhoneNumber.fromString('123-456-7890'),
-      schoolPhone: PhoneNumber.fromString('123-456-7890'),
       email: 'jim.dungeon@email.com',
       dateBirth: null,
       address: Address.empty,

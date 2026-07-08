@@ -478,7 +478,6 @@ class _RecrutedBy extends StatelessWidget {
           const Text(
             'Entreprise démarchée pour la 1ère fois pour ce métier par :',
           ),
-          // TODO Add teacher phone here?
           teacher == null
               ? Padding(
                   padding: const EdgeInsets.only(left: 24.0),

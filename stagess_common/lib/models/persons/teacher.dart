@@ -20,8 +20,6 @@ class Teacher extends Person with SchoolMember {
   final List<Itinerary> itineraries;
   final Map<String, VisitingPriority> _visitingPriorities;
 
-  final PhoneNumber schoolPhone;
-
   Teacher({
     super.id,
     required super.firstName,
@@ -32,7 +30,6 @@ class Teacher extends Person with SchoolMember {
     required this.groups,
     required super.email,
     required super.phone,
-    required this.schoolPhone,
     required super.address,
     required super.dateBirth,
     required this.itineraries,
@@ -53,7 +50,6 @@ class Teacher extends Person with SchoolMember {
         groups: [],
         email: '',
         phone: PhoneNumber.empty,
-        schoolPhone: PhoneNumber.empty,
         address: Address.empty,
         dateBirth: null,
         itineraries: [],
@@ -78,8 +74,6 @@ class Teacher extends Person with SchoolMember {
         groups = ListExt.from(map?['groups'],
                 deserializer: (e) => StringExt.from(e) ?? '-1') ??
             [],
-        schoolPhone =
-            PhoneNumber.from(map?['school_phone']) ?? PhoneNumber.empty,
         itineraries = ListExt.from(map?['itineraries'],
                 deserializer: Itinerary.fromSerialized) ??
             [],
@@ -97,7 +91,6 @@ class Teacher extends Person with SchoolMember {
       'school_id': schoolId.serialize(),
       'has_registered_account': hasRegisteredAccount.serialize(),
       'groups': groups.serialize(),
-      'school_phone': schoolPhone.serialize(),
       'itineraries': itineraries.serialize(),
       'visiting_priorities': _visitingPriorities
           .map((key, value) => MapEntry(key, value.serialize())),
@@ -110,7 +103,6 @@ class Teacher extends Person with SchoolMember {
       'email': FetchableFields.mandatory,
       'has_registered_account': FetchableFields.mandatory,
       'groups': FetchableFields.mandatory,
-      'school_phone': FetchableFields.optional,
       'itineraries': Itinerary.fetchableFields,
       'visiting_priorities': FetchableFields.mandatory,
     }));
@@ -126,7 +118,6 @@ class Teacher extends Person with SchoolMember {
     List<String>? groups,
     String? email,
     PhoneNumber? phone,
-    PhoneNumber? schoolPhone,
     Address? address,
     DateTime? dateBirth,
     List<Itinerary>? itineraries,
@@ -141,7 +132,6 @@ class Teacher extends Person with SchoolMember {
         hasRegisteredAccount: hasRegisteredAccount ?? this.hasRegisteredAccount,
         groups: groups ?? this.groups,
         phone: phone ?? this.phone,
-        schoolPhone: schoolPhone ?? this.schoolPhone,
         email: email ?? this.email,
         dateBirth: dateBirth ?? this.dateBirth,
         address: address ?? this.address,
@@ -163,7 +153,6 @@ class Teacher extends Person with SchoolMember {
           'has_registered_account',
           'groups',
           'phone',
-          'school_phone',
           'email',
           'date_birth',
           'address',
@@ -183,7 +172,6 @@ class Teacher extends Person with SchoolMember {
               deserializer: (e) => StringExt.from(e) ?? '-1') ??
           groups,
       phone: PhoneNumber.from(data['phone']) ?? phone,
-      schoolPhone: PhoneNumber.from(data['school_phone']) ?? schoolPhone,
       email: StringExt.from(data['email']) ?? email,
       dateBirth: null,
       address: Address.from(data['address']) ?? address,

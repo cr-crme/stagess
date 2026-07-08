@@ -25,8 +25,6 @@ DROP TABLE IF EXISTS student_visa_forces_items;
 DROP TABLE IF EXISTS student_visa_challenges_items;
 DROP TABLE IF EXISTS student_visa_success_conditions_items;
 
-DROP TABLE IF EXISTS teacher_professional_phone_numbers;
-DROP TABLE IF EXISTS teacher_school_phone_numbers;
 DROP TABLE IF EXISTS teaching_groups;
 DROP TABLE IF EXISTS teacher_itineraries;
 DROP TABLE IF EXISTS teacher_itinerary_waypoints;
@@ -315,20 +313,6 @@ CREATE TABLE teachers (
     FOREIGN KEY (id) REFERENCES persons(id) ON DELETE CASCADE,
     FOREIGN KEY (school_board_id) REFERENCES school_boards(id) ON DELETE CASCADE,
     FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
-);
-
-CREATE TABLE teacher_professional_phone_numbers (
-    teacher_id VARCHAR(36) NOT NULL,
-    phone_number_id VARCHAR(36) NOT NULL,
-    FOREIGN KEY (phone_number_id) REFERENCES phone_numbers(id) ON DELETE CASCADE,
-    FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE
-);
-
-CREATE TABLE teacher_school_phone_numbers (
-    teacher_id VARCHAR(36) NOT NULL,
-    phone_number_id VARCHAR(36) NOT NULL,
-    FOREIGN KEY (phone_number_id) REFERENCES phone_numbers(id) ON DELETE CASCADE,
-    FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE
 );
 
 CREATE TABLE teaching_groups (

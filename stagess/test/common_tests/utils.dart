@@ -57,7 +57,6 @@ Teacher dummyTeacher({
       groups: groups,
       email: 'peter.john.jakob@test.com',
       phone: dummyPhoneNumber(),
-      schoolPhone: dummyPhoneNumber(),
       address: Address.empty,
       dateBirth: null,
       itineraries: [],
