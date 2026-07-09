@@ -103,9 +103,10 @@ class _GroupStudentsCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Groupe : $group - ${teachersForGroups.isNotEmpty ? teachersForGroups.join(', ') : 'Aucun enseignant·e'}',
-        ),
+        Text('Groupe : $group'),
+        Text(teachersForGroups.isNotEmpty
+            ? 'Enseignant·e·s : ${teachersForGroups.join(', ')}'
+            : 'Aucun enseignant·e'),
         if (students.isEmpty)
           Center(child: Text('Aucun élève inscrit·e dans ce groupe')),
         if (students.isNotEmpty)

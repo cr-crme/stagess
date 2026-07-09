@@ -486,6 +486,7 @@ class TeacherListTileState extends State<TeacherListTile> {
                         controller: _currentGroups[i],
                         keyboardType: TextInputType.number,
                         maxLength: 50,
+                        // TODO Use the add (as visa Reference)
                         decoration: i == 0
                             ? const InputDecoration(labelText: 'Groupes')
                             : null,

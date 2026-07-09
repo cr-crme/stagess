@@ -467,6 +467,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                                 ),
                               IconButton(
                                 icon: Icon(
+                                  // TODO remove if access level is teacher or less
                                   _isEditing ? Icons.save : Icons.edit,
                                   color: _forceDisabled
                                       ? Colors.grey

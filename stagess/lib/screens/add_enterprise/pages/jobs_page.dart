@@ -54,6 +54,7 @@ class JobsPageState extends State<JobsPage> {
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ListView.builder(
               shrinkWrap: true,
@@ -62,19 +63,16 @@ class JobsPageState extends State<JobsPage> {
               itemBuilder: (BuildContext context, int index) =>
                   _buildNewJobsForm(index),
             ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 12.0),
-                child: AddJobButton(
-                  controllers: _jobsControllers,
-                  onJobAdded: () => setState(() {}),
-                  style: Theme.of(context).textButtonTheme.style!.copyWith(
-                        backgroundColor: Theme.of(
-                          context,
-                        ).elevatedButtonTheme.style!.backgroundColor,
-                      ),
-                ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: AddJobButton(
+                controllers: _jobsControllers,
+                onJobAdded: () => setState(() {}),
+                style: Theme.of(context).textButtonTheme.style!.copyWith(
+                      backgroundColor: Theme.of(
+                        context,
+                      ).elevatedButtonTheme.style!.backgroundColor,
+                    ),
               ),
             ),
           ],

@@ -14,6 +14,8 @@ import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/search.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
+// TODO Add separation admin/non-admin
+
 class EnterprisesListScreen extends StatefulWidget {
   const EnterprisesListScreen({super.key});
 
