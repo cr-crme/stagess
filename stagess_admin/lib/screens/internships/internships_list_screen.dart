@@ -252,6 +252,7 @@ class _InternshipsListScreenState extends State<InternshipsListScreen> {
           .toList(),
       AccessLevel.schoolBoardAdmin ||
       AccessLevel.schoolAdmin ||
+      AccessLevel.teacherAdmin ||
       AccessLevel.teacher =>
         [
           _InternshipsByStatus(

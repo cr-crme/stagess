@@ -2,7 +2,7 @@ enum AccessLevel {
   invalid,
   self,
   teacher,
-  // TODO Add teacherAdmin
+  teacherAdmin,
   schoolAdmin,
   schoolBoardAdmin,
   superAdmin;

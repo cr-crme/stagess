@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
@@ -205,6 +206,8 @@ class TeacherProfileListTileState extends State<TeacherProfileListTile> {
             const SizedBox(height: 8),
             _buildEmail(),
             const SizedBox(height: 8),
+            _buildAccessLevelDisplayer(),
+            const SizedBox(height: 8),
             _buildGroups(),
             const SizedBox(height: 8),
             _buildChangePasswordButton(),
@@ -261,6 +264,21 @@ class TeacherProfileListTileState extends State<TeacherProfileListTile> {
       isMandatory: true,
       enabled: false,
       title: 'Courriel',
+    );
+  }
+
+  Widget _buildAccessLevelDisplayer() {
+    return Text(
+      'Le niveau d\'accès de ce compte est : ${switch (widget.teacher.accessLevel) {
+        AccessLevel.superAdmin => 'Super administrateur',
+        AccessLevel.schoolBoardAdmin =>
+          'Administrateur de Centre de services scolaire',
+        AccessLevel.schoolAdmin => 'Administrateur d\'école',
+        AccessLevel.teacherAdmin => 'Administrateur enseignant',
+        AccessLevel.teacher => 'Enseignant',
+        AccessLevel.self => 'Utilisateur',
+        AccessLevel.invalid => 'Invalide',
+      }}',
     );
   }
 

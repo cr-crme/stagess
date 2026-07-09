@@ -14,8 +14,6 @@ import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/search.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
-// TODO Add separation admin/non-admin
-
 class EnterprisesListScreen extends StatefulWidget {
   const EnterprisesListScreen({super.key});
 
@@ -144,6 +142,10 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen> {
       return [const Center(child: Text('Aucune entreprise inscrite'))];
     }
 
+    final canDelete =
+        authProvider.databaseAccessLevel >= AccessLevel.schoolBoardAdmin;
+    final canEdit = authProvider.databaseAccessLevel >= AccessLevel.schoolAdmin;
+
     return switch (authProvider.databaseAccessLevel) {
       AccessLevel.superAdmin => schoolBoardEnterprises.entries
           .where((entry) => entry.value.any((enterprise) =>
@@ -171,6 +173,8 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen> {
                           (enterprise) => EnterpriseListTile(
                             key: ValueKey(enterprise.id),
                             enterprise: enterprise,
+                            canEdit: canEdit,
+                            canDelete: canDelete,
                           ),
                         ),
                   ],
@@ -181,6 +185,7 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen> {
           .toList(),
       AccessLevel.schoolBoardAdmin ||
       AccessLevel.schoolAdmin ||
+      AccessLevel.teacherAdmin ||
       AccessLevel.teacher =>
         schoolBoardEnterprises.values.firstOrNull
                 ?.where((enterprise) =>
@@ -190,6 +195,8 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen> {
                   (enterprise) => EnterpriseListTile(
                     key: ValueKey(enterprise.id),
                     enterprise: enterprise,
+                    canEdit: canEdit,
+                    canDelete: canDelete,
                   ),
                 )
                 .toList() ??

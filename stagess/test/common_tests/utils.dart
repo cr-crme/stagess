@@ -4,6 +4,7 @@ import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/enterprises/job_comment.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
+import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/photo.dart';
@@ -53,6 +54,7 @@ Teacher dummyTeacher({
       lastName: 'Jacques',
       schoolBoardId: schoolBoardId,
       schoolId: schoolId,
+      accessLevel: AccessLevel.teacher,
       hasRegisteredAccount: false,
       groups: groups,
       email: 'peter.john.jakob@test.com',

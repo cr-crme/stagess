@@ -95,6 +95,7 @@ class TeacherListTileState extends State<TeacherListTile> {
   late final _emailController = TextEditingController(
     text: widget.teacher.email,
   );
+  late AccessLevel _accessLevelController = widget.teacher.accessLevel;
 
   Teacher get editedTeacher => widget.teacher.copyWith(
         schoolBoardId: widget.teacher.schoolBoardId,
@@ -109,6 +110,7 @@ class TeacherListTileState extends State<TeacherListTile> {
             .map((e) => e.text)
             .where((e) => e.isNotEmpty)
             .toList(),
+        accessLevel: _accessLevelController,
       );
 
   @override
@@ -242,6 +244,7 @@ class TeacherListTileState extends State<TeacherListTile> {
 
     _phoneController.text = widget.teacher.phone.toString();
     _emailController.text = widget.teacher.email.toString();
+    _accessLevelController = widget.teacher.accessLevel;
 
     _disposeCurrentGroupsControllers();
     _fillCurrentGroupsControllers();
@@ -382,6 +385,8 @@ class TeacherListTileState extends State<TeacherListTile> {
                 _buildPhone(),
                 const SizedBox(height: 8),
                 _buildEmail(),
+                const SizedBox(height: 8),
+                _buildIsAdmin(),
                 const SizedBox(height: 8),
                 _buildGroups(),
                 if (!_isEditing && widget.teacher.email.isNotEmpty)
@@ -536,6 +541,28 @@ class TeacherListTileState extends State<TeacherListTile> {
       enabled: _isEditing && widget.forceEditingMode,
       title: 'Courriel',
     );
+  }
+
+  Widget _buildIsAdmin() {
+    return _isEditing &&
+            AuthProvider.of(context, listen: false).databaseAccessLevel >=
+                AccessLevel.schoolAdmin
+        ? Row(
+            children: [
+              Text('Donner les droits d\'administrateur à cet·te enseignant·e'),
+              SizedBox(width: 8),
+              Switch(
+                value: _accessLevelController == AccessLevel.teacherAdmin,
+                onChanged: (value) => setState(() {
+                  _accessLevelController =
+                      value ? AccessLevel.teacherAdmin : AccessLevel.teacher;
+                }),
+              ),
+            ],
+          )
+        : Text(_accessLevelController > AccessLevel.teacher
+            ? 'Cet·te enseignant·e possède les droits d\'administrateur'
+            : 'Cet·te enseignant·e ne possède pas les droits d\'administrateur');
   }
 
   Widget _sendResetEmailButton() {

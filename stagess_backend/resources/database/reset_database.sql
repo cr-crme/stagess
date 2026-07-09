@@ -310,6 +310,7 @@ CREATE TABLE teachers (
     school_board_id VARCHAR(36) NOT NULL,
     school_id VARCHAR(36) NOT NULL, 
     has_registered_account BOOLEAN NOT NULL DEFAULT FALSE,
+    access_level INT NOT NULL,
     FOREIGN KEY (id) REFERENCES persons(id) ON DELETE CASCADE,
     FOREIGN KEY (school_board_id) REFERENCES school_boards(id) ON DELETE CASCADE,
     FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE

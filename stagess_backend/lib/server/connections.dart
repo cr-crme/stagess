@@ -223,6 +223,7 @@ class Connections {
     late Map<String, dynamic>? user;
     switch (userType) {
       case AccessLevel.teacher:
+      case AccessLevel.teacherAdmin:
         if (myAccessLevel < AccessLevel.schoolAdmin) {
           throw ConnectionRefusedException(
               'Client is not authorized to register user');
@@ -290,7 +291,7 @@ class Connections {
 
     // Add the confirmation to the database
     final field = switch (userType) {
-      AccessLevel.teacher => RequestFields.teacher,
+      AccessLevel.teacher || AccessLevel.teacherAdmin => RequestFields.teacher,
       AccessLevel.schoolAdmin ||
       AccessLevel.schoolBoardAdmin =>
         RequestFields.admin,
@@ -359,6 +360,7 @@ class Connections {
     late Map<String, dynamic>? user;
     switch (userType) {
       case AccessLevel.teacher:
+      case AccessLevel.teacherAdmin:
         if (myAccessLevel < AccessLevel.schoolAdmin) {
           throw ConnectionRefusedException(
               'Client is not authorized to register user');
@@ -398,7 +400,9 @@ class Connections {
     if (user != null) {
       // Remove the confirmation from the database
       final field = switch (userType) {
-        AccessLevel.teacher => RequestFields.teacher,
+        AccessLevel.teacher ||
+        AccessLevel.teacherAdmin =>
+          RequestFields.teacher,
         AccessLevel.schoolAdmin ||
         AccessLevel.schoolBoardAdmin =>
           RequestFields.admin,
@@ -682,12 +686,12 @@ class Connections {
     if (teacher == null) return null;
     (teacher as Map).addAll((teacher['teachers'] as List).firstOrNull);
 
-    // Otherwise, we probably are logging in a teacher (case 2
+    // Otherwise, we probably are logging in a teacher (case 2)
     user = user.copyWith(
       userId: teacher['id'],
       schoolBoardId: teacher['school_board_id'],
       schoolId: teacher['school_id'],
-      accessLevel: AccessLevel.teacher,
+      accessLevel: AccessLevel.fromSerialized(teacher['access_level']),
     );
 
     // Just make sure, even though at this point it should always be verified
@@ -718,6 +722,7 @@ Future<Map<String, dynamic>?> _getTeacherFromDatabase(
             'school_board_id',
             'school_id',
             'has_registered_account',
+            'access_level',
           ],
         ),
       ]) as List)

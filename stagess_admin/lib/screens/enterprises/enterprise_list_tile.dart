@@ -8,13 +8,11 @@ import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
-import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
-import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
@@ -35,10 +33,14 @@ class EnterpriseListTile extends StatefulWidget {
     super.key,
     required this.enterprise,
     this.forceEditingMode = false,
+    required this.canEdit,
+    required this.canDelete,
   });
 
   final Enterprise enterprise;
   final bool forceEditingMode;
+  final bool canEdit;
+  final bool canDelete;
 
   @override
   State<EnterpriseListTile> createState() => EnterpriseListTileState();
@@ -433,10 +435,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                             ConnectionState.done
                         ? Row(
                             children: [
-                              if (!hasInternship &&
-                                  AuthProvider.of(context, listen: false)
-                                          .databaseAccessLevel >=
-                                      AccessLevel.schoolAdmin)
+                              if (!hasInternship && widget.canDelete)
                                 IconButton(
                                   icon: Icon(
                                     Icons.delete,
@@ -465,19 +464,19 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                                     });
                                   },
                                 ),
-                              IconButton(
-                                icon: Icon(
-                                  // TODO remove if access level is teacher or less
-                                  _isEditing ? Icons.save : Icons.edit,
-                                  color: _forceDisabled
-                                      ? Colors.grey
-                                      : Theme.of(
-                                          context,
-                                        ).primaryColor,
+                              if (widget.canEdit)
+                                IconButton(
+                                  icon: Icon(
+                                    _isEditing ? Icons.save : Icons.edit,
+                                    color: _forceDisabled
+                                        ? Colors.grey
+                                        : Theme.of(
+                                            context,
+                                          ).primaryColor,
+                                  ),
+                                  onPressed:
+                                      _forceDisabled ? null : _onClickedEditing,
                                 ),
-                                onPressed:
-                                    _forceDisabled ? null : _onClickedEditing,
-                              ),
                             ],
                           )
                         : const SizedBox.shrink(),

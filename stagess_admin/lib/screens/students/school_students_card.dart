@@ -117,9 +117,11 @@ class _GroupStudentsCard extends StatelessWidget {
             (student) {
               final canDelete = authProvider.databaseAccessLevel >
                       AccessLevel.schoolBoardAdmin ||
-                  (authProvider.databaseAccessLevel > AccessLevel.schoolAdmin &&
+                  (authProvider.databaseAccessLevel >=
+                          AccessLevel.schoolBoardAdmin &&
                       authProvider.schoolBoardId == student.schoolBoardId) ||
-                  (authProvider.databaseAccessLevel > AccessLevel.teacher &&
+                  (authProvider.databaseAccessLevel >=
+                          AccessLevel.schoolAdmin &&
                       authProvider.schoolBoardId == student.schoolBoardId &&
                       authProvider.schoolId == student.schoolId);
               final canEdit = canDelete;

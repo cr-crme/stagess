@@ -43,9 +43,10 @@ class SchoolTeachersCard extends StatelessWidget {
               .map((teacher) {
             final canDelete = authProvider.databaseAccessLevel >
                     AccessLevel.schoolBoardAdmin ||
-                (authProvider.databaseAccessLevel > AccessLevel.schoolAdmin &&
+                (authProvider.databaseAccessLevel >=
+                        AccessLevel.schoolBoardAdmin &&
                     authProvider.schoolBoardId == teacher.schoolBoardId) ||
-                (authProvider.databaseAccessLevel > AccessLevel.teacher &&
+                (authProvider.databaseAccessLevel >= AccessLevel.schoolAdmin &&
                     authProvider.schoolBoardId == teacher.schoolBoardId &&
                     authProvider.schoolId == teacher.schoolId);
             final canEdit = canDelete || (authProvider.currentId == teacher.id);

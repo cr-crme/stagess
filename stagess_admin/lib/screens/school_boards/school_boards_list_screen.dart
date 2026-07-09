@@ -139,6 +139,7 @@ class _SchoolBoardsListScreenState extends State<SchoolBoardsListScreen> {
       AccessLevel.superAdmin ||
       AccessLevel.schoolBoardAdmin ||
       AccessLevel.schoolAdmin ||
+      AccessLevel.teacherAdmin ||
       AccessLevel.teacher =>
         schoolBoards
             .map(

@@ -1,4 +1,5 @@
 import 'package:stagess_common/exceptions.dart';
+import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
@@ -14,6 +15,7 @@ class Teacher extends Person with SchoolMember {
   @override
   final String schoolId;
 
+  final AccessLevel accessLevel;
   final bool hasRegisteredAccount;
   bool get hasNotRegisteredAccount => !hasRegisteredAccount;
   final List<String> groups;
@@ -26,6 +28,7 @@ class Teacher extends Person with SchoolMember {
     required super.lastName,
     required this.schoolBoardId,
     required this.schoolId,
+    required this.accessLevel,
     required this.hasRegisteredAccount,
     required this.groups,
     required super.email,
@@ -46,6 +49,7 @@ class Teacher extends Person with SchoolMember {
         lastName: '',
         schoolBoardId: '-1',
         schoolId: '-1',
+        accessLevel: AccessLevel.teacher,
         hasRegisteredAccount: false,
         groups: [],
         email: '',
@@ -69,6 +73,7 @@ class Teacher extends Person with SchoolMember {
   Teacher.fromSerialized(super.map)
       : schoolBoardId = StringExt.from(map?['school_board_id']) ?? '-1',
         schoolId = StringExt.from(map?['school_id']) ?? '-1',
+        accessLevel = AccessLevel.fromSerialized(map?['access_level']),
         hasRegisteredAccount =
             BoolExt.from(map?['has_registered_account']) ?? false,
         groups = ListExt.from(map?['groups'],
@@ -89,6 +94,7 @@ class Teacher extends Person with SchoolMember {
     ..addAll({
       'school_board_id': schoolBoardId.serialize(),
       'school_id': schoolId.serialize(),
+      'access_level': accessLevel.serialize(),
       'has_registered_account': hasRegisteredAccount.serialize(),
       'groups': groups.serialize(),
       'itineraries': itineraries.serialize(),
@@ -100,6 +106,7 @@ class Teacher extends Person with SchoolMember {
     ..addAll(FetchableFields.reference({
       'school_board_id': FetchableFields.mandatory,
       'school_id': FetchableFields.mandatory,
+      'access_level': FetchableFields.mandatory,
       'email': FetchableFields.mandatory,
       'has_registered_account': FetchableFields.mandatory,
       'groups': FetchableFields.mandatory,
@@ -114,6 +121,7 @@ class Teacher extends Person with SchoolMember {
     String? lastName,
     String? schoolBoardId,
     String? schoolId,
+    AccessLevel? accessLevel,
     bool? hasRegisteredAccount,
     List<String>? groups,
     String? email,
@@ -129,6 +137,7 @@ class Teacher extends Person with SchoolMember {
         lastName: lastName ?? this.lastName,
         schoolBoardId: schoolBoardId ?? this.schoolBoardId,
         schoolId: schoolId ?? this.schoolId,
+        accessLevel: accessLevel ?? this.accessLevel,
         hasRegisteredAccount: hasRegisteredAccount ?? this.hasRegisteredAccount,
         groups: groups ?? this.groups,
         phone: phone ?? this.phone,
@@ -150,6 +159,7 @@ class Teacher extends Person with SchoolMember {
           'last_name',
           'school_board_id',
           'school_id',
+          'access_level',
           'has_registered_account',
           'groups',
           'phone',
@@ -167,6 +177,9 @@ class Teacher extends Person with SchoolMember {
       lastName: StringExt.from(data['last_name']) ?? lastName,
       schoolBoardId: StringExt.from(data['school_board_id']) ?? schoolBoardId,
       schoolId: StringExt.from(data['school_id']) ?? schoolId,
+      accessLevel: data['access_level'] == null
+          ? accessLevel
+          : AccessLevel.fromSerialized(data['access_level']),
       hasRegisteredAccount: data['has_registered_account'] ?? false,
       groups: ListExt.from(data['groups'],
               deserializer: (e) => StringExt.from(e) ?? '-1') ??

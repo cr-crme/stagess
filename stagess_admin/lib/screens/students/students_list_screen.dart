@@ -237,6 +237,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
           .toList(),
       AccessLevel.schoolBoardAdmin ||
       AccessLevel.schoolAdmin ||
+      AccessLevel.teacherAdmin ||
       AccessLevel.teacher =>
         schoolBoardStudents.values.firstOrNull?.entries
                 .where((schoolEntry) =>

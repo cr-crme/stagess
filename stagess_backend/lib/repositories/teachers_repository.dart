@@ -112,7 +112,11 @@ abstract class TeachersRepository extends RepositoryAbstract {
           AccessLevel.superAdmin: ['id', 'school_board_id'],
         },
         itemValidator: (user, item, previousItem) {
-          // No specific validation
+          if (item.accessLevel > AccessLevel.teacherAdmin) {
+            throw InvalidRequestException(
+                'Teachers cannot have an access level higher than teacherAdmin');
+          }
+
           return Future.value();
         },
       ),
@@ -332,6 +336,7 @@ class MySqlTeachersRepository extends TeachersRepository {
       'school_board_id': teacher.schoolBoardId,
       'school_id': teacher.schoolId,
       'has_registered_account': teacher.hasRegisteredAccount,
+      'access_level': teacher.accessLevel.index,
     });
   }
 
@@ -346,6 +351,9 @@ class MySqlTeachersRepository extends TeachersRepository {
 
     if (differences.contains('has_registered_account')) {
       toUpdate['has_registered_account'] = teacher.hasRegisteredAccount;
+    }
+    if (differences.contains('access_level')) {
+      toUpdate['access_level'] = teacher.accessLevel.index;
     }
     if (toUpdate.isNotEmpty) {
       await sqlInterface.performUpdateQuery(
@@ -564,6 +572,7 @@ class TeachersRepositoryMock extends TeachersRepository {
       lastName: 'Doe',
       schoolBoardId: '100',
       schoolId: '10',
+      accessLevel: AccessLevel.teacher,
       hasRegisteredAccount: true,
       groups: ['100', '101'],
       phone: PhoneNumber.fromString('098-765-4321'),
@@ -579,6 +588,7 @@ class TeachersRepositoryMock extends TeachersRepository {
       lastName: 'Doe',
       schoolBoardId: '100',
       schoolId: '10',
+      accessLevel: AccessLevel.teacher,
       hasRegisteredAccount: true,
       groups: ['100', '101'],
       phone: PhoneNumber.fromString('123-456-7890'),
@@ -594,6 +604,7 @@ class TeachersRepositoryMock extends TeachersRepository {
       lastName: 'Dungeon',
       schoolBoardId: '200',
       schoolId: '20',
+      accessLevel: AccessLevel.teacher,
       hasRegisteredAccount: true,
       groups: ['200', '201'],
       phone: PhoneNumber.fromString('123-456-7890'),

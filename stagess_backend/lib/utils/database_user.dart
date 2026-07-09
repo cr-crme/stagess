@@ -20,6 +20,7 @@ class DatabaseUser {
             schoolId != null &&
             schoolId!.isNotEmpty;
       case AccessLevel.teacher:
+      case AccessLevel.teacherAdmin:
         return _authenticatorId.isNotEmpty &&
             userId != null &&
             userId!.isNotEmpty &&
