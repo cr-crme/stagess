@@ -192,8 +192,8 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
 
     final schools = widget.schools?.where(
           (school) =>
-              (authProvider.databaseAccessLevel <
-                      AccessLevel.schoolBoardAdmin &&
+              (authProvider.databaseAccessLevel >=
+                      AccessLevel.schoolBoardAdmin ||
                   school.id == authProvider.schoolId) &&
               (widget.controller._reservedForSchoolId == null ||
                   widget.controller._reservedForSchoolId == school.id),
