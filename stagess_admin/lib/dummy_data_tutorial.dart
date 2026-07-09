@@ -151,10 +151,10 @@ Future<void> _addDummySchoolBoards(SchoolBoardsProvider schoolBoards) async {
     School(
       name: 'École A',
       address: Address(
-        civicNumber: 630,
-        street: 'rue Léon-Martel',
-        city: 'Terrebonne',
-        postalCode: 'J6W 2J8',
+        civicNumber: 5200,
+        street: 'Bélanger',
+        city: 'Montréal',
+        postalCode: 'H1T 1E1',
       ),
       phone: PhoneNumber.fromString('555 123 4567'),
     ),
