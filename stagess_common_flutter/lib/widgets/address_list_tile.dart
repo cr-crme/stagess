@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common_flutter/widgets/show_address_dialog.dart';
+import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 class AddressController {
   Function()? onAddressChangedCallback;
@@ -96,6 +98,7 @@ class AddressListTile extends StatefulWidget {
     required this.addressController,
     required this.isMandatory,
     required this.enabled,
+    this.canCopyToClipboard = true,
   });
 
   final String? title;
@@ -103,6 +106,7 @@ class AddressListTile extends StatefulWidget {
   final TextStyle? contentStyle;
   final bool enabled;
   final bool isMandatory;
+  final bool canCopyToClipboard;
   final AddressController addressController;
 
   @override
@@ -293,9 +297,13 @@ class _AddressListTileState extends State<AddressListTile> {
 
   @override
   Widget build(BuildContext context) {
-    final searchIsClickable = addressHasChanged &&
-        widget.addressController._textController.text.isNotEmpty &&
+    final isValid = widget.addressController._textController.text.isNotEmpty &&
         !_isValidating;
+    final searchIsClickable = isValid && addressHasChanged;
+    final canCopyToClipboard = !widget.enabled &&
+        isValid &&
+        !searchIsClickable &&
+        widget.canCopyToClipboard;
 
     return Focus(
       onFocusChange: (hasFocus) {
@@ -335,27 +343,37 @@ class _AddressListTileState extends State<AddressListTile> {
                 }),
               ),
             ),
-            if (widget.enabled)
-              InkWell(
-                onTap: searchIsClickable
-                    ? () => validate(forceShowIfNotFound: true)
-                    : null,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 4.0,
-                    horizontal: 8.0,
-                  ),
-                  child: Icon(
-                    Icons.search,
-                    color: searchIsClickable
-                        ? Theme.of(context).primaryColor
-                        : Colors.grey,
-                  ),
+            InkWell(
+              onTap: searchIsClickable
+                  ? () => validate(forceShowIfNotFound: true)
+                  : (canCopyToClipboard ? () => copyToClipboard() : null),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 4.0,
+                  horizontal: 8.0,
+                ),
+                child: Icon(
+                  widget.enabled
+                      ? Icons.search
+                      : (canCopyToClipboard ? Icons.copy : null),
+                  color: searchIsClickable || canCopyToClipboard
+                      ? Theme.of(context).primaryColor
+                      : Colors.grey,
                 ),
               ),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  void copyToClipboard() {
+    if (_address == null) return;
+
+    final data = ClipboardData(text: _address.toString());
+    Clipboard.setData(data);
+
+    showSnackBar(context, message: 'Adresse copiée dans le presse-papiers');
   }
 }

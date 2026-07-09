@@ -144,6 +144,7 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen>
               enterprises: enterprises,
             ),
           ),
+          // TODO: Add search and show only
           _EnterprisesByMap(enterprises: enterprises),
         ],
       ),
