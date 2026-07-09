@@ -26,8 +26,7 @@ class EvaluationSst extends StatelessWidget {
         internshipId: internshipId,
         evaluateButtonText: 'Évaluer la SST',
         reevaluateButtonText: 'Réévaluer la SST',
-        isInitiallyExpanded:
-            internship.isActive && internship.sstEvaluations.isEmpty,
+        isInitiallyExpanded: false,
         evaluations: internship.sstEvaluations,
         onClickedNewEvaluation: () => showInternshipEvaluationFormDialog(
             context,
