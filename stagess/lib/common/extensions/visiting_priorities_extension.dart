@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 
 extension VisitingPrioritiesExtension on VisitingPriority {
-  MaterialColor get color {
+  Color get color {
     switch (this) {
       case (VisitingPriority.low):
-        return Colors.green;
+        return const Color.fromARGB(255, 0, 130, 20);
       case (VisitingPriority.mid):
-        return Colors.orange;
+        return const Color.fromARGB(255, 225, 135, 0);
       case (VisitingPriority.high):
-        return Colors.red;
+        return const Color.fromARGB(255, 210, 50, 35);
       case (VisitingPriority.school):
         return Colors.purple;
       case (VisitingPriority.notApplicable):
-        return Colors.grey;
+        return const Color.fromARGB(255, 100, 100, 100);
     }
   }
 

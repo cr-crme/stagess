@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
 import 'package:logging/logging.dart';
+import 'package:stagess/common/extensions/visiting_priorities_extension.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
 import 'package:stagess/router.dart';
 import 'package:stagess/screens/add_enterprise/add_enterprise_screen.dart';
@@ -10,6 +11,7 @@ import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
+import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/itineraries/waypoint.dart';
 import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common_flutter/helpers/enterprise_extension.dart';
@@ -319,56 +321,72 @@ class _EnterprisesByMap extends StatelessWidget {
       final remainingPositions = enterprise.jobsWithRemainingPositions(context,
           schoolId: schoolId, listen: true);
 
-      double nameWidth = 160;
-      double nameHeight = 100;
+      double nameWidth = 110;
       final waypoint = enterprises[enterprise]!;
       final color = i == 0
-          ? Colors.purple
+          ? VisitingPriority.school.color
           : enterprise.status == EnterpriseStatus.active
-              ? (remainingPositions.isNotEmpty ? Colors.green : Colors.red)
-              : Colors.grey;
+              ? (remainingPositions.isNotEmpty
+                  ? VisitingPriority.low.color
+                  : VisitingPriority.high.color)
+              : VisitingPriority.notApplicable.color;
 
       out.add(
         Marker(
           point: waypoint.toLatLng(),
-          alignment: const Alignment(0.8, 0.0), // Centered almost at max right
+          alignment: const Alignment(1.0, 0.0),
           width: markerSize + nameWidth,
-          height: markerSize + nameHeight,
-          child: Row(
-            children: [
-              GestureDetector(
-                onTap: i == 0
-                    ? null
-                    : () => GoRouter.of(context).goNamed(
-                          Screens.enterprise,
-                          pathParameters: Screens.params(enterprise),
-                          queryParameters: Screens.queryParams(pageIndex: '0'),
-                        ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withAlpha(75),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    i == 0 ? Icons.school : Icons.location_on_sharp,
-                    size: markerSize,
-                    color: color,
+          height: markerSize,
+          child: GestureDetector(
+            onTap: i == 0
+                ? null
+                : () => GoRouter.of(context).goNamed(
+                      Screens.enterprise,
+                      pathParameters: Screens.params(enterprise),
+                      queryParameters: Screens.queryParams(pageIndex: '0'),
+                    ),
+            child: Row(
+              children: [
+                MouseRegion(
+                  cursor: i == 0
+                      ? SystemMouseCursors.basic
+                      : SystemMouseCursors.click,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(75),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      i == 0 ? Icons.school : Icons.location_on_sharp,
+                      size: markerSize,
+                      color: color,
+                    ),
                   ),
                 ),
-              ),
-              if (waypoint.showTitle)
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 5,
-                    vertical: 2,
+                if (waypoint.showTitle)
+                  MouseRegion(
+                    cursor: i == 0
+                        ? SystemMouseCursors.basic
+                        : SystemMouseCursors.click,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 5,
+                        vertical: 2,
+                      ),
+                      width: nameWidth,
+                      decoration: BoxDecoration(
+                        color: color.withAlpha(200),
+                        shape: BoxShape.rectangle,
+                      ),
+                      child: Text(waypoint.title,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold)),
+                    ),
                   ),
-                  decoration: BoxDecoration(
-                    color: color.withAlpha(125),
-                    shape: BoxShape.rectangle,
-                  ),
-                  child: Text(waypoint.title),
-                ),
-            ],
+              ],
+            ),
           ),
         ),
       );
