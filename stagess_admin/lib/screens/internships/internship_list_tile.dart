@@ -748,19 +748,17 @@ class InternshipListTileState extends State<InternshipListTile> {
               ],
             )),
         if (_isEditing)
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.only(top: 12.0),
-              child: TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _extraTeachersPickerController
-                          .add(TeacherPickerController());
-                    });
-                  },
-                  child: Text('Ajouter un·e enseignant·e responsable',
-                      textAlign: TextAlign.center)),
-            ),
+          Padding(
+            padding: const EdgeInsets.only(top: 12.0),
+            child: TextButton(
+                onPressed: () {
+                  setState(() {
+                    _extraTeachersPickerController
+                        .add(TeacherPickerController());
+                  });
+                },
+                child: Text('Ajouter un·e enseignant·e responsable',
+                    textAlign: TextAlign.center)),
           )
       ],
     );
@@ -786,25 +784,30 @@ class InternshipListTileState extends State<InternshipListTile> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Flexible(
-              child: _isEditing && _isActive
-                  ? Text('Contact')
-                  : Text(
-                      'Contact : ${widget.internship.currentContract?.supervisor.toString() ?? ''}',
-                    ),
-            ),
-            if (_isEditing)
+        _isEditing && _isActive
+            ? Text('Responsable en milieu de stage')
+            : Text(
+                'Responsable en milieu de stage : ${widget.internship.currentContract?.supervisor.toString() ?? ''}',
+              ),
+        if (_isEditing)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                child: Text(
+                  'Même personne que le contact de l\'entreprise',
+                  textAlign: TextAlign.right,
+                ),
+              ),
+              const SizedBox(width: 8),
               Switch(
                 onChanged: (newValue) => _toggleUseContactInfo(newValue,
                     enterprise: _enterprisePickerController.enterprise),
                 value: _useContactInfo,
               ),
-          ],
-        ),
+            ],
+          ),
         Padding(
           padding: const EdgeInsets.only(left: 16.0),
           child: Column(
