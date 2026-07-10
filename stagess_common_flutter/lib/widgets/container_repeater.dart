@@ -3,10 +3,10 @@ import 'package:stagess_common/models/generic/selectable_items.dart';
 
 export 'package:stagess_common/models/generic/selectable_items.dart';
 
-class SelectableItemsController<T extends SelectableItem> {
+class RepeaterController<T extends SelectableItem> {
   final List<T> _options;
 
-  SelectableItemsController({
+  RepeaterController({
     List<T>? options,
   }) : _options = options ?? [];
 
@@ -81,9 +81,9 @@ class SelectableItemsController<T extends SelectableItem> {
   }
 }
 
-class SelectableTextFormBoxes<T extends SelectableItem>
+class SelectableTextFormRepeater<T extends SelectableItem>
     extends StatelessWidget {
-  const SelectableTextFormBoxes({
+  const SelectableTextFormRepeater({
     super.key,
     required this.controller,
     this.enabled = true,
@@ -96,7 +96,7 @@ class SelectableTextFormBoxes<T extends SelectableItem>
     this.maxLength,
   });
 
-  final SelectableItemsController<T>? controller;
+  final RepeaterController<T>? controller;
   final bool enabled;
   final int minOptionCount;
   final int? maxOptionCount;
@@ -108,7 +108,7 @@ class SelectableTextFormBoxes<T extends SelectableItem>
 
   @override
   Widget build(BuildContext context) {
-    return SelectableBoxes<T>(
+    return ContainerRepeater<T>(
       controller: controller,
       enabled: enabled,
       minOptionCount: minOptionCount,
@@ -137,8 +137,8 @@ class SelectableTextFormBoxes<T extends SelectableItem>
   }
 }
 
-class SelectableBoxes<T extends SelectableItem> extends StatefulWidget {
-  const SelectableBoxes({
+class ContainerRepeater<T extends SelectableItem> extends StatefulWidget {
+  const ContainerRepeater({
     super.key,
     this.controller,
     this.enabled = true,
@@ -147,9 +147,10 @@ class SelectableBoxes<T extends SelectableItem> extends StatefulWidget {
     this.maxSelectedOptions,
     required this.newItemBuilder,
     required this.widgetBuilder,
+    this.hasCheckboxes = true,
   });
 
-  final SelectableItemsController<T>? controller;
+  final RepeaterController<T>? controller;
   final bool enabled;
   final int minOptionCount;
   final int? maxOptionCount;
@@ -157,16 +158,17 @@ class SelectableBoxes<T extends SelectableItem> extends StatefulWidget {
   final T Function(int index) newItemBuilder;
   final Widget Function(BuildContext context, int index, T item,
       void Function(T newItem) updateItem) widgetBuilder;
+  final bool hasCheckboxes;
 
   @override
-  State<SelectableBoxes<T>> createState() => _SelectableBoxesState<T>();
+  State<ContainerRepeater<T>> createState() => _ContainerRepeaterState<T>();
 }
 
-class _SelectableBoxesState<T extends SelectableItem>
-    extends State<SelectableBoxes<T>> {
+class _ContainerRepeaterState<T extends SelectableItem>
+    extends State<ContainerRepeater<T>> {
   late final _shouldDisposeController = widget.controller == null;
-  late final SelectableItemsController<T> _controller =
-      widget.controller ?? SelectableItemsController<T>();
+  late final RepeaterController<T> _controller =
+      widget.controller ?? RepeaterController<T>();
 
   @override
   void initState() {
@@ -200,11 +202,9 @@ class _SelectableBoxesState<T extends SelectableItem>
         if (_controller.options.isEmpty)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24.0),
-            child: Center(
-              child: TextButton(
-                onPressed: widget.enabled ? () => _insertNewItem(0) : null,
-                child: const Text('Ajouter un premier élément'),
-              ),
+            child: TextButton(
+              onPressed: widget.enabled ? () => _insertNewItem(0) : null,
+              child: const Text('Ajouter un premier élément'),
             ),
           ),
         for (int i = 0; i < _controller.options.length; i++)
@@ -213,20 +213,26 @@ class _SelectableBoxesState<T extends SelectableItem>
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Checkbox(
-                  value: _controller.options[i].isSelected,
-                  onChanged: widget.enabled &&
-                          (widget.maxSelectedOptions == null ||
-                              _controller.options[i].isSelected ||
-                              _controller.selectedCount <
-                                  widget.maxSelectedOptions!)
-                      ? (value) => _controller.updateOption(
-                          i,
-                          _controller.options[i].copyWith(isSelected: value!)
-                              as T)
-                      : null,
-                ),
-                const SizedBox(width: 8.0),
+                if (widget.hasCheckboxes)
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Checkbox(
+                        value: _controller.options[i].isSelected,
+                        onChanged: widget.enabled &&
+                                (widget.maxSelectedOptions == null ||
+                                    _controller.options[i].isSelected ||
+                                    _controller.selectedCount <
+                                        widget.maxSelectedOptions!)
+                            ? (value) => _controller.updateOption(
+                                i,
+                                _controller.options[i]
+                                    .copyWith(isSelected: value!) as T)
+                            : null,
+                      ),
+                      const SizedBox(width: 8.0),
+                    ],
+                  ),
                 widget.widgetBuilder(
                   context,
                   i,

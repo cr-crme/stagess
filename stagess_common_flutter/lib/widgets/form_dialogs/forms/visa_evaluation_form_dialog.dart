@@ -16,12 +16,12 @@ import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
+import 'package:stagess_common_flutter/widgets/container_repeater.dart';
 import 'package:stagess_common_flutter/widgets/dialogs/show_pdf_dialog.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/visa_pdf_template.dart';
 import 'package:stagess_common_flutter/widgets/numbered_text.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
-import 'package:stagess_common_flutter/widgets/selectable_boxes.dart';
 import 'package:stagess_common_flutter/widgets/sub_title.dart';
 
 final _logger = Logger('VisaFormDialog');
@@ -63,21 +63,20 @@ class VisaFormController {
   final bool canModify;
 
   final _experiencesAndAptitudesController =
-      SelectableItemsController<ExperiencesAndAptitudes>();
+      RepeaterController<ExperiencesAndAptitudes>();
   final _attestationsAndMentionsController =
-      SelectableItemsController<AttestationsAndMentions>();
-  final _sstTrainingsController = SelectableItemsController<SstTraining>();
+      RepeaterController<AttestationsAndMentions>();
+  final _sstTrainingsController = RepeaterController<SstTraining>();
 
   bool _isGatewayToFmsAvailable = false;
-  final _sstCertificateController = SelectableItemsController<Certificate>();
-  final _specificSkillsController = SelectableItemsController<Skill>();
-  final _referencesController = SelectableItemsController<Reference>();
+  final _sstCertificateController = RepeaterController<Certificate>();
+  final _specificSkillsController = RepeaterController<Skill>();
+  final _referencesController = RepeaterController<Reference>();
 
-  final _forcesController = SelectableItemsController<Attitude>();
-  final _challengesController = SelectableItemsController<Attitude>();
+  final _forcesController = RepeaterController<Attitude>();
+  final _challengesController = RepeaterController<Attitude>();
 
-  final _successConditionsController =
-      SelectableItemsController<SuccessConditions>();
+  final _successConditionsController = RepeaterController<SuccessConditions>();
 
   VisaFormController(
     BuildContext context, {
@@ -560,7 +559,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
               'Cocher celles à afficher dans le VISA en PDF (maximum de 8 items).'
             ]),
             SizedBox(height: 8.0),
-            SelectableTextFormBoxes(
+            SelectableTextFormRepeater(
               controller: controller._experiencesAndAptitudesController,
               enabled: controller.canModify,
               maxSelectedOptions: 8,
@@ -598,7 +597,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
               'Cocher celles à afficher dans le VISA en PDF (maximum de 5 items).'
             ]),
             SizedBox(height: 8.0),
-            SelectableTextFormBoxes(
+            SelectableTextFormRepeater(
               controller: controller._attestationsAndMentionsController,
               enabled: controller.canModify,
               maxSelectedOptions: 5,
@@ -989,7 +988,7 @@ class _EmployabilityProfileSection extends StatelessWidget {
                   'Inscrire les références, soit le nom de l\'entreprise si c\'est le milieu '
                   'de stage ou un employeur ainsi que le numéro de téléphone, à afficher dans le VISA en PDF.'),
               SizedBox(height: 8.0),
-              SelectableBoxes(
+              ContainerRepeater(
                 controller: controller._referencesController,
                 enabled: controller.canModify,
                 minOptionCount: 0,
@@ -1188,7 +1187,7 @@ class _ForcesAndChallengesSection extends StatelessWidget {
     required String title,
     required String definition,
     required bool enabled,
-    required SelectableItemsController controller,
+    required RepeaterController controller,
     required int maxSelectedOptions,
   }) {
     return AnimatedExpandingCard(
@@ -1253,7 +1252,7 @@ class _ForcesAndChallengesSection extends StatelessWidget {
                 'Lister toutes les adaptations, requises pour aider l\'élève à réussir, '
                 'à afficher dans le VISA en PDF.'),
             SizedBox(height: 8.0),
-            SelectableTextFormBoxes(
+            SelectableTextFormRepeater(
               controller: controller._successConditionsController,
               enabled: controller.canModify,
               maxSelectedOptions: 8,
