@@ -83,7 +83,7 @@ class _SchoolBoardsListScreenState extends State<SchoolBoardsListScreen> {
         title: Text(
           authProvider.databaseAccessLevel == AccessLevel.superAdmin
               ? 'Liste des Centres de services scolaire'
-              : 'Liste des écoles',
+              : 'Centre de services scolaire',
         ),
         actions: [
           IconButton(

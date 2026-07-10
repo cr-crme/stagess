@@ -76,7 +76,7 @@ class MainDrawer extends StatelessWidget {
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         _DrawerItem(
-                          titleText: 'Écoles',
+                          titleText: 'Centre de services scolaire',
                           icon: Icons.school,
                           route: Screens.schoolBoardsListScreen,
                           iconOnly: iconOnly,
