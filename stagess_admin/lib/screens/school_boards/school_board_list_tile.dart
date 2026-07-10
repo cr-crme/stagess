@@ -351,7 +351,13 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
                 _buildName(),
                 _buildLogo(),
                 _buildCnesst(),
-                _buildSchoolNames(),
+                if (!_isEditing)
+                  Column(
+                    children: [
+                      Divider(),
+                      _buildSchoolNames(),
+                    ],
+                  ),
               ],
             ),
           ),
