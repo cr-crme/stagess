@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stagess/common/provider_helpers/itineraries_helpers.dart';
+import 'package:stagess/screens/supervision_chart/common/internship_meta_data.dart';
 import 'package:stagess/screens/visiting_students/itinerary_pdf_template.dart';
 import 'package:stagess/screens/visiting_students/widgets/routing_map.dart';
 import 'package:stagess/screens/visiting_students/widgets/waypoint_card.dart';
@@ -11,7 +12,6 @@ import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/itineraries/waypoint.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
-import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
@@ -28,15 +28,20 @@ TextStyle _subtitleStyleOf(BuildContext context) => TextStyle(
 String _newItineraryName = 'Nouvel itinéraire';
 
 class ItineraryMainScreen extends StatefulWidget {
-  const ItineraryMainScreen({super.key});
+  const ItineraryMainScreen({super.key, required this.filteredInternships});
 
   static const route = '/itineraries';
+  final List<InternshipMetaData> filteredInternships;
 
   @override
   State<ItineraryMainScreen> createState() => _ItineraryMainScreenState();
 }
 
-class _ItineraryMainScreenState extends State<ItineraryMainScreen> {
+class _ItineraryMainScreenState extends State<ItineraryMainScreen>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   final List<Waypoint> _waypoints = [];
   final _scrollController = ScrollController();
 
@@ -58,14 +63,6 @@ class _ItineraryMainScreenState extends State<ItineraryMainScreen> {
 
     final enterprises = EnterprisesProvider.of(context, listen: false);
     if (enterprises.isEmpty) return;
-
-    final students = {
-      ...StudentsHelpers.mySupervizedStudents(
-        context,
-        listen: false,
-        activeOnly: true,
-      ),
-    };
     if (!mounted) return;
 
     // Add the school as the first waypoint
@@ -80,7 +77,11 @@ class _ItineraryMainScreenState extends State<ItineraryMainScreen> {
 
     // Get the students from the registered students, but we copy them so
     // we don't mess with them
-    for (final student in students) {
+    for (int i = 0; i < widget.filteredInternships.supervizedCount; i++) {
+      final meta = widget.filteredInternships.getSupervized(i);
+      if (meta == null) continue;
+      final student = meta.student;
+
       final studentInternships = internships.byStudentId(student.id);
       if (studentInternships.isEmpty) continue;
       final internship = studentInternships.last;
@@ -104,6 +105,8 @@ class _ItineraryMainScreenState extends State<ItineraryMainScreen> {
     _logger.finer(
       'Building ItineraryMainScreen with ${_waypoints.length} waypoints',
     );
+
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
 
     _fillAllWaypoints();
     return RawScrollbar(
@@ -300,6 +303,9 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
     final isSmall = MediaQuery.of(context).size.width <
         ResponsiveService.smallScreenWidth + 200;
 
+    // Force rebuilt if the teacher has changed
+    TeachersProvider.of(context, listen: true);
+
     return Column(
       children: [
         if (_hasLock)
@@ -428,16 +434,10 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
                   children: [
                     RoutingMap(
                       controller: _routingController,
-                      waypoints:
-                          widget.waypoints.length == 1 ? [] : widget.waypoints,
+                      waypoints: widget.waypoints,
                       centerWaypoint: widget.waypoints.first,
                       itinerary: _currentItinerary,
                     ),
-                    if (widget.waypoints.length == 1)
-                      Container(
-                        color: Colors.white.withAlpha(100),
-                        child: Center(child: CircularProgressIndicator()),
-                      ),
                   ],
                 ),
         );

@@ -1,5 +1,4 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:collection/collection.dart';
 import 'package:crcrme_material_theme/crcrme_material_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +7,7 @@ import 'package:stagess/common/extensions/internship_extension.dart';
 import 'package:stagess/common/extensions/visiting_priorities_extension.dart';
 import 'package:stagess/common/widgets/main_drawer.dart';
 import 'package:stagess/router.dart';
+import 'package:stagess/screens/supervision_chart/common/internship_meta_data.dart';
 import 'package:stagess/screens/visiting_students/itinerary_screen.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
@@ -28,101 +28,6 @@ import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 
 final _logger = Logger('SupervisionChart');
-
-class _InternshipMetaData {
-  final Internship internship;
-  final Student student;
-  bool isSupervised;
-  bool isTeacherSignatory;
-  VisitingPriority visitingPriority;
-
-  _InternshipMetaData({
-    required this.internship,
-    required this.student,
-    required this.isSupervised,
-    required this.visitingPriority,
-    required this.isTeacherSignatory,
-  });
-}
-
-extension _InternshipMetaDataList on List<_InternshipMetaData> {
-  int get supervizedCount =>
-      fold(0, (count, metaData) => count + (metaData.isSupervised ? 1 : 0));
-
-  List<_InternshipMetaData> filterPriorities(
-    List<VisitingPriority> whiteList,
-  ) =>
-      where(
-        (metaData) => whiteList.contains(metaData.visitingPriority),
-      ).toList();
-
-  List<_InternshipMetaData> filterByText(String text) {
-    if (text.isEmpty) return this;
-    return where(
-      (metaData) => metaData.student.fullName.toLowerCase().contains(text),
-    ).toList();
-  }
-
-  _InternshipMetaData? getSupervized(int index) {
-    int count = 0;
-    for (final metaData in this) {
-      if (metaData.isSupervised) {
-        if (count == index) return metaData;
-        count++;
-      }
-    }
-    return null;
-  }
-
-  static List<_InternshipMetaData> _internshipsOf(BuildContext context) {
-    final currentTeacher =
-        TeachersProvider.of(context, listen: true).currentTeacher;
-    if (currentTeacher == null) return [];
-
-    final internships = InternshipsProvider.of(context, listen: true);
-    final students = StudentsHelpers.studentsInMyGroups(context, listen: true);
-
-    List<_InternshipMetaData> out = [];
-
-    for (final internship in internships) {
-      if (!internship.isActive) continue;
-
-      final student = students.firstWhereOrNull(
-        (student) => student.id == internship.studentId,
-      );
-      // Skip internships with no student I have access to
-      if (student == null) continue;
-
-      out.add(
-        _InternshipMetaData(
-          internship: internship,
-          student: students.firstWhere(
-            (student) => student.id == internship.studentId,
-          ),
-          isSupervised: internship.supervisingTeacherIds.contains(
-            currentTeacher.id,
-          ),
-          visitingPriority: currentTeacher.visitingPriority(internship.id) ==
-                  VisitingPriority.notApplicable
-              ? VisitingPriority.low
-              : currentTeacher.visitingPriority(internship.id),
-          isTeacherSignatory:
-              internship.signatoryTeacherId == currentTeacher.id,
-        ),
-      );
-    }
-
-    // Sort the internships by student names
-    out.sort(
-      (a, b) => a.student.lastName.toLowerCase().compareTo(
-            b.student.lastName.toLowerCase(),
-          ),
-    );
-
-    // Return the internships
-    return out;
-  }
-}
 
 class SupervisionChart extends StatelessWidget {
   const SupervisionChart({super.key});
@@ -237,7 +142,7 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
       InternshipsProvider.of(context, listen: false);
 
   late final _internshipsMetaData =
-      _InternshipMetaDataList._internshipsOf(context);
+      InternshipMetaDataList.internshipsOf(context);
 
   void _navigateToStudentInfo(Student student) {
     if (_editPrioritiesMode || _editSignatoriesMode) return;
@@ -248,7 +153,7 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
   }
 
   Future<bool> _getAllInternshipLocks(
-    List<_InternshipMetaData> internships,
+    List<InternshipMetaData> internships,
   ) async {
     final hasLocks = await Future.wait([
       for (final meta in internships)
@@ -263,7 +168,7 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
   }
 
   Future<void> _releaseAllInternshipLocks(
-    Iterable<_InternshipMetaData> internships,
+    Iterable<InternshipMetaData> internships,
   ) async {
     await Future.wait([
       for (final meta in internships)
@@ -273,7 +178,7 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
 
   Future<void> _toggleEditPrioritiesMode(
     BuildContext context, {
-    required List<_InternshipMetaData> internships,
+    required List<InternshipMetaData> internships,
   }) async {
     if (_forcePrioritiesDisabled) return;
     if (_currentTeacher == null) {
@@ -328,7 +233,7 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
 
   Future<void> _toggleEditSignatoriesMode(
     BuildContext context, {
-    required List<_InternshipMetaData> internships,
+    required List<InternshipMetaData> internships,
   }) async {
     if (_forceSignatoriesDisabled) return;
     final teacherId = _currentTeacher?.id;
@@ -454,84 +359,19 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
         bottom: _buildBottomTabBar(context),
       ),
       body: widget.hasFullData
-          ? TabBarView(
-              controller: _tabController,
+          ? Column(
               children: [
-                Column(
-                  children: [
-                    _buildFilters(context),
-                    if (_editPrioritiesMode)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(
-                          'Modifier les niveaux de priorité',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ),
-                    if (_editSignatoriesMode)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(
-                          'Sélectionner les élèves à superviser',
-                          style: Theme.of(context).textTheme.titleMedium,
-                        ),
-                      ),
-                    if (filteredInternshipsMetaData.isEmpty)
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                            top: 12.0,
-                            left: 36,
-                            right: 36,
-                          ),
-                          child: Text(
-                            'Aucun élève trouvé',
-                            textAlign: TextAlign.center,
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                        ),
-                      )
-                    else
-                      Expanded(
-                        child: ListView.builder(
-                          shrinkWrap: true,
-                          itemCount: _editSignatoriesMode
-                              ? filteredInternshipsMetaData.length
-                              : filteredInternshipsMetaData.supervizedCount,
-                          itemBuilder: ((ctx, i) {
-                            final meta = _editSignatoriesMode
-                                ? filteredInternshipsMetaData[i]
-                                : filteredInternshipsMetaData.getSupervized(i);
-                            if (meta == null) return Container();
-
-                            return Padding(
-                              padding: i ==
-                                      (_editSignatoriesMode
-                                              ? filteredInternshipsMetaData
-                                                  .length
-                                              : filteredInternshipsMetaData
-                                                  .supervizedCount) -
-                                          1
-                                  ? EdgeInsets.only(
-                                      bottom:
-                                          MediaQuery.of(context).size.height *
-                                              0.5)
-                                  : const EdgeInsets.only(),
-                              child: _StudentTile(
-                                key: Key(meta.student.id),
-                                meta: meta,
-                                onTap: () =>
-                                    _navigateToStudentInfo(meta.student),
-                                editPrioritiesMode: _editPrioritiesMode,
-                                editSignatoriesMode: _editSignatoriesMode,
-                              ),
-                            );
-                          }),
-                        ),
-                      ),
-                  ],
+                _buildFilters(context),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildPriorityPage(filteredInternshipsMetaData),
+                      ItineraryMainScreen(
+                          filteredInternships: filteredInternshipsMetaData),
+                    ],
+                  ),
                 ),
-                const ItineraryMainScreen(),
               ],
             )
           : Center(
@@ -539,6 +379,79 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
                 color: Theme.of(context).primaryColor,
               ),
             ),
+    );
+  }
+
+  Widget _buildPriorityPage(
+      List<InternshipMetaData> filteredInternshipsMetaData) {
+    return Column(
+      children: [
+        if (_editPrioritiesMode)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              'Modifier les niveaux de priorité',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
+        if (_editSignatoriesMode)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              'Sélectionner les élèves à superviser',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+          ),
+        if (filteredInternshipsMetaData.isEmpty)
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                top: 12.0,
+                left: 36,
+                right: 36,
+              ),
+              child: Text(
+                'Aucun élève trouvé',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+          )
+        else
+          Expanded(
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: _editSignatoriesMode
+                  ? filteredInternshipsMetaData.length
+                  : filteredInternshipsMetaData.supervizedCount,
+              itemBuilder: ((ctx, i) {
+                final meta = _editSignatoriesMode
+                    ? filteredInternshipsMetaData[i]
+                    : filteredInternshipsMetaData.getSupervized(i);
+                if (meta == null) return Container();
+
+                return Padding(
+                  padding: i ==
+                          (_editSignatoriesMode
+                                  ? filteredInternshipsMetaData.length
+                                  : filteredInternshipsMetaData
+                                      .supervizedCount) -
+                              1
+                      ? EdgeInsets.only(
+                          bottom: MediaQuery.of(context).size.height * 0.5)
+                      : const EdgeInsets.only(),
+                  child: _StudentTile(
+                    key: Key(meta.student.id),
+                    meta: meta,
+                    onTap: () => _navigateToStudentInfo(meta.student),
+                    editPrioritiesMode: _editPrioritiesMode,
+                    editSignatoriesMode: _editSignatoriesMode,
+                  ),
+                );
+              }),
+            ),
+          ),
+      ],
     );
   }
 
@@ -599,23 +512,29 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
                 style: Theme.of(context).textTheme.titleSmall,
               ),
               const SizedBox(width: 8),
-              InkWell(
-                borderRadius: BorderRadius.circular(25),
-                onTap: _forcePrioritiesDisabled || _editSignatoriesMode
-                    ? null
-                    : () => _toggleEditPrioritiesMode(context,
-                        internships: _internshipsMetaData),
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(25),
-                      border:
-                          Border.all(color: Theme.of(context).primaryColor)),
-                  child: Icon(
-                    _editPrioritiesMode ? Icons.save : Icons.edit,
-                    color: _forcePrioritiesDisabled || _editSignatoriesMode
-                        ? Colors.grey
-                        : Theme.of(context).primaryColor,
+              Visibility(
+                visible: _tabController.index == 0,
+                maintainSize: true,
+                maintainAnimation: true,
+                maintainState: true,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(25),
+                  onTap: _forcePrioritiesDisabled || _editSignatoriesMode
+                      ? null
+                      : () => _toggleEditPrioritiesMode(context,
+                          internships: _internshipsMetaData),
+                  child: Container(
+                    padding: const EdgeInsets.all(2),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(25),
+                        border:
+                            Border.all(color: Theme.of(context).primaryColor)),
+                    child: Icon(
+                      _editPrioritiesMode ? Icons.save : Icons.edit,
+                      color: _forcePrioritiesDisabled || _editSignatoriesMode
+                          ? Colors.grey
+                          : Theme.of(context).primaryColor,
+                    ),
                   ),
                 ),
               )
@@ -706,7 +625,7 @@ class _StudentTile extends StatefulWidget {
     required this.editSignatoriesMode,
   });
 
-  final _InternshipMetaData meta;
+  final InternshipMetaData meta;
   final Function()? onTap;
   final bool editPrioritiesMode;
   final bool editSignatoriesMode;

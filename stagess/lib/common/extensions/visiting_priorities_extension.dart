@@ -31,4 +31,30 @@ extension VisitingPrioritiesExtension on VisitingPriority {
         return Icons.cancel;
     }
   }
+
+  IconData get waypointIcon {
+    switch (this) {
+      case (VisitingPriority.school):
+        return Icons.school;
+      case (VisitingPriority.low):
+      case (VisitingPriority.mid):
+      case (VisitingPriority.high):
+        return Icons.face;
+      case (VisitingPriority.notApplicable):
+        return Icons.cancel;
+    }
+  }
+
+  Color? get waypointColor {
+    switch (this) {
+      case (VisitingPriority.school):
+        return Colors.purple;
+      case (VisitingPriority.low):
+      case (VisitingPriority.mid):
+      case (VisitingPriority.high):
+        return null; // Main theme color
+      case (VisitingPriority.notApplicable):
+        return Colors.grey;
+    }
+  }
 }

@@ -33,20 +33,21 @@ class WaypointCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.only(left: 8.0, right: 8.0),
                   child: Icon(
-                    waypoint.priority.icon,
-                    color: waypoint.priority.color,
+                    waypoint.priority.waypointIcon,
+                    color: waypoint.priority.waypointColor ??
+                        Theme.of(context).primaryColor,
                   ),
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(name, style: const TextStyle(color: Colors.black)),
-                    waypoint.subtitle == null
+                    waypoint.subtitle == null || waypoint.subtitle!.isEmpty
                         ? SizedBox.shrink()
                         : Text(
-                          waypoint.subtitle!,
-                          style: const TextStyle(color: Colors.blueGrey),
-                        ),
+                            waypoint.subtitle!,
+                            style: const TextStyle(color: Colors.blueGrey),
+                          ),
                   ],
                 ),
               ],
