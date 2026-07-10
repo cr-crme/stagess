@@ -128,6 +128,11 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       (job) => MapEntry(job.id, _controllerFromJob(context, job: job)),
     ),
   );
+  late final _jobIsNew = Map.fromEntries(
+    widget.enterprise.jobs.map(
+      (job) => MapEntry(job.id, false),
+    ),
+  );
   late final _teacherPickerController = TeacherPickerController(
     initial: context.mounted
         ? TeachersProvider.of(context, listen: false).firstWhereOrNull(
@@ -329,16 +334,19 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       final serializedOldJob = _jobControllers[key]!.job.serialize();
       if (areMapsNotEqual(serializedOldJob, job.serialize())) {
         _jobControllers[key] = _controllerFromJob(context, job: job);
+        _jobIsNew[key] = false;
       }
     }
     // Remove deleted jobs
     for (final key in keysToRemove) {
       _jobControllers.remove(key);
+      _jobIsNew.remove(key);
     }
     // Add new jobs
     for (final job in widget.enterprise.jobs) {
       if (!_jobControllers.containsKey(job.id)) {
         _jobControllers[job.id] = _controllerFromJob(context, job: job);
+        _jobIsNew[job.id] = true;
       }
     }
   }
@@ -627,23 +635,29 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
   void _addJob() {
     final job = Job.empty;
     setState(
-      () => _jobControllers[job.id] = EnterpriseJobListController(
-        context: context,
-        enterpriseId: widget.enterprise.id,
-        enterpriseStatus: _enterpriseStatusController.value!,
-        job: job,
-        reservedForPickerController: EntityPickerController(
-          allElementsTitle: 'Tous les enseignant\u00b7e\u00b7s',
-          schools: _currentSchoolBoard?.schools ?? [],
-          teachers: [...TeachersProvider.of(context, listen: false)],
-          initialId: job.reservedForId,
-        ),
-      ),
+      () {
+        _jobControllers[job.id] = EnterpriseJobListController(
+          context: context,
+          enterpriseId: widget.enterprise.id,
+          enterpriseStatus: _enterpriseStatusController.value!,
+          job: job,
+          reservedForPickerController: EntityPickerController(
+            allElementsTitle: 'Tous les enseignant\u00b7e\u00b7s',
+            schools: _currentSchoolBoard?.schools ?? [],
+            teachers: [...TeachersProvider.of(context, listen: false)],
+            initialId: job.reservedForId,
+          ),
+        );
+        _jobIsNew[job.id] = true;
+      },
     );
   }
 
   void _deleteJob(String id) {
-    setState(() => _jobControllers.remove(id));
+    setState(() {
+      _jobControllers.remove(id);
+      _jobIsNew.remove(id);
+    });
   }
 
   Widget _buildJobs() {
@@ -683,6 +697,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                       controller: _jobControllers[jobId]!,
                       schools: _currentSchoolBoard?.schools ?? [],
                       editMode: _isEditing,
+                      canChangeSpecialization: _jobIsNew[jobId]!,
                       onRequestDelete:
                           hasInternship ? null : () => _deleteJob(jobId),
                       initialExpandedState:

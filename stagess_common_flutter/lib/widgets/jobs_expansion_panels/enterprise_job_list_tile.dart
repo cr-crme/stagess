@@ -121,6 +121,7 @@ class EnterpriseJobListTile extends StatefulWidget {
     required this.controller,
     required this.schools,
     this.editMode = false,
+    this.canChangeSpecialization = true,
     this.onRequestDelete,
     this.canChangeExpandedState = true,
     this.initialExpandedState = false,
@@ -136,6 +137,7 @@ class EnterpriseJobListTile extends StatefulWidget {
   final EnterpriseJobListController controller;
   final List<School>? schools;
   final bool editMode;
+  final bool canChangeSpecialization;
   final Function()? onRequestDelete;
   final bool canChangeExpandedState;
   final bool initialExpandedState;
@@ -371,7 +373,9 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
             return null;
           },
           style: const TextStyle(color: Colors.black),
-          enabled: widget.editMode && _availableSpecialization.length != 1,
+          enabled: widget.editMode &&
+              _availableSpecialization.length != 1 &&
+              widget.canChangeSpecialization,
           decoration: InputDecoration(
             // TODO Autoselect from the pages
             labelText: '* Métier semi-spécialisé',
