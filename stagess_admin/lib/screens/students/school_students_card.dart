@@ -124,7 +124,11 @@ class _GroupStudentsCard extends StatelessWidget {
                           AccessLevel.schoolAdmin &&
                       authProvider.schoolBoardId == student.schoolBoardId &&
                       authProvider.schoolId == student.schoolId);
-              final canEdit = canDelete;
+              final canEdit = canDelete ||
+                  (authProvider.databaseAccessLevel >=
+                          AccessLevel.teacherAdmin &&
+                      authProvider.schoolBoardId == student.schoolBoardId &&
+                      authProvider.schoolId == student.schoolId);
 
               return StudentListTile(
                 key: ValueKey(student.id),

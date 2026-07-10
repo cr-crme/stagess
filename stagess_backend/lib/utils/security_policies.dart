@@ -2,6 +2,8 @@ import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/extended_item_serializable.dart';
 import 'package:stagess_common/models/persons/school_member.dart';
+import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/utils.dart';
 
 class SecurityPolicyException implements Exception {
@@ -322,6 +324,40 @@ class UserIsFromSameSchool implements SecurityPolicy {
 
     if (item!.schoolId != user!.schoolId) {
       throw SecurityPolicyException('User does not have access to this item');
+    }
+    return Future.value();
+  }
+}
+
+class UserIsFromSameGroupAsStudent implements SecurityPolicy {
+  final DatabaseUser? user;
+  final Student? item;
+  final Teacher? teacher;
+
+  UserIsFromSameGroupAsStudent(
+      {required this.user, required this.teacher, required this.item});
+
+  @override
+  Future<void> validate() {
+    if (user == null) {
+      throw SecurityPolicyException('User is not logged in');
+    }
+
+    if (item == null) {
+      throw SecurityPolicyException('No item provided for validation');
+    }
+
+    if (user!.accessLevel >= AccessLevel.schoolAdmin) {
+      return Future.value();
+    }
+
+    if (teacher == null) {
+      throw SecurityPolicyException('No teacher provided for validation');
+    }
+
+    if (!teacher!.groups.contains(item!.group)) {
+      throw SecurityPolicyException(
+          'User does not have access to this student');
     }
     return Future.value();
   }

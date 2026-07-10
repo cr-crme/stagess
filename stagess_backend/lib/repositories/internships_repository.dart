@@ -153,6 +153,12 @@ abstract class InternshipsRepository extends RepositoryAbstract {
             'signatory_teacher_id',
             'student_id',
           ],
+          AccessLevel.teacherAdmin: [
+            'id',
+            'enterprise_id',
+            'signatory_teacher_id',
+            'student_id',
+          ],
           AccessLevel.schoolAdmin: [
             'id',
             'enterprise_id',

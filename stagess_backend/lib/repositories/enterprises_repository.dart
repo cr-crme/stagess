@@ -123,6 +123,7 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
         ],
         allowedToModify: [
           AccessLevel.teacher,
+          AccessLevel.teacherAdmin,
           AccessLevel.schoolAdmin,
           AccessLevel.schoolBoardAdmin,
           AccessLevel.superAdmin,
@@ -141,8 +142,10 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
             'headquarters_address',
             'neq',
           ],
+          // TODO fix teacherAdmin can't remove jobs
         },
         blackList: {
+          AccessLevel.teacherAdmin: ['id', 'school_board_id', 'school_id'],
           AccessLevel.schoolAdmin: ['id', 'school_board_id', 'school_id'],
           AccessLevel.schoolBoardAdmin: ['id', 'school_board_id', 'school_id'],
           AccessLevel.superAdmin: ['id', 'school_board_id', 'school_id'],

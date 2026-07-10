@@ -76,11 +76,14 @@ abstract class StudentsRepository extends RepositoryAbstract {
     final newStudent = previous?.copyWithData(data) ??
         Student.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
 
+    // TODO Fix Teacher
+
     await SecurityPolicies([
       UserIsVerified(user: user),
       HasData(item: newStudent),
       UserIsFromSameSchoolBoard(user: user, item: newStudent),
       UserIsFromSameSchool(user: user, item: newStudent),
+      // UserIsFromSameGroupAsStudent(user: user, item: newStudent),
       ModificationsAreValid(
         user: user,
         item: newStudent,
@@ -92,12 +95,14 @@ abstract class StudentsRepository extends RepositoryAbstract {
         ],
         allowedToModify: [
           AccessLevel.teacher,
+          AccessLevel.teacherAdmin,
           AccessLevel.schoolAdmin,
           AccessLevel.schoolBoardAdmin,
           AccessLevel.superAdmin,
         ],
         whiteList: {
           AccessLevel.teacher: ['all_visa'],
+          AccessLevel.teacherAdmin: ['all_visa'],
         },
         blackList: {
           AccessLevel.schoolAdmin: [
