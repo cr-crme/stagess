@@ -18,7 +18,6 @@ import 'package:stagess_common_flutter/helpers/enterprise_extension.dart';
 import 'package:stagess_common_flutter/helpers/job_extension.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
-import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/widgets/cached_flutter_map.dart';
 import 'package:stagess_common_flutter/widgets/search.dart';
@@ -36,14 +35,14 @@ class EnterprisesListScreen extends StatefulWidget {
 
 class _EnterprisesListScreenState extends State<EnterprisesListScreen>
     with SingleTickerProviderStateMixin {
-  final _enterpriseKey = GlobalKey<_EnterprisesByListState>();
   bool _withSearchBar = false;
+  late final _searchController = TextEditingController()
+    ..addListener(() => setState(() {}));
+  bool _hideNotAvailable = false;
 
-  late final _tabController = TabController(
-    initialIndex: 0,
-    length: 2,
-    vsync: this,
-  )..addListener(() => setState(() {}));
+  late final _tabController =
+      TabController(initialIndex: 0, length: 2, vsync: this)
+        ..addListener(() => setState(() {}));
 
   void _search() => setState(() => _withSearchBar = !_withSearchBar);
 
@@ -76,15 +75,13 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen>
       context,
       title: const Text('Entreprises'),
       actions: [
-        if (_tabController.index == 0)
-          IconButton(
-              onPressed: _search,
-              icon: const Icon(Icons.search),
-              tooltip: 'Rechercher une entreprise'),
+        IconButton(
+            onPressed: _search,
+            icon: const Icon(Icons.search),
+            tooltip: 'Rechercher une entreprise'),
         IconButton(
           onPressed: () {
             _withSearchBar = false;
-            _enterpriseKey.currentState?.searchController.text = '';
             showDialog(
               context: context,
               barrierDismissible: false,
@@ -122,10 +119,9 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen>
       ),
     );
 
-    final enterprises = EnterprisesProviderExtension.availableEnterprisesOf(
-      context,
-      listen: true,
-    );
+    final enterprises = _sortEnterprisesByName(_filterEnterprises(
+        EnterprisesProviderExtension.availableEnterprisesOf(context,
+            listen: true)));
 
     return ResponsiveService.scaffoldOf(
       context,
@@ -133,43 +129,56 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen>
       smallDrawer: MainDrawer.small,
       mediumDrawer: MainDrawer.medium,
       largeDrawer: MainDrawer.large,
-      body: TabBarView(
-        controller: _tabController,
+      body: Column(
         children: [
-          SizedBox(
-            width: 100,
-            child: _EnterprisesByList(
-              key: _enterpriseKey,
-              withSearchBar: _withSearchBar,
-              enterprises: enterprises,
+          if (_withSearchBar)
+            Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).primaryColor,
+                borderRadius: const BorderRadius.vertical(
+                  bottom: Radius.circular(8),
+                ),
+              ),
+              child: Search(controller: _searchController),
+            ),
+          Align(
+            alignment: Alignment.centerRight,
+            child: InkWell(
+              onTap: () =>
+                  setState(() => _hideNotAvailable = !_hideNotAvailable),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                    child: const Text('N\'afficher que les stages disponibles',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  Switch(
+                    value: _hideNotAvailable,
+                    onChanged: (value) =>
+                        setState(() => _hideNotAvailable = value),
+                  )
+                ],
+              ),
             ),
           ),
-          // TODO: Add search and show only
-          _EnterprisesByMap(enterprises: enterprises),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                SizedBox(
+                  width: 100,
+                  child: _EnterprisesByList(enterprises: enterprises),
+                ),
+                _EnterprisesByMap(enterprises: enterprises),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
-}
-
-class _EnterprisesByList extends StatefulWidget {
-  const _EnterprisesByList({
-    super.key,
-    required this.withSearchBar,
-    required this.enterprises,
-  });
-
-  final bool withSearchBar;
-  final List<Enterprise> enterprises;
-
-  @override
-  State<_EnterprisesByList> createState() => _EnterprisesByListState();
-}
-
-class _EnterprisesByListState extends State<_EnterprisesByList> {
-  bool _hideNotAvailable = false;
-  late final searchController = TextEditingController()
-    ..addListener(() => setState(() {}));
 
   List<Enterprise> _sortEnterprisesByName(List<Enterprise> enterprises) {
     _logger.finer('Sorting enterprises by name');
@@ -179,11 +188,9 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
     return res.toList();
   }
 
-  List<Enterprise> _filterSelectedEnterprises(List<Enterprise> enterprises) {
+  List<Enterprise> _filterEnterprises(List<Enterprise> enterprises) {
     _logger.finer(
-      'Filtering enterprises based on search and availability '
-      '(searchController.text: ${searchController.text}, '
-      'hideNotAvailable: $_hideNotAvailable)',
+      'Filtering enterprises based on search',
     );
 
     final schoolId = AuthProvider.of(context, listen: false).schoolId;
@@ -195,13 +202,13 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
           (enterprise.status != EnterpriseStatus.active ||
               enterprise.availablejobs(context).every((job) {
                 final positions = job.positionsRemaining(context,
-                    schoolId: schoolId, listen: true);
+                    schoolId: schoolId, listen: false);
                 return positions <= 0;
               }))) {
         return false;
       }
 
-      final textToSearch = searchController.text.toLowerCase().trim();
+      final textToSearch = _searchController.text.toLowerCase().trim();
 
       // Perform the searchbar filter
       if (enterprise.name.toLowerCase().contains(textToSearch)) {
@@ -228,51 +235,19 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
       return false;
     }).toList();
   }
+}
+
+class _EnterprisesByList extends StatelessWidget {
+  const _EnterprisesByList({required this.enterprises});
+
+  final List<Enterprise> enterprises;
 
   @override
   Widget build(BuildContext context) {
     _logger.finer('Building _EnterprisesByList');
 
-    // Register to the enterprises provider to refresh the list if it changes
-    EnterprisesProvider.of(context, listen: true);
-
-    final enterprises = _sortEnterprisesByName(
-      _filterSelectedEnterprises(widget.enterprises),
-    );
-
     return Column(
       children: [
-        if (widget.withSearchBar)
-          Container(
-            decoration: BoxDecoration(
-              color: Theme.of(context).primaryColor,
-              borderRadius: const BorderRadius.vertical(
-                bottom: Radius.circular(8),
-              ),
-            ),
-            child: Search(controller: searchController),
-          ),
-        Align(
-          alignment: Alignment.centerRight,
-          child: InkWell(
-            onTap: () => setState(() => _hideNotAvailable = !_hideNotAvailable),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-                  child: const Text('N\'afficher que les stages disponibles',
-                      style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-                Switch(
-                  value: _hideNotAvailable,
-                  onChanged: (value) =>
-                      setState(() => _hideNotAvailable = value),
-                )
-              ],
-            ),
-          ),
-        ),
         Expanded(
           child: ListView.builder(
             shrinkWrap: true,
@@ -298,10 +273,19 @@ class _EnterprisesByListState extends State<_EnterprisesByList> {
   }
 }
 
-class _EnterprisesByMap extends StatelessWidget {
+class _EnterprisesByMap extends StatefulWidget {
   const _EnterprisesByMap({required this.enterprises});
 
   final List<Enterprise> enterprises;
+
+  @override
+  State<_EnterprisesByMap> createState() => _EnterprisesByMapState();
+}
+
+class _EnterprisesByMapState extends State<_EnterprisesByMap>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
 
   List<Marker> _latlngToMarkers(
     BuildContext context,
@@ -397,7 +381,7 @@ class _EnterprisesByMap extends StatelessWidget {
 
   Map<Enterprise, Waypoint> _fetchEnterprisesCoordinates(BuildContext context) {
     _logger.finer(
-      'Fetching enterprises coordinates (enterprises: ${enterprises.length})',
+      'Fetching enterprises coordinates (enterprises: ${widget.enterprises.length})',
     );
     final Map<Enterprise, Waypoint> out = {};
 
@@ -420,7 +404,7 @@ class _EnterprisesByMap extends StatelessWidget {
     out[schoolAsEnterprise] =
         Waypoint(title: school.name, address: school.address);
 
-    for (final enterprise in enterprises) {
+    for (final enterprise in widget.enterprises) {
       out[enterprise] = Waypoint(
         title: enterprise.name,
         address: enterprise.address,
@@ -432,6 +416,8 @@ class _EnterprisesByMap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     _logger.finer('Building _EnterprisesByMap');
+    super.build(context); // Required for AutomaticKeepAliveClientMixin
+
     Map<Enterprise, Waypoint> locations = _fetchEnterprisesCoordinates(context);
     final waypoint = locations[locations.keys.first]!;
 
