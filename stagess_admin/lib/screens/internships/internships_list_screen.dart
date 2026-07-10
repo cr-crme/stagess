@@ -11,6 +11,7 @@ import 'package:stagess_common/models/school_boards/school.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
+import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
@@ -40,6 +41,7 @@ class _InternshipsListScreenState extends State<InternshipsListScreen> {
     if (!_showSearchBar || textToSearch.isEmpty) return null;
 
     final students = StudentsProvider.of(context, listen: false);
+    final enterprises = EnterprisesProvider.of(context, listen: false);
 
     final matchingInternshipIds = <String>{};
     for (final internshipsBySchools in internships.values) {
@@ -66,8 +68,12 @@ class _InternshipsListScreenState extends State<InternshipsListScreen> {
 
             for (final internship in internshipList) {
               final student = students.fromIdOrNull(internship.studentId);
-              if (student != null &&
-                  student.fullName.toLowerCase().contains(textToSearch)) {
+              final enterprise =
+                  enterprises.fromIdOrNull(internship.enterpriseId);
+              if ((student != null &&
+                      student.fullName.toLowerCase().contains(textToSearch)) ||
+                  (enterprise != null &&
+                      enterprise.name.toLowerCase().contains(textToSearch))) {
                 matchingInternshipIds.add(internship.id);
               }
             }
