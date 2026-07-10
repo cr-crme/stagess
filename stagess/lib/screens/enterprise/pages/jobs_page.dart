@@ -325,6 +325,7 @@ class JobsPageState extends State<JobsPage> {
                                               child: const Text(
                                                 'Inscrire un\nstagiaire',
                                                 textAlign: TextAlign.center,
+                                                //  TODO Autoselect
                                               ),
                                             ),
                                           ),
@@ -482,7 +483,7 @@ class _RecrutedBy extends StatelessWidget {
               ? Padding(
                   padding: const EdgeInsets.only(left: 24.0),
                   child: Text(
-                    'Enseignant\u00b7e non reconnu\u00b7e.',
+                    'Un\u00b7e administrateur\u00b7rice',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 )
