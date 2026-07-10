@@ -27,6 +27,7 @@ import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
+import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
@@ -105,15 +106,25 @@ class InternshipListTileState extends State<InternshipListTile> {
   bool _isEditing = false;
 
   late final _studentPickerController = StudentPickerController(
-    schoolBoardId: widget.schoolBoardId,
-    initial: context.mounted
-        ? StudentsProvider.of(
-            context,
-            listen: false,
-          ).firstWhereOrNull(
-            (student) => student.id == widget.internship.studentId)
-        : null,
-  );
+      schoolBoardId: widget.schoolBoardId,
+      initial: context.mounted
+          ? StudentsProvider.of(
+              context,
+              listen: false,
+            ).firstWhereOrNull(
+              (student) => student.id == widget.internship.studentId)
+          : null,
+      studentWhiteList: switch (
+          AuthProvider.of(context, listen: false).databaseAccessLevel) {
+        AccessLevel.superAdmin ||
+        AccessLevel.schoolBoardAdmin ||
+        AccessLevel.schoolAdmin =>
+          null,
+        AccessLevel.teacherAdmin ||
+        AccessLevel.teacher =>
+          StudentsHelpers.studentsInMyGroups(context),
+        AccessLevel.self || AccessLevel.invalid => [],
+      });
   late final _teacherPickerController = TeacherPickerController(
     initial: context.mounted
         ? TeachersProvider.of(context, listen: false).firstWhereOrNull(
