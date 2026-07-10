@@ -94,7 +94,7 @@ class _EnterpriseScreenInternalState extends State<_EnterpriseScreenInternal>
     vsync: this,
   );
 
-  late IconButton _actionButton;
+  late IconButton? _actionButton;
 
   final _aboutPageKey = GlobalKey<EnterpriseAboutPageState>();
   final _jobsPageKey = GlobalKey<JobsPageState>();
@@ -118,7 +118,7 @@ class _EnterpriseScreenInternalState extends State<_EnterpriseScreenInternal>
 
   void _updateActionButton() {
     _logger.finer('Updating action button in EnterpriseScreen');
-    late Icon icon;
+    late Icon? icon;
 
     if (_tabController.index == 0) {
       icon = const Icon(Icons.add);
@@ -127,61 +127,65 @@ class _EnterpriseScreenInternalState extends State<_EnterpriseScreenInternal>
           ? const Icon(Icons.save)
           : const Icon(Icons.edit);
     } else if (_tabController.index == 2) {
-      icon = const Icon(Icons.add);
+      icon = null;
     }
-    _actionButton = IconButton(
-      icon: icon,
-      tooltip: switch (_tabController.index) {
-        0 => 'Ajouter un métier',
-        1 => _aboutPageKey.currentState?.editing ?? false
-            ? 'Enregistrer les modifications'
-            : 'Modifier les informations',
-        2 => 'Ajouter un stage',
-        _ => throw Exception('Invalid tab index: ${_tabController.index}'),
-      },
-      onPressed: () async {
-        if (_tabController.index == 0) {
-          if (_jobsPageKey.currentState!.isEditing) {
-            if (!await ConfirmExitDialog.show(
-              context,
-              content: Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                      text: '** Vous quittez la page sans avoir '
-                          'cliqué sur Enregistrer ',
-                    ),
-                    WidgetSpan(
-                      child: SizedBox(
-                        height: 22,
-                        width: 22,
-                        child: Icon(
-                          Icons.save,
-                          color: Theme.of(context).primaryColor,
-                        ),
+    _actionButton = icon == null
+        ? null
+        : IconButton(
+            icon: icon,
+            tooltip: switch (_tabController.index) {
+              0 => 'Ajouter un métier',
+              1 => _aboutPageKey.currentState?.editing ?? false
+                  ? 'Enregistrer les modifications'
+                  : 'Modifier les informations',
+              2 => 'Ajouter un stage',
+              _ =>
+                throw Exception('Invalid tab index: ${_tabController.index}'),
+            },
+            onPressed: () async {
+              if (_tabController.index == 0) {
+                if (_jobsPageKey.currentState!.isEditing) {
+                  if (!await ConfirmExitDialog.show(
+                    context,
+                    content: Text.rich(
+                      TextSpan(
+                        children: [
+                          const TextSpan(
+                            text: '** Vous quittez la page sans avoir '
+                                'cliqué sur Enregistrer ',
+                          ),
+                          WidgetSpan(
+                            child: SizedBox(
+                              height: 22,
+                              width: 22,
+                              child: Icon(
+                                Icons.save,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                          ),
+                          const TextSpan(
+                            text:
+                                '. **\n\nToutes vos modifications seront perdues.',
+                          ),
+                        ],
                       ),
                     ),
-                    const TextSpan(
-                      text: '. **\n\nToutes vos modifications seront perdues.',
-                    ),
-                  ],
-                ),
-              ),
-            )) {
-              return;
-            }
-            cancelEditing();
-          }
-          await _jobsPageKey.currentState?.addJob();
-        } else if (_tabController.index == 1) {
-          await _aboutPageKey.currentState?.toggleEdit();
-        } else if (_tabController.index == 2) {
-          await _stagePageKey.currentState?.addInternship();
-        }
+                  )) {
+                    return;
+                  }
+                  cancelEditing();
+                }
+                await _jobsPageKey.currentState?.addJob();
+              } else if (_tabController.index == 1) {
+                await _aboutPageKey.currentState?.toggleEdit();
+              } else if (_tabController.index == 2) {
+                await _stagePageKey.currentState?.addInternship();
+              }
 
-        _updateActionButton();
-      },
-    );
+              _updateActionButton();
+            },
+          );
     _logger.finer('Action button updated in EnterpriseScreen');
 
     if (!mounted) return;
@@ -280,7 +284,7 @@ class _EnterpriseScreenInternalState extends State<_EnterpriseScreenInternal>
       appBar: ResponsiveService.appBarOf(
         context,
         title: Text(enterprise.name),
-        actions: [_actionButton],
+        actions: _actionButton == null ? null : [_actionButton!],
         leading: ResponsiveService.getScreenSize(context) == ScreenSize.small
             ? null
             : SizedBox.shrink(),

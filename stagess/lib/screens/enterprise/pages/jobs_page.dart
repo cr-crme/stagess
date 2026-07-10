@@ -325,7 +325,7 @@ class JobsPageState extends State<JobsPage> {
                                               child: const Text(
                                                 'Inscrire un\nstagiaire',
                                                 textAlign: TextAlign.center,
-                                                //  TODO Autoselect
+                                                //  TODO Autoselect the job
                                               ),
                                             ),
                                           ),
