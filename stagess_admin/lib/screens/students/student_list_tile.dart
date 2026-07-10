@@ -587,6 +587,8 @@ class StudentListTileState extends State<StudentListTile> {
       enabled: _isEditing,
       isMandatory: false,
       onSaved: (value) => setState(() {}),
+      initialEntryMode: DatePickerEntryMode.input,
+      initialDatePickerMode: DatePickerMode.year,
     );
   }
 
@@ -625,9 +627,9 @@ class StudentListTileState extends State<StudentListTile> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _isEditing
-            ? Text('Contact')
+            ? Text('Contact en cas d\'urgence')
             : Text(
-                'Contact : ${widget.student.contact.toString()} (${widget.student.contactLink})',
+                'Contact en cas d\'urgence : ${widget.student.contact.toString()} (${widget.student.contactLink})',
               ),
         Padding(
           padding: const EdgeInsets.only(left: 16.0),

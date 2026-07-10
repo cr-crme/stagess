@@ -293,7 +293,12 @@ class SchoolListTileState extends State<SchoolListTile> {
         padding: const EdgeInsets.only(left: 24.0, bottom: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: [_buildName(), _buildAddress(), _buildPhone()],
+          children: [
+            _buildName(),
+            _buildAddress(),
+            _buildPhone(),
+            // TODO Add logo for school
+          ],
         ),
       ),
     );

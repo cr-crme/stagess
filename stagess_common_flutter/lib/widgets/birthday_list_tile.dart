@@ -27,6 +27,8 @@ class BirthdayListTile extends StatefulWidget {
     this.isMandatory = false,
     this.enabled = true,
     required this.controller,
+    this.initialEntryMode = DatePickerEntryMode.calendar,
+    this.initialDatePickerMode = DatePickerMode.day,
   });
 
   final String title;
@@ -37,6 +39,8 @@ class BirthdayListTile extends StatefulWidget {
   final bool isMandatory;
   final bool enabled;
   final BirthdayController controller;
+  final DatePickerEntryMode initialEntryMode;
+  final DatePickerMode initialDatePickerMode;
 
   @override
   State<BirthdayListTile> createState() => _BirthdayListTileState();
@@ -46,13 +50,14 @@ class _BirthdayListTileState extends State<BirthdayListTile> {
   Future<void> _onTap() async {
     final answer = await showDatePicker(
       context: context,
-      initialDate:
-          widget.controller.value == DateTime(0) ||
-                  widget.controller.value == null
-              ? DateTime.now()
-              : widget.controller.value,
+      initialDate: widget.controller.value == DateTime(0) ||
+              widget.controller.value == null
+          ? DateTime.now()
+          : widget.controller.value,
       firstDate: DateTime(2000),
       lastDate: DateTime.now(),
+      initialEntryMode: widget.initialEntryMode,
+      initialDatePickerMode: widget.initialDatePickerMode,
     );
     if (answer == null || !mounted) return;
 
@@ -107,10 +112,9 @@ class _BirthdayListTileState extends State<BirthdayListTile> {
                           widget.controller.value == DateTime(0)
                       ? 'Aucune fournie'
                       : DateFormat(
-                        'yyyy-MM-dd',
-                      ).format(widget.controller.value!),
-                  style:
-                      widget.contentStyle ??
+                          'yyyy-MM-dd',
+                        ).format(widget.controller.value!),
+                  style: widget.contentStyle ??
                       const TextStyle(color: Colors.black),
                 ),
               ],
