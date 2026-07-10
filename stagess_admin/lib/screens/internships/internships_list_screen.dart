@@ -82,11 +82,14 @@ class _InternshipsListScreenState extends State<InternshipsListScreen> {
       _getInternships(BuildContext context) {
     final schoolBoards = SchoolBoardsProvider.of(context, listen: true);
     final teachers = TeachersProvider.of(context, listen: true);
+    final students = StudentsProvider.of(context, listen: true);
 
     final internshipsTp = [...InternshipsProvider.of(context, listen: true)];
     internshipsTp.sort((a, b) {
-      final nameA = a.studentId.toLowerCase();
-      final nameB = b.studentId.toLowerCase();
+      final studentA = students.fromIdOrNull(a.studentId);
+      final studentB = students.fromIdOrNull(b.studentId);
+      final nameA = studentA?.lastName.toLowerCase() ?? '';
+      final nameB = studentB?.lastName.toLowerCase() ?? '';
       return nameA.compareTo(nameB);
     });
 
@@ -216,6 +219,7 @@ class _InternshipsListScreenState extends State<InternshipsListScreen> {
               ),
             ),
           )
+          .sorted((a, b) => a.key.name.compareTo(b.key.name))
           .map(
             (schoolBoardEntry) => AnimatedExpandingCard(
               header: (ctx, isExpanded) => Padding(
@@ -330,14 +334,15 @@ class _InternshipsBySchools extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: internships.entries
           .where(
-        (entry) => entry.value.values.any(
-          (internshipList) => internshipList.any(
-            (internship) =>
-                filteredInternshipIds == null ||
-                filteredInternshipIds!.contains(internship.id),
-          ),
-        ),
-      )
+            (entry) => entry.value.values.any(
+              (internshipList) => internshipList.any(
+                (internship) =>
+                    filteredInternshipIds == null ||
+                    filteredInternshipIds!.contains(internship.id),
+              ),
+            ),
+          )
+          .sorted((a, b) => a.key.name.compareTo(b.key.name))
           .map((entry) {
         final school = entry.key;
         final teachers = entry.value;
@@ -386,6 +391,7 @@ class _InternshipsByTeachers extends StatelessWidget {
                       filteredInternshipIds == null ||
                       filteredInternshipIds!.contains(internship.id),
                 ))
+            .sorted((a, b) => a.key.fullName.compareTo(b.key.fullName))
             .map((entry) {
           final teacher = entry.key;
           final internshipsList = entry.value;

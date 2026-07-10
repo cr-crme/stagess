@@ -560,7 +560,7 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
                         const SizedBox(height: 8),
                         _buildActivityTypes(),
                         const SizedBox(height: 16),
-                        Text('Informations légales',
+                        Text('Informations légales pour le crédit d\'impôt',
                             style: Theme.of(context).textTheme.titleSmall),
                         const SizedBox(height: 8),
                         _buildHeadquartersAddress(),

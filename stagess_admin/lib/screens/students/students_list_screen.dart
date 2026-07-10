@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/drawer/main_drawer.dart';
 import 'package:stagess_admin/screens/students/add_student_dialog.dart';
@@ -199,6 +200,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                 studentsByGroups.values.any((students) => students.any(
                     (student) => filteredStudentIds.contains(student.id))));
           })
+          .sorted((a, b) => a.key.name.compareTo(b.key.name))
           .map(
             (schoolBoardEntry) => Padding(
               padding: const EdgeInsets.all(8.0),
@@ -213,22 +215,25 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                 initialExpandedState: true,
                 child: Column(
                   children: [
-                    ...schoolBoardEntry.value.entries.where((schoolEntry) {
-                      if (filteredStudentIds == null) return true;
-                      return schoolEntry.value.values.any((students) =>
-                          students.any((student) =>
-                              filteredStudentIds.contains(student.id)));
-                    }).map(
-                      (schoolEntry) => Column(
-                        children: [
-                          SchoolStudentsCard(
-                            schoolId: schoolEntry.key.id,
-                            studentsByGroups: schoolEntry.value,
-                            filteredStudentIds: filteredStudentIds,
+                    ...schoolBoardEntry.value.entries
+                        .where((schoolEntry) {
+                          if (filteredStudentIds == null) return true;
+                          return schoolEntry.value.values.any((students) =>
+                              students.any((student) =>
+                                  filteredStudentIds.contains(student.id)));
+                        })
+                        .sorted((a, b) => a.key.name.compareTo(b.key.name))
+                        .map(
+                          (schoolEntry) => Column(
+                            children: [
+                              SchoolStudentsCard(
+                                schoolId: schoolEntry.key.id,
+                                studentsByGroups: schoolEntry.value,
+                                filteredStudentIds: filteredStudentIds,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
                   ],
                 ),
               ),
@@ -247,6 +252,7 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
                         (student) =>
                             filteredStudentIds == null ||
                             filteredStudentIds.contains(student.id))))
+                .sorted((a, b) => a.key.name.compareTo(b.key.name))
                 .map(
                   (schoolEntry) => Column(
                     children: [

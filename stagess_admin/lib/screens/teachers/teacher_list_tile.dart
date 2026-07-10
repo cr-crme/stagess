@@ -507,15 +507,14 @@ class TeacherListTileState extends State<TeacherListTile> {
                     ),
                   ],
                 ),
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: TextButton(
-                    onPressed: () => setState(
-                      () => _currentGroups.add(TextEditingController()),
-                    ),
-                    child: const Text('Ajouter un groupe'),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextButton(
+                  onPressed: () => setState(
+                    () => _currentGroups.add(TextEditingController()),
                   ),
+                  // TODO Keep on left
+                  child: const Text('Ajouter un groupe'),
                 ),
               ),
             ],

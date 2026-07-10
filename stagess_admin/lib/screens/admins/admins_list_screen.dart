@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/admins/add_admin_dialog.dart';
 import 'package:stagess_admin/screens/admins/school_admins_card.dart';
@@ -171,6 +172,7 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
           .where((element) => element.value.values.any((admins) =>
               filteredAdminIds == null ||
               admins.any((admin) => filteredAdminIds.contains(admin.id))))
+          .sorted((a, b) => (a.key?.name ?? '').compareTo(b.key?.name ?? ''))
           .map(
             (schoolBoardEntry) => Padding(
               padding: const EdgeInsets.all(8.0),
@@ -189,6 +191,8 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
                         .where((schoolEntry) => schoolEntry.value.any((admin) =>
                             filteredAdminIds == null ||
                             filteredAdminIds.contains(admin.id)))
+                        .sorted((a, b) =>
+                            (a.key?.name ?? '').compareTo(b.key?.name ?? ''))
                         .map(
                           (schoolEntry) => SchoolAdminsCard(
                             schoolId: schoolEntry.key?.id,
@@ -210,6 +214,8 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
                 .where((schoolEntry) => schoolEntry.value.any((admin) =>
                     filteredAdminIds == null ||
                     filteredAdminIds.contains(admin.id))) // Filter schools
+                .sorted(
+                    (a, b) => (a.key?.name ?? '').compareTo(b.key?.name ?? ''))
                 .map((adminEntry) => SchoolAdminsCard(
                       schoolId: adminEntry.key?.id,
                       admins: adminEntry.value,
