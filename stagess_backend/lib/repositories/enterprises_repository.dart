@@ -674,8 +674,8 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       toWait.add(sqlInterface
           .performInsertQuery(tableName: 'enterprise_job_photos', data: {
         'job_id': jobId.serialize(),
-        'photo':
-            ImageHelpers.resizeImage(photo.bytes, width: null, height: 350),
+        'photo': await ImageHelpers.resizeImage(photo.bytes,
+            width: null, height: 350),
       }));
     }
     await Future.wait(toWait);

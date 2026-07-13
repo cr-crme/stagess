@@ -219,10 +219,8 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
 
   Future<void> _fetchData() async {
     if (_isExpanded) {
-      await SchoolBoardsProvider.of(
-        context,
-        listen: false,
-      ).fetchData(id: widget.schoolBoard.id, fields: FetchableFields.all);
+      await SchoolBoardsProvider.of(context, listen: false)
+          .fetchData(id: widget.schoolBoard.id, fields: FetchableFields.all);
       _fetchFullDataCompleter.complete();
     } else {
       await Future.delayed(ConfigurationService.expandingTileDuration);
@@ -430,18 +428,24 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
                   children: [
                     IconButton(
                       onPressed: () async {
-                        final result = await FilePicker.pickFiles();
+                        final result = await FilePicker.pickFiles(
+                            withData: true, type: FileType.image);
                         if (result == null ||
                             result.files.first.bytes == null ||
                             !mounted) {
                           return;
                         }
                         setState(() {
-                          _logoController = ImageHelpers.resizeImage(
-                            result.files.first.bytes!,
-                            width: null,
-                            height: ImageHelpers.logoHeight,
-                          );
+                          _forceDisabled = true;
+                        });
+
+                        _logoController = await ImageHelpers.resizeImage(
+                          result.files.first.bytes!,
+                          width: null,
+                          height: ImageHelpers.logoHeight,
+                        );
+                        setState(() {
+                          _forceDisabled = false;
                         });
                       },
                       icon: Icon(

@@ -40,6 +40,7 @@ School dummySchool({String? id}) => School(
       name: 'Meine Schule',
       address: Address.empty,
       phone: PhoneNumber.empty,
+      logo: Uint8List(0),
     );
 
 Teacher dummyTeacher({

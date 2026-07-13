@@ -155,6 +155,7 @@ CREATE TABLE schools (
     id VARCHAR(36) NOT NULL PRIMARY KEY,
     school_board_id VARCHAR(36) NOT NULL,
     name VARCHAR(200) NOT NULL,
+    logo BLOB,
     FOREIGN KEY (school_board_id) REFERENCES school_boards(id),
     FOREIGN KEY (id) REFERENCES entities(shared_id) ON DELETE CASCADE
 );

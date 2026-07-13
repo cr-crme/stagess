@@ -5,11 +5,11 @@ class ImageHelpers {
   static const logoWidth = 190;
   static const logoHeight = 80;
 
-  static Uint8List resizeImage(
+  static Future<Uint8List> resizeImage(
     Uint8List imageData, {
     required int? width,
     required int? height,
-  }) {
+  }) async {
     // Decode the image from the Uint8List
     Image? image = decodeImage(imageData);
     if (image == null) throw Exception('Failed to decode image');

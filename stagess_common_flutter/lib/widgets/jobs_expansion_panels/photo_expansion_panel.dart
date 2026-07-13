@@ -240,7 +240,7 @@ class _PhotoExpansionPanelState extends State<PhotoExpansionPanel> {
 
     for (XFile? file in images) {
       if (file == null) continue;
-      final Uint8List bytes = ImageHelpers.resizeImage(
+      final Uint8List bytes = await ImageHelpers.resizeImage(
         await (kIsWeb ? file.readAsBytes() : File(file.path).readAsBytes()),
         width: null,
         height: 350,

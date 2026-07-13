@@ -157,6 +157,7 @@ Future<void> _addDummySchoolBoards(SchoolBoardsProvider schoolBoards) async {
         postalCode: 'H1T 1E1',
       ),
       phone: PhoneNumber.fromString('555 123 4567'),
+      logo: Uint8List(0),
     ),
     School(
       name: 'École B',
@@ -169,6 +170,7 @@ Future<void> _addDummySchoolBoards(SchoolBoardsProvider schoolBoards) async {
         longitude: -73.675854,
       ),
       phone: PhoneNumber.fromString('555 123 7654'),
+      logo: Uint8List(0),
     ),
     School(
       name: 'École C',
@@ -181,6 +183,7 @@ Future<void> _addDummySchoolBoards(SchoolBoardsProvider schoolBoards) async {
         longitude: -73.4644863,
       ),
       phone: PhoneNumber.fromString('555 123 7654'),
+      logo: Uint8List(0),
     ),
   ];
   schoolBoards.add(

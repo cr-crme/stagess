@@ -5,9 +5,11 @@ import 'package:logging/logging.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/persons/student_visa.dart';
 import 'package:stagess_common/services/job_data_file_service.dart'
     as job_service;
+import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/widgets/pdf_widgets/pdf_bullet_points.dart';
 
 final _logger = Logger('GenerateVisaPdf');
@@ -22,8 +24,19 @@ final _bullets = pw.Container(
 );
 
 class _VisaPdfContext {
-  static Future<_VisaPdfContext> create(PdfPageFormat format,
+  static Future<_VisaPdfContext> create(
+      PdfPageFormat format, BuildContext context,
       {required StudentVisa studentVisa}) async {
+    // Fetch the school boards and schools logo
+    final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
+    if (schoolBoards.currentSchool?.logo.isEmpty ?? true) {
+      await Future.wait([
+        ...schoolBoards.map(
+          (e) => schoolBoards.fetchData(id: e.id, fields: FetchableFields.all),
+        )
+      ]);
+    }
+
     final frontPageTheme = await _buildPageTheme(format,
         'packages/stagess_common_flutter/assets/visa_background_front.svg');
     final leftPageTheme = await _buildPageTheme(format,
@@ -82,7 +95,7 @@ Future<Uint8List> generateVisaPdf(BuildContext context, PdfPageFormat format,
 
   final document = pw.Document();
   final pdfContext =
-      await _VisaPdfContext.create(format, studentVisa: studentVisa);
+      await _VisaPdfContext.create(format, context, studentVisa: studentVisa);
 
   document.addPage(_buildFirstPage(pdfContext));
   document.addPage(_buildSecondPage(pdfContext));

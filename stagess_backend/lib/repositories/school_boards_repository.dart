@@ -203,7 +203,7 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
       final id = schoolBoard['id'].toString();
 
       schoolBoard['logo'] =
-          Uint8List.fromList((schoolBoard['logo'] as Blob).toBytes());
+          Uint8List.fromList((schoolBoard['logo'] as Blob?)?.toBytes() ?? []);
 
       final schools = await sqlInterface.performSelectQuery(
         user: user,
@@ -225,6 +225,9 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
           filters: {'entity_id': schoolId},
         );
         school['phone'] = phone.isNotEmpty ? phone.first : null;
+
+        school['logo'] =
+            Uint8List.fromList((school['logo'] as Blob?)?.toBytes() ?? []);
       }
       schoolBoard['schools'] = schools;
 
@@ -250,7 +253,7 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
       'name': schoolBoard.name,
       'logo': schoolBoard.logo.isEmpty
           ? schoolBoard.logo
-          : ImageHelpers.resizeImage(schoolBoard.logo,
+          : await ImageHelpers.resizeImage(schoolBoard.logo,
               width: null, height: ImageHelpers.logoHeight),
       'cnesst_number': schoolBoard.cnesstNumber
     });
@@ -274,7 +277,7 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
     if (differences.contains('logo')) {
       toUpdate['logo'] = schoolBoard.logo.isEmpty
           ? schoolBoard.logo
-          : ImageHelpers.resizeImage(schoolBoard.logo,
+          : await ImageHelpers.resizeImage(schoolBoard.logo,
               width: null, height: ImageHelpers.logoHeight);
     }
 
@@ -295,6 +298,10 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
       'id': school.id.serialize(),
       'school_board_id': schoolBoard.id.serialize(),
       'name': school.name.serialize(),
+      'logo': school.logo.isEmpty
+          ? school.logo
+          : await ImageHelpers.resizeImage(school.logo,
+              width: null, height: ImageHelpers.logoHeight),
     });
 
     await sqlInterface.performInsertAddress(
@@ -326,6 +333,18 @@ class MySqlSchoolBoardsRepository extends SchoolBoardsRepository {
       await sqlInterface.performUpdatePhoneNumber(
         phoneNumber: school.phone,
         previous: previous.phone,
+      );
+    }
+    if (toUpdate.contains('logo')) {
+      await sqlInterface.performUpdateQuery(
+        tableName: 'schools',
+        filters: {'id': school.id.serialize()},
+        data: {
+          'logo': school.logo.isEmpty
+              ? school.logo
+              : await ImageHelpers.resizeImage(school.logo,
+                  width: null, height: ImageHelpers.logoHeight),
+        },
       );
     }
   }

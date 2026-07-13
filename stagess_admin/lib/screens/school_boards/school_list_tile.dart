@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/school_boards/confirm_delete_school_dialog.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
@@ -5,6 +8,7 @@ import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/school_boards/school.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
+import 'package:stagess_common/services/image_helpers.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
@@ -71,6 +75,10 @@ class SchoolListTileState extends State<SchoolListTile> {
     text: widget.school.phone.toString(),
   );
 
+  late Uint8List _logoController = Uint8List.fromList([
+    ...widget.schoolBoard.logo,
+  ]);
+
   School get editedSchool => widget.school.copyWith(
         name: _nameController.text,
         address: _addressController.address?.isEmpty ?? true
@@ -78,6 +86,7 @@ class SchoolListTileState extends State<SchoolListTile> {
             : _addressController.address!,
         phone: PhoneNumber.fromString(_phoneController.text,
             id: widget.school.phone.id),
+        logo: _logoController,
       );
 
   @override
@@ -215,6 +224,7 @@ class SchoolListTileState extends State<SchoolListTile> {
     _addressController.setAddress(widget.school.address,
         forceIsValid: widget.school.address.isNotEmpty);
     _phoneController.text = widget.school.phone.toString();
+    _logoController = Uint8List.fromList([...widget.school.logo]);
   }
 
   @override
@@ -297,7 +307,7 @@ class SchoolListTileState extends State<SchoolListTile> {
             _buildName(),
             _buildAddress(),
             _buildPhone(),
-            // TODO Add logo for school
+            _buildLogo(),
           ],
         ),
       ),
@@ -346,6 +356,97 @@ class SchoolListTileState extends State<SchoolListTile> {
         controller: _phoneController,
         isMandatory: false,
         enabled: _isEditing,
+      ),
+    );
+  }
+
+  Widget _buildLogo() {
+    return Padding(
+      padding: const EdgeInsets.only(right: 12.0, top: 8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Logo de l\'école'),
+          _logoController.isEmpty
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12.0),
+                    child: Container(
+                      width: ImageHelpers.logoWidth.toDouble(),
+                      height: ImageHelpers.logoHeight.toDouble(),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black),
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: Center(
+                        child: const Text(
+                          'Aucun logo n\'a été téléversé',
+                          style: TextStyle(
+                            fontStyle: FontStyle.italic,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              : Center(child: Image.memory(_logoController)),
+          if (_isEditing)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      onPressed: _forceDisabled
+                          ? null
+                          : () async {
+                              final result = await FilePicker.pickFiles(
+                                  withData: true, type: FileType.image);
+                              if (result == null ||
+                                  result.files.first.bytes == null ||
+                                  !mounted) {
+                                return;
+                              }
+                              setState(() {
+                                _forceDisabled = true;
+                              });
+                              _logoController = await ImageHelpers.resizeImage(
+                                result.files.first.bytes!,
+                                width: null,
+                                height: ImageHelpers.logoHeight,
+                              );
+                              setState(() {
+                                _forceDisabled = false;
+                              });
+                            },
+                      icon: Icon(
+                        Icons.upload_file_rounded,
+                        color: _forceDisabled
+                            ? Colors.grey
+                            : Theme.of(context).primaryColor,
+                      ),
+                      tooltip: 'Téléverser un logo',
+                    ),
+                    if (_logoController.isNotEmpty)
+                      IconButton(
+                        onPressed: _forceDisabled
+                            ? null
+                            : () {
+                                setState(() {
+                                  _logoController = Uint8List(0);
+                                });
+                              },
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        tooltip: 'Supprimer le logo',
+                      ),
+                  ],
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

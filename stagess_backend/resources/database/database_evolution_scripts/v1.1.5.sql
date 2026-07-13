@@ -5,6 +5,9 @@ START TRANSACTION;
 /*** ADMIN SECTION ***/
 /*********************/
 
+ALTER TABLE schools
+    ADD COLUMN logo BLOB;
+
 ALTER TABLE teachers
     ADD COLUMN access_level INT NOT NULL DEFAULT 2;
 

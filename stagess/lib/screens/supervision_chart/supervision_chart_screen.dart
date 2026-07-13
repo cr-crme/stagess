@@ -22,7 +22,6 @@ import 'package:stagess_common_flutter/helpers/students_extension.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
 import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
-import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
@@ -34,7 +33,6 @@ class SupervisionChart extends StatelessWidget {
   static const route = '/supervision';
 
   Future<void> _fetchInfo(BuildContext context) async {
-    final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
     final teachers = TeachersProvider.of(context, listen: false);
     final students = StudentsProvider.of(context, listen: false);
     final internships = InternshipsProvider.of(context, listen: false);
@@ -69,9 +67,6 @@ class SupervisionChart extends StatelessWidget {
     }
 
     await Future.wait([
-      ...schoolBoards.map(
-        (e) => schoolBoards.fetchData(id: e.id, fields: FetchableFields.all),
-      ),
       ...teachersToFetch.map(
         (e) => teachers.fetchData(
           id: e.id,

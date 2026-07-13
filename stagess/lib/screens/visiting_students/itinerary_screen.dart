@@ -7,6 +7,7 @@ import 'package:stagess/screens/supervision_chart/common/internship_meta_data.da
 import 'package:stagess/screens/visiting_students/itinerary_pdf_template.dart';
 import 'package:stagess/screens/visiting_students/widgets/routing_map.dart';
 import 'package:stagess/screens/visiting_students/widgets/waypoint_card.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/itineraries/itinerary.dart';
 import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/itineraries/waypoint.dart';
@@ -67,13 +68,16 @@ class _ItineraryMainScreenState extends State<ItineraryMainScreen>
 
     // Add the school as the first waypoint
     _waypoints.clear();
-    _waypoints.add(
-      Waypoint(
-        title: 'École',
-        address: school.address,
-        priority: VisitingPriority.school,
-      ),
-    );
+    final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
+    if (schoolBoards.currentSchool?.address.isNotEmpty ?? false) {
+      _waypoints.add(
+        Waypoint(
+          title: 'École',
+          address: school.address,
+          priority: VisitingPriority.school,
+        ),
+      );
+    }
 
     // Get the students from the registered students, but we copy them so
     // we don't mess with them
@@ -267,6 +271,16 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
 
     // Select the last itinerary used if exists, otherwise select the first one
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
+      if (schoolBoards.currentSchool?.address.isEmpty ?? true) {
+        await Future.wait([
+          ...schoolBoards.map(
+            (e) =>
+                schoolBoards.fetchData(id: e.id, fields: FetchableFields.all),
+          ),
+        ]);
+      }
+
       if (_teachersProvider.currentTeacher!.itineraries.isEmpty) {
         await _onSelectedItinerary(_newItineraryName);
         await _saveItinerary();
@@ -429,7 +443,9 @@ class _ItineraryScreenState extends State<ItineraryScreen> {
           width: constraints.maxWidth,
           height: MediaQuery.of(context).size.height * 0.5,
           child: widget.waypoints.isEmpty
-              ? Center(child: CircularProgressIndicator())
+              ? Center(
+                  child: CircularProgressIndicator(
+                      color: Theme.of(context).primaryColor))
               : Stack(
                   children: [
                     RoutingMap(

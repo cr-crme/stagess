@@ -46,21 +46,6 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen>
 
   void _search() => setState(() => _withSearchBar = !_withSearchBar);
 
-  Future<void> _fetchSchool(BuildContext context) async {
-    final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
-    if (schoolBoards.currentSchool?.address.isNotEmpty ?? false) {
-      // No need to setState as we don't act on this information in the build method
-      return;
-    }
-
-    await Future.wait([
-      ...schoolBoards.map(
-        (e) => schoolBoards.fetchData(id: e.id, fields: FetchableFields.all),
-      )
-    ]);
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     _logger.finer('Building EnterprisesListScreen');
@@ -69,7 +54,6 @@ class _EnterprisesListScreenState extends State<EnterprisesListScreen>
     // screen that is loaded after the login, but school resources may not be loaded
     // yet in the provider.
     SchoolBoardsProvider.of(context, listen: true);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _fetchSchool(context));
 
     final appBar = ResponsiveService.appBarOf(
       context,
@@ -414,6 +398,12 @@ class _EnterprisesByMapState extends State<_EnterprisesByMap>
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _fetchSchool(context));
+  }
+
+  @override
   Widget build(BuildContext context) {
     _logger.finer('Building _EnterprisesByMap');
     super.build(context); // Required for AutomaticKeepAliveClientMixin
@@ -421,17 +411,38 @@ class _EnterprisesByMapState extends State<_EnterprisesByMap>
     Map<Enterprise, Waypoint> locations = _fetchEnterprisesCoordinates(context);
     final waypoint = locations[locations.keys.first]!;
 
+    final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
     return SingleChildScrollView(
         physics: const ScrollPhysics(),
         child: SizedBox(
           height: MediaQuery.of(context).size.height - 150,
-          child: CachedFlutterMap(
-            options:
-                MapOptions(initialCenter: waypoint.toLatLng(), initialZoom: 14),
-            markersOverlayBuilder: (context) => MarkerLayer(
-              markers: _latlngToMarkers(context, locations),
-            ),
-          ),
+          child: schoolBoards.currentSchool?.address.isEmpty ?? true
+              ? Center(
+                  child: CircularProgressIndicator(
+                      color: Theme.of(context).primaryColor),
+                )
+              : CachedFlutterMap(
+                  options: MapOptions(
+                      initialCenter: waypoint.toLatLng(), initialZoom: 14),
+                  markersOverlayBuilder: (context) => MarkerLayer(
+                    markers: _latlngToMarkers(context, locations),
+                  ),
+                ),
         ));
+  }
+
+  Future<void> _fetchSchool(BuildContext context) async {
+    final schoolBoards = SchoolBoardsProvider.of(context, listen: false);
+    if (schoolBoards.currentSchool?.address.isNotEmpty ?? false) {
+      // No need to setState as we don't act on this information in the build method
+      return;
+    }
+
+    await Future.wait([
+      ...schoolBoards.map(
+        (e) => schoolBoards.fetchData(id: e.id, fields: FetchableFields.all),
+      )
+    ]);
+    setState(() {});
   }
 }
