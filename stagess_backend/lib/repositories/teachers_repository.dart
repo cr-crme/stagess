@@ -25,7 +25,6 @@ abstract class TeachersRepository extends RepositoryAbstract {
       UserIsVerified(user: user),
       ...teachers.values
           .map((e) => UserIsFromSameSchoolBoard(user: user, item: e)),
-      ...teachers.values.map((e) => UserIsFromSameSchool(user: user, item: e)),
     ]).validate();
 
     return RepositoryResponse(
@@ -45,7 +44,6 @@ abstract class TeachersRepository extends RepositoryAbstract {
       UserIsVerified(user: user),
       HasData(item: teacher),
       UserIsFromSameSchoolBoard(user: user, item: teacher),
-      UserIsFromSameSchool(user: user, item: teacher),
     ]).validate();
 
     return RepositoryResponse(data: teacher!.serializeWithFields(fields));
@@ -196,12 +194,8 @@ class MySqlTeachersRepository extends TeachersRepository {
     required DatabaseUser user,
   }) async {
     final schoolFilters = ({
-      'school_board_id': user.accessLevel < AccessLevel.superAdmin
-          ? user.schoolBoardId!
-          : null,
-      'school_id': user.accessLevel < AccessLevel.schoolBoardAdmin
-          ? user.schoolId!
-          : null,
+      'school_board_id':
+          user.accessLevel < AccessLevel.superAdmin ? user.schoolBoardId! : null
     }..removeWhere((key, value) => value == null))
         .cast<String, String>();
 

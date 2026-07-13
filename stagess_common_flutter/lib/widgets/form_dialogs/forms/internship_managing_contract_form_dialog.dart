@@ -40,8 +40,24 @@ Future<Internship?> showManagingContractFormDialog(
   BuildContext context, {
   required bool isNewContract,
   required Internship internship,
+  Specialization? forceMainSpecialization,
   String? evaluationId,
 }) async {
+  if (!isNewContract) {
+    final currentSpecializationId =
+        internship.currentContract?.specializationId;
+    if (forceMainSpecialization == null) {
+      forceMainSpecialization =
+          ActivitySectorsService.specializationOrNull(currentSpecializationId);
+    } else {
+      // Do a sanity check
+      if (currentSpecializationId != forceMainSpecialization.id) {
+        throw Exception(
+            'The provided forceMainSpecialization does not match the specialization of the current contract.');
+      }
+    }
+  }
+
   return await showDialog<Internship>(
     context: context,
     barrierDismissible: false,
@@ -52,6 +68,7 @@ Future<Internship?> showManagingContractFormDialog(
             rootContext: context,
             isNewContract: isNewContract,
             internship: internship,
+            forceMainSpecialization: forceMainSpecialization,
             contractId: evaluationId,
           ),
         ),
@@ -123,10 +140,13 @@ class InternshipContractFormController {
     required this.canModify,
     required this.internship,
     required this.contractId,
+    Specialization? forceMainSpecialization,
   })  : _studentController =
             _studentPickerControllerOf(context, internship: internship),
         _primaryJobController = _jobListControllerOf(context,
-            internship: internship, isEditing: isNewContract),
+            internship: internship,
+            isEditing: isNewContract,
+            forceSpecialization: forceMainSpecialization),
         _extraJobControllers = (contractId == null
                     ? (internship.currentContract)
                     : internship.contracts
@@ -160,6 +180,7 @@ class InternshipContractFormController {
     required bool canModify,
     required Internship internship,
     required String contractId,
+    Specialization? forceMainSpecialization,
   }) {
     InternshipContract contract =
         internship.contracts.firstWhereOrNull((e) => e.id == contractId) ??
@@ -171,6 +192,7 @@ class InternshipContractFormController {
       canModify: canModify,
       internship: internship,
       contractId: contractId,
+      forceMainSpecialization: forceMainSpecialization,
     );
 
     controller.creationDate = contract.date;
@@ -224,12 +246,14 @@ class _InternshipDetailsScreen extends StatefulWidget {
     required this.isNewContract,
     required this.internship,
     required this.contractId,
+    this.forceMainSpecialization,
   });
 
   final BuildContext rootContext;
   final bool isNewContract;
   final Internship internship;
   final String? contractId;
+  final Specialization? forceMainSpecialization;
 
   @override
   State<_InternshipDetailsScreen> createState() =>
@@ -247,6 +271,7 @@ class _InternshipDetailsScreenState extends State<_InternshipDetailsScreen> {
           canModify: true,
           internship: widget.internship,
           contractId: widget.contractId,
+          forceMainSpecialization: widget.forceMainSpecialization,
         )
       : InternshipContractFormController.fromInternshipId(
           context,
@@ -254,6 +279,7 @@ class _InternshipDetailsScreenState extends State<_InternshipDetailsScreen> {
           canModify: false,
           internship: widget.internship,
           contractId: widget.contractId!,
+          forceMainSpecialization: widget.forceMainSpecialization,
         );
 
   void _cancel() async {
@@ -1073,7 +1099,9 @@ StudentPickerController _studentPickerControllerOf(BuildContext context,
 }
 
 EnterpriseJobListController _jobListControllerOf(BuildContext context,
-    {required Internship internship, required bool isEditing}) {
+    {required Internship internship,
+    required bool isEditing,
+    Specialization? forceSpecialization}) {
   final enterprise = EnterprisesProvider.of(context, listen: false)
       .fromIdOrNull(internship.enterpriseId);
 
@@ -1089,7 +1117,9 @@ EnterpriseJobListController _jobListControllerOf(BuildContext context,
     context: context,
     enterpriseStatus: EnterpriseStatus.active,
     job: null,
-    specializationWhiteList: jobs?.map((job) => job.specialization).toList(),
+    specializationWhiteList: forceSpecialization == null
+        ? jobs?.map((job) => job.specialization).toList()
+        : [forceSpecialization],
   );
 }
 

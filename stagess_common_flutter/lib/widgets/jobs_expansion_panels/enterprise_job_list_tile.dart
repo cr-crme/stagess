@@ -377,7 +377,6 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
               _availableSpecialization.length != 1 &&
               widget.canChangeSpecialization,
           decoration: InputDecoration(
-            // TODO Autoselect from the pages
             labelText: '* Métier semi-spécialisé',
             labelStyle: TextStyle(color: Colors.black),
             hintText: 'Saisir nom ou n° de métier',

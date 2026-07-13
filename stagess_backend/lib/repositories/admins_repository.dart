@@ -25,10 +25,6 @@ abstract class AdminsRepository extends RepositoryAbstract {
       HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.teacher),
       ...admins.values
           .map((e) => UserIsFromSameSchoolBoard(user: user, item: e)),
-      ...admins.values.map((e) => OrPolicy([
-            UserIsFromSameSchool(user: user, item: e),
-            NotPolicy(HasSchool(item: e)),
-          ])),
     ]).validate();
 
     return RepositoryResponse(
@@ -49,11 +45,9 @@ abstract class AdminsRepository extends RepositoryAbstract {
       HasMinimumAccessLevel(user: user, minimumLevel: AccessLevel.teacher),
       HasData(item: admin),
       UserIsFromSameSchoolBoard(user: user, item: admin),
-      if (admin!.schoolId.isNotEmpty)
-        UserIsFromSameSchool(user: user, item: admin),
     ]).validate();
 
-    return RepositoryResponse(data: admin.serializeWithFields(fields));
+    return RepositoryResponse(data: admin!.serializeWithFields(fields));
   }
 
   @override
@@ -231,9 +225,6 @@ class MySqlAdminsRepository extends AdminsRepository {
     final schoolFilters = ({
       'school_board_id': user.accessLevel < AccessLevel.superAdmin
           ? [user.schoolBoardId!]
-          : null,
-      'school_id': user.accessLevel < AccessLevel.schoolBoardAdmin
-          ? ['', user.schoolId!]
           : null,
     }..removeWhere((key, value) => value == null))
         .cast<String, List<String>>();

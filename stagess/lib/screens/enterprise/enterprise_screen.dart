@@ -208,6 +208,7 @@ class _EnterpriseScreenInternalState extends State<_EnterpriseScreenInternal>
       context,
       isNewContract: true,
       internship: Internship.empty.copyWith(enterpriseId: enterprise.id),
+      forceMainSpecialization: specialization,
     );
     if (internship == null || !mounted) return;
 

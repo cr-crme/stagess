@@ -32,7 +32,7 @@ class InternshipManagingContract extends StatelessWidget {
             ? 'Afficher les contrats du\u00a0: '
             : 'Afficher le contrat du\u00a0: ',
         internshipId: internshipId,
-        evaluateButtonText: 'Évaluer l\'entreprise',
+        evaluateButtonText: '', // This never appears
         reevaluateButtonText: 'Modifier le contrat',
         evaluations: contracts,
         onClickedNewEvaluation: () => showInternshipEvaluationFormDialog(context,

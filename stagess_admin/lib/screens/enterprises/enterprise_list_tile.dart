@@ -283,9 +283,8 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       // Finish editing
       final newEnterprise = editedEnterprise;
       if (newEnterprise.getDifference(widget.enterprise).isNotEmpty) {
-        final isSuccess = await enterprises.replaceWithConfirmation(
-          newEnterprise,
-        );
+        final isSuccess =
+            await enterprises.replaceWithConfirmation(newEnterprise);
         if (mounted) {
           showSnackBar(
             context,

@@ -142,7 +142,6 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
             'headquarters_address',
             'neq',
           ],
-          // TODO fix teacherAdmin can't remove jobs
         },
         blackList: {
           AccessLevel.teacherAdmin: ['id', 'school_board_id', 'school_id'],
@@ -155,6 +154,16 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
               (item.contact.id != previousItem?.contact.id)) {
             throw InvalidRequestException(
                 'Cannot update the contact id of an enterprise');
+          }
+
+          // Check for removed jobs (which is only allowed for teacherAdmin and above)
+          for (final job in previousItem?.jobs ?? JobList()) {
+            if (!item.jobs.map((e) => e.id).contains(job.id)) {
+              if (user.accessLevel < AccessLevel.teacherAdmin) {
+                throw InvalidRequestException(
+                    'You do not have permission to remove jobs from this enterprise');
+              }
+            }
           }
 
           for (final job in item.jobs) {
@@ -178,6 +187,11 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
             if (differences.contains('enterprise_id')) {
               throw InvalidRequestException(
                   'Cannot update the enterprise id of a job');
+            }
+
+            if (differences.contains('specialization_id')) {
+              throw InvalidRequestException(
+                  'Cannot update the specialization of a job');
             }
 
             if (differencesNoId.contains('comments')) {
@@ -787,13 +801,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     // Prevent from removing a job from an enterprise
     for (final job in previous.jobs) {
       if (!enterprise.jobs.map((e) => e.id).contains(job.id)) {
-        if (user.accessLevel < AccessLevel.schoolAdmin) {
-          _logger.warning(
-              'User ${user.userId} tried to remove job (${job.id}) from enterprise '
-              '(${enterprise.id}) but does not have permission, skipping');
-          continue;
-        }
-
         await _deleteInternshipsFromJob(job.id,
             user: user,
             internshipsRepository: internshipsRepository,
