@@ -1,12 +1,12 @@
 import 'package:enhanced_containers_foundation/enhanced_containers_foundation.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
-import 'package:stagess_common/models/generic/selectable_items.dart';
+import 'package:stagess_common/models/generic/repeatable_items.dart';
 import 'package:stagess_common/models/generic/serializable_elements.dart';
 
-export 'package:stagess_common/models/generic/selectable_items.dart';
+export 'package:stagess_common/models/generic/repeatable_items.dart';
 
-class ExperiencesAndAptitudes extends SelectableItem {
+class ExperiencesAndAptitudes extends RepeatableItem {
   final String text;
 
   ExperiencesAndAptitudes({
@@ -24,7 +24,7 @@ class ExperiencesAndAptitudes extends SelectableItem {
   Map<String, dynamic> serializedMap() =>
       super.serializedMap()..addAll({'text': text.serialize()});
 
-  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+  static FetchableFields get fetchableFields => RepeatableItem.fetchableFields
     ..addAll(FetchableFields.reference({
       'text': FetchableFields.optional,
     }));
@@ -43,7 +43,7 @@ class ExperiencesAndAptitudes extends SelectableItem {
       );
 }
 
-class AttestationsAndMentions extends SelectableItem {
+class AttestationsAndMentions extends RepeatableItem {
   final String text;
 
   AttestationsAndMentions({
@@ -61,7 +61,7 @@ class AttestationsAndMentions extends SelectableItem {
   Map<String, dynamic> serializedMap() =>
       super.serializedMap()..addAll({'text': text.serialize()});
 
-  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+  static FetchableFields get fetchableFields => RepeatableItem.fetchableFields
     ..addAll(FetchableFields.reference({
       'text': FetchableFields.optional,
     }));
@@ -80,7 +80,7 @@ class AttestationsAndMentions extends SelectableItem {
       );
 }
 
-class SstTraining extends SelectableItem {
+class SstTraining extends RepeatableItem {
   final String trainingId;
   bool isHidden;
   bool get isNotHidden => !isHidden;
@@ -105,7 +105,7 @@ class SstTraining extends SelectableItem {
       'is_hidden': isHidden.serialize(),
     });
 
-  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+  static FetchableFields get fetchableFields => RepeatableItem.fetchableFields
     ..addAll(FetchableFields.reference({
       'training_id': FetchableFields.optional,
       'is_hidden': FetchableFields.optional,
@@ -156,7 +156,7 @@ enum CertificateType {
       switch (this) { fpt => 'FPT', fms => 'FMS', none => '__NONE__' };
 }
 
-class Certificate extends SelectableItem {
+class Certificate extends RepeatableItem {
   final CertificateType certificateType;
   final int? year;
   final String? specializationId;
@@ -185,7 +185,7 @@ class Certificate extends SelectableItem {
       'year': year?.serialize(),
     });
 
-  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+  static FetchableFields get fetchableFields => RepeatableItem.fetchableFields
     ..addAll(FetchableFields.reference({
       'certificate_type': FetchableFields.optional,
       'specialization_id': FetchableFields.optional,
@@ -211,7 +211,7 @@ class Certificate extends SelectableItem {
   }
 }
 
-class Skill extends SelectableItem {
+class Skill extends RepeatableItem {
   final String skillId;
 
   Skill({
@@ -229,7 +229,7 @@ class Skill extends SelectableItem {
   Map<String, dynamic> serializedMap() =>
       super.serializedMap()..addAll({'skill_id': skillId.serialize()});
 
-  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+  static FetchableFields get fetchableFields => RepeatableItem.fetchableFields
     ..addAll(FetchableFields.reference({
       'skill_id': FetchableFields.optional,
     }));
@@ -248,7 +248,7 @@ class Skill extends SelectableItem {
       );
 }
 
-class Reference extends SelectableItem {
+class Reference extends RepeatableItem {
   final String referee;
   final String enterprise;
   final PhoneNumber phoneNumber;
@@ -284,7 +284,7 @@ class Reference extends SelectableItem {
       'supplementary_info': supplementaryInfo.serialize(),
     });
 
-  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+  static FetchableFields get fetchableFields => RepeatableItem.fetchableFields
     ..addAll(FetchableFields.reference({
       'referee': FetchableFields.optional,
       'enterprise': FetchableFields.optional,
@@ -316,7 +316,7 @@ class Reference extends SelectableItem {
   }
 }
 
-class Attitude extends SelectableItem {
+class Attitude extends RepeatableItem {
   final String attitudeId;
 
   Attitude({
@@ -334,7 +334,7 @@ class Attitude extends SelectableItem {
   Map<String, dynamic> serializedMap() =>
       super.serializedMap()..addAll({'attitude_id': attitudeId.serialize()});
 
-  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+  static FetchableFields get fetchableFields => RepeatableItem.fetchableFields
     ..addAll(FetchableFields.reference({
       'attitude_id': FetchableFields.optional,
     }));
@@ -366,7 +366,7 @@ class Attitude extends SelectableItem {
       );
 }
 
-class SuccessConditions extends SelectableItem {
+class SuccessConditions extends RepeatableItem {
   final String text;
 
   SuccessConditions({
@@ -384,7 +384,7 @@ class SuccessConditions extends SelectableItem {
   Map<String, dynamic> serializedMap() =>
       super.serializedMap()..addAll({'text': text.serialize()});
 
-  static FetchableFields get fetchableFields => SelectableItem.fetchableFields
+  static FetchableFields get fetchableFields => RepeatableItem.fetchableFields
     ..addAll(FetchableFields.reference({
       'text': FetchableFields.optional,
     }));

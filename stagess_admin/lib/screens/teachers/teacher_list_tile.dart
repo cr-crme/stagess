@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:stagess_admin/screens/teachers/confirm_delete_teacher_dialog.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
@@ -18,6 +17,29 @@ import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
+import 'package:stagess_common_flutter/widgets/widget_repeater.dart';
+
+class _StudentGroup extends RepeatableItem {
+  final String group;
+
+  static List<_StudentGroup> optionsFromTeacher(Teacher teacher) {
+    return teacher.groups.map((group) => _StudentGroup(group: group)).toList();
+  }
+
+  _StudentGroup({super.id, required this.group});
+
+  @override
+  _StudentGroup copyWith({
+    int? index,
+    bool? isSelected,
+    String? group,
+  }) {
+    return _StudentGroup(
+      id: id,
+      group: group ?? this.group,
+    );
+  }
+}
 
 class TeacherListTile extends StatefulWidget {
   const TeacherListTile({
@@ -55,15 +77,8 @@ class TeacherListTileState extends State<TeacherListTile> {
     _lastNameController.dispose();
     _phoneController.dispose();
     _emailController.dispose();
-    _disposeCurrentGroupsControllers();
+    _groupController.dispose();
     super.dispose();
-  }
-
-  void _disposeCurrentGroupsControllers() {
-    for (var controller in _currentGroups) {
-      controller.dispose();
-    }
-    _currentGroups.clear();
   }
 
   var _fetchFullDataCompleter = Completer<void>();
@@ -81,13 +96,8 @@ class TeacherListTileState extends State<TeacherListTile> {
   late final _lastNameController = TextEditingController(
     text: widget.teacher.lastName,
   );
-  final List<TextEditingController> _currentGroups = [];
-  void _fillCurrentGroupsControllers() {
-    _currentGroups.clear();
-    for (var group in widget.teacher.groups) {
-      _currentGroups.add(TextEditingController(text: group));
-    }
-  }
+  late final _groupController = WidgetRepeaterController<_StudentGroup>(
+      options: _StudentGroup.optionsFromTeacher(widget.teacher));
 
   late final _phoneController = TextEditingController(
     text: widget.teacher.phone.toString(),
@@ -106,17 +116,13 @@ class TeacherListTileState extends State<TeacherListTile> {
         phone: PhoneNumber.fromString(_phoneController.text,
             id: widget.teacher.phone.id),
         email: _emailController.text,
-        groups: _currentGroups
-            .map((e) => e.text)
-            .where((e) => e.isNotEmpty)
-            .toList(),
+        groups: _groupController.options.map((e) => e.group).toList(),
         accessLevel: _accessLevelController,
       );
 
   @override
   void initState() {
     super.initState();
-    _fillCurrentGroupsControllers();
     if (widget.forceEditingMode) {
       _fetchFullDataCompleter.complete();
       _onClickedEditing();
@@ -246,8 +252,10 @@ class TeacherListTileState extends State<TeacherListTile> {
     _emailController.text = widget.teacher.email.toString();
     _accessLevelController = widget.teacher.accessLevel;
 
-    _disposeCurrentGroupsControllers();
-    _fillCurrentGroupsControllers();
+    _groupController.clear();
+    for (final group in _StudentGroup.optionsFromTeacher(widget.teacher)) {
+      _groupController.add(group);
+    }
   }
 
   Future<void> _fetchData() async {
@@ -477,49 +485,24 @@ class TeacherListTileState extends State<TeacherListTile> {
     }
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (_isEditing)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              for (int i = 0; i < _currentGroups.length; i++)
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: _currentGroups[i],
-                        keyboardType: TextInputType.number,
-                        maxLength: 50,
-                        // TODO Use the add (as visa Reference)
-                        decoration: i == 0
-                            ? const InputDecoration(labelText: 'Groupes')
-                            : null,
-                        inputFormatters: [
-                          FilteringTextInputFormatter.digitsOnly,
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () =>
-                          setState(() => _currentGroups.removeAt(i)),
-                      icon: Icon(Icons.delete, color: Colors.red),
-                    ),
-                  ],
-                ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: TextButton(
-                  onPressed: () => setState(
-                    () => _currentGroups.add(TextEditingController()),
-                  ),
-                  // TODO Keep on left
-                  child: const Text('Ajouter un groupe'),
-                ),
-              ),
-            ],
+        Text('Groupes :'),
+        SizedBox(
+          width: 250,
+          child: TextFormRepeater(
+            controller: _groupController,
+            enabled: _isEditing,
+            minOptionCount: 0,
+            maxLength: 50,
+            maxLines: 1,
+            hasCheckboxes: false,
+            newItemBuilder: (index) => _StudentGroup(group: ''),
+            updateItemBuilder: (item, text) => item.copyWith(group: text),
+            itemToText: (item) => item.group,
           ),
-        if (!_isEditing) Text('Groupes : ${widget.teacher.groups.join(', ')}'),
+        ),
       ],
     );
   }

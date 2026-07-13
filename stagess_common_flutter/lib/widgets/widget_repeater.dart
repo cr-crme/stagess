@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:stagess_common/models/generic/selectable_items.dart';
+import 'package:stagess_common/models/generic/repeatable_items.dart';
 
-export 'package:stagess_common/models/generic/selectable_items.dart';
+export 'package:stagess_common/models/generic/repeatable_items.dart';
 
-class RepeaterController<T extends SelectableItem> {
+class WidgetRepeaterController<T extends RepeatableItem> {
   final List<T> _options;
 
-  RepeaterController({
+  WidgetRepeaterController({
     List<T>? options,
   }) : _options = options ?? [];
 
@@ -81,9 +81,8 @@ class RepeaterController<T extends SelectableItem> {
   }
 }
 
-class SelectableTextFormRepeater<T extends SelectableItem>
-    extends StatelessWidget {
-  const SelectableTextFormRepeater({
+class TextFormRepeater<T extends RepeatableItem> extends StatelessWidget {
+  const TextFormRepeater({
     super.key,
     required this.controller,
     this.enabled = true,
@@ -93,10 +92,12 @@ class SelectableTextFormRepeater<T extends SelectableItem>
     required this.newItemBuilder,
     required this.updateItemBuilder,
     required this.itemToText,
+    this.hasCheckboxes = true,
     this.maxLength,
+    this.maxLines = 5,
   });
 
-  final RepeaterController<T>? controller;
+  final WidgetRepeaterController<T>? controller;
   final bool enabled;
   final int minOptionCount;
   final int? maxOptionCount;
@@ -104,13 +105,16 @@ class SelectableTextFormRepeater<T extends SelectableItem>
   final T Function(int index) newItemBuilder;
   final T Function(T item, String text) updateItemBuilder;
   final String Function(T item) itemToText;
+  final bool hasCheckboxes;
   final int? maxLength;
+  final int maxLines;
 
   @override
   Widget build(BuildContext context) {
-    return ContainerRepeater<T>(
+    return WidgetRepeater<T>(
       controller: controller,
       enabled: enabled,
+      hasCheckboxes: hasCheckboxes,
       minOptionCount: minOptionCount,
       maxOptionCount: maxOptionCount,
       maxSelectedOptions: maxSelectedOptions,
@@ -127,7 +131,7 @@ class SelectableTextFormRepeater<T extends SelectableItem>
             initialValue: itemToText(item),
             enabled: enabled,
             maxLength: maxLength,
-            maxLines: 5,
+            maxLines: maxLines,
             style: const TextStyle(color: Colors.black),
             onChanged: (value) => onUpdated(updateItemBuilder(item, value)),
           ),
@@ -137,8 +141,8 @@ class SelectableTextFormRepeater<T extends SelectableItem>
   }
 }
 
-class ContainerRepeater<T extends SelectableItem> extends StatefulWidget {
-  const ContainerRepeater({
+class WidgetRepeater<T extends RepeatableItem> extends StatefulWidget {
+  const WidgetRepeater({
     super.key,
     this.controller,
     this.enabled = true,
@@ -150,7 +154,7 @@ class ContainerRepeater<T extends SelectableItem> extends StatefulWidget {
     this.hasCheckboxes = true,
   });
 
-  final RepeaterController<T>? controller;
+  final WidgetRepeaterController<T>? controller;
   final bool enabled;
   final int minOptionCount;
   final int? maxOptionCount;
@@ -161,14 +165,14 @@ class ContainerRepeater<T extends SelectableItem> extends StatefulWidget {
   final bool hasCheckboxes;
 
   @override
-  State<ContainerRepeater<T>> createState() => _ContainerRepeaterState<T>();
+  State<WidgetRepeater<T>> createState() => _WidgetRepeaterState<T>();
 }
 
-class _ContainerRepeaterState<T extends SelectableItem>
-    extends State<ContainerRepeater<T>> {
+class _WidgetRepeaterState<T extends RepeatableItem>
+    extends State<WidgetRepeater<T>> {
   late final _shouldDisposeController = widget.controller == null;
-  late final RepeaterController<T> _controller =
-      widget.controller ?? RepeaterController<T>();
+  late final WidgetRepeaterController<T> _controller =
+      widget.controller ?? WidgetRepeaterController<T>();
 
   @override
   void initState() {
@@ -199,7 +203,7 @@ class _ContainerRepeaterState<T extends SelectableItem>
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        if (_controller.options.isEmpty)
+        if (_controller.options.isEmpty && widget.enabled)
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 24.0),
             child: TextButton(

@@ -23,6 +23,7 @@ abstract class StudentsRepository extends RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     final students = await _getAllStudents(user: user);
+    // TODO: Filter out students from other groups
 
     await SecurityPolicies([
       UserIsVerified(user: user),
