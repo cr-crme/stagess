@@ -153,6 +153,7 @@ class DatabaseManager {
               messageOnNull: 'An "id" is required to put a student'),
           data: data,
           user: user,
+          teachersRepository: teachersDatabase,
         ),
       RequestFields.enterprises => throw InvalidRequestException(
           'Enterprises must be created individually'),

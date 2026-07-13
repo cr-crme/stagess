@@ -1,6 +1,7 @@
 import 'package:stagess_backend/repositories/internships_repository.dart';
 import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
+import 'package:stagess_backend/repositories/teachers_repository.dart';
 import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_backend/utils/security_policies.dart';
@@ -12,6 +13,7 @@ import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/person.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/utils.dart';
 
 abstract class StudentsRepository extends RepositoryAbstract {
@@ -57,6 +59,7 @@ abstract class StudentsRepository extends RepositoryAbstract {
     required String id,
     required Map<String, dynamic> data,
     required DatabaseUser user,
+    TeachersRepository? teachersRepository,
     bool tryRequestingLock = true,
   }) async {
     if (!canEdit(user: user, id: id)) {
@@ -68,7 +71,11 @@ abstract class StudentsRepository extends RepositoryAbstract {
           id: id,
           user: user,
           task: () => putById(
-              id: id, data: data, user: user, tryRequestingLock: false));
+              id: id,
+              data: data,
+              user: user,
+              teachersRepository: teachersRepository,
+              tryRequestingLock: false));
     }
 
     // Update if exists, insert if not
@@ -76,14 +83,22 @@ abstract class StudentsRepository extends RepositoryAbstract {
     final newStudent = previous?.copyWithData(data) ??
         Student.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
 
-    // TODO Fix Teacher
+    Teacher? teacher;
+    try {
+      final teacherData = await teachersRepository!
+          .getById(id: user.userId!, fields: FetchableFields.all, user: user);
+      teacher = Teacher.fromSerialized(teacherData.data);
+    } catch (e) {
+      // User is not a teacher (e.g., an admin)
+    }
 
     await SecurityPolicies([
       UserIsVerified(user: user),
       HasData(item: newStudent),
       UserIsFromSameSchoolBoard(user: user, item: newStudent),
       UserIsFromSameSchool(user: user, item: newStudent),
-      // UserIsFromSameGroupAsStudent(user: user, item: newStudent),
+      UserIsFromSameGroupAsStudent(
+          user: user, item: newStudent, teacher: teacher),
       ModificationsAreValid(
         user: user,
         item: newStudent,
@@ -102,7 +117,7 @@ abstract class StudentsRepository extends RepositoryAbstract {
         ],
         whiteList: {
           AccessLevel.teacher: ['all_visa'],
-          AccessLevel.teacherAdmin: ['all_visa'],
+          AccessLevel.teacherAdmin: ['all_visa', 'contact', 'contact_link'],
         },
         blackList: {
           AccessLevel.schoolAdmin: [

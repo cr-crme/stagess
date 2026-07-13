@@ -401,6 +401,7 @@ Future<void> _addDummyTeachers(
       schoolId: schoolBId,
       groups: ['201'],
       email: 'b1@moncentre.qc',
+      accessLevel: AccessLevel.teacherAdmin,
     ),
   );
 
