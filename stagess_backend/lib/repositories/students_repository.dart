@@ -24,6 +24,8 @@ abstract class StudentsRepository extends RepositoryAbstract {
   }) async {
     final students = await _getAllStudents(user: user);
     // TODO: Filter out students from other groups
+    // TODO: Add a "enseignant responsable" to the student model and allow them to update their students
+    // TODO: Add "enseignants supplémentaires" to the student model and allow them to show them in their list
 
     await SecurityPolicies([
       UserIsVerified(user: user),
