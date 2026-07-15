@@ -5,12 +5,14 @@ import 'package:stagess_common/models/internships/time_utils.dart';
 import 'package:stagess_common/utils.dart';
 
 enum DayCycle {
+  undefined,
   weekdaysCycle,
   nineDaysCycle,
   tenDaysCycle;
 
   int get dayCount {
     return switch (this) {
+      DayCycle.undefined => 0,
       DayCycle.weekdaysCycle => 7,
       DayCycle.nineDaysCycle => 9,
       DayCycle.tenDaysCycle => 10,
@@ -19,6 +21,7 @@ enum DayCycle {
 
   String get name {
     return switch (this) {
+      DayCycle.undefined => 'Erreur interne',
       DayCycle.weekdaysCycle => 'Semaine de 7 jours',
       DayCycle.nineDaysCycle => 'Cycle de 9 jours',
       DayCycle.tenDaysCycle => 'Cycle de 10 jours',
@@ -27,6 +30,8 @@ enum DayCycle {
 
   String dayAsString(int day) {
     switch (this) {
+      case DayCycle.undefined:
+        return 'Erreur interne';
       case DayCycle.weekdaysCycle:
         return switch (day) {
           0 => 'Lundi',
@@ -168,7 +173,9 @@ class WeeklySchedule extends ItemSerializable {
           start: DateTimeExt.from(map?['start']) ?? DateTime(0),
           end: DateTimeExt.from(map?['end']) ?? DateTime(0),
         ),
-        dayCycle = DayCycle.fromSerialized(map?['cycle']),
+        dayCycle = map?['cycle'] == null
+            ? DayCycle.undefined
+            : DayCycle.fromSerialized(map!['cycle']),
         schedule = (map?['days'] as Map?)?.map((day, e) =>
                 MapEntry(int.parse(day), DailySchedule.fromSerialized(e))) ??
             {},
