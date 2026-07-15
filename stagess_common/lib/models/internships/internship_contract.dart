@@ -194,7 +194,7 @@ class InternshipContract extends InternshipEvaluation {
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
-        'date': FetchableFields.optional,
+        'date': FetchableFields.mandatory,
         'job_id': FetchableFields.mandatory,
         'specialization_id': FetchableFields.mandatory,
         'extra_specialization_ids': FetchableFields.mandatory,
@@ -203,8 +203,8 @@ class InternshipContract extends InternshipEvaluation {
         'supervisor_last_name': FetchableFields.optional,
         'supervisor_phone_number': FetchableFields.optional,
         'supervisor_email': FetchableFields.optional,
-        'starting_date': FetchableFields.optional,
-        'ending_date': FetchableFields.optional,
+        'starting_date': FetchableFields.mandatory,
+        'ending_date': FetchableFields.mandatory,
         'schedules': WeeklySchedule.fetchableFields,
         'transportations': FetchableFields.optional,
         'visit_frequencies': FetchableFields.optional,

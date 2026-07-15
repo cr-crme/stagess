@@ -245,7 +245,7 @@ class MySqlInterface implements SqlInterface {
               String e => [e],
               List<String> e => e,
               _ => throw InvalidRequestException(
-                  'Invalid filters value for $key: $value. It must be a string a list of strings.')
+                  'Invalid filters value for $key: $value. It must be a string or a list of strings.')
             })) ??
         {});
 

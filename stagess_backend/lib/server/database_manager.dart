@@ -72,13 +72,14 @@ class DatabaseManager {
               messageOnNull: 'An "id" is required to get a teacher'),
           fields: fields,
           user: user),
-      RequestFields.students =>
-        await studentsDatabase.getAll(fields: fields, user: user),
+      RequestFields.students => await studentsDatabase.getAll(
+          fields: fields, user: user, teachersRepository: teachersDatabase),
       RequestFields.student => await studentsDatabase.getById(
           id: _getId(data,
               messageOnNull: 'An "id" is required to get a student'),
           fields: fields,
-          user: user),
+          user: user,
+          teachersRepository: teachersDatabase),
       RequestFields.enterprises =>
         await enterprisesDatabase.getAll(fields: fields, user: user),
       RequestFields.enterprise => await enterprisesDatabase.getById(
@@ -86,14 +87,13 @@ class DatabaseManager {
               messageOnNull: 'An "id" is required to get an enterprise'),
           fields: fields,
           user: user),
-      RequestFields.internships => await internshipsDatabase.getAll(
-          fields: fields, user: user, studentsRepository: studentsDatabase),
+      RequestFields.internships =>
+        await internshipsDatabase.getAll(fields: fields, user: user),
       RequestFields.internship => await internshipsDatabase.getById(
           id: _getId(data,
               messageOnNull: 'An "id" is required to get an internship'),
           fields: fields,
-          user: user,
-          studentsRepository: studentsDatabase),
+          user: user),
     };
 
     if (response.data == null) {
@@ -163,7 +163,6 @@ class DatabaseManager {
           data: data,
           user: user,
           internshipsRepository: internshipsDatabase,
-          studentsRepository: studentsDatabase,
         ),
       RequestFields.internships => throw InvalidRequestException(
           'Internships must be created individually'),
@@ -230,14 +229,12 @@ class DatabaseManager {
               messageOnNull: 'An "id" is required to delete an enterprise'),
           user: user,
           internshipsRepository: internshipsDatabase,
-          studentsRepository: studentsDatabase,
         ),
       RequestFields.internships => throw InvalidRequestException(
           'Internships must be deleted individually'),
       RequestFields.internship => await internshipsDatabase.deleteById(
           id: _getId(data,
               messageOnNull: 'An "id" is required to delete an internship'),
-          studentsRepository: studentsDatabase,
           user: user,
         ),
     };

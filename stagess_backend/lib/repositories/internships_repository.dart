@@ -30,29 +30,15 @@ abstract class InternshipsRepository extends RepositoryAbstract {
   Future<RepositoryResponse> getAll({
     required FetchableFields fields,
     required DatabaseUser user,
-    StudentsRepository? studentsRepository,
   }) async {
-    if (studentsRepository == null) {
-      throw ArgumentError(
-          'studentsRepository is required to get internships with access control');
-    }
-
-    final students = (await studentsRepository.getAll(
-                fields: FetchableFields({'id': FetchableFields.all}),
-                user: user))
-            .data
-            ?.keys
-            .toList() ??
-        [];
-
-    final internships =
-        await _getAllInternships(user: user, students: students);
+    final internships = await _getAllInternships(user: user);
 
     await SecurityPolicies([
       UserIsVerified(user: user),
       // Access control were valided when fetching students
     ]).validate();
 
+    // TODO Remove evaluations for non-supervising users
     return RepositoryResponse(
         data: internships.map(
             (key, value) => MapEntry(key, value.serializeWithFields(fields))));
@@ -63,18 +49,9 @@ abstract class InternshipsRepository extends RepositoryAbstract {
     required String id,
     required FetchableFields fields,
     required DatabaseUser user,
-    StudentsRepository? studentsRepository,
   }) async {
-    if (studentsRepository == null) {
-      throw ArgumentError(
-          'studentsRepository is required to get internships with access control');
-    }
-
     final internship = await _getInternshipById(id: id, user: user);
-    await studentsRepository.getById(
-        id: internship?.studentId ?? '-1',
-        fields: FetchableFields({'id': FetchableFields.all}),
-        user: user);
+    // TODO Double-check that we are happy by not filtering over students
 
     await SecurityPolicies([
       UserIsVerified(user: user),
@@ -82,6 +59,7 @@ abstract class InternshipsRepository extends RepositoryAbstract {
       // Access control were valided when fetching students
     ]).validate();
 
+    // TODO Remove evaluations for non-supervising users
     return RepositoryResponse(data: internship!.serializeWithFields(fields));
   }
 
@@ -328,14 +306,8 @@ abstract class InternshipsRepository extends RepositoryAbstract {
   Future<RepositoryResponse> deleteById({
     required String id,
     required DatabaseUser user,
-    StudentsRepository? studentsRepository,
     bool tryRequestingLock = true,
   }) async {
-    if (studentsRepository == null) {
-      throw ArgumentError(
-          'studentsRepository is required to delete internships');
-    }
-
     if (!canEdit(user: user, id: id)) {
       if (!tryRequestingLock) {
         throw InvalidRequestException(
@@ -344,18 +316,10 @@ abstract class InternshipsRepository extends RepositoryAbstract {
       return await requestLockAndPerformTask(
           id: id,
           user: user,
-          task: () => deleteById(
-              id: id,
-              user: user,
-              studentsRepository: studentsRepository,
-              tryRequestingLock: false));
+          task: () => deleteById(id: id, user: user, tryRequestingLock: false));
     }
 
     final internship = await _getInternshipById(id: id, user: user);
-    await studentsRepository.getById(
-        id: internship?.studentId ?? '-1',
-        fields: FetchableFields({'id': FetchableFields.all}),
-        user: user);
 
     await SecurityPolicies([
       UserIsVerified(user: user),
@@ -375,7 +339,6 @@ abstract class InternshipsRepository extends RepositoryAbstract {
 
   Future<Map<String, Internship>> _getAllInternships({
     required DatabaseUser user,
-    required List<String> students,
   });
 
   Future<Internship?> _getInternshipById({
@@ -404,21 +367,11 @@ class MySqlInternshipsRepository extends InternshipsRepository {
   Future<Map<String, Internship>> _getAllInternships({
     String? internshipId,
     required DatabaseUser user,
-    required List<String> students,
   }) async {
-    final studentFilters = ({
-      'student_id':
-          user.accessLevel < AccessLevel.superAdmin && internshipId == null
-              ? students
-              : null,
-    }..removeWhere((key, value) => value == null))
-        .cast<String, List<String>>();
-
     final internships = await sqlInterface.performSelectQuery(
         user: user,
         tableName: 'internships',
-        filters: (internshipId == null ? {} : {'id': internshipId})
-          ..addAll(studentFilters),
+        filters: (internshipId == null ? {} : {'id': internshipId}),
         subqueries: [
           sqlInterface.selectSubquery(
             dataTableName: 'internship_supervising_teachers',
@@ -756,8 +709,7 @@ class MySqlInternshipsRepository extends InternshipsRepository {
     required String id,
     required DatabaseUser user,
   }) async {
-    return (await _getAllInternships(
-        internshipId: id, user: user, students: []))[id];
+    return (await _getAllInternships(internshipId: id, user: user))[id];
   }
 
   Future<void> _insertToInternships(Internship internship) async {
@@ -1333,7 +1285,6 @@ class InternshipsRepositoryMock extends InternshipsRepository {
   @override
   Future<Map<String, Internship>> _getAllInternships({
     required DatabaseUser user,
-    List<String>? students,
   }) async =>
       _dummyDatabase;
 

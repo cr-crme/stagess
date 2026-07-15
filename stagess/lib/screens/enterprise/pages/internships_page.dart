@@ -198,15 +198,14 @@ class _InternshipListState extends State<_InternshipList> {
               final specialization =
                   ActivitySectorsService.specializationOrNull(
                       contract.specializationId);
-              final student = StudentsProvider.of(
-                context,
-              ).firstWhereOrNull((e) => e.id == internship.studentId);
+              final student = StudentsProvider.of(context)
+                  .firstWhereOrNull((e) => e.id == internship.studentId);
               final signatoryTeacher = teachers.firstWhere(
                 (e) => e.id == internship.signatoryTeacherId,
               );
               final canSeeDetails = _canSeeDetails(internshipId: internship.id);
 
-              if (specialization == null || student == null) return Container();
+              if (specialization == null) return Container();
 
               var internshipDays = <String>{};
               for (final weeklySchedule in contract.weeklySchedules) {
@@ -226,7 +225,11 @@ class _InternshipListState extends State<_InternshipList> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        '${student.fullName} (${student.program})',
+                        student == null
+                            ? 'Élève'
+                            : (student.fullName.isEmpty
+                                ? 'Élève de ${student.program}'
+                                : '${student.fullName} (${student.program})'),
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Text(

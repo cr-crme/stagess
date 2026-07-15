@@ -21,8 +21,11 @@ abstract class StudentsRepository extends RepositoryAbstract {
   Future<RepositoryResponse> getAll({
     required FetchableFields fields,
     required DatabaseUser user,
+    TeachersRepository? teachersRepository,
   }) async {
-    final students = await _getAllStudents(user: user);
+    final teacher =
+        await _fetchTeacher(user: user, teachersRepository: teachersRepository);
+    final students = await _getAllStudents(user: user, teacher: teacher);
     // TODO: Filter out students from other groups
     // TODO: Add a "enseignant responsable" to the student model and allow them to update their students
     // TODO: Add "enseignants supplémentaires" to the student model and allow them to show them in their list
@@ -31,11 +34,12 @@ abstract class StudentsRepository extends RepositoryAbstract {
       UserIsVerified(user: user),
       ...students.values
           .map((e) => UserIsFromSameSchoolBoard(user: user, item: e)),
-      ...students.values.map((e) => UserIsFromSameSchool(user: user, item: e)),
     ]).validate();
 
+    final filteredStudents = students.map((key, value) => MapEntry(
+        key, _filterDataByGroup(user: user, teacher: teacher, student: value)));
     return RepositoryResponse(
-        data: students.map(
+        data: filteredStudents.map(
             (key, value) => MapEntry(key, value.serializeWithFields(fields))));
   }
 
@@ -44,8 +48,11 @@ abstract class StudentsRepository extends RepositoryAbstract {
     required String id,
     required FetchableFields fields,
     required DatabaseUser user,
+    TeachersRepository? teachersRepository,
   }) async {
-    final student = await _getStudentById(id: id, user: user);
+    final teacher =
+        await _fetchTeacher(user: user, teachersRepository: teachersRepository);
+    final student = await _getStudentById(id: id, user: user, teacher: teacher);
 
     await SecurityPolicies([
       UserIsVerified(user: user),
@@ -54,7 +61,10 @@ abstract class StudentsRepository extends RepositoryAbstract {
       UserIsFromSameSchool(user: user, item: student),
     ]).validate();
 
-    return RepositoryResponse(data: student!.serializeWithFields(fields));
+    final filteredStudent =
+        _filterDataByGroup(user: user, teacher: teacher, student: student!);
+    return RepositoryResponse(
+        data: filteredStudent.serializeWithFields(fields));
   }
 
   @override
@@ -82,7 +92,7 @@ abstract class StudentsRepository extends RepositoryAbstract {
     }
 
     // Update if exists, insert if not
-    final previous = await _getStudentById(id: id, user: user);
+    final previous = await _getStudentById(id: id, user: user, teacher: null);
     final newStudent = previous?.copyWithData(data) ??
         Student.fromSerialized(<String, dynamic>{'id': id}..addAll(data));
 
@@ -174,7 +184,7 @@ abstract class StudentsRepository extends RepositoryAbstract {
               tryRequestingLock: false));
     }
 
-    final student = await _getStudentById(id: id, user: user);
+    final student = await _getStudentById(id: id, user: user, teacher: null);
 
     await SecurityPolicies([
       UserIsVerified(user: user),
@@ -189,7 +199,6 @@ abstract class StudentsRepository extends RepositoryAbstract {
                 user: user,
                 fields:
                     FetchableFields({'student_id': FetchableFields.mandatory}),
-                studentsRepository: this,
               ))
                   .data ??
               {};
@@ -213,11 +222,13 @@ abstract class StudentsRepository extends RepositoryAbstract {
 
   Future<Map<String, Student>> _getAllStudents({
     required DatabaseUser user,
+    required Teacher? teacher,
   });
 
   Future<Student?> _getStudentById({
     required String id,
     required DatabaseUser user,
+    required Teacher? teacher,
   });
 
   Future<void> _putStudent(
@@ -229,6 +240,41 @@ abstract class StudentsRepository extends RepositoryAbstract {
     required String id,
     required DatabaseUser user,
   });
+
+  Future<Teacher?> _fetchTeacher({
+    required DatabaseUser user,
+    required TeachersRepository? teachersRepository,
+  }) async {
+    if (teachersRepository == null) return null;
+    if (user.accessLevel >= AccessLevel.schoolAdmin) return null;
+
+    try {
+      final teacherData = await teachersRepository.getById(
+          id: user.userId!, fields: FetchableFields.all, user: user);
+      return Teacher.fromSerialized(teacherData.data);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  Student _filterDataByGroup({
+    required DatabaseUser user,
+    required Teacher? teacher,
+    required Student student,
+  }) {
+    // If the user has access, simply return
+    if (user.accessLevel >= AccessLevel.schoolAdmin) return student;
+    if (teacher == null) {
+      throw InvalidRequestException(
+          'Teacher information is required for this operation');
+    }
+    if (teacher.groups.contains(student.group)) return student;
+
+    // Otherwise, remove data from students for the teachers if they are not in the same group
+    // This is for privacy reasons, so that teachers cannot see students from other groups than their own
+    return Student.empty.copyWith(
+        id: student.id, program: student.program, group: student.group);
+  }
 }
 
 class MySqlStudentsRepository extends StudentsRepository {
@@ -240,16 +286,14 @@ class MySqlStudentsRepository extends StudentsRepository {
   Future<Map<String, Student>> _getAllStudents({
     String? studentId,
     required DatabaseUser user,
+    required Teacher? teacher,
   }) async {
     final schoolFilters = ({
       'school_board_id': user.accessLevel < AccessLevel.superAdmin
           ? user.schoolBoardId!
           : null,
-      'school_id': user.accessLevel < AccessLevel.schoolBoardAdmin
-          ? user.schoolId!
-          : null,
     }..removeWhere((key, value) => value == null))
-        .cast<String, String>();
+        .cast<String, dynamic>();
 
     final students = await sqlInterface.performSelectQuery(
       user: user,
@@ -497,8 +541,9 @@ class MySqlStudentsRepository extends StudentsRepository {
   Future<Student?> _getStudentById({
     required String id,
     required DatabaseUser user,
+    required Teacher? teacher,
   }) async =>
-      (await _getAllStudents(studentId: id, user: user))[id];
+      (await _getAllStudents(studentId: id, user: user, teacher: teacher))[id];
 
   Future<void> _insertToStudents(Student student) async {
     await sqlInterface.performInsertPerson(person: student);
@@ -853,6 +898,7 @@ class StudentsRepositoryMock extends StudentsRepository {
   @override
   Future<Map<String, Student>> _getAllStudents({
     required DatabaseUser user,
+    required Teacher? teacher,
   }) async =>
       _dummyDatabase;
 
@@ -860,6 +906,7 @@ class StudentsRepositoryMock extends StudentsRepository {
   Future<Student?> _getStudentById({
     required String id,
     required DatabaseUser user,
+    required Teacher? teacher,
   }) async =>
       _dummyDatabase[id];
 

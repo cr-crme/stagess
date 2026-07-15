@@ -3,7 +3,6 @@ import 'package:mysql1/mysql1.dart';
 import 'package:stagess_backend/repositories/internships_repository.dart';
 import 'package:stagess_backend/repositories/repository_abstract.dart';
 import 'package:stagess_backend/repositories/sql_interfaces.dart';
-import 'package:stagess_backend/repositories/students_repository.dart';
 import 'package:stagess_backend/utils/database_user.dart';
 import 'package:stagess_backend/utils/exceptions.dart';
 import 'package:stagess_backend/utils/security_policies.dart';
@@ -70,16 +69,11 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     required Map<String, dynamic> data,
     required DatabaseUser user,
     InternshipsRepository? internshipsRepository,
-    StudentsRepository? studentsRepository,
     bool tryRequestingLock = true,
   }) async {
     if (internshipsRepository == null) {
       throw InvalidRequestException(
           'Internships repository is required for this operation');
-    }
-    if (studentsRepository == null) {
-      throw InvalidRequestException(
-          'Students repository is required for this operation');
     }
 
     if (!canEdit(user: user, id: id)) {
@@ -96,7 +90,6 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
               data: data,
               user: user,
               internshipsRepository: internshipsRepository,
-              studentsRepository: studentsRepository,
               tryRequestingLock: false,
             );
           });
@@ -205,7 +198,6 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
                     'signatory_teacher_id': FetchableFields.mandatory,
                     'extra_supervising_teacher_ids': FetchableFields.mandatory,
                   }),
-                  studentsRepository: studentsRepository,
                 ));
                 final teacherHasSupervizedInThisEnterprise = internships
                         .data?.values
@@ -231,11 +223,11 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
 
     // Put enterprise can remove internships if a job is removed
     await _putEnterprise(
-        enterprise: newEnterprise,
-        previous: previous,
-        user: user,
-        internshipsRepository: internshipsRepository,
-        studentsRepository: studentsRepository);
+      enterprise: newEnterprise,
+      previous: previous,
+      user: user,
+      internshipsRepository: internshipsRepository,
+    );
 
     return RepositoryResponse(
       updatedData: {
@@ -252,16 +244,11 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     required String id,
     required DatabaseUser user,
     InternshipsRepository? internshipsRepository,
-    StudentsRepository? studentsRepository,
     bool tryRequestingLock = true,
   }) async {
     if (internshipsRepository == null) {
       throw InvalidRequestException(
           'Internships repository is required for this operation');
-    }
-    if (studentsRepository == null) {
-      throw InvalidRequestException(
-          'Students repository is required for this operation');
     }
 
     if (!canEdit(user: user, id: id)) {
@@ -277,7 +264,6 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
               id: id,
               user: user,
               internshipsRepository: internshipsRepository,
-              studentsRepository: studentsRepository,
               tryRequestingLock: false,
             );
           });
@@ -297,7 +283,6 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
                 user: user,
                 fields: FetchableFields(
                     {'enterprise_id': FetchableFields.mandatory}),
-                studentsRepository: studentsRepository,
               ))
                   .data ??
               {};
@@ -311,10 +296,7 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     ]).validate();
 
     final response = await _deleteEnterprise(
-        id: id,
-        user: user,
-        internshipsRepository: internshipsRepository,
-        studentsRepository: studentsRepository);
+        id: id, user: user, internshipsRepository: internshipsRepository);
     if (response.deletedData?[RequestFields.enterprise] == null) {
       throw DatabaseFailureException('Failed to delete enterprise with id $id');
     }
@@ -339,14 +321,12 @@ abstract class EnterprisesRepository extends RepositoryAbstract {
     required Enterprise? previous,
     required DatabaseUser user,
     required InternshipsRepository internshipsRepository,
-    required StudentsRepository studentsRepository,
   });
 
   Future<RepositoryResponse> _deleteEnterprise({
     required String id,
     required DatabaseUser user,
     required InternshipsRepository internshipsRepository,
-    required StudentsRepository studentsRepository,
   });
 }
 
@@ -791,7 +771,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     Enterprise previous, {
     required DatabaseUser user,
     required InternshipsRepository internshipsRepository,
-    required StudentsRepository studentsRepository,
   }) async {
     final out = RepositoryResponse();
 
@@ -802,9 +781,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     for (final job in previous.jobs) {
       if (!enterprise.jobs.map((e) => e.id).contains(job.id)) {
         await _deleteInternshipsFromJob(job.id,
-            user: user,
-            internshipsRepository: internshipsRepository,
-            studentsRepository: studentsRepository);
+            user: user, internshipsRepository: internshipsRepository);
 
         await sqlInterface.performDeleteQuery(
             tableName: 'enterprise_jobs', filters: {'id': job.id});
@@ -1030,7 +1007,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     required Enterprise? previous,
     required DatabaseUser user,
     required InternshipsRepository internshipsRepository,
-    required StudentsRepository studentsRepository,
   }) async {
     try {
       // Set to transaction to rollback at the end of the operation
@@ -1054,9 +1030,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       } else {
         toWait.add(_updateToEnterprisesActivityTypes(enterprise, previous));
         toWait.add(_updateToEnterprisesJobs(enterprise, previous,
-            user: user,
-            internshipsRepository: internshipsRepository,
-            studentsRepository: studentsRepository));
+            user: user, internshipsRepository: internshipsRepository));
         toWait.add(_updateToContact(enterprise, previous));
         toWait.add(_updateToEnterpriseAddress(enterprise, previous));
         toWait
@@ -1077,7 +1051,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     String jobId, {
     required DatabaseUser user,
     required InternshipsRepository internshipsRepository,
-    required StudentsRepository? studentsRepository,
   }) async {
     final internshipIds = (await sqlInterface.performSelectQuery(
         user: user,
@@ -1088,9 +1061,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     final toWait = <Future>[];
     for (final internshipId in internshipIds) {
       toWait.add(internshipsRepository.deleteById(
-          id: internshipId['internship_id'],
-          user: user,
-          studentsRepository: studentsRepository));
+          id: internshipId['internship_id'], user: user));
     }
     await Future.wait(toWait);
   }
@@ -1100,7 +1071,6 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
     required String id,
     required DatabaseUser user,
     required InternshipsRepository internshipsRepository,
-    required StudentsRepository studentsRepository,
   }) async {
     final out = RepositoryResponse();
 
@@ -1115,9 +1085,7 @@ class MySqlEnterprisesRepository extends EnterprisesRepository {
       if (enterprise.jobs.isNotEmpty) {
         for (final job in enterprise.jobs) {
           await _deleteInternshipsFromJob(job.id,
-              user: user,
-              internshipsRepository: internshipsRepository,
-              studentsRepository: studentsRepository);
+              user: user, internshipsRepository: internshipsRepository);
         }
         out.deletedData ??= {};
         out.deletedData![RequestFields.internship] = {
@@ -1228,7 +1196,6 @@ class EnterprisesRepositoryMock extends EnterprisesRepository {
     required Enterprise? previous,
     required DatabaseUser user,
     required InternshipsRepository internshipsRepository,
-    required StudentsRepository studentsRepository,
   }) async {
     _dummyDatabase[enterprise.id] = enterprise;
   }
@@ -1238,7 +1205,6 @@ class EnterprisesRepositoryMock extends EnterprisesRepository {
     required String id,
     required DatabaseUser user,
     required InternshipsRepository internshipsRepository,
-    required StudentsRepository studentsRepository,
   }) async {
     if (_dummyDatabase.containsKey(id)) {
       _dummyDatabase.remove(id);

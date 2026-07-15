@@ -504,7 +504,7 @@ class InternshipListTileState extends State<InternshipListTile> {
                     bottom: 8,
                   ),
                   child: Text(
-                    '${student?.fullName} - ${enterprise.name}',
+                    '${student == null ? 'Élève' : (student.fullName.isEmpty ? 'Élève de ${student.program}' : student.fullName)} - ${enterprise.name}',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
