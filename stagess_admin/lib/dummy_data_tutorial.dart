@@ -11,7 +11,6 @@ import 'package:stagess_common/models/enterprises/job_comment.dart';
 import 'package:stagess_common/models/enterprises/job_list.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
-import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/generic/photo.dart';
 import 'package:stagess_common/models/internships/internship.dart';
@@ -126,15 +125,8 @@ Future<void> _removeAll(
   await _waitForDatabaseUpdate(students, 0, strictlyEqualToExpected: true);
 
   // There is supposed to have one remaining admin (the dev one)
-  final hasSuperAdmin = admins.any(
-    (admin) => admin.accessLevel == AccessLevel.superAdmin,
-  );
   admins.clear(confirm: true);
-  await _waitForDatabaseUpdate(
-    admins,
-    hasSuperAdmin ? 1 : 0,
-    strictlyEqualToExpected: true,
-  );
+  await _waitForDatabaseUpdate(admins, 1, strictlyEqualToExpected: true);
 
   teachers.clear(confirm: true);
   await _waitForDatabaseUpdate(teachers, 0, strictlyEqualToExpected: true);
@@ -3348,7 +3340,8 @@ Future<void> _addDummyInternships(
   await _waitForDatabaseUpdate(internships, 10);
 
   // Set the visiting priorities of the internships for teacherA1Id
-  await teachers.fetchData(id: teacherA1Id, fields: FetchableFields.all);
+  await teachers.fetchData(
+      id: teacherA1Id, fields: Teacher.fetchableFields, forceRefetchAll: true);
   final currentTeacher = teachers.firstWhere((t) => t.id == teacherA1Id);
   var studentId = students.firstWhere((e) => e.fullName == 'Cedric Masson').id;
   var internshipId = internships

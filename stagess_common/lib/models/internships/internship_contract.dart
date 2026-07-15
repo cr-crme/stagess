@@ -48,7 +48,9 @@ class InternshipContract extends InternshipEvaluation {
         extraSpecializationIds = ListExt.from(map?['extra_specialization_ids'],
                 deserializer: (e) => StringExt.from(e)!) ??
             [],
-        program = Program.fromSerialized(map?['program'] ?? {}, currentVersion),
+        program = map?['program'] == null
+            ? Program.undefined
+            : Program.fromSerialized(map!['program'], currentVersion),
         supervisor = Person.fromSerialized({
           'first_name': map?['supervisor_first_name'],
           'last_name': map?['supervisor_last_name'],
@@ -163,12 +165,12 @@ class InternshipContract extends InternshipEvaluation {
               deserializer: (e) => StringExt.from(e)!) ??
           extraSpecializationIds,
       program: serialized['program'] == null
-          ? Program.fromSerialized(serialized['program'] ?? {}, currentVersion)
-          : program,
+          ? program
+          : Program.fromSerialized(serialized['program'], currentVersion),
       supervisor: supervisor.copyWithData({
         'first_name': serialized['supervisor_first_name'],
         'last_name': serialized['supervisor_last_name'],
-        'phone': serialized['supervisor_phone_number'],
+        'phone': {'phone_number': serialized['supervisor_phone_number']},
         'email': serialized['supervisor_email'],
       }),
       dates: DateTimeRange(
@@ -193,9 +195,10 @@ class InternshipContract extends InternshipEvaluation {
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
         'date': FetchableFields.optional,
+        'job_id': FetchableFields.mandatory,
         'specialization_id': FetchableFields.mandatory,
         'extra_specialization_ids': FetchableFields.mandatory,
-        'program': FetchableFields.optional,
+        'program': FetchableFields.mandatory,
         'supervisor_first_name': FetchableFields.optional,
         'supervisor_last_name': FetchableFields.optional,
         'supervisor_phone_number': FetchableFields.optional,

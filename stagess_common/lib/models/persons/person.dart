@@ -62,9 +62,9 @@ class Person extends ExtendedItemSerializable {
         'first_name': FetchableFields.mandatory,
         'last_name': FetchableFields.mandatory,
         'date_birth': FetchableFields.optional,
-        'phone': FetchableFields.optional,
+        'phone': PhoneNumber.fetchableFields,
         'email': FetchableFields.optional,
-        'address': FetchableFields.optional,
+        'address': Address.fetchableFields,
       });
 
   Person copyWith({

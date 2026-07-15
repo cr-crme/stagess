@@ -14,7 +14,6 @@ import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/persons/student.dart';
-import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
@@ -38,16 +37,15 @@ class SupervisionChart extends StatelessWidget {
     final internships = InternshipsProvider.of(context, listen: false);
     final enterprises = EnterprisesProvider.of(context, listen: false);
 
-    final teachersToFetch = <Teacher>[];
     for (final teacher in teachers) {
       if (teacher.id != teachers.currentTeacher?.id) continue;
-      teachersToFetch.add(teacher);
+      await teachers.fetchData(id: teacher.id, fields: FetchableFields.all);
+      break;
     }
+    if (!context.mounted) return;
 
-    final studentsToFetch = StudentsHelpers.studentsInMyGroups(
-      context,
-      listen: false,
-    );
+    final studentsToFetch =
+        StudentsHelpers.studentsInMyGroups(context, listen: false);
     final studentIds = studentsToFetch.map((e) => e.id).toSet();
 
     final internshipsToFetch = <Internship>[];
@@ -67,15 +65,6 @@ class SupervisionChart extends StatelessWidget {
     }
 
     await Future.wait([
-      ...teachersToFetch.map(
-        (e) => teachers.fetchData(
-          id: e.id,
-          fields: FetchableFields({
-            'itineraries': FetchableFields.all,
-            'visiting_priorities': FetchableFields.all,
-          }),
-        ),
-      ),
       ...studentsToFetch.map(
         (e) => students.fetchData(id: e.id, fields: FetchableFields.all),
       ),
@@ -95,16 +84,20 @@ class SupervisionChart extends StatelessWidget {
       future: _fetchInfo(context),
       builder: (context, snapshot) {
         final hasFullData = snapshot.connectionState == ConnectionState.done;
-        return _SupervisionChartInternal(hasFullData: hasFullData);
+        return hasFullData
+            ? const _SupervisionChartInternal()
+            : Center(
+                child: CircularProgressIndicator(
+                  color: Theme.of(context).primaryColor,
+                ),
+              );
       },
     );
   }
 }
 
 class _SupervisionChartInternal extends StatefulWidget {
-  const _SupervisionChartInternal({required this.hasFullData});
-
-  final bool hasFullData;
+  const _SupervisionChartInternal();
 
   @override
   State<_SupervisionChartInternal> createState() =>
@@ -353,27 +346,21 @@ class _SupervisionChartInternalState extends State<_SupervisionChartInternal>
         ],
         bottom: _buildBottomTabBar(context),
       ),
-      body: widget.hasFullData
-          ? Column(
+      body: Column(
+        children: [
+          _buildFilters(context),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
               children: [
-                _buildFilters(context),
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      _buildPriorityPage(filteredInternshipsMetaData),
-                      ItineraryMainScreen(
-                          filteredInternships: filteredInternshipsMetaData),
-                    ],
-                  ),
-                ),
+                _buildPriorityPage(filteredInternshipsMetaData),
+                ItineraryMainScreen(
+                    filteredInternships: filteredInternshipsMetaData),
               ],
-            )
-          : Center(
-              child: CircularProgressIndicator(
-                color: Theme.of(context).primaryColor,
-              ),
             ),
+          ),
+        ],
+      ),
     );
   }
 

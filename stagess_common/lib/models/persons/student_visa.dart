@@ -269,7 +269,9 @@ class Reference extends RepeatableItem {
   Reference.fromSerialized(super.map)
       : referee = StringExt.from(map?['referee']) ?? '',
         enterprise = StringExt.from(map?['enterprise']) ?? '',
-        phoneNumber = PhoneNumber.fromString(map?['phone_number']),
+        phoneNumber = map?['phone_number'] == null
+            ? PhoneNumber.empty
+            : PhoneNumber.fromString(map!['phone_number']),
         email = StringExt.from(map?['email']) ?? '',
         supplementaryInfo = StringExt.from(map?['supplementary_info']) ?? '',
         super.fromSerialized();
@@ -288,7 +290,7 @@ class Reference extends RepeatableItem {
     ..addAll(FetchableFields.reference({
       'referee': FetchableFields.optional,
       'enterprise': FetchableFields.optional,
-      'phone_number': FetchableFields.optional,
+      'phone_number': PhoneNumber.fetchableFields,
       'email': FetchableFields.optional,
       'supplementary_info': FetchableFields.optional,
     }));
@@ -555,42 +557,29 @@ class VisaForm extends ItemSerializable {
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
         'experiences_and_aptitudes': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference({
-            '*': ExperiencesAndAptitudes.fetchableFields,
-          })),
+          ..addAll(FetchableFields.reference(
+              {'*': ExperiencesAndAptitudes.fetchableFields})),
         'attestations_and_mentions': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference({
-            '*': AttestationsAndMentions.fetchableFields,
-          })),
+          ..addAll(FetchableFields.reference(
+              {'*': AttestationsAndMentions.fetchableFields})),
         'sst_trainings': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference({
-            '*': SstTraining.fetchableFields,
-          })),
+          ..addAll(
+              FetchableFields.reference({'*': SstTraining.fetchableFields})),
         'is_gateway_to_fms_available': FetchableFields.optional,
         'certificates': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference({
-            '*': Certificate.fetchableFields,
-          })),
+          ..addAll(
+              FetchableFields.reference({'*': Certificate.fetchableFields})),
         'skills': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference({
-            '*': Skill.fetchableFields,
-          })),
+          ..addAll(FetchableFields.reference({'*': Skill.fetchableFields})),
         'references': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference({
-            '*': Reference.fetchableFields,
-          })),
+          ..addAll(FetchableFields.reference({'*': Reference.fetchableFields})),
         'forces': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference({
-            '*': Attitude.fetchableFields,
-          })),
+          ..addAll(FetchableFields.reference({'*': Attitude.fetchableFields})),
         'challenges': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference({
-            '*': Attitude.fetchableFields,
-          })),
+          ..addAll(FetchableFields.reference({'*': Attitude.fetchableFields})),
         'success_conditions': FetchableFields.optional
-          ..addAll(FetchableFields.reference({
-            '*': SuccessConditions.fetchableFields,
-          })),
+          ..addAll(FetchableFields.reference(
+              {'*': SuccessConditions.fetchableFields})),
       });
 }
 

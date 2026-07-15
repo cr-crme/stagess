@@ -141,7 +141,7 @@ class Student extends Person with SchoolMember {
       'school_board_id': FetchableFields.mandatory,
       'school_id': FetchableFields.mandatory,
       'photo': FetchableFields.optional,
-      'program': FetchableFields.mandatory,
+      'program': FetchableFields.optional,
       'group': FetchableFields.mandatory,
       'contact': FetchableFields.optional,
       'contact_link': FetchableFields.optional,

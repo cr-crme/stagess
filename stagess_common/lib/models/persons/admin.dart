@@ -66,9 +66,9 @@ class Admin extends Person with SchoolMember {
     ..addAll(FetchableFields.reference({
       'school_board_id': FetchableFields.mandatory,
       'school_id': FetchableFields.mandatory,
-      'email': FetchableFields.mandatory,
-      'has_registered_account': FetchableFields.mandatory,
-      'access_level': FetchableFields.mandatory,
+      'email': FetchableFields.optional,
+      'has_registered_account': FetchableFields.optional,
+      'access_level': FetchableFields.optional,
     }));
 
   @override

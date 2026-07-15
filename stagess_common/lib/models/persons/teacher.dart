@@ -106,12 +106,12 @@ class Teacher extends Person with SchoolMember {
     ..addAll(FetchableFields.reference({
       'school_board_id': FetchableFields.mandatory,
       'school_id': FetchableFields.mandatory,
-      'access_level': FetchableFields.mandatory,
+      'access_level': FetchableFields.optional,
       'email': FetchableFields.mandatory,
-      'has_registered_account': FetchableFields.mandatory,
+      'has_registered_account': FetchableFields.optional,
       'groups': FetchableFields.mandatory,
       'itineraries': Itinerary.fetchableFields,
-      'visiting_priorities': FetchableFields.mandatory,
+      'visiting_priorities': FetchableFields.optional,
     }));
 
   @override

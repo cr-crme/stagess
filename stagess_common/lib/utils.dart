@@ -130,51 +130,68 @@ extension _MapExtensions on Map<String, dynamic> {
   Map<String, dynamic> filter(FetchableFields fields) {
     if (fields.includeAll) return this;
 
-    final fieldsToKeep = fields.fieldNames.toList();
+    final fieldsToKeep = fields.fieldNames.toSet();
+    final keepAllCurrentFields =
+        fieldsToKeep.length == 1 && fieldsToKeep.contains('*');
+
     removeWhere((key, value) =>
         key != 'id' &&
         key != 'version' &&
-        !((fieldsToKeep.length == 1 && fieldsToKeep[0] == '*') ||
-            fieldsToKeep.contains(key) ||
-            (fields[key]?.includeAll == false)));
+        !keepAllCurrentFields &&
+        !fieldsToKeep.contains(key));
 
-    for (var key in fieldsToKeep) {
+    for (final key in fieldsToKeep) {
       final subfields = fields[key];
       if (subfields?.isEmpty ?? true) continue;
 
       if (key == '*') {
         for (final thisKey in keys.toList()) {
-          if (this[thisKey] is! Map<String, dynamic>) continue;
-          final element = (this[thisKey] as Map<String, dynamic>)
-              .filter(subfields?[thisKey] ?? FetchableFields.none);
-          if (element.isEmpty) {
+          final targetFields = subfields ?? FetchableFields.none;
+          if (!targetFields.isEndpointField) continue;
+
+          final filtered = _filterDynamicValue(this[thisKey], targetFields);
+          if (filtered == null) {
             remove(thisKey);
           } else {
-            this[thisKey] = element;
+            this[thisKey] = filtered;
           }
         }
+        continue;
       }
 
-      final subElements = this[key];
-      if (subElements is Map<String, dynamic>) {
-        this[key] = subElements.map((key, value) {
-          if (value is Map<String, dynamic>) {
-            return MapEntry(
-                key, value.filter(subfields ?? FetchableFields.none));
-          }
-          return MapEntry(key, value);
-        });
-      } else if (subElements is List) {
-        this[key] = subElements.map((element) {
-          if (element is Map<String, dynamic>) {
-            return element.filter(subfields!);
-          }
-          return element;
-        }).toList();
+      if (!containsKey(key)) continue;
+
+      final filtered = _filterDynamicValue(this[key], subfields!);
+      if (filtered == null) {
+        remove(key);
       } else {
-        // Do nothing
+        this[key] = filtered;
       }
     }
+
     return this;
   }
+}
+
+dynamic _filterDynamicValue(dynamic value, FetchableFields fields) {
+  if (fields.includeAll) return value;
+
+  if (value is Map<String, dynamic>) {
+    final filtered = value.filter(fields);
+    return filtered.isEmpty ? null : filtered;
+  }
+
+  if (value is List) {
+    final elementFields = fields['*'] ?? fields;
+    return value
+        .map((element) => _filterDynamicValue(element, elementFields))
+        .where((element) => element != null)
+        .toList();
+  }
+
+  // Scalar leaf values must be kept when that field is requested.
+  if (!fields.hasSubfields) return value;
+
+  // A scalar cannot contain requested subfields.
+  return null;
 }

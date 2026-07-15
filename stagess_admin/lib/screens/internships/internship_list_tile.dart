@@ -452,17 +452,19 @@ class InternshipListTileState extends State<InternshipListTile> {
       ).fetchData(id: widget.internship.id, fields: FetchableFields.all);
       if (!mounted) return;
 
-      await StudentsProvider.of(context, listen: false).fetchData(
+      final studentsProvider = StudentsProvider.of(context, listen: false);
+      await studentsProvider.fetchData(
           id: widget.internship.studentId, fields: FetchableFields.all);
       if (!mounted) return;
 
       if (!widget.forceEditingMode) {
+        _studentPickerController.student =
+            studentsProvider.fromId(widget.internship.studentId);
+
         final enterpriseProvider =
             EnterprisesProvider.of(context, listen: false);
         await enterpriseProvider.fetchData(
-          id: widget.internship.enterpriseId,
-          fields: FetchableFields.all,
-        );
+            id: widget.internship.enterpriseId, fields: FetchableFields.all);
         _enterprisePickerController.enterprise =
             enterpriseProvider.fromId(widget.internship.enterpriseId);
       }

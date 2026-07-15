@@ -65,9 +65,10 @@ class Itinerary extends ListSerializable<Waypoint>
     return Itinerary(
       id: data['id'] ?? id,
       name: data['name'] ?? name,
-      waypoints: ListExt.from(data['waypoints'],
-              deserializer: Waypoint.fromSerialized) ??
-          toList(),
+      waypoints: ListExt.mergeWithData(rawList, data['waypoints'],
+          copyWithData: (original, serialized) =>
+              original.copyWithData(serialized),
+          deserializer: Waypoint.fromSerialized),
     );
   }
 
