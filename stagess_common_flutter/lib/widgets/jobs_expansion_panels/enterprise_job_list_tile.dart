@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
@@ -36,21 +37,11 @@ class EnterpriseJobListController {
   late final Map<String, int> _positionsOffered = _job.positionsOffered.map(
     (key, value) => MapEntry(key, value),
   );
-  Map<String, int> get _realPositionsOffered {
-    final statuses = enterpriseStatus == EnterpriseStatus.active
-        ? _positionsOffered.map((key, value) => MapEntry(key, value))
-        : _positionsOffered.map((key, value) => MapEntry(key, 0));
-
-    if (_reservedForPickerController?.selection != null) {
-      final schoolId = _reservedForSchoolId;
-      if (schoolId != null) {
-        for (final element in statuses.keys) {
-          if (element != schoolId) {
-            statuses[element] = 0;
-          }
-        }
-      }
-    }
+  Map<String, int> _realPositionsOffered({required bool keepActiveStatus}) {
+    final statuses =
+        keepActiveStatus && enterpriseStatus != EnterpriseStatus.active
+            ? _positionsOffered.map((key, value) => MapEntry(key, 0))
+            : _positionsOffered.map((key, value) => MapEntry(key, value));
     return statuses;
   }
 
@@ -103,7 +94,7 @@ class EnterpriseJobListController {
   Job get job => _job.copyWith(
         specialization: _specialization,
         minimumAge: int.tryParse(_minimumAgeController.text),
-        positionsOffered: _realPositionsOffered,
+        positionsOffered: _realPositionsOffered(keepActiveStatus: false),
         preInternshipRequests: _preInternshipRequests,
         reservedForId: _reservedForPickerController == null
             ? _job.reservedForId
@@ -247,15 +238,15 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
                         : 'Nombre de places de stages disponibles :',
                     style: Theme.of(context).textTheme.titleSmall,
                   ),
-                  ...schools.map(
-                    (school) => Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12.0,
-                        vertical: 2.0,
+                  ...schools.sorted((a, b) => a.name.compareTo(b.name)).map(
+                        (school) => Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12.0,
+                            vertical: 2.0,
+                          ),
+                          child: _buildAvailability(school: school),
+                        ),
                       ),
-                      child: _buildAvailability(school: school),
-                    ),
-                  ),
                   if (widget.canChangeExpandedState) const SizedBox(height: 8),
                 ],
               ),
@@ -417,7 +408,9 @@ class _EnterpriseJobListTileState extends State<EnterpriseJobListTile> {
   }
 
   int _positionOffered(String schoolId) {
-    return widget.controller._realPositionsOffered[schoolId] ?? 0;
+    return widget.controller
+            ._realPositionsOffered(keepActiveStatus: true)[schoolId] ??
+        0;
   }
 
   int _positionOccupied(String schoolId) {

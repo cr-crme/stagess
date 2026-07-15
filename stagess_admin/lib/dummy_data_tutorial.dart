@@ -101,6 +101,32 @@ Future<void> resetDummyDataTutorial(BuildContext context) async {
     teachers: teachers,
   );
 
+  // Refetch all data to ensure that the providers are up to date
+  await Future.wait([
+    ...schoolBoards.map((schoolBoard) => schoolBoards.fetchData(
+        id: schoolBoard.id,
+        fields: SchoolBoard.fetchableFields,
+        forceRefetchAll: true)),
+    ...admins.map((admin) => admins.fetchData(
+        id: admin.id, fields: Admin.fetchableFields, forceRefetchAll: true)),
+    ...teachers.map((teacher) => teachers.fetchData(
+        id: teacher.id,
+        fields: Teacher.fetchableFields,
+        forceRefetchAll: true)),
+    ...students.map((student) => students.fetchData(
+        id: student.id,
+        fields: Student.fetchableFields,
+        forceRefetchAll: true)),
+    ...enterprises.map((enterprise) => enterprises.fetchData(
+        id: enterprise.id,
+        fields: Enterprise.fetchableFields,
+        forceRefetchAll: true)),
+    ...internships.map((internship) => internships.fetchData(
+        id: internship.id,
+        fields: Internship.fetchableFields,
+        forceRefetchAll: true)),
+  ]);
+
   dev.log('Dummy reset data done');
   if (context.mounted) Navigator.of(context).pop();
 }
@@ -2095,6 +2121,9 @@ Future<void> _addDummyInternships(
   required EnterprisesProvider enterprises,
 }) async {
   dev.log('Adding dummy internships');
+
+  await Future.wait(students.map((student) => students.fetchData(
+      id: student.id, fields: Student.fetchableFields, forceRefetchAll: true)));
 
   final teacherA1Id =
       teachers.firstWhere((teacher) => teacher.email == 'a1@moncentre.qc').id;
