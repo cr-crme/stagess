@@ -105,6 +105,8 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
             .toList();
         final studentsByGroups = <String, List<Student>>{};
         for (final student in studentsInSchool) {
+          if (!student.hasData) continue;
+
           if (!studentsByGroups.containsKey(student.group)) {
             studentsByGroups[student.group] = [];
           }

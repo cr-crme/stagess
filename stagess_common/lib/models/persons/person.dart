@@ -116,6 +116,8 @@ class Person extends ExtendedItemSerializable {
   /// Full name
   String get fullName => '$firstName${lastName.isEmpty ? '' : ' $lastName'}';
 
+  bool get hasData => fullName.isNotEmpty;
+
   ///
   /// Initials of the first and last name
   String get initials {

@@ -272,7 +272,11 @@ abstract class StudentsRepository extends RepositoryAbstract {
     // Otherwise, remove data from students for the teachers if they are not in the same group
     // This is for privacy reasons, so that teachers cannot see students from other groups than their own
     return Student.empty.copyWith(
-        id: student.id, program: student.program, group: student.group);
+        schoolBoardId: student.schoolBoardId,
+        schoolId: student.schoolId,
+        id: student.id,
+        program: student.program,
+        group: student.group);
   }
 }
 

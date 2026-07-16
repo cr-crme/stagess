@@ -127,7 +127,7 @@ class InternshipListTileState extends State<InternshipListTile> {
       });
   bool get _showPrivateFields {
     final student = _studentPickerController.student;
-    return student != null && student.fullName.isNotEmpty;
+    return student != null && student.hasData;
   }
 
   late final _teacherPickerController = TeacherPickerController(
@@ -509,7 +509,7 @@ class InternshipListTileState extends State<InternshipListTile> {
                     bottom: 8,
                   ),
                   child: Text(
-                    '${student == null ? 'Élève' : (student.fullName.isEmpty ? 'Élève de ${student.program}' : student.fullName)} - ${enterprise.name}',
+                    '${student == null ? 'Élève' : (student.hasData ? student.fullName : 'Élève de ${student.program}')} - ${enterprise.name}',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),

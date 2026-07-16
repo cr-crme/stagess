@@ -227,9 +227,9 @@ class _InternshipListState extends State<_InternshipList> {
                       Text(
                         student == null
                             ? 'Élève'
-                            : (student.fullName.isEmpty
-                                ? 'Élève de ${student.program}'
-                                : '${student.fullName} (${student.program})'),
+                            : (student.hasData
+                                ? '${student.fullName} (${student.program})'
+                                : 'Élève de ${student.program}'),
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                       Text(

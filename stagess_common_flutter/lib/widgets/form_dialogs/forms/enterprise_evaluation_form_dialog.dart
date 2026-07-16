@@ -433,9 +433,9 @@ class _EnterpriseEvaluationScreenState
       controller: TextEditingController(
           text: student == null
               ? 'Élève'
-              : (student.fullName.isEmpty
-                  ? 'Élève de ${student.program}'
-                  : student.fullName)),
+              : (student.hasData
+                  ? student.fullName
+                  : 'Élève de ${student.program}')),
     );
   }
 

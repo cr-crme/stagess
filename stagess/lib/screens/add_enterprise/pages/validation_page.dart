@@ -58,9 +58,9 @@ class ValidationPage extends StatelessWidget {
             style: Theme.of(context).textTheme.titleSmall,
           ),
           Text(
-            enterprise.contact.fullName.isEmpty
-                ? 'Non spécifié'
-                : enterprise.contact.fullName,
+            enterprise.contact.hasData
+                ? enterprise.contact.fullName
+                : 'Non spécifié',
           ),
           const SizedBox(height: 8),
           Text('Fonction', style: Theme.of(context).textTheme.titleSmall),
