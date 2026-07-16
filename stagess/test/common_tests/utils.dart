@@ -99,6 +99,8 @@ Student dummyStudent({
     photo: '0x00FF00',
     contactLink: 'Mère',
     group: group,
+    teacherInChargeId: '',
+    supplementaryTeacherInChargeIds: [],
     program: program,
     allVisa: [dummyStudentVisa()],
   );

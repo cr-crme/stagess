@@ -93,7 +93,10 @@ class DatabaseManager {
           id: _getId(data,
               messageOnNull: 'An "id" is required to get an internship'),
           fields: fields,
-          user: user),
+          user: user,
+          studentsRepository: studentsDatabase,
+          teachersRepository: teachersDatabase,
+        ),
     };
 
     if (response.data == null) {

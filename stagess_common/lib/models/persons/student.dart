@@ -55,6 +55,9 @@ class Student extends Person with SchoolMember {
   @override
   final String schoolId;
 
+  final String teacherInChargeId;
+  final List<String> supplementaryTeacherInChargeIds;
+
   final String photo;
 
   final Program program;
@@ -75,6 +78,8 @@ class Student extends Person with SchoolMember {
         phone: PhoneNumber.empty,
         email: '',
         address: Address.empty,
+        teacherInChargeId: '',
+        supplementaryTeacherInChargeIds: [],
         program: Program.undefined,
         group: '-1',
         contact: Person.empty,
@@ -93,6 +98,8 @@ class Student extends Person with SchoolMember {
     required super.email,
     required super.address,
     String? photo,
+    required this.teacherInChargeId,
+    required this.supplementaryTeacherInChargeIds,
     required this.program,
     required this.group,
     required this.contact,
@@ -110,6 +117,11 @@ class Student extends Person with SchoolMember {
         program = map?['program'] == null
             ? Program.undefined
             : Program.fromSerialized(map?['program'] as int, map?['version']),
+        teacherInChargeId = StringExt.from(map?['teacher_in_charge_id']) ?? '',
+        supplementaryTeacherInChargeIds = ListExt.from(
+                map?['supplementary_teacher_in_charge_ids'],
+                deserializer: (map) => StringExt.from(map) ?? '') ??
+            [],
         group = StringExt.from(map?['group']) ?? '-1',
         contact = Person.fromSerialized(map?['contact'] ?? {}),
         contactLink = StringExt.from(map?['contact_link']) ?? '',
@@ -129,6 +141,9 @@ class Student extends Person with SchoolMember {
         'school_id': schoolId.serialize(),
         'photo': photo.serialize(),
         'program': programSerialized,
+        'teacher_in_charge_id': teacherInChargeId.serialize(),
+        'supplementary_teacher_in_charge_ids':
+            supplementaryTeacherInChargeIds.serialize(),
         'group': group.serialize(),
         'contact': contact.serialize(),
         'contact_link': contactLink.serialize(),
@@ -142,6 +157,8 @@ class Student extends Person with SchoolMember {
       'school_id': FetchableFields.mandatory,
       'photo': FetchableFields.optional,
       'program': FetchableFields.mandatory,
+      'teacher_in_charge_id': FetchableFields.mandatory,
+      'supplementary_teacher_in_charge_ids': FetchableFields.mandatory,
       'group': FetchableFields.mandatory,
       'contact': FetchableFields.optional,
       'contact_link': FetchableFields.optional,
@@ -152,23 +169,6 @@ class Student extends Person with SchoolMember {
   void _sortAll() {
     allVisa.sort((a, b) => a.date.compareTo(b.date));
   }
-
-  Student get limitedInfo => Student(
-        id: id,
-        schoolBoardId: schoolBoardId,
-        schoolId: schoolId,
-        firstName: firstName,
-        lastName: lastName,
-        group: group,
-        program: program,
-        address: Address.empty,
-        contact: Person.empty,
-        phone: PhoneNumber.empty,
-        contactLink: '',
-        allVisa: [],
-        dateBirth: null,
-        email: '',
-      );
 
   @override
   Student copyWith({
@@ -183,6 +183,8 @@ class Student extends Person with SchoolMember {
     Address? address,
     String? photo,
     Program? program,
+    String? teacherInChargeId,
+    List<String>? supplementaryTeacherInChargeIds,
     String? group,
     Person? contact,
     String? contactLink,
@@ -199,6 +201,9 @@ class Student extends Person with SchoolMember {
         email: email ?? this.email,
         address: address ?? this.address,
         program: program ?? this.program,
+        teacherInChargeId: teacherInChargeId ?? this.teacherInChargeId,
+        supplementaryTeacherInChargeIds: supplementaryTeacherInChargeIds ??
+            this.supplementaryTeacherInChargeIds,
         group: group ?? this.group,
         contact: contact ?? this.contact,
         contactLink: contactLink ?? this.contactLink,
@@ -223,6 +228,8 @@ class Student extends Person with SchoolMember {
           'email',
           'address',
           'photo',
+          'teacher_in_charge_id',
+          'supplementary_teacher_in_charge_ids',
           'program',
           'group',
           'contact',
@@ -246,6 +253,12 @@ class Student extends Person with SchoolMember {
           ? program
           : Program.fromSerialized(data['program'] as int, _currentVersion),
       group: StringExt.from(data['group']) ?? group,
+      teacherInChargeId:
+          StringExt.from(data['teacher_in_charge_id']) ?? teacherInChargeId,
+      supplementaryTeacherInChargeIds: ListExt.from(
+              data['supplementary_teacher_in_charge_ids'],
+              deserializer: (map) => StringExt.from(map) ?? '') ??
+          supplementaryTeacherInChargeIds,
       contact: contact.copyWithData(data['contact']),
       contactLink: StringExt.from(data['contact_link']) ?? contactLink,
       allVisa: ListExt.from(data['all_visa'],

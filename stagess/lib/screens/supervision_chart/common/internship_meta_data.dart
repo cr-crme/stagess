@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/itineraries/visiting_priority.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common_flutter/providers/helpers/internships_helpers.dart';
 import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
@@ -77,9 +78,7 @@ extension InternshipMetaDataList on List<InternshipMetaData> {
           student: students.firstWhere(
             (student) => student.id == internship.studentId,
           ),
-          isSupervised: internship.supervisingTeacherIds.contains(
-            currentTeacher.id,
-          ),
+          isSupervised: internship.hasAccessToPrivateFields(context),
           visitingPriority: currentTeacher.visitingPriority(internship.id) ==
                   VisitingPriority.notApplicable
               ? VisitingPriority.low

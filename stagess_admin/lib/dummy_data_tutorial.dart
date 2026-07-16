@@ -87,7 +87,8 @@ Future<void> resetDummyDataTutorial(BuildContext context) async {
   await _addDummySchoolBoards(schoolBoards);
   await _addDummyAdmins(admins, schoolBoards: schoolBoards);
   await _addDummyTeachers(teachers, schoolBoards: schoolBoards);
-  await _addDummyStudents(students, schoolBoards: schoolBoards);
+  await _addDummyStudents(students,
+      teachers: teachers, schoolBoards: schoolBoards);
   await _addDummyEnterprises(
     enterprises,
     schoolBoards: schoolBoards,
@@ -451,6 +452,7 @@ Future<void> _addDummyTeachers(
 Future<void> _addDummyStudents(
   StudentsProvider students, {
   required SchoolBoardsProvider schoolBoards,
+  required TeachersProvider teachers,
 }) async {
   dev.log('Adding dummy students');
 
@@ -465,6 +467,17 @@ Future<void> _addDummyStudents(
   final schoolCId =
       schoolBoard.schools.firstWhere((school) => school.name == 'École C').id;
 
+  final teacherA1 =
+      teachers.firstWhere((teacher) => teacher.email == 'a1@moncentre.qc');
+  final teacherA2 =
+      teachers.firstWhere((teacher) => teacher.email == 'a2@moncentre.qc');
+  final teacherA11 =
+      teachers.firstWhere((teacher) => teacher.email == 'a11@moncentre.qc');
+  final teacherB1 =
+      teachers.firstWhere((teacher) => teacher.email == 'b1@moncentre.qc');
+  final teacherC1 =
+      teachers.firstWhere((teacher) => teacher.email == 'c1@moncentre.qc');
+
   students.add(
     Student(
       schoolBoardId: schoolBoardId,
@@ -475,6 +488,8 @@ Future<void> _addDummyStudents(
       email: 'c.masson@email.com',
       program: Program.fpt,
       group: '550',
+      teacherInChargeId: teacherA1.id,
+      supplementaryTeacherInChargeIds: [teacherA11.id],
       address: Address(
         civicNumber: 7248,
         street: 'Rue D\'Iberville',
@@ -623,6 +638,8 @@ Future<void> _addDummyStudents(
       email: 't.caron@email.com',
       program: Program.fpt,
       group: '550',
+      teacherInChargeId: teacherA1.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Jean-Pierre',
         lastName: 'Caron Mathieu',
@@ -655,6 +672,8 @@ Future<void> _addDummyStudents(
       email: 'm.boucher@email.com',
       program: Program.fpt,
       group: '550',
+      teacherInChargeId: teacherA1.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Nicole',
         lastName: 'Lefranc',
@@ -687,6 +706,8 @@ Future<void> _addDummyStudents(
       email: 'k.leblanc@email.com',
       program: Program.fpt,
       group: '550',
+      teacherInChargeId: teacherA1.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Martine',
         lastName: 'Gagnon',
@@ -719,6 +740,8 @@ Future<void> _addDummyStudents(
       email: 's.gingras@email.com',
       program: Program.fms,
       group: '201',
+      teacherInChargeId: teacherB1.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Raoul',
         lastName: 'Gingras',
@@ -751,6 +774,8 @@ Future<void> _addDummyStudents(
       email: 'd.vargas@email.com',
       program: Program.fpt,
       group: '200',
+      teacherInChargeId: teacherB1.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Laura',
         lastName: 'Vargas',
@@ -790,6 +815,8 @@ Future<void> _addDummyStudents(
       email: 'j.tremblay@email.com',
       program: Program.fpt,
       group: '550',
+      teacherInChargeId: teacherA1.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Vincent',
         lastName: 'Tremblay',
@@ -956,6 +983,8 @@ Future<void> _addDummyStudents(
       email: 'v.picard@email.com',
       program: Program.fms,
       group: '551',
+      teacherInChargeId: teacherA2.id,
+      supplementaryTeacherInChargeIds: [teacherA1.id],
       contact: Person(
         firstName: 'Jean-François',
         lastName: 'Picard',
@@ -988,6 +1017,8 @@ Future<void> _addDummyStudents(
       email: 'v.monette@email.com',
       program: Program.fms,
       group: '551',
+      teacherInChargeId: teacherA2.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Stéphane',
         lastName: 'Monette',
@@ -1020,6 +1051,8 @@ Future<void> _addDummyStudents(
       email: 'm.poulain@email.com',
       program: Program.fms,
       group: '551',
+      teacherInChargeId: teacherA2.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Mathieu',
         lastName: 'Poulain',
@@ -1052,6 +1085,8 @@ Future<void> _addDummyStudents(
       email: 'c.viger@email.com',
       program: Program.fms,
       group: '551',
+      teacherInChargeId: teacherA2.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Sandrine',
         lastName: 'Poulain',
@@ -1084,6 +1119,8 @@ Future<void> _addDummyStudents(
       email: 'v.marien@email.com',
       program: Program.fpt,
       group: '550',
+      teacherInChargeId: teacherA1.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Dominique',
         lastName: 'Marien',
@@ -1116,6 +1153,8 @@ Future<void> _addDummyStudents(
       email: 'f.lamotte@email.com',
       program: Program.fpt,
       group: '550',
+      teacherInChargeId: teacherA1.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Antoine',
         lastName: 'Lamotte',
@@ -1148,6 +1187,8 @@ Future<void> _addDummyStudents(
       email: 'f.dorval@email.com',
       program: Program.fpt,
       group: '550',
+      teacherInChargeId: teacherA1.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Marie',
         lastName: 'Lerouge',
@@ -1180,6 +1221,8 @@ Future<void> _addDummyStudents(
       email: 'j.cloutier@email.com',
       program: Program.fms,
       group: '551',
+      teacherInChargeId: teacherA2.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'François',
         lastName: 'Cloutier',
@@ -1212,6 +1255,8 @@ Future<void> _addDummyStudents(
       email: 'j.labbé@email.com',
       program: Program.fms,
       group: '551',
+      teacherInChargeId: teacherA2.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Martine',
         lastName: 'Rousseau',
@@ -1244,6 +1289,8 @@ Future<void> _addDummyStudents(
       email: 'b.girard@email.com',
       program: Program.fpt,
       group: '550',
+      teacherInChargeId: teacherA1.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Jessica',
         lastName: 'Brière',
@@ -1276,6 +1323,8 @@ Future<void> _addDummyStudents(
       email: 'j.adam@email.com',
       program: Program.fpt,
       group: '550',
+      teacherInChargeId: teacherA1.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Daniel',
         lastName: 'Adam',
@@ -1308,6 +1357,8 @@ Future<void> _addDummyStudents(
       email: 'd.vachon@email.com',
       program: Program.fpt,
       group: '550',
+      teacherInChargeId: teacherA1.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Romain',
         lastName: 'Vachon',
@@ -1340,6 +1391,8 @@ Future<void> _addDummyStudents(
       email: 'g.robin@email.com',
       program: Program.fms,
       group: '551',
+      teacherInChargeId: teacherA2.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Patricia',
         lastName: 'Leduc',
@@ -1371,6 +1424,8 @@ Future<void> _addDummyStudents(
       email: 's.desmarais@email.com',
       program: Program.fpt,
       group: '300',
+      teacherInChargeId: teacherC1.id,
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
         firstName: 'Tony',
         lastName: 'Desmarais',

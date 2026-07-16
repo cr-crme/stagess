@@ -8,6 +8,7 @@ import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
+import 'package:stagess_common_flutter/providers/helpers/internships_helpers.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
@@ -247,9 +248,7 @@ class _StudentInternshipListViewState
                         Text(
                             '${DateFormat.yMMMd('fr_CA').format(internship.currentContract?.dates.start ?? DateTime.now())} - $endDate'),
                         if (internship.isActive &&
-                            internship.supervisingTeacherIds.contains(
-                              teacherId,
-                            ))
+                            internship.hasAccessToPrivateFields(context))
                           Align(
                             alignment: Alignment.centerRight,
                             child: TextButton(

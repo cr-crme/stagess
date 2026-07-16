@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess_common/models/internships/internship_evaluation.dart';
+import 'package:stagess_common_flutter/providers/helpers/internships_helpers.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
-import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 
 final _logger = Logger('InternshipEvaluationCard');
@@ -53,8 +53,6 @@ class _InternshipEvaluationCardState extends State<InternshipEvaluationCard> {
 
     final internship =
         InternshipsProvider.of(context).fromId(widget.internshipId);
-    final teacherId =
-        TeachersProvider.of(context, listen: false).currentTeacher?.id;
 
     return AnimatedExpandingCard(
       elevation: 0.0,
@@ -77,7 +75,7 @@ class _InternshipEvaluationCardState extends State<InternshipEvaluationCard> {
                     : 'Dernière évaluation réalisée le\u00a0: '
                         '${DateFormat.yMMMEd('fr_CA').format(widget.evaluations.last.date)}')),
             Visibility(
-              visible: internship.supervisingTeacherIds.contains(teacherId),
+              visible: internship.hasAccessToPrivateFields(context),
               child: Align(
                 alignment: Alignment.centerRight,
                 child: Padding(

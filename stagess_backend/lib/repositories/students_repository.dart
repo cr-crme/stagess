@@ -36,7 +36,9 @@ abstract class StudentsRepository extends RepositoryAbstract {
     ]).validate();
 
     final filteredStudents = students.map((key, value) => MapEntry(
-        key, _filterDataByGroup(user: user, teacher: teacher, student: value)));
+        key,
+        _filterDataByAccessibility(
+            user: user, teacher: teacher, student: value)));
     return RepositoryResponse(
         data: filteredStudents.map(
             (key, value) => MapEntry(key, value.serializeWithFields(fields))));
@@ -60,8 +62,8 @@ abstract class StudentsRepository extends RepositoryAbstract {
       UserIsFromSameSchool(user: user, item: student),
     ]).validate();
 
-    final filteredStudent =
-        _filterDataByGroup(user: user, teacher: teacher, student: student!);
+    final filteredStudent = _filterDataByAccessibility(
+        user: user, teacher: teacher, student: student!);
     return RepositoryResponse(
         data: filteredStudent.serializeWithFields(fields));
   }
@@ -104,13 +106,18 @@ abstract class StudentsRepository extends RepositoryAbstract {
       // User is not a teacher (e.g., an admin)
     }
 
+    final teacherIsInCharge = teacher != null &&
+        (previous?.teacherInChargeId == teacher.id ||
+            (previous?.supplementaryTeacherInChargeIds.contains(teacher.id) ??
+                false));
+
     await SecurityPolicies([
       UserIsVerified(user: user),
       HasData(item: newStudent),
       UserIsFromSameSchoolBoard(user: user, item: newStudent),
       UserIsFromSameSchool(user: user, item: newStudent),
       UserIsFromSameGroupAsStudent(
-          user: user, item: newStudent, teacher: teacher),
+          user: user, previousItem: previous, teacher: teacher),
       ModificationsAreValid(
         user: user,
         item: newStudent,
@@ -121,17 +128,16 @@ abstract class StudentsRepository extends RepositoryAbstract {
           AccessLevel.superAdmin,
         ],
         allowedToModify: [
-          AccessLevel.teacher,
+          if (teacherIsInCharge) AccessLevel.teacher,
           AccessLevel.teacherAdmin,
           AccessLevel.schoolAdmin,
           AccessLevel.schoolBoardAdmin,
           AccessLevel.superAdmin,
         ],
-        whiteList: {
-          AccessLevel.teacher: ['all_visa'],
-          AccessLevel.teacherAdmin: ['all_visa', 'contact', 'contact_link'],
-        },
+        whiteList: {},
         blackList: {
+          AccessLevel.teacher: ['id', 'school_board_id', 'school_id'],
+          AccessLevel.teacherAdmin: ['id', 'school_board_id', 'school_id'],
           AccessLevel.schoolAdmin: [
             'id',
             'school_board_id',
@@ -256,7 +262,7 @@ abstract class StudentsRepository extends RepositoryAbstract {
     }
   }
 
-  Student _filterDataByGroup({
+  Student _filterDataByAccessibility({
     required DatabaseUser user,
     required Teacher? teacher,
     required Student student,
@@ -267,7 +273,11 @@ abstract class StudentsRepository extends RepositoryAbstract {
       throw InvalidRequestException(
           'Teacher information is required for this operation');
     }
-    if (teacher.groups.contains(student.group)) return student;
+    if (teacher.groups.contains(student.group) ||
+        student.teacherInChargeId == teacher.id ||
+        student.supplementaryTeacherInChargeIds.contains(teacher.id)) {
+      return student;
+    }
 
     // Otherwise, remove data from students for the teachers if they are not in the same group
     // This is for privacy reasons, so that teachers cannot see students from other groups than their own
@@ -309,6 +319,11 @@ class MySqlStudentsRepository extends StudentsRepository {
           fieldsToFetch: ['first_name', 'last_name', 'date_birthday', 'email'],
         ),
         sqlInterface.selectSubquery(
+          dataTableName: 'student_supplementary_teachers_in_charge',
+          fieldsToFetch: ['teacher_id'],
+          idNameToDataTable: 'student_id',
+        ),
+        sqlInterface.selectSubquery(
             dataTableName: 'phone_numbers',
             idNameToDataTable: 'entity_id',
             fieldsToFetch: ['id', 'phone_number']),
@@ -345,6 +360,11 @@ class MySqlStudentsRepository extends StudentsRepository {
     for (final student in students) {
       final id = student['id'].toString();
       student['group'] = student['group_name'];
+      student['supplementary_teacher_in_charge_ids'] =
+          (student['student_supplementary_teachers_in_charge'] as List?)
+                  ?.map((e) => e['teacher_id'])
+                  .toList() ??
+              [];
 
       final contactId =
           (student['contact'] as List?)?.map((e) => e['id']).firstOrNull;
@@ -558,8 +578,51 @@ class MySqlStudentsRepository extends StudentsRepository {
       'photo': student.photo.serialize(),
       'program': student.programSerialized,
       'group_name': student.group.serialize(),
+      'teacher_in_charge_id': student.teacherInChargeId.serialize(),
       'contact_link': student.contactLink.serialize(),
     });
+  }
+
+  Future<void> _insertToSupplementaryTeachersInCharge(Student student) async {
+    final toWait = <Future>[];
+    for (final teacherId in student.supplementaryTeacherInChargeIds) {
+      toWait.add(sqlInterface.performInsertQuery(
+          tableName: 'student_supplementary_teachers_in_charge',
+          data: {
+            'student_id': student.id.serialize(),
+            'teacher_id': teacherId.serialize(),
+          }));
+    }
+    await Future.wait(toWait);
+  }
+
+  Future<void> _updateToSupplementaryTeachersInCharge(
+      Student student, Student previous) async {
+    final toWait = <Future>[];
+    final newIds = student.supplementaryTeacherInChargeIds.toSet();
+    final oldIds = previous.supplementaryTeacherInChargeIds.toSet();
+    final toAdd = newIds.difference(oldIds);
+    final toRemove = oldIds.difference(newIds);
+
+    for (final teacherId in toAdd) {
+      toWait.add(sqlInterface.performInsertQuery(
+          tableName: 'student_supplementary_teachers_in_charge',
+          data: {
+            'student_id': student.id.serialize(),
+            'teacher_id': teacherId.serialize(),
+          }));
+    }
+
+    for (final teacherId in toRemove) {
+      toWait.add(sqlInterface.performDeleteQuery(
+          tableName: 'student_supplementary_teachers_in_charge',
+          filters: {
+            'student_id': student.id.serialize(),
+            'teacher_id': teacherId.serialize(),
+          }));
+    }
+
+    await Future.wait(toWait);
   }
 
   Future<void> _updateToStudents(
@@ -584,6 +647,9 @@ class MySqlStudentsRepository extends StudentsRepository {
     }
     if (student.group != previous.group) {
       toUpdate['group_name'] = student.group.serialize();
+    }
+    if (student.teacherInChargeId != previous.teacherInChargeId) {
+      toUpdate['teacher_in_charge_id'] = student.teacherInChargeId.serialize();
     }
     if (student.contactLink != previous.contactLink) {
       toUpdate['contact_link'] = student.contactLink.serialize();
@@ -788,10 +854,12 @@ class MySqlStudentsRepository extends StudentsRepository {
 
       if (previous == null) {
         await _insertToStudents(student);
+        await _insertToSupplementaryTeachersInCharge(student);
         await _insertToContacts(student);
         await _insertToVisa(student);
       } else {
         await _updateToStudents(student, previous, user);
+        await _updateToSupplementaryTeachersInCharge(student, previous);
         await _updateToContacts(
             student: student, previous: previous, user: user);
         await _updateToVisa(student, previous);
@@ -862,6 +930,8 @@ class StudentsRepositoryMock extends StudentsRepository {
       address: Address.empty,
       program: Program.fms,
       group: 'A',
+      teacherInChargeId: '',
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
           id: '1',
           firstName: 'Jane',
@@ -885,6 +955,8 @@ class StudentsRepositoryMock extends StudentsRepository {
       address: Address.empty,
       program: Program.fms,
       group: 'A',
+      teacherInChargeId: '',
+      supplementaryTeacherInChargeIds: [],
       contact: Person(
           id: '0',
           firstName: 'John',

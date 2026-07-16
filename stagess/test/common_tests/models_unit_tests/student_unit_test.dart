@@ -45,23 +45,6 @@ void main() {
       expect(student.hasActiveInternship(context), isTrue);
     });
 
-    test('"limitedInfo" provides less information', () {
-      final student = dummyStudent();
-      final limitedInfo = student.limitedInfo;
-
-      expect(limitedInfo.id, student.id);
-      expect(limitedInfo.firstName, student.firstName);
-      expect(limitedInfo.lastName, student.lastName);
-      expect(limitedInfo.group, student.group);
-      expect(limitedInfo.program, student.program);
-      expect(limitedInfo.address.toString(), Address.empty.toString());
-      expect(limitedInfo.contact.toString(), Person.empty.toString());
-      expect(limitedInfo.contactLink, '');
-      expect(limitedInfo.dateBirth, isNull);
-      expect(limitedInfo.email, '');
-      expect(limitedInfo.phone.toString(), PhoneNumber.empty.toString());
-    });
-
     test('"copyWith" behave properly', () {
       final student = dummyStudent();
 

@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:stagess_common/models/generic/access_level.dart';
+import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/internships/internship_evaluation_skill.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
+import 'package:stagess_common_flutter/providers/students_provider.dart';
 
 final _logger = Logger('InternshipsHelpers');
 
@@ -85,5 +89,36 @@ class InternshipsHelpers {
       }
     }
     return out;
+  }
+}
+
+extension InternshipCommonExtension on Internship {
+  bool hasAccessToPrivateFields(BuildContext context) {
+    final user = AuthProvider.of(context, listen: false);
+    final student = StudentsProvider.of(context, listen: false)
+        .firstWhereOrNull((s) => s.id == studentId);
+    if (user.currentUser == null || student == null) {
+      return false;
+    }
+
+    if (user.databaseAccessLevel <= AccessLevel.schoolBoardAdmin &&
+        student.schoolBoardId != user.schoolBoardId) {
+      return false;
+    }
+
+    if (user.databaseAccessLevel <= AccessLevel.schoolAdmin &&
+        student.schoolId != user.schoolId) {
+      return false;
+    }
+
+    if (user.databaseAccessLevel <= AccessLevel.teacherAdmin) {
+      if (student.teacherInChargeId != user.currentId &&
+          !student.supplementaryTeacherInChargeIds.contains(user.currentId) &&
+          !supervisingTeacherIds.contains(user.currentId)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

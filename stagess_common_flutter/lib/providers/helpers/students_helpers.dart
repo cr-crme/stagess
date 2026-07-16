@@ -5,6 +5,7 @@ import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
+import 'package:stagess_common_flutter/providers/helpers/internships_helpers.dart';
 
 class StudentsHelpers {
   ///
@@ -13,18 +14,21 @@ class StudentsHelpers {
   /// they are not supervising them personally)
   static List<Student> studentsInMyGroups(BuildContext context,
       {bool listen = true}) {
+    final students = StudentsProvider.of(context, listen: listen);
+
     if (AuthProvider.of(context, listen: false).isAdmin) {
-      return [...StudentsProvider.of(context, listen: listen)];
+      return [...students];
     }
 
-    final acceptedGroups =
-        TeachersProvider.of(context, listen: false).currentTeacher?.groups;
-    if (acceptedGroups == null || acceptedGroups.isEmpty) return [];
+    final teacher = TeachersProvider.of(context, listen: false).currentTeacher;
+    if (teacher == null) return [];
 
-    return StudentsProvider.of(
-      context,
-      listen: listen,
-    ).where((e) => acceptedGroups.contains(e.group)).toList();
+    return students
+        .where((e) =>
+            teacher.groups.contains(e.group) ||
+            e.teacherInChargeId == teacher.id ||
+            e.supplementaryTeacherInChargeIds.contains(teacher.id))
+        .toList();
   }
 
   ///
@@ -46,7 +50,7 @@ class StudentsHelpers {
     // Add them those that were transfered to me
     for (final internship in internships) {
       // If I am not in charge of this internship
-      if (!internship.supervisingTeacherIds.contains(currentTeacherId)) {
+      if (!internship.hasAccessToPrivateFields(context)) {
         continue;
       }
 

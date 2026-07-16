@@ -132,9 +132,7 @@ class InternshipEvaluationAttitude extends InternshipEvaluation {
         'id': FetchableFields.mandatory,
         'date': FetchableFields.optional,
         'present': FetchableFields.optional,
-        'attitude': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference(
-              {'*': AttitudeEvaluation.fetchableFields})),
+        'attitude': AttitudeEvaluation.fetchableFields,
         'form_version': FetchableFields.mandatory,
       });
 

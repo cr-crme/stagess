@@ -9,6 +9,7 @@ import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/helpers/enterprise_extension.dart';
+import 'package:stagess_common_flutter/providers/helpers/internships_helpers.dart';
 import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
@@ -56,13 +57,11 @@ class InternshipsPageState extends State<InternshipsPage> {
       'Getting closed internships for enterprise: ${widget.enterprise.id}',
     );
 
-    final currentId = TeachersProvider.of(context).currentTeacher?.id;
-
     final List<Internship> out = [];
     for (final internship in internships) {
       if (internship.isClosed ||
           internship.isEnterpriseEvaluationPending &&
-              !internship.supervisingTeacherIds.contains(currentId)) {
+              !internship.hasAccessToPrivateFields(context)) {
         out.add(internship);
       }
     }
@@ -80,7 +79,7 @@ class InternshipsPageState extends State<InternshipsPage> {
     final List<Internship> out = [];
     for (final internship in internships) {
       if (internship.isEnterpriseEvaluationPending &&
-          internship.supervisingTeacherIds.contains(currentId)) {
+          internship.hasAccessToPrivateFields(context)) {
         out.add(internship);
       }
     }

@@ -13,6 +13,7 @@ DROP TABLE IF EXISTS users;
 
 DROP TABLE IF EXISTS student_contacts;
 DROP TABLE IF EXISTS students;
+DROP TABLE IF EXISTS student_supplementary_teachers_in_charge;
 DROP TABLE IF EXISTS student_visa;
 DROP TABLE IF EXISTS student_visa_forms;
 DROP TABLE IF EXISTS student_visa_experiences_and_aptitude_items;
@@ -188,10 +189,19 @@ CREATE TABLE students (
     photo VARCHAR(200) NOT NULL,
     program INT NOT NULL,
     group_name VARCHAR(50) NOT NULL,
+    teacher_in_charge_id VARCHAR(36),
     contact_link VARCHAR(50) NOT NULL,
     FOREIGN KEY (id) REFERENCES persons(id) ON DELETE CASCADE,
     FOREIGN KEY (school_board_id) REFERENCES school_boards(id) ON DELETE CASCADE,
-    FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
+    FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE,
+    FOREIGN KEY (teacher_in_charge_id) REFERENCES teachers(id)
+);
+
+CREATE TABLE student_supplementary_teachers_in_charge (
+    student_id VARCHAR(36) NOT NULL,
+    teacher_id VARCHAR(36) NOT NULL,
+    FOREIGN KEY (teacher_id) REFERENCES teachers(id),
+    FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
 );
 
 CREATE TABLE student_contacts (

@@ -7,6 +7,7 @@ import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
+import 'package:stagess_common_flutter/providers/helpers/internships_helpers.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
@@ -96,7 +97,7 @@ class CommentsExpansionPanel extends StatelessWidget {
     final internship = InternshipsProvider.of(context, listen: false).where(
       (internship) =>
           internship.enterpriseId == enterprise.id &&
-          internship.supervisingTeacherIds.contains(userId),
+          internship.hasAccessToPrivateFields(context),
     );
     if (authProvider.databaseAccessLevel < AccessLevel.schoolAdmin &&
         internship.isEmpty) {

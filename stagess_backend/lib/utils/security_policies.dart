@@ -331,11 +331,11 @@ class UserIsFromSameSchool implements SecurityPolicy {
 
 class UserIsFromSameGroupAsStudent implements SecurityPolicy {
   final DatabaseUser? user;
-  final Student? item;
   final Teacher? teacher;
+  final Student? previousItem;
 
   UserIsFromSameGroupAsStudent(
-      {required this.user, required this.teacher, required this.item});
+      {required this.user, required this.teacher, required this.previousItem});
 
   @override
   Future<void> validate() {
@@ -343,19 +343,19 @@ class UserIsFromSameGroupAsStudent implements SecurityPolicy {
       throw SecurityPolicyException('User is not logged in');
     }
 
-    if (item == null) {
-      throw SecurityPolicyException('No item provided for validation');
-    }
+    if (user!.accessLevel >= AccessLevel.schoolAdmin) return Future.value();
 
-    if (user!.accessLevel >= AccessLevel.schoolAdmin) {
-      return Future.value();
+    if (previousItem == null) {
+      throw SecurityPolicyException(
+          'Teachers are not allowed to create students');
     }
-
     if (teacher == null) {
       throw SecurityPolicyException('No teacher provided for validation');
     }
 
-    if (!teacher!.groups.contains(item!.group)) {
+    if (!teacher!.groups.contains(previousItem!.group) &&
+        previousItem!.teacherInChargeId != teacher!.id &&
+        !previousItem!.supplementaryTeacherInChargeIds.contains(teacher!.id)) {
       throw SecurityPolicyException(
           'User does not have access to this student');
     }

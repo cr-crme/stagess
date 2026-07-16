@@ -12,6 +12,7 @@ import 'package:stagess_common/services/job_data_file_service.dart';
 import 'package:stagess_common_flutter/helpers/enterprise_extension.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
+import 'package:stagess_common_flutter/providers/helpers/internships_helpers.dart';
 import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
@@ -48,7 +49,7 @@ List<_EnterpriseInternshipStudent> _sstToEvaluate(BuildContext context) {
   List<_EnterpriseInternshipStudent> out = [];
   for (final internship in internships) {
     if (internship.sstEvaluations.isEmpty &&
-        internship.supervisingTeacherIds.contains(teacherId)) {
+        internship.hasAccessToPrivateFields(context)) {
       final enterprise =
           enterprises.firstWhereOrNull((e) => e.id == internship.enterpriseId);
       final student =

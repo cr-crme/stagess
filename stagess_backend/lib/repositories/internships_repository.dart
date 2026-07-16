@@ -38,8 +38,14 @@ abstract class InternshipsRepository extends RepositoryAbstract {
       // Access control were valided when fetching students
     ]).validate();
 
-    // Remove evaluations for non-supervising/non-admin users
-    _sanitizeFields(fields, user: user);
+    // Remove evaluations for non-supervising/non-admin users (apply to all)
+    await _sanitizeFields(
+      fields,
+      user: user,
+      studentId: null,
+      studentsRepository: null,
+      teachersRepository: null,
+    );
 
     return RepositoryResponse(
         data: internships.map(
@@ -51,24 +57,79 @@ abstract class InternshipsRepository extends RepositoryAbstract {
     required String id,
     required FetchableFields fields,
     required DatabaseUser user,
+    StudentsRepository? studentsRepository,
+    TeachersRepository? teachersRepository,
   }) async {
     final internship = await _getInternshipById(id: id, user: user);
+    if (studentsRepository == null) {
+      throw ArgumentError(
+          'studentsRepository is required to get internships with access control. '
+          'This should not happen, please contact the developers.');
+    }
 
     await SecurityPolicies([
       UserIsVerified(user: user),
       HasData(item: internship),
     ]).validate();
 
-    // Remove evaluations for non-supervising/non-admin users
-    _sanitizeFields(fields, user: user);
+    // Remove evaluations for non-supervising/non-admin users=
+    await _sanitizeFields(
+      fields,
+      user: user,
+      studentId: internship?.studentId,
+      studentsRepository: studentsRepository,
+      teachersRepository: teachersRepository,
+    );
 
     return RepositoryResponse(data: internship!.serializeWithFields(fields));
   }
 
-  void _sanitizeFields(FetchableFields fields, {required DatabaseUser user}) {
+  Future<void> _sanitizeFields(
+    FetchableFields fields, {
+    required DatabaseUser user,
+    required String? studentId,
+    required StudentsRepository? studentsRepository,
+    required TeachersRepository? teachersRepository,
+  }) async {
     if (user.accessLevel < AccessLevel.schoolAdmin) {
-      for (var field in Internship.privateFields) {
-        fields.remove(field);
+      final teacher = user.userId == null || teachersRepository == null
+          ? null
+          : (await teachersRepository.getById(
+                  id: user.userId!,
+                  fields: FetchableFields({
+                    'id': FetchableFields.all,
+                    'groups': FetchableFields.all,
+                  }),
+                  user:
+                      user.copyWith(accessLevel: AccessLevel.schoolBoardAdmin)))
+              .data;
+
+      final student = teacher == null ||
+              studentId == null ||
+              studentsRepository == null
+          ? null
+          : (await studentsRepository.getById(
+                  id: studentId,
+                  fields: FetchableFields({
+                    'id': FetchableFields.all,
+                    'group': FetchableFields.all,
+                    'teacher_in_charge_id': FetchableFields.all,
+                    'supplementary_teacher_in_charge_ids': FetchableFields.all,
+                  }),
+                  user:
+                      user.copyWith(accessLevel: AccessLevel.schoolBoardAdmin)))
+              .data;
+      if ((student != null && teacher != null) &&
+          ((teacher['groups'] as List).contains(student['group']) ||
+              student['teacher_in_charge_id'] == teacher['id'] ||
+              (student['supplementary_teacher_in_charge_ids'] as List)
+                  .contains(teacher['id']))) {
+        return; // Give access to information
+      } else {
+        // Apply the filter
+        for (var field in Internship.privateFields) {
+          fields.remove(field);
+        }
       }
     }
   }
@@ -180,12 +241,19 @@ abstract class InternshipsRepository extends RepositoryAbstract {
                 'An internship must be associated with a student');
           }
           if (user.accessLevel < AccessLevel.schoolAdmin) {
-            final student = await studentsRepository.getById(
-                id: newInternship.studentId,
-                fields: FetchableFields(
-                    {'id': FetchableFields.all, 'group': FetchableFields.all}),
-                user: user.copyWith(accessLevel: AccessLevel.schoolBoardAdmin));
-            final studentGroup = student.data!['group'];
+            final student = (await studentsRepository.getById(
+                    id: newInternship.studentId,
+                    fields: FetchableFields({
+                      'id': FetchableFields.all,
+                      'group': FetchableFields.all,
+                      'teacher_in_charge_id': FetchableFields.all,
+                      'supplementary_teacher_in_charge_ids':
+                          FetchableFields.all,
+                    }),
+                    user: user.copyWith(
+                        accessLevel: AccessLevel.schoolBoardAdmin)))
+                .data!;
+            final studentGroup = student['group'];
             if (studentGroup == null ||
                 studentGroup is! String ||
                 studentGroup.isEmpty) {
@@ -205,6 +273,10 @@ abstract class InternshipsRepository extends RepositoryAbstract {
               throw InvalidRequestException(
                   'The teacher id could not be found');
             }
+            final isInCharge = student['teacher_in_charge_id'] == teacherId ||
+                (student['supplementary_teacher_in_charge_ids'] as List)
+                    .contains(teacherId);
+
             // TODO: What to do when a teacher from another group is added to the supplementary supervising teachers?
             // TODO: Are we still okay that a teacher can assign themselves to the supplementary supervising teachers?
             final teacherGroups = teacher.data?['groups'];
@@ -213,7 +285,7 @@ abstract class InternshipsRepository extends RepositoryAbstract {
                   'The signatory teacher associated with this internship must be in a group');
             }
 
-            if (!teacherGroups.contains(studentGroup)) {
+            if (!teacherGroups.contains(studentGroup) && !isInCharge) {
               throw InvalidRequestException(
                   'The signatory teacher must be in the same group as the student for this internship');
             }
@@ -228,14 +300,17 @@ abstract class InternshipsRepository extends RepositoryAbstract {
                     'You cannot change the supervising status of another teacher');
               }
             }
-            if (!item.supervisingTeacherIds.contains(teacherId) &&
+
+            if (!isInCharge &&
+                !item.supervisingTeacherIds.contains(teacherId) &&
                 !(previousItem?.supervisingTeacherIds.contains(teacherId) ??
                     false)) {
               throw InvalidRequestException(
                   'The signatory teacher must be a supervising teacher for this internship');
             }
 
-            if (!item.supervisingTeacherIds.contains(teacherId)) {
+            if (!isInCharge &&
+                !item.supervisingTeacherIds.contains(teacherId)) {
               // If the teacher removed themselves, this is the only modification they are allowed to do
               final differences = item.getDifference(previousItem,
                   ignoreKeys: ['id', 'extra_supervising_teacher_ids']);

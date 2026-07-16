@@ -458,8 +458,14 @@ class StudentListTileState extends State<StudentListTile> {
                     children: [
                       SectionDivider(),
                       _buildProgression(),
-                      SectionDivider(),
-                      _buildVisa(),
+                      if (ConfigurationService.showDevelopmentFeatures)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SectionDivider(),
+                            _buildVisa(),
+                          ],
+                        ),
                     ],
                   )
               ],

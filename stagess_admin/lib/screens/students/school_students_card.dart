@@ -128,7 +128,10 @@ class _GroupStudentsCard extends StatelessWidget {
                   (authProvider.databaseAccessLevel >=
                           AccessLevel.teacherAdmin &&
                       authProvider.schoolBoardId == student.schoolBoardId &&
-                      authProvider.schoolId == student.schoolId);
+                      authProvider.schoolId == student.schoolId) ||
+                  (student.teacherInChargeId == authProvider.currentId ||
+                      student.supplementaryTeacherInChargeIds
+                          .contains(authProvider.currentId));
 
               return StudentListTile(
                 key: ValueKey(student.id),
