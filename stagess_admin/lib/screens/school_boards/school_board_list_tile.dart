@@ -523,6 +523,7 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           schools.isEmpty
               ? Center(
@@ -556,12 +557,10 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
                 ),
           if (_canEdit && !widget.forceEditingMode)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Center(
-                child: TextButton(
-                  onPressed: () => _showAddSchoolDialog(widget.schoolBoard),
-                  child: Text('Ajouter une école'),
-                ),
+              padding: const EdgeInsets.only(left: 12.0, top: 8.0, bottom: 8.0),
+              child: TextButton(
+                onPressed: () => _showAddSchoolDialog(widget.schoolBoard),
+                child: Text('Ajouter une école'),
               ),
             ),
         ],

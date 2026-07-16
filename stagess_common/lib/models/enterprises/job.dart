@@ -141,9 +141,7 @@ class Job extends ItemSerializable {
         'positions_offered': FetchableFields.mandatory
           ..addAll(FetchableFields.reference({'*': FetchableFields.mandatory})),
         'minimum_age': FetchableFields.optional,
-        'pre_internship_requests': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference(
-              {'*': PreInternshipRequests.fetchableFields})),
+        'pre_internship_requests': PreInternshipRequests.fetchableFields,
         'photos': FetchableFields.optional,
         'incidents': Incidents.fetchableFields,
         'comments': FetchableFields.optional,

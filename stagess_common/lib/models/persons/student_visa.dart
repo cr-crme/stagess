@@ -556,30 +556,16 @@ class VisaForm extends ItemSerializable {
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
-        'experiences_and_aptitudes': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference(
-              {'*': ExperiencesAndAptitudes.fetchableFields})),
-        'attestations_and_mentions': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference(
-              {'*': AttestationsAndMentions.fetchableFields})),
-        'sst_trainings': FetchableFields.mandatory
-          ..addAll(
-              FetchableFields.reference({'*': SstTraining.fetchableFields})),
+        'experiences_and_aptitudes': ExperiencesAndAptitudes.fetchableFields,
+        'attestations_and_mentions': AttestationsAndMentions.fetchableFields,
+        'sst_trainings': SstTraining.fetchableFields,
         'is_gateway_to_fms_available': FetchableFields.optional,
-        'certificates': FetchableFields.mandatory
-          ..addAll(
-              FetchableFields.reference({'*': Certificate.fetchableFields})),
-        'skills': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference({'*': Skill.fetchableFields})),
-        'references': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference({'*': Reference.fetchableFields})),
-        'forces': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference({'*': Attitude.fetchableFields})),
-        'challenges': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference({'*': Attitude.fetchableFields})),
-        'success_conditions': FetchableFields.optional
-          ..addAll(FetchableFields.reference(
-              {'*': SuccessConditions.fetchableFields})),
+        'certificates': Certificate.fetchableFields,
+        'skills': Skill.fetchableFields,
+        'references': Reference.fetchableFields,
+        'forces': Attitude.fetchableFields,
+        'challenges': Attitude.fetchableFields,
+        'success_conditions': SuccessConditions.fetchableFields,
       });
 }
 
@@ -616,8 +602,7 @@ class StudentVisa extends ItemSerializable {
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
         'date': FetchableFields.optional,
-        'form': FetchableFields.mandatory
-          ..addAll(FetchableFields.reference({'*': VisaForm.fetchableFields})),
+        'form': VisaForm.fetchableFields,
         'form_version': FetchableFields.mandatory,
       });
 

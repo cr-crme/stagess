@@ -30,7 +30,7 @@ class Incident extends ItemSerializable {
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
-        'user_id': FetchableFields.mandatory,
+        'user_id': FetchableFields.optional,
         'incident': FetchableFields.optional,
         'date': FetchableFields.optional,
       });
@@ -98,11 +98,8 @@ class Incidents extends ItemSerializable {
 
   static FetchableFields get fetchableFields => FetchableFields.reference({
         'id': FetchableFields.mandatory,
-        'severe_injuries': FetchableFields.optional
-          ..addAll(FetchableFields.reference({'*': Incident.fetchableFields})),
-        'verbal_abuses': FetchableFields.optional
-          ..addAll(FetchableFields.reference({'*': Incident.fetchableFields})),
-        'minor_injuries': FetchableFields.optional
-          ..addAll(FetchableFields.reference({'*': Incident.fetchableFields})),
+        'severe_injuries': Incident.fetchableFields,
+        'verbal_abuses': Incident.fetchableFields,
+        'minor_injuries': Incident.fetchableFields,
       });
 }

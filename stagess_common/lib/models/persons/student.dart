@@ -162,8 +162,7 @@ class Student extends Person with SchoolMember {
       'group': FetchableFields.mandatory,
       'contact': FetchableFields.optional,
       'contact_link': FetchableFields.optional,
-      'all_visa': FetchableFields.mandatory
-        ..addAll(FetchableFields.reference({'*': StudentVisa.fetchableFields})),
+      'all_visa': StudentVisa.fetchableFields,
     }));
 
   void _sortAll() {
