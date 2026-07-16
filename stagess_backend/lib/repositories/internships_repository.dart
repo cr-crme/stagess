@@ -38,7 +38,9 @@ abstract class InternshipsRepository extends RepositoryAbstract {
       // Access control were valided when fetching students
     ]).validate();
 
-    // TODO Remove evaluations for non-supervising users
+    // Remove evaluations for non-supervising/non-admin users
+    _sanitizeFields(fields, user: user);
+
     return RepositoryResponse(
         data: internships.map(
             (key, value) => MapEntry(key, value.serializeWithFields(fields))));
@@ -51,16 +53,24 @@ abstract class InternshipsRepository extends RepositoryAbstract {
     required DatabaseUser user,
   }) async {
     final internship = await _getInternshipById(id: id, user: user);
-    // TODO Double-check that we are happy by not filtering over students
 
     await SecurityPolicies([
       UserIsVerified(user: user),
       HasData(item: internship),
-      // Access control were valided when fetching students
     ]).validate();
 
-    // TODO Remove evaluations for non-supervising users
+    // Remove evaluations for non-supervising/non-admin users
+    _sanitizeFields(fields, user: user);
+
     return RepositoryResponse(data: internship!.serializeWithFields(fields));
+  }
+
+  void _sanitizeFields(FetchableFields fields, {required DatabaseUser user}) {
+    if (user.accessLevel < AccessLevel.schoolAdmin) {
+      for (var field in Internship.privateFields) {
+        fields.remove(field);
+      }
+    }
   }
 
   @override
@@ -174,7 +184,7 @@ abstract class InternshipsRepository extends RepositoryAbstract {
                 id: newInternship.studentId,
                 fields: FetchableFields(
                     {'id': FetchableFields.all, 'group': FetchableFields.all}),
-                user: user);
+                user: user.copyWith(accessLevel: AccessLevel.schoolBoardAdmin));
             final studentGroup = student.data!['group'];
             if (studentGroup == null ||
                 studentGroup is! String ||
@@ -187,7 +197,7 @@ abstract class InternshipsRepository extends RepositoryAbstract {
                 id: user.userId ?? '-1',
                 fields: FetchableFields(
                     {'id': FetchableFields.all, 'groups': FetchableFields.all}),
-                user: user);
+                user: user.copyWith(accessLevel: AccessLevel.schoolBoardAdmin));
             final teacherId = teacher.data?['id'];
             if (teacherId == null ||
                 teacherId is! String ||
@@ -195,6 +205,8 @@ abstract class InternshipsRepository extends RepositoryAbstract {
               throw InvalidRequestException(
                   'The teacher id could not be found');
             }
+            // TODO: What to do when a teacher from another group is added to the supplementary supervising teachers?
+            // TODO: Are we still okay that a teacher can assign themselves to the supplementary supervising teachers?
             final teacherGroups = teacher.data?['groups'];
             if (teacherGroups == null || teacherGroups is! List) {
               throw InvalidRequestException(

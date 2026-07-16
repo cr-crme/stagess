@@ -12,7 +12,6 @@ import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/providers/enterprises_provider.dart';
-import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/widgets/checkbox_with_other.dart';
@@ -279,7 +278,7 @@ class _EnterpriseEvaluationScreenState
     final enterprise = EnterprisesProvider.of(context, listen: false)
         .firstWhereOrNull((e) => e.id == internship.enterpriseId);
 
-    final student = StudentsHelpers.studentsInMyGroups(context, listen: false)
+    final student = StudentsProvider.of(context, listen: false)
         .firstWhereOrNull((e) => e.id == internship.studentId);
 
     return SizedBox(
@@ -294,7 +293,7 @@ class _EnterpriseEvaluationScreenState
         ),
         // Sometimes for some reason the build is called this with these
         // provider empty on the first call
-        body: student == null || enterprise == null
+        body: enterprise == null
             ? Center(
                 child: CircularProgressIndicator(
                     color: Theme.of(context).primaryColor),
@@ -419,7 +418,7 @@ class _EnterpriseEvaluationScreenState
     );
   }
 
-  Widget _buildStudentName(Student student) {
+  Widget _buildStudentName(Student? student) {
     // ThemeData does not work anymore so we have to override the style manually
     const styleOverride = TextStyle(color: Colors.black);
 
@@ -431,7 +430,12 @@ class _EnterpriseEvaluationScreenState
       ),
       enabled: false,
       style: styleOverride,
-      controller: TextEditingController(text: student.fullName),
+      controller: TextEditingController(
+          text: student == null
+              ? 'Élève'
+              : (student.fullName.isEmpty
+                  ? 'Élève de ${student.program}'
+                  : student.fullName)),
     );
   }
 

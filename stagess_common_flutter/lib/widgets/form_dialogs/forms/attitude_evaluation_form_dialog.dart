@@ -272,9 +272,8 @@ class _AttitudeEvaluationScreenState extends State<_AttitudeEvaluationScreen> {
 
     final internship =
         InternshipsProvider.of(context)[_formController.internshipId];
-    final student = StudentsHelpers.studentsInMyGroups(
-      context,
-    ).firstWhereOrNull((e) => e.id == internship.studentId);
+    final student = StudentsHelpers.studentsInMyGroups(context)
+        .firstWhereOrNull((e) => e.id == internship.studentId);
 
     final workingSituations = [
       _formController.ponctuality,

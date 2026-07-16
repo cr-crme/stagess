@@ -125,6 +125,11 @@ class InternshipListTileState extends State<InternshipListTile> {
           StudentsHelpers.studentsInMyGroups(context),
         AccessLevel.self || AccessLevel.invalid => [],
       });
+  bool get _showPrivateFields {
+    final student = _studentPickerController.student;
+    return student != null && student.fullName.isNotEmpty;
+  }
+
   late final _teacherPickerController = TeacherPickerController(
     initial: context.mounted
         ? TeachersProvider.of(context, listen: false).firstWhereOrNull(
@@ -606,30 +611,51 @@ class InternshipListTileState extends State<InternshipListTile> {
                     ],
                   ),
                 _buildEnterprise(),
-                const SizedBox(height: 8),
-                _buildExtraJob(),
-                const SizedBox(height: 32),
-                _buildSupervisorContact(),
-                const SizedBox(height: 8),
-                _buildWeeklySchedule(),
-                const SizedBox(height: 8.0),
-                _buildExpectedDuration(),
-                const SizedBox(height: 8.0),
-                _buildTransportation(),
-                const SizedBox(height: 8.0),
-                _buildVisitFrequencies(),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: _buildExtraJob(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 32.0),
+                  child: _buildSupervisorContact(),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: _buildWeeklySchedule(),
+                ),
+                if (_showPrivateFields)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: _buildExpectedDuration(),
+                  ),
+                if (_showPrivateFields)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: _buildTransportation(),
+                  ),
+                if (_showPrivateFields)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0),
+                    child: _buildVisitFrequencies(),
+                  ),
                 const SizedBox(height: 8.0),
                 if (!_isEditing)
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _buildEndDate(),
-                      const SizedBox(height: 8.0),
-                      _buildAchievedDuration(),
-                      const SizedBox(height: 8),
-                      _buildTeacherNotes(),
-                      SectionDivider(),
-                      _buildActions(),
+                      if (_showPrivateFields)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: _buildAchievedDuration(),
+                        ),
+                      if (_showPrivateFields)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: _buildTeacherNotes(),
+                        ),
+                      if (_showPrivateFields) SectionDivider(),
+                      if (_showPrivateFields) _buildActions(),
                       SectionDivider(),
                       _buildDocumentsSection(),
                       const SizedBox(height: 8),
@@ -1063,9 +1089,9 @@ class InternshipListTileState extends State<InternshipListTile> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildContractTile(),
-              _buildC1Tile(),
-              _buildC2Tile(),
+              if (_showPrivateFields) _buildContractTile(),
+              if (_showPrivateFields) _buildC1Tile(),
+              if (_showPrivateFields) _buildC2Tile(),
               _buildSstTile(),
               _buildEnterpriseTile(),
             ],

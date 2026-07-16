@@ -167,6 +167,13 @@ class Internship extends ExtendedItemSerializable {
               {'*': PostInternshipEnterpriseEvaluation.fetchableFields})),
       });
 
+  static List<String> get privateFields => [
+        'achieved_duration',
+        'teacher_notes',
+        'skill_evaluations',
+        'attitude_evaluations',
+      ];
+
   Internship copyWith({
     String? id,
     String? studentId,

@@ -147,7 +147,7 @@ extension _MapExtensions on Map<String, dynamic> {
       if (key == '*') {
         for (final thisKey in keys.toList()) {
           final targetFields = subfields ?? FetchableFields.none;
-          if (!targetFields.isEndpointField) continue;
+          if (targetFields.isEndpointField) continue;
 
           final filtered = _filterDynamicValue(this[thisKey], targetFields);
           if (filtered == null) {

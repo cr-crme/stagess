@@ -440,9 +440,8 @@ class _SkillEvaluationMainScreenState
     );
     final internship = InternshipsProvider.of(context)[widget.internshipId];
 
-    final student = StudentsHelpers.studentsInMyGroups(
-      context,
-    ).firstWhereOrNull((e) => e.id == internship.studentId);
+    final student = StudentsHelpers.studentsInMyGroups(context)
+        .firstWhereOrNull((e) => e.id == internship.studentId);
 
     return SizedBox(
       width: ResponsiveService.maxBodyWidth,
@@ -1163,9 +1162,8 @@ class _SkillEvaluationFormScreenState
     final internship = widget.formController.internship(context);
     final skills = _extractSkills(context, internship: internship);
 
-    final student = StudentsHelpers.studentsInMyGroups(
-      context,
-    ).firstWhereOrNull((e) => e.id == internship.studentId);
+    final student = StudentsHelpers.studentsInMyGroups(context)
+        .firstWhereOrNull((e) => e.id == internship.studentId);
 
     return SizedBox(
       width: ResponsiveService.maxBodyWidth,

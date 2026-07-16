@@ -107,6 +107,13 @@ class FetchableFields {
     _fields[fieldName] = value;
   }
 
+  void remove(String fieldName) {
+    if (includeAll) {
+      throw 'Cannot remove a field from FetchableFields with includeAll = true';
+    }
+    _fields.remove(fieldName);
+  }
+
   FetchableFields filter(FetchableFields other, {bool keepMandatory = false}) {
     final out = FetchableFields.none;
 

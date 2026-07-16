@@ -30,10 +30,15 @@ Future<void> showFinalizeInternshipDialog(
     await internships.releaseLockForItem(internship);
     return;
   }
-  await internships.replaceWithConfirmation(editedInternship);
+  final isSuccess = await internships.replaceWithConfirmation(editedInternship);
 
   if (context.mounted) {
-    showSnackBar(context, message: 'Le stage a été mis à jour');
+    showSnackBar(
+      context,
+      message: isSuccess
+          ? 'Le stage a été mis à jour'
+          : 'Échec de la mise à jour du stage. Vous devez avoir les droits pour modifier ce stage.',
+    );
   }
   await internships.releaseLockForItem(internship);
 }
