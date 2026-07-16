@@ -7,6 +7,7 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:stagess_admin/screens/students/confirm_delete_student_dialog.dart';
 import 'package:stagess_admin/widgets/section_divider.dart';
+import 'package:stagess_admin/widgets/teacher_picker_tile.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
@@ -17,6 +18,7 @@ import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
+import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/address_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/birthday_list_tile.dart';
@@ -77,6 +79,7 @@ class StudentListTileState extends State<StudentListTile> {
     _addressController.dispose();
     _phoneController.dispose();
     _groupController.dispose();
+    _teacherInChargeIdController.dispose();
     _emailController.dispose();
     _contactFirstNameController.dispose();
     _contactLastNameController.dispose();
@@ -114,6 +117,11 @@ class StudentListTileState extends State<StudentListTile> {
   late final _groupController = TextEditingController(
     text: widget.student.group == '-1' ? '' : widget.student.group,
   );
+  late final _teacherInChargeIdController = TeacherPickerController(
+    initial: TeachersProvider.of(context, listen: false)
+        .firstWhereOrNull((e) => e.id == widget.student.teacherInChargeId),
+  );
+  // TODO: Add the repeater here
   late Program _selectedProgram = widget.student.program;
   late final _emailController = TextEditingController(
     text: widget.student.email,
@@ -144,6 +152,7 @@ class StudentListTileState extends State<StudentListTile> {
         lastName: _lastNameController.text,
         dateBirth: _birthController.value,
         group: _groupController.text,
+        teacherInChargeId: _teacherInChargeIdController.teacher?.id ?? '',
         program: _selectedProgram,
         address: _addressController.address ??
             Address.empty.copyWith(id: widget.student.address.id),
@@ -297,6 +306,9 @@ class StudentListTileState extends State<StudentListTile> {
 
     _groupController.text =
         widget.student.group == '-1' ? '' : widget.student.group;
+    _teacherInChargeIdController.teacher =
+        TeachersProvider.of(context, listen: false)
+            .firstWhereOrNull((e) => e.id == widget.student.teacherInChargeId);
     _selectedProgram = widget.student.program;
 
     _contactFirstNameController.text = widget.student.contact.firstName;
@@ -449,6 +461,8 @@ class StudentListTileState extends State<StudentListTile> {
                 const SizedBox(height: 4),
                 _buildGroup(),
                 const SizedBox(height: 4),
+                _buildTeacherInCharge(),
+                const SizedBox(height: 4),
                 _buildProgramSelection(),
                 const SizedBox(height: 8),
                 _buildContact(),
@@ -554,6 +568,14 @@ class StudentListTileState extends State<StudentListTile> {
             decoration: const InputDecoration(labelText: 'Groupe'),
           )
         : Text('Groupe : ${widget.student.group}');
+  }
+
+  Widget _buildTeacherInCharge() {
+    return TeacherPickerTile(
+      controller: _teacherInChargeIdController,
+      schoolBoardId: widget.student.schoolBoardId,
+      editMode: _isEditing,
+    );
   }
 
   Widget _buildProgramSelection() {
