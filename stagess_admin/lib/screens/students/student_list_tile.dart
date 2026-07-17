@@ -23,6 +23,7 @@ import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/address_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/birthday_list_tile.dart';
+import 'package:stagess_common_flutter/widgets/dialogs/help_dialog.dart';
 import 'package:stagess_common_flutter/widgets/dialogs/show_pdf_dialog.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/form_dialogs/forms/show_forms.dart';
@@ -525,14 +526,6 @@ class StudentListTileState extends State<StudentListTile> {
                 const SizedBox(height: 8),
                 _buildName(),
                 const SizedBox(height: 8),
-                _buildBirthday(),
-                const SizedBox(height: 4),
-                _buildAddress(),
-                const SizedBox(height: 4),
-                _buildPhone(),
-                const SizedBox(height: 4),
-                _buildEmail(),
-                const SizedBox(height: 4),
                 _buildGroup(),
                 const SizedBox(height: 4),
                 _buildTeacherInCharge(),
@@ -541,6 +534,14 @@ class StudentListTileState extends State<StudentListTile> {
                 const SizedBox(height: 24),
                 _buildProgramSelection(),
                 const SizedBox(height: 8),
+                _buildBirthday(),
+                const SizedBox(height: 4),
+                _buildAddress(),
+                const SizedBox(height: 4),
+                _buildPhone(),
+                const SizedBox(height: 4),
+                _buildEmail(),
+                const SizedBox(height: 4),
                 _buildContact(),
                 if (!_isEditing)
                   Column(
@@ -647,52 +648,105 @@ class StudentListTileState extends State<StudentListTile> {
   }
 
   Widget _buildTeacherInCharge() {
-    return TeacherPickerTile(
-      controller: _teacherInChargeIdController,
-      title: 'Enseignant·e responsable',
-      filter: (teacher) =>
-          teacher.schoolBoardId == widget.student.schoolBoardId,
-      editMode: _isEditing,
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Flexible(
+              child: Text(
+                _isEditing
+                    ? 'Sélectionner l\'enseignant·e responsable'
+                    : 'Enseignant·e responsable',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 12.0),
+              child: IconButton(
+                  onPressed: () {
+                    showHelpDialog(
+                      context,
+                      title: 'Enseignant·e responsable',
+                      content: Text(
+                          'Avec les administrateurs, l\'enseignant responsable est '
+                          'la seule personne capable de modifier les informations ' // TODO Confirm this is true (supplementary)
+                          'personnelles de l’élève qui figurent sur l’onglet "À propos" '
+                          'de la page de l’élève (p. ex. son adresse courriel)'),
+                    );
+                  },
+                  icon:
+                      Icon(Icons.info, color: Theme.of(context).primaryColor)),
+            ),
+          ],
+        ),
+        TeacherPickerTile(
+          controller: _teacherInChargeIdController,
+          title: '',
+          filter: (teacher) =>
+              teacher.schoolBoardId == widget.student.schoolBoardId,
+          editMode: _isEditing,
+        ),
+      ],
     );
   }
 
   Widget _buildSupplementaryTeachersInCharge() {
-    return _isEditing ||
-            _supplementaryTeacherInChargeIdsController.options.isNotEmpty
-        ? Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Flexible(
-                child: Text(
-                  _isEditing
-                      ? 'Sélectionner les enseignant·e·s responsables supplémentaires'
-                      : 'Enseignant·e·s responsables supplémentaires :',
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Flexible(
+              child: Text(
+                _isEditing
+                    ? 'Sélectionner les intervenant·e·s supplémentaires'
+                    : _supplementaryTeacherInChargeIdsController.options.isEmpty
+                        ? 'Aucun·e intervenant·e supplémentaire sélectionné·e'
+                        : 'Intervenant·e·s supplémentaires',
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 12.0),
+              child: IconButton(
+                  onPressed: () {
+                    showHelpDialog(
+                      context,
+                      title: 'Intervenant·e·s supplémentaires',
+                      content: Text(
+                          'L\'élève apparaitra dans la liste d’élèves de tous les '
+                          'intervenants supplémentaires sélectionnés dans la liste'),
+                    );
+                  },
+                  icon:
+                      Icon(Icons.info, color: Theme.of(context).primaryColor)),
+            ),
+          ],
+        ),
+        if (_isEditing ||
+            _supplementaryTeacherInChargeIdsController.options.isNotEmpty)
+          WidgetRepeater(
+            controller: _supplementaryTeacherInChargeIdsController,
+            buttonTitle: 'Ajouter un·e intervenant·e',
+            hasCheckboxes: false,
+            canReorder: false,
+            enabled: _isEditing,
+            newItemBuilder: (index) => _RepeatableTeacher(id: '', index: index),
+            widgetBuilder: (context, index, item, onUpdated) {
+              return Flexible(
+                child: TeacherPickerTile(
+                  title: 'Intervenant·e N°${index + 1}',
+                  controller: item.controller,
+                  editMode: _isEditing,
+                  filter: (teacher) =>
+                      teacher.schoolBoardId == widget.student.schoolBoardId,
                 ),
-              ),
-              WidgetRepeater(
-                controller: _supplementaryTeacherInChargeIdsController,
-                buttonTitle: 'Ajouter un·e enseignant·e',
-                hasCheckboxes: false,
-                canReorder: false,
-                enabled: _isEditing,
-                newItemBuilder: (index) =>
-                    _RepeatableTeacher(id: '', index: index),
-                widgetBuilder: (context, index, item, onUpdated) {
-                  return Flexible(
-                    child: TeacherPickerTile(
-                      title: 'Titulaires de stages N°${index + 1}',
-                      controller: item.controller,
-                      editMode: _isEditing,
-                      filter: (teacher) =>
-                          teacher.schoolBoardId == widget.student.schoolBoardId,
-                    ),
-                  );
-                },
-              ),
-            ],
-          )
-        : Text('Aucun·e enseignant·e responsable supplémentaire sélectionné·e');
+              );
+            },
+          ),
+      ],
+    );
   }
 
   Widget _buildProgramSelection() {
