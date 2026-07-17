@@ -56,10 +56,30 @@ class WidgetRepeaterController<T extends RepeatableItem> {
   void remove(int index) {
     if (index < 0 || index >= length) return;
 
+    _options[index].dispose();
     _options.removeAt(index);
 
     // Update indices of subsequent items
     for (int i = index; i < _options.length; i++) {
+      _options[i] = _options[i].copyWith(index: i) as T;
+    }
+
+    if (_setStateCallback != null) _setStateCallback!(() {});
+  }
+
+  void reorder(int oldIndex, int newIndex) {
+    if (oldIndex < 0 ||
+        oldIndex >= _options.length ||
+        newIndex < 0 ||
+        newIndex >= _options.length) {
+      return;
+    }
+
+    final item = _options.removeAt(oldIndex);
+    _options.insert(newIndex, item);
+
+    // Update indices of all items
+    for (int i = 0; i < _options.length; i++) {
       _options[i] = _options[i].copyWith(index: i) as T;
     }
 
@@ -86,13 +106,14 @@ class TextFormRepeater<T extends RepeatableItem> extends StatelessWidget {
     super.key,
     required this.controller,
     this.enabled = true,
-    this.minOptionCount = 1,
+    this.minOptionCount = 0,
     this.maxOptionCount,
     this.maxSelectedOptions,
     required this.newItemBuilder,
     required this.updateItemBuilder,
     required this.itemToText,
     this.hasCheckboxes = true,
+    this.canReorder = true,
     this.maxLength,
     this.maxLines = 5,
   });
@@ -106,6 +127,7 @@ class TextFormRepeater<T extends RepeatableItem> extends StatelessWidget {
   final T Function(T item, String text) updateItemBuilder;
   final String Function(T item) itemToText;
   final bool hasCheckboxes;
+  final bool canReorder;
   final int? maxLength;
   final int maxLines;
 
@@ -115,6 +137,7 @@ class TextFormRepeater<T extends RepeatableItem> extends StatelessWidget {
       controller: controller,
       enabled: enabled,
       hasCheckboxes: hasCheckboxes,
+      canReorder: canReorder,
       minOptionCount: minOptionCount,
       maxOptionCount: maxOptionCount,
       maxSelectedOptions: maxSelectedOptions,
@@ -146,12 +169,14 @@ class WidgetRepeater<T extends RepeatableItem> extends StatefulWidget {
     super.key,
     this.controller,
     this.enabled = true,
-    this.minOptionCount = 1,
+    this.minOptionCount = 0,
     this.maxOptionCount,
     this.maxSelectedOptions,
     required this.newItemBuilder,
     required this.widgetBuilder,
+    this.buttonTitle = 'Ajouter un élément',
     this.hasCheckboxes = true,
+    this.canReorder = true,
   });
 
   final WidgetRepeaterController<T>? controller;
@@ -162,7 +187,9 @@ class WidgetRepeater<T extends RepeatableItem> extends StatefulWidget {
   final T Function(int index) newItemBuilder;
   final Widget Function(BuildContext context, int index, T item,
       void Function(T newItem) updateItem) widgetBuilder;
+  final String buttonTitle;
   final bool hasCheckboxes;
+  final bool canReorder;
 
   @override
   State<WidgetRepeater<T>> createState() => _WidgetRepeaterState<T>();
@@ -201,104 +228,95 @@ class _WidgetRepeaterState<T extends RepeatableItem>
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (_controller.options.isEmpty && widget.enabled)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24.0),
-            child: TextButton(
-              onPressed: widget.enabled ? () => _insertNewItem(0) : null,
-              child: const Text('Ajouter un premier élément'),
-            ),
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ReorderableListView.builder(
+            physics: const NeverScrollableScrollPhysics(),
+            shrinkWrap: true,
+            buildDefaultDragHandles: false,
+            itemCount: _controller.options.length,
+            onReorderItem: (oldIndex, newIndex) => setState(() {
+              _controller.reorder(oldIndex, newIndex);
+            }),
+            itemBuilder: (context, i) => _buildTile(i),
           ),
-        for (int i = 0; i < _controller.options.length; i++)
-          Padding(
-            padding: EdgeInsets.only(top: i == 0 ? 0.0 : 12.0),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (widget.hasCheckboxes)
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Checkbox(
-                        value: _controller.options[i].isSelected,
-                        onChanged: widget.enabled &&
-                                (widget.maxSelectedOptions == null ||
-                                    _controller.options[i].isSelected ||
-                                    _controller.selectedCount <
-                                        widget.maxSelectedOptions!)
-                            ? (value) => _controller.updateOption(
-                                i,
-                                _controller.options[i]
-                                    .copyWith(isSelected: value!) as T)
-                            : null,
-                      ),
-                      const SizedBox(width: 8.0),
-                    ],
+          if (widget.enabled)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: TextButton(
+                onPressed: widget.enabled
+                    ? () => _insertNewItem(_controller.options.length)
+                    : null,
+                child: Text(widget.buttonTitle),
+              ),
+            ),
+        ]);
+  }
+
+  Padding _buildTile(int i) {
+    return Padding(
+      key: ValueKey(_controller.options[i].id),
+      padding: EdgeInsets.only(top: i == 0 ? 0.0 : 12.0),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (widget.canReorder)
+            ReorderableDragStartListener(
+              index: i,
+              child: InkWell(
+                onTap: () {},
+                borderRadius: BorderRadius.circular(25.0),
+                child: Padding(
+                  padding: const EdgeInsets.all(6.0),
+                  child: Icon(
+                    Icons.drag_handle,
+                    color: widget.enabled
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey,
+                    size: 28.0,
                   ),
-                widget.widgetBuilder(
-                  context,
-                  i,
-                  _controller.options[i],
-                  (newItem) {
-                    _controller.updateOption(i, newItem);
-                  },
                 ),
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    InkWell(
-                      onTap: widget.enabled &&
-                              (widget.maxOptionCount == null ||
-                                  _controller.options.length <
-                                      widget.maxOptionCount!)
-                          ? () => _insertNewItem(i + 1)
-                          : null,
-                      borderRadius: BorderRadius.circular(25.0),
-                      child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: Icon(
-                          Icons.add,
-                          color: widget.enabled &&
-                                  (widget.maxOptionCount == null ||
-                                      _controller.options.length <
-                                          widget.maxOptionCount!)
-                              ? Colors.green
-                              : Colors.grey,
-                          size: 28,
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12.0),
-                      child: InkWell(
-                        onTap: widget.enabled &&
-                                _controller.options.length >
-                                    widget.minOptionCount
-                            ? () => _removeItem(i)
-                            : null,
-                        borderRadius: BorderRadius.circular(25.0),
-                        child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Icon(
-                            Icons.remove,
-                            color: widget.enabled &&
-                                    _controller.options.length >
-                                        widget.minOptionCount
-                                ? Colors.red
-                                : Colors.grey,
-                            size: 28,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
+            ),
+          if (widget.hasCheckboxes)
+            Checkbox(
+              value: _controller.options[i].isSelected,
+              onChanged: widget.enabled &&
+                      (widget.maxSelectedOptions == null ||
+                          _controller.options[i].isSelected ||
+                          _controller.selectedCount <
+                              widget.maxSelectedOptions!)
+                  ? (value) => _controller.updateOption(i,
+                      _controller.options[i].copyWith(isSelected: value!) as T)
+                  : null,
+            ),
+          if (widget.canReorder || widget.hasCheckboxes)
+            const SizedBox(width: 8.0),
+          widget.widgetBuilder(context, i, _controller.options[i], (newItem) {
+            _controller.updateOption(i, newItem);
+          }),
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: InkWell(
+              onTap: widget.enabled &&
+                      _controller.options.length > widget.minOptionCount
+                  ? () => _removeItem(i)
+                  : null,
+              borderRadius: BorderRadius.circular(25.0),
+              child: Padding(
+                padding: const EdgeInsets.all(4.0),
+                child: Icon(Icons.delete,
+                    color: widget.enabled &&
+                            _controller.options.length > widget.minOptionCount
+                        ? Colors.red
+                        : Colors.grey),
+              ),
             ),
           ),
-      ],
+        ],
+      ),
     );
   }
 }

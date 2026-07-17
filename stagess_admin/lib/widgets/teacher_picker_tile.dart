@@ -31,15 +31,15 @@ class TeacherPickerTile extends StatelessWidget {
   const TeacherPickerTile({
     super.key,
     this.title,
-    required this.schoolBoardId,
     required this.controller,
-    required this.editMode,
+    this.editMode = true,
+    this.filter,
     this.isMandatory = false,
   });
 
   final String? title;
   final TeacherPickerController controller;
-  final String schoolBoardId;
+  final bool Function(Teacher)? filter;
   final bool editMode;
   final bool isMandatory;
 
@@ -54,10 +54,8 @@ class TeacherPickerTile extends StatelessWidget {
   }
 
   Widget _builder(BuildContext context, FormFieldState<Teacher> state) {
-    final teachers = TeachersProvider.of(
-      context,
-      listen: true,
-    ).where((teacher) => teacher.schoolBoardId == schoolBoardId);
+    final teachers = TeachersProvider.of(context, listen: true).toList();
+    if (filter != null) teachers.retainWhere(filter!);
 
     return Autocomplete<Teacher>(
       initialValue: TextEditingValue(

@@ -490,14 +490,14 @@ class TeacherListTileState extends State<TeacherListTile> {
       children: [
         Text('Groupes :'),
         SizedBox(
-          width: 250,
+          width: 400,
           child: TextFormRepeater(
             controller: _groupController,
             enabled: _isEditing,
-            minOptionCount: 0,
             maxLength: 50,
             maxLines: 1,
             hasCheckboxes: false,
+            canReorder: false,
             newItemBuilder: (index) => _StudentGroup(group: ''),
             updateItemBuilder: (item, text) => item.copyWith(group: text),
             itemToText: (item) => item.group,

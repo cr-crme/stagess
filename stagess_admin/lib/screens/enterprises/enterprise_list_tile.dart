@@ -739,8 +739,9 @@ class EnterpriseListTileState extends State<EnterpriseListTile> {
       padding: const EdgeInsets.only(right: 12.0),
       child: TeacherPickerTile(
         title: 'Enseignant·e ayant démarché l\'entreprise',
-        schoolBoardId: widget.enterprise.schoolBoardId,
         controller: _teacherPickerController,
+        filter: (teacher) =>
+            teacher.schoolBoardId == widget.enterprise.schoolBoardId,
         editMode: _isEditing,
       ),
     );

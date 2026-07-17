@@ -564,6 +564,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
               controller: controller._experiencesAndAptitudesController,
               enabled: controller.canModify,
               maxSelectedOptions: 8,
+              minOptionCount: 1,
               newItemBuilder: (index) => ExperiencesAndAptitudes(
                   index: index, text: '', isSelected: true),
               updateItemBuilder: (item, text) => item.copyWith(text: text),
@@ -602,6 +603,7 @@ class _ExpereinceAndAptitudeSection extends StatelessWidget {
               controller: controller._attestationsAndMentionsController,
               enabled: controller.canModify,
               maxSelectedOptions: 5,
+              minOptionCount: 1,
               newItemBuilder: (index) => AttestationsAndMentions(
                   index: index, text: '', isSelected: true),
               updateItemBuilder: (item, text) => item.copyWith(text: text),
@@ -992,7 +994,6 @@ class _EmployabilityProfileSection extends StatelessWidget {
               WidgetRepeater(
                 controller: controller._referencesController,
                 enabled: controller.canModify,
-                minOptionCount: 0,
                 maxSelectedOptions: 5,
                 newItemBuilder: (index) => Reference(
                   index: index,
@@ -1256,6 +1257,7 @@ class _ForcesAndChallengesSection extends StatelessWidget {
             TextFormRepeater(
               controller: controller._successConditionsController,
               enabled: controller.canModify,
+              minOptionCount: 1,
               maxSelectedOptions: 8,
               newItemBuilder: (index) =>
                   SuccessConditions(index: index, text: '', isSelected: true),

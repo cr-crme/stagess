@@ -13,6 +13,7 @@ import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
@@ -30,6 +31,55 @@ import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/visa_pdf_templat
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 import 'package:stagess_common_flutter/widgets/skill_progression_tile.dart';
+import 'package:stagess_common_flutter/widgets/widget_repeater.dart';
+
+class _RepeatableTeacher extends RepeatableItem {
+  static Teacher? toTeacher(BuildContext context, String id) =>
+      TeachersProvider.of(context, listen: false)
+          .firstWhereOrNull((e) => e.id == id);
+
+  _RepeatableTeacher({
+    required super.index,
+    TeacherPickerController? controller,
+    String? id,
+    BuildContext? context,
+  }) : controller = _prepareController(
+            controller: controller, id: id, context: context);
+
+  final TeacherPickerController controller;
+
+  static TeacherPickerController _prepareController(
+      {TeacherPickerController? controller,
+      String? id,
+      BuildContext? context}) {
+    if (controller != null) {
+      if (id != null && id.isNotEmpty) throw ArgumentError('controller and id');
+      return controller;
+    }
+
+    if (id == null || id.isEmpty) {
+      return TeacherPickerController(initial: null);
+    }
+
+    if (context == null) {
+      throw ArgumentError(
+          'controller and context cannot both be null if id is not empty');
+    }
+    return TeacherPickerController(initial: toTeacher(context, id));
+  }
+
+  @override
+  _RepeatableTeacher copyWith({int? index, bool? isSelected}) {
+    return _RepeatableTeacher(
+        index: index ?? this.index, controller: controller);
+  }
+
+  @override
+  void dispose() {
+    controller.dispose();
+    super.dispose();
+  }
+}
 
 class StudentListTile extends StatefulWidget {
   const StudentListTile({
@@ -80,6 +130,7 @@ class StudentListTileState extends State<StudentListTile> {
     _phoneController.dispose();
     _groupController.dispose();
     _teacherInChargeIdController.dispose();
+    _supplementaryTeacherInChargeIdsController.dispose();
     _emailController.dispose();
     _contactFirstNameController.dispose();
     _contactLastNameController.dispose();
@@ -121,7 +172,15 @@ class StudentListTileState extends State<StudentListTile> {
     initial: TeachersProvider.of(context, listen: false)
         .firstWhereOrNull((e) => e.id == widget.student.teacherInChargeId),
   );
-  // TODO: Add the repeater here
+  late final _supplementaryTeacherInChargeIdsController =
+      WidgetRepeaterController(
+    options: widget.student.supplementaryTeacherInChargeIds
+        .asMap()
+        .map((index, e) => MapEntry(
+            index, _RepeatableTeacher(id: e, index: index, context: context)))
+        .values
+        .toList(),
+  );
   late Program _selectedProgram = widget.student.program;
   late final _emailController = TextEditingController(
     text: widget.student.email,
@@ -153,6 +212,11 @@ class StudentListTileState extends State<StudentListTile> {
         dateBirth: _birthController.value,
         group: _groupController.text,
         teacherInChargeId: _teacherInChargeIdController.teacher?.id ?? '',
+        supplementaryTeacherInChargeIds:
+            _supplementaryTeacherInChargeIdsController.options
+                .map((e) => e.controller.teacher?.id ?? '')
+                .where((e) => e.isNotEmpty)
+                .toList(),
         program: _selectedProgram,
         address: _addressController.address ??
             Address.empty.copyWith(id: widget.student.address.id),
@@ -309,6 +373,16 @@ class StudentListTileState extends State<StudentListTile> {
     _teacherInChargeIdController.teacher =
         TeachersProvider.of(context, listen: false)
             .firstWhereOrNull((e) => e.id == widget.student.teacherInChargeId);
+    _supplementaryTeacherInChargeIdsController.clear();
+    for (final id in widget.student.supplementaryTeacherInChargeIds) {
+      _supplementaryTeacherInChargeIdsController.add(
+        _RepeatableTeacher(
+          id: id,
+          index: _supplementaryTeacherInChargeIdsController.options.length,
+          context: context,
+        ),
+      );
+    }
     _selectedProgram = widget.student.program;
 
     _contactFirstNameController.text = widget.student.contact.firstName;
@@ -462,7 +536,9 @@ class StudentListTileState extends State<StudentListTile> {
                 _buildGroup(),
                 const SizedBox(height: 4),
                 _buildTeacherInCharge(),
-                const SizedBox(height: 4),
+                const SizedBox(height: 24),
+                _buildSupplementaryTeachersInCharge(),
+                const SizedBox(height: 24),
                 _buildProgramSelection(),
                 const SizedBox(height: 8),
                 _buildContact(),
@@ -573,9 +649,50 @@ class StudentListTileState extends State<StudentListTile> {
   Widget _buildTeacherInCharge() {
     return TeacherPickerTile(
       controller: _teacherInChargeIdController,
-      schoolBoardId: widget.student.schoolBoardId,
+      title: 'Enseignant·e responsable',
+      filter: (teacher) =>
+          teacher.schoolBoardId == widget.student.schoolBoardId,
       editMode: _isEditing,
     );
+  }
+
+  Widget _buildSupplementaryTeachersInCharge() {
+    return _isEditing ||
+            _supplementaryTeacherInChargeIdsController.options.isNotEmpty
+        ? Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Flexible(
+                child: Text(
+                  _isEditing
+                      ? 'Sélectionner les enseignant·e·s responsables supplémentaires'
+                      : 'Enseignant·e·s responsables supplémentaires :',
+                ),
+              ),
+              WidgetRepeater(
+                controller: _supplementaryTeacherInChargeIdsController,
+                buttonTitle: 'Ajouter un·e enseignant·e',
+                hasCheckboxes: false,
+                canReorder: false,
+                enabled: _isEditing,
+                newItemBuilder: (index) =>
+                    _RepeatableTeacher(id: '', index: index),
+                widgetBuilder: (context, index, item, onUpdated) {
+                  return Flexible(
+                    child: TeacherPickerTile(
+                      title: 'Titulaires de stages N°${index + 1}',
+                      controller: item.controller,
+                      editMode: _isEditing,
+                      filter: (teacher) =>
+                          teacher.schoolBoardId == widget.student.schoolBoardId,
+                    ),
+                  );
+                },
+              ),
+            ],
+          )
+        : Text('Aucun·e enseignant·e responsable supplémentaire sélectionné·e');
   }
 
   Widget _buildProgramSelection() {

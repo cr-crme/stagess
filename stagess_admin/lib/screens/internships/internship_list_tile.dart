@@ -754,9 +754,9 @@ class InternshipListTileState extends State<InternshipListTile> {
       padding: const EdgeInsets.only(right: 12.0),
       child: TeacherPickerTile(
         title: '${_isEditing ? '* ' : ''}Enseignant·e responsable',
-        schoolBoardId: widget.schoolBoardId,
         controller: _teacherPickerController,
         editMode: widget.forceEditingMode,
+        filter: (teacher) => teacher.schoolBoardId == widget.schoolBoardId,
         isMandatory: true,
       ),
     );
@@ -772,9 +772,10 @@ class InternshipListTileState extends State<InternshipListTile> {
                     key: ValueKey(controller.hashCode),
                     title:
                         '${_isEditing ? '* ' : ''}Enseignant·e responsable supplémentaire',
-                    schoolBoardId: widget.schoolBoardId,
                     controller: controller,
                     editMode: _isEditing,
+                    filter: (teacher) =>
+                        teacher.schoolBoardId == widget.schoolBoardId,
                     isMandatory: true,
                   ),
                 ),
