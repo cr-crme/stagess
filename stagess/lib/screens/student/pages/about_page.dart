@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/address_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/birthday_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
@@ -50,12 +51,58 @@ class AboutPageState extends State<AboutPage> {
                 addressController: _addressController,
                 birthdayController: _birthdayController,
               ),
+              _TeachersInCharge(student: widget.student),
               _EmergencyContact(student: widget.student),
               SizedBox(height: MediaQuery.of(context).size.height * 0.5),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+class _TeachersInCharge extends StatelessWidget {
+  const _TeachersInCharge({required this.student});
+
+  final Student student;
+
+  @override
+  Widget build(BuildContext context) {
+    final teacherInCharge = TeachersProvider.of(context)
+        .firstWhereOrNull((e) => e.id == student.teacherInChargeId);
+    final supplementaryTeachersInCharge = TeachersProvider.of(context)
+        .where((e) => student.supplementaryTeacherInChargeIds.contains(e.id))
+        .toList();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SubTitle('Enseignant·e·s responsable·s', top: 12),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListTile(
+              title: Text(
+                'Enseignant·e responsable',
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              subtitle: Text(teacherInCharge?.fullName ??
+                  'Aucun·e enseignant·e responsable'),
+            ),
+            if (supplementaryTeachersInCharge.isNotEmpty)
+              ListTile(
+                title: Text(
+                  'Intervenant·e·s supplémentaire·s',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                subtitle: Text(supplementaryTeachersInCharge
+                    .map((e) => e.fullName)
+                    .join(', ')),
+              ),
+          ],
+        ),
+      ],
     );
   }
 }

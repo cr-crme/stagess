@@ -5,9 +5,11 @@ import 'package:stagess/common/widgets/main_drawer.dart';
 import 'package:stagess/screens/student/pages/about_page.dart';
 import 'package:stagess/screens/student/pages/internships_page.dart';
 import 'package:stagess/screens/student/pages/progression_page.dart';
+import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common_flutter/helpers/responsive_service.dart';
 import 'package:stagess_common_flutter/helpers/students_extension.dart';
+import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
@@ -79,10 +81,15 @@ class _StudentScreenInternal extends StatefulWidget {
 class _StudentScreenInternalState extends State<_StudentScreenInternal>
     with SingleTickerProviderStateMixin {
   late final _tabController = TabController(length: 3, vsync: this)
-    ..index = widget.initialPage;
+    ..index = widget.initialPage
+    ..addListener(_onTabChanged);
 
   final _aboutPageKey = GlobalKey<AboutPageState>();
   final _internshipPageKey = GlobalKey<InternshipsPageState>();
+
+  void _onTabChanged() {
+    setState(() {});
+  }
 
   void _onTapBack() async {
     _logger.finer(
@@ -127,6 +134,7 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
                 onPressed: _onTapBack,
                 icon: const Icon(Icons.arrow_back),
               ),
+              actions: _buildActionButton(),
               bottom: widget.hasFullData
                   ? TabBar(
                       controller: _tabController,
@@ -160,5 +168,27 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
                     ),
                   ),
           );
+  }
+
+  List<Widget> _buildActionButton() {
+    if (_tabController.index != 0) return [];
+
+    final student = StudentsHelpers.studentsInMyGroups(context)
+        .firstWhereOrNull((e) => e.id == widget.id);
+    final user = AuthProvider.of(context, listen: false);
+    if (student == null || user.currentId == null) return [];
+
+    if (user.databaseAccessLevel < AccessLevel.schoolBoardAdmin &&
+        student.teacherInChargeId != user.currentId &&
+        !student.supplementaryTeacherInChargeIds.contains(user.currentId)) {
+      return [];
+    }
+
+    return [
+      IconButton(
+        onPressed: () {},
+        icon: const Icon(Icons.edit),
+      ),
+    ];
   }
 }
