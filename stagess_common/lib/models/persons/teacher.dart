@@ -110,7 +110,7 @@ class Teacher extends Person with SchoolMember {
       'email': FetchableFields.mandatory,
       'has_registered_account': FetchableFields.optional,
       'groups': FetchableFields.mandatory,
-      'itineraries': Itinerary.fetchableFields,
+      'itineraries': FetchableFields.optional,
       'visiting_priorities': FetchableFields.optional,
     }));
 
@@ -188,10 +188,9 @@ class Teacher extends Person with SchoolMember {
       email: StringExt.from(data['email']) ?? email,
       dateBirth: null,
       address: Address.from(data['address']) ?? address,
-      itineraries: ListExt.mergeWithData(itineraries, data['itineraries'],
-          copyWithData: (original, serialized) =>
-              original.copyWithData(serialized),
-          deserializer: Itinerary.fromSerialized),
+      itineraries: ListExt.from(data['itineraries'],
+              deserializer: Itinerary.fromSerialized) ??
+          itineraries,
       visitingPriorities: MapExt.from(data['visiting_priorities'],
               deserializer: (e) => VisitingPriority
                   .values[IntExt.from(e) ?? VisitingPriority.low.index]) ??
