@@ -7,7 +7,6 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:stagess_admin/screens/students/confirm_delete_student_dialog.dart';
 import 'package:stagess_admin/widgets/section_divider.dart';
-import 'package:stagess_admin/widgets/teacher_picker_tile.dart';
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
@@ -32,6 +31,7 @@ import 'package:stagess_common_flutter/widgets/form_dialogs/pdf/visa_pdf_templat
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 import 'package:stagess_common_flutter/widgets/skill_progression_tile.dart';
+import 'package:stagess_common_flutter/widgets/teacher_picker_tile.dart';
 import 'package:stagess_common_flutter/widgets/widget_repeater.dart';
 
 class _RepeatableTeacher extends RepeatableItem {
@@ -682,7 +682,7 @@ class StudentListTileState extends State<StudentListTile> {
         ),
         TeacherPickerTile(
           controller: _teacherInChargeIdController,
-          title: '',
+          title: 'Nom de l\'enseignant·e',
           filter: (teacher) =>
               teacher.schoolBoardId == widget.student.schoolBoardId,
           editMode: _isEditing,

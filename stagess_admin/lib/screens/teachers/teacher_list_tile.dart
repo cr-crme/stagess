@@ -494,6 +494,7 @@ class TeacherListTileState extends State<TeacherListTile> {
           child: TextFormRepeater(
             controller: _groupController,
             enabled: _isEditing,
+            buttonTitle: 'Ajouter un groupe',
             maxLength: 50,
             maxLines: 1,
             hasCheckboxes: false,
@@ -503,6 +504,7 @@ class TeacherListTileState extends State<TeacherListTile> {
             itemToText: (item) => item.group,
           ),
         ),
+        const SizedBox(height: 8)
       ],
     );
   }

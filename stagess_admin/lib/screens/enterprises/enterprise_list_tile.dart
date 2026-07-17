@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:stagess_admin/screens/enterprises/confirm_delete_enterprise_dialog.dart';
-import 'package:stagess_admin/widgets/teacher_picker_tile.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
@@ -26,6 +25,7 @@ import 'package:stagess_common_flutter/widgets/jobs_expansion_panels/enterprise_
 import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/radio_with_follow_up.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
+import 'package:stagess_common_flutter/widgets/teacher_picker_tile.dart';
 import 'package:stagess_common_flutter/widgets/web_site_list_tile.dart';
 
 class EnterpriseListTile extends StatefulWidget {

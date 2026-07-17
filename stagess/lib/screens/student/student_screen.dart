@@ -13,6 +13,7 @@ import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
+import 'package:stagess_common_flutter/widgets/confirm_exit_dialog.dart';
 
 final _logger = Logger('StudentScreen');
 
@@ -85,7 +86,6 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
     ..addListener(_onTabChanged);
 
   final _aboutPageKey = GlobalKey<AboutPageState>();
-  final _internshipPageKey = GlobalKey<InternshipsPageState>();
 
   void _onTabChanged() {
     setState(() {});
@@ -138,7 +138,7 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
               bottom: widget.hasFullData
                   ? TabBar(
                       controller: _tabController,
-                      onTap: (value) => _tabController.index = value,
+                      onTap: _onTapTab,
                       tabs: const [
                         Tab(icon: Icon(Icons.info_outlined), text: 'À propos'),
                         Tab(icon: Icon(Icons.assignment), text: 'Stages'),
@@ -155,10 +155,7 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
                     controller: _tabController,
                     children: [
                       AboutPage(key: _aboutPageKey, student: student),
-                      InternshipsPage(
-                        key: _internshipPageKey,
-                        student: student,
-                      ),
+                      InternshipsPage(student: student),
                       SkillsPage(studentId: student.id),
                     ],
                   )
@@ -168,6 +165,44 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
                     ),
                   ),
           );
+  }
+
+  bool get _isEditingAboutPage =>
+      _aboutPageKey.currentState?.isEditing ?? false;
+
+  void _onTapTab(int value) async {
+    if (_isEditingAboutPage) {
+      // Prevent the switching for now
+      final targetTab = _tabController.index;
+      _tabController.index = _tabController.previousIndex;
+      final confirm = await ConfirmExitDialog.show(
+        context,
+        content: Text.rich(
+          TextSpan(
+            children: [
+              const TextSpan(
+                  text:
+                      '** Vous quittez la page sans avoir cliqué sur Enregistrer '),
+              WidgetSpan(
+                  child: SizedBox(
+                height: 22,
+                width: 22,
+                child: Icon(Icons.save, color: Theme.of(context).primaryColor),
+              )),
+              const TextSpan(
+                text: '. **\n\nToutes vos modifications seront perdues.',
+              ),
+            ],
+          ),
+        ),
+      );
+      if (!confirm) return;
+      // Confirm the exit and proceed to switch the tab
+      _tabController.index = targetTab;
+      await _aboutPageKey.currentState?.toggleEdit(save: false);
+      setState(() {});
+      return;
+    }
   }
 
   List<Widget> _buildActionButton() {
@@ -186,9 +221,38 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
 
     return [
       IconButton(
-        onPressed: () {},
-        icon: const Icon(Icons.edit),
+        onPressed: _onClickedActionAbout,
+        tooltip: _isEditingAboutPage
+            ? 'Enregistrer les modifications'
+            : 'Modifier les informations de l\'étudiant',
+        icon: _isEditingAboutPage
+            ? const Icon(Icons.save)
+            : const Icon(Icons.edit),
       ),
     ];
+  }
+
+  Future<void> _onClickedActionAbout() async {
+    if (_tabController.index != 0) return;
+
+    // If we start editing, simply set the editing state to true and return early.
+    if (!_isEditingAboutPage) {
+      await _aboutPageKey.currentState?.toggleEdit();
+      setState(() {});
+      return;
+    }
+
+    final state = _aboutPageKey.currentState;
+    if (state == null) {
+      _logger.warning(
+        'AboutPage state is null when trying to save changes. Aborting save operation.',
+      );
+      await _aboutPageKey.currentState?.toggleEdit(save: false);
+      setState(() {});
+      return;
+    }
+
+    await _aboutPageKey.currentState?.toggleEdit(save: true);
+    setState(() {});
   }
 }

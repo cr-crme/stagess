@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stagess_common/models/internships/internship.dart';
+import 'package:stagess_common_flutter/providers/helpers/internships_helpers.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 
@@ -16,7 +17,8 @@ extension InternshipExtension on Internship {
     final students = StudentsProvider.of(context, listen: false);
     final student = students.firstWhere((e) => e.id == studentId);
     final teacher = TeachersProvider.of(context, listen: false)[teacherId];
-    if (!teacher.groups.contains(student.group)) {
+    if (!teacher.groups.contains(student.group) ||
+        hasAccessToPrivateFields(context)) {
       throw Exception(
         'The teacher ${teacher.fullName} is not assigned to the group ${student.group}',
       );

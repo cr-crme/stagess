@@ -8,7 +8,6 @@ import 'package:stagess_admin/screens/internships/confirm_delete_internship_dial
 import 'package:stagess_admin/screens/internships/schedule_list_tile.dart';
 import 'package:stagess_admin/widgets/enterprise_picker_tile.dart';
 import 'package:stagess_admin/widgets/section_divider.dart';
-import 'package:stagess_admin/widgets/teacher_picker_tile.dart';
 import 'package:stagess_common/models/enterprises/enterprise.dart';
 import 'package:stagess_common/models/enterprises/enterprise_status.dart';
 import 'package:stagess_common/models/enterprises/job.dart';
@@ -54,6 +53,7 @@ import 'package:stagess_common_flutter/widgets/phone_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/schedule_selector.dart';
 import 'package:stagess_common_flutter/widgets/show_snackbar.dart';
 import 'package:stagess_common_flutter/widgets/student_picker_tile.dart';
+import 'package:stagess_common_flutter/widgets/teacher_picker_tile.dart';
 
 class InternshipListTile extends StatefulWidget {
   const InternshipListTile({

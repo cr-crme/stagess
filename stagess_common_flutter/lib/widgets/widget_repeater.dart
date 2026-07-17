@@ -106,6 +106,7 @@ class TextFormRepeater<T extends RepeatableItem> extends StatelessWidget {
     super.key,
     required this.controller,
     this.enabled = true,
+    this.buttonTitle,
     this.minOptionCount = 0,
     this.maxOptionCount,
     this.maxSelectedOptions,
@@ -120,6 +121,7 @@ class TextFormRepeater<T extends RepeatableItem> extends StatelessWidget {
 
   final WidgetRepeaterController<T>? controller;
   final bool enabled;
+  final String? buttonTitle;
   final int minOptionCount;
   final int? maxOptionCount;
   final int? maxSelectedOptions;
@@ -135,6 +137,7 @@ class TextFormRepeater<T extends RepeatableItem> extends StatelessWidget {
   Widget build(BuildContext context) {
     return WidgetRepeater<T>(
       controller: controller,
+      buttonTitle: buttonTitle,
       enabled: enabled,
       hasCheckboxes: hasCheckboxes,
       canReorder: canReorder,
@@ -174,7 +177,7 @@ class WidgetRepeater<T extends RepeatableItem> extends StatefulWidget {
     this.maxSelectedOptions,
     required this.newItemBuilder,
     required this.widgetBuilder,
-    this.buttonTitle = 'Ajouter un élément',
+    this.buttonTitle,
     this.hasCheckboxes = true,
     this.canReorder = true,
   });
@@ -187,7 +190,7 @@ class WidgetRepeater<T extends RepeatableItem> extends StatefulWidget {
   final T Function(int index) newItemBuilder;
   final Widget Function(BuildContext context, int index, T item,
       void Function(T newItem) updateItem) widgetBuilder;
-  final String buttonTitle;
+  final String? buttonTitle;
   final bool hasCheckboxes;
   final bool canReorder;
 
@@ -204,9 +207,15 @@ class _WidgetRepeaterState<T extends RepeatableItem>
   @override
   void initState() {
     super.initState();
-    _controller._setStateCallback = setState;
+    _controller._setStateCallback = _safeSetState;
     for (int i = _controller.options.length; i < widget.minOptionCount; i++) {
       _insertNewItem(i);
+    }
+  }
+
+  void _safeSetState(VoidCallback fn) {
+    if (mounted) {
+      setState(fn);
     }
   }
 
@@ -243,12 +252,12 @@ class _WidgetRepeaterState<T extends RepeatableItem>
           ),
           if (widget.enabled)
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              padding: const EdgeInsets.only(top: 12.0, left: 12.0),
               child: TextButton(
                 onPressed: widget.enabled
                     ? () => _insertNewItem(_controller.options.length)
                     : null,
-                child: Text(widget.buttonTitle),
+                child: Text(widget.buttonTitle ?? 'Ajouter un élément'),
               ),
             ),
         ]);
