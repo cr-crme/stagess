@@ -1,16 +1,20 @@
 import json
+from pathlib import Path
 import re
 import threading
 import tkinter as tk
 from tkinter import filedialog as fd
+from urllib.parse import unquote
 
 # Imports to install
-# > pip install pandas requests bs4 openpyxl
+# > pip install pandas bs4 openpyxl playwright
 import pandas as pd
-import requests
 from bs4 import BeautifulSoup
+from playwright.sync_api import sync_playwright
 
 # Constants
+BASE_URL = "https://prod-da.education.gouv.qc.ca"
+REPERTOIRE_URL = f"{BASE_URL}/pls/apexda/r/esp_rms/rms_gp/repertoire"
 JSON_FILE_PATH = "assets/jobs-data.json"
 
 EXCEL_SECTOR_HEADER = "N° secteur"
@@ -18,6 +22,13 @@ EXCEL_SPECIALIZATION_HEADER = "N° métiers"
 EXCEL_SKILL_HEADER = "Numéro de compétences"
 
 IS_OPTIONAL_REGEX = re.compile(r"images/ico_opt.gif")
+SECTOR_REGEX = re.compile(r"^Secteur:\s*(\d+)\s*-\s*(.+)$")
+SPECIALIZATION_ID_REGEX = re.compile(r"^(\d{4})\b")
+SKILL_TITLE_REGEX = re.compile(r"(\d{6})\s*-\s*([^\t\r\n]*)")
+SKILL_BLOCK_REGEX = re.compile(
+    r"(?ms)^(?P<id>\d{6})\s*-\s*(?P<name>.+?)\s+Ajouter à mon plan\s+Complexité\s*:\s*(?P<complexity>\d+)\s+"
+    r"Critères de performance\s+(?P<criteria>.*?)\s+Tâches\s+(?P<tasks>.*?)(?=^\d{6}\s*-\s*|\Z)"
+)
 
 # Data to change
 EXCEL_SST_RISKS_HEADERS = {
@@ -70,23 +81,20 @@ def run():
 
     def target():
         ui = [entrySSTRisks, entryStageQuestions, fileButtonSSTRisks, fileButtonStageQuestions, startButton]
-        # Disable the UI
-        for element in ui:
-            element["state"] = "disabled"
-        # Run the script
-        start(excelPathSSTRisks.get(), excelPathStageQuestions.get())
-        # Enable the UI
-        for element in ui:
-            element["state"] = "normal"
+        try:
+            for element in ui:
+                element["state"] = "disabled"
+            start(excelPathSSTRisks.get(), excelPathStageQuestions.get())
+        finally:
+            for element in ui:
+                element["state"] = "normal"
 
     threading.Thread(target=target).start()
 
 
 def start(excelPathSSTRisks: str, excelPathStageQuestions: str):
     """Starts the main script"""
-    # Open excel
     try:
-        print(excelPathSSTRisks)
         excelSSTRisks = pd.read_excel(excelPathSSTRisks)
     except FileNotFoundError:
         setMessage("Could not read the SST excel file.")
@@ -98,15 +106,15 @@ def start(excelPathSSTRisks: str, excelPathStageQuestions: str):
         setMessage("Could not read the Stage excel file.")
         return
 
-    json = []
-    for sectorID, sectorName in fetchActivitySectors():
-        specializations = []
-        for specializationURL in fetchSpecializationURLsOfSector(sectorID):
-            specialization = fetchSpecialization(specializationURL)
-            specializations.append(specialization)
-            if specialization is None:
-                continue
+    try:
+        data = fetchJobsData()
+    except Exception as error:
+        setMessage(f"Could not fetch jobs data: {error}")
+        return
 
+    for sector in data:
+        sectorID = sector["id"]
+        for specialization in sector["s"]:
             try:
                 specialization["q"] = getStageQuestionsFromExcel(excelStageQuestions, sectorID, specialization["id"])
             except KeyError as e:
@@ -124,15 +132,7 @@ def start(excelPathSSTRisks: str, excelPathStageQuestions: str):
                 )
                 return
 
-        json.append(
-            {
-                "n": sectorName,
-                "id": sectorID,
-                "s": specializations,
-            }
-        )
-
-    saveJson(json, JSON_FILE_PATH)
+    saveJson(data, JSON_FILE_PATH)
     setMessage("All done !")
 
 
@@ -208,104 +208,246 @@ def getStageQuestionsFromExcel(excel: pd.DataFrame, sectorID: str, specializatio
 
 
 # Data fetching
-def fetchActivitySectors():
-    """Fetches and parses all the available activity sectors."""
+def fetchJobsData():
+    """Fetches the current repertoire and returns it in the app's compact schema."""
+    setMessage("Fetching all jobs from the repertoire...")
+
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(headless=True)
+        context = browser.new_context()
+        repertoirePage = context.new_page()
+        repertoirePage.goto(REPERTOIRE_URL, wait_until="networkidle")
+
+        sectors = []
+        sectorIndex = {}
+        specializationCount = 0
+
+        while True:
+            entries = parseRepertoirePage(repertoirePage.content())
+
+            for entry in entries:
+                sector = sectorIndex.get(entry["sectorId"])
+                if sector is None:
+                    sector = {"n": entry["sectorName"], "id": entry["sectorId"], "s": []}
+                    sectorIndex[entry["sectorId"]] = sector
+                    sectors.append(sector)
+
+                specialization = fetchSpecialization(
+                    context,
+                    entry["detailUrl"],
+                    fallbackSpecializationId=entry["specializationId"],
+                    fallbackSpecializationName=entry["specializationName"],
+                )
+                if specialization is None:
+                    continue
+
+                sector["s"].append(specialization)
+                specializationCount += 1
+                setMessage(f"Fetched {specializationCount} specializations...")
+
+            if not goToNextRepertoirePage(repertoirePage):
+                break
+
+        browser.close()
+
+    return sectors
+
+
+def parseRepertoirePage(html: str):
+    """Parses one repertoire result page and returns specialization links grouped by sector context."""
     result = []
-    nameRegex = re.compile(r"^\d+ - (\D*)$")
+    soup = BeautifulSoup(html, "html.parser")
+    currentSectorId = None
+    currentSectorName = None
 
-    setMessage("Fetching all sectors...")
-    page = requests.get("http://www1.education.gouv.qc.ca/sections/metiers/index.asp")
-    soup = BeautifulSoup(page.content, "html.parser")
-
-    # For each checkbox in the page
-    for input in soup.find_all("input", type="checkbox"):
-        sectorID = input["value"]
-        name = nameRegex.match(input.find_next_sibling("label").text)
-
-        # Handle error
-        if name is None:
-            setMessage(f"Missing data ! Could not find a name of Sector {sectorID}.")
+    for row in soup.find_all("tr"):
+        rowText = cleanUpText(row.get_text(" ", strip=True))
+        if not rowText:
             continue
 
-        result.append((sectorID, name.group(1)))
+        sectorMatch = SECTOR_REGEX.match(rowText)
+        if sectorMatch is not None:
+            currentSectorId = sectorMatch.group(1)
+            currentSectorName = sectorMatch.group(2)
+            continue
+
+        cells = row.find_all("td")
+        if len(cells) < 4 or currentSectorId is None or currentSectorName is None:
+            continue
+
+        detailLink = cells[0].find("a", href=True)
+        if detailLink is None or "action$a-dialog-open" not in detailLink["href"]:
+            continue
+
+        specializationId = cleanUpText(cells[1].get_text())
+        specializationName = cleanUpText(cells[3].get_text())
+        if not specializationId or not specializationName:
+            continue
+
+        result.append(
+            {
+                "sectorId": currentSectorId,
+                "sectorName": currentSectorName,
+                "specializationId": specializationId,
+                "specializationName": specializationName,
+                "detailUrl": extractDetailUrl(detailLink["href"]),
+            }
+        )
 
     return result
 
 
-def fetchSpecializationURLsOfSector(sectorId: str):
-    """Returns all the specializations' URL of a particular sector."""
+def extractDetailUrl(dialogHref: str):
+    """Extracts the inner APEX dialog URL from the result table link."""
+    encodedUrl = dialogHref.split("url=", 1)[1].split("&appId=", 1)[0]
+    return unquote(encodedUrl)
+
+
+def goToNextRepertoirePage(page):
+    """Moves to the next repertoire page if pagination is available."""
+    nextButtons = page.locator('button[title="Suivant"], button[aria-label="Suivant"]')
+    if nextButtons.count() == 0:
+        return False
+
+    nextButton = nextButtons.first
+    if nextButton.is_disabled():
+        return False
+
+    firstCell = page.locator("#METIER_data_panel tr td:nth-child(2)").first
+    previousValue = firstCell.inner_text() if firstCell.count() > 0 else ""
+    nextButton.click(force=True)
+
+    if previousValue:
+        try:
+            page.wait_for_function(
+                """
+                previousValue => {
+                    const firstCell = document.querySelector('#METIER_data_panel tr td:nth-child(2)');
+                    return firstCell && firstCell.textContent.trim() !== previousValue;
+                }
+                """,
+                previousValue,
+                timeout=5000,
+            )
+        except Exception:
+            page.wait_for_timeout(1000)
+
+    return True
+
+
+def fetchSpecialization(context, detailUrl: str, fallbackSpecializationId=None, fallbackSpecializationName=None):
+    """Fetches a specialization detail page and parses its skills."""
+    detailPage = context.new_page()
+
+    try:
+        detailPage.goto(f"{BASE_URL}{detailUrl}", wait_until="networkidle")
+        bodyText = cleanUpText(detailPage.locator("body").inner_text())
+        if "Métier" not in bodyText:
+            setMessage(f"Missing data ! Specialization page did not load correctly. ({detailUrl})")
+            return None
+
+        html = detailPage.content()
+        specializationId, specializationName = parseSpecializationIdentity(bodyText)
+        specializationId = specializationId or fallbackSpecializationId
+        specializationName = specializationName or fallbackSpecializationName
+        if specializationId is None or specializationName is None:
+            setMessage(f"Missing data ! Specialization header not found. ({detailUrl})")
+            return None
+
+        skills = parseSkillsFromHtml(html)
+        if not skills:
+            skills = parseSkillsFromText(bodyText)
+
+        if not skills:
+            setMessage(f"Missing data ! No skills found for specialization {specializationId}.")
+            return None
+
+        return {"n": specializationName, "id": specializationId, "s": skills}
+    finally:
+        detailPage.close()
+
+
+def parseSpecializationIdentity(bodyText: str):
+    """Extracts the specialization id and title from the detail page text."""
+    lines = [cleanUpText(line) for line in bodyText.splitlines() if cleanUpText(line)]
+    specializationId = None
+    specializationName = None
+
+    for index, line in enumerate(lines):
+        if SPECIALIZATION_ID_REGEX.match(line):
+            specializationId = SPECIALIZATION_ID_REGEX.match(line).group(1)
+            if index + 1 < len(lines):
+                specializationName = lines[index + 1]
+            break
+
+    return specializationId, specializationName
+
+
+def parseSkillsFromHtml(html: str):
+    """Parses the skill tables when the detail page exposes structured table markup."""
     result = []
-    hrefRegex = re.compile(r"^index\.asp\?.*id=(\d+)")
+    soup = BeautifulSoup(html, "html.parser")
 
-    setMessage(f"Fetching all specializations of {sectorId}...")
-    page = requests.get(
-        f"http://www1.education.gouv.qc.ca/sections/metiers/index.asp?page=recherche&action=search&navSeq=1&sector1={sectorId}"
-    )
-    soup = BeautifulSoup(page.content, "html.parser")
-
-    # Exctract the id of each specializations' link
-    for specialization in soup.find_all("a", href=hrefRegex):
-        s = hrefRegex.match(specialization["href"])
-        if s is None:
-            continue
-        result.append(s.group(1))
-
-    return result
-
-
-def fetchSpecialization(specializationURL: str):
-    """Returns a detailed specialization."""
-    titleRegex = re.compile(r"(\d+) - ([^\t\r\n]*)")
-
-    page = requests.get(
-        f"http://www1.education.gouv.qc.ca/sections/metiers/index.asp?page=fiche&id={specializationURL}"
-    )
-    soup = BeautifulSoup(page.content, "html.parser")
-
-    # Find the name of the specialization
-    header = soup.find("h2")
-    if header is None:
-        setMessage(f"Missing data ! Specialization header not found. (sector: {specializationURL})")
-        return None
-    headerText = header.getText(";", True).split(";")
-
-    result = {"n": headerText[1], "id": headerText[0], "s": []}
-
-    # Parse each skill
     for header in soup.find_all("thead"):
         headerSections = header.find_all("th")
-
-        # Extract id and name from the title
-        titleSearch = titleRegex.search(headerSections[0].text)
-        is_optional = IS_OPTIONAL_REGEX.search(str(header)) is not None
-        if titleSearch is None:
-            setMessage(
-                f"Missing data ! The title of skill {header.find('th').text} (specialization: {specializationURL}) could not be found"
-            )
+        if len(headerSections) < 3:
             continue
 
-        skillID = titleSearch.group(1)
-        skillName = titleSearch.group(2)
+        titleSearch = SKILL_TITLE_REGEX.search(cleanUpText(headerSections[0].get_text(" ", strip=True)))
+        if titleSearch is None:
+            continue
 
-        # Get the complexity
-        complexity = headerSections[2].text
+        body = header.find_next_sibling("tbody")
+        if body is None:
+            continue
 
-        # Get the two list that are inside the table under the header
-        lists = header.find_next_sibling("tbody").find_all("ul")
+        lists = body.find_all("ul")
+        if len(lists) < 2:
+            continue
 
-        criteria = []
-        # Criteria are situated on the first list
-        for criterion in lists[0].find_all("li"):
-            criteria.append(criterion.text)
-
+        criteria = [cleanUpText(item.get_text(" ", strip=True)) for item in lists[0].find_all("li")]
         tasks = []
-        # Tasks are situated on the second list
         for task in lists[1].find_all("li"):
-            is_task_optional = IS_OPTIONAL_REGEX.search(str(task)) is not None
-            tasks.append({"t": task.text, "o": is_task_optional})
+            tasks.append(
+                {
+                    "t": cleanUpText(task.get_text(" ", strip=True)),
+                    "o": IS_OPTIONAL_REGEX.search(str(task)) is not None,
+                }
+            )
 
-        result["s"].append(
-            {"id": skillID, "n": skillName, "x": complexity, "c": criteria, "t": tasks, "o": is_optional}
+        result.append(
+            {
+                "id": titleSearch.group(1),
+                "n": cleanUpText(titleSearch.group(2)),
+                "x": cleanUpText(headerSections[2].get_text(" ", strip=True)),
+                "c": criteria,
+                "t": tasks,
+                "o": IS_OPTIONAL_REGEX.search(str(header)) is not None,
+            }
+        )
+
+    return result
+
+
+def parseSkillsFromText(bodyText: str):
+    """Fallback parser for the rendered text content of the detail page."""
+    result = []
+
+    for match in SKILL_BLOCK_REGEX.finditer(bodyText):
+        criteria = [cleanUpText(line) for line in match.group("criteria").splitlines() if cleanUpText(line)]
+        tasks = [
+            {"t": cleanUpText(line), "o": False} for line in match.group("tasks").splitlines() if cleanUpText(line)
+        ]
+
+        result.append(
+            {
+                "id": match.group("id"),
+                "n": cleanUpText(match.group("name")),
+                "x": match.group("complexity"),
+                "c": criteria,
+                "t": tasks,
+                "o": False,
+            }
         )
 
     return result
@@ -315,6 +457,7 @@ def fetchSpecialization(specializationURL: str):
 def cleanUpText(text: str):
     """Removes unwanted formating chars at the end of [text]."""
     text = text.strip()
+    text = text.replace("\xa0", " ")
     text = text.replace("\u009c", "oe")
     text = text.replace("\u0092", "'")
     return text
@@ -336,7 +479,8 @@ def cleanUpData(data):
 def saveJson(data: list, path: str):
     """Saves [json] as a file named [path]."""
     setMessage("Saving json...")
-    with open(path, "w") as file:
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as file:
         file.write(json.dumps(cleanUpData(data), indent=0, separators=(",", ":")))
 
 
