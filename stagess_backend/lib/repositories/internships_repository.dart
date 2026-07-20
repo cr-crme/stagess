@@ -184,12 +184,14 @@ abstract class InternshipsRepository extends RepositoryAbstract {
         previous: previous,
         allowedToCreate: [
           AccessLevel.teacher,
+          AccessLevel.teacherAdmin,
           AccessLevel.schoolAdmin,
           AccessLevel.schoolBoardAdmin,
           AccessLevel.superAdmin,
         ],
         allowedToModify: [
           AccessLevel.teacher,
+          AccessLevel.teacherAdmin,
           AccessLevel.schoolAdmin,
           AccessLevel.schoolBoardAdmin,
           AccessLevel.superAdmin,
@@ -277,8 +279,6 @@ abstract class InternshipsRepository extends RepositoryAbstract {
                 (student['supplementary_teacher_in_charge_ids'] as List)
                     .contains(teacherId);
 
-            // TODO: What to do when a teacher from another group is added to the supplementary supervising teachers?
-            // TODO: Are we still okay that a teacher can assign themselves to the supplementary supervising teachers?
             final teacherGroups = teacher.data?['groups'];
             if (teacherGroups == null || teacherGroups is! List) {
               throw InvalidRequestException(

@@ -753,7 +753,7 @@ class InternshipListTileState extends State<InternshipListTile> {
     return Padding(
       padding: const EdgeInsets.only(right: 12.0),
       child: TeacherPickerTile(
-        title: '${_isEditing ? '* ' : ''}Enseignant·e responsable',
+        title: '${_isEditing ? '* ' : ''}Enseignant·e superviseur de stage',
         controller: _teacherPickerController,
         editMode: widget.forceEditingMode,
         filter: (teacher) => teacher.schoolBoardId == widget.schoolBoardId,
@@ -797,7 +797,7 @@ class InternshipListTileState extends State<InternshipListTile> {
                         .add(TeacherPickerController());
                   });
                 },
-                child: Text('Ajouter un·e enseignant·e responsable',
+                child: Text('Ajouter un·e enseignant·e superviseur·e',
                     textAlign: TextAlign.center)),
           )
       ],

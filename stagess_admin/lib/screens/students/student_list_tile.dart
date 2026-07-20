@@ -670,9 +670,9 @@ class StudentListTileState extends State<StudentListTile> {
                       title: 'Enseignant·e responsable',
                       content: Text(
                           'Avec les administrateurs, l\'enseignant responsable est '
-                          'la seule personne capable de modifier les informations ' // TODO Confirm this is true (supplementary)
-                          'personnelles de l’élève qui figurent sur l’onglet "À propos" '
-                          'de la page de l’élève (p. ex. son adresse courriel)'),
+                          'la seule personne capable de modifier les informations '
+                          'personnelles de l\'élève qui figurent sur l\'onglet "À propos" '
+                          'de la page de l\'élève (p. ex. son adresse courriel)'),
                     );
                   },
                   icon:
@@ -715,7 +715,7 @@ class StudentListTileState extends State<StudentListTile> {
                       context,
                       title: 'Intervenant·e·s supplémentaires',
                       content: Text(
-                          'L\'élève apparaitra dans la liste d’élèves de tous les '
+                          'L\'élève apparaitra dans la liste d\'élèves de tous les '
                           'intervenants supplémentaires sélectionnés dans la liste'),
                     );
                   },

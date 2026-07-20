@@ -104,10 +104,8 @@ abstract class StudentsRepository extends RepositoryAbstract {
       // User is not a teacher (e.g., an admin)
     }
 
-    final teacherIsInCharge = teacher != null &&
-        (previous?.teacherInChargeId == teacher.id ||
-            (previous?.supplementaryTeacherInChargeIds.contains(teacher.id) ??
-                false));
+    final teacherWhoCanModify =
+        teacher != null && previous?.teacherInChargeId == teacher.id;
 
     await SecurityPolicies([
       UserIsVerified(user: user),
@@ -126,8 +124,8 @@ abstract class StudentsRepository extends RepositoryAbstract {
           AccessLevel.superAdmin,
         ],
         allowedToModify: [
-          if (teacherIsInCharge) AccessLevel.teacher,
-          AccessLevel.teacherAdmin,
+          if (teacherWhoCanModify) AccessLevel.teacher,
+          if (teacherWhoCanModify) AccessLevel.teacherAdmin,
           AccessLevel.schoolAdmin,
           AccessLevel.schoolBoardAdmin,
           AccessLevel.superAdmin,

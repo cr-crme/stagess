@@ -96,6 +96,14 @@
             },
         },
         {
+            "name": "Generate jobs data asset file",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "utilities/generateJobsDataAssetFile.py",
+            "console": "integratedTerminal",
+            "env": {},
+        },
+        {
             "name": "Widget tester",
             "request": "launch",
             "type": "dart",

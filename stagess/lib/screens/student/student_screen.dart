@@ -214,8 +214,7 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
     if (student == null || user.currentId == null) return [];
 
     if (user.databaseAccessLevel < AccessLevel.schoolBoardAdmin &&
-        student.teacherInChargeId != user.currentId &&
-        !student.supplementaryTeacherInChargeIds.contains(user.currentId)) {
+        student.teacherInChargeId != user.currentId) {
       return [];
     }
 

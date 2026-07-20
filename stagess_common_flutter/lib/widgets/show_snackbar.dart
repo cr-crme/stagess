@@ -9,14 +9,17 @@ void showSnackBar(
   Duration duration = const Duration(seconds: 5),
 }) {
   _logger.finer('Showing snackbar with message: $message');
-
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-      content: Text(
-        message,
-        style: TextStyle(fontSize: 16, color: Colors.white),
+  try {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: TextStyle(fontSize: 16, color: Colors.white),
+        ),
+        duration: duration,
       ),
-      duration: duration,
-    ),
-  );
+    );
+  } catch (e, stackTrace) {
+    _logger.severe('Error showing snackbar: $e', e, stackTrace);
+  }
 }
