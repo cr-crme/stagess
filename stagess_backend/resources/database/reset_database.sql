@@ -178,6 +178,48 @@ CREATE TABLE persons (
     FOREIGN KEY (id) REFERENCES entities(shared_id) ON DELETE CASCADE
 );
 
+/**** Teachers ****/
+
+CREATE TABLE teachers (
+    id VARCHAR(36) NOT NULL PRIMARY KEY,
+    school_board_id VARCHAR(36) NOT NULL,
+    school_id VARCHAR(36) NOT NULL, 
+    has_registered_account BOOLEAN NOT NULL DEFAULT FALSE,
+    access_level INT NOT NULL,
+    FOREIGN KEY (id) REFERENCES persons(id) ON DELETE CASCADE,
+    FOREIGN KEY (school_board_id) REFERENCES school_boards(id) ON DELETE CASCADE,
+    FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
+);
+
+CREATE TABLE teaching_groups (
+    teacher_id VARCHAR(36) NOT NULL,
+    group_name VARCHAR(50) NOT NULL, 
+    FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE
+);
+
+CREATE TABLE teacher_itineraries (
+    id VARCHAR(36) NOT NULL PRIMARY KEY,
+    teacher_id VARCHAR(36) NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE
+);
+
+CREATE TABLE teacher_itinerary_waypoints (
+    step_index INT NOT NULL,
+    itinerary_id VARCHAR(36) NOT NULL,
+    title VARCHAR(50) NOT NULL,
+    subtitle VARCHAR(50) NOT NULL,
+    address_civic INT,
+    address_street VARCHAR(100),
+    address_apartment VARCHAR(50),
+    address_city VARCHAR(50),
+    address_postal_code VARCHAR(50),
+    address_latitude FLOAT NOT NULL,
+    address_longitude FLOAT NOT NULL,
+    visiting_priority INT NOT NULL,
+    FOREIGN KEY (itinerary_id) REFERENCES teacher_itineraries(id) ON DELETE CASCADE
+);
+
 
 /**** Students ****/
 
@@ -312,48 +354,6 @@ CREATE TABLE student_visa_success_conditions_items (
     is_selected BOOLEAN NOT NULL,
     text VARCHAR(200) NOT NULL,
     FOREIGN KEY (visa_form_id) REFERENCES student_visa_forms(id) ON DELETE CASCADE
-);
-
-/**** Teachers ****/
-
-CREATE TABLE teachers (
-    id VARCHAR(36) NOT NULL PRIMARY KEY,
-    school_board_id VARCHAR(36) NOT NULL,
-    school_id VARCHAR(36) NOT NULL, 
-    has_registered_account BOOLEAN NOT NULL DEFAULT FALSE,
-    access_level INT NOT NULL,
-    FOREIGN KEY (id) REFERENCES persons(id) ON DELETE CASCADE,
-    FOREIGN KEY (school_board_id) REFERENCES school_boards(id) ON DELETE CASCADE,
-    FOREIGN KEY (school_id) REFERENCES schools(id) ON DELETE CASCADE
-);
-
-CREATE TABLE teaching_groups (
-    teacher_id VARCHAR(36) NOT NULL,
-    group_name VARCHAR(50) NOT NULL, 
-    FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE
-);
-
-CREATE TABLE teacher_itineraries (
-    id VARCHAR(36) NOT NULL PRIMARY KEY,
-    teacher_id VARCHAR(36) NOT NULL,
-    name VARCHAR(50) NOT NULL,
-    FOREIGN KEY (teacher_id) REFERENCES teachers(id) ON DELETE CASCADE
-);
-
-CREATE TABLE teacher_itinerary_waypoints (
-    step_index INT NOT NULL,
-    itinerary_id VARCHAR(36) NOT NULL,
-    title VARCHAR(50) NOT NULL,
-    subtitle VARCHAR(50) NOT NULL,
-    address_civic INT,
-    address_street VARCHAR(100),
-    address_apartment VARCHAR(50),
-    address_city VARCHAR(50),
-    address_postal_code VARCHAR(50),
-    address_latitude FLOAT NOT NULL,
-    address_longitude FLOAT NOT NULL,
-    visiting_priority INT NOT NULL,
-    FOREIGN KEY (itinerary_id) REFERENCES teacher_itineraries(id) ON DELETE CASCADE
 );
 
 

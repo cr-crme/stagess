@@ -771,7 +771,7 @@ class InternshipListTileState extends State<InternshipListTile> {
                   child: TeacherPickerTile(
                     key: ValueKey(controller.hashCode),
                     title:
-                        '${_isEditing ? '* ' : ''}Enseignant·e responsable supplémentaire',
+                        '${_isEditing ? '* ' : ''}Enseignant·e superviseur de stage supplémentaire',
                     controller: controller,
                     editMode: _isEditing,
                     filter: (teacher) =>

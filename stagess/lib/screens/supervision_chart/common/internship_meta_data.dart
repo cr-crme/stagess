@@ -13,12 +13,14 @@ class InternshipMetaData {
   final Student student;
   bool isSupervised;
   bool isTeacherSignatory;
+  bool isTeacherInCharge;
   VisitingPriority visitingPriority;
 
   InternshipMetaData({
     required this.internship,
     required this.student,
     required this.isSupervised,
+    required this.isTeacherInCharge,
     required this.visitingPriority,
     required this.isTeacherSignatory,
   });
@@ -79,6 +81,9 @@ extension InternshipMetaDataList on List<InternshipMetaData> {
             (student) => student.id == internship.studentId,
           ),
           isSupervised: internship.hasAccessToPrivateFields(context),
+          isTeacherInCharge: student.teacherInChargeId == currentTeacher.id ||
+              student.supplementaryTeacherInChargeIds
+                  .contains(currentTeacher.id),
           visitingPriority: currentTeacher.visitingPriority(internship.id) ==
                   VisitingPriority.notApplicable
               ? VisitingPriority.low

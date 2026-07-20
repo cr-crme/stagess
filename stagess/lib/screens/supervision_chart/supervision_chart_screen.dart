@@ -682,11 +682,13 @@ class _StudentTileState extends State<_StudentTile> {
         ),
         trailing: widget.editSignatoriesMode
             ? Checkbox(
-                value: widget.meta.isTeacherSignatory
+                value: widget.meta.isTeacherSignatory ||
+                        widget.meta.isTeacherInCharge
                     ? true
                     : widget.meta.isSupervised,
                 onChanged: widget.editSignatoriesMode &&
-                        !widget.meta.isTeacherSignatory
+                        !widget.meta.isTeacherSignatory &&
+                        !widget.meta.isTeacherInCharge
                     ? (value) => setState(
                           () => widget.meta.isSupervised = value ?? false,
                         )
