@@ -647,7 +647,9 @@ class MySqlStudentsRepository extends StudentsRepository {
       toUpdate['group_name'] = student.group.serialize();
     }
     if (student.teacherInChargeId != previous.teacherInChargeId) {
-      toUpdate['teacher_in_charge_id'] = student.teacherInChargeId.serialize();
+      toUpdate['teacher_in_charge_id'] = student.teacherInChargeId.isEmpty
+          ? null
+          : student.teacherInChargeId.serialize();
     }
     if (student.contactLink != previous.contactLink) {
       toUpdate['contact_link'] = student.contactLink.serialize();
