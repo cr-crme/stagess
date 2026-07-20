@@ -294,6 +294,11 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     return _registeredFields[id]!;
   }
 
+  ///
+  /// A callback to notify any inheriting class that a new item has been registered to
+  /// the registered list. It can be used to perform action on this item if needed
+  void itemChanged(String id) async {}
+
   final bool mockMe;
 
   bool isOfCorrectRequestFields(RequestFields field) =>
@@ -375,7 +380,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
 
     try {
       if (mockMe) {
-        super.add(item, notify: true);
+        _addItem(item, notify: true);
         return true;
       }
 
@@ -401,11 +406,11 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     if (items.containsKey('id')) {
       // A single item was received
       if (contains(items['id'])) {
-        super.replace(this[items['id']].copyWithData(items), notify: notify);
+        _replaceItem(this[items['id']].copyWithData(items), notify: notify);
       } else {
         final item = deserializeItem(items);
         if (item == null) return;
-        super.add(item, notify: notify);
+        _addItem(item, notify: notify);
       }
     } else {
       // A map of items was received, callback the add function for each item
@@ -413,6 +418,7 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
         _addOrReplaceIntoSelf(item, notify: false);
       }
     }
+
     if (notify) notifyListeners();
   }
 
@@ -438,12 +444,26 @@ abstract class BackendListProvided<T extends ExtendedItemSerializable>
     replaceWithConfirmation(item, notify: notify);
   }
 
+  ///
+  /// Replace an item in the rawlist and inform any subclass of that change.
+  void _replaceItem(T item, {bool notify = true}) {
+    super.replace(item, notify: notify);
+    itemChanged(item.id);
+  }
+
+  ///
+  /// Add an item in the rawlist and inform any subclass of that change.
+  void _addItem(T item, {bool notify = true}) {
+    super.add(item, notify: notify);
+    itemChanged(item.id);
+  }
+
   Future<bool> replaceWithConfirmation(T item, {bool notify = true}) async {
     _sanityChecks(notify: notify);
 
     try {
       if (mockMe) {
-        super.replace(item, notify: true);
+        _replaceItem(item, notify: true);
         return true;
       }
 
@@ -660,9 +680,8 @@ Future<void> _incomingMessage(
           final id = protocol.data!['id'];
           if (id != null) {
             final referenceFields = selector.getReferenceFetchableFields();
-            final registeredFieldsOfId = _getSelector(
-              mainField,
-            ).getRegisteredFieldsOf(id);
+            final registeredFieldsOfId =
+                _getSelector(mainField).getRegisteredFieldsOf(id);
             registeredFieldsOfId.addAll(
               referenceFields
                   .extractFrom(protocol.data?.keys ?? Iterable.empty()),
@@ -681,13 +700,12 @@ Future<void> _incomingMessage(
 
           final mainField = protocol.field!;
           final id = protocol.data!['id'];
-          final registeredFieldsOfId = _getSelector(
-            mainField,
-          ).getRegisteredFieldsOf(id);
+          final registeredFieldsOfId =
+              _getSelector(mainField).getRegisteredFieldsOf(id);
 
-          final subFields = FetchableFields.fromSerialized(
-            (protocol.data!['updated_fields']),
-          ).filter(registeredFieldsOfId);
+          final subFields =
+              FetchableFields.fromSerialized((protocol.data!['updated_fields']))
+                  .filter(registeredFieldsOfId);
           if (subFields.isEmpty) return;
 
           await _getFromBackend(mainField, id: id, fields: subFields);
