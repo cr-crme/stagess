@@ -16680,8 +16680,7 @@ const jobData = [
         "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17", "18"]
       },
       {
-        "n":
-            "Ouvri\u00e8re, ouvrier \u00e0 la pr\u00e9paration des panneaux de bois",
+        "n": "Préposée, préposé à la préparation des panneaux de bois",
         "id": "8250",
         "s": [
           {
@@ -16708,7 +16707,7 @@ const jobData = [
               },
               {
                 "t":
-                    "Lire les renseignements inscrits sur la liste de d\u00e9bitage (mat\u00e9riaux, identification des pi\u00e8ces, code,  dimensions, nombre de pi\u00e8ces, etc.).",
+                    "Lire les renseignements inscrits sur la liste de d\u00e9bitage (mat\u00e9riaux, identification des pi\u00e8ces, code, dimensions, nombre de pi\u00e8ces, etc.).",
                 "o": false
               },
               {
@@ -16769,7 +16768,7 @@ const jobData = [
               },
               {
                 "t":
-                    "S'assurer d'un espace de travail s\u00e9curitaire (absence de rebuts autour de la d\u00e9ligneuse ou de la scie conventionnelle, trappe d'aspiration des poussi\u00e8res ouverte, etc.).",
+                    "S'assurer que l'espace de travail est s\u00e9curitaire (absence de rebuts autour de la d\u00e9ligneuse ou de la scie conventionnelle, trappe d'aspiration des poussi\u00e8res ouverte, etc.).",
                 "o": false
               },
               {
@@ -16794,7 +16793,7 @@ const jobData = [
               },
               {
                 "t":
-                    "V\u00e9rifier les ajustements ou les faire approuver par la personne responsable.",
+                    "V\u00e9rifier les r\u00e9glages ou les faire approuver par la personne responsable.",
                 "o": false
               },
               {
@@ -16848,6 +16847,7 @@ const jobData = [
               "Respect des normes de qualit\u00e9.",
               "Application correcte des techniques de travail.",
               "Utilisation appropri\u00e9e des outils, de l'\u00e9quipement et des instruments de mesure.",
+              "Utilisation appropri\u00e9e du syst\u00e8me de mesure imp\u00e9riale ou m\u00e9trique.",
               "Souci de l'atteinte des objectifs de production.",
               "Souci de l'\u00e9conomie des mat\u00e9riaux."
             ],
@@ -16859,7 +16859,7 @@ const jobData = [
               },
               {
                 "t":
-                    "S'assurer d'un espace de travail s\u00e9curitaire (absence de rebuts autour de la scie \u00e0 panneaux horizontale, trappe d'aspiration des poussi\u00e8res ouverte, etc.).",
+                    "S'assurer que l'espace de travail est s\u00e9curitaire (absence de rebuts autour de la scie \u00e0 panneaux horizontale, trappe d'aspiration des poussi\u00e8res ouverte, etc.).",
                 "o": false
               },
               {
@@ -16881,7 +16881,7 @@ const jobData = [
               },
               {
                 "t":
-                    "V\u00e9rifier les ajustements ou les faire approuver par la personne responsable.",
+                    "V\u00e9rifier les r\u00e9glages ou les faire approuver par la personne responsable.",
                 "o": false
               },
               {
@@ -16901,7 +16901,7 @@ const jobData = [
               {"t": "V\u00e9rifier la qualit\u00e9 de la coupe.", "o": false},
               {
                 "t":
-                    "Porter les num\u00e9ros du plan de coupe sur les pi\u00e8ces.",
+                    "Reporter les num\u00e9ros du plan de coupe sur les pi\u00e8ces.",
                 "o": false
               },
               {
@@ -16939,7 +16939,7 @@ const jobData = [
               },
               {
                 "t":
-                    "S'assurer d'un espace de travail s\u00e9curitaire (absence de rebuts autour de la scie \u00e0 panneaux verticale, trappe d'aspiration des poussi\u00e8res ouverte, etc.).",
+                    "S'assurer que l'espace de travail est s\u00e9curitaire (absence de rebuts autour de la scie \u00e0 panneaux verticale, trappe d'aspiration des poussi\u00e8res ouverte, etc.).",
                 "o": false
               },
               {
@@ -16947,7 +16947,7 @@ const jobData = [
                 "o": false
               },
               {"t": "Enlever et remplacer la lame de scie.", "o": true},
-              {"t": "Effectuer les ajustements.", "o": true},
+              {"t": "Effectuer les r\u00e9glages.", "o": true},
               {
                 "t":
                     "V\u00e9rifier la pr\u00e9sence et l'\u00e9tat des dispositifs de s\u00e9curit\u00e9.",
@@ -16955,7 +16955,7 @@ const jobData = [
               },
               {
                 "t":
-                    "V\u00e9rifier les ajustements ou les faire approuver par la personne responsable.",
+                    "V\u00e9rifier les r\u00e9glages ou les faire approuver par la personne responsable.",
                 "o": false
               },
               {
@@ -16991,7 +16991,6 @@ const jobData = [
               "Respect des directives de travail.",
               "Respect des fr\u00e9quences d'entretien.",
               "Application correcte des techniques de travail.",
-              "",
               "Ordre et propret\u00e9."
             ],
             "t": [
@@ -17007,7 +17006,7 @@ const jobData = [
               },
               {
                 "t":
-                    "Remettre les ajustements initiaux sur les machines-outils de d\u00e9bitage.",
+                    "Remettre les r\u00e9glages initiaux sur les machines-outils de d\u00e9bitage.",
                 "o": false
               },
               {
