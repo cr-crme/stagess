@@ -245,7 +245,7 @@ const jobData = [
             "r": ["e", "f", "t", "psy"]
           }
         ],
-        "q": ["1", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 au vestiaire",
@@ -675,7 +675,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Commis de teinturerie",
@@ -1041,7 +1041,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Caissi\u00e8re, caissier",
@@ -1415,7 +1415,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -1603,7 +1603,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Commis de club vid\u00e9o",
@@ -1997,7 +1997,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -2414,7 +2414,7 @@ const jobData = [
             "r": ["c", "b", "e", "f", "of", "p", "mv", "h", "et"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 aux marchandises",
@@ -2861,7 +2861,8 @@ const jobData = [
                 "t":
                     "Arr\u00eater le chariot \u00e9l\u00e9vateur : mettre le moteur au point mort, , serrer le frein de stationnement, abaisser le dispositif de charge, etc.",
                 "o": false
-              }
+              },
+              {"t": "Stationner le chariot \u00e9l\u00e9vateur.", "o": false}
             ],
             "o": true,
             "r": ["e", "t", "p", "mv", "h", "n", "et", "v", "a"]
@@ -2909,7 +2910,7 @@ const jobData = [
             "r": ["f", "t", "psy"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       }
     ]
   },
@@ -3131,7 +3132,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Manoeuvre en am\u00e9nagement paysager",
@@ -3301,7 +3302,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Assistante-fleuriste, assistant-fleuriste",
@@ -3543,7 +3544,7 @@ const jobData = [
             "r": ["c", "f", "of", "p", "mv", "h", "et"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Manoeuvre en production ac\u00e9ricole",
@@ -3997,7 +3998,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -4241,7 +4242,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Manoeuvre en production horticole",
@@ -4593,7 +4594,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Manoeuvre agricole en production animale",
@@ -4917,7 +4918,7 @@ const jobData = [
             "r": ["b", "e", "p", "mv", "h", "psy", "et"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "13", "14", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "13", "14", "15", "16", "17"]
       },
       {
         "n": "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 aux \u00e9curies",
@@ -5097,7 +5098,7 @@ const jobData = [
             "r": ["b", "psy"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "14", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "14", "15", "16", "17"]
       },
       {
         "n": "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 aux animaux de compagnie",
@@ -5582,7 +5583,7 @@ const jobData = [
             "r": ["b", "e", "f", "of", "p", "mv", "h", "psy", "n"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "14", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "14", "15", "16", "17"]
       },
       {
         "n": "Manoeuvre en production avicole",
@@ -5754,7 +5755,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "14", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "14", "15", "16", "17"]
       },
       {
         "n": "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 aux animaux sauvages",
@@ -6028,7 +6029,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "14", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "14", "15", "16", "17"]
       },
       {
         "n": "Aide-toiletteuse, aide-toiletteur",
@@ -6342,7 +6343,7 @@ const jobData = [
             "r": ["c", "f", "of", "t", "p", "mv", "h", "psy"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "14", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "14", "15", "16", "17"]
       },
       {
         "n":
@@ -6710,15 +6711,16 @@ const jobData = [
               },
               {
                 "t":
-                    "Nettoyer et d\u00e9sinfecter les surfaces de travail. \r\n\u0095\tRanger les produits de nettoyage.",
+                    "Nettoyer et d\u00e9sinfecter les surfaces de travail. \n- Ranger les produits de nettoyage.",
                 "o": false
-              }
+              },
+              {"t": "Ranger les produits de nettoyage.", "o": false}
             ],
             "o": false,
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -7176,15 +7178,16 @@ const jobData = [
               },
               {
                 "t":
-                    "Nettoyer et d\u00e9sinfecter les surfaces de travail. \r\n\u0095\tRanger les produits de nettoyage.",
+                    "Nettoyer et d\u00e9sinfecter les surfaces de travail. \n- Ranger les produits de nettoyage.",
                 "o": false
-              }
+              },
+              {"t": "Ranger les produits de nettoyage.", "o": false}
             ],
             "o": false,
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -7594,15 +7597,16 @@ const jobData = [
               },
               {
                 "t":
-                    "Nettoyer et d\u00e9sinfecter les surfaces de travail. \r\n\u0095\tRanger les produits de nettoyage.",
+                    "Nettoyer et d\u00e9sinfecter les surfaces de travail. \n- Ranger les produits de nettoyage.",
                 "o": false
-              }
+              },
+              {"t": "Ranger les produits de nettoyage.", "o": false}
             ],
             "o": false,
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -7741,7 +7745,8 @@ const jobData = [
                 "t":
                     "Arr\u00eater le chariot \u00e9l\u00e9vateur : mettre le moteur au point mort, , serrer le frein de stationnement, abaisser le dispositif de charge, etc.",
                 "o": false
-              }
+              },
+              {"t": "Stationner le chariot \u00e9l\u00e9vateur.", "o": false}
             ],
             "o": true,
             "r": []
@@ -7839,7 +7844,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Cueilleuse, cueilleur de produits forestiers non ligneux",
@@ -8261,7 +8266,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Manoeuvre en production de sirop de bouleau",
@@ -8588,7 +8593,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       }
     ]
   },
@@ -8805,7 +8810,7 @@ const jobData = [
             "r": ["c", "b", "f", "of", "p", "mv", "h"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Emballeuse, emballeur",
@@ -8982,7 +8987,7 @@ const jobData = [
             "r": ["of", "t", "p", "mv", "h", "psy"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -9150,7 +9155,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "H\u00f4tesse, h\u00f4te de restaurant",
@@ -9425,7 +9430,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -9913,7 +9918,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Commis au comptoir des charcuteries ou des fromages",
@@ -10270,7 +10275,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-poissonni\u00e8re, aide-poissonnier",
@@ -10625,7 +10630,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Commis d'\u00e9picerie ou de supermarch\u00e9",
@@ -10903,7 +10908,7 @@ const jobData = [
             "r": ["c", "b", "e", "f", "of", "p", "mv", "h", "et"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-cuisini\u00e8re, aide-cuisinier",
@@ -11371,7 +11376,7 @@ const jobData = [
             "r": ["c", "b", "e", "f", "of", "p", "mv", "h", "et"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-bouch\u00e8re, aide-boucher",
@@ -11730,7 +11735,7 @@ const jobData = [
             "r": ["c", "b", "f", "of", "p", "mv", "h", "et"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -12173,7 +12178,7 @@ const jobData = [
             "r": ["c", "b", "e", "f", "of", "p", "mv", "h", "et"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "10", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "10", "12", "15", "16", "17"]
       },
       {
         "n": "Commis de fruits et l\u00e9gumes",
@@ -12526,7 +12531,7 @@ const jobData = [
             "r": ["c", "b", "e", "f", "of", "p", "mv", "h", "et"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Commis de d\u00e9panneur",
@@ -12845,7 +12850,7 @@ const jobData = [
             "r": ["b", "p", "mv", "psy"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Commis d\u00e9barrasseuse, commis d\u00e9barrasseur",
@@ -13043,7 +13048,7 @@ const jobData = [
             "r": ["c", "b", "f", "of", "p", "mv", "h"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -13464,7 +13469,7 @@ const jobData = [
             "r": ["c", "b", "f", "of", "p", "mv", "h"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Manoeuvre en transformation alimentaire",
@@ -13553,7 +13558,7 @@ const jobData = [
             "t": [
               {
                 "t":
-                    "Pr\u00e9parer le mat\u00e9riel\u00a0: former les bo\u00eetes ou placer les bo\u00eetes de carton aplaties dans des machines de formage.",
+                    "Pr\u00e9parer le mat\u00e9riel : former les bo\u00eetes ou placer les bo\u00eetes de carton aplaties dans des machines de formage.",
                 "o": false
               },
               {
@@ -13597,15 +13602,16 @@ const jobData = [
               },
               {
                 "t":
-                    "Nettoyer et d\u00e9sinfecter les surfaces de travail. \r\n\u0095\tRanger les produits de nettoyage.",
+                    "Nettoyer et d\u00e9sinfecter les surfaces de travail. \n- Ranger les produits de nettoyage.",
                 "o": false
-              }
+              },
+              {"t": "Ranger les produits de nettoyage.", "o": false}
             ],
             "o": false,
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-fromag\u00e8re, aide-fromager",
@@ -13777,15 +13783,16 @@ const jobData = [
               },
               {
                 "t":
-                    "Nettoyer et d\u00e9sinfecter les surfaces de travail. \r\n\u0095\tRanger les produits de nettoyage.",
+                    "Nettoyer et d\u00e9sinfecter les surfaces de travail. \n- Ranger les produits de nettoyage.",
                 "o": false
-              }
+              },
+              {"t": "Ranger les produits de nettoyage.", "o": false}
             ],
             "o": false,
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-bouch\u00e8re industrielle, aide-boucher industriel",
@@ -13942,15 +13949,16 @@ const jobData = [
               },
               {
                 "t":
-                    "Nettoyer et d\u00e9sinfecter les surfaces de travail. \r\n\u0095\tRanger les produits de nettoyage.",
+                    "Nettoyer et d\u00e9sinfecter les surfaces de travail. \n- Ranger les produits de nettoyage.",
                 "o": false
-              }
+              },
+              {"t": "Ranger les produits de nettoyage.", "o": false}
             ],
             "o": false,
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -14129,7 +14137,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Plongeuse, plongeur",
@@ -14395,7 +14403,1740 @@ const jobData = [
             "r": ["c", "b", "e", "f", "of", "p", "mv", "h", "psy"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
+      },
+      {
+        "n":
+            "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 \u00e0 la r\u00e9paration d'\u00e9quipements de sport d'hiver",
+        "id": "8325",
+        "s": [
+          {
+            "id": "718",
+            "n":
+                "Servir la client\u00e8le d'une entreprise de location ou de r\u00e9paration d'\u00e9quipements de sport",
+            "x": "2",
+            "c": [
+              "Respect des limites de son champ d'intervention.",
+              "Service courtois.",
+              "\u00c9coute attentive de la client\u00e8le.",
+              "Pertinence, exactitude et clart\u00e9 de l'information transmise.",
+              "Exactitude des donn\u00e9es inscrites sur les bordereaux.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le."
+            ],
+            "t": [
+              {"t": "Saluer la cliente ou le client.", "o": false},
+              {"t": "Interpr\u00e9ter la demande.", "o": false},
+              {
+                "t": "Fournir de l'information sur les services offerts.",
+                "o": false
+              },
+              {
+                "t":
+                    "Fournir des renseignements sur l'utilisation, l'entretien ou l'entreposage des \u00e9quipements.",
+                "o": false
+              },
+              {
+                "t":
+                    "Pr\u00e9senter les r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9.",
+                "o": false
+              },
+              {
+                "t":
+                    "Juger de la pertinence de refuser d'ex\u00e9cuter un ajustement ou une r\u00e9paration.",
+                "o": false
+              },
+              {
+                "t":
+                    "Fournir des explications sur le travail \u00e0 effectuer et sur les co\u00fbts approximatifs de la r\u00e9paration.",
+                "o": true
+              },
+              {
+                "t": "Remplir les bordereaux ou saisir les donn\u00e9es.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "832501",
+            "n":
+                "Pr\u00e9parer, ajuster ou r\u00e9parer des skis ou des planches \u00e0 neige",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des sp\u00e9cifications du fabricant.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils.",
+              "Manutention soign\u00e9e de l'\u00e9quipement.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le."
+            ],
+            "t": [
+              {"t": "Interpr\u00e9ter la fiche de travail.", "o": false},
+              {
+                "t": "Aff\u00fbter des skis ou des planches \u00e0 neige.",
+                "o": false
+              },
+              {
+                "t":
+                    "Farter des skis de fond ou cirer des skis ou des planches \u00e0 neige.",
+                "o": false
+              },
+              {
+                "t":
+                    "Poser, v\u00e9rifier ou remplacer des fixations sur des skis ou sur des planches \u00e0 neige.",
+                "o": false
+              },
+              {
+                "t":
+                    "Remplacer des extr\u00e9mit\u00e9s de b\u00e2tons de ski.",
+                "o": false
+              },
+              {
+                "t":
+                    "R\u00e9parer des bases de ski avec un produit de type \"\" pytex\"\".",
+                "o": true
+              },
+              {"t": "Changer des vis ou des courroies.", "o": false},
+              {
+                "t": "S'assurer du bon \u00e9tat de l'\u00e9quipement.",
+                "o": false
+              },
+              {
+                "t":
+                    "Remplir les formulaires administratifs et les acheminer au service concern\u00e9 ou \u00e0 la personne d\u00e9sign\u00e9e.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "832502",
+            "n": "Aff\u00fbter des patins",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des sp\u00e9cifications du fabricant.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le."
+            ],
+            "t": [
+              {"t": "Interpr\u00e9ter la fiche de travail.", "o": false},
+              {
+                "t":
+                    "Utiliser l'\u00e9quipement pour aff\u00fbter des patins et enlever des griffes.",
+                "o": false
+              },
+              {
+                "t": "S'assurer du bon \u00e9tat de l'\u00e9quipement.",
+                "o": false
+              },
+              {
+                "t":
+                    "Remplir les formulaires administratifs et les acheminer au service concern\u00e9 ou \u00e0 la personne d\u00e9sign\u00e9e.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "832503",
+            "n": "Entretenir des raquettes de marche",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des sp\u00e9cifications du fabricant.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le."
+            ],
+            "t": [
+              {"t": "Interpr\u00e9ter la fiche de travail.", "o": false},
+              {
+                "t": "Enduire des raquettes de produits de protection.",
+                "o": false
+              },
+              {
+                "t": "Remplacer des pi\u00e8ces de b\u00e2tons de marche.",
+                "o": false
+              },
+              {"t": "Tresser des raquettes.", "o": true},
+              {
+                "t": "S'assurer du bon \u00e9tat de l'\u00e9quipement.",
+                "o": false
+              },
+              {
+                "t":
+                    "Remplir les formulaires administratifs et les acheminer au service concern\u00e9 ou \u00e0 la personne d\u00e9sign\u00e9e.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "10",
+            "n": "Percevoir les paiements",
+            "x": "2",
+            "c": [
+              "Respect des directives de travail.",
+              "Service courtois.",
+              "Honn\u00eatet\u00e9.",
+              "Exactitude des calculs ou des donn\u00e9es saisies.",
+              "Utilisation appropri\u00e9e de l'\u00e9quipement informatique"
+            ],
+            "t": [
+              {"t": "Recevoir l'argent et remettre la monnaie.", "o": false},
+              {
+                "t":
+                    "Utiliser une caisse enregistreuse, un \u00e9quipement informatis\u00e9 d'enregistrement des ventes ou un terminal de point de vente pour recevoir les paiements par carte de cr\u00e9dit ou par carte de d\u00e9bit.",
+                "o": false
+              },
+              {"t": "Faire une facturation au compte.", "o": true},
+              {
+                "t":
+                    "Remettre les re\u00e7us, les coupons de caisse, les relev\u00e9s de transactions, etc.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "505",
+            "n":
+                "Assurer l'ordre et la propret\u00e9 des aires de travail dans une entreprise de location ou de r\u00e9paration d'\u00e9quipements de sport",
+            "x": "1",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Conformit\u00e9 avec le plan de rangement ou d'entreposage.",
+              "Ordre et propret\u00e9."
+            ],
+            "t": [
+              {
+                "t":
+                    "Ranger les outils, les pi\u00e8ces, le mat\u00e9riel, les produits, etc.",
+                "o": false
+              },
+              {"t": "Essuyer les \u00e9tablis et les tablettes.", "o": false},
+              {"t": "Approvisionner le poste de travail.", "o": false},
+              {"t": "Balayer les planchers.", "o": false},
+              {
+                "t":
+                    "R\u00e9cup\u00e9rer les restes de mat\u00e9riaux pour le recyclage ou jeter les rebuts.",
+                "o": false
+              },
+              {"t": "Vider les poubelles.", "o": false}
+            ],
+            "o": false,
+            "r": []
+          }
+        ],
+        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17"]
+      },
+      {
+        "n": "Guicheti\u00e8re, guichetier",
+        "id": "8327",
+        "s": [
+          {
+            "id": "832701",
+            "n": "Contr\u00f4ler l'acc\u00e8s aux lieux",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Courtoisie.",
+              "Pertinence, exactitude et clart\u00e9 de l'information transmise.",
+              "Souci de la satisfaction de la client\u00e8le.",
+              "Patience.",
+              "Politesse.",
+              "Amabilit\u00e9.",
+              "Tenue vestimentaire appropri\u00e9e.",
+              "Port du macaron d'identification."
+            ],
+            "t": [
+              {"t": "Pr\u00e9parer le poste de travail.", "o": false},
+              {"t": "Saluer les clientes et les clients.", "o": false},
+              {
+                "t":
+                    "V\u00e9rifier l'\u00e2ge des clientes et des clients afin qu'ils b\u00e9n\u00e9ficient des tarifs sp\u00e9ciaux, le cas \u00e9ch\u00e9ant.",
+                "o": false
+              },
+              {
+                "t":
+                    "Remettre le billet d'entr\u00e9e, le bracelet autocollant, la pastille autocollante, la carte avec code-barres, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Expliquer aux clientes et aux clients comment installer le bracelet autocollant ou comment utiliser la carte.",
+                "o": true
+              },
+              {
+                "t":
+                    "Apposer le tampon encreur sur la main des clientes et des clients afin qu'ils puissent entrer et sortir du site \u00e0 leur guise.",
+                "o": true
+              },
+              {
+                "t":
+                    "Inviter les clientes et les clients \u00e0 d\u00e9poser une partie de leur coupon \u00e0 l'endroit pr\u00e9vu, s'il y a lieu.",
+                "o": true
+              },
+              {
+                "t": "Actionner le tourniquet donnant acc\u00e8s aux lieux.",
+                "o": true
+              },
+              {
+                "t":
+                    "Informer sa sup\u00e9rieure ou son sup\u00e9rieur en cas de probl\u00e8mes (personne qui contrevient aux r\u00e8glements, qui refuse de payer son billet, etc.).",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "10",
+            "n": "Percevoir les paiements",
+            "x": "2",
+            "c": [
+              "Respect des directives de travail.",
+              "Service courtois.",
+              "Honn\u00eatet\u00e9.",
+              "Exactitude des calculs ou des donn\u00e9es saisies.",
+              "Utilisation appropri\u00e9e de l'\u00e9quipement informatique"
+            ],
+            "t": [
+              {"t": "Recevoir l'argent et remettre la monnaie.", "o": false},
+              {
+                "t":
+                    "Utiliser une caisse enregistreuse, un \u00e9quipement informatis\u00e9 d'enregistrement des ventes ou un terminal de point de vente pour recevoir les paiements par carte de cr\u00e9dit ou par carte de d\u00e9bit.",
+                "o": false
+              },
+              {"t": "Faire une facturation au compte.", "o": true},
+              {
+                "t":
+                    "Remettre les re\u00e7us, les coupons de caisse, les relev\u00e9s de transactions, etc.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "832702",
+            "n": "Surveiller l'entr\u00e9e des personnes",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des limites de son champ d'intervention.",
+              "Manifestation d'un bon sens de l'observation.",
+              "Pertinence du jugement.",
+              "Vigilance.",
+              "Tenue vestimentaire appropri\u00e9e.",
+              "Port du macaron d'identification."
+            ],
+            "t": [
+              {"t": "Saluer les personnes.", "o": false},
+              {
+                "t":
+                    "Demander aux personnes de remettre leur billet d'entr\u00e9e.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9chirer le billet en deux, en remettre une section \u00e0 la personne et d\u00e9poser l'autre section \u00e0 l'endroit pr\u00e9vu \u00e0 cet effet.",
+                "o": false
+              },
+              {
+                "t":
+                    "Porter une attention aux personnes susceptibles de poser des probl\u00e8mes (personne qui semble malade, en \u00e9tat d'\u00e9bri\u00e9t\u00e9, etc.), et en informer rapidement la personne responsable.",
+                "o": false
+              },
+              {
+                "t":
+                    "Rep\u00e9rer les personnes qui essaient d'entrer sans payer.",
+                "o": false
+              },
+              {
+                "t":
+                    "Informer sa sup\u00e9rieure ou son sup\u00e9rieur en cas de probl\u00e8me.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "832703",
+            "n": "R\u00e9pondre \u00e0 la client\u00e8le",
+            "x": "2",
+            "c": [
+              "Respect des directives de travail.",
+              "Service courtois.",
+              "\u00c9coute attentive de la client\u00e8le.",
+              "Pertinence, exactitude et clart\u00e9 de l'information transmise.",
+              "Souci de la satisfaction de la client\u00e8le.",
+              "Tenue vestimentaire appropri\u00e9e.",
+              "Port du macaron d'identification."
+            ],
+            "t": [
+              {"t": "Accueillir les personnes.", "o": false},
+              {"t": "S'enqu\u00e9rir de leurs besoins.", "o": false},
+              {
+                "t":
+                    "Fournir des renseignements sur la tarification (pour adultes, enfants, a\u00een\u00e9s, familles, etc.), les heures d'ouverture et de fermeture, les r\u00e8glements, les \u00e9v\u00e9nements sp\u00e9ciaux, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Aider les gens \u00e0 s'orienter en indiquant les num\u00e9ros de salles et leur localisation, l'emplacement des kiosques ou des man\u00e8ges, etc.",
+                "o": false
+              },
+              {"t": "Offrir des d\u00e9pliants.", "o": false},
+              {
+                "t":
+                    "Diriger les clientes ou les clients vers la personne responsable pour des questions plus complexes ou en cas de plainte.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "714",
+            "n": "Intervenir lors d'un incident ou d'un probl\u00e8me mineur",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des limites de son champ d'intervention.",
+              "Ma\u00eetrise de soi.",
+              "Promptitude."
+            ],
+            "t": [
+              {
+                "t":
+                    "Reconna\u00eetre un incident ou une situation probl\u00e9matique.",
+                "o": false
+              },
+              {
+                "t":
+                    "Pr\u00e9venir la personne responsable ou composer le num\u00e9ro de l'urgence (310-4141 ou le 911).",
+                "o": false
+              },
+              {
+                "t":
+                    "Rassurer la personne et demeurer avec elle jusqu'\u00e0 l'arriv\u00e9e des secours.",
+                "o": false
+              },
+              {"t": "Aider au maintien de l'ordre.", "o": true},
+              {"t": "Aider \u00e0 disperser un attroupement.", "o": false},
+              {
+                "t":
+                    "Intervenir tout en assurant sa propre s\u00e9curit\u00e9.",
+                "o": false
+              },
+              {
+                "t": "Compl\u00e9ter un rapport d'\u00e9v\u00e9nement.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "711",
+            "n": "Maintenir la gu\u00e9rite ou le guichet propre et en ordre",
+            "x": "1",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Conformit\u00e9  avec le plan de rangement ou d'entreposage.",
+              "Ordre et propret\u00e9."
+            ],
+            "t": [
+              {"t": "Ramasser les d\u00e9chets.", "o": false},
+              {
+                "t":
+                    "Ranger les formulaires, les billets, le mat\u00e9riel, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier l'\u00e9tat des affiches de prix, d'horaires, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "\u00c9pousseter le poste de travail (horodateur, \u00e9cran de surveillance, ordinateur, comptoir, etc.).",
+                "o": false
+              },
+              {"t": "Balayer le plancher.", "o": false},
+              {"t": "Laver les vitres.", "o": false},
+              {"t": "Vider les poubelles.", "o": false},
+              {
+                "t":
+                    "D\u00e9neiger l'espace autour de la gu\u00e9rite ou du guichet",
+                "o": true
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          }
+        ],
+        "q": ["1", "4", "5", "7", "12", "15", "16", "17"]
+      },
+      {
+        "n": "Chasseuse, chasseur d'h\u00f4tel",
+        "id": "8328",
+        "s": [
+          {
+            "id": "554",
+            "n":
+                "Commencer et terminer son quart de travail comme membre du personnel de hall d'h\u00f4tel",
+            "x": "2",
+            "c": [
+              "Respect des directives de travail.",
+              "\u00c9coute attentive des explications.",
+              "Pertinence des questions pos\u00e9es.",
+              "Reconnaissance de l'importance de la promotion du tourisme.",
+              "Pr\u00e9sentation personnelle soign\u00e9e.",
+              "Pr\u00e9sentation d'une image positive de l'\u00e9tablissement.",
+              "Tenue vestimentaire appropri\u00e9e.",
+              "Port du macaron d'identification.",
+              "Efficacit\u00e9 du travail."
+            ],
+            "t": [
+              {
+                "t":
+                    "Rev\u00eatir l'uniforme de l'\u00e9tablissement et \u00e9pingler ou suspendre son macaron d'identification.",
+                "o": false
+              },
+              {
+                "t":
+                    "Prendre connaissance des faits importants survenus durant le quart de travail pr\u00e9c\u00e9dent (nombre de chambres occup\u00e9es, incidents particuliers, arriv\u00e9e de groupes, \u00e9v\u00e9nements sp\u00e9ciaux, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "Recevoir les directives relatives \u00e0 son quart de travail (heures d'arriv\u00e9e et de d\u00e9part des groupes de touristes ou de congressistes, heures d'arriv\u00e9e et de d\u00e9part des clientes et des clients qu'ils soient ou non des personnalit\u00e9s connues, dur\u00e9e de leur s\u00e9jour, \u00e9v\u00e9nements sp\u00e9ciaux, pr\u00e9sence d'animaux de compagnie, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "\u00c9couter l'information sur les besoins particuliers de la client\u00e8le (politiciens, athl\u00e8tes, musiciens, participants \u00e0 une exposition canine, adolescents en rel\u00e2che, membres d'une communaut\u00e9 religieuse, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "\u00c0 la fin de son quart de travail, noter l'information requise dans le registre et en informer sa superviseure ou son superviseur et ses coll\u00e8gues.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "832801",
+            "n": "Transporter des bagages",
+            "x": "1",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e du chariot \u00e0 bagages.",
+              "D\u00e9placement s\u00e9curitaire dans les corridors pour \u00e9viter les blessures, les bris, etc.",
+              "Souci de la satisfaction de la client\u00e8le.",
+              "Soin apport\u00e9 aux bagages."
+            ],
+            "t": [
+              {
+                "t": "Rep\u00e9rer et compter les bagages \u00e0 transporter.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier les bagages pour s'assurer qu'ils sont bien ferm\u00e9s et en bon \u00e9tat, et informer la cliente ou le client, ou sa superviseure ou son superviseur, en cas de probl\u00e8mes.",
+                "o": false
+              },
+              {
+                "t":
+                    "Prendre les valises, les sacs de voyage, les fourre-tout, les sacs \u00e0 dos, etc., et les d\u00e9poser sur le chariot.",
+                "o": false
+              },
+              {
+                "t":
+                    "Soulever des bo\u00eetes et les d\u00e9poser sur le chariot.",
+                "o": false
+              },
+              {"t": "Suspendre les housses \u00e0 v\u00eatements.", "o": false},
+              {
+                "t":
+                    "Placer les \u00e9quipements de sport, les instruments de musique, le mat\u00e9riel informatique, etc., sur le chariot.",
+                "o": false
+              },
+              {
+                "t":
+                    "S'assurer que les bagages sont bien plac\u00e9s sur le chariot.",
+                "o": false
+              },
+              {
+                "t": "V\u00e9rifier la pr\u00e9sence de tous les bagages.",
+                "o": false
+              },
+              {
+                "t":
+                    "Faire rouler le chariot jusqu'\u00e0 l'endroit d\u00e9sign\u00e9 (chambre, salle de r\u00e9union ou consigne).",
+                "o": false
+              },
+              {
+                "t": "Rapporter le chariot vide \u00e0 la consigne.",
+                "o": false
+              },
+              {
+                "t":
+                    "Demander de l'aide pour d\u00e9placer un bagage lourd ou surdimensionn\u00e9.",
+                "o": true
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "832802",
+            "n": "Assurer le service de consigne des bagages",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des normes de qualit\u00e9.",
+              "Application correcte des techniques de travail.",
+              "Pertinence, exactitude et clart\u00e9 de l'information transmise.",
+              "Exactitude des donn\u00e9es.",
+              "Souci de la satisfaction de la client\u00e8le.",
+              "Soin apport\u00e9 aux bagages."
+            ],
+            "t": [
+              {
+                "t":
+                    "V\u00e9rifier l'\u00e9tat et la propret\u00e9 des chariots, mettre de c\u00f4t\u00e9 ceux qui sont d\u00e9fectueux et avertir sa superviseure ou son superviseur.",
+                "o": false
+              },
+              {
+                "t":
+                    "Recevoir les bagages en consigne : saluer la cliente ou le client, remplir un billet de r\u00e9clamation, apposer une \u00e9tiquette sur les bagages, remettre la partie du billet et d\u00e9poser les bagages \u00e0 l'endroit pr\u00e9vu.",
+                "o": false
+              },
+              {
+                "t":
+                    "Remettre les bagages : saluer la cliente ou le client, prendre son billet, v\u00e9rifier les \u00e9tiquettes sur les bagages, rapporter ceux-ci et faire signer le billet.",
+                "o": false
+              },
+              {
+                "t":
+                    "S'occuper des objets trouv\u00e9s : inscrire les renseignements dans un carnet (description de l'objet, lieu, jour et heure o\u00f9 il a \u00e9t\u00e9 trouv\u00e9, personne qui l'a trouv\u00e9, etc.), et les entreposer \u00e0 l'endroit pr\u00e9vu.",
+                "o": true
+              },
+              {
+                "t":
+                    "S'occuper des objets perdus : recevoir la demande d'une cliente ou d'un client, v\u00e9rifier si l'objet se trouve en consigne, s'enqu\u00e9rir aupr\u00e8s des autres services, noter les coordonn\u00e9es de la personne et lui dire qu'on donnera suite \u00e0 sa demande.",
+                "o": true
+              },
+              {
+                "t":
+                    "Noter les demandes du service de la r\u00e9ception ou de la conciergerie au regard des services requis au moment du d\u00e9part (date et heure du d\u00e9part, num\u00e9ro de chambre, nom, r\u00e9servation d'un taxi, information au chauffeur de la navette qui va \u00e0 l'a\u00e9roport, etc.).",
+                "o": true
+              },
+              {"t": "Ranger le local de la consigne.", "o": false},
+              {
+                "t":
+                    "Diriger la cliente ou le client vers sa superviseure ou son superviseur pour des questions de gestion de bagages ou en cas de plainte.",
+                "o": false
+              },
+              {
+                "t":
+                    "Signaler toute situation susceptible de repr\u00e9senter une menace \u00e0 la s\u00e9curit\u00e9 de la client\u00e8le et du personnel de l'h\u00f4tel.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "832803",
+            "n": "Accompagner les clientes et les clients \u00e0 leur chambre",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des normes de qualit\u00e9.",
+              "Respect des r\u00e8gles d'\u00e9tiquette.",
+              "Pertinence, exactitude et clart\u00e9 de l'information transmise.",
+              "Utilisation appropri\u00e9e du chariot \u00e0 bagages.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le.",
+              "Professionnalisme.",
+              "Sens des responsabilit\u00e9s.",
+              "Soin apport\u00e9 aux bagages."
+            ],
+            "t": [
+              {"t": "Saluer la cliente ou le client.", "o": false},
+              {
+                "t": "Diriger la cliente ou le client vers la chambre.",
+                "o": false
+              },
+              {"t": "S'assurer que la chambre est libre.", "o": false},
+              {
+                "t":
+                    "Aider la cliente ou le client \u00e0 d\u00e9verrouiller la porte (cl\u00e9 ou carte), le cas \u00e9ch\u00e9ant.",
+                "o": false
+              },
+              {"t": "Ouvrir la porte et allumer la lumi\u00e8re.", "o": false},
+              {"t": "Laisser entrer la cliente ou le client.", "o": false},
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes dans la chambre (d\u00e9sordre, bris, probl\u00e8me de chauffage, etc.), et en informer le personnel de la r\u00e9ception.",
+                "o": false
+              },
+              {
+                "t":
+                    "S'enqu\u00e9rir de la satisfaction de la cliente ou du client et l'inviter \u00e0 communiquer avec la r\u00e9ception en cas de probl\u00e8me.",
+                "o": false
+              },
+              {
+                "t":
+                    "Demander o\u00f9 poser les bagages et retirer ceux-ci du chariot \u00e0 bagages : suspendre les housses \u00e0 v\u00eatements dans le vestiaire, d\u00e9poser les valises, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Informer la cliente ou le client des consignes de s\u00e9curit\u00e9.",
+                "o": false
+              },
+              {
+                "t":
+                    "Expliquer le fonctionnement de l'\u00e9quipement (t\u00e9l\u00e9viseur, radio-r\u00e9veil, connexion Internet, t\u00e9l\u00e9phone, syst\u00e8me de chauffage ou de climatisation, coffre-fort, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "R\u00e9pondre aux questions (services \u00e0 l'int\u00e9rieur de l'\u00e9tablissement, restaurants, boutiques, attraits touristiques, etc.) ou diriger la cliente ou le client vers la r\u00e9ception ou le service de conciergerie.",
+                "o": false
+              },
+              {
+                "t":
+                    "Accepter un pourboire, le cas \u00e9ch\u00e9ant, souhaiter un bon s\u00e9jour et se retirer.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "832804",
+            "n": "Effectuer un changement de chambre",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des normes de qualit\u00e9.",
+              "Respect des r\u00e8gles d'\u00e9tiquette.",
+              "Pertinence, exactitude et clart\u00e9 de l'information transmise.",
+              "Gestion appropri\u00e9e de son stress.",
+              "Utilisation appropri\u00e9e du chariot \u00e0 bagages.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le.",
+              "Professionnalisme.",
+              "Sens des responsabilit\u00e9s.",
+              "Soin apport\u00e9 aux bagages.",
+              "Discr\u00e9tion."
+            ],
+            "t": [
+              {
+                "t":
+                    "Recevoir les directives de la ou du r\u00e9ceptionniste (nom de la cliente ou du client, num\u00e9ro de chambre, nombre de bagages, etc.).",
+                "o": false
+              },
+              {
+                "t": "Se pr\u00e9senter \u00e0 l'heure pr\u00e9vue.",
+                "o": false
+              },
+              {
+                "t":
+                    "Frapper \u00e0 la porte et attendre que la cliente ou le client ouvre ou demande d'entrer.",
+                "o": false
+              },
+              {
+                "t":
+                    "Prendre les bagages pr\u00e9par\u00e9s et les d\u00e9poser sur le chariot.",
+                "o": false
+              },
+              {
+                "t":
+                    "Demander \u00e0 la cliente ou au client si tous ses effets personnels sont pr\u00eats et s'assurer qu'elle ou il n'oublie rien.",
+                "o": false
+              },
+              {"t": "Porter les bagages \u00e0 l'autre chambre.", "o": false},
+              {"t": "\u00c9changer les cl\u00e9s de la chambre.", "o": false},
+              {
+                "t":
+                    "\u00c9couter les dol\u00e9ances de la cliente ou du client.",
+                "o": false
+              },
+              {
+                "t":
+                    "Transmettre les plaintes \u00e0 sa superviseure ou \u00e0 son superviseur.",
+                "o": false
+              },
+              {
+                "t":
+                    "Saluer la cliente ou le client et l'inviter \u00e0 communiquer \u00e0 nouveau avec la ou le r\u00e9ceptionniste.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "832805",
+            "n":
+                "Raccompagner les clientes et les clients \u00e0 la r\u00e9ception",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des normes de qualit\u00e9.",
+              "Respect des r\u00e8gles d'\u00e9tiquette.",
+              "Utilisation appropri\u00e9e du chariot \u00e0 bagages.",
+              "Souci de la satisfaction de la client\u00e8le.",
+              "Professionnalisme.",
+              "Sens des responsabilit\u00e9s.",
+              "Soin apport\u00e9 aux bagages.",
+              "Discr\u00e9tion."
+            ],
+            "t": [
+              {
+                "t":
+                    "Recevoir les directives de la ou du r\u00e9ceptionniste (nom de la cliente ou du client, num\u00e9ro de chambre, nombre de bagages, heure de d\u00e9part, etc.).",
+                "o": false
+              },
+              {
+                "t": "Se pr\u00e9senter \u00e0 l'heure pr\u00e9vue.",
+                "o": false
+              },
+              {
+                "t":
+                    "Frapper \u00e0 la porte et attendre que la cliente ou le client ouvre ou demande d'entrer.",
+                "o": false
+              },
+              {
+                "t":
+                    "Prendre les bagages pr\u00e9par\u00e9s et les d\u00e9poser sur le chariot.",
+                "o": false
+              },
+              {
+                "t":
+                    "Demander \u00e0 la cliente ou au client si tous ses effets personnels sont pr\u00eats et s'assurer qu'elle ou il n'oublie rien.",
+                "o": false
+              },
+              {
+                "t": "Diriger la cliente ou le client vers la r\u00e9ception.",
+                "o": false
+              },
+              {
+                "t":
+                    "Saluer la cliente ou le client et lui souhaiter un bon voyage.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "832806",
+            "n": "Assurer le service \u00e0 la client\u00e8le",
+            "x": "2",
+            "c": [
+              "Respect des directives de travail.",
+              "Respect des normes de qualit\u00e9.",
+              "Respect des limites de son champ d'intervention.",
+              "Application correcte des techniques de travail.",
+              "Application correcte du protocole de communication.",
+              "Clart\u00e9 de la communication avec la client\u00e8le.",
+              "Exactitude des donn\u00e9es.",
+              "Politesse.",
+              "Discr\u00e9tion.",
+              "Tact."
+            ],
+            "t": [
+              {
+                "t": "Noter des messages t\u00e9l\u00e9phoniques ou autres.",
+                "o": false
+              },
+              {
+                "t": "Distribuer les journaux \u00e0 la porte des chambres.",
+                "o": false
+              },
+              {
+                "t":
+                    "Livrer des messages ou des colis ou apporter des objets, tels que des serviettes suppl\u00e9mentaires, un fer \u00e0 repasser, etc., aux chambres.",
+                "o": false
+              },
+              {
+                "t":
+                    "Assurer la collecte des v\u00eatements \u00e0 nettoyer et la livraison des v\u00eatements nettoy\u00e9s.",
+                "o": true
+              },
+              {"t": "R\u00e9cup\u00e9rer le courrier et le poster.", "o": true},
+              {
+                "t":
+                    "R\u00e9pondre \u00e0 diff\u00e9rentes demandes (course \u00e0 l'ext\u00e9rieur de l'\u00e9tablissement, location de v\u00e9hicule, r\u00e9servation au restaurant, etc.).",
+                "o": true
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "832807",
+            "n":
+                "Assister le personnel du hall d'h\u00f4tel dans l'ex\u00e9cution de t\u00e2ches simples",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des normes de qualit\u00e9.",
+              "Respect des limites de son champ d'intervention.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e de l'\u00e9quipement.",
+              "Manifestation de sa capacit\u00e9 \u00e0 travailler en \u00e9quipe."
+            ],
+            "t": [
+              {
+                "t":
+                    "Demander de l'aide ou recevoir des demandes d'aide par radiot\u00e9l\u00e9phone, t\u00e9l\u00e9phone cellulaire ou t\u00e9l\u00e9avertisseur.",
+                "o": false
+              },
+              {
+                "t":
+                    "Aider la porti\u00e8re ou le portier \u00e0 l'arriv\u00e9e ou au d\u00e9part des clientes et des clients : ouvrir la porti\u00e8re du v\u00e9hicule, saluer les personnes, sortir les bagages du v\u00e9hicule ou les y d\u00e9poser, offrir de porter les bagages dans le hall d'entr\u00e9e, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Aider la superviseure ou le superviseur au moment de l'arriv\u00e9e ou du d\u00e9part d'un groupe : d\u00e9charger les bagages de l'autocar, surveiller les bagages laiss\u00e9s seuls, compter les bagages et transmettre l'information, d\u00e9poser les bagages sur les chariots \u00e0 bagages, les porter \u00e0 l'endroit d\u00e9sign\u00e9, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Appliquer les mesures de s\u00e9curit\u00e9 prescrites par l'\u00e9tablissement : d\u00e9poser les bagages dans le syst\u00e8me de d\u00e9tection \u00e0 rayons X, etc.",
+                "o": true
+              },
+              {
+                "t":
+                    "Aider au maintien de l'ordre et de la propret\u00e9 dans les aires publiques : approvisionner les pr\u00e9sentoirs \u00e0 d\u00e9pliants, ramasser des papiers ou des d\u00e9bris, rapporter les objets trouv\u00e9s \u00e0 la consigne, replacer les chariots, d\u00e9neiger ou balayer l'entr\u00e9e, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes (enfants laiss\u00e9s seuls dans le hall d'entr\u00e9e, personnes suspectes, colis suspects, etc.), et en informer la superviseure ou le superviseur.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "714",
+            "n": "Intervenir lors d'un incident ou d'un probl\u00e8me mineur",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des limites de son champ d'intervention.",
+              "Ma\u00eetrise de soi.",
+              "Promptitude."
+            ],
+            "t": [
+              {
+                "t":
+                    "Reconna\u00eetre un incident ou une situation probl\u00e9matique.",
+                "o": false
+              },
+              {
+                "t":
+                    "Pr\u00e9venir la personne responsable ou composer le num\u00e9ro de l'urgence (310-4141 ou le 911).",
+                "o": false
+              },
+              {
+                "t":
+                    "Rassurer la personne et demeurer avec elle jusqu'\u00e0 l'arriv\u00e9e des secours.",
+                "o": false
+              },
+              {"t": "Aider au maintien de l'ordre.", "o": false},
+              {"t": "Aider \u00e0 disperser un attroupement.", "o": false},
+              {
+                "t":
+                    "Intervenir tout en assurant sa propre s\u00e9curit\u00e9.",
+                "o": false
+              },
+              {
+                "t": "Compl\u00e9ter un rapport d'\u00e9v\u00e9nement.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          }
+        ],
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
+      },
+      {
+        "n": "Porti\u00e8re, portier d'h\u00f4tel",
+        "id": "8329",
+        "s": [
+          {
+            "id": "554",
+            "n":
+                "Commencer et terminer son quart de travail comme membre du personnel de hall d'h\u00f4tel",
+            "x": "2",
+            "c": [
+              "Respect des directives de travail.",
+              "\u00c9coute attentive des explications.",
+              "Pertinence des questions pos\u00e9es.",
+              "Reconnaissance de l'importance de la promotion du tourisme.",
+              "Pr\u00e9sentation personnelle soign\u00e9e.",
+              "Pr\u00e9sentation d'une image positive de l'\u00e9tablissement.",
+              "Tenue vestimentaire appropri\u00e9e.",
+              "Port du macaron d'identification.",
+              "Efficacit\u00e9 du travail."
+            ],
+            "t": [
+              {
+                "t":
+                    "Rev\u00eatir l'uniforme de l'\u00e9tablissement et \u00e9pingler ou suspendre son macaron d'identification.",
+                "o": false
+              },
+              {
+                "t":
+                    "Prendre connaissance des faits importants survenus durant le quart de travail pr\u00e9c\u00e9dent (nombre de chambres occup\u00e9es, incidents particuliers, arriv\u00e9e de groupes, \u00e9v\u00e9nements sp\u00e9ciaux, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "Recevoir les directives relatives \u00e0 son quart de travail (heures d'arriv\u00e9e et de d\u00e9part des groupes de touristes ou de congressistes, heures d'arriv\u00e9e et de d\u00e9part des clientes et des clients qu'ils soient ou non des personnalit\u00e9s connues, dur\u00e9e de leur s\u00e9jour, \u00e9v\u00e9nements sp\u00e9ciaux, pr\u00e9sence d'animaux de compagnie, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "\u00c9couter l'information sur les besoins particuliers de la client\u00e8le (politiciens, athl\u00e8tes, musiciens, participants \u00e0 une exposition canine, adolescents en rel\u00e2che, membres d'une communaut\u00e9 religieuse, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "\u00c0 la fin de son quart de travail, noter l'information requise dans le registre et en informer sa superviseure ou son superviseur et ses coll\u00e8gues.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "832901",
+            "n":
+                "Contr\u00f4ler les all\u00e9es et venues \u00e0 la porte de l'h\u00f4tel",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des normes de qualit\u00e9.",
+              "Tact.",
+              "Patience.",
+              "Calme.",
+              "Bonne humeur.",
+              "Souci de la satisfaction de la client\u00e8le.",
+              "Professionnalisme.",
+              "Sens des responsabilit\u00e9s.",
+              "Manifestation d'un bon sens de l'observation.",
+              "Gestion appropri\u00e9e de son stress.",
+              "Vigilance."
+            ],
+            "t": [
+              {
+                "t":
+                    "Accueillir et saluer les clientes et les clients et, le cas \u00e9ch\u00e9ant, saluer les personnes connues par leur nom.",
+                "o": false
+              },
+              {
+                "t":
+                    "Faciliter l'acc\u00e8s \u00e0 l'\u00e9tablissement : aider les clientes et les clients \u00e0 monter l'escalier ou les inviter \u00e0 emprunter la mont\u00e9e, ouvrir et refermer la porte, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Remarquer les personnes aux comportements suspects qui se tiennent sur le parvis de l'h\u00f4tel ou qui veulent p\u00e9n\u00e9trer dans le vestibule ou le hall, s'enqu\u00e9rir de leurs besoins, leur demander poliment de quitter les lieux, s'il y a lieu, et en informer les autorit\u00e9s.",
+                "o": false
+              },
+              {
+                "t":
+                    "Remarquer la pr\u00e9sence de colis ou d'objets suspects et en informer les autorit\u00e9s.",
+                "o": false
+              },
+              {
+                "t":
+                    "Remarquer les v\u00e9hicules stationn\u00e9s ill\u00e9galement, relever le num\u00e9ro de plaque min\u00e9ralogique et en informer les autorit\u00e9s.",
+                "o": false
+              },
+              {
+                "t":
+                    "Diriger les v\u00e9hicules de livraison vers l'endroit appropri\u00e9.",
+                "o": false
+              },
+              {
+                "t":
+                    "Demander aux chauffeurs de v\u00e9hicules stationn\u00e9s dans une zone interdite de quitter les lieux en leur indiquant le stationnement.",
+                "o": false
+              },
+              {
+                "t":
+                    "Communiquer avec le personnel de la s\u00e9curit\u00e9 en cas de probl\u00e8me majeur.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "832902",
+            "n":
+                "Aider les clientes et les clients \u00e0 leur arriv\u00e9e ou \u00e0 leur d\u00e9part",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des normes de qualit\u00e9.",
+              "Tact.",
+              "Patience.",
+              "Calme.",
+              "Bonne humeur.",
+              "Souci de la satisfaction de la client\u00e8le.",
+              "Manifestation de sa capacit\u00e9 \u00e0 travailler en \u00e9quipe.",
+              "Professionnalisme.",
+              "Sens des responsabilit\u00e9s."
+            ],
+            "t": [
+              {
+                "t": "Ouvrir la porti\u00e8re du v\u00e9hicule ou la fermer.",
+                "o": false
+              },
+              {
+                "t":
+                    "Saluer la cliente ou le client, lui souhaiter la bienvenue ou un bon voyage.",
+                "o": false
+              },
+              {
+                "t":
+                    "Sortir les bagages du v\u00e9hicule et les d\u00e9poser sur le sol ou sur le chariot \u00e0 bagages ou les d\u00e9poser dans le v\u00e9hicule.",
+                "o": false
+              },
+              {
+                "t": "Appeler une chasseuse ou un chasseur d'h\u00f4tel.",
+                "o": false
+              },
+              {"t": "Appeler une ou un valet de stationnement.", "o": false},
+              {
+                "t":
+                    "Indiquer \u00e0 la cliente ou au client la localisation du stationnement.",
+                "o": false
+              },
+              {"t": "H\u00e9ler un taxi.", "o": false},
+              {
+                "t":
+                    "R\u00e9pondre aux questions des clientes et des clients concernant la localisation des diff\u00e9rents services de l'\u00e9tablissement, les attraits touristiques de m\u00eame que certains services \u00e0 proximit\u00e9.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "832903",
+            "n": "Assister la chasseuse ou le chasseur d'h\u00f4tel",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des normes de qualit\u00e9.",
+              "Respect des limites de son champ d'intervention.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e de l'\u00e9quipement.",
+              "Manifestation de sa capacit\u00e9 \u00e0 travailler en \u00e9quipe."
+            ],
+            "t": [
+              {
+                "t":
+                    "Demander de l'aide ou recevoir des demandes d'aide par radiot\u00e9l\u00e9phone, t\u00e9l\u00e9phone cellulaire ou t\u00e9l\u00e9avertisseur.",
+                "o": false
+              },
+              {
+                "t":
+                    "Assister la chasseuse ou le chasseur d'h\u00f4tel : d\u00e9poser des bagages sur un chariot, surveiller les bagages laiss\u00e9s seuls, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Appliquer les mesures de s\u00e9curit\u00e9 prescrites par l'\u00e9tablissement.",
+                "o": true
+              },
+              {
+                "t":
+                    "Aider au maintien de l'ordre et de la propret\u00e9 \u00e0 l'entr\u00e9e ext\u00e9rieure de l'h\u00f4tel et dans le vestibule : ramasser les papiers ou les d\u00e9bris, replacer les chariots, d\u00e9neiger ou balayer l'entr\u00e9e, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Attendre qu'une autre porti\u00e8re ou un autre portier soit pr\u00e9sent avant de quitter son poste.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "714",
+            "n": "Intervenir lors d'un incident ou d'un probl\u00e8me mineur",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des limites de son champ d'intervention.",
+              "Ma\u00eetrise de soi.",
+              "Promptitude."
+            ],
+            "t": [
+              {
+                "t":
+                    "Reconna\u00eetre un incident ou une situation probl\u00e9matique.",
+                "o": false
+              },
+              {
+                "t":
+                    "Pr\u00e9venir la personne responsable ou composer le num\u00e9ro de l'urgence (310-4141 ou le 911).",
+                "o": false
+              },
+              {
+                "t":
+                    "Rassurer la personne et demeurer avec elle jusqu'\u00e0 l'arriv\u00e9e des secours.",
+                "o": false
+              },
+              {"t": "Aider au maintien de l'ordre.", "o": false},
+              {"t": "Aider \u00e0 disperser un attroupement.", "o": false},
+              {
+                "t":
+                    "Intervenir tout en assurant sa propre s\u00e9curit\u00e9.",
+                "o": false
+              },
+              {
+                "t": "Compl\u00e9ter un rapport d'\u00e9v\u00e9nement.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          }
+        ],
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
+      },
+      {
+        "n":
+            "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 \u00e0 l'entretien des aires publiques",
+        "id": "8330",
+        "s": [
+          {
+            "id": "833001",
+            "n":
+                "Entretenir les abords du b\u00e2timent principal, des b\u00e2timents secondaires et des chalets",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils et de l'\u00e9quipement.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le.",
+              "Ordre et propret\u00e9."
+            ],
+            "t": [
+              {
+                "t": "Recevoir les directives de la personne responsable.",
+                "o": false
+              },
+              {
+                "t":
+                    "Faire une tourn\u00e9e r\u00e9guli\u00e8re du terrain afin de s'assurer de la propret\u00e9 et de la s\u00e9curit\u00e9 des lieux.",
+                "o": false
+              },
+              {
+                "t":
+                    "Ramasser les d\u00e9chets et les d\u00e9poser dans des poubelles.",
+                "o": false
+              },
+              {
+                "t":
+                    "Vider les poubelles et transporter les sacs \u00e0 l'endroit pr\u00e9vu.",
+                "o": false
+              },
+              {
+                "t":
+                    "S'assurer que les poubelles ne sont pas renvers\u00e9es par des animaux sauvages.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9poser les produits recyclables dans les bacs pr\u00e9vus \u00e0 cet effet.",
+                "o": false
+              },
+              {
+                "t":
+                    "Ratisser les feuilles, ramasser les branches mortes et les d\u00e9poser \u00e0 l'endroit pr\u00e9vu.",
+                "o": false
+              },
+              {
+                "t":
+                    "Tondre la pelouse, passer le coupe-herbe en bordure du chemin et de l'entr\u00e9e ou passer la d\u00e9broussailleuse pour couper les jeunes plants de r\u00e9sineux ou de feuillus.",
+                "o": false
+              },
+              {
+                "t":
+                    "Arroser les plates-bandes et enlever les mauvaises herbes.",
+                "o": true
+              },
+              {
+                "t":
+                    "Laver le mobilier ext\u00e9rieur (tables de pique-nique, chaises, parasols, etc.), et le replacer au bon endroit.",
+                "o": false
+              },
+              {
+                "t":
+                    "Entretenir les kiosques de pr\u00e9paration du poisson ou du gibier.",
+                "o": false
+              },
+              {
+                "t":
+                    "Entretenir les entr\u00e9es et les aires de stationnement.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "833002",
+            "n": "S'assurer du bon \u00e9tat de l'\u00e9quipement des chalets",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils et de l'\u00e9quipement.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le."
+            ],
+            "t": [
+              {
+                "t": "Recevoir les directives de la personne responsable.",
+                "o": false
+              },
+              {
+                "t": "Rentrer du bois de chauffage dans l'abri \u00e0 bois.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier l'\u00e9quipement fonctionnant au gaz propane : lire l'indicateur de quantit\u00e9 de gaz dans la bonbonne, allumer ou \u00e9teindre les appareils tels que r\u00e9frig\u00e9rateur, cuisini\u00e8re, chauffe-eau, remplacer des manchons de lampes, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier l'\u00e9quipement fonctionnant \u00e0 l'huile : lire l'indicateur de niveau d'huile dans le r\u00e9servoir, allumer ou \u00e9teindre les appareils, etc.",
+                "o": true
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes d'installation septique.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter divers probl\u00e8mes li\u00e9s \u00e0 l'entretien de b\u00e2timents (planches de v\u00e9randa vermoulues, vitres cass\u00e9es, c\u00e9ramiques bris\u00e9es, tuyaux bouch\u00e9s, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier les piles des diff\u00e9rents d\u00e9tecteurs.",
+                "o": false
+              },
+              {
+                "t":
+                    "Vider les cendres du foyer \u00e0 l'endroit d\u00e9sign\u00e9.",
+                "o": true
+              },
+              {
+                "t": "Informer la personne responsable de tout probl\u00e8me.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "833003",
+            "n": "Entretenir les sites de camping",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils et de l'\u00e9quipement.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le.",
+              "Ordre et propret\u00e9."
+            ],
+            "t": [
+              {
+                "t": "Recevoir les directives de la personne responsable.",
+                "o": false
+              },
+              {
+                "t":
+                    "Faire une tourn\u00e9e r\u00e9guli\u00e8re des sites afin de s'assurer de la propret\u00e9 et de la s\u00e9curit\u00e9 des lieux.",
+                "o": false
+              },
+              {
+                "t": "Ramasser les d\u00e9chets et les objets perdus.",
+                "o": false
+              },
+              {
+                "t":
+                    "Ramasser les sacs poubelles et les transporter \u00e0 l'endroit pr\u00e9vu.",
+                "o": false
+              },
+              {
+                "t":
+                    "S'assurer que les poubelles ne sont pas renvers\u00e9es par des animaux sauvages.",
+                "o": false
+              },
+              {
+                "t":
+                    "Passer la d\u00e9broussailleuse pour couper les jeunes plants de r\u00e9sineux ou de feuillus.",
+                "o": false
+              },
+              {
+                "t":
+                    "Laver le mobilier ext\u00e9rieur (tables de pique-nique, chaises, parasols, etc.) et le replacer au bon endroit.",
+                "o": false
+              },
+              {
+                "t": "Corder du bois de chauffage aux endroits pr\u00e9vus.",
+                "o": false
+              },
+              {"t": "Nettoyer les aires d'emplacement de feux.", "o": false},
+              {
+                "t":
+                    "Nettoyer et d\u00e9sinfecter les installations sanitaires (douches, toilettes et lavabos).",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "833004",
+            "n": "Entretenir les sentiers et les ponceaux",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des lois et des r\u00e8glements relatifs \u00e0 l'environnement.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils (scie \u00e0 cha\u00eene, d\u00e9broussailleuse, s\u00e9cateur, etc.).",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le.",
+              "Ordre et propret\u00e9."
+            ],
+            "t": [
+              {
+                "t": "Recevoir les directives de la personne responsable.",
+                "o": false
+              },
+              {
+                "t":
+                    "Faire une tourn\u00e9e r\u00e9guli\u00e8re des sentiers afin de s'assurer de la propret\u00e9 et de la s\u00e9curit\u00e9 des lieux.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier l'\u00e9tat des trottoirs de bois, des bancs, etc.",
+                "o": false
+              },
+              {"t": "Ramasser les d\u00e9chets.", "o": false},
+              {"t": "Couper des branches.", "o": false},
+              {
+                "t": "Ramasser des branches obstruant les sentiers.",
+                "o": false
+              },
+              {
+                "t":
+                    "Tron\u00e7onner des arbres tomb\u00e9s en travers des sentiers, arbres dont le diam\u00e8tre est inf\u00e9rieur \u00e0 14 pouces.",
+                "o": false
+              },
+              {
+                "t":
+                    "Enlever les d\u00e9bris obstruant les ponceaux et nuisant ainsi \u00e0 la circulation de l'eau.",
+                "o": false
+              },
+              {
+                "t": "Aider \u00e0 d\u00e9molir un barrage de castors.",
+                "o": true
+              },
+              {
+                "t":
+                    "Passer la d\u00e9broussailleuse pour couper les jeunes plants de r\u00e9sineux ou de feuillus.",
+                "o": false
+              },
+              {
+                "t":
+                    "Replacer des panneaux indicateurs de direction, de danger, d'instructions, etc.",
+                "o": false
+              },
+              {"t": "Remplir les mangeoires des oiseaux.", "o": true},
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes divers (pr\u00e9sence d'ours ou d'autres animaux, etc.), et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "833005",
+            "n":
+                "Entretenir les embarcations nautiques et les sites d'embarcation",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des lois et des r\u00e8glements relatifs \u00e0 l'environnement.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils et de l'\u00e9quipement.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le.",
+              "Ordre et propret\u00e9."
+            ],
+            "t": [
+              {
+                "t": "Recevoir les directives de la personne responsable.",
+                "o": false
+              },
+              {
+                "t":
+                    "Participer \u00e0 l'installation et \u00e0 la d\u00e9sinstallation d'un quai flottant.",
+                "o": false
+              },
+              {
+                "t":
+                    "Mettre \u00e0 l'eau et retirer des embarcations (chaloupe, canot, etc.).",
+                "o": false
+              },
+              {"t": "Laver des embarcations.", "o": false},
+              {
+                "t":
+                    "V\u00e9rifier le fonctionnement du moteur hors-bord ou celui du moteur \u00e9lectrique.",
+                "o": false
+              },
+              {
+                "t":
+                    "Faire le plein d'essence du r\u00e9servoir du moteur hors-bord.",
+                "o": false
+              },
+              {
+                "t":
+                    "Effectuer des r\u00e9parations mineures : appliquer de la fibre de verre, etc.",
+                "o": false
+              },
+              {"t": "Nettoyer la plage.", "o": false},
+              {
+                "t":
+                    "V\u00e9rifier la solidit\u00e9 du quai, des amarres, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "833006",
+            "n": "Pr\u00e9parer du bois de chauffage",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils (scie \u00e0 cha\u00eene, d\u00e9broussailleuse, s\u00e9cateur, etc.)."
+            ],
+            "t": [
+              {
+                "t":
+                    "Tron\u00e7onner des arbres dont le diam\u00e8tre est inf\u00e9rieur \u00e0 14 pouces.",
+                "o": false
+              },
+              {
+                "t": "Fendre des b\u00fbches et faire du bois d'allumage.",
+                "o": false
+              },
+              {"t": "Actionner la fendeuse.", "o": true},
+              {"t": "Transporter les b\u00fbches.", "o": false},
+              {"t": "Corder le bois.", "o": false},
+              {
+                "t":
+                    "Entretenir ses outils : huiler, graisser, aff\u00fbter, etc.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "833007",
+            "n": "Entretenir les aires de jeux ext\u00e9rieures",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Pertinence du jugement.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e de l'\u00e9quipement.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le."
+            ],
+            "t": [
+              {"t": "Renouveler le sable au besoin.", "o": false},
+              {
+                "t":
+                    "V\u00e9rifier l'int\u00e9grit\u00e9 structurale des \u00e9quipements de jeu (garde-corps, barri\u00e8res de protection, balan\u00e7oires, glissoires, modules \u00e0 grimper, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "Balayer ou \u00e9galiser l'aire des terrains de p\u00e9tanque, etc.",
+                "o": true
+              },
+              {
+                "t":
+                    "Aider \u00e0 installer des filets sur un terrain de tennis ou de badminton ou \u00e0 installer des accessoires de jeux.",
+                "o": true
+              },
+              {
+                "t":
+                    "Pr\u00e9parer l'aire de tir au pigeon d'argile ou de tir \u00e0 l'arc.",
+                "o": true
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "833008",
+            "n": "Effectuer des r\u00e9parations mineures",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des limites de son champ d'intervention.",
+              "Respect des lois et des r\u00e8glements relatifs \u00e0 l'environnement.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils et de l'\u00e9quipement.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le.",
+              "Ordre et propret\u00e9."
+            ],
+            "t": [
+              {
+                "t":
+                    "Recevoir les directives de la ou du responsable de l'entretien des b\u00e2timents.",
+                "o": false
+              },
+              {
+                "t":
+                    "Repeindre des surfaces telles que des planchers de v\u00e9randa, des cadrages de fen\u00eatres ou de portes, des murs ext\u00e9rieurs, etc. : gratter la vieille peinture, brasser la peinture dans le contenant et appliquer la peinture.",
+                "o": false
+              },
+              {"t": "Remplacer un carreau.", "o": false},
+              {
+                "t":
+                    "Remplacer une planche ou un barreau : prendre des mesures, retirer le morceau bris\u00e9, couper les mat\u00e9riaux, clouer, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Remplacer des ampoules, des manchons de lampes au gaz, des rondelles de caoutchouc, etc.",
+                "o": false
+              },
+              {"t": "D\u00e9boucher des toilettes ou des lavabos.", "o": false},
+              {"t": "Ranger les outils et le mat\u00e9riel.", "o": false},
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "713",
+            "n": "Accueillir les personnes",
+            "x": "2",
+            "c": [
+              "\u00c9coute attentive de la client\u00e8le.",
+              "Pertinence, exactitude et clart\u00e9 de l'information transmise.",
+              "Amabilit\u00e9.",
+              "Courtoisie."
+            ],
+            "t": [
+              {"t": "Saluer les personnes.", "o": false},
+              {"t": "Interpr\u00e9ter la demande.", "o": false},
+              {"t": "R\u00e9pondre aux questions.", "o": false},
+              {
+                "t": "Transmettre des messages \u00e0 la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          }
+        ],
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       }
     ]
   },
@@ -14820,7 +16561,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Artisane, artisan dans la fabrication de raquettes",
@@ -15127,7 +16868,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Artisane, artisan dans la fabrication de canots de toile",
@@ -15509,7 +17250,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Artisane, artisan dans la confection de mocassins",
@@ -15818,7 +17559,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Placi\u00e8re, placier",
@@ -16158,7 +17899,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "4", "5", "7", "12", "15", "16", "17"]
       }
     ]
   },
@@ -16195,7 +17936,7 @@ const jobData = [
               },
               {
                 "t":
-                    "Lire les renseignements inscrits sur la liste de d\u00e9bitage (mat\u00e9riaux, identification des pi\u00e8ces, code, dimensions, nombre de pi\u00e8ces, etc.).",
+                    "Lire les renseignements inscrits sur la liste de d\u00e9bitage (mat\u00e9riaux, identification des pi\u00e8ces, code,  dimensions, nombre de pi\u00e8ces, etc.).",
                 "o": false
               },
               {
@@ -16262,13 +18003,13 @@ const jobData = [
               {
                 "t":
                     "V\u00e9rifier l'\u00e9tat de la lame de scie et s'assurer qu'il n'y a pas de dents cass\u00e9es.",
-                "o": false
+                "o": true
               },
               {"t": "Enlever et remplacer la lame de scie.", "o": true},
               {
                 "t":
                     "V\u00e9rifier l'\u00e9querrage de la lame de scie et l'ajuster au besoin.",
-                "o": false
+                "o": true
               },
               {
                 "t":
@@ -16348,17 +18089,17 @@ const jobData = [
                     "S'assurer que l'espace de travail est s\u00e9curitaire (absence de rebuts autour de la d\u00e9gauchisseuse, trappe d'aspiration des poussi\u00e8res ouverte, etc.).",
                 "o": false
               },
-              {"t": "V\u00e9rifier l'\u00e9tat des couteaux.", "o": false},
+              {"t": "V\u00e9rifier l'\u00e9tat des couteaux.", "o": true},
               {"t": "Enlever et remplacer les couteaux.", "o": true},
               {
                 "t":
                     "V\u00e9rifier le parall\u00e9lisme entre les couteaux et le plateau.",
-                "o": false
+                "o": true
               },
               {
                 "t":
                     "V\u00e9rifier l'\u00e9querrage du guide et du plateau et l'ajuster au besoin.",
-                "o": false
+                "o": true
               },
               {
                 "t":
@@ -16435,17 +18176,17 @@ const jobData = [
               {
                 "t":
                     "V\u00e9rifier l'\u00e9tat de la lame de scie et s'assurer qu'il n'y a pas de dents cass\u00e9es.",
-                "o": false
+                "o": true
               },
               {"t": "Enlever et remplacer la lame de scie.", "o": true},
               {
                 "t":
                     "Ajuster la lame de scie et v\u00e9rifier son \u00e9querrage.",
-                "o": false
+                "o": true
               },
               {
                 "t": "R\u00e9gler les guides \u00e0 la largeur pr\u00e9vue.",
-                "o": false
+                "o": true
               },
               {
                 "t":
@@ -16509,12 +18250,12 @@ const jobData = [
                     "S'assurer que l'espace de travail est s\u00e9curitaire (absence de rebuts autour de la raboteuse, trappe d'aspiration des poussi\u00e8res ouverte, etc.).",
                 "o": false
               },
-              {"t": "V\u00e9rifier l'\u00e9tat des couteaux.", "o": false},
+              {"t": "V\u00e9rifier l'\u00e9tat des couteaux.", "o": true},
               {"t": "Enlever et remplacer les couteaux.", "o": true},
               {
                 "t":
                     "Effectuer les ajustements (hauteur de la t\u00eate de coupe, vitesse d'avance, etc.).",
-                "o": false
+                "o": true
               },
               {
                 "t":
@@ -16588,7 +18329,7 @@ const jobData = [
               {
                 "t":
                     "V\u00e9rifier l'\u00e9tat de l'outil de coupe (lame de scie, fer de toupie).",
-                "o": false
+                "o": true
               },
               {
                 "t":
@@ -16677,10 +18418,11 @@ const jobData = [
             "r": ["b", "e", "f", "of", "p", "mv", "h", "psy", "n", "fi", "nm"]
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17"]
       },
       {
-        "n": "Préposée, préposé à la préparation des panneaux de bois",
+        "n":
+            "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 \u00e0 la pr\u00e9paration des panneaux de bois",
         "id": "8250",
         "s": [
           {
@@ -16707,7 +18449,7 @@ const jobData = [
               },
               {
                 "t":
-                    "Lire les renseignements inscrits sur la liste de d\u00e9bitage (mat\u00e9riaux, identification des pi\u00e8ces, code, dimensions, nombre de pi\u00e8ces, etc.).",
+                    "Lire les renseignements inscrits sur la liste de d\u00e9bitage (mat\u00e9riaux, identification des pi\u00e8ces, code,  dimensions, nombre de pi\u00e8ces, etc.).",
                 "o": false
               },
               {
@@ -16769,22 +18511,22 @@ const jobData = [
               {
                 "t":
                     "S'assurer que l'espace de travail est s\u00e9curitaire (absence de rebuts autour de la d\u00e9ligneuse ou de la scie conventionnelle, trappe d'aspiration des poussi\u00e8res ouverte, etc.).",
-                "o": false
+                "o": true
               },
               {
                 "t":
                     "V\u00e9rifier l'\u00e9tat de la lame de scie et s'assurer qu'il n'y a pas de dents cass\u00e9es.",
-                "o": false
+                "o": true
               },
               {"t": "Enlever et remplacer la lame de scie.", "o": true},
               {
                 "t":
                     "Ajuster la lame de scie et v\u00e9rifier son \u00e9querrage.",
-                "o": false
+                "o": true
               },
               {
                 "t": "R\u00e9gler les guides \u00e0 la largeur pr\u00e9vue.",
-                "o": false
+                "o": true
               },
               {
                 "t":
@@ -16847,7 +18589,7 @@ const jobData = [
               "Respect des normes de qualit\u00e9.",
               "Application correcte des techniques de travail.",
               "Utilisation appropri\u00e9e des outils, de l'\u00e9quipement et des instruments de mesure.",
-              "Utilisation appropri\u00e9e du syst\u00e8me de mesure imp\u00e9riale ou m\u00e9trique.",
+              "Utilisation appropri\u00e9e du syst\u00e8me de mesure imp\u00e9riale ou m\u00e9trique",
               "Souci de l'atteinte des objectifs de production.",
               "Souci de l'\u00e9conomie des mat\u00e9riaux."
             ],
@@ -16865,13 +18607,13 @@ const jobData = [
               {
                 "t":
                     "V\u00e9rifier l'\u00e9tat des lames de scie (lame principale et lame inciseuse).",
-                "o": false
+                "o": true
               },
               {"t": "Enlever et remplacer les lames de scie.", "o": true},
               {
                 "t":
                     "Ajuster les lames de scie et v\u00e9rifier leur \u00e9querrage.",
-                "o": false
+                "o": true
               },
               {"t": "R\u00e9gler les guides.", "o": false},
               {
@@ -16942,10 +18684,7 @@ const jobData = [
                     "S'assurer que l'espace de travail est s\u00e9curitaire (absence de rebuts autour de la scie \u00e0 panneaux verticale, trappe d'aspiration des poussi\u00e8res ouverte, etc.).",
                 "o": false
               },
-              {
-                "t": "V\u00e9rifier l'\u00e9tat de la lame de scie.",
-                "o": false
-              },
+              {"t": "V\u00e9rifier l'\u00e9tat de la lame de scie.", "o": true},
               {"t": "Enlever et remplacer la lame de scie.", "o": true},
               {"t": "Effectuer les r\u00e9glages.", "o": true},
               {
@@ -17034,7 +18773,7 @@ const jobData = [
             "r": ["c", "b", "e", "f", "of", "p", "mv", "h", "n", "fi", "nm"]
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17"]
       },
       {
         "n": "Assembleuse, assembleur de meubles ou d'armoires",
@@ -17365,7 +19104,7 @@ const jobData = [
             "r": ["c", "e", "of", "t", "p", "mv", "h", "psy"]
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17"]
       },
       {
         "n": "Couturi\u00e8re, couturier de meubles",
@@ -17604,7 +19343,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17"]
       },
       {
         "n": "Ouvri\u00e8re, ouvrier au pr\u00e9garnissage de meubles",
@@ -17928,7 +19667,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17"]
       },
       {
         "n": "Assembleuse, assembleur de fen\u00eatres en vinyle",
@@ -18285,7 +20024,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17"]
       },
       {
         "n": "Assembleuse, assembleur de portes et fen\u00eatres en bois",
@@ -18638,7 +20377,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17"]
       },
       {
         "n": "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 au pon\u00e7age",
@@ -18973,11 +20712,9 @@ const jobData = [
             "r": ["c", "b", "e", "f", "of", "p", "mv", "h", "psy"]
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "11", "12", "15", "16", "17"]
       }
     ]
-  },
-  {"n": "Chimie et Biologie", "id": "06", "s": [ ]
   },
   {
     "n": "B\u00e2timent et travaux publics",
@@ -19322,7 +21059,7 @@ const jobData = [
             "r": ["c", "b", "e", "f", "t", "p", "mv", "h"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -19691,7 +21428,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -20214,7 +21951,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-concierge",
@@ -20621,7 +22358,7 @@ const jobData = [
             "r": ["c", "b", "f", "of", "p", "mv", "h"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Manoeuvre en voirie municipale",
@@ -21210,7 +22947,7 @@ const jobData = [
             "r": ["f", "psy", "et"]
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Manoeuvre aux r\u00e9seaux d'aqueduc et d'\u00e9gout",
@@ -21781,7 +23518,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -22052,7 +23789,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -22407,7 +24144,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17"]
       }
     ]
   },
@@ -22725,7 +24462,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Trieuse-\u00e9tiqueteuse, trieur-\u00e9tiqueteur",
@@ -23020,7 +24757,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 au poste d'accueil",
@@ -23440,7 +25177,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Pi\u00e9geuse, pi\u00e9geur d'animaux \u00e0 fourrure",
@@ -23507,7 +25244,7 @@ const jobData = [
               },
               {
                 "t":
-                    "Mettre en place des moyens pour attirer les animaux \u00e0 fourrure sur le territoire\r\n (d\u00e9p\u00f4t d'app\u00e2ts ou de leurres visuels ou olfactifs, construction de cabanes, d'enclos ou autres, installation de perches, etc.).",
+                    "Mettre en place des moyens pour attirer les animaux \u00e0 fourrure sur le territoire\n (d\u00e9p\u00f4t d'app\u00e2ts ou de leurres visuels ou olfactifs, construction de cabanes, d'enclos ou autres, installation de perches, etc.).",
                 "o": false
               },
               {
@@ -24078,7 +25815,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Trieuse, trieur (carton, papier, verre ou m\u00e9tal)",
@@ -24414,7 +26151,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "9", "12", "15", "16", "17"]
       }
     ]
   },
@@ -24793,7 +26530,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -25041,7 +26778,7 @@ const jobData = [
             "r": ["c", "e", "f", "of", "p", "mv", "h"]
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -25293,7 +27030,7 @@ const jobData = [
             "r": ["e", "f", "of", "p", "mv", "h", "nm"]
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       }
     ]
   },
@@ -25531,7 +27268,7 @@ const jobData = [
             "r": ["b", "f", "t", "psy"]
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Nettoyeuse, nettoyeur de v\u00e9hicules",
@@ -25796,7 +27533,7 @@ const jobData = [
             "r": ["c", "b", "e", "f", "of", "p", "mv", "h", "et", "nm"]
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 de stations-services",
@@ -26093,7 +27830,7 @@ const jobData = [
             "r": ["c", "b", "e", "f", "of", "t", "p", "mv", "h", "et", "fi"]
           }
         ],
-        "q": ["1", "3", "4", "5", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Installatrice, installateur de pneus",
@@ -26538,7 +28275,7 @@ const jobData = [
             "r": ["c", "b", "e", "f", "of", "p", "mv", "h", "psy", "n", "et"]
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -26789,7 +28526,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -27011,7 +28748,343 @@ const jobData = [
             "r": ["c", "b", "e", "f", "of", "p", "mv", "h"]
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
+      },
+      {
+        "n":
+            "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 \u00e0 l'entretien de v\u00e9los",
+        "id": "8361",
+        "s": [
+          {
+            "id": "718",
+            "n":
+                "Servir la client\u00e8le d'une entreprise de location ou de r\u00e9paration d'\u00e9quipements de sport",
+            "x": "2",
+            "c": [
+              "Respect des limites de son champ d'intervention.",
+              "Service courtois.",
+              "\u00c9coute attentive de la client\u00e8le.",
+              "Pertinence, exactitude et clart\u00e9 de l'information transmise.",
+              "Exactitude des donn\u00e9es inscrites sur les bordereaux.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le."
+            ],
+            "t": [
+              {"t": "Saluer la cliente ou le client.", "o": false},
+              {"t": "Interpr\u00e9ter la demande.", "o": false},
+              {
+                "t": "Fournir de l'information sur les services offerts.",
+                "o": false
+              },
+              {
+                "t":
+                    "Fournir des renseignements sur l'utilisation, l'entretien ou l'entreposage des \u00e9quipements.",
+                "o": false
+              },
+              {
+                "t":
+                    "Pr\u00e9senter les r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9.",
+                "o": false
+              },
+              {
+                "t":
+                    "Juger de la pertinence de refuser d'ex\u00e9cuter un ajustement ou une r\u00e9paration.",
+                "o": true
+              },
+              {
+                "t":
+                    "Fournir des explications sur le travail \u00e0 effectuer et sur les co\u00fbts approximatifs de la r\u00e9paration.",
+                "o": true
+              },
+              {
+                "t": "Remplir les bordereaux ou saisir les donn\u00e9es.",
+                "o": true
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836101",
+            "n": "Nettoyer le v\u00e9lo",
+            "x": "1",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des sp\u00e9cifications du fabricant.",
+              "Identification exacte des composants du cadre.",
+              "Application correcte des techniques de travail.",
+              "Manutention soign\u00e9e du v\u00e9lo.",
+              "Propret\u00e9 du v\u00e9lo",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le."
+            ],
+            "t": [
+              {"t": "Interpr\u00e9ter la fiche de travail.", "o": false},
+              {"t": "Interpr\u00e9ter le manuel d'instructions.", "o": true},
+              {"t": "Inspecter le cadre et ses composants.", "o": false},
+              {
+                "t":
+                    "Informer la superviseure ou le superviseur des anomalies relev\u00e9es (d\u00e9fectuosit\u00e9s, bris, usure, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "Laver le cadre, la fourche, la selle, le guidon, les roues, etc.",
+                "o": false
+              },
+              {"t": "Annoter la fiche de travail.", "o": false}
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836102",
+            "n": "Entretenir les roues et les pneus",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des sp\u00e9cifications du fabricant.",
+              "Identification exacte des composants des roues.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils.",
+              "Fonctionnement appropri\u00e9 du v\u00e9lo.",
+              "Manutention soign\u00e9e du v\u00e9lo.",
+              "Propret\u00e9 du v\u00e9lo",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le."
+            ],
+            "t": [
+              {"t": "Interpr\u00e9ter la fiche de travail.", "o": false},
+              {"t": "Interpr\u00e9ter le manuel d'instructions.", "o": true},
+              {"t": "D\u00e9poser les roues.", "o": false},
+              {
+                "t":
+                    "V\u00e9rifier l'\u00e9tat g\u00e9n\u00e9ral des roues et des pneus.",
+                "o": false
+              },
+              {
+                "t":
+                    "Informer la superviseure ou le superviseur des anomalies relev\u00e9es (d\u00e9fectuosit\u00e9s, bris, usure, etc.).",
+                "o": false
+              },
+              {"t": "Nettoyer, lubrifier et ajuster les moyeux.", "o": false},
+              {
+                "t":
+                    "Nettoyer, lubrifier et ajuster les syst\u00e8mes d'attache.",
+                "o": false
+              },
+              {"t": "Aligner les roues.", "o": false},
+              {"t": "Ajuster les rayons.", "o": false},
+              {"t": "Ajuster la pression des pneus.", "o": false},
+              {"t": "Reposer les roues.", "o": false},
+              {
+                "t":
+                    "Faire v\u00e9rifier son travail par la superviseure ou le superviseur.",
+                "o": false
+              },
+              {"t": "Annoter la fiche de travail.", "o": false}
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836103",
+            "n": "Entretenir le syst\u00e8me de freinage",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des sp\u00e9cifications du fabricant.",
+              "Identification exacte des composants du syst\u00e8me de freinage.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils.",
+              "Fonctionnement appropri\u00e9 du v\u00e9lo.",
+              "Manutention soign\u00e9e du v\u00e9lo.",
+              "Propret\u00e9 du v\u00e9lo",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le."
+            ],
+            "t": [
+              {"t": "Interpr\u00e9ter la fiche de travail.", "o": false},
+              {"t": "Interpr\u00e9ter le manuel d'instructions.", "o": true},
+              {
+                "t":
+                    "V\u00e9rifier l'\u00e9tat g\u00e9n\u00e9ral des composants du syst\u00e8me de freinage.",
+                "o": false
+              },
+              {
+                "t":
+                    "Informer la superviseure ou le superviseur des anomalies relev\u00e9es (d\u00e9fectuosit\u00e9s, bris, usure, etc.).",
+                "o": false
+              },
+              {
+                "t": "Nettoyer, lubrifier et ajuster les \u00e9triers.",
+                "o": false
+              },
+              {"t": "Ajuster les freins.", "o": false},
+              {"t": "Ajuster la tension des c\u00e2bles.", "o": false},
+              {
+                "t":
+                    "Faire v\u00e9rifier son travail par la superviseure ou le superviseur.",
+                "o": false
+              },
+              {"t": "Annoter la fiche de travail.", "o": false}
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836104",
+            "n": "Entretenir le syst\u00e8me de transmission",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des sp\u00e9cifications du fabricant.",
+              "Identification exacte des composants du syst\u00e8me de transmission.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils.",
+              "Fonctionnement appropri\u00e9 du v\u00e9lo.",
+              "Manutention soign\u00e9e du v\u00e9lo.",
+              "Propret\u00e9 du v\u00e9lo",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le."
+            ],
+            "t": [
+              {"t": "Interpr\u00e9ter la fiche de travail.", "o": false},
+              {"t": "Interpr\u00e9ter le manuel d'instructions.", "o": true},
+              {
+                "t":
+                    "V\u00e9rifier l'\u00e9tat g\u00e9n\u00e9ral des composants du syst\u00e8me de transmission.",
+                "o": false
+              },
+              {
+                "t":
+                    "Informer la superviseure ou le superviseur des anomalies relev\u00e9es (d\u00e9fectuosit\u00e9s, bris, usure, etc.).",
+                "o": false
+              },
+              {"t": "Lubrifier la cha\u00eene.", "o": false},
+              {"t": "Ajuster le d\u00e9railleur.", "o": false},
+              {"t": "Ajuster les vitesses.", "o": false},
+              {
+                "t":
+                    "Faire v\u00e9rifier son travail par la superviseure ou le superviseur.",
+                "o": false
+              },
+              {"t": "Annoter la fiche de travail.", "o": false}
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836105",
+            "n": "Entretenir le syst\u00e8me de direction",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des sp\u00e9cifications du fabricant.",
+              "Identification exacte des composants du syst\u00e8me de direction.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils.",
+              "Fonctionnement appropri\u00e9 du v\u00e9lo.",
+              "Manutention soign\u00e9e du v\u00e9lo.",
+              "Propret\u00e9 du v\u00e9lo",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le."
+            ],
+            "t": [
+              {"t": "Interpr\u00e9ter la fiche de travail.", "o": false},
+              {"t": "Interpr\u00e9ter le manuel d'instructions.", "o": true},
+              {
+                "t":
+                    "V\u00e9rifier l'\u00e9tat g\u00e9n\u00e9ral des composants du syst\u00e8me de direction.",
+                "o": false
+              },
+              {
+                "t":
+                    "Informer la superviseure ou le superviseur des anomalies relev\u00e9es (d\u00e9fectuosit\u00e9s, bris, usure, etc.).",
+                "o": false
+              },
+              {"t": "Nettoyer et lubrifier le jeu de direction.", "o": false},
+              {"t": "Ajuster le guidon.", "o": false},
+              {
+                "t":
+                    "Faire v\u00e9rifier son travail par la superviseure ou le superviseur.",
+                "o": false
+              },
+              {"t": "Annoter la fiche de travail.", "o": false}
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836106",
+            "n": "Assembler un v\u00e9lo",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des sp\u00e9cifications du fabricant.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils.",
+              "Fonctionnement appropri\u00e9 du v\u00e9lo.",
+              "Manutention soign\u00e9e du v\u00e9lo.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction de la client\u00e8le."
+            ],
+            "t": [
+              {"t": "Interpr\u00e9ter la fiche de travail.", "o": false},
+              {"t": "Interpr\u00e9ter le manuel d'instructions.", "o": true},
+              {"t": "Installer les composants du v\u00e9lo.", "o": false},
+              {"t": "Ajuster les composants.", "o": false},
+              {"t": "Installer des r\u00e9flecteurs.", "o": false},
+              {
+                "t":
+                    "Fixer, visser et ajuster des accessoires (porte-bagages, porte-bidon, garde-boue, panier, sac, etc.).",
+                "o": false
+              },
+              {
+                "t": "V\u00e9rifier le fonctionnement du v\u00e9lo.",
+                "o": false
+              },
+              {
+                "t":
+                    "Faire v\u00e9rifier son travail par la superviseure ou le superviseur.",
+                "o": false
+              },
+              {"t": "Annoter la fiche de travail.", "o": false}
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "505",
+            "n":
+                "Assurer l'ordre et la propret\u00e9 des aires de travail dans une entreprise de location ou de r\u00e9paration d'\u00e9quipements de sport",
+            "x": "1",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Conformit\u00e9 avec le plan de rangement ou d'entreposage.",
+              "Ordre et propret\u00e9."
+            ],
+            "t": [
+              {
+                "t":
+                    "Ranger les outils, les pi\u00e8ces, le mat\u00e9riel, les produits, etc.",
+                "o": false
+              },
+              {"t": "Essuyer les \u00e9tablis et les tablettes.", "o": false},
+              {"t": "Approvisionner le poste de travail.", "o": false},
+              {"t": "Balayer les planchers.", "o": false},
+              {
+                "t":
+                    "R\u00e9cup\u00e9rer les restes de mat\u00e9riaux pour le recyclage ou jeter les rebuts.",
+                "o": false
+              },
+              {"t": "Vider les poubelles.", "o": false}
+            ],
+            "o": false,
+            "r": []
+          }
+        ],
+        "q": []
       }
     ]
   },
@@ -27185,7 +29258,7 @@ const jobData = [
             "r": ["c", "e", "f", "of", "p", "mv", "h", "psy"]
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 au meulage",
@@ -27309,7 +29382,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 au polissage",
@@ -27432,7 +29505,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Assembleuse, assembleur de mat\u00e9riel m\u00e9canique",
@@ -27615,7 +29688,7 @@ const jobData = [
             "r": ["c", "e", "f", "p", "mv", "h", "psy", "n"]
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Assembleuse, assembleur (caoutchouc, composites, plastiques)",
@@ -27832,7 +29905,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Manoeuvre (caoutchouc, composites, plastiques)",
@@ -28082,7 +30155,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -28478,13 +30551,17 @@ const jobData = [
               {
                 "t": "Ensacher et identifier la mati\u00e8re broy\u00e9e.",
                 "o": false
+              },
+              {
+                "t": "Acheminer les sacs \u00e0 l'endroit pr\u00e9vu.",
+                "o": false
               }
             ],
             "o": true,
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-op\u00e9ratrice, aide-op\u00e9rateur \u00e0 la presse",
@@ -28896,7 +30973,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -29289,7 +31366,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Manutentionnaire",
@@ -29339,7 +31416,8 @@ const jobData = [
                 "t":
                     "Arr\u00eater le chariot \u00e9l\u00e9vateur : mettre le moteur au point mort, , serrer le frein de stationnement, abaisser le dispositif de charge, etc.",
                 "o": false
-              }
+              },
+              {"t": "Stationner le chariot \u00e9l\u00e9vateur.", "o": false}
             ],
             "o": true,
             "r": ["e", "f", "of", "t", "p", "mv", "h", "n", "et", "v", "a"]
@@ -29659,7 +31737,7 @@ const jobData = [
             "r": ["c", "b", "e", "f", "of", "p", "mv", "h", "psy"]
           }
         ],
-        "q": ["1", "3", "4", "5", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "9", "12", "15", "16", "17"]
       }
     ]
   },
@@ -29856,7 +31934,7 @@ const jobData = [
             "r": ["b", "e", "f", "of", "t", "p", "mv", "h", "n", "et", "fi"]
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Reboiseuse, reboiseur",
@@ -30186,7 +32264,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17"]
       }
     ]
   },
@@ -30421,7 +32499,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -30678,7 +32756,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-pressi\u00e8re, aide-pressier sur une presse flexographique",
@@ -30893,7 +32971,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -31334,7 +33412,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Relieuse, relieur de manuels scolaires et de livres usag\u00e9s",
@@ -31744,7 +33822,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-op\u00e9ratrice, aide-op\u00e9rateur de massicot",
@@ -31996,7 +34074,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-op\u00e9ratrice, aide-op\u00e9rateur de plieuse",
@@ -32253,7 +34331,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -32528,7 +34606,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-op\u00e9ratrice, aide-op\u00e9rateur d'encarteuse-piqueuse",
@@ -32806,7 +34884,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -33144,7 +35222,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Pr\u00e9paratrice, pr\u00e9parateur de commandes postales",
@@ -33384,11 +35462,11 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
-            "Aide-g\u00e9n\u00e9rale, aide-g\u00e9n\u00e9ral en finition \u0096 reliure en imprimerie",
+            "Aide-g\u00e9n\u00e9rale, aide-g\u00e9n\u00e9ral en finition - reliure en imprimerie",
         "id": "8283",
         "s": [
           {
@@ -33870,7 +35948,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "9", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -33986,7 +36064,7 @@ const jobData = [
               },
               {
                 "t":
-                    "V\u00e9rifier la qualit\u00e9 des copies\u00a0: propret\u00e9, absence de taches, etc.",
+                    "V\u00e9rifier la qualit\u00e9 des copies : propret\u00e9, absence de taches, etc.",
                 "o": false
               },
               {
@@ -34129,11 +36207,9 @@ const jobData = [
             "r": ["c", "e", "f", "of", "p", "mv", "h", "psy"]
           }
         ],
-        "q": ["1", "3", "4", "5", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "9", "12", "15", "16", "17"]
       }
     ]
-  },
-  {"n": "M\u00e9canique d'entretien", "id": "14", "s": [ ]
   },
   {
     "n": "Mines et travaux de chantier",
@@ -34468,13 +36544,14 @@ const jobData = [
                 "t":
                     "Arr\u00eater le chariot \u00e9l\u00e9vateur : mettre le moteur au point mort, , serrer le frein de stationnement, abaisser le dispositif de charge, etc.",
                 "o": false
-              }
+              },
+              {"t": "Stationner le chariot \u00e9l\u00e9vateur.", "o": false}
             ],
             "o": true,
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-foreuse, aide-foreur (forage au diamant en surface)",
@@ -34833,7 +36910,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "6", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Aide de camp",
@@ -35418,11 +37495,9 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       }
     ]
-  },
-  {"n": "M\u00e9tallurgie", "id": "16", "s": [ ]
   },
   {
     "n": "Transport",
@@ -35566,7 +37641,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-livreuse, aide-livreur",
@@ -35818,7 +37893,7 @@ const jobData = [
             "r": ["e", "f", "of", "t", "p", "mv", "h", "psy", "et"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-livreuse, aide-livreur du secteur du meuble",
@@ -36119,7 +38194,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Chauffeuse-livreuse, chauffeur-livreur",
@@ -36289,7 +38364,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-d\u00e9m\u00e9nageuse, aide-d\u00e9m\u00e9nageur",
@@ -36803,7 +38878,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -37178,7 +39253,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Patrouilleuse, patrouilleur de parcs de stationnement",
@@ -37494,7 +39569,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -37756,7 +39831,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Brigadi\u00e8re, brigadier scolaire",
@@ -38102,7 +40177,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "4", "5", "7", "12", "15", "16", "17"]
       }
     ]
   },
@@ -38371,7 +40446,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 \u00e0 la buanderie",
@@ -38715,7 +40790,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Couturi\u00e8re industrielle, couturier industriel",
@@ -39089,7 +41164,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -39422,7 +41497,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "9", "12", "15", "16", "17"]
       },
       {
         "n":
@@ -39805,7 +41880,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "9", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "9", "12", "15", "16", "17"]
       },
       {
         "n": "Manoeuvre en production textile",
@@ -40032,7 +42107,7 @@ const jobData = [
             "r": []
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       }
     ]
   },
@@ -40608,7 +42683,1509 @@ const jobData = [
             "r": ["b", "f", "of", "p", "mv", "h", "psy", "et"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
+      },
+      {
+        "n": "Op\u00e9ratrice, op\u00e9rateur de four de cr\u00e9mation",
+        "id": "8362",
+        "s": [
+          {
+            "id": "836201",
+            "n": "Recevoir la d\u00e9pouille mortelle",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des r\u00e8gles d'hygi\u00e8ne.",
+              "Respect de la loi et des r\u00e8glements sur les activit\u00e9s fun\u00e9raires.",
+              "Respect des directives de travail.",
+              "Respect de la dignit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Identification exacte de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Exactitude des renseignements inscrits."
+            ],
+            "t": [
+              {
+                "t":
+                    "Interpr\u00e9ter les documents : identit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e, bulletin de d\u00e9c\u00e8s, formulaire de cr\u00e9mation, consignes de la famille ou des proches, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "S'assurer que le stimulateur \u00e9lectromagn\u00e9tique a \u00e9t\u00e9 retir\u00e9 avant de proc\u00e9der \u00e0 la cr\u00e9mation.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9placer le contenant de cr\u00e9mation ou le cercueil vers la salle r\u00e9frig\u00e9r\u00e9e ou la salle de cong\u00e9lation.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9poser le contenant de cr\u00e9mation ou le cercueil dans la case ou sur le support.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier la temp\u00e9rature de la ou des salles et l'ajuster.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              },
+              {"t": "Remplir le registre des cr\u00e9mations.", "o": false}
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836202",
+            "n": "Accompagner la famille ou les proches",
+            "x": "2",
+            "c": [
+              "Respect des directives de travail.",
+              "Respect des r\u00e8gles de d\u00e9corum.",
+              "Respect des diff\u00e9rences sociales, culturelles, religieuses, etc.",
+              "Respect des limites de son champ d'intervention.",
+              "Respect de la dignit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Clart\u00e9 de la communication avec les personnes.",
+              "Comportement appropri\u00e9 au regard d'une client\u00e8le endeuill\u00e9e.",
+              "Manifestation de compassion."
+            ],
+            "t": [
+              {
+                "t":
+                    "Interpr\u00e9ter la demande formul\u00e9e par la famille ou les proches et v\u00e9rifier si les personnes souhaitent assister \u00e0 la c\u00e9r\u00e9monie de cr\u00e9mation.",
+                "o": false
+              },
+              {
+                "t":
+                    "Contacter un membre de la famille ou la personne repr\u00e9sentant les proches : l'informer de la date et de l'heure de la cr\u00e9mation, l'inviter \u00e0 y participer ou l'aviser du moment pr\u00e9cis de la cr\u00e9mation.",
+                "o": true
+              },
+              {"t": "Accueillir les personnes.", "o": false},
+              {"t": "Offrir ses condol\u00e9ances.", "o": false},
+              {
+                "t":
+                    "Expliquer le d\u00e9roulement de la c\u00e9r\u00e9monie de cr\u00e9mation.",
+                "o": false
+              },
+              {"t": "R\u00e9pondre aux questions.", "o": false},
+              {
+                "t": "Inviter les personnes \u00e0 faire leurs adieux.",
+                "o": false
+              },
+              {
+                "t":
+                    "Communiquer avec la conseill\u00e8re ou le conseiller aux familles en cas de probl\u00e8me.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836203",
+            "n": "Op\u00e9rer un four de cr\u00e9mation",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des r\u00e8gles d'hygi\u00e8ne.",
+              "Respect de la loi et des r\u00e8glements sur les activit\u00e9s fun\u00e9raires.",
+              "Respect des directives de travail.",
+              "Respect des sp\u00e9cifications du manufacturier.",
+              "Respect de la dignit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Interpr\u00e9tation juste des commandes du panneau de contr\u00f4le.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e de l'\u00e9quipement.",
+              "Vigilance."
+            ],
+            "t": [
+              {
+                "t":
+                    "V\u00e9rifier l'identit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e.",
+                "o": false
+              },
+              {
+                "t":
+                    "Interpr\u00e9ter le formulaire, les consignes de la famille ou des proches de m\u00eame que les directives li\u00e9es \u00e0 des dimensions ou poids exceptionnels.",
+                "o": false
+              },
+              {
+                "t":
+                    "S'assurer que son \u00e9quipement de protection individuelle est en bon \u00e9tat et qu'il est mis correctement (gants calorifuges, bottes de s\u00e9curit\u00e9, lunettes de s\u00e9curit\u00e9, masque anti-poussi\u00e8re, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier l'\u00e9tat de l'\u00e9quipement de cr\u00e9mation (sectionneurs, disjoncteurs, joint de la porte, analyseurs, etc.).",
+                "o": false
+              },
+              {"t": "Mettre le four sous tension.", "o": false},
+              {"t": "D\u00e9marrer le cycle de pr\u00e9chauffage.", "o": false},
+              {
+                "t":
+                    "D\u00e9poser le contenant de cr\u00e9mation ou le cercueil sur le chariot et le d\u00e9placer vers l'\u00e9quipement de cr\u00e9mation.",
+                "o": false
+              },
+              {
+                "t":
+                    "Transf\u00e9rer le contenant de cr\u00e9mation ou le cercueil sur le dispositif de chargement du four.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9marrer le cycle de combustion et mettre en marche le dispositif de chargement du four.",
+                "o": false
+              },
+              {
+                "t":
+                    "Surveiller p\u00e9riodiquement le d\u00e9roulement du processus en observant visuellement les conditions de combustion.",
+                "o": false
+              },
+              {
+                "t":
+                    "Arr\u00eater l'\u00e9quipement \u00e0 la fin de la proc\u00e9dure.",
+                "o": false
+              },
+              {
+                "t":
+                    "Effectuer un arr\u00eat d\u00bfurgence, au besoin, et en informer la personne responsable.",
+                "o": false
+              },
+              {"t": "Remplir le registre des cr\u00e9mations.", "o": false}
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836204",
+            "n": "R\u00e9cup\u00e9rer les cendres",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect de la loi et des r\u00e8glements sur les activit\u00e9s fun\u00e9raires.",
+              "Respect de la loi et des r\u00e8glements sur la qualit\u00e9 de l'environnement.",
+              "Respect des directives de travail.",
+              "Respect du protocole de l'\u00e9tablissement fun\u00e9raire.",
+              "Respect de la dignit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Interpr\u00e9tation juste des commandes du panneau de contr\u00f4le.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e de pelles, racloirs ou balais.",
+              "Manutention soign\u00e9e des cendres."
+            ],
+            "t": [
+              {
+                "t": "Proc\u00e9der \u00e0 l'ouverture de la porte.",
+                "o": false
+              },
+              {"t": "Racler les cendres refroidies.", "o": false},
+              {
+                "t":
+                    "Transf\u00e9rer les os dans un broyeur et actionner celui-ci",
+                "o": false
+              },
+              {
+                "t":
+                    "R\u00e9cup\u00e9rer les m\u00e9taux (proth\u00e8ses, implants, tiges d'acier, etc.), et en disposer.",
+                "o": false
+              },
+              {
+                "t": "Transvider les cendres dans un sac de plastique.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier les renseignements inscrits sur la m\u00e9daille d'identification et d\u00e9poser celle-ci dans le sac.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9poser le sac de cendres dans une bo\u00eete ou transf\u00e9rer les cendres dans une urne ou dans un reliquaire.",
+                "o": false
+              },
+              {"t": "Rev\u00e9rifier les renseignements.", "o": false},
+              {"t": "Remplir le registre des cr\u00e9mations.", "o": false},
+              {
+                "t":
+                    "Remettre \u00e0 un seul membre de la famille ou \u00e0 un proche l\u00bfurne ou le reliquaire.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836205",
+            "n":
+                "Effectuer l'entretien pr\u00e9ventif d'un four de cr\u00e9mation",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect de la loi et des r\u00e8glements sur la qualit\u00e9 de l'environnement.",
+              "Respect des sp\u00e9cifications du manufacturier.",
+              "Respect des directives de travail.",
+              "Respect des limites de son champ d'intervention.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils et des instruments de mesure.",
+              "Souci d'\u00e9conomiser les sources d'\u00e9nergie."
+            ],
+            "t": [
+              {"t": "Interpr\u00e9ter le calendrier d'entretien.", "o": false},
+              {
+                "t":
+                    "S'assurer que son \u00e9quipement de protection individuelle est en bon \u00e9tat et qu'il est mis correctement (bottes de s\u00e9curit\u00e9, lunettes de s\u00e9curit\u00e9, masque anti-poussi\u00e8re, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier quotidiennement le joint de la porte, le regard du four, la bo\u00eete \u00e0 cendres, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Nettoyer le joint de la porte, le regard du four, la bo\u00eete \u00e0 cendres, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier hebdomadairement les roulements et les cha\u00eenes du dispositif de chargement, les ouvertures d'admission des ventilateurs, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Nettoyer ou graisser les roulements et les cha\u00eenes, etc.",
+                "o": true
+              },
+              {"t": "Remplacer des composants usuels.", "o": false},
+              {
+                "t":
+                    "V\u00e9rifier mensuellement les conduits, les rails des dispositifs, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier, \u00e0 l'occasion, l'\u00e9tat du rev\u00eatement r\u00e9fractaire.",
+                "o": false
+              },
+              {
+                "t":
+                    "Informer la personne responsable en cas de baisse d'inventaire des produits.",
+                "o": false
+              },
+              {"t": "Disposer des produits.", "o": false},
+              {"t": "Remplir le registre.", "o": false},
+              {
+                "t":
+                    "Communiquer avec le fabricant de fours de cr\u00e9mation en vue de l'entretien p\u00e9riodique.",
+                "o": true
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836206",
+            "n": "Assurer la propret\u00e9 des lieux",
+            "x": "1",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des r\u00e8gles d'hygi\u00e8ne.",
+              "Respect de la loi et des r\u00e8glements sur les activit\u00e9s fun\u00e9raires.",
+              "Respect de la loi et des r\u00e8glements sur la qualit\u00e9 de l'environnement.",
+              "Respect des directives de travail.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des produits de nettoyage ou de d\u00e9sinfection.",
+              "Propret\u00e9 des lieux."
+            ],
+            "t": [
+              {"t": "Ranger les outils, les accessoires, etc.", "o": false},
+              {"t": "Positionner les chariots.", "o": false},
+              {"t": "Balayer les planchers.", "o": false},
+              {
+                "t":
+                    "Nettoyer et d\u00e9sinfecter les surfaces d'entreposage des salles r\u00e9frig\u00e9r\u00e9es et de cong\u00e9lation.",
+                "o": false
+              },
+              {
+                "t": "Mettre en marche le syst\u00e8me de ventilation.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836207",
+            "n":
+                "Intervenir en situation d'urgence sanitaire ou environnementale",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des limites de son champ d'intervention.",
+              "Respect du protocole de l'\u00e9tablissement fun\u00e9raire.",
+              "Ma\u00eetrise de soi.",
+              "Promptitude."
+            ],
+            "t": [
+              {"t": "Reconna\u00eetre l'urgence de la situation.", "o": false},
+              {
+                "t":
+                    "Pr\u00e9venir la personne responsable ou composer le num\u00e9ro de l'urgence (310-4141 ou 911).",
+                "o": false
+              },
+              {
+                "t":
+                    "Demander aux personnes pr\u00e9sentes de quitter les lieux.",
+                "o": false
+              },
+              {
+                "t":
+                    "Appliquer les mesures prescrites en cas de panne de courant.",
+                "o": false
+              },
+              {
+                "t":
+                    "Appliquer les mesures prescrites en cas de porte bloqu\u00e9e en position ouverte.",
+                "o": false
+              },
+              {
+                "t": "Appliquer les mesures prescrites en cas de fuite de gaz.",
+                "o": false
+              },
+              {
+                "t": "Appliquer les mesures prescrites en cas d'incendie.",
+                "o": false
+              },
+              {
+                "t": "Appliquer les mesures prescrites en cas d'explosion.",
+                "o": false
+              },
+              {"t": "Adopter une approche s\u00e9curitaire.", "o": false},
+              {"t": "Remplir un rapport d'\u00e9v\u00e8nement.", "o": false}
+            ],
+            "o": true,
+            "r": []
+          }
+        ],
+        "q": []
+      },
+      {
+        "n": "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 de salon fun\u00e9raire",
+        "id": "8363",
+        "s": [
+          {
+            "id": "836301",
+            "n": "Effectuer l'ouverture et la fermeture du salon",
+            "x": "1",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des r\u00e8gles d'hygi\u00e8ne.",
+              "Respect des directives de travail.",
+              "Souci de la s\u00e9curit\u00e9 des lieux.",
+              "Travail minutieux."
+            ],
+            "t": [
+              {
+                "t":
+                    "D\u00e9verrouiller les portes et \u00e9teindre le syst\u00e8me de s\u00e9curit\u00e9.",
+                "o": false
+              },
+              {"t": "Allumer les lumi\u00e8res.", "o": false},
+              {
+                "t":
+                    "S'assurer de la propret\u00e9 des salles et des aires communes.",
+                "o": false
+              },
+              {
+                "t":
+                    "Installer le plan des salles d'exposition et indiquer le nom des personnes d\u00e9c\u00e9d\u00e9es.",
+                "o": false
+              },
+              {
+                "t":
+                    "Approvisionner la salle de d\u00e9tente en eau, caf\u00e9, autres boissons, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              },
+              {
+                "t": "Lors de la fermeture, \u00e9teindre les lumi\u00e8res.",
+                "o": false
+              },
+              {
+                "t":
+                    "Activer le syst\u00e8me de s\u00e9curit\u00e9 et verrouiller les portes.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836302",
+            "n":
+                "Pr\u00e9parer les salles d'expositions et de c\u00e9r\u00e9monies",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des demandes de la famille ou des proches.",
+              "Respect de la dignit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Clart\u00e9 de la communication.",
+              "Souci de la satisfaction de la famille et des proches.",
+              "Maintien de l'atmosph\u00e8re calme et apaisante."
+            ],
+            "t": [
+              {
+                "t":
+                    "Interpr\u00e9ter les consignes de la famille ou des proches de m\u00eame que la feuille de route pr\u00e9par\u00e9e par la conseill\u00e8re ou le conseiller aux familles.",
+                "o": false
+              },
+              {
+                "t":
+                    "Disposer le support du cercueil ou de l'urne \u00e0 l'endroit pr\u00e9vu.",
+                "o": false
+              },
+              {
+                "t":
+                    "Fournir des indications aux porteuses et porteurs de cercueils et d'urnes.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier l'am\u00e9nagement des salles : les sellettes, les bancs, les chaises, les fauteuils, les tables, le pupitre de c\u00e9r\u00e9monie ou tout autre mobilier.",
+                "o": false
+              },
+              {"t": "V\u00e9rifier l'\u00e9clairage.", "o": false},
+              {
+                "t":
+                    "Pr\u00e9parer le syst\u00e8me de son et le faire fonctionner.",
+                "o": false
+              },
+              {
+                "t":
+                    "Pr\u00e9parer le syst\u00e8me vid\u00e9o, y ins\u00e9rer un DVD ou une cl\u00e9 USB et le faire fonctionner.",
+                "o": false
+              },
+              {
+                "t":
+                    "S'assurer que le syst\u00e8me de diffusion vid\u00e9o est en place et pr\u00eat \u00e0 diffuser \u00e0 l'heure pr\u00e9vue.",
+                "o": false
+              },
+              {"t": "Installer les arrangements floraux.", "o": false},
+              {
+                "t":
+                    "Disposer les photographies, les objets personnels, les signets, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "R\u00e9alimenter l'inventaire des signets comm\u00e9moratifs.",
+                "o": false
+              },
+              {
+                "t": "Mettre en place le registre de condol\u00e9ances.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836303",
+            "n":
+                "Accueillir les membres de la famille, les proches et les visiteurs",
+            "x": "2",
+            "c": [
+              "Respect des directives de travail.",
+              "Respect des r\u00e8gles de d\u00e9corum.",
+              "Respect des diff\u00e9rences sociales, culturelles, religieuses, etc.",
+              "Respect de la dignit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Clart\u00e9 de la communication avec les personnes.",
+              "Manifestation de compassion.",
+              "Manifestation de son professionnalisme, de son sens des responsabilit\u00e9s et de sa discr\u00e9tion.",
+              "Souci de la satisfaction de la famille et des proches."
+            ],
+            "t": [
+              {"t": "Accueillir les personnes.", "o": false},
+              {
+                "t":
+                    "Offrir ses condol\u00e9ances aux membres de la famille et aux proches et leur remettre des autocollants d'identification.",
+                "o": false
+              },
+              {
+                "t":
+                    "nformer la famille et les proches de la localisation de la salle, du d\u00e9roulement de la c\u00e9r\u00e9monie, etc.",
+                "o": false
+              },
+              {"t": "R\u00e9pondre aux questions.", "o": false},
+              {
+                "t": "Guider les visiteurs vers les diff\u00e9rentes salles.",
+                "o": false
+              },
+              {
+                "t":
+                    "Inviter les visiteurs \u00e0 signer le registre des condol\u00e9ances.",
+                "o": false
+              },
+              {
+                "t": "Informer les visiteurs de l'heure de la fermeture.",
+                "o": false
+              },
+              {
+                "t": "Saluer les personnes \u00e0 leur d\u00e9part.",
+                "o": false
+              },
+              {
+                "t":
+                    "Communiquer avec la conseill\u00e8re ou le conseiller aux familles en cas de probl\u00e8me.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836304",
+            "n": "Assurer une surveillance des lieux",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Pertinence de l'analyse des situations",
+              "Clart\u00e9 de la communication.",
+              "Diplomatie.",
+              "Souci constant de la s\u00e9curit\u00e9 des lieux.",
+              "Vigilance."
+            ],
+            "t": [
+              {
+                "t":
+                    "Constater des manquements aux r\u00e8glements (bruit excessif, usage de cigarettes, de boissons, en dehors de la zone pr\u00e9vue, etc.), et informer les personnes de l'importance de les respecter.",
+                "o": false
+              },
+              {
+                "t":
+                    "Constater des d\u00e9fectuosit\u00e9s \u00e9lectriques, une absence de chauffage, des d\u00e9g\u00e2ts d'eau, etc., et en informer la personne responsable.",
+                "o": false
+              },
+              {
+                "t":
+                    "Constater des comportements inhabituels et en informer les autorit\u00e9s.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836305",
+            "n": "Contribuer \u00e0 l'entretien du salon",
+            "x": "1",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des r\u00e8gles d'hygi\u00e8ne.",
+              "Respect des directives de travail.",
+              "Pr\u00e9sentation soign\u00e9e du salon."
+            ],
+            "t": [
+              {"t": "Replacer le mobilier.", "o": false},
+              {
+                "t": "Ramasser des verres, des assiettes, des papiers, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Essuyer les d\u00e9g\u00e2ts tels qu'un verre renvers\u00e9, des d\u00e9bris de nourriture, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9poser les d\u00e9chets et les mati\u00e8res recyclables dans les bacs pr\u00e9vus \u00e0 cet effet.",
+                "o": false
+              },
+              {
+                "t":
+                    "Demander \u00e0 une pr\u00e9pos\u00e9e ou un pr\u00e9pos\u00e9 \u00e0 l'entretien m\u00e9nager de nettoyer les planchers, les tapis, les salles de bain en cas de d\u00e9g\u00e2ts majeurs ou encore effectuer soi-m\u00eame ces t\u00e2ches.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "720",
+            "n": "Intervenir en situation d'urgence",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des limites de son champ d'intervention.",
+              "Respect du protocole d'intervention de l'entreprise.",
+              "Utilisation appropri\u00e9e du mat\u00e9riel contenu dans la trousse de premiers secours.",
+              "Ma\u00eetrise de soi.",
+              "Promptitude."
+            ],
+            "t": [
+              {"t": "Reconna\u00eetre l'urgence de la situation.", "o": false},
+              {
+                "t":
+                    "Pr\u00e9venir la personne responsable ou composer le num\u00e9ro de l'urgence (310-4141 ou le 911).",
+                "o": false
+              },
+              {"t": "Appliquer les mesures prescrites.", "o": false},
+              {
+                "t":
+                    "Rassurer la personne et demeurer avec elle jusqu'\u00e0 l'arriv\u00e9e des secours.",
+                "o": false
+              },
+              {
+                "t":
+                    "Adopter une approche s\u00e9curitaire en situation d'urgence.",
+                "o": false
+              },
+              {
+                "t": "Compl\u00e9ter un rapport d'\u00e9v\u00e8nement.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          }
+        ],
+        "q": []
+      },
+      {
+        "n": "Porteuse, porteur",
+        "id": "8364",
+        "s": [
+          {
+            "id": "836401",
+            "n": "Porter le cercueil",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des r\u00e8gles de d\u00e9corum.",
+              "Respect de la dignit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Application correcte des techniques de travail.",
+              "Tenue vestimentaire appropri\u00e9e.",
+              "Coordination synchronis\u00e9e des mouvements avec les autres porteuses et porteurs.",
+              "Port\u00e9e et d\u00e9p\u00f4t de fa\u00e7on naturelle et fluide.",
+              "Manifestation de professionnalisme.",
+              "Manifestation de sa capacit\u00e9 \u00e0 travailler en \u00e9quipe.",
+              "Gestion appropri\u00e9e de ses \u00e9motions."
+            ],
+            "t": [
+              {
+                "t":
+                    "Appliquer  les directives de la directrice ou du directeur des fun\u00e9railles.",
+                "o": false
+              },
+              {
+                "t":
+                    "Interpr\u00e9ter la demande formul\u00e9e par la famille ou les proches concernant la technique de portage.",
+                "o": false
+              },
+              {
+                "t": "Se positionner \u00e0 c\u00f4t\u00e9 du cercueil.",
+                "o": false
+              },
+              {
+                "t":
+                    "Saisir les poign\u00e9es du cercueil, le soulever jusqu\u00bf\u00e0 la taille, le d\u00e9poser sur l'\u00e9paule ou encore le placer sur un chariot fun\u00e9raire.",
+                "o": false
+              },
+              {
+                "t": "Pr\u00e9c\u00e9der le cort\u00e8ge fun\u00e8bre.",
+                "o": false
+              },
+              {"t": "D\u00e9poser le cercueil.", "o": false},
+              {
+                "t": "Transf\u00e9rer le cercueil dans le corbillard.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836402",
+            "n": "Porter l'urne",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des r\u00e8gles de d\u00e9corum.",
+              "Respect de la dignit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Application correcte des techniques de travail.",
+              "Tenue vestimentaire appropri\u00e9e.",
+              "Port\u00e9e et d\u00e9p\u00f4t de fa\u00e7on naturelle et fluide.",
+              "Manifestation de professionnalisme.",
+              "Gestion appropri\u00e9e de ses \u00e9motions."
+            ],
+            "t": [
+              {
+                "t":
+                    "Appliquer les directives de la directrice ou du directeur des fun\u00e9railles.",
+                "o": false
+              },
+              {
+                "t":
+                    "Interpr\u00e9ter la demande formul\u00e9e par la famille ou les proches.",
+                "o": false
+              },
+              {"t": "Se positionner devant l'urne.", "o": false},
+              {"t": "Soulever l'urne.", "o": false},
+              {"t": "Transporter l'urne.", "o": false},
+              {
+                "t": "Pr\u00e9c\u00e9der le cort\u00e8ge fun\u00e8bre.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9poser l'urne sur une table, un pi\u00e9destal, etc.",
+                "o": false
+              },
+              {"t": "Transf\u00e9rer l'urne dans le corbillard.", "o": false}
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836403",
+            "n": "Assister les membres de l'\u00e9quipe des fun\u00e9railles",
+            "x": "1",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect de la dignit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Clart\u00e9 de la communication.",
+              "Manifestation de professionnalisme.",
+              "Manifestation de sa capacit\u00e9 \u00e0 travailler en \u00e9quipe.",
+              "Comportement appropri\u00e9 au regard d'une client\u00e8le endeuill\u00e9e."
+            ],
+            "t": [
+              {
+                "t":
+                    "Transporter des arrangements floraux et les d\u00e9poser aux endroits pr\u00e9vus soit au salon fun\u00e9raire, au lieu de la c\u00e9r\u00e9monie, au cimeti\u00e8re, au colombarium ou au mausol\u00e9e.",
+                "o": false
+              },
+              {
+                "t":
+                    "Agir \u00e0 titre de porti\u00e8re ou de portier aux diff\u00e9rents endroits.",
+                "o": false
+              },
+              {
+                "t":
+                    "R\u00e9pondre aux questions de la famille ou des proches.",
+                "o": false
+              },
+              {"t": "Diriger la circulation automobile.", "o": false}
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836404",
+            "n": "Conduire un corbillard",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect du Code de la s\u00e9curit\u00e9 routi\u00e8re.",
+              "Respect de la dignit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Utilisation appropri\u00e9e du syst\u00e8me de positionnement (GPS).",
+              "Propret\u00e9 du corbillard.",
+              "Manifestation de professionnalisme.",
+              "Conduite adapt\u00e9e \u00e0 des fun\u00e9railles."
+            ],
+            "t": [
+              {"t": "D\u00e9terminer l'itin\u00e9raire.", "o": false},
+              {
+                "t":
+                    "Pr\u00e9parer le v\u00e9hicule : v\u00e9rifier les freins, les phares et les clignotants; v\u00e9rifier le niveau de carburant et faire le plein au besoin ou encore v\u00e9rifier le niveau de charge \u00e9lectrique et brancher le v\u00e9hicule; v\u00e9rifier le niveau du lave-glace, la pression des pneus, etc.",
+                "o": false
+              },
+              {
+                "t": "S'assurer de la propret\u00e9 du corbillard ou le laver.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9marrer le v\u00e9hicule et assurer la mise en cort\u00e8ge.",
+                "o": false
+              },
+              {
+                "t":
+                    "Circuler d\u00bfun lieu \u00e0 l'autre sur diff\u00e9rentes routes et dans diverses conditions climatiques.",
+                "o": false
+              },
+              {"t": "Stationner et arr\u00eater le v\u00e9hicule.", "o": false}
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836405",
+            "n": "Proc\u00e9der \u00e0 la descente du cercueil dans la fosse",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des r\u00e8gles de d\u00e9corum.",
+              "Respect de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Utilisation appropri\u00e9e du syst\u00e8me de mise en terre.",
+              "Manifestation de professionnalisme.",
+              "Manifestation de sa capacit\u00e9 \u00e0 travailler en \u00e9quipe.",
+              "Gestion appropri\u00e9e de ses \u00e9motions.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction et de la famille et des proches."
+            ],
+            "t": [
+              {"t": "Sortir le cercueil du corbillard.", "o": false},
+              {
+                "t":
+                    "Attendre que la famille et les proches aient termin\u00e9 leurs adieux apr\u00e8s la c\u00e9l\u00e9bration.",
+                "o": false
+              },
+              {
+                "t": "Activer la manivelle du syst\u00e8me de descente.",
+                "o": false
+              },
+              {
+                "t":
+                    "Offrir ses condol\u00e9ances \u00e0 la famille et aux proches.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              },
+              {"t": "Remplir le registre des s\u00e9pultures.", "o": true}
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836406",
+            "n": "Proc\u00e9der \u00e0 la mise en terre de l'urne",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des r\u00e8gles de d\u00e9corum.",
+              "Respect de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Application correcte de la technique de travail.",
+              "Manifestation de professionnalisme.",
+              "Gestion appropri\u00e9e de ses \u00e9motions.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction et de la famille et des proches."
+            ],
+            "t": [
+              {"t": "Sortir l'urne du corbillard.", "o": false},
+              {
+                "t": "D\u00e9poser l'urne sur une table ou tout autre support.",
+                "o": false
+              },
+              {
+                "t":
+                    "Attendre que la famille et les proches aient termin\u00e9 leurs adieux apr\u00e8s la c\u00e9l\u00e9bration.",
+                "o": false
+              },
+              {"t": "D\u00e9poser l'urne dans la terre.", "o": false},
+              {
+                "t":
+                    "Offrir ses condol\u00e9ances \u00e0 la famille et aux proches.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              },
+              {"t": "Remplir le registre des s\u00e9pultures.", "o": true}
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836407",
+            "n": "Effectuer la mise dans l'enfeu du cercueil",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des r\u00e8gles de d\u00e9corum.",
+              "Respect de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Application correcte de la technique de travail.",
+              "Manifestation de professionnalisme.",
+              "Gestion appropri\u00e9e de ses \u00e9motions.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction et de la famille et des proches."
+            ],
+            "t": [
+              {"t": "Sortir le cercueil du corbillard.", "o": false},
+              {
+                "t":
+                    "D\u00e9poser sur le cercueil sur le chariot fun\u00e9raire.",
+                "o": false
+              },
+              {
+                "t":
+                    "Attendre que la famille et les proches aient termin\u00e9 leurs adieux apr\u00e8s la c\u00e9l\u00e9bration.",
+                "o": false
+              },
+              {
+                "t": "Soulever le cercueil et le transf\u00e9rer dans l'enfeu.",
+                "o": false
+              },
+              {
+                "t":
+                    "Offrir ses condol\u00e9ances \u00e0 la famille et aux proches.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              },
+              {"t": "Remplir le registre des s\u00e9pultures.", "o": true}
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836408",
+            "n": "Effectuer la mise en niche de l'urne",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des r\u00e8gles de d\u00e9corum.",
+              "Respect de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Application correcte de la technique de travail.",
+              "Manifestation de professionnalisme.",
+              "Gestion appropri\u00e9e de ses \u00e9motions.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction et de la famille et des proches."
+            ],
+            "t": [
+              {"t": "Sortir l'urne du corbillard.", "o": false},
+              {
+                "t":
+                    "D\u00e9poser sur l'urne sur une table, un pi\u00e9destal, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Attendre que la famille et les proches aient termin\u00e9 leurs adieux apr\u00e8s la c\u00e9l\u00e9bration.",
+                "o": false
+              },
+              {
+                "t": "Soulever l'urne et la transf\u00e9rer dans la niche.",
+                "o": false
+              },
+              {
+                "t":
+                    "Offrir ses condol\u00e9ances \u00e0 la famille et aux proches.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              },
+              {"t": "Remplir le registre des s\u00e9pultures.", "o": true}
+            ],
+            "o": true,
+            "r": []
+          }
+        ],
+        "q": []
+      },
+      {
+        "n": "Fossoyeuse, fossoyeur",
+        "id": "8365",
+        "s": [
+          {
+            "id": "836501",
+            "n": "Localiser le lot en vue d'une inhumation ou d'une exhumation",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Interpr\u00e9tation juste du plan ou de la carte du cimeti\u00e8re.",
+              "Utilisation appropri\u00e9e d'un logiciel de gestion des registres d'inhumation.",
+              "Utilisation appropri\u00e9e du syst\u00e8me de positionnement GPS."
+            ],
+            "t": [
+              {
+                "t":
+                    "Interpr\u00e9ter la feuille de travail (date et heure, num\u00e9ro d'emplacement, nom du concessionnaire, nom de la personne d\u00e9c\u00e9d\u00e9e, etc.).",
+                "o": false
+              },
+              {"t": "Localiser la section du cimeti\u00e8re.", "o": false},
+              {
+                "t":
+                    "Localiser la concession : interpr\u00e9ter le ou les noms et le num\u00e9ro grav\u00e9s.",
+                "o": false
+              },
+              {"t": "Confirmer les mesures du lot.", "o": false},
+              {"t": "Mesurer l\u00bfemplacement.", "o": false},
+              {
+                "t":
+                    "Sonder le site pour trouver les autres cercueils ou urnes.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9limiter l'emplacement (peinture, ruban ou tout autre marquage).",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              },
+              {"t": "Remplir le registre des s\u00e9pultures.", "o": false}
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836502",
+            "n":
+                "Conduire une r\u00e9trocaveuse dans les all\u00e9es d'un cimeti\u00e8re",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Application correcte des proc\u00e9dures de mise en marche et d'arr\u00eat de la r\u00e9trocaveuse.",
+              "Bonne coordination des mouvements.",
+              "Conduite s\u00e9curitaire de la r\u00e9trocaveuse.",
+              "Soin apport\u00e9 \u00e0 la r\u00e9trocaveuse.",
+              "Propret\u00e9 de la r\u00e9trocaveuse.",
+              "Souci de la s\u00e9curit\u00e9 des visiteurs et des autres travailleuses ou travailleurs."
+            ],
+            "t": [
+              {
+                "t":
+                    "Examiner l'\u00e9tat g\u00e9n\u00e9ral de la r\u00e9trocaveuse.",
+                "o": false
+              },
+              {
+                "t":
+                    "Effectuer les v\u00e9rifications d'usage : les freins, les phares, les clignotants, le niveau de carburant ou encore le niveau de charge \u00e9lectrique, le niveau du lave-glace, les pneus, les composants m\u00e9caniques, les dispositifs de s\u00e9curit\u00e9, etc.",
+                "o": false
+              },
+              {
+                "t": "Installer ou enlever un godet ou un accessoire.",
+                "o": false
+              },
+              {"t": "Interpr\u00e9ter les instruments de bord.", "o": false},
+              {"t": "Mettre en marche la r\u00e9trocaveuse.", "o": false},
+              {
+                "t":
+                    "Circuler dans les all\u00e9es jusqu'au site d'inhumation : avancer, prendre des virages vers l'avant ou l'arri\u00e8re, v\u00e9rifier les angles morts, etc.",
+                "o": false
+              },
+              {"t": "Stationner la r\u00e9trocaveuse.", "o": false},
+              {"t": "Arr\u00eater la r\u00e9trocaveuse.", "o": false},
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes de fonctionnement et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836503",
+            "n": "Excaver la fosse",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect de la loi et des r\u00e8glements sur les activit\u00e9s fun\u00e9raires.",
+              "Respect de la loi et des r\u00e8glements sur la qualit\u00e9 de l'environnement.",
+              "Respect des directives de travail.",
+              "Respect de la capacit\u00e9 maximale de la r\u00e9trocaveuse et de ses accessoires.",
+              "Identification exacte du type de sol.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e d'une pelle.",
+              "Man\u00bfuvres appropri\u00e9es de la r\u00e9trocaveuse.",
+              "Pr\u00e9servations des pierres tombales."
+            ],
+            "t": [
+              {
+                "t":
+                    "Creuser la fosse aux dimensions prescrites : profondeur, largeur et longueur ou creuser l'emplacement pr\u00e9vu pour l'urne fun\u00e9raire.",
+                "o": false
+              },
+              {
+                "t":
+                    "Relever le manque d\u00bf\u00e9cart entre les cercueils ou les urnes et en informer la personne responsable.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9poser le mat\u00e9riel \u00e0 c\u00f4t\u00e9 de la fosse et d\u00e9placer les pierres.",
+                "o": false
+              },
+              {
+                "t":
+                    "Constater la pr\u00e9sence d'eau, un risque d'\u00e9boulis de terre et en informer la personne responsable.",
+                "o": false
+              },
+              {
+                "t":
+                    "Installer un caisson d'\u00e9tan\u00e7onnement ou une pompe \u00e0 eau.",
+                "o": true
+              },
+              {"t": "Niveler le fond de la fosse.", "o": false},
+              {
+                "t":
+                    "Stationner la r\u00e9trocaveuse \u00e0 une certaine distance du lieu d'inhumation.",
+                "o": false
+              },
+              {"t": "Arr\u00eater la r\u00e9trocaveuse.", "o": false}
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836504",
+            "n": "Pr\u00e9parer le lieu d'inhumation",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect de la loi et des r\u00e8glements sur les activit\u00e9s fun\u00e9raires.",
+              "Respect de la loi et des r\u00e8glements sur la qualit\u00e9 de l'environnement.",
+              "Respect des directives de travail.",
+              "Respect du temps allou\u00e9.",
+              "Installation stable.",
+              "Propret\u00e9 des lieux.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction et de la famille et des proches."
+            ],
+            "t": [
+              {
+                "t":
+                    "Installer l\u00bf\u00e9quipement de descente d'un cercueil : d\u00e9poser les supports et les mettre au niveau; mettre les madriers de bois ou les plateformes en aluminium, inspecter les courroies, d\u00e9poser la descente, effectuer les alignements, disposer la manette de frein, tendre les courroies et appliquer le frein.",
+                "o": false
+              },
+              {
+                "t": "V\u00e9rifier la stabilit\u00e9 de l'\u00e9quipement.",
+                "o": false
+              },
+              {
+                "t":
+                    "Installer des panneaux, des tapis, etc. pour faciliter le passage de la famille, des proches et des porteurs.",
+                "o": false
+              },
+              {
+                "t": "Disposer un fanion indicateur de l'emplacement.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836505",
+            "n": "Proc\u00e9der \u00e0 la descente du cercueil dans la fosse",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des r\u00e8gles de d\u00e9corum.",
+              "Respect de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Utilisation appropri\u00e9e du syst\u00e8me de mise en terre.",
+              "Manifestation de professionnalisme.",
+              "Manifestation de sa capacit\u00e9 \u00e0 travailler en \u00e9quipe.",
+              "Gestion appropri\u00e9e de ses \u00e9motions.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction et de la famille et des proches."
+            ],
+            "t": [
+              {"t": "Sortir le cercueil du corbillard.", "o": false},
+              {
+                "t":
+                    "D\u00e9poser le cercueil sur les sangles du syst\u00e8me de mise en terre.",
+                "o": false
+              },
+              {
+                "t":
+                    "Attendre que la famille et les proches aient termin\u00e9 leurs adieux apr\u00e8s la c\u00e9l\u00e9bration.",
+                "o": false
+              },
+              {
+                "t": "Activer la manivelle du syst\u00e8me de descente.",
+                "o": false
+              },
+              {
+                "t":
+                    "Offrir ses condol\u00e9ances \u00e0 la famille et aux proches.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              },
+              {"t": "Remplir le registre des s\u00e9pultures.", "o": true}
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836506",
+            "n": "Proc\u00e9der \u00e0 la mise en terre de l'urne",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des r\u00e8gles de d\u00e9corum.",
+              "Respect de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Application correcte de la technique de travail.",
+              "Manifestation de professionnalisme.",
+              "Gestion appropri\u00e9e de ses \u00e9motions.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction et de la famille et des proches."
+            ],
+            "t": [
+              {"t": "Sortir l'urne du corbillard.", "o": false},
+              {
+                "t": "D\u00e9poser l'urne sur une table ou tout autre support.",
+                "o": false
+              },
+              {
+                "t":
+                    "Attendre que la famille et les proches aient termin\u00e9 leurs adieux apr\u00e8s la c\u00e9l\u00e9bration.",
+                "o": false
+              },
+              {"t": "D\u00e9poser l'urne dans la terre.", "o": false},
+              {
+                "t":
+                    "Offrir ses condol\u00e9ances \u00e0 la famille et aux proches.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              },
+              {"t": "Remplir le registre des s\u00e9pultures.", "o": true}
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836507",
+            "n": "Enterrer le cercueil ou l'urne",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect de la loi et des r\u00e8glements sur les activit\u00e9s fun\u00e9raires.",
+              "Respect de la loi et des r\u00e8glements sur la qualit\u00e9 de l'environnement.",
+              "Respect des directives de travail.",
+              "Respect de la dignit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e d'un compacteur \u00e0 plaque vibrante.",
+              "Man\u00bfuvres appropri\u00e9es de la r\u00e9trocaveuse."
+            ],
+            "t": [
+              {
+                "t":
+                    "Appliquer les consignes relatives \u00e0 la pr\u00e9sence ou \u00e0 l'absence de la famille et des proches.",
+                "o": false
+              },
+              {
+                "t":
+                    "Retirer le syst\u00e8me de descente, les madriers ou la plateforme en aluminium et les tapis.",
+                "o": false
+              },
+              {"t": "Ranger l'\u00e9quipement dans le camion.", "o": false},
+              {"t": "Mettre en marche la r\u00e9trocaveuse.", "o": false},
+              {"t": "D\u00e9poser la terre.", "o": false},
+              {"t": "Niveler le sol.", "o": false},
+              {"t": "Compacter le sol.", "o": false},
+              {
+                "t":
+                    "Ensemencer le tertre fun\u00e9raire ou y d\u00e9poser de la tourbe.",
+                "o": false
+              },
+              {
+                "t":
+                    "Transf\u00e9rer le mat\u00e9riel suppl\u00e9mentaire dans un camion.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836508",
+            "n": "Pr\u00e9parer l'enfeu ou la niche fun\u00e9raire",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect de la loi et des r\u00e8glements sur les activit\u00e9s fun\u00e9raires.",
+              "Respect des directives de travail.",
+              "Respect du temps allou\u00e9.",
+              "Utilisation appropri\u00e9e des outils et des produits.",
+              "Propret\u00e9 des lieux.",
+              "Souci de la s\u00e9curit\u00e9 et de la satisfaction et de la famille et des proches."
+            ],
+            "t": [
+              {
+                "t":
+                    "Enlever la plaque de marbre avant la c\u00e9r\u00e9monie et la remettre apr\u00e8s celle-ci.",
+                "o": false
+              },
+              {
+                "t":
+                    "Enlever le panneau de scellement avant la c\u00e9r\u00e9monie et le remettre apr\u00e8s celle-ci.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier l\u00bf\u00e9tat d'une urne ou d'un cercueil existant.",
+                "o": false
+              },
+              {
+                "t":
+                    "Prendre les mesures de s\u00e9curit\u00e9 requises pour le travail en espace clos, au besoin.",
+                "o": false
+              },
+              {
+                "t":
+                    "Inspecter les parois et d\u00e9gager l'\u00e9vent de l'enfeu.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9poser un tapis et disposer l'\u00e9quipement servant \u00e0 d\u00e9poser le cercueil dans l'enfeu ou l'urne dans la niche et le retirer apr\u00e8s la c\u00e9r\u00e9monie.",
+                "o": false
+              },
+              {
+                "t":
+                    "Placer le chariot fun\u00e9raire pr\u00e8s de l'entr\u00e9e du mausol\u00e9e.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836509",
+            "n": "Pr\u00e9parer le lieu d'exhumation",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect de la loi et des r\u00e8glements sur les activit\u00e9s fun\u00e9raires.",
+              "Respect de la loi et des r\u00e8glements sur la qualit\u00e9 de l'environnement.",
+              "Respect des directives de travail.",
+              "Respect du temps allou\u00e9.",
+              "Installation stable."
+            ],
+            "t": [
+              {
+                "t": "Installer des rideaux protecteurs d'intimit\u00e9.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9poser un contenant en bois ou un cercueil pour recevoir les restes humains.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836510",
+            "n": "Exhumer un cercueil ou une urne",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect de la loi et des r\u00e8glements sur les activit\u00e9s fun\u00e9raires.",
+              "Respect de la loi et des r\u00e8glements sur la qualit\u00e9 de l'environnement.",
+              "Respect des directives de travail.",
+              "Respect de la dignit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e.",
+              "Application correcte des techniques de travail.",
+              "Man\u00bfuvres appropri\u00e9es de la r\u00e9trocaveuse.",
+              "Gestion appropri\u00e9e de ses \u00e9motions."
+            ],
+            "t": [
+              {
+                "t":
+                    "S'assurer que son \u00e9quipement de protection individuelle est en bon \u00e9tat et qu'il est mis correctement (combinaison int\u00e9grale, gants, masque chirurgical, bottes de s\u00e9curit\u00e9, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "Creuser la fosse et d\u00e9poser la terre \u00e0 proximit\u00e9.",
+                "o": false
+              },
+              {
+                "t":
+                    "Constater le manque d'\u00e9cart entre les cercueils ou les urnes.",
+                "o": false
+              },
+              {
+                "t":
+                    "Constater la pr\u00e9sence d'eau, un risque d'\u00e9boulis de terre et en informer la personne responsable.",
+                "o": true
+              },
+              {
+                "t":
+                    "Installer un caisson d'\u00e9tan\u00e7onnement ou une pompe \u00e0 eau.",
+                "o": true
+              },
+              {
+                "t":
+                    "D\u00e9gager l'urne ou le cercueil en bon \u00e9tat, l'extraire de la fosse et le d\u00e9poser \u00e0 c\u00f4t\u00e9 de la fosse.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9gager l'urne ou le cercueil endommag\u00e9 et transf\u00e9rer les restes humains dans la bo\u00eete ou le nouveau cercueil.",
+                "o": true
+              },
+              {
+                "t": "Disposer du vieux cercueil ou de la vieille urne.",
+                "o": false
+              },
+              {"t": "Remettre la terre dans la fosse.", "o": false}
+            ],
+            "o": true,
+            "r": []
+          }
+        ],
+        "q": []
       }
     ]
   },
@@ -40935,7 +44512,7 @@ const jobData = [
             "r": ["c", "b", "f", "of", "p", "mv"]
           }
         ],
-        "q": ["1", "2", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "2", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Aide-\u00e9ducatrice, aide-\u00e9ducateur",
@@ -40971,7 +44548,7 @@ const jobData = [
               },
               {
                 "t":
-                    "Distraire les enfants qui pleurent ou consoler ceux qui sont tristes.",
+                    "Accompagner les enfants dans la gestion de leurs \u00e9motions lors de la s\u00e9paration et des retrouvailles avec leurs parents.",
                 "o": false
               },
               {
@@ -41434,7 +45011,7 @@ const jobData = [
             "r": ["f", "p", "psy"]
           }
         ],
-        "q": ["1", "2", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "2", "4", "5", "7", "12", "15", "16", "17"]
       },
       {
         "n": "Assistante, assistant en loisirs",
@@ -41819,7 +45396,7 @@ const jobData = [
             "r": ["psy"]
           }
         ],
-        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17", "18"]
+        "q": ["1", "3", "4", "5", "7", "12", "15", "16", "17"]
       }
     ]
   },
@@ -42027,7 +45604,7 @@ const jobData = [
             "r": ["c", "b", "f", "of", "p", "mv", "h"]
           }
         ],
-        "q": ["1", "4", "5", "8", "12", "15", "16", "17", "18"]
+        "q": ["1", "4", "5", "8", "12", "15", "16", "17"]
       }
     ]
   }
