@@ -110,7 +110,11 @@ class Specialization extends NamedItemSerializable {
 
   Specialization.fromSerialized(super.map)
       : skills = SkillList.fromSerialized(map?['s']),
-        questions = List.from(map?['q']),
+        questions = List.from(
+            map?['q']?.isEmpty ?? true
+                ? List.generate(17, (index) => '${index + 1}')
+                : map?['q'],
+            growable: false),
         super.fromSerialized();
 
   @override
