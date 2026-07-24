@@ -177,8 +177,10 @@ class StudentListTileState extends State<StudentListTile> {
     text: widget.student.group == '-1' ? '' : widget.student.group,
   );
   late final _teacherInChargeIdController = TeacherPickerController(
-    initial: TeachersProvider.of(context, listen: false)
-        .firstWhereOrNull((e) => e.id == widget.student.teacherInChargeId),
+    initial: mounted
+        ? TeachersProvider.of(context, listen: false)
+            .firstWhereOrNull((e) => e.id == widget.student.teacherInChargeId)
+        : null,
   );
   late final _supplementaryTeacherInChargeIdsController =
       WidgetRepeaterController(

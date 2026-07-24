@@ -413,7 +413,9 @@ class TeacherListTileState extends State<TeacherListTile> {
                 const SizedBox(height: 8),
                 const Divider(),
                 _StudentsInCharge(
-                    teacher: widget.teacher, canEdit: widget.canEdit),
+                    key: ValueKey(widget.teacher.id),
+                    teacher: widget.teacher,
+                    editMode: _isEditing),
                 if (!_isEditing && widget.teacher.email.isNotEmpty)
                   Column(
                     children: [
@@ -611,10 +613,11 @@ class TeacherListTileState extends State<TeacherListTile> {
 }
 
 class _StudentsInCharge extends StatefulWidget {
-  const _StudentsInCharge({required this.teacher, required this.canEdit});
+  const _StudentsInCharge(
+      {super.key, required this.teacher, required this.editMode});
 
   final Teacher teacher;
-  final bool canEdit;
+  final bool editMode;
 
   @override
   State<_StudentsInCharge> createState() => _StudentsInChargeState();
@@ -625,28 +628,26 @@ class _StudentsInChargeState extends State<_StudentsInCharge> {
   bool _isEditing = false;
 
   late final _studentsInCharge = <Student, (bool canModify, bool isChecked)>{
-    for (final student in StudentsHelpers.studentsInChargeByTeacher(
-      context,
-      teacher: widget.teacher,
-      includeGroups: false,
-      includeInCharge: true,
-      listen: false,
-    ))
+    for (final student in StudentsHelpers.studentsInChargeByTeacher(context,
+        teacher: widget.teacher, includeGroups: false, listen: false))
       student: (false, true)
   };
 
   Future<void> _onClickedEditing() async {
+    final studentsInChargeCopy =
+        Map<Student, (bool canModify, bool isChecked)>.from(_studentsInCharge);
+
     Future<void> getStudentLocks() async {
       final toWait = <Future<bool>>[];
       final studentsProvider = StudentsProvider.of(context, listen: false);
-      final studentsList = _studentsInCharge.keys.toList();
+      final studentsList = studentsInChargeCopy.keys.toList();
 
       for (final student in studentsList) {
         toWait.add(studentsProvider.getLockForItem(student));
       }
       final hasLocks = await Future.wait(toWait);
 
-      for (final studentEntry in _studentsInCharge.entries) {
+      for (final studentEntry in studentsInChargeCopy.entries) {
         final student = studentEntry.key;
         final i = studentsList.indexOf(student);
         _studentsInCharge[student] =
@@ -657,12 +658,12 @@ class _StudentsInChargeState extends State<_StudentsInCharge> {
     Future<void> releaseStudentLocks() async {
       final studentsProvider = StudentsProvider.of(context, listen: false);
       final toWait = <Future>[];
-      for (final student in _studentsInCharge.keys) {
+      for (final student in studentsInChargeCopy.keys) {
         toWait.add(studentsProvider.releaseLockForItem(student));
       }
       await Future.wait(toWait);
 
-      for (final studentEntry in _studentsInCharge.entries) {
+      for (final studentEntry in studentsInChargeCopy.entries) {
         final student = studentEntry.key;
         _studentsInCharge[student] = (false, studentEntry.value.$2);
       }
@@ -679,9 +680,9 @@ class _StudentsInChargeState extends State<_StudentsInCharge> {
       final emptyId = Student.empty.teacherInChargeId;
       // Finish editing
       final toWait = <Future>[];
-      for (final student in _studentsInCharge.keys) {
+      for (final student in studentsInChargeCopy.keys) {
         // If the student is still in charge, we don't need to do anything
-        if (_studentsInCharge[student]!.$2) continue;
+        if (studentsInChargeCopy[student]!.$2) continue;
 
         // Make sure we have to full data set
         await studentsProvider.fetchData(
@@ -721,7 +722,7 @@ class _StudentsInChargeState extends State<_StudentsInCharge> {
     } else {
       await getStudentLocks();
 
-      if (!_studentsInCharge.values.every((e) => e.$1) || !mounted) {
+      if (!studentsInChargeCopy.values.every((e) => e.$1) || !mounted) {
         if (mounted) {
           showSnackBar(
             context,
@@ -744,15 +745,10 @@ class _StudentsInChargeState extends State<_StudentsInCharge> {
     }
   }
 
-  void _checkIfNewAtBuildTime() {
+  void _updateStudents() {
     // This is to take into account the fact that other users might have modified the students
-    final current = StudentsHelpers.studentsInChargeByTeacher(
-      context,
-      teacher: widget.teacher,
-      includeGroups: false,
-      includeInCharge: true,
-      listen: true,
-    );
+    final current = StudentsHelpers.studentsInChargeByTeacher(context,
+        teacher: widget.teacher, includeGroups: false, listen: false);
 
     for (final student in current) {
       if (!_studentsInCharge.containsKey(student)) {
@@ -775,55 +771,65 @@ class _StudentsInChargeState extends State<_StudentsInCharge> {
   }
 
   @override
+  void didUpdateWidget(covariant _StudentsInCharge oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // [didUpdateWidget] seems to be called only when the parent widget is rebuilt,
+    // so we can assume the only thing that can have changed is the edit mode.
+    if (oldWidget.editMode != widget.editMode) {
+      // The update was called by the parent widget
+      WidgetsBinding.instance.addPostFrameCallback((_) => _onClickedEditing());
+    }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // [didChangeDependencies] seems to be called when the students list is updated
+    // possibly from another user, so we need to update it
+    _updateStudents();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final students = _studentsInCharge.keys.toList()
       ..sort((a, b) => a.lastName.compareTo(b.lastName));
-    _checkIfNewAtBuildTime();
+
+    StudentsProvider.of(context, listen: true);
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            Text('Élève·s dont l\'enseignant·e a la charge de la supervision',
-                style: Theme.of(context).textTheme.titleSmall),
-            if (widget.canEdit && students.isNotEmpty)
-              IconButton(
-                icon: Icon(
-                  _isEditing ? Icons.save : Icons.edit,
-                  color: Theme.of(context).primaryColor,
-                ),
-                onPressed: _onClickedEditing,
-              ),
-          ],
-        ),
+        Text('Élève·s dont l\'enseignant·e a la charge de la supervision',
+            style: Theme.of(context).textTheme.titleSmall),
         if (students.isEmpty)
           const Text('Aucun élève supervisé·e')
         else
           ...students.map(
             (student) {
+              if (_studentsInCharge[student] == null) return SizedBox.shrink();
+
+              final canModify = _studentsInCharge[student]!.$1;
+              final isChecked = _studentsInCharge[student]!.$2;
+
               void onTapStudent() {
                 setState(() {
-                  _studentsInCharge[student] =
-                      (true, !_studentsInCharge[student]!.$2);
+                  _studentsInCharge[student] = (true, !isChecked);
                 });
               }
 
-              if (_studentsInCharge[student] == null) return SizedBox.shrink();
-
               return InkWell(
-                onTap: _isEditing && _studentsInCharge[student]!.$1
-                    ? onTapStudent
-                    : null,
+                onTap: _isEditing && canModify ? onTapStudent : null,
                 child: SizedBox(
                   width: 350,
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Checkbox(
-                        value: _studentsInCharge[student]!.$2,
-                        onChanged: _isEditing && _studentsInCharge[student]!.$1
+                        value: isChecked,
+                        onChanged: _isEditing && canModify
                             ? (value) => onTapStudent()
                             : null,
                       ),
