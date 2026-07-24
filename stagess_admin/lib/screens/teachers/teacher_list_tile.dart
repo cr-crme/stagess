@@ -7,12 +7,15 @@ import 'package:stagess_admin/screens/teachers/confirm_delete_teacher_dialog.dar
 import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
+import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common/utils.dart';
 import 'package:stagess_common_flutter/helpers/configuration_service.dart';
 import 'package:stagess_common_flutter/providers/admins_provider.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
+import 'package:stagess_common_flutter/providers/helpers/students_helpers.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
+import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/email_list_tile.dart';
@@ -89,6 +92,7 @@ class TeacherListTileState extends State<TeacherListTile> {
   bool _forceDisabled = false;
   bool _isExpanded = false;
   bool _isEditing = false;
+  bool _isEditingStudentsInCharge = false;
   bool get _showSchoolSelection =>
       AuthProvider.of(context, listen: false).databaseAccessLevel >=
       AccessLevel.schoolBoardAdmin;
@@ -102,6 +106,16 @@ class TeacherListTileState extends State<TeacherListTile> {
   );
   late final _groupController = WidgetRepeaterController<_StudentGroup>(
       options: _StudentGroup.optionsFromTeacher(widget.teacher));
+  late final _studentsInCharge = <Student, bool>{
+    for (final student in StudentsHelpers.studentsInChargeByTeacher(
+      context,
+      teacher: widget.teacher,
+      includeGroups: false,
+      includeInCharge: true,
+      listen: false,
+    ))
+      student: true
+  };
 
   late final _phoneController = TextEditingController(
     text: widget.teacher.phone.toString(),
@@ -242,6 +256,102 @@ class TeacherListTileState extends State<TeacherListTile> {
     }
   }
 
+  Future<void> _onClickedEditingStudentsInCharge() async {
+    Future<bool> getStudentLocks() async {
+      final toWait = <Future<bool>>[];
+      final studentsProvider = StudentsProvider.of(context, listen: false);
+      for (final student in _studentsInCharge.keys) {
+        toWait.add(studentsProvider.getLockForItem(student));
+      }
+      final hasLocks = await Future.wait(toWait);
+      return !hasLocks.contains(false);
+    }
+
+    Future<void> releaseStudentLocks() async {
+      final studentsProvider = StudentsProvider.of(context, listen: false);
+      for (final student in _studentsInCharge.keys) {
+        await studentsProvider.releaseLockForItem(student);
+      }
+    }
+
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
+
+    final studentsProvider = StudentsProvider.of(context, listen: false);
+
+    if (_isEditingStudentsInCharge) {
+      final emptyId = Student.empty.teacherInChargeId;
+      // Finish editing
+      final toWait = <Future>[];
+      for (final student in _studentsInCharge.keys) {
+        // If the student is still in charge, we don't need to do anything
+        if (_studentsInCharge[student]!) continue;
+
+        // Make sure we have to full data set
+        await studentsProvider.fetchData(
+            id: student.id, fields: FetchableFields.all);
+        final updatedStudent = studentsProvider.fromId(student.id);
+
+        if (updatedStudent.teacherInChargeId == widget.teacher.id) {
+          toWait.add(studentsProvider.replaceWithConfirmation(
+            updatedStudent.copyWith(teacherInChargeId: emptyId),
+          ));
+        }
+        if (updatedStudent.supplementaryTeacherInChargeIds
+            .contains(widget.teacher.id)) {
+          final newIds =
+              List<String>.from(updatedStudent.supplementaryTeacherInChargeIds)
+                ..remove(widget.teacher.id);
+          toWait.add(studentsProvider.replaceWithConfirmation(
+            updatedStudent.copyWith(supplementaryTeacherInChargeIds: newIds),
+          ));
+        }
+      }
+      final results = await Future.wait(toWait);
+
+      final isSuccess = results.every((e) => e == true);
+      if (mounted) {
+        showSnackBar(
+          context,
+          message: isSuccess
+              ? 'L\'enseignant·e a été modifié·e avec succès.'
+              : 'Une erreur est survenue lors de la modification de l\'enseignant·e.',
+        );
+      }
+      await releaseStudentLocks();
+    } else {
+      final hasLock = await getStudentLocks();
+
+      if (!hasLock || !mounted) {
+        // Release all locks that were acquired
+        await releaseStudentLocks();
+
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                'Impossible de modifier les élèves dont cet enseignant·e est en '
+                'charge, car au moins un ou une de ces élèves est en cours de modification '
+                'par un autre utilisateur·trice.',
+          );
+        }
+        setState(() {
+          _forceDisabled = false;
+        });
+        return;
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _isEditingStudentsInCharge = !_isEditingStudentsInCharge;
+        _forceDisabled = false;
+      });
+    }
+  }
+
   @override
   void didUpdateWidget(covariant TeacherListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -260,6 +370,12 @@ class TeacherListTileState extends State<TeacherListTile> {
     _groupController.clear();
     for (final group in _StudentGroup.optionsFromTeacher(widget.teacher)) {
       _groupController.add(group);
+    }
+
+    _studentsInCharge.clear();
+    for (final student in StudentsHelpers.studentsInChargeByTeacher(context,
+        teacher: widget.teacher, includeGroups: false, listen: false)) {
+      _studentsInCharge[student] = true;
     }
   }
 
@@ -406,6 +522,8 @@ class TeacherListTileState extends State<TeacherListTile> {
                       )
                     : const SizedBox.shrink(),
                 _buildGroups(),
+                const SizedBox(height: 8),
+                _buildSupervisedStudents(),
                 if (!_isEditing && widget.teacher.email.isNotEmpty)
                   Column(
                     children: [
@@ -436,7 +554,7 @@ class TeacherListTileState extends State<TeacherListTile> {
         style: TextStyle(color: Colors.red),
       );
     }
-// TODO Add list of students which I am responsible for
+
     return _isEditing
         ? FormBuilderRadioGroup(
             key: _radioKey,
@@ -516,6 +634,67 @@ class TeacherListTileState extends State<TeacherListTile> {
           ),
         ),
         const SizedBox(height: 8)
+      ],
+    );
+  }
+
+  Widget _buildSupervisedStudents() {
+    final students = StudentsHelpers.studentsInChargeByTeacher(context,
+        teacher: widget.teacher, includeGroups: false, listen: false);
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text('Élève·s dont l\'enseignant·e a la charge de la supervision',
+                style: Theme.of(context).textTheme.titleSmall),
+            if (widget.canEdit && students.isNotEmpty)
+              IconButton(
+                icon: Icon(
+                  _isEditingStudentsInCharge ? Icons.save : Icons.edit,
+                  color: Theme.of(context).primaryColor,
+                ),
+                onPressed: _onClickedEditingStudentsInCharge,
+              ),
+          ],
+        ),
+        if (students.isEmpty)
+          const Text('Aucun élève supervisé·e')
+        else
+          ...students.map(
+            (student) {
+              void onTapStudent() {
+                setState(() {
+                  _studentsInCharge[student] =
+                      !(_studentsInCharge[student] ?? false);
+                });
+              }
+
+              return InkWell(
+                onTap: _isEditingStudentsInCharge ? onTapStudent : null,
+                child: SizedBox(
+                  width: 350,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Checkbox(
+                        value: _studentsInCharge[student] ?? false,
+                        onChanged: _isEditingStudentsInCharge
+                            ? (value) => onTapStudent()
+                            : null,
+                      ),
+                      Flexible(
+                        child: Text(student.fullName,
+                            style: Theme.of(context).textTheme.bodyMedium),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
       ],
     );
   }
