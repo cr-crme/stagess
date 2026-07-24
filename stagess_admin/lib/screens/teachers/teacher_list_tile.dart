@@ -93,6 +93,8 @@ class TeacherListTileState extends State<TeacherListTile> {
   bool _isExpanded = false;
   bool _isEditing = false;
 
+  final _studentInChargeKey = GlobalKey<_StudentsInChargeState>();
+
   bool get _showSchoolSelection =>
       AuthProvider.of(context, listen: false).databaseAccessLevel >=
       AccessLevel.schoolBoardAdmin;
@@ -238,6 +240,7 @@ class TeacherListTileState extends State<TeacherListTile> {
       }
     }
 
+    _studentInChargeKey.currentState?._onClickedEditing();
     if (mounted) {
       setState(() {
         _isEditing = !_isEditing;
@@ -311,58 +314,57 @@ class TeacherListTileState extends State<TeacherListTile> {
                 if (_isExpanded)
                   FutureBuilder(
                     future: _fetchFullDataCompleter.future,
-                    builder: (context, snapshot) =>
-                        snapshot.connectionState == ConnectionState.done
-                            ? Row(
-                                children: [
-                                  if (widget.canDelete)
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.delete,
-                                        color: _forceDisabled
-                                            ? Colors.grey
-                                            : Colors.red,
-                                      ),
-                                      onPressed: _forceDisabled
-                                          ? null
-                                          : _onClickedDeleting,
-                                    ),
-                                  if (_isEditing && !widget.forceEditingMode)
-                                    IconButton(
-                                      icon: Icon(
-                                        Icons.cancel,
-                                        color: Theme.of(context).primaryColor,
-                                      ),
-                                      onPressed: () async {
-                                        _resetForm();
-                                        setState(() {});
+                    builder: (context, snapshot) => snapshot.connectionState ==
+                            ConnectionState.done
+                        ? Row(
+                            children: [
+                              if (widget.canDelete)
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: _forceDisabled
+                                        ? Colors.grey
+                                        : Colors.red,
+                                  ),
+                                  onPressed: _forceDisabled
+                                      ? null
+                                      : _onClickedDeleting,
+                                ),
+                              if (_isEditing && !widget.forceEditingMode)
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.cancel,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                  onPressed: () async {
+                                    _resetForm();
+                                    setState(() {});
 
-                                        await TeachersProvider.of(context,
-                                                listen: false)
-                                            .releaseLockForItem(widget.teacher);
-
-                                        setState(() {
-                                          _isEditing = false;
-                                        });
-                                      },
-                                    ),
-                                  if (widget.canEdit)
-                                    IconButton(
-                                      icon: Icon(
-                                        _isEditing ? Icons.save : Icons.edit,
-                                        color: _forceDisabled
-                                            ? Colors.grey
-                                            : Theme.of(
-                                                context,
-                                              ).primaryColor,
-                                      ),
-                                      onPressed: _forceDisabled
-                                          ? null
-                                          : _onClickedEditing,
-                                    ),
-                                ],
-                              )
-                            : const SizedBox.shrink(),
+                                    await TeachersProvider.of(context,
+                                            listen: false)
+                                        .releaseLockForItem(widget.teacher);
+                                    _studentInChargeKey.currentState?._cancel();
+                                    setState(() {
+                                      _isEditing = false;
+                                    });
+                                  },
+                                ),
+                              if (widget.canEdit)
+                                IconButton(
+                                  icon: Icon(
+                                    _isEditing ? Icons.save : Icons.edit,
+                                    color: _forceDisabled
+                                        ? Colors.grey
+                                        : Theme.of(
+                                            context,
+                                          ).primaryColor,
+                                  ),
+                                  onPressed:
+                                      _forceDisabled ? null : _onClickedEditing,
+                                ),
+                            ],
+                          )
+                        : const SizedBox.shrink(),
                   ),
               ],
             ),
@@ -413,9 +415,7 @@ class TeacherListTileState extends State<TeacherListTile> {
                 const SizedBox(height: 8),
                 const Divider(),
                 _StudentsInCharge(
-                    key: ValueKey(widget.teacher.id),
-                    teacher: widget.teacher,
-                    editMode: _isEditing),
+                    key: _studentInChargeKey, teacher: widget.teacher),
                 if (!_isEditing && widget.teacher.email.isNotEmpty)
                   Column(
                     children: [
@@ -613,11 +613,9 @@ class TeacherListTileState extends State<TeacherListTile> {
 }
 
 class _StudentsInCharge extends StatefulWidget {
-  const _StudentsInCharge(
-      {super.key, required this.teacher, required this.editMode});
+  const _StudentsInCharge({super.key, required this.teacher});
 
   final Teacher teacher;
-  final bool editMode;
 
   @override
   State<_StudentsInCharge> createState() => _StudentsInChargeState();
@@ -633,42 +631,55 @@ class _StudentsInChargeState extends State<_StudentsInCharge> {
       student: (false, true)
   };
 
+  Future<void> _cancel() async {
+    if (!_isEditing) return;
+
+    setState(() {
+      _forceDisabled = true;
+    });
+
+    await _releaseStudentLocks();
+    _studentsInCharge.updateAll((key, value) => (false, true));
+
+    setState(() {
+      _isEditing = false;
+      _forceDisabled = false;
+    });
+  }
+
+  Future<void> _getStudentLocks() async {
+    final toWait = <Future<bool>>[];
+    final studentsProvider = StudentsProvider.of(context, listen: false);
+    final studentsList = _studentsInCharge.keys.toList();
+
+    for (final student in studentsList) {
+      toWait.add(studentsProvider.getLockForItem(student));
+    }
+    final hasLocks = await Future.wait(toWait);
+
+    for (final studentEntry in _studentsInCharge.entries) {
+      final student = studentEntry.key;
+      final i = studentsList.indexOf(student);
+      _studentsInCharge[student] =
+          (hasLocks.elementAt(i), studentEntry.value.$2);
+    }
+  }
+
+  Future<void> _releaseStudentLocks() async {
+    final studentsProvider = StudentsProvider.of(context, listen: false);
+    final toWait = <Future>[];
+    for (final student in _studentsInCharge.keys) {
+      toWait.add(studentsProvider.releaseLockForItem(student));
+    }
+    await Future.wait(toWait);
+
+    for (final studentEntry in _studentsInCharge.entries) {
+      final student = studentEntry.key;
+      _studentsInCharge[student] = (false, studentEntry.value.$2);
+    }
+  }
+
   Future<void> _onClickedEditing() async {
-    final studentsInChargeCopy =
-        Map<Student, (bool canModify, bool isChecked)>.from(_studentsInCharge);
-
-    Future<void> getStudentLocks() async {
-      final toWait = <Future<bool>>[];
-      final studentsProvider = StudentsProvider.of(context, listen: false);
-      final studentsList = studentsInChargeCopy.keys.toList();
-
-      for (final student in studentsList) {
-        toWait.add(studentsProvider.getLockForItem(student));
-      }
-      final hasLocks = await Future.wait(toWait);
-
-      for (final studentEntry in studentsInChargeCopy.entries) {
-        final student = studentEntry.key;
-        final i = studentsList.indexOf(student);
-        _studentsInCharge[student] =
-            (hasLocks.elementAt(i), studentEntry.value.$2);
-      }
-    }
-
-    Future<void> releaseStudentLocks() async {
-      final studentsProvider = StudentsProvider.of(context, listen: false);
-      final toWait = <Future>[];
-      for (final student in studentsInChargeCopy.keys) {
-        toWait.add(studentsProvider.releaseLockForItem(student));
-      }
-      await Future.wait(toWait);
-
-      for (final studentEntry in studentsInChargeCopy.entries) {
-        final student = studentEntry.key;
-        _studentsInCharge[student] = (false, studentEntry.value.$2);
-      }
-    }
-
     if (_forceDisabled) return;
     setState(() {
       _forceDisabled = true;
@@ -680,9 +691,11 @@ class _StudentsInChargeState extends State<_StudentsInCharge> {
       final emptyId = Student.empty.teacherInChargeId;
       // Finish editing
       final toWait = <Future>[];
-      for (final student in studentsInChargeCopy.keys) {
+      for (final student in Map<Student, (bool canModify, bool isChecked)>.from(
+              _studentsInCharge)
+          .keys) {
         // If the student is still in charge, we don't need to do anything
-        if (studentsInChargeCopy[student]!.$2) continue;
+        if (_studentsInCharge[student]?.$2 ?? false) continue;
 
         // Make sure we have to full data set
         await studentsProvider.fetchData(
@@ -715,14 +728,14 @@ class _StudentsInChargeState extends State<_StudentsInCharge> {
               : 'Une erreur est survenue lors de la modification de l\'enseignant·e.',
         );
       }
-      await releaseStudentLocks();
+      await _releaseStudentLocks();
 
       // Remove the students that are no longer in charge from the map
       _studentsInCharge.removeWhere((student, value) => !value.$2);
     } else {
-      await getStudentLocks();
+      await _getStudentLocks();
 
-      if (!studentsInChargeCopy.values.every((e) => e.$1) || !mounted) {
+      if (!_studentsInCharge.values.every((e) => e.$1) || !mounted) {
         if (mounted) {
           showSnackBar(
             context,
@@ -767,18 +780,6 @@ class _StudentsInChargeState extends State<_StudentsInCharge> {
           });
         });
       }
-    }
-  }
-
-  @override
-  void didUpdateWidget(covariant _StudentsInCharge oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    // [didUpdateWidget] seems to be called only when the parent widget is rebuilt,
-    // so we can assume the only thing that can have changed is the edit mode.
-    if (oldWidget.editMode != widget.editMode) {
-      // The update was called by the parent widget
-      WidgetsBinding.instance.addPostFrameCallback((_) => _onClickedEditing());
     }
   }
 
