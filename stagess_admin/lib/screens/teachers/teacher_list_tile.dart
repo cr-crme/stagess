@@ -92,7 +92,7 @@ class TeacherListTileState extends State<TeacherListTile> {
   bool _forceDisabled = false;
   bool _isExpanded = false;
   bool _isEditing = false;
-  bool _isEditingStudentsInCharge = false;
+
   bool get _showSchoolSelection =>
       AuthProvider.of(context, listen: false).databaseAccessLevel >=
       AccessLevel.schoolBoardAdmin;
@@ -106,17 +106,6 @@ class TeacherListTileState extends State<TeacherListTile> {
   );
   late final _groupController = WidgetRepeaterController<_StudentGroup>(
       options: _StudentGroup.optionsFromTeacher(widget.teacher));
-  // CanModify, IsSelected
-  late final _studentsInCharge = <Student, (bool, bool)>{
-    for (final student in StudentsHelpers.studentsInChargeByTeacher(
-      context,
-      teacher: widget.teacher,
-      includeGroups: false,
-      includeInCharge: true,
-      listen: false,
-    ))
-      student: (false, true)
-  };
 
   late final _phoneController = TextEditingController(
     text: widget.teacher.phone.toString(),
@@ -257,115 +246,6 @@ class TeacherListTileState extends State<TeacherListTile> {
     }
   }
 
-  Future<void> _onClickedEditingStudentsInCharge() async {
-    Future<void> getStudentLocks() async {
-      final toWait = <Future<bool>>[];
-      final studentsProvider = StudentsProvider.of(context, listen: false);
-      final studentsList = _studentsInCharge.keys.toList();
-
-      for (final student in studentsList) {
-        toWait.add(studentsProvider.getLockForItem(student));
-      }
-      final hasLocks = await Future.wait(toWait);
-
-      for (final studentEntry in _studentsInCharge.entries) {
-        final student = studentEntry.key;
-        final i = studentsList.indexOf(student);
-        _studentsInCharge[student] =
-            (hasLocks.elementAt(i), studentEntry.value.$2);
-      }
-    }
-
-    Future<void> releaseStudentLocks() async {
-      final studentsProvider = StudentsProvider.of(context, listen: false);
-      final toWait = <Future>[];
-      for (final student in _studentsInCharge.keys) {
-        toWait.add(studentsProvider.releaseLockForItem(student));
-      }
-      await Future.wait(toWait);
-
-      for (final studentEntry in _studentsInCharge.entries) {
-        final student = studentEntry.key;
-        _studentsInCharge[student] = (false, studentEntry.value.$2);
-      }
-    }
-
-    if (_forceDisabled) return;
-    setState(() {
-      _forceDisabled = true;
-    });
-
-    final studentsProvider = StudentsProvider.of(context, listen: false);
-
-    if (_isEditingStudentsInCharge) {
-      final emptyId = Student.empty.teacherInChargeId;
-      // Finish editing
-      final toWait = <Future>[];
-      for (final student in _studentsInCharge.keys) {
-        // If the student is still in charge, we don't need to do anything
-        if (_studentsInCharge[student]!.$2) continue;
-
-        // Make sure we have to full data set
-        await studentsProvider.fetchData(
-            id: student.id, fields: FetchableFields.all);
-        final updatedStudent = studentsProvider.fromId(student.id);
-
-        if (updatedStudent.teacherInChargeId == widget.teacher.id) {
-          toWait.add(studentsProvider.replaceWithConfirmation(
-            updatedStudent.copyWith(teacherInChargeId: emptyId),
-          ));
-        }
-        if (updatedStudent.supplementaryTeacherInChargeIds
-            .contains(widget.teacher.id)) {
-          final newIds =
-              List<String>.from(updatedStudent.supplementaryTeacherInChargeIds)
-                ..remove(widget.teacher.id);
-          toWait.add(studentsProvider.replaceWithConfirmation(
-            updatedStudent.copyWith(supplementaryTeacherInChargeIds: newIds),
-          ));
-        }
-      }
-      final results = await Future.wait(toWait);
-
-      final isSuccess = results.every((e) => e == true);
-      if (mounted) {
-        showSnackBar(
-          context,
-          message: isSuccess
-              ? 'L\'enseignant·e a été modifié·e avec succès.'
-              : 'Une erreur est survenue lors de la modification de l\'enseignant·e.',
-        );
-      }
-      await releaseStudentLocks();
-
-      // Remove the students that are no longer in charge from the map
-      _studentsInCharge.removeWhere((student, value) => !value.$2);
-    } else {
-      await getStudentLocks();
-
-      if (!_studentsInCharge.values.every((e) => e.$1) || !mounted) {
-        if (mounted) {
-          showSnackBar(
-            context,
-            message:
-                'Au moins un·e élève est en cours de modification par un autre utilisateur·trice. '
-                'Cet élève ne pourra pas être modifié pour l\'instant.',
-          );
-        }
-        setState(() {
-          _forceDisabled = false;
-        });
-      }
-    }
-
-    if (mounted) {
-      setState(() {
-        _isEditingStudentsInCharge = !_isEditingStudentsInCharge;
-        _forceDisabled = false;
-      });
-    }
-  }
-
   @override
   void didUpdateWidget(covariant TeacherListTile oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -384,12 +264,6 @@ class TeacherListTileState extends State<TeacherListTile> {
     _groupController.clear();
     for (final group in _StudentGroup.optionsFromTeacher(widget.teacher)) {
       _groupController.add(group);
-    }
-
-    _studentsInCharge.clear();
-    for (final student in StudentsHelpers.studentsInChargeByTeacher(context,
-        teacher: widget.teacher, includeGroups: false, listen: false)) {
-      _studentsInCharge[student] = (false, true);
     }
   }
 
@@ -538,7 +412,8 @@ class TeacherListTileState extends State<TeacherListTile> {
                 _buildGroups(),
                 const SizedBox(height: 8),
                 const Divider(),
-                _buildSupervisedStudents(),
+                _StudentsInCharge(
+                    teacher: widget.teacher, canEdit: widget.canEdit),
                 if (!_isEditing && widget.teacher.email.isNotEmpty)
                   Column(
                     children: [
@@ -653,72 +528,6 @@ class TeacherListTileState extends State<TeacherListTile> {
     );
   }
 
-  // TODO move to a dedicated widget
-  Widget _buildSupervisedStudents() {
-    final students = _studentsInCharge.keys.toList()
-      ..sort((a, b) => a.lastName.compareTo(b.lastName));
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text('Élève·s dont l\'enseignant·e a la charge de la supervision',
-                style: Theme.of(context).textTheme.titleSmall),
-            if (widget.canEdit && students.isNotEmpty)
-              IconButton(
-                icon: Icon(
-                  _isEditingStudentsInCharge ? Icons.save : Icons.edit,
-                  color: Theme.of(context).primaryColor,
-                ),
-                onPressed: _onClickedEditingStudentsInCharge,
-              ),
-          ],
-        ),
-        if (students.isEmpty)
-          const Text('Aucun élève supervisé·e')
-        else
-          ...students.map(
-            (student) {
-              void onTapStudent() {
-                setState(() {
-                  _studentsInCharge[student] =
-                      (true, !_studentsInCharge[student]!.$2);
-                });
-              }
-
-              return InkWell(
-                onTap:
-                    _isEditingStudentsInCharge && _studentsInCharge[student]!.$1
-                        ? onTapStudent
-                        : null,
-                child: SizedBox(
-                  width: 350,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Checkbox(
-                        value: _studentsInCharge[student]!.$2,
-                        onChanged: _isEditingStudentsInCharge &&
-                                _studentsInCharge[student]!.$1
-                            ? (value) => onTapStudent()
-                            : null,
-                      ),
-                      Flexible(
-                        child: Text(student.fullName,
-                            style: Theme.of(context).textTheme.bodyMedium),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-      ],
-    );
-  }
-
   Widget _buildPhone() {
     return PhoneListTile(
       controller: _phoneController,
@@ -797,6 +606,212 @@ class TeacherListTileState extends State<TeacherListTile> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _StudentsInCharge extends StatefulWidget {
+  const _StudentsInCharge({required this.teacher, required this.canEdit});
+
+  final Teacher teacher;
+  final bool canEdit;
+
+  @override
+  State<_StudentsInCharge> createState() => _StudentsInChargeState();
+}
+
+class _StudentsInChargeState extends State<_StudentsInCharge> {
+  bool _forceDisabled = false;
+  bool _isEditing = false;
+
+  late final _studentsInCharge = <Student, (bool canModify, bool isChecked)>{
+    for (final student in StudentsHelpers.studentsInChargeByTeacher(
+      context,
+      teacher: widget.teacher,
+      includeGroups: false,
+      includeInCharge: true,
+      listen: false,
+    ))
+      student: (false, true)
+  };
+
+  Future<void> _onClickedEditing() async {
+    Future<void> getStudentLocks() async {
+      final toWait = <Future<bool>>[];
+      final studentsProvider = StudentsProvider.of(context, listen: false);
+      final studentsList = _studentsInCharge.keys.toList();
+
+      for (final student in studentsList) {
+        toWait.add(studentsProvider.getLockForItem(student));
+      }
+      final hasLocks = await Future.wait(toWait);
+
+      for (final studentEntry in _studentsInCharge.entries) {
+        final student = studentEntry.key;
+        final i = studentsList.indexOf(student);
+        _studentsInCharge[student] =
+            (hasLocks.elementAt(i), studentEntry.value.$2);
+      }
+    }
+
+    Future<void> releaseStudentLocks() async {
+      final studentsProvider = StudentsProvider.of(context, listen: false);
+      final toWait = <Future>[];
+      for (final student in _studentsInCharge.keys) {
+        toWait.add(studentsProvider.releaseLockForItem(student));
+      }
+      await Future.wait(toWait);
+
+      for (final studentEntry in _studentsInCharge.entries) {
+        final student = studentEntry.key;
+        _studentsInCharge[student] = (false, studentEntry.value.$2);
+      }
+    }
+
+    if (_forceDisabled) return;
+    setState(() {
+      _forceDisabled = true;
+    });
+
+    final studentsProvider = StudentsProvider.of(context, listen: false);
+
+    if (_isEditing) {
+      final emptyId = Student.empty.teacherInChargeId;
+      // Finish editing
+      final toWait = <Future>[];
+      for (final student in _studentsInCharge.keys) {
+        // If the student is still in charge, we don't need to do anything
+        if (_studentsInCharge[student]!.$2) continue;
+
+        // Make sure we have to full data set
+        await studentsProvider.fetchData(
+            id: student.id, fields: FetchableFields.all);
+        final updatedStudent = studentsProvider.fromId(student.id);
+
+        if (updatedStudent.teacherInChargeId == widget.teacher.id) {
+          toWait.add(studentsProvider.replaceWithConfirmation(
+            updatedStudent.copyWith(teacherInChargeId: emptyId),
+          ));
+        }
+        if (updatedStudent.supplementaryTeacherInChargeIds
+            .contains(widget.teacher.id)) {
+          final newIds =
+              List<String>.from(updatedStudent.supplementaryTeacherInChargeIds)
+                ..remove(widget.teacher.id);
+          toWait.add(studentsProvider.replaceWithConfirmation(
+            updatedStudent.copyWith(supplementaryTeacherInChargeIds: newIds),
+          ));
+        }
+      }
+      final results = await Future.wait(toWait);
+
+      final isSuccess = results.every((e) => e == true);
+      if (mounted) {
+        showSnackBar(
+          context,
+          message: isSuccess
+              ? 'L\'enseignant·e a été modifié·e avec succès.'
+              : 'Une erreur est survenue lors de la modification de l\'enseignant·e.',
+        );
+      }
+      await releaseStudentLocks();
+
+      // Remove the students that are no longer in charge from the map
+      _studentsInCharge.removeWhere((student, value) => !value.$2);
+    } else {
+      await getStudentLocks();
+
+      if (!_studentsInCharge.values.every((e) => e.$1) || !mounted) {
+        if (mounted) {
+          showSnackBar(
+            context,
+            message:
+                'Au moins un·e élève est en cours de modification par un autre utilisateur·trice. '
+                'Cet élève ne pourra pas être modifié pour l\'instant.',
+          );
+        }
+        setState(() {
+          _forceDisabled = false;
+        });
+      }
+    }
+
+    if (mounted) {
+      setState(() {
+        _isEditing = !_isEditing;
+        _forceDisabled = false;
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _StudentsInCharge oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    print('coucou');
+    // TODO Find a way to update this dynamically
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final students = _studentsInCharge.keys.toList()
+      ..sort((a, b) => a.lastName.compareTo(b.lastName));
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Text('Élève·s dont l\'enseignant·e a la charge de la supervision',
+                style: Theme.of(context).textTheme.titleSmall),
+            if (widget.canEdit && students.isNotEmpty)
+              IconButton(
+                icon: Icon(
+                  _isEditing ? Icons.save : Icons.edit,
+                  color: Theme.of(context).primaryColor,
+                ),
+                onPressed: _onClickedEditing,
+              ),
+          ],
+        ),
+        if (students.isEmpty)
+          const Text('Aucun élève supervisé·e')
+        else
+          ...students.map(
+            (student) {
+              void onTapStudent() {
+                setState(() {
+                  _studentsInCharge[student] =
+                      (true, !_studentsInCharge[student]!.$2);
+                });
+              }
+
+              return InkWell(
+                onTap: _isEditing && _studentsInCharge[student]!.$1
+                    ? onTapStudent
+                    : null,
+                child: SizedBox(
+                  width: 350,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Checkbox(
+                        value: _studentsInCharge[student]!.$2,
+                        onChanged: _isEditing && _studentsInCharge[student]!.$1
+                            ? (value) => onTapStudent()
+                            : null,
+                      ),
+                      Flexible(
+                        child: Text(student.fullName,
+                            style: Theme.of(context).textTheme.bodyMedium),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+      ],
     );
   }
 }
