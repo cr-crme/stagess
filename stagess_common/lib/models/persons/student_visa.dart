@@ -41,6 +41,9 @@ class ExperiencesAndAptitudes extends RepeatableItem {
         isSelected: isSelected ?? this.isSelected,
         text: text ?? this.text,
       );
+
+  @override
+  bool get isEmpty => super.isEmpty && text.isEmpty;
 }
 
 class AttestationsAndMentions extends RepeatableItem {
@@ -78,6 +81,9 @@ class AttestationsAndMentions extends RepeatableItem {
         isSelected: isSelected ?? this.isSelected,
         text: text ?? this.text,
       );
+
+  @override
+  bool get isEmpty => super.isEmpty && text.isEmpty;
 }
 
 class SstTraining extends RepeatableItem {
@@ -138,6 +144,9 @@ class SstTraining extends RepeatableItem {
       isHidden: isHidden ?? this.isHidden,
     );
   }
+
+  @override
+  bool get isEmpty => super.isEmpty && trainingId.isEmpty;
 }
 
 enum CertificateType {
@@ -209,6 +218,9 @@ class Certificate extends RepeatableItem {
       year: year ?? this.year,
     );
   }
+
+  @override
+  bool get isEmpty => super.isEmpty && certificateType == CertificateType.none;
 }
 
 class Skill extends RepeatableItem {
@@ -246,6 +258,9 @@ class Skill extends RepeatableItem {
         isSelected: isSelected ?? this.isSelected,
         skillId: skillId ?? this.skillId,
       );
+
+  @override
+  bool get isEmpty => super.isEmpty && skillId.isEmpty;
 }
 
 class Reference extends RepeatableItem {
@@ -316,6 +331,15 @@ class Reference extends RepeatableItem {
       supplementaryInfo: supplementaryInfo ?? this.supplementaryInfo,
     );
   }
+
+  @override
+  bool get isEmpty =>
+      super.isEmpty &&
+      referee.isEmpty &&
+      enterprise.isEmpty &&
+      phoneNumber.toString().isEmpty &&
+      email.isEmpty &&
+      supplementaryInfo.isEmpty;
 }
 
 class Attitude extends RepeatableItem {
@@ -366,6 +390,9 @@ class Attitude extends RepeatableItem {
         isSelected: isSelected ?? this.isSelected,
         attitudeId: attitudeId ?? this.attitudeId,
       );
+
+  @override
+  bool get isEmpty => super.isEmpty && attitudeId.isEmpty;
 }
 
 class SuccessConditions extends RepeatableItem {
@@ -403,6 +430,9 @@ class SuccessConditions extends RepeatableItem {
         isSelected: isSelected ?? this.isSelected,
         text: text ?? this.text,
       );
+
+  @override
+  bool get isEmpty => super.isEmpty && text.isEmpty;
 }
 
 class VisaForm extends ItemSerializable {

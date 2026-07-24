@@ -52,6 +52,13 @@ class RepeatableItem extends ItemSerializable {
   }
 
   ///
+  /// This method returns if the item is empty, meaning it has no data and is not selected.
+  @mustBeOverridden
+  bool get isEmpty => index == -1 && !isSelected;
+
+  bool get isNotEmpty => !isEmpty;
+
+  ///
   /// Dispose is called right before the object is removed from the list.
   /// It can be overloaded in the extended class to perform any necessary cleanup.
   void dispose() {}

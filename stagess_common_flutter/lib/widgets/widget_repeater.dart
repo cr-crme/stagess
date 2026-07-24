@@ -16,10 +16,11 @@ class WidgetRepeaterController<T extends RepeatableItem> {
   int get selectedCount =>
       _options.fold(0, (count, option) => count + (option.isSelected ? 1 : 0));
 
-  void clear() {
+  void clear({bool keepNonEmptyItems = false}) {
     final elementCount = _options.length;
-    for (int i = 0; i < elementCount; i++) {
-      remove(0);
+    for (int i = elementCount - 1; i >= 0; i--) {
+      if (keepNonEmptyItems && _options[i].isNotEmpty) continue;
+      remove(i);
     }
 
     if (_setStateCallback != null) _setStateCallback!(() {});

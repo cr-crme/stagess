@@ -76,6 +76,9 @@ class _RepeatableTeacher extends RepeatableItem {
   }
 
   @override
+  bool get isEmpty => controller.teacher == null;
+
+  @override
   void dispose() {
     controller.dispose();
     super.dispose();
@@ -321,6 +324,10 @@ class StudentListTileState extends State<StudentListTile> {
       }
 
       // Finish editing
+      setState(() {
+        _supplementaryTeacherInChargeIdsController.clear(
+            keepNonEmptyItems: true);
+      });
       final newStudent = editedStudent;
       if (newStudent.getDifference(widget.student).isNotEmpty) {
         final isSuccess = await students.replaceWithConfirmation(newStudent);
@@ -739,7 +746,6 @@ class StudentListTileState extends State<StudentListTile> {
         ),
         if (_isEditing ||
             _supplementaryTeacherInChargeIdsController.options.isNotEmpty)
-          // TODO Clean empty elements on save
           WidgetRepeater(
             controller: _supplementaryTeacherInChargeIdsController,
             buttonTitle: 'Ajouter un·e intervenant·e',

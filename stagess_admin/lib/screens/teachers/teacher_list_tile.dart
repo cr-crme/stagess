@@ -40,6 +40,9 @@ class _StudentGroup extends RepeatableItem {
       group: group ?? this.group,
     );
   }
+
+  @override
+  bool get isEmpty => group.isEmpty;
 }
 
 class TeacherListTile extends StatefulWidget {
@@ -200,6 +203,7 @@ class TeacherListTileState extends State<TeacherListTile> {
       }
 
       // Finish editing
+      _groupController.clear(keepNonEmptyItems: true);
       final newTeacher = editedTeacher;
       if (newTeacher.getDifference(widget.teacher).isNotEmpty) {
         final isSuccess = await teachers.replaceWithConfirmation(newTeacher);

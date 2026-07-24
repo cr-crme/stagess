@@ -224,6 +224,7 @@ class AboutPageState extends State<AboutPage> {
     }
     _editing = false;
 
+    _supplementaryTeacherInChargeIdsController.clear(keepNonEmptyItems: true);
     final newStudent = editedStudent;
     if (widget.student.getDifference(newStudent).isEmpty) {
       if (mounted) {
@@ -591,6 +592,9 @@ class _RepeatableTeacher extends RepeatableItem {
     return _RepeatableTeacher(
         index: index ?? this.index, controller: controller);
   }
+
+  @override
+  bool get isEmpty => controller.teacher == null;
 
   @override
   void dispose() {
