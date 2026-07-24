@@ -61,7 +61,8 @@ extension InternshipMetaDataList on List<InternshipMetaData> {
     if (currentTeacher == null) return [];
 
     final internships = InternshipsProvider.of(context, listen: true);
-    final students = StudentsHelpers.studentsInMyGroups(context, listen: true);
+    final students =
+        StudentsHelpers.studentsInChargeByCurrentUser(context, listen: true);
 
     List<InternshipMetaData> out = [];
 

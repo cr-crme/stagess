@@ -168,7 +168,7 @@ class _InternshipListState extends State<_InternshipList> {
   /// id [internshipId].
   bool _canSeeDetails({required String internshipId}) {
     final internship = InternshipsProvider.of(context)[internshipId];
-    final student = StudentsHelpers.studentsInMyGroups(
+    final student = StudentsHelpers.studentsInChargeByCurrentUser(
       context,
     ).firstWhereOrNull((e) => e.id == internship.studentId);
 

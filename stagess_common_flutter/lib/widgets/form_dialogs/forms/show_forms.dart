@@ -79,7 +79,7 @@ Future<void> showStudentEvaluationFormDialog(
         showSnackBar(
           context,
           message:
-              'Impossible de modifier cet étudiant, car il est en cours de modification par un autre utilisateur.',
+              'Impossible de modifier cet élève, car il est en cours de modification par un autre utilisateur.',
         );
       }
       return;
@@ -108,8 +108,8 @@ Future<void> showStudentEvaluationFormDialog(
   if (context.mounted) {
     showSnackBar(context,
         message: isSuccess
-            ? 'L\'étudiant a été mis à jour'
-            : 'Échec de la mise à jour de l\'étudiant.');
+            ? 'L\'élève a été mis à jour'
+            : 'Échec de la mise à jour de l\'élève.');
   }
   await students.releaseLockForItem(student);
 }

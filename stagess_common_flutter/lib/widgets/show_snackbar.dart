@@ -19,7 +19,7 @@ void showSnackBar(
         duration: duration,
       ),
     );
-  } catch (e, stackTrace) {
-    _logger.severe('Error showing snackbar: $e', e, stackTrace);
+  } catch (e) {
+    // _logger.severe('Error showing snackbar: $e', e, stackTrace);
   }
 }

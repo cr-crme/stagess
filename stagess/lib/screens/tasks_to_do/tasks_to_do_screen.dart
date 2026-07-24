@@ -68,7 +68,8 @@ List<_EnterpriseInternshipStudent> _internshipsToTerminate(
   // We should terminate an internship if the end date is passed for more that
   // one day
   final internships = InternshipsProvider.of(context);
-  final students = StudentsHelpers.mySupervizedStudents(context);
+  final students =
+      StudentsHelpers.studentsWithInternshipsByCurrentUser(context);
   final enterprises = EnterprisesProviderExtension.availableEnterprisesOf(
     context,
   );
@@ -108,7 +109,8 @@ List<_EnterpriseInternshipStudent> _postInternshipEvaluationToDo(
     BuildContext context) {
   // We should evaluate an internship as soon as it is terminated
   final internships = InternshipsProvider.of(context);
-  final students = StudentsHelpers.mySupervizedStudents(context);
+  final students =
+      StudentsHelpers.studentsWithInternshipsByCurrentUser(context);
   final enterprises = EnterprisesProviderExtension.availableEnterprisesOf(
     context,
   );

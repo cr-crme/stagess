@@ -45,7 +45,7 @@ class SupervisionChart extends StatelessWidget {
     if (!context.mounted) return;
 
     final studentsToFetch =
-        StudentsHelpers.studentsInMyGroups(context, listen: false);
+        StudentsHelpers.studentsInChargeByCurrentUser(context, listen: false);
     final studentIds = studentsToFetch.map((e) => e.id).toSet();
 
     final internshipsToFetch = <Internship>[];

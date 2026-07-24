@@ -40,7 +40,8 @@ void main() {
       students.add(dummyStudent(group: '103'));
 
       expect(
-        StudentsHelpers.studentsInMyGroups(context, listen: false).length,
+        StudentsHelpers.studentsInChargeByCurrentUser(context, listen: false)
+            .length,
         3,
       );
     });
@@ -64,7 +65,9 @@ void main() {
       students.add(dummyStudent(id: 'neverMyStudent2', group: '103'));
 
       expect(
-        StudentsHelpers.mySupervizedStudents(context, listen: false).length,
+        StudentsHelpers.studentsWithInternshipsByCurrentUser(context,
+                listen: false)
+            .length,
         0,
       );
 
@@ -82,7 +85,9 @@ void main() {
         );
       }
       expect(
-        StudentsHelpers.mySupervizedStudents(context, listen: false).length,
+        StudentsHelpers.studentsWithInternshipsByCurrentUser(context,
+                listen: false)
+            .length,
         3,
       );
 
@@ -96,7 +101,9 @@ void main() {
             ),
       );
       expect(
-        StudentsHelpers.mySupervizedStudents(context, listen: false).length,
+        StudentsHelpers.studentsWithInternshipsByCurrentUser(context,
+                listen: false)
+            .length,
         4,
       );
 
@@ -106,7 +113,7 @@ void main() {
           .copyWith(endDate: DateTime(2023, 1, 1));
       internships.replace(internship);
       expect(
-        StudentsHelpers.mySupervizedStudents(
+        StudentsHelpers.studentsWithInternshipsByCurrentUser(
           context,
           listen: false,
           activeOnly: false,
@@ -114,7 +121,7 @@ void main() {
         4,
       );
       expect(
-        StudentsHelpers.mySupervizedStudents(
+        StudentsHelpers.studentsWithInternshipsByCurrentUser(
           context,
           listen: false,
           activeOnly: true,
@@ -133,7 +140,9 @@ void main() {
         throwsException,
       );
       expect(
-        StudentsHelpers.mySupervizedStudents(context, listen: false).length,
+        StudentsHelpers.studentsWithInternshipsByCurrentUser(context,
+                listen: false)
+            .length,
         4,
       );
     });

@@ -104,7 +104,7 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
   Widget build(BuildContext context) {
     _logger.finer('Building StudentScreen for ID: ${widget.id}');
 
-    final student = StudentsHelpers.studentsInMyGroups(
+    final student = StudentsHelpers.studentsInChargeByCurrentUser(
       context,
     ).firstWhereOrNull((e) => e.id == widget.id);
 
@@ -208,7 +208,7 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
   List<Widget> _buildActionButton() {
     if (_tabController.index != 0) return [];
 
-    final student = StudentsHelpers.studentsInMyGroups(context)
+    final student = StudentsHelpers.studentsInChargeByCurrentUser(context)
         .firstWhereOrNull((e) => e.id == widget.id);
     final user = AuthProvider.of(context, listen: false);
     if (student == null || user.currentId == null) return [];
@@ -223,7 +223,7 @@ class _StudentScreenInternalState extends State<_StudentScreenInternal>
         onPressed: _onClickedActionAbout,
         tooltip: _isEditingAboutPage
             ? 'Enregistrer les modifications'
-            : 'Modifier les informations de l\'étudiant',
+            : 'Modifier les informations de l\'élève',
         icon: _isEditingAboutPage
             ? const Icon(Icons.save)
             : const Icon(Icons.edit),

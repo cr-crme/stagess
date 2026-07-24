@@ -1,6 +1,7 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:stagess_common/models/persons/student.dart';
+import 'package:stagess_common/models/persons/teacher.dart';
 import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/internships_provider.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
@@ -12,34 +13,53 @@ class StudentsHelpers {
   /// This returns the students the teacher should have read/write access too.
   /// These are the students from the group the teacher teaches too (even though
   /// they are not supervising them personally)
-  static List<Student> studentsInMyGroups(BuildContext context,
-      {bool listen = true}) {
-    final students = StudentsProvider.of(context, listen: listen);
-
+  static List<Student> studentsInChargeByCurrentUser(
+    BuildContext context, {
+    bool includeGroups = true,
+    bool includeInCharge = true,
+    bool listen = true,
+  }) {
     if (AuthProvider.of(context, listen: false).isAdmin) {
-      return [...students];
+      return [...StudentsProvider.of(context, listen: listen)];
     }
 
     final teacher = TeachersProvider.of(context, listen: false).currentTeacher;
     if (teacher == null) return [];
 
-    return students
+    return studentsInChargeByTeacher(
+      context,
+      teacher: teacher,
+      includeGroups: includeGroups,
+      includeInCharge: includeInCharge,
+      listen: listen,
+    );
+  }
+
+  static List<Student> studentsInChargeByTeacher(
+    BuildContext context, {
+    required Teacher teacher,
+    bool includeGroups = true,
+    bool includeInCharge = true,
+    bool listen = true,
+  }) {
+    return StudentsProvider.of(context, listen: listen)
         .where((e) =>
-            teacher.groups.contains(e.group) ||
-            e.teacherInChargeId == teacher.id ||
-            e.supplementaryTeacherInChargeIds.contains(teacher.id))
+            (includeGroups && teacher.groups.contains(e.group)) ||
+            (includeInCharge &&
+                (e.teacherInChargeId == teacher.id ||
+                    e.supplementaryTeacherInChargeIds.contains(teacher.id))))
         .toList();
   }
 
   ///
   /// Get all the supervized students. If [activeOnly], the students without an
   /// active internship are ignored
-  static List<Student> mySupervizedStudents(
+  static List<Student> studentsWithInternshipsByCurrentUser(
     BuildContext context, {
-    listen = true,
+    bool listen = true,
     bool activeOnly = false,
   }) {
-    final allStudents = studentsInMyGroups(context, listen: listen);
+    final allStudents = studentsInChargeByCurrentUser(context, listen: listen);
     final internships = InternshipsProvider.of(context, listen: false);
     final currentTeacherId =
         TeachersProvider.of(context, listen: false).currentTeacher?.id;

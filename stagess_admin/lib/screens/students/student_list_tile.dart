@@ -678,7 +678,9 @@ class StudentListTileState extends State<StudentListTile> {
               child: Text(
                 _isEditing
                     ? 'Sélectionner l\'enseignant·e responsable'
-                    : 'Enseignant·e responsable',
+                    : (_teacherInChargeIdController.teacher == null
+                        ? 'Aucun·e enseignant·e responsable sélectionné·e'
+                        : 'Enseignant·e responsable'),
               ),
             ),
             Padding(
@@ -700,13 +702,14 @@ class StudentListTileState extends State<StudentListTile> {
             ),
           ],
         ),
-        TeacherPickerTile(
-          controller: _teacherInChargeIdController,
-          title: 'Nom de l\'enseignant·e',
-          filter: (teacher) =>
-              teacher.schoolBoardId == widget.student.schoolBoardId,
-          editMode: _isEditing,
-        ),
+        if (_isEditing || _teacherInChargeIdController.teacher != null)
+          TeacherPickerTile(
+            controller: _teacherInChargeIdController,
+            title: 'Nom de l\'enseignant·e',
+            filter: (teacher) =>
+                teacher.schoolBoardId == widget.student.schoolBoardId,
+            editMode: _isEditing,
+          ),
       ],
     );
   }

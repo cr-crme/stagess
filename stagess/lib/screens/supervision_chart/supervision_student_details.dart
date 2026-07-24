@@ -44,7 +44,7 @@ Job? _getJob(BuildContext context, {required String studentId}) {
 }
 
 Student? _getStudent(BuildContext context, {required String studentId}) {
-  final students = StudentsHelpers.studentsInMyGroups(context);
+  final students = StudentsHelpers.studentsInChargeByCurrentUser(context);
   return students.firstWhereOrNull((e) => e.id == studentId);
 }
 

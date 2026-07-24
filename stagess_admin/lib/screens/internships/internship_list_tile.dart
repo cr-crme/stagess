@@ -125,7 +125,7 @@ class InternshipListTileState extends State<InternshipListTile> {
           null,
         AccessLevel.teacherAdmin ||
         AccessLevel.teacher =>
-          StudentsHelpers.studentsInMyGroups(context),
+          StudentsHelpers.studentsInChargeByCurrentUser(context),
         AccessLevel.self || AccessLevel.invalid => [],
       });
   bool get _showPrivateFields {

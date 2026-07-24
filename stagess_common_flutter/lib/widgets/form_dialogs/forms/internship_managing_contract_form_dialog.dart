@@ -1092,7 +1092,7 @@ StudentPickerController _studentPickerControllerOf(BuildContext context,
   List<Student> myStudents = student != null
       ? [student]
       : _studentsWithoutInternship(
-          context, StudentsHelpers.studentsInMyGroups(context));
+          context, StudentsHelpers.studentsInChargeByCurrentUser(context));
 
   return StudentPickerController(
     schoolBoardId: AuthProvider.of(context, listen: false).schoolBoardId!,

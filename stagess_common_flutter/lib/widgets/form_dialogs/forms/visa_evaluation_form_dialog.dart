@@ -397,7 +397,7 @@ class _VisaEvaluationScreenState extends State<_VisaEvaluationScreen> {
       'Building AttitudeEvaluationScreen for student: ${widget.studentId}',
     );
 
-    final student = StudentsHelpers.studentsInMyGroups(context)
+    final student = StudentsHelpers.studentsInChargeByCurrentUser(context)
         .firstWhereOrNull((e) => e.id == widget.studentId);
 
     return SizedBox(

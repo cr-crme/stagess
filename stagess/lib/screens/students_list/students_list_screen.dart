@@ -49,8 +49,8 @@ class _StudentsListScreenState extends State<StudentsListScreen> {
   @override
   Widget build(BuildContext context) {
     _logger.finer('Building StudentsListScreen');
-    final students =
-        _filterSelectedStudents(StudentsHelpers.studentsInMyGroups(context));
+    final students = _filterSelectedStudents(
+        StudentsHelpers.studentsInChargeByCurrentUser(context));
 
     return ResponsiveService.scaffoldOf(
       context,
