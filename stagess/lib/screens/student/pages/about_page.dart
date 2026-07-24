@@ -350,10 +350,12 @@ class AboutPageState extends State<AboutPage> {
                       context,
                       title: 'Enseignant·e responsable',
                       content: Text(
-                          'Avec les administrateurs, l\'enseignant responsable est '
-                          'la seule personne capable de modifier les informations '
-                          'personnelles de l\'élève qui figurent sur l\'onglet "À propos" '
-                          'de la page de l\'élève (p. ex. son adresse courriel)'),
+                          'Le rôle d\'enseignant·e responsable permet à un·e enseignant·e '
+                          'de modifier toutes les informations concernant l\'élève, incluant '
+                          'ses informations personnelles dans l\'onglet "À propos".\n\n'
+                          'L\'élève dont l\'enseignant·e est le ou la responsable fait automatiquement '
+                          'partie de la liste "Mes élèves" et du "Tableau de supervisions" de '
+                          'l\'enseignant·e concerné·e.'),
                     );
                   },
                   icon:
@@ -397,8 +399,10 @@ class AboutPageState extends State<AboutPage> {
                       context,
                       title: 'Intervenant·e·s supplémentaires',
                       content: Text(
-                          'L\'élève apparaitra dans la liste d\'élèves de tous les '
-                          'intervenants supplémentaires sélectionnés dans la liste'),
+                          'Le rôle d\'intervenant·e supplémentaire est le même que '
+                          'celui d\'enseignant·e responsable, avec la différence que l\'intervenant·e '
+                          'supplémentaire ne peut pas modifier les informations '
+                          'personnelles de l\'élève dans l\'onglet "À propos".'),
                     );
                   },
                   icon:
