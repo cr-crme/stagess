@@ -61,6 +61,7 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
   void dispose() {
     _nameController.dispose();
     _cnesstController.dispose();
+    _logoController.clear();
     super.dispose();
   }
 
@@ -542,17 +543,26 @@ class SchoolBoardListTileState extends State<SchoolBoardListTile> {
                             widget.filteredSchoolIds == null ||
                             widget.filteredSchoolIds!.contains(element.id))
                         .map(
-                          (school) => Padding(
-                            padding: const EdgeInsets.only(top: 4),
-                            child: SchoolListTile(
-                              school: school,
-                              schoolBoard: widget.schoolBoard,
-                              elevation: 0,
-                              canEdit: _canEdit,
-                              canDelete: _canDelete,
-                            ),
+                      (school) {
+                        final authProvider =
+                            AuthProvider.of(context, listen: false);
+                        final canEditSchool =
+                            (authProvider.databaseAccessLevel >=
+                                    AccessLevel.schoolBoardAdmin ||
+                                school.id == authProvider.schoolId);
+
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: SchoolListTile(
+                            school: school,
+                            schoolBoard: widget.schoolBoard,
+                            elevation: 0,
+                            canEdit: canEditSchool,
+                            canDelete: _canDelete,
                           ),
-                        ),
+                        );
+                      },
+                    ),
                   ],
                 ),
           if (_canEdit && !widget.forceEditingMode)

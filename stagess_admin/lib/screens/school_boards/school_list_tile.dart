@@ -3,14 +3,12 @@ import 'dart:typed_data';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:stagess_admin/screens/school_boards/confirm_delete_school_dialog.dart';
-import 'package:stagess_common/models/generic/access_level.dart';
 import 'package:stagess_common/models/generic/address.dart';
 import 'package:stagess_common/models/generic/phone_number.dart';
 import 'package:stagess_common/models/school_boards/school.dart';
 import 'package:stagess_common/models/school_boards/school_board.dart';
 import 'package:stagess_common/services/image_helpers.dart';
 import 'package:stagess_common/utils.dart';
-import 'package:stagess_common_flutter/providers/auth_provider.dart';
 import 'package:stagess_common_flutter/providers/school_boards_provider.dart';
 import 'package:stagess_common_flutter/widgets/address_list_tile.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
@@ -63,9 +61,6 @@ class SchoolListTileState extends State<SchoolListTile> {
   bool _forceDisabled = false;
   bool _isExpanded = false;
   bool _isEditing = false;
-  late final bool _canEdit =
-      AuthProvider.of(context, listen: false).databaseAccessLevel >=
-          AccessLevel.schoolBoardAdmin;
 
   late final _nameController = TextEditingController(text: widget.school.name);
   late final _addressController = AddressController(
@@ -249,8 +244,7 @@ class SchoolListTileState extends State<SchoolListTile> {
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                 ),
-                // TODO: Add the capability for schoolAdmin to edit their own school
-                if (_isExpanded && _canEdit)
+                if (_isExpanded && widget.canEdit)
                   Row(
                     children: [
                       if (widget.canDelete)

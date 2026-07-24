@@ -88,21 +88,40 @@ abstract class SchoolBoardsRepository extends RepositoryAbstract {
           AccessLevel.superAdmin,
         ],
         allowedToModify: [
+          AccessLevel.schoolAdmin,
           AccessLevel.schoolBoardAdmin,
           AccessLevel.superAdmin,
         ],
         whiteList: {
+          AccessLevel.schoolAdmin: ['schools'],
           AccessLevel.schoolBoardAdmin: ['logo', 'schools', 'cnesst_number'],
         },
         blackList: {
           AccessLevel.superAdmin: ['id'],
         },
         itemValidator: (user, item, previousItem) {
-          if (user.accessLevel < AccessLevel.superAdmin) {
-            for (final school in previousItem?.schools ?? []) {
-              if (!item.schools.any((s) => s.id == school.id)) {
+          if (user.accessLevel >= AccessLevel.superAdmin) return Future.value();
+
+          for (final school in previousItem?.schools ?? <School>[]) {
+            if (!item.schools.any((s) => s.id == school.id)) {
+              throw InvalidRequestException(
+                  'You cannot delete schools from the school board');
+            }
+          }
+
+          if (user.accessLevel < AccessLevel.schoolBoardAdmin) {
+            for (final school in item.schools) {
+              final previousSchool = previousItem?.schools
+                  .firstWhereOrNull((s) => s.id == school.id);
+              if (previousSchool == null) {
                 throw InvalidRequestException(
-                    'You cannot delete schools from the school board');
+                    'You cannot add new schools to the school board');
+              }
+
+              if (school.getDifference(previousSchool).isNotEmpty &&
+                  school.id != user.schoolId) {
+                throw InvalidRequestException(
+                    'You cannot modify schools that are not yours');
               }
             }
           }
