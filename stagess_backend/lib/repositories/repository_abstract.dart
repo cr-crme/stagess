@@ -114,21 +114,34 @@ abstract class RepositoryAbstract {
 
   ///
   /// Release a lock on the data related to the given field and [id].
+  /// If not id is provided, all the locks for the given user will be released.
   Future<RepositoryResponse> releaseLock({
-    required String id,
+    String? id,
     required DatabaseUser user,
   }) async {
-    if (_locks.containsKey(id)) {
-      if (_locks[id]!.user.userId == user.userId) {
-        _locks.remove(id);
-        return RepositoryResponse(data: {'released': true});
+    if (id != null) {
+      if (_locks.containsKey(id)) {
+        if (_locks[id]!.user.userId == user.userId) {
+          _locks.remove(id);
+          return RepositoryResponse(data: {'released': true});
+        } else {
+          // Locked by another user
+          return RepositoryResponse(data: {'released': false});
+        }
       } else {
-        // Locked by another user
+        // Not locked
         return RepositoryResponse(data: {'released': false});
       }
     } else {
-      // Not locked
-      return RepositoryResponse(data: {'released': false});
+      // Release all locks for the user
+      final keysToRemove = _locks.entries
+          .where((entry) => entry.value.user.userId == user.userId)
+          .map((entry) => entry.key)
+          .toList();
+      for (final key in keysToRemove) {
+        _locks.remove(key);
+      }
+      return RepositoryResponse(data: {'released': true});
     }
   }
 

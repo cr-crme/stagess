@@ -605,6 +605,14 @@ class Connections {
     }
 
     await client.close();
+
+    // Make sure there is no lock left for this client in the database
+    try {
+      await _database.releaseAllLocks(user: _clients[client]!);
+    } catch (e) {
+      _logger.warning(
+          'Failed to release all locks for client (${client.hashCode}:${_clients[client]?.userId}, ip=${client.ipAddress}:${client.port}): $e');
+    }
     _clients.remove(client);
   }
 

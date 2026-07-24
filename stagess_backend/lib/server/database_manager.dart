@@ -302,6 +302,27 @@ class DatabaseManager {
     return response;
   }
 
+  Future<RepositoryResponse> releaseAllLocks(
+      {required DatabaseUser user}) async {
+    final responses = await Future.wait([
+      schoolBoardsDatabase.releaseLock(user: user),
+      adminsDatabase.releaseLock(user: user),
+      teachersDatabase.releaseLock(user: user),
+      studentsDatabase.releaseLock(user: user),
+      enterprisesDatabase.releaseLock(user: user),
+      internshipsDatabase.releaseLock(user: user),
+    ]);
+
+    final allReleased =
+        responses.every((response) => response.data?['released'] == true);
+
+    if (!allReleased) {
+      throw InvalidRequestException('Could not release all locks for user');
+    }
+
+    return RepositoryResponse(data: {'released': true});
+  }
+
   Future<RepositoryResponse> releaseLock(
     RequestFields field, {
     required Map<String, dynamic>? data,
