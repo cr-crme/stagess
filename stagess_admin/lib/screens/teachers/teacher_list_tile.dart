@@ -710,7 +710,7 @@ class _StudentsInChargeState extends State<_StudentsInCharge> {
         showSnackBar(
           context,
           message: isSuccess
-              ? 'L\'enseignant·e a été modifié·e avec succès.'
+              ? 'Les élèves supervisé·e·s ont été modifié·e·s avec succès.'
               : 'Une erreur est survenue lors de la modification de l\'enseignant·e.',
         );
       }
@@ -744,17 +744,41 @@ class _StudentsInChargeState extends State<_StudentsInCharge> {
     }
   }
 
-  @override
-  void didUpdateWidget(covariant _StudentsInCharge oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    print('coucou');
-    // TODO Find a way to update this dynamically
+  void _checkIfNewAtBuildTime() {
+    // This is to take into account the fact that other users might have modified the students
+    final current = StudentsHelpers.studentsInChargeByTeacher(
+      context,
+      teacher: widget.teacher,
+      includeGroups: false,
+      includeInCharge: true,
+      listen: true,
+    );
+
+    for (final student in current) {
+      if (!_studentsInCharge.containsKey(student)) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setState(() {
+            _studentsInCharge[student] = (_isEditing, true);
+          });
+        });
+      }
+    }
+    for (final student in _studentsInCharge.keys.toList()) {
+      if (!current.contains(student)) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          setState(() {
+            _studentsInCharge.remove(student);
+          });
+        });
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final students = _studentsInCharge.keys.toList()
       ..sort((a, b) => a.lastName.compareTo(b.lastName));
+    _checkIfNewAtBuildTime();
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -785,6 +809,8 @@ class _StudentsInChargeState extends State<_StudentsInCharge> {
                       (true, !_studentsInCharge[student]!.$2);
                 });
               }
+
+              if (_studentsInCharge[student] == null) return SizedBox.shrink();
 
               return InkWell(
                 onTap: _isEditing && _studentsInCharge[student]!.$1
