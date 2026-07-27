@@ -122,6 +122,13 @@ class DailySchedule extends ItemSerializable {
             (blocks ?? this.blocks).map((block) => block.copyWith()).toList(),
       );
 
+  DailySchedule copyWithData(Map<String, dynamic> serialized) => DailySchedule(
+        id: serialized['id'] ?? id,
+        blocks: ListExt.from(serialized['blocks'] as List?,
+                deserializer: (element) => TimeBlock.fromSerialized(element)) ??
+            blocks,
+      );
+
   @override
   String toString() {
     return 'DailySchedule(id: $id, blocks: $blocks)';
@@ -180,6 +187,25 @@ class WeeklySchedule extends ItemSerializable {
                 MapEntry(int.parse(day), DailySchedule.fromSerialized(e))) ??
             {},
         super.fromSerialized();
+
+  WeeklySchedule copyWithData(Map<String, dynamic> serialized) =>
+      WeeklySchedule(
+        id: serialized['id'] ?? id,
+        period: DateTimeRange(
+          start: DateTimeExt.from(serialized['starting_date']) ?? period.start,
+          end: DateTimeExt.from(serialized['ending_date']) ?? period.end,
+        ),
+        dayCycle: serialized['cycle'] == null
+            ? dayCycle
+            : DayCycle.fromSerialized(serialized['cycle']),
+        schedule: MapExt.mergeWithData(
+            schedule,
+            (serialized['days'] as Map?)
+                ?.map((day, e) => MapEntry(int.parse(day), e)),
+            copyWithData: (original, serialized) =>
+                original.copyWithData(serialized),
+            deserializer: (map) => DailySchedule.fromSerialized(map)),
+      );
 
   @override
   Map<String, dynamic> serializedMap() => {

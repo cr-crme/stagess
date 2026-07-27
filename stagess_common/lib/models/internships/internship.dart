@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:stagess_common/exceptions.dart';
 import 'package:stagess_common/models/generic/extended_item_serializable.dart';
 import 'package:stagess_common/models/generic/fetchable_fields.dart';
@@ -246,13 +245,10 @@ class Internship extends ExtendedItemSerializable {
           IntExt.from(data['achieved_duration']) ?? achievedDuration,
       teacherNotes: StringExt.from(data['teacher_notes']) ?? teacherNotes,
       endDate: DateTimeExt.from(data['end_date']) ?? endDate,
-      contracts: ListExt.from(data['contracts'],
-              deserializer: (map) =>
-                  contracts
-                      .firstWhereOrNull((c) => c.id == map['id'])
-                      ?.copyWithData(map) ??
-                  InternshipContract.fromSerialized(map)) ??
-          contracts,
+      contracts: ListExt.mergeWithData(contracts, data['contracts'],
+          copyWithData: (original, serialized) =>
+              original.copyWithData(serialized),
+          deserializer: (map) => InternshipContract.fromSerialized(map)),
       skillEvaluations: ListExt.from(data['skill_evaluations'],
               deserializer: (map) =>
                   InternshipEvaluationSkill.fromSerialized(map)) ??

@@ -33,6 +33,15 @@ class PhoneNumber extends ItemSerializable {
     );
   }
 
+  PhoneNumber copyWithData(Map<String, dynamic>? serialized) {
+    if (serialized == null) return copyWith();
+
+    return PhoneNumber.fromSerialized({
+      'id': serialized['id'] ?? id,
+      'phone_number': serialized['phone_number'] ?? toString(),
+    });
+  }
+
   factory PhoneNumber.fromString(String number, {String? id}) {
     final reg = RegExp(_regExp);
     if (!reg.hasMatch(number)) return PhoneNumber.empty.copyWith(id: id);

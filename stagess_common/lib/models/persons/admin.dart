@@ -130,8 +130,8 @@ class Admin extends Person with SchoolMember {
       accessLevel: data['access_level'] == null
           ? accessLevel
           : AccessLevel.fromSerialized(data['access_level']),
-      phone: PhoneNumber.from(data['phone']) ?? phone,
-      address: Address.from(data['address']) ?? address,
+      phone: phone.copyWithData(data['phone']),
+      address: address.copyWithData(data['address']),
     );
   }
 

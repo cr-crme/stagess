@@ -106,7 +106,7 @@ class Person extends ExtendedItemSerializable {
       firstName: StringExt.from(data['first_name']) ?? firstName,
       lastName: StringExt.from(data['last_name']) ?? lastName,
       dateBirth: DateTimeExt.from(data['date_birth']) ?? dateBirth,
-      phone: PhoneNumber.from(data['phone']) ?? phone,
+      phone: phone.copyWithData(data['phone']),
       email: StringExt.from(data['email']) ?? email,
       address: address.copyWithData(data['address']),
     );

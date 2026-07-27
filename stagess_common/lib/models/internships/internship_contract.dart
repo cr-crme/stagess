@@ -177,10 +177,11 @@ class InternshipContract extends InternshipEvaluation {
         start: DateTimeExt.from(serialized['starting_date']) ?? dates.start,
         end: DateTimeExt.from(serialized['ending_date']) ?? dates.end,
       ),
-      weeklySchedules: (serialized['schedules'] as List?)
-              ?.map((e) => WeeklySchedule.fromSerialized(e))
-              .toList() ??
-          weeklySchedules,
+      weeklySchedules: ListExt.mergeWithData(
+          weeklySchedules, (serialized['schedules'] as List?),
+          copyWithData: (original, serialized) =>
+              original.copyWithData(serialized),
+          deserializer: (map) => WeeklySchedule.fromSerialized(map)).toList(),
       transportations: ListExt.from(serialized['transportations'],
               deserializer: (e) => StringExt.from(e)!) ??
           transportations,

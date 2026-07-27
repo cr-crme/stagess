@@ -49,8 +49,8 @@ extension ListExt on List {
   }
 }
 
-extension MapExt<T> on Map<String, T> {
-  Map<String, dynamic> serialize() {
+extension MapExt<S, T> on Map<S, T> {
+  Map<S, dynamic> serialize() {
     return map((key, value) {
       if (value is String) {
         return MapEntry(key, value.serialize());
@@ -68,12 +68,34 @@ extension MapExt<T> on Map<String, T> {
     });
   }
 
-  static Map<String, T>? from<T>(Map? elements,
+  static Map<S, T>? from<S, T>(Map? elements,
       {required T Function(dynamic) deserializer}) {
     if (elements == null) return null;
     return {
       for (var entry in elements.entries) entry.key: deserializer(entry.value),
     };
+  }
+
+  static Map<S, T> mergeWithData<S, T extends ItemSerializable>(
+    Map<S, T?> original,
+    Map? elements, {
+    required T Function(T original, dynamic serialized) copyWithData,
+    required T Function(dynamic serialized) deserializer,
+  }) {
+    final out = from<S, T>(elements, deserializer: (serialized) {
+          final e = original.values
+              .firstWhereOrNull((e) => e != null && e.id == serialized?['id']);
+          return e == null
+              ? deserializer(serialized)
+              : copyWithData(e, serialized);
+        }) ??
+        {};
+
+    for (final element in original.entries) {
+      if (out.containsKey(element.key)) continue;
+      out[element.key] = element.value!;
+    }
+    return out;
   }
 }
 

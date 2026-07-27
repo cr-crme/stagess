@@ -256,9 +256,9 @@ class Student extends Person with SchoolMember {
       firstName: StringExt.from(data['first_name']) ?? firstName,
       lastName: StringExt.from(data['last_name']) ?? lastName,
       dateBirth: DateTimeExt.from(data['date_birth']) ?? dateBirth,
-      phone: PhoneNumber.from(data['phone']) ?? phone,
+      phone: phone.copyWithData(data['phone']),
       email: StringExt.from(data['email']) ?? email,
-      address: Address.from(data['address']) ?? address,
+      address: address.copyWithData(data['address']),
       photo: StringExt.from(data['photo']) ?? photo,
       program: data['program'] == null
           ? program

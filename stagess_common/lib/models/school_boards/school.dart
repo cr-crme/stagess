@@ -74,8 +74,8 @@ class School extends ItemSerializable {
     return School(
       id: StringExt.from(data['id']) ?? id,
       name: StringExt.from(data['name']) ?? name,
-      address: Address.from(data['address']) ?? address,
-      phone: PhoneNumber.from(data['phone']) ?? phone,
+      address: address.copyWithData(data['address']),
+      phone: phone.copyWithData(data['phone']),
       logo: _deserializeLogo(data['logo']),
     );
   }

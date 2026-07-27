@@ -184,10 +184,10 @@ class Teacher extends Person with SchoolMember {
       groups: ListExt.from(data['groups'],
               deserializer: (e) => StringExt.from(e) ?? '-1') ??
           groups,
-      phone: PhoneNumber.from(data['phone']) ?? phone,
+      phone: phone.copyWithData(data['phone']),
       email: StringExt.from(data['email']) ?? email,
       dateBirth: null,
-      address: Address.from(data['address']) ?? address,
+      address: address.copyWithData(data['address']),
       itineraries: ListExt.from(data['itineraries'],
               deserializer: Itinerary.fromSerialized) ??
           itineraries,

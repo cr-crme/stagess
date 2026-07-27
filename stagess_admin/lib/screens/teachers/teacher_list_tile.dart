@@ -803,7 +803,8 @@ class _StudentsInChargeState extends State<_StudentsInCharge> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Élève·s dont l\'enseignant·e a la charge de la supervision',
+        Text(
+            'Élèves dont l\'enseignant·e est responsable ou intervenant·e supplémentaire :',
             style: Theme.of(context).textTheme.titleSmall),
         if (students.isEmpty)
           const Text('Aucun élève supervisé·e')

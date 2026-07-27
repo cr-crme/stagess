@@ -177,8 +177,8 @@ class Enterprise extends ExtendedItemSerializable with SchoolMember {
       contactFunction:
           StringExt.from(data['contact_function']) ?? contactFunction,
       address: address.copyWithData(data['address']),
-      phone: PhoneNumber.from(data['phone']) ?? phone,
-      fax: PhoneNumber.from(data['fax']) ?? fax,
+      phone: phone.copyWithData(data['phone']),
+      fax: fax.copyWithData(data['fax']),
       website: StringExt.from(data['website']) ?? website,
       headquartersAddress:
           headquartersAddress.copyWithData(data['headquarters_address']),

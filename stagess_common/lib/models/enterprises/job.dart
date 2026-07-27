@@ -89,9 +89,9 @@ class Job extends ItemSerializable {
       specialization: ActivitySectorsService.specializationOrNull(
               map['specialization_id']) ??
           _specialization,
-      positionsOffered:
-          MapExt.from<int>(map['positions_offered'], deserializer: (e) => e) ??
-              positionsOffered,
+      positionsOffered: MapExt.from<String, int>(map['positions_offered'],
+              deserializer: (e) => e) ??
+          positionsOffered,
       minimumAge: IntExt.from(map['minimum_age']) ?? minimumAge,
       preInternshipRequests: PreInternshipRequests.fromSerialized(
           map['pre_internship_requests'] ?? {}, map['version'] ?? '1.0.0'),
@@ -151,7 +151,7 @@ class Job extends ItemSerializable {
   Job.fromSerialized(super.map)
       : _specialization = ActivitySectorsService.specializationOrNull(
             map?['specialization_id']),
-        positionsOffered = MapExt.from<int>(map?['positions_offered'],
+        positionsOffered = MapExt.from<String, int>(map?['positions_offered'],
                 deserializer: (e) => e) ??
             {},
         minimumAge = IntExt.from(map?['minimum_age']) ?? 0,

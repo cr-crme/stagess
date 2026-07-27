@@ -219,6 +219,10 @@ class _EnterpriseScreenInternalState extends State<_EnterpriseScreenInternal>
       showSnackBar(context, message: 'Erreur lors de la création du stage');
       return;
     }
+    InternshipsProvider.of(context, listen: false).fetchData(
+        id: internship.id,
+        fields: Internship.fetchableFields,
+        forceRefetchAll: true);
 
     final student = StudentsProvider.of(context, listen: false)
         .fromId(internship.studentId);
