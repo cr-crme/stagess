@@ -1125,14 +1125,14 @@ packages:
       path: "../stagess_common"
       relative: true
     source: path
-    version: "1.1.7"
+    version: "1.1.8"
   stagess_common_flutter:
     dependency: "direct main"
     description:
       path: "../stagess_common_flutter"
       relative: true
     source: path
-    version: "1.1.7+1"
+    version: "1.1.8+1"
   stream_channel:
     dependency: transitive
     description:
