@@ -269,6 +269,7 @@ class _ScheduleSelectorState extends State<ScheduleSelector> {
                 setState(() => widget.scheduleController.dayCycle = newCycle);
               },
               items: DayCycle.values
+                  .where((cycle) => cycle != DayCycle.undefined)
                   .map((cycle) => DropdownMenuItem<DayCycle>(
                       value: cycle,
                       child: Padding(
@@ -471,6 +472,7 @@ class _ScheduleSelector extends StatelessWidget {
               ),
             ],
           ),
+        // TODO Use earlies day to change the reference hours and not the order to click
         FormField(
           validator: (value) {
             if (!editMode) return null;
