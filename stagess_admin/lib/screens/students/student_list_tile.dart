@@ -711,7 +711,8 @@ class StudentListTileState extends State<StudentListTile> {
             controller: _teacherInChargeIdController,
             title: 'Nom de l\'enseignant·e',
             filter: (teacher) =>
-                teacher.schoolBoardId == widget.student.schoolBoardId,
+                teacher.schoolBoardId == widget.student.schoolBoardId &&
+                teacher.schoolId == widget.student.schoolId,
             editMode: _isEditing,
           ),
       ],
@@ -769,8 +770,11 @@ class StudentListTileState extends State<StudentListTile> {
                   title: 'Intervenant·e N°${index + 1}',
                   controller: item.controller,
                   editMode: _isEditing,
-                  filter: (teacher) =>
-                      teacher.schoolBoardId == widget.student.schoolBoardId,
+                  filter: (teacher) {
+                    return teacher.schoolBoardId ==
+                            widget.student.schoolBoardId &&
+                        teacher.schoolId == widget.student.schoolId;
+                  },
                 ),
               );
             },
