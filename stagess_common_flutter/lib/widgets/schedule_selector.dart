@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -189,7 +191,8 @@ class WeeklySchedulesController {
   void applySameScheduleForAllDays(int weeklyIndex) {
     // Reference day is the first day with a schedule
     final schedules = _weeklySchedules[weeklyIndex].schedule;
-    final referenceDayIndex = schedules.keys.firstOrNull;
+    final referenceDayIndex =
+        schedules.keys.isEmpty ? null : schedules.keys.reduce(min);
     if (referenceDayIndex == null) return;
 
     schedules.forEach((day, schedule) {
@@ -472,7 +475,6 @@ class _ScheduleSelector extends StatelessWidget {
               ),
             ],
           ),
-        // TODO Use earlies day to change the reference hours and not the order to click
         FormField(
           validator: (value) {
             if (!editMode) return null;
