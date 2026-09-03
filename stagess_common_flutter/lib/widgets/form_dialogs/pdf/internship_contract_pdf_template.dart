@@ -599,8 +599,7 @@ pw.Widget _contract({
       pw.Text('En foi de quoi, les parties ont signé la présente :',
           style: _textStyleBold),
       pw.SizedBox(height: 24),
-      _signature(
-          person: contract.supervisor, role: 'Représentant de l\'employeur'),
+      _signature(person: null, role: 'Représentant de l\'employeur'),
       pw.SizedBox(height: 24),
       _signature(person: teacher, role: 'Enseignant responsable'),
       pw.SizedBox(height: 24),
@@ -609,7 +608,7 @@ pw.Widget _contract({
   );
 }
 
-pw.Widget _signature({required Person person, required String role}) {
+pw.Widget _signature({required Person? person, required String role}) {
   return pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       crossAxisAlignment: pw.CrossAxisAlignment.start,
@@ -619,7 +618,9 @@ pw.Widget _signature({required Person person, required String role}) {
               style: _textStyleBold),
           pw.Row(children: [
             pw.Text('Signature de ', style: _textStyle),
-            pw.Text(person.fullName, style: _textStyleItalic),
+            pw.Text(
+                person == null ? '_______________________' : person.fullName,
+                style: _textStyleItalic),
           ]),
           pw.Text(role, style: _textStyle),
         ]),
