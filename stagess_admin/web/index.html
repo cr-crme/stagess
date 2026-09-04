@@ -35,24 +35,27 @@
 </head>
 
 <body>
-  <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
-
-    For more details:
-    * https://docs.flutter.dev/platform-integration/web/initialization
-  -->
+  <!-- 1. Force unregister old service workers immediately -->
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function(registrations) {
-        for(let registration of registrations) {
-          registration.unregister();
+      navigator.serviceWorker.getRegistration().then(function(registration) {
+        if (!registration) {
+          return;
         }
+
+        registration.unregister().then(function(success) {
+          if (success) {
+            console.log('Legacy service worker killed.');
+            window.location.reload();
+          }
+        });
       });
     }
   </script>
+
+  <!-- 2. Pure Flutter Bootstrap without assigning a serviceWorkerVersion config -->
   <script src="flutter_bootstrap.js" async></script>
 </body>
+
 
 </html>
