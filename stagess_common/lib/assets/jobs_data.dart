@@ -31738,6 +31738,230 @@ const jobData = [
           }
         ],
         "q": ["1", "3", "4", "5", "9", "12", "15", "16", "17"]
+      },
+      {
+        "n":
+            "Pr\u00e9pos\u00e9e, pr\u00e9pos\u00e9 au pr\u00e9traitement des tubulures ac\u00e9ricoles en vue de leur revalorisation",
+        "id": "8367",
+        "s": [
+          {
+            "id": "836701",
+            "n": "Manoeuvrer une mini-grue d'atelier",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect de la capacit\u00e9 maximale de la mini-grue.",
+              "Application correcte des techniques de travail.",
+              "Souci de la s\u00e9curit\u00e9 de ses coll\u00e8gues."
+            ],
+            "t": [
+              {
+                "t":
+                    "V\u00e9rifier la mini-grue : bon \u00e9tat des c\u00e2bles, serrage des boulons, \u00e9tat des pi\u00e8ces m\u00e9caniques, fonctionnement de l'accessoire de pr\u00e9hension, etc.",
+                "o": false
+              },
+              {
+                "t": "Lubrifier ou graisser des pi\u00e8ces, au besoin.",
+                "o": true
+              },
+              {"t": "Mettre en marche la mini-grue.", "o": false},
+              {
+                "t":
+                    "Actionner les manettes pour prendre les tubulures ac\u00e9ricoles.",
+                "o": false
+              },
+              {
+                "t":
+                    "Diriger la fl\u00e8che t\u00e9lescopique vers la table ou le convoyeur et y d\u00e9poser les tubulures.",
+                "o": false
+              },
+              {"t": "Arr\u00eater la mini-grue.", "o": false},
+              {"t": "D\u00e9poussi\u00e9rer la mini-grue.", "o": false},
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes de fonctionnement et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836702",
+            "n":
+                "Trier les tubulures et les accessoires ac\u00e9ricoles usag\u00e9s",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Identification juste du type de plastique.",
+              "Pertinence du jugement.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e de la pince coupe-tube pour plastique.",
+              "Manifestation d'un bon sens de l'observation.",
+              "Perception juste de l'importance du recyclage.",
+              "Efficacit\u00e9 du travail.",
+              "Homog\u00e9n\u00e9it\u00e9 du tri."
+            ],
+            "t": [
+              {
+                "t":
+                    "Couper les attaches des tubulures ou les tubulures emm\u00eal\u00e9es.",
+                "o": false
+              },
+              {
+                "t":
+                    "Retirer les tubulures recouvertes de peinture ou de tout autre contaminant.",
+                "o": false
+              },
+              {
+                "t":
+                    "Retirer les chalumeaux, les broches, les raccords, les collets m\u00e9talliques, etc., et les d\u00e9poser dans leurs bacs respectifs.",
+                "o": false
+              },
+              {
+                "t":
+                    "S\u00e9parer les tubulures et les accessoires en fonction des types de plastiques.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9poser les tubulures sur la table ou sur le ou les convoyeurs.",
+                "o": false
+              },
+              {"t": "Actionner le ou les convoyeurs, au besoin.", "o": false},
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836703",
+            "n": "Couper les tubulures ac\u00e9ricoles usag\u00e9es",
+            "x": "1",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e du gabarit de coupe et de l'outil de coupe.",
+              "Coupe \u00e0 angle droit.",
+              "Efficacit\u00e9 du travail."
+            ],
+            "t": [
+              {"t": "Pr\u00e9parer le couteau pneumatique.", "o": false},
+              {"t": "Sectionner les tubulures.", "o": false},
+              {
+                "t":
+                    "D\u00e9poser les sections de tubulures sur le convoyeur ou dans des bacs.",
+                "o": false
+              },
+              {"t": "Actionner le convoyeur, au besoin.", "o": false},
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "515",
+            "n":
+                "Granuler des pi\u00e8ces non conformes ou d'autres pi\u00e8ces recyclables.",
+            "x": "1",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Interpr\u00e9tation juste des codes de classification.",
+              "Traitement ad\u00e9quat des mati\u00e8res.",
+              "R\u00e9cup\u00e9ration maximale des r\u00e9sidus.",
+              "Souci de la protection de l'environnement."
+            ],
+            "t": [
+              {"t": "Classer les rejets ou les r\u00e9sidus.", "o": true},
+              {"t": "Jeter les rebuts.", "o": true},
+              {
+                "t":
+                    "Actionner l'\u00e9quipement (granulateur, d\u00e9chiqueteur, broyeur, etc.), l'alimenter ou voir \u00e0 son bon fonctionnement.",
+                "o": false
+              },
+              {"t": "Ramasser la mati\u00e8re broy\u00e9e.", "o": false},
+              {
+                "t": "Ensacher et identifier la mati\u00e8re broy\u00e9e.",
+                "o": false
+              },
+              {
+                "t": "Acheminer les sacs \u00e0 l'endroit pr\u00e9vu.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "800",
+            "n": "Communiquer avec ses coll\u00e8gues et ses sup\u00e9rieurs",
+            "x": "2",
+            "c": [
+              "\u00c9coute attentive des personnes.",
+              "Pertinence, exactitude et clart\u00e9 de l'information transmise.",
+              "Courtoisie."
+            ],
+            "t": [
+              {
+                "t":
+                    "Saluer ses coll\u00e8gues et ses sup\u00e9rieures ou sup\u00e9rieurs.",
+                "o": false
+              },
+              {"t": "Saluer les visiteuses ou visiteurs.", "o": true},
+              {"t": "\u00c9couter les directives.", "o": false},
+              {"t": "Recevoir et transmettre des messages.", "o": false},
+              {
+                "t": "Interpr\u00e9ter des questions et y r\u00e9pondre.",
+                "o": false
+              },
+              {"t": "Formuler des commentaires.", "o": false}
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "801",
+            "n": "Entretenir son poste de travail",
+            "x": "1",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Ordre et propret\u00e9."
+            ],
+            "t": [
+              {
+                "t":
+                    "Nettoyer ou balayer l'aire de travail au moment de l'arr\u00eat du convoyeur, au besoin.",
+                "o": false
+              },
+              {"t": "Entretenir les outils de coupe.", "o": true},
+              {
+                "t":
+                    "Ranger ou classer les outils de coupe et les accessoires.",
+                "o": false
+              },
+              {
+                "t":
+                    "Nettoyer ou balayer l'aire de travail \u00e0 la fin du quart de travail.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          }
+        ],
+        "q": []
       }
     ]
   },
@@ -40178,6 +40402,1145 @@ const jobData = [
           }
         ],
         "q": ["1", "4", "5", "7", "12", "15", "16", "17"]
+      },
+      {
+        "n":
+            "Manutentionnaire de fret a\u00e9rien en r\u00e9gions \u00e9loign\u00e9es",
+        "id": "8366",
+        "s": [
+          {
+            "id": "522",
+            "n": "Conduire un chariot \u00e9l\u00e9vateur",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect de la capacit\u00e9 maximale du chariot et de ses accessoires de pr\u00e9hension.",
+              "Respect des r\u00e8gles de circulation.",
+              "Application correcte des proc\u00e9dures de mise en marche et d'arr\u00eat du chariot \u00e9l\u00e9vateur.",
+              "Application correcte des techniques de travail.",
+              "Interpr\u00e9tation juste des signaux de la personne qui guide.",
+              "Souci de la s\u00e9curit\u00e9 des pi\u00e9tons.",
+              "Manutention soign\u00e9e des marchandises, des mat\u00e9riaux, des produits, etc.",
+              "Conduite s\u00e9curitaire du chariot \u00e9l\u00e9vateur."
+            ],
+            "t": [
+              {
+                "t":
+                    "V\u00e9rifier le fonctionnement du chariot \u00e9l\u00e9vateur et de ses accessoires.",
+                "o": false
+              },
+              {
+                "t":
+                    "Installer ou enlever les \u00e9quipements de pr\u00e9hension.",
+                "o": false
+              },
+              {
+                "t":
+                    "Utiliser les diff\u00e9rents dispositifs de retenue : ceinture de s\u00e9curit\u00e9, portes grillag\u00e9es, etc.",
+                "o": false
+              },
+              {
+                "t": "Mettre en marche le chariot \u00e9l\u00e9vateur.",
+                "o": false
+              },
+              {
+                "t":
+                    "Circuler avec le chariot \u00e9l\u00e9vateur charg\u00e9 ou non charg\u00e9 : avancer, reculer, prendre des virages vers l'avant ou l'arri\u00e8re, v\u00e9rifier les angles morts, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Arr\u00eater le chariot \u00e9l\u00e9vateur : mettre le moteur au point mort, , serrer le frein de stationnement, abaisser le dispositif de charge, etc.",
+                "o": false
+              },
+              {"t": "Stationner le chariot \u00e9l\u00e9vateur.", "o": false}
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836601",
+            "n":
+                "Pr\u00e9parer les marchandises ou participer \u00e0 leur pr\u00e9paration",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des r\u00e8gles relatives au transport a\u00e9rien, incluant celles sur le transport des mati\u00e8res dangereuses.",
+              "Respect des politiques et des protocoles de l'entreprise.",
+              "Respect des directives de travail.",
+              "Respect des d\u00e9lais allou\u00e9s.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e de l'\u00e9quipement de manutention.",
+              "Manifestation de sa capacit\u00e9 \u00e0 travailler en \u00e9quipe.",
+              "Manutention soign\u00e9e des marchandises."
+            ],
+            "t": [
+              {
+                "t":
+                    "Prendre connaissance des sections de l'entrep\u00f4t de l'a\u00e9roport.",
+                "o": false
+              },
+              {
+                "t":
+                    "Interpr\u00e9ter le manifeste de vol (types de marchandises, quantit\u00e9s, poids, lettres de transport a\u00e9rien, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "Choisir l'\u00e9quipement de manutention en fonction du format et du poids de la marchandise.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier l'\u00e9tat de l'\u00e9quipement de manutention (diable, chariot manuel, transpalette ou chariot \u00e9l\u00e9vateur).",
+                "o": false
+              },
+              {
+                "t":
+                    "Rassembler les marchandises (produits divers, produits alimentaires, mat\u00e9riaux de construction, pi\u00e8ces m\u00e9caniques, petits v\u00e9hicules, marchandises dangereuses, \u00e9quipement de sport, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier le poids des marchandises, au besoin : peser les marchandises, calculer le poids total, noter l'information et informer l'agente ou l'agent d'entrep\u00f4t de tout poids exc\u00e9dentaire.",
+                "o": true
+              },
+              {
+                "t":
+                    "Placer les marchandises sur des chariots ou former des unit\u00e9s de chargement (Unit Load Device) : palettiser les marchandises et emballer les palettes ou placer les marchandises dans des conteneurs.",
+                "o": false
+              },
+              {
+                "t":
+                    "Imprimer les \u00e9tiquettes requises, v\u00e9rifier leur concordance avec le manifeste de vol et les apposer sur les bo\u00eetes, les contenants, les palettes, les conteneurs, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer l'agente ou l'agent d'entrep\u00f4t.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836602",
+            "n": "Charger les bagages sur les chariots",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des r\u00e8gles relatives au transport a\u00e9rien, incluant celles sur le transport des mati\u00e8res dangereuses.",
+              "Respect des politiques et des protocoles de l'entreprise.",
+              "Respect des directives de travail.",
+              "Respect des d\u00e9lais allou\u00e9s.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e de l'\u00e9quipement de manutention.",
+              "Manifestation de sa capacit\u00e9 \u00e0 travailler en \u00e9quipe.",
+              "Manutention soign\u00e9e des bagages.",
+              "Soin port\u00e9 aux animaux en cage."
+            ],
+            "t": [
+              {
+                "t":
+                    "Interpr\u00e9ter les \u00e9tiquettes des bagages (code de l'a\u00e9roport, code de couleur, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "Retirer les bagages du convoyeur et les trier sur les chariots en tenant compte de leur destination, de leur num\u00e9ro de vol, de leur emplacement dans la soute, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836603",
+            "n": "Conduire un v\u00e9hicule sur le tarmac",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des r\u00e8gles relatives au transport a\u00e9rien, incluant celles sur le transport des mati\u00e8res dangereuses.",
+              "Respect des proc\u00e9dures d'approche aux avions.",
+              "Respect des directives de travail.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e de l'\u00e9quipement de communication.",
+              "Conduite s\u00e9curitaire du v\u00e9hicule."
+            ],
+            "t": [
+              {
+                "t":
+                    "Inspecter le v\u00e9hicule \u00e9lectrique ou motoris\u00e9 : \u00e9tat de charge de la batterie ou niveau d'essence, niveau des liquides, freins, roues, barre de remorquage, feux de position, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Utiliser les diff\u00e9rents dispositifs de retenue : ceinture de s\u00e9curit\u00e9, portes grillag\u00e9es, etc.",
+                "o": false
+              },
+              {"t": "Mettre en marche le v\u00e9hicule.", "o": false},
+              {"t": "Accrocher les chariots, au besoin.", "o": false},
+              {"t": "Communiquer par radio, au besoin.", "o": false},
+              {"t": "Circuler sur le tarmac.", "o": false},
+              {
+                "t":
+                    "Stationner le v\u00e9hicule \u00e0 proximit\u00e9 de l'avion.",
+                "o": false
+              },
+              {"t": "Arr\u00eater le v\u00e9hicule.", "o": false},
+              {
+                "t":
+                    "Rapporter rapidement, \u00e0 sa superviseure ou son superviseur, tout contact avec un avion.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836604",
+            "n": "Participer au d\u00e9chargement et au chargement d'un avion",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des r\u00e8gles relatives au transport a\u00e9rien, incluant celles sur le transport des mati\u00e8res dangereuses.",
+              "Respect des politiques et des protocoles de l'entreprise.",
+              "Respect des plans de d\u00e9chargement et de chargement.",
+              "Respect des directives de travail.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e de l'\u00e9quipement de manutention.",
+              "Manifestation de sa capacit\u00e9 \u00e0 travailler en \u00e9quipe.",
+              "Soin port\u00e9 aux marchandises regroup\u00e9es ou non en unit\u00e9 de chargement.",
+              "Soin port\u00e9 aux sacs postaux et aux bagages.",
+              "Soin port\u00e9 aux animaux en cage."
+            ],
+            "t": [
+              {
+                "t":
+                    "Interpr\u00e9ter les plans de d\u00e9chargement et de chargement de l'avion.",
+                "o": false
+              },
+              {"t": "Ouvrir la porte du compartiment.", "o": false},
+              {
+                "t":
+                    "Aider \u00e0 l'installation d'un convoyeur ou d'une plateforme \u00e9l\u00e9vatrice.",
+                "o": true
+              },
+              {
+                "t":
+                    "Retirer les marchandises, les sacs postaux, les cages d'animaux ou les bagages de leur emplacement, les d\u00e9poser sur le convoyeur, puis les placer sur des chariots ou tout autre \u00e9quipement.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9placer les unit\u00e9s de chargement et les transf\u00e9rer sur la plateforme \u00e9l\u00e9vatrice.",
+                "o": true
+              },
+              {
+                "t":
+                    "D\u00e9poser les marchandises, les sacs postaux, les cages d'animaux ou les bagages sur le convoyeur, puis les placer \u00e0 l'endroit appropri\u00e9 dans l'avion.",
+                "o": false
+              },
+              {
+                "t":
+                    "Transf\u00e9rer les unit\u00e9s de chargement de la plateforme \u00e9l\u00e9vatrice \u00e0 l'endroit appropri\u00e9 dans l'avion.",
+                "o": true
+              },
+              {
+                "t":
+                    "Attacher les s\u00e9parateurs du compartiment pour assurer la s\u00e9curit\u00e9 du chargement.",
+                "o": false
+              },
+              {"t": "V\u00e9rifier son travail.", "o": false},
+              {"t": "Ramasser des d\u00e9bris tomb\u00e9s au sol.", "o": false},
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la superviseure ou le superviseur.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "112",
+            "n": "Participer \u00e0 l'entretien de l'entrep\u00f4t",
+            "x": "1",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e du mat\u00e9riel et des produits de nettoyage.",
+              "Ordre et propret\u00e9."
+            ],
+            "t": [
+              {"t": "Entretenir l'\u00e9quipement de manutention.", "o": false},
+              {"t": "Ranger l'\u00e9quipement de manutention.", "o": false},
+              {"t": "Ranger les palettes.", "o": false},
+              {
+                "t":
+                    "Ranger le mat\u00e9riel d'emballage, les bo\u00eetes de carton et les autres types de contenants.",
+                "o": false
+              },
+              {
+                "t":
+                    "R\u00e9cup\u00e9rer les mat\u00e9riaux recyclables et jeter les rebuts.",
+                "o": false
+              },
+              {"t": "Balayer le plancher.", "o": false},
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "714",
+            "n": "Intervenir lors d'un incident ou d'un probl\u00e8me mineur",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des limites de son champ d'intervention.",
+              "Ma\u00eetrise de soi.",
+              "Promptitude."
+            ],
+            "t": [
+              {
+                "t":
+                    "Reconna\u00eetre un incident ou une situation probl\u00e9matique.",
+                "o": false
+              },
+              {
+                "t":
+                    "Pr\u00e9venir la personne responsable ou composer le num\u00e9ro de l'urgence (310-4141 ou le 911).",
+                "o": false
+              },
+              {
+                "t":
+                    "Rassurer la personne et demeurer avec elle jusqu'\u00e0 l'arriv\u00e9e des secours.",
+                "o": false
+              },
+              {"t": "Aider au maintien de l'ordre.", "o": true},
+              {"t": "Aider \u00e0 disperser un attroupement.", "o": true},
+              {
+                "t":
+                    "Intervenir tout en assurant sa propre s\u00e9curit\u00e9.",
+                "o": false
+              },
+              {
+                "t": "Compl\u00e9ter un rapport d'\u00e9v\u00e9nement.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          }
+        ],
+        "q": []
+      },
+      {
+        "n":
+            "Chauffeuse-op\u00e9ratrice, chauffeur-op\u00e9rateur de camion-citerne aspirateur pour la livraison d'eau potable",
+        "id": "8368",
+        "s": [
+          {
+            "id": "805",
+            "n":
+                "Commencer et terminer sa journ\u00e9e de travail comme chauffeuse-op\u00e9ratrice ou chauffeur-op\u00e9rateur de camion-citerne aspirateur",
+            "x": "2",
+            "c": [
+              "Respect des directives de travail.",
+              "\u00c9coute attentive des explications.",
+              "Pertinence des questions pos\u00e9es.",
+              "Pr\u00e9sentation d'une image positive de l'\u00e9tablissement.",
+              "Port du macaron d'identification.",
+              "Efficacit\u00e9 du travail."
+            ],
+            "t": [
+              {
+                "t":
+                    "Rev\u00eatir une combinaison \u00e9tanche et porter les autres \u00e9quipements de protection individuelle (gants, bottes de s\u00e9curit\u00e9, lunettes, masque, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "Recevoir les directives relatives \u00e0 l'organisation de la journ\u00e9e de travail (nombre de clients, horaire, itin\u00e9raires, particularit\u00e9s des interventions, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier l'exactitude des coordonn\u00e9es des clientes et des clients (nom ou raison sociale, adresse et num\u00e9ro de t\u00e9l\u00e9phone).",
+                "o": false
+              },
+              {"t": "Inscrire les coordonn\u00e9es dans le GPS.", "o": true},
+              {
+                "t":
+                    "Effectuer la v\u00e9rification avant le d\u00e9part du camion-citerne aspirateur.",
+                "o": false
+              },
+              {
+                "t":
+                    "\u00c0 la fin de son quart de travail, v\u00e9rifier l'information inscrite dans le registre au cours de sa tourn\u00e9e et la transmettre \u00e0 la personne responsable.",
+                "o": false
+              },
+              {
+                "t":
+                    "Signaler \u00e0 la personne responsable toute anomalie ou tout incident survenu pendant la journ\u00e9e.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "806",
+            "n": "Inspecter le syst\u00e8me de pompage \u00e0 vide",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des r\u00e8gles d'hygi\u00e8ne ou de salubrit\u00e9.",
+              "Application rigoureuse des proc\u00e9dures d'inspection.",
+              "D\u00e9tection juste des anomalies, des bris ou des signes d'usure.",
+              "Consignation appropri\u00e9e des observations.",
+              "Clart\u00e9 de la communication avec la personne responsable de l'entretien."
+            ],
+            "t": [
+              {
+                "t":
+                    "Inspecter visuellement le camion-citerne et le r\u00e9servoir.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier l'\u00e9tat de la pompe \u00e0 vide, des boyaux, des raccords et des accessoires.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier le fonctionnement des appareils de mesure et de contr\u00f4le.",
+                "o": false
+              },
+              {
+                "t":
+                    "S'assurer du bon \u00e9tat des dispositifs de s\u00e9curit\u00e9.",
+                "o": false
+              },
+              {
+                "t": "Consigner les renseignements dans le registre.",
+                "o": false
+              },
+              {
+                "t":
+                    "Signaler \u00e0 la personne responsable toute anomalie ou tout besoin de r\u00e9paration.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "807",
+            "n":
+                "Communiquer avec les propri\u00e9taires ou les locataires de m\u00eame qu'avec l'inspectrice ou l'inspecteur municipal",
+            "x": "2",
+            "c": [
+              "Respect des personnes et de leur propri\u00e9t\u00e9.",
+              "\u00c9coute attentive des personnes.",
+              "Pertinence, exactitude et clart\u00e9 de l'information transmise.",
+              "Utilisation d'un langage appropri\u00e9.",
+              "Courtoisie et professionnalisme.",
+              "Maintien de relations harmonieuses."
+            ],
+            "t": [
+              {
+                "t":
+                    "Se pr\u00e9senter \u00e0 la propri\u00e9taire ou au propri\u00e9taire, \u00e0 la locataire ou au locataire.",
+                "o": false
+              },
+              {
+                "t":
+                    "Expliquer la nature de l'intervention et son d\u00e9roulement.",
+                "o": false
+              },
+              {
+                "t":
+                    "R\u00e9pondre aux questions de la cliente ou du client ou de l'inspectrice ou de l'inspecteur municipal.",
+                "o": false
+              },
+              {
+                "t":
+                    "Informer la cliente ou le client de toute particularit\u00e9 ou anomalie observ\u00e9e.",
+                "o": false
+              },
+              {
+                "t":
+                    "Communiquer avec l'inspectrice ou l'inspecteur municipal, au besoin.",
+                "o": false
+              },
+              {
+                "t":
+                    "Faire un compte rendu de l'intervention \u00e0 la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836801",
+            "n": "Remplir la citerne du camion avec de l'eau potable",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des lois et des r\u00e8glements relatifs \u00e0 la qualit\u00e9 de l'eau potable.",
+              "Respect des directives de travail.",
+              "V\u00e9rification rigoureuse de la salubrit\u00e9 des \u00e9quipements.",
+              "Application correcte des proc\u00e9dures de remplissage.",
+              "Pr\u00e9cision du volume d'eau pris en charge.",
+              "Vigilance au regard de la pr\u00e9vention de toute contamination de l'eau.",
+              "Manifestation de son sens des responsabilit\u00e9s."
+            ],
+            "t": [
+              {
+                "t": "Se rendre au lieu de remplissage autoris\u00e9.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier la propret\u00e9 et l'\u00e9tat des boyaux, des raccords et des accessoires.",
+                "o": false
+              },
+              {"t": "Effectuer les raccordements.", "o": false},
+              {"t": "D\u00e9marrer la pompe \u00e0 vide.", "o": false},
+              {
+                "t": "Surveiller le remplissage et le niveau de la citerne.",
+                "o": false
+              },
+              {
+                "t":
+                    "Fermer les vannes et d\u00e9connecter les \u00e9quipements.",
+                "o": false
+              },
+              {
+                "t":
+                    "Lire le volume d'eau sur la jauge ou l'indicateur de niveau.",
+                "o": false
+              },
+              {
+                "t": "Consigner les renseignements dans le registre.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836802",
+            "n": "Remplir le r\u00e9servoir d'eau potable",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des lois et des r\u00e8glements relatifs \u00e0 la qualit\u00e9 de l'eau potable.",
+              "Respect des directives de travail.",
+              "V\u00e9rification rigoureuse de la salubrit\u00e9 des \u00e9quipements.",
+              "Application correcte des proc\u00e9dures de livraison.",
+              "Pr\u00e9cision du volume d'eau livr\u00e9.",
+              "Vigilance au regard de la pr\u00e9vention de toute contamination de l'eau et des installations de la client\u00e8le.",
+              "Manifestation de son sens des responsabilit\u00e9s."
+            ],
+            "t": [
+              {"t": "Se rendre au lieu de livraison.", "o": false},
+              {
+                "t":
+                    "Rep\u00e9rer l'emplacement du r\u00e9servoir ou du point de raccordement.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier la propret\u00e9 et l'\u00e9tat des boyaux, des raccords et des accessoires.",
+                "o": false
+              },
+              {"t": "Effectuer les raccordements.", "o": false},
+              {"t": "D\u00e9marrer la pompe \u00e0 vide.", "o": false},
+              {"t": "Surveiller le transfert.", "o": false},
+              {
+                "t":
+                    "Surveiller le niveau de remplissage du r\u00e9servoir et arr\u00eater le pompage au moment opportun.",
+                "o": false
+              },
+              {"t": "D\u00e9connecter les \u00e9quipements.", "o": false},
+              {
+                "t":
+                    "Lire le volume d'eau livr\u00e9 sur la jauge ou l'indicateur de niveau.",
+                "o": false
+              },
+              {
+                "t": "Consigner les renseignements dans le registre.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836803",
+            "n": "Nettoyer le camion-citerne aspirateur",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des r\u00e8gles d'hygi\u00e8ne ou de salubrit\u00e9.",
+              "Respect des directives de travail.",
+              "Application correcte des proc\u00e9dures de nettoyage et de d\u00e9sinfection.",
+              "Utilisation appropri\u00e9e des produits de nettoyage ou de d\u00e9sinfection.",
+              "Vigilance au regard de la pr\u00e9vention de toute contamination de l'eau et des \u00e9quipements.",
+              "Propret\u00e9 et bon \u00e9tat du camion."
+            ],
+            "t": [
+              {
+                "t":
+                    "Pr\u00e9parer les produits de nettoyage et de d\u00e9sinfection.",
+                "o": false
+              },
+              {"t": "Laver l'ext\u00e9rieur du camion-citerne.", "o": false},
+              {
+                "t":
+                    "Laver et d\u00e9sinfecter l'int\u00e9rieur de la citerne et les accessoires.",
+                "o": false
+              },
+              {
+                "t":
+                    "Rincer la citerne et les accessoires \u00e0 l'eau potable.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier la propret\u00e9 et l'\u00e9tat des \u00e9quipements.",
+                "o": false
+              },
+              {
+                "t": "Consigner les renseignements dans le registre.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836804",
+            "n": "Nettoyer l'\u00e9quipement de pompage",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des r\u00e8gles d'hygi\u00e8ne ou de salubrit\u00e9.",
+              "Respect des directives de travail.",
+              "Application correcte des proc\u00e9dures de nettoyage et de d\u00e9sinfection.",
+              "Utilisation appropri\u00e9e des produits de nettoyage ou de d\u00e9sinfection.",
+              "Vigilance au regard de la pr\u00e9vention de toute contamination de l'eau et des \u00e9quipements.",
+              "Propret\u00e9 et bon \u00e9tat de l'\u00e9quipement."
+            ],
+            "t": [
+              {
+                "t":
+                    "Pr\u00e9parer les produits de nettoyage et de d\u00e9sinfection.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9monter les composants accessibles de la pompe et des accessoires, au besoin.",
+                "o": false
+              },
+              {
+                "t":
+                    "Laver et d\u00e9sinfecter la pompe, les boyaux, les raccords et les autres accessoires.",
+                "o": false
+              },
+              {"t": "Rincer les composants \u00e0 l'eau potable.", "o": false},
+              {
+                "t": "Remonter et remettre en place les composants.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier le fonctionnement de l'\u00e9quipement de pompage.",
+                "o": false
+              },
+              {
+                "t": "Consigner les renseignements dans le registre.",
+                "o": false
+              },
+              {
+                "t":
+                    "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836805",
+            "n":
+                "Assister le personnel municipal dans l'installation et l'utilisation d'un syst\u00e8me de pompage d'appoint",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des lois et r\u00e8glements relatifs \u00e0 l'environnement.",
+              "Respect des r\u00e8gles d'hygi\u00e8ne ou de salubrit\u00e9.",
+              "Respect des limites de son champ d'intervention.",
+              "Respect des directives de travail.",
+              "Application correcte des techniques de travail.",
+              "Utilisation appropri\u00e9e des outils.",
+              "Travail minutieux.",
+              "Propret\u00e9 du syst\u00e8me de pompage.",
+              "\u00c9tanch\u00e9it\u00e9 du syst\u00e8me d'alimentation en eau."
+            ],
+            "t": [
+              {"t": "Aider \u00e0 localiser une source d'eau.", "o": false},
+              {
+                "t":
+                    "Manutentionner l'\u00e9quipement de pompage (pompes, tuyaux, raccords, outils, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "Aider \u00e0 l'installation de la pompe : la mettre en place, assurer sa stabilit\u00e9, fixer des raccords, etc.",
+                "o": false
+              },
+              {
+                "t":
+                    "Aider \u00e0 appliquer des mesures de protection des pompes, des tuyaux, etc.",
+                "o": false
+              },
+              {"t": "D\u00e9tecter des fuites d'eau.", "o": false},
+              {
+                "t":
+                    "Participer \u00e0 la surveillance de la mise en marche du syst\u00e8me de pompage.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "714",
+            "n": "Intervenir lors d'un incident ou d'un probl\u00e8me mineur",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des limites de son champ d'intervention.",
+              "Ma\u00eetrise de soi.",
+              "Promptitude."
+            ],
+            "t": [
+              {
+                "t":
+                    "Reconna\u00eetre un incident ou une situation probl\u00e9matique.",
+                "o": false
+              },
+              {
+                "t":
+                    "Pr\u00e9venir la personne responsable ou composer le num\u00e9ro de l'urgence (310-4141 ou le 911).",
+                "o": false
+              },
+              {
+                "t":
+                    "Rassurer la personne et demeurer avec elle jusqu'\u00e0 l'arriv\u00e9e des secours.",
+                "o": false
+              },
+              {"t": "Aider au maintien de l'ordre.", "o": true},
+              {"t": "Aider \u00e0 disperser un attroupement.", "o": true},
+              {
+                "t":
+                    "Intervenir tout en assurant sa propre s\u00e9curit\u00e9.",
+                "o": false
+              },
+              {
+                "t": "Compl\u00e9ter un rapport d'\u00e9v\u00e9nement.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          }
+        ],
+        "q": []
+      },
+      {
+        "n":
+            "Chauffeuse-op\u00e9ratrice, chauffeur-op\u00e9rateur de camion-citerne aspirateur pour la vidange de fosses septiques",
+        "id": "8369",
+        "s": [
+          {
+            "id": "805",
+            "n":
+                "Commencer et terminer sa journ\u00e9e de travail comme chauffeuse-op\u00e9ratrice ou chauffeur-op\u00e9rateur de camion-citerne aspirateur",
+            "x": "2",
+            "c": [
+              "Respect des directives de travail.",
+              "\u00c9coute attentive des explications.",
+              "Pertinence des questions pos\u00e9es.",
+              "Pr\u00e9sentation d'une image positive de l'\u00e9tablissement.",
+              "Port du macaron d'identification.",
+              "Efficacit\u00e9 du travail."
+            ],
+            "t": [
+              {
+                "t":
+                    "Rev\u00eatir une combinaison \u00e9tanche et porter les autres \u00e9quipements de protection individuelle (gants, bottes de s\u00e9curit\u00e9, lunettes, masque, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "Recevoir les directives relatives \u00e0 l'organisation de la journ\u00e9e de travail (nombre de clients, horaire, itin\u00e9raires, particularit\u00e9s des interventions, etc.).",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier l'exactitude des coordonn\u00e9es des clientes et des clients (nom ou raison sociale, adresse et num\u00e9ro de t\u00e9l\u00e9phone).",
+                "o": false
+              },
+              {"t": "Inscrire les coordonn\u00e9es dans le GPS.", "o": true},
+              {
+                "t":
+                    "Effectuer la v\u00e9rification avant le d\u00e9part du camion-citerne aspirateur.",
+                "o": false
+              },
+              {
+                "t":
+                    "\u00c0 la fin de son quart de travail, v\u00e9rifier l'information inscrite dans le registre au cours de sa tourn\u00e9e et la transmettre \u00e0 la personne responsable.",
+                "o": false
+              },
+              {
+                "t":
+                    "Signaler \u00e0 la personne responsable toute anomalie ou tout incident survenu pendant la journ\u00e9e.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "806",
+            "n": "Inspecter le syst\u00e8me de pompage \u00e0 vide",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des r\u00e8gles d'hygi\u00e8ne ou de salubrit\u00e9.",
+              "Application rigoureuse des proc\u00e9dures d'inspection.",
+              "D\u00e9tection juste des anomalies, des bris ou des signes d'usure.",
+              "Consignation appropri\u00e9e des observations.",
+              "Clart\u00e9 de la communication avec la personne responsable de l'entretien."
+            ],
+            "t": [
+              {
+                "t":
+                    "Inspecter visuellement le camion-citerne et le r\u00e9servoir.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier l'\u00e9tat de la pompe \u00e0 vide, des boyaux, des raccords et des accessoires.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier le fonctionnement des appareils de mesure et de contr\u00f4le.",
+                "o": false
+              },
+              {
+                "t":
+                    "S'assurer du bon \u00e9tat des dispositifs de s\u00e9curit\u00e9.",
+                "o": false
+              },
+              {
+                "t": "Consigner les renseignements dans le registre.",
+                "o": false
+              },
+              {
+                "t":
+                    "Signaler \u00e0 la personne responsable toute anomalie ou tout besoin de r\u00e9paration.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "807",
+            "n":
+                "Communiquer avec les propri\u00e9taires ou les locataires de m\u00eame qu'avec l'inspectrice ou l'inspecteur municipal",
+            "x": "2",
+            "c": [
+              "Respect des personnes et de leur propri\u00e9t\u00e9.",
+              "\u00c9coute attentive des personnes.",
+              "Pertinence, exactitude et clart\u00e9 de l'information transmise.",
+              "Utilisation d'un langage appropri\u00e9.",
+              "Courtoisie et professionnalisme.",
+              "Maintien de relations harmonieuses."
+            ],
+            "t": [
+              {
+                "t":
+                    "Se pr\u00e9senter \u00e0 la propri\u00e9taire ou au propri\u00e9taire, \u00e0 la locataire ou au locataire.",
+                "o": false
+              },
+              {
+                "t":
+                    "Expliquer la nature de l'intervention et son d\u00e9roulement.",
+                "o": false
+              },
+              {
+                "t":
+                    "R\u00e9pondre aux questions de la cliente ou du client ou de l'inspectrice ou de l'inspecteur municipal.",
+                "o": false
+              },
+              {
+                "t":
+                    "Informer la cliente ou le client de toute particularit\u00e9 ou anomalie observ\u00e9e.",
+                "o": false
+              },
+              {
+                "t":
+                    "Communiquer avec l'inspectrice ou l'inspecteur municipal, au besoin.",
+                "o": false
+              },
+              {
+                "t":
+                    "Faire un compte rendu de l'intervention \u00e0 la personne responsable.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836901",
+            "n":
+                "Effectuer la vidange compl\u00e8te d'une fosse de r\u00e9tention ou d'une fosse reli\u00e9e \u00e0 un syst\u00e8me d'\u00e9puration des eaux us\u00e9es",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des r\u00e8gles d'hygi\u00e8ne ou de salubrit\u00e9.",
+              "Respect des lois et des r\u00e8glements relatifs \u00e0 la vidange compl\u00e8te des fosses septiques.",
+              "Respect des directives de travail.",
+              "Interpr\u00e9tation juste des renseignements relatifs au type d'installation septique.",
+              "Application correcte des proc\u00e9dures de vidange.",
+              "Absence de bris \u00e0 la propri\u00e9t\u00e9 et au terrain.",
+              "Vigilance au regard de la pr\u00e9vention des d\u00e9versements accidentels et de la contamination du site.",
+              "Manifestation de son sens des responsabilit\u00e9s."
+            ],
+            "t": [
+              {
+                "t":
+                    "Rep\u00e9rer l'emplacement de la fosse et les acc\u00e8s au site.",
+                "o": true
+              },
+              {
+                "t":
+                    "Constater l'\u00e9tat des lieux : forte pente, terrain mar\u00e9cageux ou sablonneux, etc.",
+                "o": true
+              },
+              {"t": "S\u00e9curiser le secteur d'intervention.", "o": false},
+              {"t": "Ouvrir les couvercles de la fosse.", "o": true},
+              {
+                "t": "\u00c9valuer l'\u00e9tat de la fosse et de son contenu.",
+                "o": false
+              },
+              {
+                "t":
+                    "Mettre en place les boyaux et les raccords n\u00e9cessaires.",
+                "o": false
+              },
+              {"t": "D\u00e9marrer la pompe \u00e0 vide.", "o": false},
+              {
+                "t": "Proc\u00e9der au pompage complet du contenu de la fosse.",
+                "o": false
+              },
+              {"t": "Surveiller le d\u00e9roulement du pompage.", "o": false},
+              {"t": "Refermer la fosse.", "o": false},
+              {"t": "Nettoyer le secteur d'intervention.", "o": false},
+              {
+                "t": "Consigner les renseignements dans le registre.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "836902",
+            "n":
+                "Effectuer la vidange s\u00e9lective d'une fosse reli\u00e9e \u00e0 un syst\u00e8me d'\u00e9puration des eaux us\u00e9es",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des r\u00e8gles d'hygi\u00e8ne ou de salubrit\u00e9.",
+              "Respect des lois et des r\u00e8glements relatifs \u00e0 la vidange compl\u00e8te des fosses septiques.",
+              "Respect des directives de travail.",
+              "Interpr\u00e9tation juste des renseignements relatifs au type d'installation septique.",
+              "Application correcte des proc\u00e9dures de vidange s\u00e9lective.",
+              "Absence de bris \u00e0 la propri\u00e9t\u00e9 et au terrain.",
+              "Vigilance au regard de la pr\u00e9servation de la couche bact\u00e9rienne et des mati\u00e8res solides n\u00e9cessaires au syst\u00e8me d'\u00e9puration.",
+              "Manifestation de son sens des responsabilit\u00e9s."
+            ],
+            "t": [
+              {
+                "t":
+                    "Rep\u00e9rer l'emplacement de la fosse et les acc\u00e8s au site.",
+                "o": false
+              },
+              {
+                "t":
+                    "Constater l'\u00e9tat des lieux : forte pente, terrain mar\u00e9cageux ou sablonneux, etc.",
+                "o": false
+              },
+              {"t": "S\u00e9curiser le secteur d'intervention.", "o": false},
+              {"t": "Ouvrir les couvercles de la fosse.", "o": false},
+              {
+                "t":
+                    "\u00c9valuer la nature des couches pr\u00e9sentes (\u00e9cume, liquide, boue).",
+                "o": false
+              },
+              {
+                "t":
+                    "Mettre en place les boyaux et les raccords n\u00e9cessaires.",
+                "o": false
+              },
+              {"t": "D\u00e9marrer la pompe \u00e0 vide.", "o": false},
+              {
+                "t":
+                    "Proc\u00e9der au pompage en pr\u00e9servant la couche bact\u00e9rienne et les mati\u00e8res solides n\u00e9cessaires au bon fonctionnement du syst\u00e8me.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier le r\u00e9sultat de la vidange s\u00e9lective.",
+                "o": false
+              },
+              {"t": "Refermer la fosse.", "o": false},
+              {"t": "Nettoyer le secteur d'intervention.", "o": false},
+              {
+                "t": "Consigner les renseignements dans le registre.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          },
+          {
+            "id": "836903",
+            "n":
+                "Vider les eaux us\u00e9es dans un \u00e9tang a\u00e9r\u00e9 ou tout autre lieu de traitement",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des lois et r\u00e8glements relatifs au d\u00e9versement des eaux us\u00e9es.",
+              "Respect des consignes d'acc\u00e8s et de circulation sur le site.",
+              "Application correcte des proc\u00e9dures de d\u00e9versement.",
+              "Vigilance au regard de la pr\u00e9vention des d\u00e9versements accidentels et de la contamination du site.",
+              "Manifestation de son sens des responsabilit\u00e9s."
+            ],
+            "t": [
+              {
+                "t": "Se rendre au lieu de traitement autoris\u00e9.",
+                "o": false
+              },
+              {
+                "t":
+                    "Positionner le camion-citerne au point de d\u00e9versement.",
+                "o": false
+              },
+              {
+                "t":
+                    "Mettre en place les boyaux et les raccords n\u00e9cessaires.",
+                "o": false
+              },
+              {
+                "t": "Proc\u00e9der au d\u00e9versement des eaux us\u00e9es.",
+                "o": false
+              },
+              {
+                "t": "Surveiller le d\u00e9roulement du d\u00e9versement.",
+                "o": false
+              },
+              {
+                "t":
+                    "V\u00e9rifier que la citerne est compl\u00e8tement vid\u00e9e.",
+                "o": false
+              },
+              {
+                "t":
+                    "Nettoyer les \u00e9quipements et le secteur d'intervention, au besoin.",
+                "o": false
+              },
+              {
+                "t": "Consigner les renseignements dans le registre.",
+                "o": false
+              }
+            ],
+            "o": false,
+            "r": []
+          },
+          {
+            "id": "714",
+            "n": "Intervenir lors d'un incident ou d'un probl\u00e8me mineur",
+            "x": "2",
+            "c": [
+              "Respect des r\u00e8gles de sant\u00e9 et de s\u00e9curit\u00e9 au travail.",
+              "Respect des directives de travail.",
+              "Respect des limites de son champ d'intervention.",
+              "Ma\u00eetrise de soi.",
+              "Promptitude."
+            ],
+            "t": [
+              {
+                "t":
+                    "Reconna\u00eetre un incident ou une situation probl\u00e9matique.",
+                "o": false
+              },
+              {
+                "t":
+                    "Pr\u00e9venir la personne responsable ou composer le num\u00e9ro de l'urgence (310-4141 ou le 911).",
+                "o": false
+              },
+              {
+                "t":
+                    "Rassurer la personne et demeurer avec elle jusqu'\u00e0 l'arriv\u00e9e des secours.",
+                "o": false
+              },
+              {"t": "Aider au maintien de l'ordre.", "o": true},
+              {"t": "Aider \u00e0 disperser un attroupement.", "o": true},
+              {
+                "t":
+                    "Intervenir tout en assurant sa propre s\u00e9curit\u00e9.",
+                "o": false
+              },
+              {
+                "t": "Compl\u00e9ter un rapport d'\u00e9v\u00e9nement.",
+                "o": false
+              }
+            ],
+            "o": true,
+            "r": []
+          }
+        ],
+        "q": []
       }
     ]
   },
@@ -42908,8 +44271,8 @@ const jobData = [
               {"t": "Remplir le registre des cr\u00e9mations.", "o": false},
               {
                 "t":
-                    "Remettre \u00e0 un seul membre de la famille ou \u00e0 un proche l\u00bfurne ou le reliquaire.",
-                "o": false
+                    "Remettre \u00e0 un seul membre de la famille ou \u00e0 un proche l'urne ou le reliquaire.",
+                "o": true
               }
             ],
             "o": false,
@@ -43575,7 +44938,12 @@ const jobData = [
                     "D\u00e9tecter des probl\u00e8mes et en informer la personne responsable.",
                 "o": false
               },
-              {"t": "Remplir le registre des s\u00e9pultures.", "o": true}
+              {"t": "Remplir le registre des s\u00e9pultures.", "o": true},
+              {
+                "t":
+                    "D\u00e9poser le cercueil sur les sangles du syst\u00e8me de mise en terre",
+                "o": false
+              }
             ],
             "o": false,
             "r": []
@@ -43727,7 +45095,8 @@ const jobData = [
               "Respect des directives de travail.",
               "Interpr\u00e9tation juste du plan ou de la carte du cimeti\u00e8re.",
               "Utilisation appropri\u00e9e d'un logiciel de gestion des registres d'inhumation.",
-              "Utilisation appropri\u00e9e du syst\u00e8me de positionnement GPS."
+              "Utilisation appropri\u00e9e du syst\u00e8me de positionnement GPS.",
+              "Exactitude des renseignements inscrits."
             ],
             "t": [
               {
@@ -43742,7 +45111,7 @@ const jobData = [
                 "o": false
               },
               {"t": "Confirmer les mesures du lot.", "o": false},
-              {"t": "Mesurer l\u00bfemplacement.", "o": false},
+              {"t": "Mesurer l'emplacement.", "o": false},
               {
                 "t":
                     "Sonder le site pour trouver les autres cercueils ou urnes.",
@@ -43823,7 +45192,7 @@ const jobData = [
               "Identification exacte du type de sol.",
               "Application correcte des techniques de travail.",
               "Utilisation appropri\u00e9e d'une pelle.",
-              "Man\u00bfuvres appropri\u00e9es de la r\u00e9trocaveuse.",
+              "Manoeuvres appropri\u00e9es de la r\u00e9trocaveuse.",
               "Pr\u00e9servations des pierres tombales."
             ],
             "t": [
@@ -43834,7 +45203,7 @@ const jobData = [
               },
               {
                 "t":
-                    "Relever le manque d\u00bf\u00e9cart entre les cercueils ou les urnes et en informer la personne responsable.",
+                    "Relever le manque d'\u00e9cart entre les cercueils ou les urnes et en informer la personne responsable.",
                 "o": false
               },
               {
@@ -44004,7 +45373,7 @@ const jobData = [
               "Respect de la dignit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e.",
               "Application correcte des techniques de travail.",
               "Utilisation appropri\u00e9e d'un compacteur \u00e0 plaque vibrante.",
-              "Man\u00bfuvres appropri\u00e9es de la r\u00e9trocaveuse."
+              "Manoeuvres appropri\u00e9es de la r\u00e9trocaveuse."
             ],
             "t": [
               {
@@ -44136,7 +45505,7 @@ const jobData = [
               "Respect des directives de travail.",
               "Respect de la dignit\u00e9 de la personne d\u00e9c\u00e9d\u00e9e.",
               "Application correcte des techniques de travail.",
-              "Man\u00bfuvres appropri\u00e9es de la r\u00e9trocaveuse.",
+              "Manoeuvres appropri\u00e9es de la r\u00e9trocaveuse.",
               "Gestion appropri\u00e9e de ses \u00e9motions."
             ],
             "t": [
