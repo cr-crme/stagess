@@ -23,6 +23,7 @@ Future<void> showInternshipEvaluationFormDialog(
       'Showing InternshipEvaluationFormDialog for internship: $internshipId, editMode: $editMode');
   final internships = InternshipsProvider.of(context, listen: false);
   await internships.fetchData(id: internshipId, fields: FetchableFields.all);
+  if (!context.mounted) return;
 
   final internship = internships.fromId(internshipId);
 

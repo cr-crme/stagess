@@ -37,7 +37,7 @@ enum Response {
   connectionRefused,
 }
 
-const String _currentVersion = '1.1.10';
+const String _currentVersion = '1.1.11';
 
 final _uuid = Uuid();
 
