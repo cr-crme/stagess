@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:stagess_common/models/generic/fetchable_fields.dart';
 import 'package:stagess_common/models/internships/internship.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common/utils.dart';
@@ -21,6 +22,8 @@ Future<void> showInternshipEvaluationFormDialog(
   _logger.info(
       'Showing InternshipEvaluationFormDialog for internship: $internshipId, editMode: $editMode');
   final internships = InternshipsProvider.of(context, listen: false);
+  await internships.fetchData(id: internshipId, fields: FetchableFields.all);
+
   final internship = internships.fromId(internshipId);
 
   if (editMode) {

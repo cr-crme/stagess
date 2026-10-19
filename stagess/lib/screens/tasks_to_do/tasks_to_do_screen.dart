@@ -320,18 +320,19 @@ class _PostInternshipEvaluation extends StatelessWidget {
                 final enterprise = e.enterprise!;
 
                 return _TaskTile(
-                  title: student.fullName,
-                  subtitle: enterprise.name,
-                  student: student,
-                  icon: Icons.rate_review,
-                  iconColor: Colors.blueGrey,
-                  date: internship.endDate,
-                  buttonTitle: 'Évaluer l\'entreprise',
-                  onTap: () => showEnterpriseEvaluationFormDialog(
-                    context,
-                    internshipId: internship.id,
-                  ),
-                );
+                    title: student.fullName,
+                    subtitle: enterprise.name,
+                    student: student,
+                    icon: Icons.rate_review,
+                    iconColor: Colors.blueGrey,
+                    date: internship.endDate,
+                    buttonTitle: 'Évaluer l\'entreprise',
+                    onTap: () => showInternshipEvaluationFormDialog(
+                          context,
+                          internshipId: internship.id,
+                          showEvaluationDialog:
+                              showEnterpriseEvaluationFormDialog,
+                        ));
               })),
       ],
     );

@@ -16,6 +16,7 @@ import 'package:stagess_common_flutter/providers/students_provider.dart';
 import 'package:stagess_common_flutter/providers/teachers_provider.dart';
 import 'package:stagess_common_flutter/widgets/animated_expanding_card.dart';
 import 'package:stagess_common_flutter/widgets/form_dialogs/forms/enterprise_evaluation_form_dialog.dart';
+import 'package:stagess_common_flutter/widgets/form_dialogs/forms/show_forms.dart';
 import 'package:stagess_common_flutter/widgets/sub_title.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -160,8 +161,11 @@ class _InternshipListState extends State<_InternshipList> {
   }
 
   void _evaluateEnterprise(BuildContext context, Internship internship) async {
-    await showEnterpriseEvaluationFormDialog(context,
-        internshipId: internship.id);
+    await showInternshipEvaluationFormDialog(
+      context,
+      internshipId: internship.id,
+      showEvaluationDialog: showEnterpriseEvaluationFormDialog,
+    );
   }
 
   /// Returns if the current teacher can control the internship that has the
