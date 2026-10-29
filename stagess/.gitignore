@@ -67,3 +67,5 @@ lib/localizations/untranslated-messages.txt
 utilities/
 
 coverage/
+# Widget Preview related
+.widget_preview/

@@ -83,7 +83,7 @@
             "program": "stagess_backend/resources/database/reset_database.py",
             "console": "integratedTerminal",
             "env": {
-                "STAGESS_SQL_COMMAND": "<PUT THE SQL COMMAND HERE">",
+                "STAGESS_SQL_COMMAND": "<PUT THE SQL COMMAND HERE>",
                 "STAGESS_SUPERADMIN_EMAIL": "<PUT EMAIL OF THE SUPERADMIN ACCOUNT HERE>",
                 "STAGESS_DATABASE_DEV_DOCKER": "<PUT THE NAME OF THE DEV DOCKER CONTAINER HERE, DO NOT SET IF NO DOCKER IS USED>",
                 "STAGESS_DATABASE_DEV_NAME": "<PUT YOUR DEV DATABASE NAME HERE>",
