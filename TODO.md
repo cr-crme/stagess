@@ -6,7 +6,6 @@ Changer le libellé du message du popup connexion perdue
 Gestion des doublons
 
 
-
 WARNING: 
 Ne fonctionne pas : 1380 grande-allée, terreboone (L'adresse ne possède pas de code postal. Revert commit b94fa87daf8d025042bb696669d0babc86428b2c if we decide to not allow addresses without postal code)
 
