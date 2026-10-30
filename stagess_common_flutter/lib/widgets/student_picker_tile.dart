@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:stagess_common/models/persons/student.dart';
 import 'package:stagess_common_flutter/providers/students_provider.dart';
@@ -78,31 +77,18 @@ class StudentPickerTile extends StatelessWidget {
         text: controller._selection?.fullName ?? '',
       ),
       optionsBuilder: (textEditingValue) {
-        // We kind of hijack this builder to test the current status of the text.
-        // If it fits a student, or if it is empty, we set that value to the
-        // current selection.
-        if (textEditingValue.text.isEmpty) {
-          controller._selection = Student.empty;
-        } else {
-          final selectedStudent = students.firstWhereOrNull(
-            (student) =>
-                student.fullName.toLowerCase() ==
-                textEditingValue.text.toLowerCase(),
-          );
-          if (selectedStudent != null) controller._selection = selectedStudent;
-        }
-        if (onSelected != null) onSelected!(controller._selection);
+        final text = textEditingValue.text.trim();
 
-        // We show everything if there is no text. Otherwise, we show only if
-        // the names containing that approach the text.
-        if (textEditingValue.text.isEmpty) return students;
+        // Suggestions are computed here; selection state should not be mutated,
+        // otherwise the parent widget rebuilds while the dropdown is opening and
+        // Enter/click selection becomes inconsistent.
+        if (text.isEmpty) return students;
+
+        final normalizedText = text.toLowerCase();
         return students.where(
           (student) =>
-              student.fullName.toLowerCase().contains(
-                    textEditingValue.text.toLowerCase(),
-                  ) &&
-              student.fullName.toLowerCase() !=
-                  textEditingValue.text.toLowerCase(),
+              student.fullName.toLowerCase().contains(normalizedText) &&
+              student.fullName.toLowerCase() != normalizedText,
         );
       },
       optionsViewBuilder: (context, onSelected, options) =>
@@ -124,6 +110,7 @@ class StudentPickerTile extends StatelessWidget {
           readOnly: false,
           enabled: editMode,
           style: const TextStyle(color: Colors.black),
+          onFieldSubmitted: (_) => onSubmitted(),
           validator: (value) => isMandatory && (value?.isEmpty ?? true)
               ? 'Sélectionner un·e élève'
               : null,
